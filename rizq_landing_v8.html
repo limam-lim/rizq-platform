@@ -4023,69 +4023,69 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rizq-style-card[data-sty-gender="girls"] .rizq-style-badge{
   color:#8a3a5c;background:#ffffff;border-color:rgba(138,58,92,.28)
 }
-/* شريط «تسوّق حسب الماركة» — شعار + اسم واضحين (أسلوب المتاجر الكبيرة) */
+/* شريط احترافي: صورة الشعار فوق + اختصار الاسم تحت (مثل أمازون / كتالوج الماركات) */
 .rzq-landing-brand-strip-wrap{margin:8px 0 16px}
 .rzq-landing-brand-strip-wrap .rzq-brand-strip-panel{
   background:#fff;
   border:1px solid rgba(15,35,71,.1);
-  border-radius:12px;
-  padding:12px 12px 10px;
-  box-shadow:0 2px 12px rgba(15,35,71,.05)
+  border-radius:14px;
+  padding:14px 14px 12px;
+  box-shadow:0 2px 14px rgba(15,35,71,.05)
 }
-.rzq-landing-brand-strip-wrap .rzq-brand-strip-head{
-  display:flex;align-items:center;justify-content:space-between;
-  margin:0 0 10px;padding:0 2px
-}
+.rzq-landing-brand-strip-wrap .rzq-brand-strip-head{margin:0 0 12px;padding:0 2px}
 .rzq-landing-brand-strip-wrap .rzq-brand-strip-head-label{
-  font-size:14px;font-weight:800;color:#0F2347;letter-spacing:.01em
+  font-size:15px;font-weight:800;color:#0F2347;letter-spacing:.01em
 }
-.rzq-landing-brand-strip-wrap .rzq-brand-strip{
-  display:flex;flex-wrap:nowrap;gap:12px;overflow-x:auto;padding:2px 2px 8px;
+.rzq-landing-brand-strip-wrap .rzq-brand-strip,
+.rzq-landing-brand-strip-wrap .rzq-brand-tile-strip{
+  display:flex;flex-wrap:nowrap;gap:14px;overflow-x:auto;padding:4px 2px 10px;
   -webkit-overflow-scrolling:touch;scrollbar-width:thin
 }
-.rzq-landing-brand-strip-wrap .rzq-brand-strip-btn{
-  flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:8px;width:88px;
-  padding:10px 8px 8px;border:1px solid rgba(15,35,71,.12);border-radius:12px;background:#fafbfc;
+.rzq-brand-tile{
+  flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:8px;
+  width:96px;min-height:118px;padding:12px 8px 10px;
+  border:1px solid rgba(15,35,71,.1);border-radius:14px;background:#fff;
   cursor:pointer;font-family:inherit;color:#0F2347;
-  transition:border-color .2s,box-shadow .2s,transform .15s,background .15s
+  transition:border-color .2s,box-shadow .2s,transform .15s
 }
-.rzq-landing-brand-strip-wrap .rzq-brand-strip-logo{
-  width:52px;height:52px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;
-  background:#fff;border:1px solid rgba(15,35,71,.08);
-  box-shadow:0 1px 4px rgba(15,35,71,.08)
+.rzq-brand-tile-logo{
+  width:64px;height:64px;display:flex;align-items:center;justify-content:center;
+  background:#fff;border-radius:14px
 }
-.rzq-landing-brand-strip-wrap .rzq-brand-strip-logo img{
-  width:48px;height:48px;border-radius:50%;display:block;object-fit:cover
+.rzq-brand-tile-logo img{
+  width:64px;height:64px;display:block;object-fit:contain;border-radius:12px
 }
-.rzq-landing-brand-strip-wrap .rzq-brand-strip-name{
-  font-size:11px;font-weight:800;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;
-  color:#0F2347;line-height:1.25
+.rzq-brand-tile-abbr{
+  font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;
+  color:#111;line-height:1.2
 }
-.rzq-landing-brand-strip-wrap .rzq-brand-strip-btn:hover,
-.rzq-landing-brand-strip-wrap .rzq-brand-strip-btn.is-on{
-  border-color:var(--gold,#C9A84C);background:#fff;
-  box-shadow:0 0 0 2px rgba(201,168,76,.2);transform:translateY(-1px)
+.rzq-brand-tile:hover,
+.rzq-brand-tile.is-on{
+  border-color:var(--gold,#C9A84C);
+  box-shadow:0 4px 16px rgba(15,35,71,.1),0 0 0 2px rgba(201,168,76,.18);
+  transform:translateY(-2px)
 }
-/* شعار الماركة + اسمها فوق نص الإطلالة / نموذج المعرض */
+/* على بطاقة الإطلالة: شعار فوق + اختصار تحت */
 .rizq-style-mosaic{position:relative}
 .rizq-style-brand-row{
-  display:flex;align-items:center;gap:8px;
-  margin:0 0 4px;min-width:0
+  display:flex;align-items:center;justify-content:flex-start;
+  margin:0 0 6px;min-width:0
 }
-.rizq-style-brand-row .rzq-brand-logo-name{
-  display:inline-flex;align-items:center;gap:8px;min-width:0;max-width:100%
+.rizq-style-brand-row .rzq-brand-logo-name.is-stack{
+  display:inline-flex;flex-direction:column;align-items:center;gap:4px;min-width:0
+}
+.rizq-style-brand-row .rzq-brand-logo-name.is-inline{
+  display:inline-flex;flex-direction:row;align-items:center;gap:8px;min-width:0;max-width:100%
 }
 .rizq-style-brand-row .rzq-brand-logo-name-img{
-  width:28px;height:28px;border-radius:50%;flex-shrink:0;display:block;
-  border:1px solid rgba(15,35,71,.12);background:#fff;
-  box-shadow:0 1px 3px rgba(15,35,71,.1)
-}
-.rizq-style-brand-row .rzq-brand-logo-name-text{
-  display:flex;flex-direction:column;min-width:0;gap:0
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;display:block;
+  background:#fff;border:1px solid rgba(15,35,71,.1);
+  box-shadow:0 1px 4px rgba(15,35,71,.08);object-fit:contain
 }
 .rizq-style-brand-row .rzq-brand-logo-name-main{
-  font-size:12px;font-weight:800;color:#0F2347;line-height:1.2;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+  font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  color:#111;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%
 }
 .rizq-style-brand-row .rzq-brand-logo-name-sub{
   font-size:10px;font-weight:600;color:#5b6b85;line-height:1.2;
@@ -6289,7 +6289,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 </div><!-- /#modal -->
 
 <script src="rizq_categories_config.js?v=23.0" defer></script>
-<script src="rizq_brands_catalog.js?v=4" defer></script>
+<script src="rizq_brands_catalog.js?v=5" defer></script>
 <script>
 var isAr = true;
 
@@ -7165,7 +7165,7 @@ function _styBrandLogoNameHtml(ad, fr, opts){
   if(!brandId) return '';
   var modelId = (ad && ad.modelId) || '';
   if(typeof RizqBrands.logoNameHtml === 'function'){
-    return RizqBrands.logoNameHtml(brandId, { fr: !!fr, modelId: modelId, size: opts.size || 28 });
+    return RizqBrands.logoNameHtml(brandId, { fr: !!fr, modelId: modelId, size: opts.size || 36, inline: !!opts.inline });
   }
   if(typeof RizqBrands.chipHtml === 'function'){
     return RizqBrands.chipHtml(brandId, { fr: !!fr, modelId: modelId, size: opts.size || 22 });
@@ -7190,7 +7190,7 @@ function _styBrandChipForLook(items, fr, catKey){
   for(i = 0; i < key.length; i++) hash = ((hash << 5) - hash) + key.charCodeAt(i) | 0;
   brandId = brands[Math.abs(hash) % brands.length].id;
   if(typeof RizqBrands.logoNameHtml === 'function'){
-    return RizqBrands.logoNameHtml(brandId, { fr: !!fr, size: 28 });
+    return RizqBrands.logoNameHtml(brandId, { fr: !!fr, size: 36 });
   }
   return RizqBrands.chipHtml(brandId, { fr: !!fr, size: 22 });
 }
@@ -7422,7 +7422,8 @@ function _fillLandingBrandStrip(mountId, catKey, ariaAr, ariaFr){
     return;
   }
   var html = catKey ? RizqBrands.stripHtml(catKey, fr, {
-    heading: fr ? 'Shop by Brand — logo & name' : 'تسوّق حسب الماركة — الشعار مع الاسم'
+    heading: fr ? 'Shop by Brand' : 'تسوّق حسب الماركة',
+    imgSize: 64
   }) : '';
   if(!html){
     mount.innerHTML = '';

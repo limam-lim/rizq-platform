@@ -1291,9 +1291,9 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_ux_polish.js?v=17.0"></script>
 <script src="rizq_ad_cards.js?v=3.9"></script>
 <script src="rizq_categories_config.js?v=20"></script>
-<script src="rizq_brands_catalog.js?v=4"></script>
+<script src="rizq_brands_catalog.js?v=5"></script>
 <style>
-/* فلتر الماركة — شعار + اسم + أحرف (صفحة كل الإعلانات) */
+/* فلتر الماركة الاحترافي: صورة الشعار فوق + اختصار الاسم تحت + أحرف */
 #brand-filter-section{background:rgba(201,168,76,.04)!important}
 #brand-filter-section .wilaya-select{margin-bottom:8px}
 .rzq-brand-filter-panel{margin:4px 0 0}
@@ -1317,46 +1317,42 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 .rzq-brand-letter-btn.is-on{
   background:linear-gradient(135deg,#1B3A6B,#0f2347);color:#fff;border-color:transparent
 }
-.rzq-brand-filter-list{
-  display:flex;flex-direction:column;gap:4px;max-height:220px;overflow:auto;
-  padding:2px 0 4px;-webkit-overflow-scrolling:touch;scrollbar-width:thin
+.rzq-brand-filter-list.rzq-brand-tile-grid,
+.rzq-brand-tile-grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;
+  max-height:280px;overflow:auto;padding:2px 0 6px;
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin
 }
-.rzq-brand-filter-row{
-  display:flex;align-items:center;gap:8px;width:100%;text-align:start;
-  padding:6px 8px;border:1px solid rgba(27,58,107,.1);border-radius:10px;
-  background:#fff;cursor:pointer;font-family:inherit;color:#0F2347;
-  transition:border-color .15s,box-shadow .15s,background .15s
+.rzq-brand-tile{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  width:100%;min-height:96px;padding:8px 4px 8px;box-sizing:border-box;
+  border:1px solid rgba(27,58,107,.12);border-radius:12px;background:#fff;
+  cursor:pointer;font-family:inherit;color:#111;
+  transition:border-color .15s,box-shadow .15s,transform .15s
 }
-.rzq-brand-filter-row:hover{border-color:rgba(201,168,76,.55);background:#fffcf5}
-.rzq-brand-filter-row.is-on{
+.rzq-brand-tile-logo{
+  width:52px;height:52px;display:flex;align-items:center;justify-content:center
+}
+.rzq-brand-tile-logo img{
+  width:52px;height:52px;display:block;object-fit:contain;border-radius:10px
+}
+.rzq-brand-tile-abbr{
+  font-size:10px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+  max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center
+}
+.rzq-brand-tile:hover{border-color:rgba(201,168,76,.55);background:#fffcf5}
+.rzq-brand-tile.is-on{
   border-color:var(--gold,#C9A84C);background:rgba(201,168,76,.12);
   box-shadow:0 0 0 2px rgba(201,168,76,.15)
 }
-.rzq-brand-filter-logo{
-  width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;
-  background:#f4f6fa;border:1px solid rgba(15,35,71,.08);display:flex;align-items:center;justify-content:center
-}
-.rzq-brand-filter-logo img{width:32px;height:32px;border-radius:50%;display:block;object-fit:cover}
-.rzq-brand-filter-meta{display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0;flex:1}
-.rzq-brand-filter-name{
-  font-size:12px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0
-}
-.rzq-brand-filter-letter{
-  flex-shrink:0;font-size:10px;font-weight:800;color:#5b6b85;
-  background:rgba(27,58,107,.06);border-radius:6px;padding:2px 6px
-}
-.rzq-brand-filter-empty{font-size:11px;color:#5b6b85;padding:10px 4px;text-align:center}
-/* شريط أفقي احتياطي إن استُخدم stripHtml */
+.rzq-brand-filter-empty{font-size:11px;color:#5b6b85;padding:10px 4px;text-align:center;grid-column:1/-1}
 .rzq-brand-strip-panel{margin:0 0 8px}
 .rzq-brand-strip-head{margin:0 0 8px}
 .rzq-brand-strip-head-label{font-size:13px;font-weight:800;color:#0F2347}
-.rzq-brand-strip{display:flex;flex-wrap:nowrap;gap:10px;overflow-x:auto;padding:8px 2px 12px;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
-.rzq-brand-strip-btn{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;width:80px;padding:8px 6px;border:1px solid rgba(27,58,107,.12);border-radius:12px;background:#fafbfc;cursor:pointer;font-family:inherit;color:#0F2347;transition:border-color .2s,box-shadow .2s,transform .15s}
-.rzq-brand-strip-logo{width:48px;height:48px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fff;border:1px solid rgba(15,35,71,.08)}
-.rzq-brand-strip-logo img{width:44px;height:44px;border-radius:50%;display:block;object-fit:cover}
-.rzq-brand-strip-name{font-size:11px;font-weight:800;max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
-.rzq-brand-strip-btn:hover,.rzq-brand-strip-btn.is-on{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.2);transform:translateY(-1px);background:#fff}
-.rzq-brand-strip-btn.is-on{background:rgba(201,168,76,.08)}
+.rzq-brand-strip,.rzq-brand-tile-strip{
+  display:flex;flex-wrap:nowrap;gap:10px;overflow-x:auto;padding:8px 2px 12px;
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin
+}
 </style>
 <script src="rizq_contact_gate.js" defer></script>
 <script>
@@ -3639,7 +3635,7 @@ function _refreshBrandFilterUI(catKey, keepFocus){
           activeId: brandSel.value||'',
           letter: _browseBrandLetter||'',
           query: _browseBrandQuery||'',
-          heading: fr ? 'Logo + brand name' : 'الشعار مع اسم الماركة'
+          heading: fr ? 'Logo on top · short name under' : 'الشعار فوق · اختصار الاسم تحت'
         });
       } else {
         mount.innerHTML=RizqBrands.stripHtml(catKey||'', fr, {

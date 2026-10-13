@@ -1,7 +1,8 @@
 /**
  * rizq_brands_catalog.js — كتالوج الماركات + الموديلات (إلهام Milanuncios / coche.net)
  * سيارات · أزياء · ملابس رياضية · نظارات وإكسسوارات
- * الشعارات: شارات حروف بألوان الماركة (بدون نسخ شعارات تجارية محمية).
+ * العرض الاحترافي: صورة الشعار (شارة) فوق + اختصار الاسم تحتها (مثل المتاجر الكبيرة).
+ * الشارات هندسية أصلية بألوان الماركة — ليست نسخاً لشعارات تجارية محمية.
  */
 (function (global) {
   'use strict';
@@ -802,25 +803,85 @@
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  /** اختصار الاسم تحت صورة الشعار (NIKE / TOYOTA / BMW…) */
+  function abbrName(brand) {
+    if (!brand) return '';
+    if (brand.abbr) return String(brand.abbr).toUpperCase();
+    var fr = String(brand.nameFr || '').trim();
+    if (fr) {
+      var parts = fr.replace(/[^a-zA-Z0-9\s&-]/g, ' ').trim().split(/[\s-]+/).filter(Boolean);
+      if (parts.length) {
+        var main = parts[0];
+        if (main.length <= 2 && parts[1]) main = parts[0] + parts[1];
+        if (main.length > 10) main = main.slice(0, 10);
+        return main.toUpperCase();
+      }
+    }
+    if (brand.letter != null && String(brand.letter).trim() !== '') {
+      return String(brand.letter).toUpperCase();
+    }
+    return String(brand.id || '?').slice(0, 8).toUpperCase();
+  }
+
+  /** رمز داخل الشعار (حروف الشارة) */
+  function markGlyph(brand) {
+    if (!brand) return '?';
+    if (brand.letter != null && String(brand.letter).trim() !== '') {
+      return String(brand.letter).toUpperCase().slice(0, 4);
+    }
+    return abbrName(brand).slice(0, 3);
+  }
+
+  /**
+   * صورة الشعار فقط (شارة ملوّنة). اختصار الاسم يُعرض تحتها في الواجهة.
+   */
   function logoSvg(brand, size) {
-    size = size || 40;
-    var letter = (brand.letter != null && brand.letter !== '')
-      ? brand.letter
-      : String(brand.nameFr || brand.nameAr || '?').slice(0, 2).toUpperCase();
-    var fill = brand.color || '#1B3A6B';
-    var fs = letter.length > 2 ? Math.round(size * 0.28) : Math.round(size * 0.36);
-    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" role="img" aria-label="' + esc(brand.nameFr || brand.nameAr) + '">'
-      + '<circle cx="' + (size / 2) + '" cy="' + (size / 2) + '" r="' + (size / 2) + '" fill="' + esc(fill) + '"/>'
-      + '<text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" fill="#fff" font-family="Georgia,serif" font-weight="700" font-size="' + fs + '">' + esc(letter) + '</text>'
+    size = size || 72;
+    var glyph = markGlyph(brand);
+    var fill = brand.color || '#111111';
+    var isAuto = brand.sector === 'auto';
+    var cx = size / 2;
+    var cy = size / 2;
+    var pad = Math.round(size * 0.08);
+    var mark = size - pad * 2;
+    var fs = glyph.length > 3 ? Math.round(size * 0.2)
+      : glyph.length > 2 ? Math.round(size * 0.24)
+      : Math.round(size * 0.32);
+    var shape;
+    if (isAuto) {
+      shape = '<circle cx="' + cx + '" cy="' + cy + '" r="' + (mark / 2) + '" fill="' + esc(fill) + '"/>'
+        + '<circle cx="' + cx + '" cy="' + cy + '" r="' + (mark / 2 - Math.max(1, size * 0.045)) + '" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="' + Math.max(1, size * 0.028) + '"/>';
+    } else {
+      var r = Math.round(size * 0.16);
+      shape = '<rect x="' + pad + '" y="' + pad + '" width="' + mark + '" height="' + mark + '" rx="' + r + '" fill="' + esc(fill) + '"/>';
+    }
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" role="img" aria-label="' + esc(brand.nameFr || brand.nameAr || glyph) + '">'
+      + shape
+      + '<text x="50%" y="52%" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-family="Arial Black, Helvetica Neue, Arial, sans-serif" font-weight="800" font-size="' + fs + '">' + esc(glyph) + '</text>'
       + '</svg>';
   }
 
   function logoDataUri(brand, size) {
     try {
-      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(logoSvg(brand, size || 64));
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(logoSvg(brand, size || 96));
     } catch (e) {
       return '';
     }
+  }
+
+  /** بلاطة: صورة الشعار فوق + اختصار الاسم تحت */
+  function tileButtonHtml(brand, fr, opts) {
+    opts = opts || {};
+    var on = !!opts.active;
+    var name = displayName(brand, fr);
+    var abbr = abbrName(brand);
+    var size = opts.imgSize || 72;
+    return '<button type="button" class="rzq-brand-tile' + (on ? ' is-on' : '') + '" data-brand-id="' + esc(brand.id) + '" title="' + esc(name) + '" role="listitem" aria-label="' + esc(name) + '" aria-pressed="' + (on ? 'true' : 'false') + '">'
+      + '<span class="rzq-brand-tile-logo">'
+      +   '<img src="' + esc(logoDataUri(brand, size * 2)) + '" alt="' + esc(name) + '" width="' + size + '" height="' + size + '"/>'
+      + '</span>'
+      + '<span class="rzq-brand-tile-abbr">' + esc(abbr) + '</span>'
+      + '</button>';
   }
 
   function listAll() {
@@ -919,23 +980,30 @@
   }
 
   /**
-   * صف واضح: شعار الماركة + اسمها (لبطاقات الإطلالات / المعارض — أسلوب أمازون)
+   * بطاقة مدمجة: الشعار فوق + الاختصار تحت (أو صف أفقي إن opts.inline)
    */
   function logoNameHtml(brandId, opts) {
     opts = opts || {};
     var brand = getById(brandId);
     if (!brand) return '';
     var fr = !!opts.fr;
-    var size = opts.size || 28;
+    var size = opts.size || 36;
     var name = displayName(brand, fr);
+    var abbr = abbrName(brand);
     var model = opts.modelId ? getModel(brandId, opts.modelId) : null;
     var sub = model ? modelName(model, fr) : '';
-    return '<div class="rzq-brand-logo-name" data-brand-id="' + esc(brand.id) + '" title="' + esc(name) + '">'
+    if (opts.inline) {
+      return '<div class="rzq-brand-logo-name is-inline" data-brand-id="' + esc(brand.id) + '" title="' + esc(name) + '">'
+        + '<img class="rzq-brand-logo-name-img" src="' + esc(logoDataUri(brand, size * 2)) + '" alt="' + esc(name) + '" width="' + size + '" height="' + size + '"/>'
+        + '<span class="rzq-brand-logo-name-text">'
+        +   '<span class="rzq-brand-logo-name-main">' + esc(abbr) + '</span>'
+        +   (sub ? '<span class="rzq-brand-logo-name-sub">' + esc(sub) + '</span>' : '')
+        + '</span>'
+        + '</div>';
+    }
+    return '<div class="rzq-brand-logo-name is-stack" data-brand-id="' + esc(brand.id) + '" title="' + esc(name) + '">'
       + '<img class="rzq-brand-logo-name-img" src="' + esc(logoDataUri(brand, size * 2)) + '" alt="' + esc(name) + '" width="' + size + '" height="' + size + '"/>'
-      + '<span class="rzq-brand-logo-name-text">'
-      +   '<span class="rzq-brand-logo-name-main">' + esc(name) + '</span>'
-      +   (sub ? '<span class="rzq-brand-logo-name-sub">' + esc(sub) + '</span>' : '')
-      + '</span>'
+      + '<span class="rzq-brand-logo-name-main">' + esc(abbr) + '</span>'
       + '</div>';
   }
 
@@ -968,7 +1036,7 @@
     return models.length;
   }
 
-  /** شريط شعارات أفقي — كل زر: شعار + اسم واضحين */
+  /** شريط أفقي احترافي: صورة الشعار فوق + اختصار الاسم تحت */
   function stripHtml(catKey, fr, opts) {
     opts = opts || {};
     var brands = forCategory(catKey);
@@ -982,29 +1050,24 @@
       : '';
     return '<div class="rzq-brand-strip-panel">'
       + headHtml
-      + '<div class="rzq-brand-strip" role="list" aria-label="' + esc(head || (fr ? 'Marques' : 'الماركات')) + '">'
+      + '<div class="rzq-brand-strip rzq-brand-tile-strip" role="list" aria-label="' + esc(head || (fr ? 'Marques' : 'الماركات')) + '">'
       + brands.map(function (b) {
-        var on = active && String(active) === String(b.id);
-        var name = displayName(b, fr);
-        return '<button type="button" class="rzq-brand-strip-btn' + (on ? ' is-on' : '') + '" data-brand-id="' + esc(b.id) + '" title="' + esc(name) + '" role="listitem" aria-label="' + esc(name) + '">'
-          + '<span class="rzq-brand-strip-logo">'
-          +   '<img src="' + esc(logoDataUri(b, 96)) + '" alt="' + esc(name) + '" width="48" height="48"/>'
-          + '</span>'
-          + '<span class="rzq-brand-strip-name">' + esc(name) + '</span>'
-          + '</button>';
+        return tileButtonHtml(b, fr, {
+          active: active && String(active) === String(b.id),
+          imgSize: opts.imgSize || 64
+        });
       }).join('')
       + '</div></div>';
   }
 
-  /** حرف أول لاسم الماركة (لاتيني أو عربي) لفلتر الأحرف */
+  /** حرف أول لاختصار الماركة (لاتيني أولاً ليتوافق مع الاختصار تحت الشعار) */
   function brandLetter(brand, fr) {
     var latin = String((brand && brand.nameFr) || '').trim();
     var ar = String((brand && brand.nameAr) || '').trim();
-    var prefer = fr ? (latin || ar) : (ar || latin);
-    if (!prefer) prefer = String((brand && brand.id) || '');
+    var prefer = latin || ar || String((brand && brand.id) || '');
+    if (fr === false && !latin && ar) prefer = ar;
     var ch = prefer.charAt(0);
     if (!ch) return '#';
-    // لاتيني → uppercase؛ عربي يبقى كما هو
     if (/[a-zA-Z]/.test(ch)) return ch.toUpperCase();
     return ch;
   }
@@ -1053,18 +1116,12 @@
       }).join('')
       + '</div>';
 
-    var listHtml = '<div class="rzq-brand-filter-list" role="list" aria-label="' + esc(head) + '">'
+    var listHtml = '<div class="rzq-brand-filter-list rzq-brand-tile-grid" role="list" aria-label="' + esc(head) + '">'
       + (filtered.length ? filtered.map(function (b) {
-        var on = active && String(active) === String(b.id);
-        var name = displayName(b, fr);
-        var L = brandLetter(b, fr);
-        return '<button type="button" class="rzq-brand-filter-row' + (on ? ' is-on' : '') + '" data-brand-id="' + esc(b.id) + '" role="listitem" aria-pressed="' + (on ? 'true' : 'false') + '" title="' + esc(name) + '">'
-          + '<span class="rzq-brand-filter-logo"><img src="' + esc(logoDataUri(b, 72)) + '" alt="' + esc(name) + '" width="32" height="32"/></span>'
-          + '<span class="rzq-brand-filter-meta">'
-          +   '<span class="rzq-brand-filter-name">' + esc(name) + '</span>'
-          +   '<span class="rzq-brand-filter-letter" aria-hidden="true">' + esc(L) + '</span>'
-          + '</span>'
-          + '</button>';
+        return tileButtonHtml(b, fr, {
+          active: active && String(active) === String(b.id),
+          imgSize: 52
+        });
       }).join('') : ('<div class="rzq-brand-filter-empty">' + (fr ? 'No brands for this letter' : 'لا ماركات لهذا الحرف') + '</div>'))
       + '</div>';
 
@@ -1087,6 +1144,7 @@
     getModel: getModel,
     displayName: displayName,
     modelName: modelName,
+    abbrName: abbrName,
     searchMatch: searchMatch,
     findByAlias: findByAlias,
     brandLetter: brandLetter,
@@ -1094,6 +1152,7 @@
     logoDataUri: logoDataUri,
     chipHtml: chipHtml,
     logoNameHtml: logoNameHtml,
+    tileButtonHtml: tileButtonHtml,
     fillBrandSelect: fillBrandSelect,
     fillModelSelect: fillModelSelect,
     stripHtml: stripHtml,

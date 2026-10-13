@@ -54,15 +54,16 @@ assert(logoName.indexOf('data:image/svg+xml') >= 0, 'logoName logo uri');
 
 const strip = B.stripHtml('أزياء', false, { heading: 'تسوّق حسب الماركة' });
 assert(strip.indexOf('تسوّق حسب الماركة') >= 0, 'strip heading');
-assert(strip.indexOf('rzq-brand-strip-logo') >= 0, 'strip logo wrap');
-assert(strip.indexOf('rzq-brand-strip-name') >= 0, 'strip brand name');
+assert(strip.indexOf('rzq-brand-tile-logo') >= 0, 'strip logo tile');
+assert(strip.indexOf('rzq-brand-tile-abbr') >= 0, 'strip abbr under logo');
+assert(B.abbrName(B.getById('nike')) === 'NIKE', 'nike abbr');
 assert(strip.indexOf('data-brand-id="nike"') >= 0, 'strip includes nike');
 
-const fl = B.filterListHtml('سيارات', false, { activeId: 'toyota', letter: 'ت' });
-assert(fl.indexOf('rzq-brand-filter-row') >= 0, 'filter list rows');
+const fl = B.filterListHtml('سيارات', false, { activeId: 'toyota', letter: 'T' });
+assert(fl.indexOf('rzq-brand-tile') >= 0, 'filter brand tiles');
 assert(fl.indexOf('rzq-brand-letter-btn') >= 0, 'filter letter buttons');
-assert(fl.indexOf('تويوتا') >= 0, 'filter list has toyota name');
-assert(fl.indexOf('rzq-brand-filter-logo') >= 0, 'filter list logo');
+assert(fl.indexOf('TOYOTA') >= 0 || fl.indexOf('data-brand-id="toyota"') >= 0, 'filter has toyota');
+assert(fl.indexOf('rzq-brand-tile-logo') >= 0, 'filter tile logo');
 
 const postHtml = fs.readFileSync(path.join(__dirname, '..', 'rizq_post.html'), 'utf8');
 assert(postHtml.includes('rizq_brands_catalog.js'));
