@@ -105,6 +105,34 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .hero-video-card .rzq-iv-frame{border-radius:0;aspect-ratio:16/9;min-height:0;width:100%;box-shadow:none;animation:none}
 .hero-video-card .rzq-iv-badge{display:none}
 .hero-video-card .rzq-iv-src{display:none}
+.hero-video-card .rzq-iv-play-label,
+.hero-video-card .rzq-iv-sound,
+.hero-video-card .rzq-iv-dash-hint{
+  opacity:0!important;transition:opacity .22s ease,transform .22s ease,background .2s ease!important;
+  pointer-events:none!important
+}
+.hero-video-card .rzq-iv-play{
+  opacity:.28;background:rgba(201,168,76,.35)!important;color:rgba(13,27,42,.75)!important;
+  box-shadow:none!important;transition:opacity .22s ease,transform .22s ease,background .2s ease!important
+}
+.hero-video-card:hover .rzq-iv-play-label,
+.hero-video-card:focus-within .rzq-iv-play-label,
+.hero-video-card:hover .rzq-iv-sound.is-on,
+.hero-video-card:focus-within .rzq-iv-sound.is-on,
+.hero-video-card:hover .rzq-iv-dash-hint,
+.hero-video-card:focus-within .rzq-iv-dash-hint{
+  opacity:1!important;pointer-events:auto!important
+}
+.hero-video-card:hover .rzq-iv-play,
+.hero-video-card:focus-within .rzq-iv-play{
+  opacity:1;background:rgba(201,168,76,.92)!important;color:#0D1B2A!important
+}
+@media (hover:none) and (pointer:coarse){
+  .hero-video-card .rzq-iv-play-label,
+  .hero-video-card .rzq-iv-sound.is-on,
+  .hero-video-card .rzq-iv-dash-hint,
+  .hero-video-card .rzq-iv-play{opacity:.95!important;pointer-events:auto!important}
+}
 .hero-video-caption{
   position:absolute;left:10px;right:10px;bottom:10px;z-index:3;
   display:inline-flex;align-items:center;justify-content:center;
