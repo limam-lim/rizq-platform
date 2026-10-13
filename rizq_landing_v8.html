@@ -3953,7 +3953,11 @@ html[dir="ltr"] .rzq-disc-live-head{direction:ltr}
 .rzq-disc-track{display:inline-flex;gap:16px;padding:2px;direction:ltr}
 .rzq-disc-card{flex:0 0 auto;width:210px;background:#fff;border-radius:16px;overflow:hidden;text-decoration:none;box-shadow:0 4px 18px rgba(27,58,107,.1);border:1px solid rgba(27,58,107,.08);transition:transform .25s,box-shadow .25s}
 .rzq-disc-card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(27,58,107,.16)}
-.rzq-disc-img{width:100%;height:120px;background:linear-gradient(135deg,#1B3A6B,#0F2347);overflow:hidden}
+.rzq-disc-img{position:relative;width:100%;height:132px;background:linear-gradient(145deg,#0D1B2A,#1B3A6B);overflow:hidden}
+.rzq-disc-img img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.02);transition:transform .45s ease}
+.rzq-disc-card:hover .rzq-disc-img img{transform:scale(1.06)}
+.rzq-disc-img::after{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(13,27,42,.05) 35%,rgba(13,27,42,.42) 100%)}
+.rzq-disc-img-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:34px;color:rgba(255,255,255,.9);background:radial-gradient(circle at 30% 20%,rgba(201,168,76,.22),transparent 45%),linear-gradient(145deg,#0D1B2A,#1B3A6B)}
 .rzq-disc-body{padding:12px 14px;text-align:left}
 html[dir="rtl"] .rzq-disc-body{text-align:right;direction:rtl}
 html[dir="ltr"] .rzq-disc-body{text-align:left;direction:ltr}
@@ -3981,7 +3985,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rzq-disc-empty-examples .rzq-disc-card:hover{transform:translateY(-2px)}
 .rzq-disc-empty-examples .rzq-disc-badge{background:rgba(15,35,71,.06);color:#0F2347;border-color:rgba(15,35,71,.12)}
 .rzq-disc-ex-label{width:100%;font-size:11.5px;font-weight:700;color:rgba(255,255,255,.72);margin:0 0 2px}
-@media(max-width:640px){.rzq-disc-card{width:170px}.rzq-disc-img{height:100px}}
+@media(max-width:640px){.rzq-disc-card{width:170px}.rzq-disc-img{height:112px}}
 
 /* ── Style Ideas — شريط إطلالات فاخر (هوية رزق كحلي/ذهبي) ── */
 #rizq-styles,#rizq-showroom-models{
@@ -14598,53 +14602,82 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         bizType:'investments' }
     };
 
-    /** معاينات عند الفراغ التام فقط (لا حسابات جاهزة ولا عيّنات عرض) */
+    /** معاينات عند الفراغ التام فقط — بصور غلاف حقيقية مثل واجهة المحل */
     var EMPTY_EXAMPLES = {
       store: [
-        { href:'rizq_store.html?demo=1', nameAr:'محل نموذجي على رزق', nameFr:'Boutique modèle Rizq', tagAr:'إلكترونيات وتقنية', tagFr:'Électronique & tech', icon:'🏪' },
-        { href:'rizq_store.html?demo=1', nameAr:'واجهة محل بالصور والاسم', nameFr:'Vitrine photo + nom', tagAr:'أزياء وموضة', tagFr:'Mode', icon:'👗' }
+        { href:'rizq_store.html?demo=1', nameAr:'محل النور', nameFr:'Boutique Al-Nour', tagAr:'أزياء وعطور وإكسسوارات', tagFr:'Mode, parfums et accessoires', icon:'🏪', cover:'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=640&q=80' },
+        { href:'rizq_store.html?demo=1', nameAr:'واجهة محل بالصور والاسم', nameFr:'Vitrine photo + nom', tagAr:'أزياء وموضة', tagFr:'Mode', icon:'👗', cover:'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=640&q=80' }
       ],
       corp: [
-        { href:'rizq_showroom.html?demo=1', nameAr:'معرض نموذجي على رزق', nameFr:'Showroom modèle Rizq', tagAr:'معارض سيارات', tagFr:'Showroom auto', icon:'🚗' },
-        { href:'rizq_showroom.html?demo=1', nameAr:'كتالوج معرض بالصور', nameFr:'Catalogue showroom', tagAr:'أثاث وإلكترونيات', tagFr:'Meubles & tech', icon:'🏬' }
+        { href:'rizq_showroom.html?demo=1', nameAr:'معرض نموذجي على رزق', nameFr:'Showroom modèle Rizq', tagAr:'معارض سيارات', tagFr:'Showroom auto', icon:'🚗', cover:'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=640&q=80' },
+        { href:'rizq_showroom.html?demo=1', nameAr:'كتالوج معرض بالصور', nameFr:'Catalogue showroom', tagAr:'أثاث وإلكترونيات', tagFr:'Meubles & tech', icon:'🏬', cover:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=640&q=80' }
       ],
       office: [
-        { href:'rizq_office.html?demo=1', nameAr:'مكتب محاماة نموذجي', nameFr:'Cabinet d\'avocats modèle', tagAr:'محامون وقانون', tagFr:'Avocats & droit', icon:'⚖️' },
-        { href:'rizq_office.html?demo=1', nameAr:'مكتب خدمات إدارية', nameFr:'Bureau administratif', tagAr:'خدمات إدارية', tagFr:'Services admin.', icon:'🏛️' }
+        { href:'rizq_office.html?demo=1', nameAr:'مكتب محاماة نموذجي', nameFr:'Cabinet d\'avocats modèle', tagAr:'محامون وقانون', tagFr:'Avocats & droit', icon:'⚖️', cover:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=640&q=80' },
+        { href:'rizq_office.html?demo=1', nameAr:'مكتب خدمات إدارية', nameFr:'Bureau administratif', tagAr:'خدمات إدارية', tagFr:'Services admin.', icon:'🏛️', cover:'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=640&q=80' }
       ]
     };
+
+    var DEMO_COVER_BY_TYPE = {
+      store: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=960&q=80',
+      corp: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=960&q=80',
+      office: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=960&q=80'
+    };
+
+    function safeDiscMediaUrl(u){
+      var s = String(u == null ? '' : u).trim();
+      if(!s || /javascript:/i.test(s) || /[\s<>"']/.test(s)) return '';
+      if(!/^(https?:\/\/|\/|data:image\/)/i.test(s)) return '';
+      return s;
+    }
+    function accountCardMedia(acc, type){
+      if(!acc) return '';
+      var media = safeDiscMediaUrl(acc.cover) || safeDiscMediaUrl(acc.thumb);
+      if(media) return media;
+      var id = String(acc.id || '');
+      if(id === 'demo_store' || id === 'demo_corp' || id === 'demo_office' || id === 'demo_law' || /^acc_promo_/.test(id) || acc.graduationDemo){
+        return DEMO_COVER_BY_TYPE[type] || DEMO_COVER_BY_TYPE.store;
+      }
+      /* محل النور التجريبي غالباً بلا thumb في localStorage */
+      if(type === 'store' && /محل النور|Al-Nour|Al Nour/i.test(String(acc.name || ''))){
+        return DEMO_COVER_BY_TYPE.store;
+      }
+      return '';
+    }
 
     /** احتياطي واجهة إن تعذّر الـ API — نفس أسماء بذور التخرج (acc_grad_*) */
     function showcaseAccounts(type){
       var now = Date.now();
-      var mk = function(id, name, tagline, city, thumb, offsetHrs){
+      var mk = function(id, name, tagline, city, photo, offsetHrs){
+        var media = photo || DEMO_COVER_BY_TYPE[type] || '';
         return {
           id: id, type: type, status: 'approved', graduationDemo: true,
-          name: name, tagline: tagline, city: city, thumb: thumb || '',
+          name: name, tagline: tagline, city: city,
+          cover: media, thumb: media,
           approvedAt: new Date(now - offsetHrs * 3600000).toISOString()
         };
       };
       if(type === 'store'){
         return [
-          mk('acc_grad_store_01', 'تقنية الشنقيط', 'هواتف وإكسسوارات أصلية بأسعار واضحة', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-store01/480/360', 2),
-          mk('acc_grad_store_02', 'أناقة موريتانيا', 'دراعة وأزياء رجالية ونسائية', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-store02/480/360', 8),
-          mk('acc_grad_store_03', 'سوق الأمل للأغذية', 'تموين يومي ومواد غذائية جملة وتجزئة', 'نواذيبو', 'https://picsum.photos/seed/rizq-grad-store03/480/360', 14),
-          mk('acc_grad_store_04', 'ذهبيات روصو', 'ذهب ومجوهرات بأوزان وأسعار معلنة', 'روصو', 'https://picsum.photos/seed/rizq-grad-store04/480/360', 20),
-          mk('acc_grad_store_05', 'بيت الديكور', 'أثاث ومفروشات منزلية عصرية', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-store05/480/360', 30)
+          mk('acc_grad_store_01', 'تقنية الشنقيط', 'هواتف وإكسسوارات أصلية بأسعار واضحة', 'نواكشوط', 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=640&q=80', 2),
+          mk('acc_grad_store_02', 'أناقة موريتانيا', 'دراعة وأزياء رجالية ونسائية', 'نواكشوط', 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=640&q=80', 8),
+          mk('acc_grad_store_03', 'سوق الأمل للأغذية', 'تموين يومي ومواد غذائية جملة وتجزئة', 'نواذيبو', 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=640&q=80', 14),
+          mk('acc_grad_store_04', 'ذهبيات روصو', 'ذهب ومجوهرات بأوزان وأسعار معلنة', 'روصو', 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=640&q=80', 20),
+          mk('acc_grad_store_05', 'بيت الديكور', 'أثاث ومفروشات منزلية عصرية', 'نواكشوط', 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=640&q=80', 30)
         ];
       }
       if(type === 'corp'){
         return [
-          mk('acc_grad_corp_01', 'معرض أمل للسيارات', 'سيارات جديدة ومستعملة موثّقة بالوثائق', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-corp01/480/360', 3),
-          mk('acc_grad_corp_02', 'معرض المحيط للإلكترونيات', 'أجهزة وشاشات وكمبيوترات للجملة والتجزئة', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-corp02/480/360', 12),
-          mk('acc_grad_corp_03', 'معرض الواحة للأثاث', 'أطقم وصالات ومكاتب للشركات والمنازل', 'نواذيبو', 'https://picsum.photos/seed/rizq-grad-corp03/480/360', 22)
+          mk('acc_grad_corp_01', 'معرض أمل للسيارات', 'سيارات جديدة ومستعملة موثّقة بالوثائق', 'نواكشوط', 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=640&q=80', 3),
+          mk('acc_grad_corp_02', 'معرض المحيط للإلكترونيات', 'أجهزة وشاشات وكمبيوترات للجملة والتجزئة', 'نواكشوط', 'https://images.unsplash.com/photo-1498049860655-afd7e5aa8d6f?auto=format&fit=crop&w=640&q=80', 12),
+          mk('acc_grad_corp_03', 'معرض الواحة للأثاث', 'أطقم وصالات ومكاتب للشركات والمنازل', 'نواذيبو', 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=640&q=80', 22)
         ];
       }
       if(type === 'office'){
         return [
-          mk('acc_grad_office_01', 'مكتب أطوار للعقارات', 'بيع وإيجار واستشارات عقارية في كل الولايات', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-office01/480/360', 5),
-          mk('acc_grad_office_02', 'مكتب النخبة للمحاماة', 'استشارات وقضايا مدنية وتجارية', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-office02/480/360', 16),
-          mk('acc_grad_office_03', 'وكالة الصدى الإدارية', 'خدمات إدارية ومعاملات بسرعة ووضوح', 'روصو', 'https://picsum.photos/seed/rizq-grad-office03/480/360', 28)
+          mk('acc_grad_office_01', 'مكتب أطوار للعقارات', 'بيع وإيجار واستشارات عقارية في كل الولايات', 'نواكشوط', 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=640&q=80', 5),
+          mk('acc_grad_office_02', 'مكتب النخبة للمحاماة', 'استشارات وقضايا مدنية وتجارية', 'نواكشوط', 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=640&q=80', 16),
+          mk('acc_grad_office_03', 'وكالة الصدى الإدارية', 'خدمات إدارية ومعاملات بسرعة ووضوح', 'روصو', 'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=640&q=80', 28)
         ];
       }
       return [];
@@ -14699,9 +14732,10 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
     };
 
     function cardHTML(acc, cfg, fr){
-      var img = acc.thumb
-        ? '<img src="'+acc.thumb+'" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover"/>'
-        : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;color:rgba(255,255,255,.85)">'+cfg.icon+'</div>';
+      var media = accountCardMedia(acc, acc && acc.type || cfg.bizType);
+      var img = media
+        ? '<img src="'+esc(media)+'" alt="" loading="lazy" decoding="async"/>'
+        : '<div class="rzq-disc-img-fallback" aria-hidden="true">'+cfg.icon+'</div>';
       var tagline = (acc.tagline||'').slice(0,50);
       return '<a class="rzq-disc-card" href="'+cfg.page+'?id='+encodeURIComponent(acc.id)+'">'
         + '<div class="rzq-disc-img">'+img+'</div>'
@@ -14751,11 +14785,15 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       if(samples.length){
         examples = '<div class="rzq-disc-empty-examples">'
           + '<p class="rzq-disc-ex-label">'+esc(exLabel)+'</p>'
-          + samples.map(function(ex){
+          +           samples.map(function(ex){
             var name = fr ? ex.nameFr : ex.nameAr;
             var tag = fr ? ex.tagFr : ex.tagAr;
+            var cover = safeDiscMediaUrl(ex.cover);
+            var mediaHtml = cover
+              ? '<img src="'+esc(cover)+'" alt="" loading="lazy" decoding="async"/>'
+              : '<div class="rzq-disc-img-fallback" aria-hidden="true">'+ex.icon+'</div>';
             return '<a class="rzq-disc-card" href="'+esc(ex.href)+'">'
-              + '<div class="rzq-disc-img"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:linear-gradient(145deg,#eef2f7,#dfe7f2)">'+ex.icon+'</div></div>'
+              + '<div class="rzq-disc-img">'+mediaHtml+'</div>'
               + '<div class="rzq-disc-body">'
               +   '<div class="rzq-disc-name">'+esc(name)+'</div>'
               +   (tag ? '<div class="rzq-disc-tag">'+esc(tag)+'</div>' : '')
@@ -14867,11 +14905,19 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
           /* صورة اختيارية: الاسم + الجملة يكفيان للظهور الحي */
           return a.status==='approved' && a.type===type && a.name && a.tagline;
         });
-        list.sort(function(a,b){ return new Date(b.approvedAt||0) - new Date(a.approvedAt||0); });
+        list.sort(function(a,b){
+          var am = accountCardMedia(a, type) ? 1 : 0;
+          var bm = accountCardMedia(b, type) ? 1 : 0;
+          if(bm !== am) return bm - am;
+          return new Date(b.approvedAt||0) - new Date(a.approvedAt||0);
+        });
 
         /* إن وُجدت محلات حقيقية → شريط مباشر فقط (تختفي الخلفية والنص الفارغ) */
         if(list.length < DISCOVERY_MIN_READY_ACCOUNTS){
           list = showcaseAccounts(type);
+        } else if(!list.some(function(a){ return !!accountCardMedia(a, type); })){
+          /* حسابات بلا غلاف/صورة → عيّنات مصوّرة حتى لا تبقى بطاقات زرقاء فارغة */
+          list = showcaseAccounts(type).concat(list);
         }
         if(!list.length){
           mountStrip(mount, '', cfg, fr);
@@ -14965,9 +15011,10 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
     function starsHTML(n){ var s=''; var r=Math.round(n); for(var i=1;i<=5;i++) s += (i<=r?'★':'☆'); return s; }
     function topSellerCardHTML(seller, fr){
       var cfg = TYPE_CFG[seller.type] || TYPE_CFG.store;
-      var img = seller.thumb
-        ? '<img src="'+seller.thumb+'" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover"/>'
-        : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;color:rgba(255,255,255,.85)">'+cfg.icon+'</div>';
+      var media = accountCardMedia(seller, seller && seller.type || 'store');
+      var img = media
+        ? '<img src="'+esc(media)+'" alt="" loading="lazy" decoding="async"/>'
+        : '<div class="rzq-disc-img-fallback" aria-hidden="true">'+cfg.icon+'</div>';
       return '<a class="rzq-disc-card" href="'+cfg.page+'?id='+encodeURIComponent(seller.id)+'">'
         + '<div class="rzq-disc-img">'+img+'</div>'
         + '<div class="rzq-disc-body">'
