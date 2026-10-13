@@ -1005,7 +1005,7 @@ footer{
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=29.0" defer></script>
+  <script src="rizq_store_commerce.js?v=29.1" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.0" defer></script>
   <script src="rizq_auth_gate.js?v=23.0" defer></script>
@@ -1464,6 +1464,7 @@ function openQuickView(id, name, price, emoji, cat){
       catalog.push({
         id: k, name: f.name || '', nameF: f.nameF || f.name || '', price: f.price || 0,
         emoji: f.emoji || '📦', cat: f.cat || '',
+        variants: f.variants || ex.variants || '', unit: f.unit || ex.unit || '',
         images: ex.images || [], imgDataArr: ex.images || [],
         desc: ex.desc || '', descF: ex.descFr || '', stock: ex.stock
       });
@@ -1477,6 +1478,8 @@ function openQuickView(id, name, price, emoji, cat){
     price: parseFloat(String(price||'').replace(/[^\d.]/g,'')) || feat.price || 0,
     emoji: emoji || feat.emoji || '📦',
     cat: cat || feat.cat || '',
+    variants: feat.variants || extra.variants || '',
+    unit: feat.unit || extra.unit || '',
     images: images, imgDataArr: images,
     desc: extra.desc || '', descF: extra.descFr || '',
     stock: extra.stock
@@ -1487,8 +1490,8 @@ function openQuickView(id, name, price, emoji, cat){
       fr: fr,
       storeName: storeName,
       catalog: catalog,
-      onAdd: function(p, qty){
-        for(var i=0;i<(qty||1);i++) addToCartStore(p.id);
+      onAdd: function(p, qty, selection){
+        addToCartStore(p.id, qty || 1, selection);
       },
       onWish: function(p){
         var nm = fr ? (p.nameF || p.name) : (p.name || p.nameF || '');
@@ -2028,24 +2031,24 @@ function rizqShare(title, url) {
         promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ'
       };
       var products = [
-        { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 12, desc: '' },
-        { id: 'P2', name: 'عطر شرقي 100مل', nameF: 'Parfum oriental 100ml', price: 18000, cat: 'عطور', emoji: '🧴', stock: 30, desc: '' },
-        { id: 'P3', name: 'حذاء رياضي', nameF: 'Baskets sport', price: 22000, cat: 'أحذية', emoji: '👟', stock: 4, desc: '' },
+        { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 12, variants: 'S, M, L, XL, XXL', unit: 'قطعة', desc: '' },
+        { id: 'P2', name: 'عطر شرقي 100مل', nameF: 'Parfum oriental 100ml', price: 18000, cat: 'عطور', emoji: '🧴', stock: 30, variants: '50مل, 100مل, 200مل', unit: 'زجاجة', desc: '' },
+        { id: 'P3', name: 'حذاء رياضي', nameF: 'Baskets sport', price: 22000, cat: 'أحذية', emoji: '👟', stock: 4, variants: 'مقاس: 39, 40, 41, 42, 43, 44', unit: 'زوج', desc: '' },
         { id: 'P4', name: 'ساعة كلاسيكية', nameF: 'Montre classique', price: 35000, cat: 'إكسسوارات', emoji: '⌚', stock: 8, desc: '' },
         { id: 'P5', name: 'حقيبة جلدية', nameF: 'Sac en cuir', price: 28000, cat: 'إكسسوارات', emoji: '👜', stock: 6, desc: '' },
         { id: 'P6', name: 'نظارة شمسية', nameF: 'Lunettes de soleil', price: 9000, cat: 'إكسسوارات', emoji: '🕶️', stock: 20, desc: '' },
-        { id: 'P7', name: 'قميص قطني', nameF: 'Chemise coton', price: 12000, cat: 'أزياء', emoji: '👔', stock: 15, desc: '' },
-        { id: 'P8', name: 'فستان سهرة', nameF: 'Robe de soirée', price: 55000, cat: 'أزياء', emoji: '👗', stock: 3, desc: '' },
-        { id: 'P9', name: 'صندل صيفي', nameF: 'Sandales été', price: 8000, cat: 'أحذية', emoji: '🩴', stock: 18, desc: '' },
-        { id: 'P10', name: 'عطر نسائي', nameF: 'Parfum femme', price: 21000, cat: 'عطور', emoji: '🌸', stock: 14, desc: '' },
+        { id: 'P7', name: 'قميص قطني', nameF: 'Chemise coton', price: 12000, cat: 'أزياء', emoji: '👔', stock: 15, variants: 'مقاس: S, M, L, XL · لون: أبيض, أزرق, أسود', unit: 'قطعة', desc: '' },
+        { id: 'P8', name: 'فستان سهرة', nameF: 'Robe de soirée', price: 55000, cat: 'أزياء', emoji: '👗', stock: 3, variants: 'S, M, L, XL', unit: 'قطعة', desc: '' },
+        { id: 'P9', name: 'صندل صيفي', nameF: 'Sandales été', price: 8000, cat: 'أحذية', emoji: '🩴', stock: 18, variants: '38, 39, 40, 41, 42', unit: 'زوج', desc: '' },
+        { id: 'P10', name: 'عطر نسائي', nameF: 'Parfum femme', price: 21000, cat: 'عطور', emoji: '🌸', stock: 14, variants: '50مل, 100مل', unit: 'زجاجة', desc: '' },
         { id: 'P11', name: 'سوار ذهب مظهر', nameF: 'Bracelet doré', price: 15000, cat: 'إكسسوارات', emoji: '💍', stock: 9, desc: '' },
-        { id: 'P12', name: 'طقم أطفال', nameF: 'Ensemble enfant', price: 11000, cat: 'أطفال', emoji: '🧸', stock: 11, desc: '' },
-        { id: 'P13', name: 'حذاء رسمي', nameF: 'Chaussures formal', price: 32000, cat: 'أحذية', emoji: '👞', stock: 7, desc: '' },
-        { id: 'P14', name: 'معطف خفيف', nameF: 'Manteau léger', price: 40000, cat: 'أزياء', emoji: '🧥', stock: 5, desc: '' },
-        { id: 'P15', name: 'كريم عناية', nameF: 'Crème soin', price: 7000, cat: 'عطور', emoji: '🧴', stock: 25, desc: '' },
+        { id: 'P12', name: 'طقم أطفال', nameF: 'Ensemble enfant', price: 11000, cat: 'أطفال', emoji: '🧸', stock: 11, variants: '2-3 سنوات, 4-5 سنوات, 6-7 سنوات', unit: 'طقم', desc: '' },
+        { id: 'P13', name: 'حذاء رسمي', nameF: 'Chaussures formal', price: 32000, cat: 'أحذية', emoji: '👞', stock: 7, variants: 'مقاس: 40, 41, 42, 43, 44, 45', unit: 'زوج', desc: '' },
+        { id: 'P14', name: 'معطف خفيف', nameF: 'Manteau léger', price: 40000, cat: 'أزياء', emoji: '🧥', stock: 5, variants: 'M, L, XL, XXL', unit: 'قطعة', desc: '' },
+        { id: 'P15', name: 'كريم عناية', nameF: 'Crème soin', price: 7000, cat: 'عطور', emoji: '🧴', stock: 25, variants: '50مل, 100مل, 200مل', unit: 'علبة', desc: '' },
         { id: 'P16', name: 'لعبة تعليمية', nameF: 'Jouet éducatif', price: 6500, cat: 'أطفال', emoji: '🧩', stock: 16, desc: '' },
         { id: 'P17', name: 'قبعة أنيقة', nameF: 'Casquette chic', price: 4500, cat: 'إكسسوارات', emoji: '🧢', stock: 22, desc: '' },
-        { id: 'P18', name: 'تيشيرت قطن', nameF: 'T-shirt coton', price: 5000, cat: 'أزياء', emoji: '👕', stock: 30, desc: '' }
+        { id: 'P18', name: 'تيشيرت قطن', nameF: 'T-shirt coton', price: 5000, cat: 'أزياء', emoji: '👕', stock: 30, variants: 'S, M, L, XL, XXL', unit: 'قطعة', desc: '' }
       ];
       var demoTopics = window.RizqStoreTopics ? RizqStoreTopics.seedFromProducts(products) : [];
       var frMap = { 'أزياء':'Mode', 'عطور':'Parfums', 'أحذية':'Chaussures', 'إكسسوارات':'Accessoires', 'أطفال':'Enfants' };
@@ -2761,9 +2764,11 @@ function updateCartCount(){
   }
   try{ document.dispatchEvent(new CustomEvent('rizq_cart', { detail: { count: t } })); }catch(e){}
 }
-function addToCartStore(id){
+function addToCartStore(id, qty, selection){
   id = String(id == null ? '' : id);
   if (!id) return false;
+  qty = Math.max(1, Math.min(99, Number(qty) || 1));
+  selection = selection || null;
   var catalog = window.STORE_FEATURED_PRODUCTS || STORE_FEATURED_PRODUCTS || {};
   var p = catalog[id];
   if (!p) {
@@ -2781,7 +2786,10 @@ function addToCartStore(id){
     return false;
   }
   var cart = _storeLoadCart();
-  var lineId = 'store-prod-' + id;
+  var baseId = 'store-prod-' + id;
+  var lineId = (window.RizqStoreCommerce && typeof RizqStoreCommerce.cartLineIdForProduct === 'function')
+    ? RizqStoreCommerce.cartLineIdForProduct(baseId, selection && selection.selected)
+    : baseId;
   var ex = cart.find(function(c){ return String(c.id) === lineId; });
   var sid = window._rizqStoreAccountId || '';
   try {
@@ -2792,27 +2800,38 @@ function addToCartStore(id){
   } catch (e) {}
   var nameEl = document.getElementById('store-name-el') || document.getElementById('store-name');
   var sname = nameEl ? String(nameEl.textContent || '').trim() : '';
-  if (ex) ex.qty = (Number(ex.qty) || 0) + 1;
+  var imgs = (window.RizqStoreCommerce && RizqStoreCommerce.imagesOf) ? RizqStoreCommerce.imagesOf(p) : [];
+  if (ex) ex.qty = Math.min(99, (Number(ex.qty) || 0) + qty);
   // إصلاح تسرب اللغة: كنا نخزّن اسماً واحداً محسوماً وقت الإضافة فقط (name أو
   // nameF)، فإذا بدّل المستخدم اللغة لاحقاً في rizq_cart.html يبقى الاسم القديم
   // ظاهراً. الآن نخزّن كلا الاسمين ليختار cart.html الاسم الصحيح دائماً.
   else {
     cart.push({
       id: lineId,
+      productId: id,
       name: p.name || p.nameF || '',
       nameF: p.nameF || p.name || '',
       price: Number(p.price) || 0,
-      qty: 1,
+      qty: qty,
       emoji: p.emoji || '📦',
       storeId: sid,
       accountId: sid,
       storeName: sname,
-      module: 'store'
+      module: 'store',
+      cat: p.cat || '',
+      variants: p.variants || '',
+      unit: p.unit || '',
+      images: imgs,
+      imgDataArr: imgs,
+      variantKey: (selection && selection.key) || '',
+      variantLabel: (selection && selection.label) || '',
+      selected: (selection && selection.selected) || null
     });
   }
   _storeSaveCart(cart);
   updateCartCount();
   var label = fr ? (p.nameF || p.name || '') : (p.name || p.nameF || '');
+  if (selection && selection.label) label += ' · ' + selection.label;
   showToast((fr ? '✅ Ajouté : ' : '✅ أضيف للسلة: ') + label);
   // اربط روابط السلة في الهيدر بمعرّف المحل بعد أول إضافة
   if (sid && window.RizqStoreCommerce && typeof RizqStoreCommerce.wireStoreLinks === 'function') {

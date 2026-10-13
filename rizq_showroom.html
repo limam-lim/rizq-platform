@@ -1240,7 +1240,7 @@ function openShowroomItemDetail(itemId){
     storeName: sname,
     moduleLabel: _t('بطاقة عرض','Fiche article'),
     pricePeriod: _t('سعر المعرض','Prix showroom'),
-    onAdd: function(p){ addToCartShowroom(p.id); },
+    onAdd: function(p, qty, selection){ addToCartShowroom(p.id, qty || 1, selection); },
     onAsk: function(p){
       var nm = (_lang==='fr' && (p.nameF || p.nameFr)) ? (p.nameF || p.nameFr) : (p.name || '');
       openItemChat(p.id, nm);
@@ -1285,31 +1285,46 @@ function _parsePriceMRU(v){
   return isFinite(n) ? n : 0;
 }
 
-function addToCartShowroom(itemId){
+function addToCartShowroom(itemId, qty, selection){
   var item = (_allItems || []).find(function(it){ return String(it.id) === String(itemId); });
   if(!item) return showToast(_t('❌ العرض غير موجود','❌ Article introuvable'));
+  qty = Math.max(1, Math.min(99, Number(qty) || 1));
+  selection = selection || null;
   var name = (_lang==='fr' && item.nameFr) ? item.nameFr : (item.name || '');
   var price = typeof _parsePriceMRU === 'function' ? _parsePriceMRU(item.price) : (parseFloat(String(item.price||'').replace(/[^\d.]/g,''))||0);
   var cart = [];
   try{ cart = JSON.parse(localStorage.getItem('rizq_cart')||'[]'); }catch(e){ cart = []; }
-  var key = 'showroom-'+String(item.id);
+  var base = 'showroom-'+String(item.id);
+  var key = (window.RizqStoreCommerce && typeof RizqStoreCommerce.cartLineIdForProduct === 'function')
+    ? RizqStoreCommerce.cartLineIdForProduct(base, selection && selection.selected)
+    : base;
   var ex = cart.find(function(c){ return c.id === key; });
   var seller = _acc ? _acc.name : ((document.getElementById('showroom-name')||{}).textContent || '');
-  if(ex) ex.qty = (ex.qty||1) + 1;
+  var imgs = (window.RizqStoreCommerce && RizqStoreCommerce.imagesOf) ? RizqStoreCommerce.imagesOf(item) : [];
+  if(ex) ex.qty = Math.min(99, (ex.qty||1) + qty);
   else cart.push({
     id: key,
+    productId: String(item.id),
     name: item.name || name,
     nameF: item.nameFr || name,
     price: price,
-    qty: 1,
+    qty: qty,
     emoji: item.emoji || '📦',
     storeId: _showroomId || '',
     accountId: _showroomId || '',
     storeName: seller,
-    module: 'showroom'
+    module: 'showroom',
+    cat: item.cat || '',
+    variants: item.variants || '',
+    unit: item.unit || '',
+    images: imgs,
+    imgDataArr: imgs,
+    variantKey: (selection && selection.key) || '',
+    variantLabel: (selection && selection.label) || '',
+    selected: (selection && selection.selected) || null
   });
   try{ localStorage.setItem('rizq_cart', JSON.stringify(cart)); }catch(e){}
-  showToast(_t('✅ أضيف للسلة','✅ Ajouté au panier') + ': ' + name);
+  showToast(_t('✅ أضيف للسلة','✅ Ajouté au panier') + ': ' + name + (selection && selection.label ? (' · ' + selection.label) : ''));
   var cartHref = 'rizq_cart.html?id=' + encodeURIComponent(_showroomId || '') + '&module=showroom';
   ['sr-cart-link', 'sr-cart-btn'].forEach(function(cid){
     var el = document.getElementById(cid);

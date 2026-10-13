@@ -185,6 +185,27 @@
 .rzq-pd-badge.low{color:#b45309;border-color:rgba(180,83,9,.35);background:rgba(180,83,9,.08)}
 .rzq-pd-badge.out{color:#b91c1c;border-color:rgba(185,28,28,.35);background:rgba(185,28,28,.08)}
 
+/* خيارات ديناميكية (مقاس / وزن / لون) بأسلوب أمازون */
+.rzq-pd-variant{margin:0 0 10px}
+.rzq-pd-variant-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.rzq-pd-variant-label{font-size:12.5px;font-weight:700;color:var(--pd-navy)}
+.rzq-pd-variant-label strong{font-weight:900;color:#1a2535}
+.rzq-pd-variant-opts{
+  display:flex;flex-wrap:wrap;gap:6px;
+  max-height:96px;overflow:auto;padding:1px;scrollbar-width:thin;
+}
+.rzq-pd-vopt{
+  min-width:44px;padding:8px 11px;border-radius:8px;
+  border:1.5px solid rgba(27,58,107,.16);background:#fff;
+  color:#1a2535;font:inherit;font-size:12.5px;font-weight:800;
+  cursor:pointer;line-height:1.1;transition:border-color .15s,box-shadow .15s,background .15s;
+}
+.rzq-pd-vopt:hover{border-color:rgba(201,168,76,.55);background:#fffcf5}
+.rzq-pd-vopt.is-selected{
+  border-color:#1B3A6B;box-shadow:0 0 0 1px #1B3A6B;
+  background:linear-gradient(180deg,#fff,#f4f7fc);
+}
+
 .rzq-pd-qty{
   display:flex;align-items:center;gap:8px;margin:0 0 8px;
   font-size:12.5px;color:var(--pd-navy);font-weight:700;

@@ -20,6 +20,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_header.css?v=27.1"/>
+<link rel="stylesheet" href="rizq_product_detail.css?v=29.1"/>
   <link rel="preload" href="rizq_header.js?v=27.0" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title data-t-ar="سلة المشتريات | رزق" data-t-fr="Mon panier | Rizq">سلة المشتريات | رزق</title>
@@ -145,8 +146,11 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 .cart-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;min-width:0}
 .cart-item-name{font-size:13px;font-weight:700;color:#1a2a3a;margin:0;line-height:1.3;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.cart-item{cursor:pointer}
+.cart-item .qty-controls,.cart-item .qty-btn,.cart-item-del{cursor:pointer}
 .cart-item-cat{font-size:10.5px;color:#9aabbb;margin:0;line-height:1.2;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cart-item-variant{font-size:11px;font-weight:700;color:#1B3A6B;margin:0;line-height:1.25}
 .cart-item-price{font-size:12.5px;font-weight:800;color:var(--navy);white-space:nowrap;flex-shrink:0}
 .cart-item-price-old{font-size:10px;color:#9aa;text-decoration:line-through;margin-inline-end:4px}
 .cart-item-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
@@ -467,7 +471,7 @@ main, .page-content.active, .main-content, .results-area,
   
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=29.0" defer></script>
+  <script src="rizq_store_commerce.js?v=29.1" defer></script>
   <script src="rizq_stock.js" defer></script>
   <script src="rizq_account_payments.js?v=28.2" defer></script>
   <script src="rizq_contact_gate.js" defer></script>
@@ -1116,13 +1120,15 @@ function renderCart() {
       ? ('<img src="'+sanitize(safeImg)+'" alt="'+sanitize(__itemName)+'" loading="lazy" decoding="async"/>')
       : sanitize(item.emoji || '📦');
     var safeId = sanitize(String(item.id));
+    var __vLabel = item.variantLabel || '';
     return `
-    <div class="cart-item" id="cart-item-${safeId}" data-cart-id="${safeId}">
+    <div class="cart-item" id="cart-item-${safeId}" data-cart-id="${safeId}" data-cart-open="1" title="${__isAr ? 'اضغط لمراجعة المنتج' : 'Cliquer pour revoir le produit'}">
       <div class="cart-item-img">${thumb}</div>
       <div class="cart-item-info">
         <div class="cart-item-top">
           <div style="min-width:0;flex:1">
             <div class="cart-item-name" title="${sanitize(__itemName)}">${sanitize(__itemName)}</div>
+            ${__vLabel ? `<div class="cart-item-variant">📏 ${sanitize(__vLabel)}</div>` : ''}
             <div class="cart-item-cat">${sanitize(__lineSeller)}</div>
           </div>
           <div class="cart-item-price">${Number(item.price||0).toLocaleString()} MRU</div>
@@ -1165,23 +1171,108 @@ function removeItem(id) {
   showToast(isAr ? '🗑 تم حذف المنتج' : '🗑 Produit supprimé');
 }
 
-/* تفويض أحداث الكمية/الحذف — يتجنب كسر onclick بسبب علامات التنصيص في المعرّف */
+function openCartLineDetail(lineId) {
+  var item = cart.find(function (c) { return String(c.id) === String(lineId); });
+  if (!item || !window.RizqStoreCommerce || typeof RizqStoreCommerce.openProductDetail !== 'function') return;
+  var isAr = document.documentElement.lang !== 'fr';
+  var productId = item.productId || String(item.id || '').replace(/^store-prod-/, '').replace(/__v_.*$/, '');
+  var catalogItem = null;
+  try {
+    var sid = item.storeId || item.accountId || '';
+    if (sid) {
+      var raw = JSON.parse(localStorage.getItem('store_products_' + sid) || '[]');
+      if (Array.isArray(raw)) {
+        catalogItem = raw.find(function (x) { return String(x.id) === String(productId); }) || null;
+      }
+    }
+  } catch (eCat) {}
+  var p = Object.assign({}, catalogItem || {}, {
+    id: productId,
+    name: item.name || (catalogItem && catalogItem.name) || '',
+    nameF: item.nameF || (catalogItem && catalogItem.nameF) || '',
+    price: item.price,
+    emoji: item.emoji || '📦',
+    cat: item.cat || (catalogItem && catalogItem.cat) || '',
+    variants: item.variants || (catalogItem && catalogItem.variants) || '',
+    unit: item.unit || (catalogItem && catalogItem.unit) || '',
+    images: item.images || item.imgDataArr || (catalogItem && (catalogItem.images || catalogItem.imgDataArr)) || [],
+    stock: item.stock != null ? item.stock : (catalogItem && catalogItem.stock)
+  });
+  RizqStoreCommerce.openProductDetail(p, {
+    fr: !isAr,
+    storeName: item.storeName || (isAr ? 'المحل' : 'Boutique'),
+    catalog: [p],
+    qty: item.qty || 1,
+    selected: item.selected || null,
+    selectedVariant: item.variantKey || null,
+    onAdd: function (prod, qty, selection) {
+      var mod = item.module || 'store';
+      var base = (mod === 'showroom' ? 'showroom-' : 'store-prod-') + String(prod.id);
+      var newId = (typeof RizqStoreCommerce.cartLineIdForProduct === 'function')
+        ? RizqStoreCommerce.cartLineIdForProduct(base, selection && selection.selected)
+        : base;
+      var oldIdx = cart.findIndex(function (c) { return String(c.id) === String(lineId); });
+      var imgs = RizqStoreCommerce.imagesOf ? RizqStoreCommerce.imagesOf(prod) : [];
+      var next = {
+        id: newId,
+        productId: String(prod.id),
+        name: prod.name || '',
+        nameF: prod.nameF || '',
+        price: Number(prod.price) || 0,
+        qty: Math.max(1, Number(qty) || 1),
+        emoji: prod.emoji || '📦',
+        storeId: item.storeId || item.accountId || '',
+        accountId: item.accountId || item.storeId || '',
+        storeName: item.storeName || '',
+        module: item.module || 'store',
+        cat: prod.cat || '',
+        variants: prod.variants || '',
+        unit: prod.unit || '',
+        images: imgs,
+        imgDataArr: imgs,
+        variantKey: (selection && selection.key) || '',
+        variantLabel: (selection && selection.label) || '',
+        selected: (selection && selection.selected) || null
+      };
+      if (oldIdx >= 0) {
+        if (String(newId) === String(lineId)) cart[oldIdx] = next;
+        else {
+          cart.splice(oldIdx, 1);
+          var merge = cart.find(function (c) { return String(c.id) === String(newId); });
+          if (merge) merge.qty = Math.min(99, (Number(merge.qty) || 0) + next.qty);
+          else cart.push(next);
+        }
+      } else cart.push(next);
+      saveCart();
+      renderCart();
+      showToast(isAr ? '✅ تم تحديث المنتج في السلة' : '✅ Article mis à jour dans le panier');
+    }
+  });
+}
+
+/* تفويض أحداث الكمية/الحذف/فتح البطاقة — يتجنب كسر onclick بسبب علامات التنصيص في المعرّف */
 (function bindCartItemActions(){
   var list = document.getElementById('cart-items-list');
   if (!list || list._rizqQtyBound) return;
   list._rizqQtyBound = true;
   list.addEventListener('click', function (e) {
     var btn = e.target && e.target.closest ? e.target.closest('[data-qty-delta], [data-cart-remove]') : null;
-    if (!btn || !list.contains(btn)) return;
-    var row = btn.closest('[data-cart-id]');
-    if (!row) return;
-    var id = row.getAttribute('data-cart-id');
-    if (btn.hasAttribute('data-cart-remove')) {
-      removeItem(id);
+    if (btn && list.contains(btn)) {
+      var row = btn.closest('[data-cart-id]');
+      if (!row) return;
+      var id = row.getAttribute('data-cart-id');
+      if (btn.hasAttribute('data-cart-remove')) {
+        removeItem(id);
+        return;
+      }
+      var delta = parseInt(btn.getAttribute('data-qty-delta') || '0', 10);
+      if (delta) changeQty(id, delta);
       return;
     }
-    var delta = parseInt(btn.getAttribute('data-qty-delta') || '0', 10);
-    if (delta) changeQty(id, delta);
+    var openRow = e.target && e.target.closest ? e.target.closest('[data-cart-open][data-cart-id]') : null;
+    if (openRow && list.contains(openRow)) {
+      openCartLineDetail(openRow.getAttribute('data-cart-id'));
+    }
   });
 })();
 
@@ -1352,6 +1443,7 @@ function updateSummary() {
   if (summaryItems) {
     summaryItems.innerHTML = view.map(item => {
       var __sName = isAr ? (item.name || item.nameF) : (item.nameF || item.name);
+      if (item.variantLabel) __sName += ' · ' + item.variantLabel;
       return '<div class="summary-line">'
         + '<span title="'+sanitize(__sName)+'">'+sanitize(__sName)+' ×'+item.qty+'</span>'
         + '<span>'+(item.price*item.qty).toLocaleString()+' MRU</span>'
