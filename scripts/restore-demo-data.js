@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 'use strict';
 /**
- * Restores local showcase/demo data (ads, tenders, investments).
- * Safe for Cloud Agent / local demo — does not wipe accounts.
+ * Restores local showcase/demo data (ads, tenders, investments)
+ * + graduation directory accounts (stores / showrooms / offices).
+ * Safe for Cloud Agent / local demo — does not wipe unrelated accounts.
  *
  *   node scripts/restore-demo-data.js
  */
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { spawnSync } = require('child_process');
 
 const DATA = path.join(__dirname, '..', 'rizq-backend', 'data');
 fs.mkdirSync(DATA, { recursive: true });
@@ -65,9 +67,31 @@ write('investments.json', {
   ],
 });
 
+/* بذور التخرج: محلات/معارض/مكاتب ظاهرة في /api/accounts/public */
+let graduation = null;
+try {
+  const seedJs = path.join(__dirname, '..', 'rizq-backend', 'scripts', 'seed-graduation-demo.js');
+  const r = spawnSync(process.execPath, [seedJs], {
+    cwd: path.join(__dirname, '..', 'rizq-backend'),
+    encoding: 'utf8',
+    env: Object.assign({}, process.env, { NODE_ENV: process.env.NODE_ENV || 'development' })
+  });
+  if (r.status === 0) {
+    const out = String(r.stdout || '');
+    const start = out.indexOf('{');
+    const end = out.lastIndexOf('}');
+    graduation = start >= 0 && end > start ? JSON.parse(out.slice(start, end + 1)) : { ok: true };
+  } else {
+    graduation = { ok: false, error: (r.stderr || r.stdout || '').slice(0, 200) };
+  }
+} catch (e) {
+  graduation = { ok: false, error: String(e && e.message || e) };
+}
+
 console.log(JSON.stringify({
   ads: ads.length,
   activeAds: ads.filter((a) => a.status === 'active').length,
   tenders: 3,
   investments: 3,
+  graduation,
 }, null, 2));

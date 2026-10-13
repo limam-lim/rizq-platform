@@ -1,0 +1,1490 @@
+/**
+ * rizq_brands_catalog.js — كتالوج الماركات + الموديلات (إلهام Milanuncios / coche.net)
+ * سيارات · أزياء · ملابس رياضية · نظارات وإكسسوارات
+ * العرض: شعار الماركة الحقيقي فوق + اسم الماركة تحته.
+ * الشعارات من مصادر عامة (Carlogos / Simple Icons / أيقونة الموقع) مع مونوغرام احتياطي فقط.
+ */
+(function (global) {
+  'use strict';
+
+  function M(id, nameAr, nameFr) {
+    return { id: id, nameAr: nameAr, nameFr: nameFr || nameAr };
+  }
+
+  /** @type {Array<object>} */
+  var BRANDS = [
+    /* ── سيارات ── */
+    {
+      id: 'toyota', nameAr: 'تويوتا', nameFr: 'Toyota', sector: 'auto',
+      categories: ['سيارات'], color: '#EB0A1E', letter: 'T',
+      aliases: ['toyota', 'تويوتا'],
+      models: [
+        M('corolla', 'كورولا', 'Corolla'), M('camry', 'كامري', 'Camry'),
+        M('hilux', 'هايلكس', 'Hilux'), M('rav4', 'RAV4', 'RAV4'),
+        M('land-cruiser', 'لاند كروزر', 'Land Cruiser'), M('yaris', 'ياريس', 'Yaris'),
+        M('prado', 'برادو', 'Prado'), M('fortuner', 'فورتشنر', 'Fortuner')
+      ]
+    },
+    {
+      id: 'mercedes', nameAr: 'مرسيدس-بنز', nameFr: 'Mercedes-Benz', sector: 'auto',
+      categories: ['سيارات'], color: '#333333', letter: 'MB',
+      aliases: ['mercedes', 'benz', 'مرسيدس', 'بنز'],
+      models: [
+        M('a-class', 'الفئة A', 'Classe A'), M('c-class', 'الفئة C', 'Classe C'),
+        M('e-class', 'الفئة E', 'Classe E'), M('s-class', 'الفئة S', 'Classe S'),
+        M('gla', 'GLA', 'GLA'), M('glb', 'GLB', 'GLB'), M('glc', 'GLC', 'GLC'),
+        M('gle', 'GLE', 'GLE'), M('g-class', 'الفئة G', 'Classe G')
+      ]
+    },
+    {
+      id: 'bmw', nameAr: 'بي إم دبليو', nameFr: 'BMW', sector: 'auto',
+      categories: ['سيارات'], color: '#1C69D4', letter: 'BMW',
+      aliases: ['bmw', 'بي ام دبليو', 'بي إم دبليو'],
+      models: [
+        M('serie-1', 'الفئة 1', 'Série 1'), M('serie-3', 'الفئة 3', 'Série 3'),
+        M('serie-5', 'الفئة 5', 'Série 5'), M('x1', 'X1', 'X1'),
+        M('x3', 'X3', 'X3'), M('x5', 'X5', 'X5'), M('x6', 'X6', 'X6')
+      ]
+    },
+    {
+      id: 'hyundai', nameAr: 'هيونداي', nameFr: 'Hyundai', sector: 'auto',
+      categories: ['سيارات'], color: '#002C5F', letter: 'H',
+      aliases: ['hyundai', 'هيونداي', 'هونداي'],
+      models: [
+        M('accent', 'أكسنت', 'Accent'), M('elantra', 'إلنترا', 'Elantra'),
+        M('tucson', 'توسان', 'Tucson'), M('santa-fe', 'سانتا في', 'Santa Fe'),
+        M('creta', 'كريتا', 'Creta'), M('i10', 'i10', 'i10'), M('i20', 'i20', 'i20')
+      ]
+    },
+    {
+      id: 'kia', nameAr: 'كيا', nameFr: 'Kia', sector: 'auto',
+      categories: ['سيارات'], color: '#05141F', letter: 'KIA',
+      aliases: ['kia', 'كيا'],
+      models: [
+        M('picanto', 'بيكانتو', 'Picanto'), M('rio', 'ريو', 'Rio'),
+        M('cerato', 'سيراتو', 'Cerato'), M('sportage', 'سبورتاج', 'Sportage'),
+        M('sorento', 'سورينتو', 'Sorento'), M('seltos', 'سيلتوس', 'Seltos')
+      ]
+    },
+    {
+      id: 'nissan', nameAr: 'نيسان', nameFr: 'Nissan', sector: 'auto',
+      categories: ['سيارات'], color: '#C3002F', letter: 'N',
+      aliases: ['nissan', 'نيسان'],
+      models: [
+        M('sunny', 'صني', 'Sunny'), M('altima', 'التيما', 'Altima'),
+        M('patrol', 'باترول', 'Patrol'), M('xtrail', 'إكس تريل', 'X-Trail'),
+        M('qashqai', 'قاشقاي', 'Qashqai'), M('navara', 'نافارا', 'Navara')
+      ]
+    },
+    {
+      id: 'volkswagen', nameAr: 'فولكسفاغن', nameFr: 'Volkswagen', sector: 'auto',
+      categories: ['سيارات'], color: '#001E50', letter: 'VW',
+      aliases: ['volkswagen', 'vw', 'فولكس', 'فولكسفاغن'],
+      models: [
+        M('golf', 'غولف', 'Golf'), M('polo', 'بولو', 'Polo'),
+        M('passat', 'باسات', 'Passat'), M('tiguan', 'تيغوان', 'Tiguan'),
+        M('touareg', 'طوارق', 'Touareg')
+      ]
+    },
+    {
+      id: 'peugeot', nameAr: 'بيجو', nameFr: 'Peugeot', sector: 'auto',
+      categories: ['سيارات'], color: '#000000', letter: 'PE',
+      aliases: ['peugeot', 'بيجو'],
+      models: [
+        M('208', '208', '208'), M('301', '301', '301'), M('308', '308', '308'),
+        M('2008', '2008', '2008'), M('3008', '3008', '3008'), M('5008', '5008', '5008')
+      ]
+    },
+    {
+      id: 'renault', nameAr: 'رينو', nameFr: 'Renault', sector: 'auto',
+      categories: ['سيارات'], color: '#FFCC33', letter: 'R',
+      aliases: ['renault', 'رينو'],
+      models: [
+        M('clio', 'كليو', 'Clio'), M('megane', 'ميغان', 'Mégane'),
+        M('duster', 'داستر', 'Duster'), M('symbol', 'سيمبول', 'Symbol'),
+        M('captur', 'كابتشر', 'Captur')
+      ]
+    },
+    {
+      id: 'ford', nameAr: 'فورد', nameFr: 'Ford', sector: 'auto',
+      categories: ['سيارات'], color: '#003478', letter: 'F',
+      aliases: ['ford', 'فورد'],
+      models: [
+        M('focus', 'فوكاس', 'Focus'), M('fiesta', 'فييستا', 'Fiesta'),
+        M('ranger', 'رينجر', 'Ranger'), M('explorer', 'إكسبلورر', 'Explorer'),
+        M('edge', 'إيدج', 'Edge')
+      ]
+    },
+    {
+      id: 'chevrolet', nameAr: 'شيفروليه', nameFr: 'Chevrolet', sector: 'auto',
+      categories: ['سيارات'], color: '#D4A017', letter: 'CH',
+      aliases: ['chevrolet', 'chevy', 'شيفروليه', 'شفروليه'],
+      models: [
+        M('spark', 'سبارك', 'Spark'), M('aveo', 'أفيو', 'Aveo'),
+        M('cruze', 'كروز', 'Cruze'), M('captiva', 'كابتيفا', 'Captiva'),
+        M('tahoe', 'تاهو', 'Tahoe'), M('silverado', 'سيلفرادو', 'Silverado')
+      ]
+    },
+    {
+      id: 'dacia', nameAr: 'داسيا', nameFr: 'Dacia', sector: 'auto',
+      categories: ['سيارات'], color: '#6EB52C', letter: 'D',
+      aliases: ['dacia', 'داسيا'],
+      models: [
+        M('logan', 'لوغان', 'Logan'), M('sandero', 'سانديرو', 'Sandero'),
+        M('duster', 'داستر', 'Duster'), M('lodgy', 'لودجي', 'Lodgy')
+      ]
+    },
+    {
+      id: 'honda', nameAr: 'هوندا', nameFr: 'Honda', sector: 'auto',
+      categories: ['سيارات'], color: '#E40521', letter: 'H',
+      aliases: ['honda', 'هوندا'],
+      models: [
+        M('civic', 'سيفيك', 'Civic'), M('accord', 'أكورد', 'Accord'),
+        M('cr-v', 'CR-V', 'CR-V'), M('hr-v', 'HR-V', 'HR-V'), M('city', 'سيتي', 'City')
+      ]
+    },
+    {
+      id: 'mazda', nameAr: 'مازدا', nameFr: 'Mazda', sector: 'auto',
+      categories: ['سيارات'], color: '#910A2D', letter: 'MZ',
+      aliases: ['mazda', 'مازدا'],
+      models: [
+        M('mazda3', 'مازدا 3', 'Mazda3'), M('mazda6', 'مازدا 6', 'Mazda6'),
+        M('cx-5', 'CX-5', 'CX-5'), M('cx-30', 'CX-30', 'CX-30')
+      ]
+    },
+    {
+      id: 'mitsubishi', nameAr: 'ميتسوبيشي', nameFr: 'Mitsubishi', sector: 'auto',
+      categories: ['سيارات'], color: '#E60012', letter: 'M',
+      aliases: ['mitsubishi', 'ميتسوبيشي', 'ميتسبيشي'],
+      models: [
+        M('l200', 'L200', 'L200'), M('pajero', 'باجيرو', 'Pajero'),
+        M('outlander', 'أوتلاندر', 'Outlander'), M('asx', 'ASX', 'ASX')
+      ]
+    },
+    {
+      id: 'suzuki', nameAr: 'سوزوكي', nameFr: 'Suzuki', sector: 'auto',
+      categories: ['سيارات'], color: '#E30613', letter: 'SZ',
+      aliases: ['suzuki', 'سوزوكي'],
+      models: [
+        M('swift', 'سويفت', 'Swift'), M('vitara', 'فيتارا', 'Vitara'),
+        M('jimny', 'جيمني', 'Jimny'), M('dzire', 'ديزاير', 'Dzire')
+      ]
+    },
+    {
+      id: 'audi', nameAr: 'أودي', nameFr: 'Audi', sector: 'auto',
+      categories: ['سيارات'], color: '#BB0A30', letter: 'AU',
+      aliases: ['audi', 'أودي', 'اودي'],
+      models: [
+        M('a3', 'A3', 'A3'), M('a4', 'A4', 'A4'), M('a6', 'A6', 'A6'),
+        M('q3', 'Q3', 'Q3'), M('q5', 'Q5', 'Q5'), M('q7', 'Q7', 'Q7')
+      ]
+    },
+    {
+      id: 'land-rover', nameAr: 'لاند روفر', nameFr: 'Land Rover', sector: 'auto',
+      categories: ['سيارات'], color: '#005A2B', letter: 'LR',
+      aliases: ['land rover', 'landrover', 'لاند روفر', 'رنج روفر'],
+      models: [
+        M('defender', 'ديفندر', 'Defender'), M('discovery', 'ديسكفري', 'Discovery'),
+        M('range-rover', 'رنج روفر', 'Range Rover'), M('evoque', 'إيفوك', 'Evoque')
+      ]
+    },
+    {
+      id: 'jeep', nameAr: 'جيب', nameFr: 'Jeep', sector: 'auto',
+      categories: ['سيارات'], color: '#1C3F24', letter: 'JP',
+      aliases: ['jeep', 'جيب'],
+      models: [
+        M('wrangler', 'رانجلر', 'Wrangler'), M('cherokee', 'شيروكي', 'Cherokee'),
+        M('compass', 'كومباس', 'Compass'), M('grand-cherokee', 'جراند شيروكي', 'Grand Cherokee')
+      ]
+    },
+    {
+      id: 'volvo', nameAr: 'فولفو', nameFr: 'Volvo', sector: 'auto',
+      categories: ['سيارات'], color: '#003057', letter: 'VO',
+      aliases: ['volvo', 'فولفو'],
+      models: [
+        M('xc40', 'XC40', 'XC40'), M('xc60', 'XC60', 'XC60'),
+        M('xc90', 'XC90', 'XC90'), M('s60', 'S60', 'S60')
+      ]
+    },
+    {
+      id: 'skoda', nameAr: 'سكودا', nameFr: 'Škoda', sector: 'auto',
+      categories: ['سيارات'], color: '#4BA82E', letter: 'SK',
+      aliases: ['skoda', 'škoda', 'سكودا'],
+      models: [
+        M('octavia', 'أوكتافيا', 'Octavia'), M('superb', 'سوبيرب', 'Superb'),
+        M('kodiaq', 'كودياك', 'Kodiaq'), M('kamiq', 'كاميك', 'Kamiq')
+      ]
+    },
+    {
+      id: 'opel', nameAr: 'أوبل', nameFr: 'Opel', sector: 'auto',
+      categories: ['سيارات'], color: '#F7D117', letter: 'OP',
+      aliases: ['opel', 'أوبل', 'اوبل'],
+      models: [
+        M('corsa', 'كورسا', 'Corsa'), M('astra', 'أسترا', 'Astra'),
+        M('mokka', 'موكا', 'Mokka'), M('grandland', 'جراندلاند', 'Grandland')
+      ]
+    },
+    {
+      id: 'geely', nameAr: 'جيلي', nameFr: 'Geely', sector: 'auto',
+      categories: ['سيارات'], color: '#003DA5', letter: 'GE',
+      aliases: ['geely', 'جيلي'],
+      models: [
+        M('coolray', 'كولراي', 'Coolray'), M('azkarra', 'أزكارا', 'Azkarra'),
+        M('okavango', 'أوكافانجو', 'Okavango'), M('emgrand', 'إمجراند', 'Emgrand')
+      ]
+    },
+    {
+      id: 'chery', nameAr: 'شيري', nameFr: 'Chery', sector: 'auto',
+      categories: ['سيارات'], color: '#E31C23', letter: 'CH',
+      aliases: ['chery', 'شيري'],
+      models: [
+        M('tiggo-4', 'تيجو 4', 'Tiggo 4'), M('tiggo-7', 'تيجو 7', 'Tiggo 7'),
+        M('tiggo-8', 'تيجو 8', 'Tiggo 8'), M('arrizo', 'أريزو', 'Arrizo')
+      ]
+    },
+    {
+      id: 'byd', nameAr: 'بي واي دي', nameFr: 'BYD', sector: 'auto',
+      categories: ['سيارات'], color: '#FF3300', letter: 'BYD',
+      aliases: ['byd', 'بي واي دي'],
+      models: [
+        M('atto-3', 'أتو 3', 'Atto 3'), M('seal', 'سيل', 'Seal'),
+        M('dolphin', 'دولفين', 'Dolphin'), M('han', 'هان', 'Han')
+      ]
+    },
+    {
+      id: 'tesla', nameAr: 'تيسلا', nameFr: 'Tesla', sector: 'auto',
+      categories: ['سيارات'], color: '#CC0000', letter: 'TS',
+      aliases: ['tesla', 'تيسلا'],
+      models: [
+        M('model-3', 'موديل 3', 'Model 3'), M('model-y', 'موديل Y', 'Model Y'),
+        M('model-s', 'موديل S', 'Model S'), M('model-x', 'موديل X', 'Model X')
+      ]
+    },
+
+    /* ── أزياء وملابس ── */
+    {
+      id: 'nike', nameAr: 'نايك', nameFr: 'Nike', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#111111', letter: 'NK',
+      aliases: ['nike', 'نايك'],
+      models: [
+        M('air-force-1', 'إير فورس 1', 'Air Force 1'), M('air-max', 'إير ماكس', 'Air Max'),
+        M('dunk', 'دانك', 'Dunk'), M('jordan', 'جوردان', 'Jordan'),
+        M('dri-fit', 'دراي فت', 'Dri-FIT'), M('tech-fleece', 'تك فليس', 'Tech Fleece')
+      ]
+    },
+    {
+      id: 'adidas', nameAr: 'أديداس', nameFr: 'Adidas', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#000000', letter: 'AD',
+      aliases: ['adidas', 'أديداس', 'اديداس'],
+      models: [
+        M('ultraboost', 'ألترابوست', 'Ultraboost'), M('samba', 'سامبا', 'Samba'),
+        M('gazelle', 'غزال', 'Gazelle'), M('superstar', 'سوبرستار', 'Superstar'),
+        M('campus', 'كامبوس', 'Campus'), M('originals', 'أوريجينالز', 'Originals')
+      ]
+    },
+    {
+      id: 'puma', nameAr: 'بوما', nameFr: 'Puma', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#000000', letter: 'PU',
+      aliases: ['puma', 'بوما'],
+      models: [
+        M('suede', 'سويد', 'Suede'), M('rs-x', 'RS-X', 'RS-X'),
+        M('speedcat', 'سبيدكات', 'Speedcat'), M('future', 'فيوتشر', 'Future')
+      ]
+    },
+    {
+      id: 'zara', nameAr: 'زارا', nameFr: 'Zara', sector: 'fashion',
+      categories: ['أزياء'], color: '#000000', letter: 'Z',
+      aliases: ['zara', 'زارا'],
+      models: [
+        M('homme', 'رجالي', 'Homme'), M('femme', 'نسائي', 'Femme'),
+        M('kids', 'أطفال', 'Kids'), M('basics', 'أساسيات', 'Basics')
+      ]
+    },
+    {
+      id: 'h-m', nameAr: 'إتش آند إم', nameFr: 'H&M', sector: 'fashion',
+      categories: ['أزياء'], color: '#E50010', letter: 'HM',
+      aliases: ['h&m', 'hm', 'اتش اند ام', 'إتش آند إم'],
+      models: [
+        M('divided', 'ديفايدد', 'Divided'), M('basics', 'أساسيات', 'Basics'),
+        M('kids', 'أطفال', 'Kids'), M('home', 'منزلي', 'Home')
+      ]
+    },
+    {
+      id: 'lc-waikiki', nameAr: 'إل سي واكيكي', nameFr: 'LC Waikiki', sector: 'fashion',
+      categories: ['أزياء'], color: '#0057A0', letter: 'LC',
+      aliases: ['lc waikiki', 'lcw', 'واكيكي', 'إل سي'],
+      models: [
+        M('homme', 'رجالي', 'Homme'), M('femme', 'نسائي', 'Femme'),
+        M('kids', 'أطفال', 'Kids'), M('sports', 'رياضي', 'Sports')
+      ]
+    },
+    {
+      id: 'defacto', nameAr: 'ديفاكتو', nameFr: 'DeFacto', sector: 'fashion',
+      categories: ['أزياء'], color: '#111111', letter: 'DF',
+      aliases: ['defacto', 'ديفاكتو'],
+      models: [
+        M('homme', 'رجالي', 'Homme'), M('femme', 'نسائي', 'Femme'),
+        M('kids', 'أطفال', 'Kids')
+      ]
+    },
+    {
+      id: 'gucci', nameAr: 'غوتشي', nameFr: 'Gucci', sector: 'fashion',
+      categories: ['أزياء'], color: '#006341', letter: 'GG',
+      aliases: ['gucci', 'غوتشي', 'جوتشي'],
+      models: [
+        M('bags', 'حقائب', 'Sacs'), M('shoes', 'أحذية', 'Chaussures'),
+        M('ready-to-wear', 'ملابس جاهزة', 'Prêt-à-porter'), M('accessories', 'إكسسوارات', 'Accessoires')
+      ]
+    },
+    {
+      id: 'mango', nameAr: 'مانجو', nameFr: 'Mango', sector: 'fashion',
+      categories: ['أزياء'], color: '#E87722', letter: 'MG',
+      aliases: ['mango', 'مانجو'],
+      models: [
+        M('femme', 'نسائي', 'Femme'), M('homme', 'رجالي', 'Homme'), M('kids', 'أطفال', 'Kids')
+      ]
+    },
+    {
+      id: 'pull-bear', nameAr: 'بول آند بير', nameFr: 'Pull&Bear', sector: 'fashion',
+      categories: ['أزياء'], color: '#111111', letter: 'PB',
+      aliases: ['pull&bear', 'pull and bear', 'بول اند بير', 'بول آند بير'],
+      models: [
+        M('homme', 'رجالي', 'Homme'), M('femme', 'نسائي', 'Femme')
+      ]
+    },
+    {
+      id: 'bershka', nameAr: 'بيرشكا', nameFr: 'Bershka', sector: 'fashion',
+      categories: ['أزياء'], color: '#00A0E3', letter: 'BK',
+      aliases: ['bershka', 'بيرشكا'],
+      models: [
+        M('femme', 'نسائي', 'Femme'), M('homme', 'رجالي', 'Homme')
+      ]
+    },
+    {
+      id: 'uniqlo', nameAr: 'يونيكلو', nameFr: 'Uniqlo', sector: 'fashion',
+      categories: ['أزياء'], color: '#FF0000', letter: 'UQ',
+      aliases: ['uniqlo', 'يونيكلو'],
+      models: [
+        M('ut', 'UT', 'UT'), M('airism', 'إيريزم', 'AIRism'), M('heattech', 'هيت تك', 'HEATTECH')
+      ]
+    },
+    {
+      id: 'guess', nameAr: 'جيس', nameFr: 'Guess', sector: 'fashion',
+      categories: ['أزياء'], color: '#C4A35A', letter: 'GU',
+      aliases: ['guess', 'جيس'],
+      models: [
+        M('jeans', 'جينز', 'Jeans'), M('bags', 'حقائب', 'Sacs'), M('watches', 'ساعات', 'Montres')
+      ]
+    },
+    {
+      id: 'calvin-klein', nameAr: 'كالفن كلاين', nameFr: 'Calvin Klein', sector: 'fashion',
+      categories: ['أزياء'], color: '#111111', letter: 'CK',
+      aliases: ['calvin klein', 'ck', 'كالفن كلاين'],
+      models: [
+        M('underwear', 'داخلي', 'Underwear'), M('jeans', 'جينز', 'Jeans'), M('perfume', 'عطور', 'Parfum')
+      ]
+    },
+    {
+      id: 'tommy-hilfiger', nameAr: 'تومي هيلفيغر', nameFr: 'Tommy Hilfiger', sector: 'fashion',
+      categories: ['أزياء'], color: '#001F5B', letter: 'TH',
+      aliases: ['tommy', 'tommy hilfiger', 'تومي', 'تومي هيلفيغر'],
+      models: [
+        M('polo', 'بولو', 'Polo'), M('denim', 'دينيم', 'Denim'), M('kids', 'أطفال', 'Kids')
+      ]
+    },
+    {
+      id: 'lacoste', nameAr: 'لاكوست', nameFr: 'Lacoste', sector: 'fashion',
+      categories: ['أزياء', 'رياضة'], color: '#004D28', letter: 'LA',
+      aliases: ['lacoste', 'لاكوست'],
+      models: [
+        M('polo', 'بولو', 'Polo'), M('sneakers', 'سنيكرز', 'Sneakers'), M('tennis', 'تنس', 'Tennis')
+      ]
+    },
+    {
+      id: 'levis', nameAr: 'ليفايز', nameFr: "Levi's", sector: 'fashion',
+      categories: ['أزياء'], color: '#C41230', letter: 'LV',
+      aliases: ['levis', "levi's", 'ليفايز', 'ليفي'],
+      models: [
+        M('501', '501', '501'), M('511', '511', '511'), M('trucker', 'تراكر', 'Trucker')
+      ]
+    },
+    {
+      id: 'ralph-lauren', nameAr: 'رالف لورين', nameFr: 'Ralph Lauren', sector: 'fashion',
+      categories: ['أزياء'], color: '#00205B', letter: 'RL',
+      aliases: ['ralph lauren', 'polo ralph', 'رالف لورين'],
+      models: [
+        M('polo', 'بولو', 'Polo'), M('oxford', 'أكسفورد', 'Oxford'), M('kids', 'أطفال', 'Kids')
+      ]
+    },
+    {
+      id: 'chanel', nameAr: 'شانيل', nameFr: 'Chanel', sector: 'fashion',
+      categories: ['أزياء'], color: '#111111', letter: 'CH',
+      aliases: ['chanel', 'شانيل'],
+      models: [
+        M('bags', 'حقائب', 'Sacs'), M('perfume', 'عطور', 'Parfum'), M('ready-to-wear', 'ملابس', 'Prêt-à-porter')
+      ]
+    },
+    {
+      id: 'louis-vuitton', nameAr: 'لويس فويتون', nameFr: 'Louis Vuitton', sector: 'fashion',
+      categories: ['أزياء'], color: '#8B5A2B', letter: 'LV',
+      aliases: ['louis vuitton', 'lv', 'لويس فويتون', 'لويس فيتون'],
+      models: [
+        M('bags', 'حقائب', 'Sacs'), M('sneakers', 'سنيكرز', 'Sneakers'), M('accessories', 'إكسسوارات', 'Accessoires')
+      ]
+    },
+    {
+      id: 'prada', nameAr: 'برادا', nameFr: 'Prada', sector: 'fashion',
+      categories: ['أزياء'], color: '#111111', letter: 'PR',
+      aliases: ['prada', 'برادا'],
+      models: [
+        M('bags', 'حقائب', 'Sacs'), M('shoes', 'أحذية', 'Chaussures'), M('eyewear', 'نظارات', 'Lunettes')
+      ]
+    },
+    {
+      id: 'dior', nameAr: 'ديور', nameFr: 'Dior', sector: 'fashion',
+      categories: ['أزياء'], color: '#111111', letter: 'DI',
+      aliases: ['dior', 'ديور'],
+      models: [
+        M('bags', 'حقائب', 'Sacs'), M('perfume', 'عطور', 'Parfum'), M('makeup', 'مكياج', 'Maquillage')
+      ]
+    },
+    {
+      id: 'new-balance', nameAr: 'نيو بالانس', nameFr: 'New Balance', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#CF0A2C', letter: 'NB',
+      aliases: ['new balance', 'nb', 'نيو بالانس'],
+      models: [
+        M('574', '574', '574'), M('550', '550', '550'), M('327', '327', '327'), M('990', '990', '990')
+      ]
+    },
+    {
+      id: 'under-armour', nameAr: 'أندر آرمر', nameFr: 'Under Armour', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#1D1D1D', letter: 'UA',
+      aliases: ['under armour', 'ua', 'أندر آرمر', 'اندر ارمر'],
+      models: [
+        M('hovr', 'هوفر', 'HOVR'), M('curry', 'كوري', 'Curry'), M('heatgear', 'هيت جير', 'HeatGear')
+      ]
+    },
+    {
+      id: 'reebok', nameAr: 'ريبوك', nameFr: 'Reebok', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#E31C23', letter: 'RB',
+      aliases: ['reebok', 'ريبوك'],
+      models: [
+        M('classic', 'كلاسيك', 'Classic'), M('nano', 'نانو', 'Nano'), M('club-c', 'كلوب C', 'Club C')
+      ]
+    },
+    {
+      id: 'converse', nameAr: 'كونفيرس', nameFr: 'Converse', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#111111', letter: 'CV',
+      aliases: ['converse', 'كونفيرس', 'كونفرس'],
+      models: [
+        M('chuck-70', 'تشاك 70', 'Chuck 70'), M('all-star', 'أول ستار', 'All Star'), M('run-star', 'ران ستار', 'Run Star')
+      ]
+    },
+    {
+      id: 'vans', nameAr: 'فانس', nameFr: 'Vans', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#C41E3A', letter: 'VN',
+      aliases: ['vans', 'فانس'],
+      models: [
+        M('old-skool', 'أولد سكول', 'Old Skool'), M('sk8-hi', 'SK8-Hi', 'SK8-Hi'), M('authentic', 'أوثنتيك', 'Authentic')
+      ]
+    },
+    {
+      id: 'asics', nameAr: 'أسيكس', nameFr: 'ASICS', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#001E62', letter: 'AS',
+      aliases: ['asics', 'أسيكس', 'اسيكس'],
+      models: [
+        M('gel-kayano', 'جيل كايانو', 'Gel-Kayano'), M('gel-nimbus', 'جيل نمبس', 'Gel-Nimbus'), M('gt-2000', 'GT-2000', 'GT-2000')
+      ]
+    },
+    {
+      id: 'skechers', nameAr: 'سكيتشرز', nameFr: 'Skechers', sector: 'sports',
+      categories: ['أزياء', 'رياضة'], color: '#111111', letter: 'SK',
+      aliases: ['skechers', 'سكيتشرز'],
+      models: [
+        M('go-walk', 'جو ووك', 'Go Walk'), M('d-lites', 'دي لايتس', 'D-Lites'), M('arch-fit', 'آرتش فت', 'Arch Fit')
+      ]
+    },
+
+    /* ── نظارات وإكسسوارات ── */
+    {
+      id: 'ray-ban', nameAr: 'راي بان', nameFr: 'Ray-Ban', sector: 'eyewear',
+      categories: ['أزياء'], color: '#ED1C24', letter: 'RB',
+      aliases: ['ray-ban', 'rayban', 'راي بان'],
+      models: [
+        M('aviator', 'أفياتور', 'Aviator'), M('wayfarer', 'وايفارير', 'Wayfarer'),
+        M('clubmaster', 'كلوب ماستر', 'Clubmaster'), M('erika', 'إريكا', 'Erika')
+      ]
+    },
+    {
+      id: 'oakley', nameAr: 'أوكلي', nameFr: 'Oakley', sector: 'eyewear',
+      categories: ['أزياء', 'رياضة'], color: '#000000', letter: 'OK',
+      aliases: ['oakley', 'اوكلي', 'أوكلي'],
+      models: [
+        M('holbrook', 'هولبروك', 'Holbrook'), M('frogskins', 'فروغ سكينز', 'Frogskins'),
+        M('radar', 'رادار', 'Radar'), M('sutro', 'سوترو', 'Sutro')
+      ]
+    },
+    {
+      id: 'persol', nameAr: 'بيرسول', nameFr: 'Persol', sector: 'eyewear',
+      categories: ['أزياء'], color: '#6B3A2A', letter: 'PO',
+      aliases: ['persol', 'بيرسول'],
+      models: [
+        M('649', '649', '649'), M('714', '714', '714'), M('po9649', 'PO9649', 'PO9649')
+      ]
+    },
+    {
+      id: 'carrera', nameAr: 'كاريرا', nameFr: 'Carrera', sector: 'eyewear',
+      categories: ['أزياء'], color: '#E30613', letter: 'CA',
+      aliases: ['carrera', 'كاريرا'],
+      models: [
+        M('champion', 'شامبيون', 'Champion'), M('safari', 'سفاري', 'Safari'),
+        M('panamerika', 'باناميريكا', 'Panamerika')
+      ]
+    },
+    {
+      id: 'police', nameAr: 'بوليس', nameFr: 'Police', sector: 'eyewear',
+      categories: ['أزياء'], color: '#111111', letter: 'PL',
+      aliases: ['police', 'بوليس'],
+      models: [
+        M('origins', 'أوريجينز', 'Origins'), M('lifestyle', 'لايف ستايل', 'Lifestyle')
+      ]
+    },
+    {
+      id: 'tom-ford', nameAr: 'توم فورد', nameFr: 'Tom Ford', sector: 'eyewear',
+      categories: ['أزياء'], color: '#111111', letter: 'TF',
+      aliases: ['tom ford', 'توم فورد'],
+      models: [
+        M('ft', 'FT', 'FT'), M('private', 'برايفت', 'Private')
+      ]
+    },
+
+    /* ── إلكترونيات شائعة (ماركة فقط + خطوط) ── */
+    {
+      id: 'apple', nameAr: 'آبل', nameFr: 'Apple', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#555555', letter: 'AP',
+      aliases: ['apple', 'آبل', 'ابل', 'آيفون'],
+      models: [
+        M('iphone-15', 'آيفون 15', 'iPhone 15'), M('iphone-14', 'آيفون 14', 'iPhone 14'),
+        M('iphone-13', 'آيفون 13', 'iPhone 13'), M('ipad', 'آيباد', 'iPad'),
+        M('macbook', 'ماك بوك', 'MacBook'), M('airpods', 'إيربودز', 'AirPods'),
+        M('watch', 'ساعة', 'Watch')
+      ]
+    },
+    {
+      id: 'samsung', nameAr: 'سامسونج', nameFr: 'Samsung', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#1428A0', letter: 'S',
+      aliases: ['samsung', 'سامسونج'],
+      models: [
+        M('galaxy-s24', 'Galaxy S24', 'Galaxy S24'), M('galaxy-s23', 'Galaxy S23', 'Galaxy S23'),
+        M('galaxy-a', 'Galaxy A', 'Galaxy A'), M('galaxy-tab', 'Galaxy Tab', 'Galaxy Tab'),
+        M('galaxy-watch', 'Galaxy Watch', 'Galaxy Watch'), M('buds', 'Buds', 'Buds')
+      ]
+    },
+    {
+      id: 'xiaomi', nameAr: 'شاومي', nameFr: 'Xiaomi', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#FF6900', letter: 'MI',
+      aliases: ['xiaomi', 'mi', 'شاومي'],
+      models: [
+        M('redmi', 'ريدمي', 'Redmi'), M('poco', 'بوكو', 'POCO'),
+        M('note', 'نوت', 'Note'), M('mi-tv', 'تلفزيون', 'Mi TV')
+      ]
+    },
+    {
+      id: 'huawei', nameAr: 'هواوي', nameFr: 'Huawei', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#CF0A2C', letter: 'HW',
+      aliases: ['huawei', 'هواوي'],
+      models: [
+        M('p-series', 'سلسلة P', 'P Series'), M('mate', 'ميت', 'Mate'),
+        M('nova', 'نوفا', 'Nova'), M('watch-gt', 'Watch GT', 'Watch GT')
+      ]
+    },
+    {
+      id: 'oppo', nameAr: 'أوبو', nameFr: 'OPPO', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#1BA784', letter: 'OP',
+      aliases: ['oppo', 'أوبو', 'اوبو'],
+      models: [
+        M('find-x', 'Find X', 'Find X'), M('reno', 'رينو', 'Reno'), M('a-series', 'سلسلة A', 'A Series')
+      ]
+    },
+    {
+      id: 'vivo', nameAr: 'فيفو', nameFr: 'vivo', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#415FFF', letter: 'VI',
+      aliases: ['vivo', 'فيفو'],
+      models: [
+        M('x-series', 'سلسلة X', 'X Series'), M('v-series', 'سلسلة V', 'V Series'), M('y-series', 'سلسلة Y', 'Y Series')
+      ]
+    },
+    {
+      id: 'realme', nameAr: 'ريلمي', nameFr: 'realme', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#FFC915', letter: 'RM',
+      aliases: ['realme', 'ريلمي'],
+      models: [
+        M('gt', 'GT', 'GT'), M('narzo', 'نارزو', 'Narzo'), M('c-series', 'سلسلة C', 'C Series')
+      ]
+    },
+    {
+      id: 'honor', nameAr: 'هونر', nameFr: 'Honor', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#111111', letter: 'HO',
+      aliases: ['honor', 'هونر'],
+      models: [
+        M('magic', 'ماجيك', 'Magic'), M('x-series', 'سلسلة X', 'X Series'), M('watch', 'ساعة', 'Watch')
+      ]
+    },
+    {
+      id: 'sony', nameAr: 'سوني', nameFr: 'Sony', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#111111', letter: 'SO',
+      aliases: ['sony', 'سوني'],
+      models: [
+        M('xperia', 'إكسبيريا', 'Xperia'), M('bravia', 'برافيا', 'Bravia'),
+        M('playstation', 'بلايستيشن', 'PlayStation'), M('wh1000', 'WH-1000', 'WH-1000')
+      ]
+    },
+    {
+      id: 'lg', nameAr: 'إل جي', nameFr: 'LG', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#A50034', letter: 'LG',
+      aliases: ['lg', 'إل جي', 'ال جي'],
+      models: [
+        M('oled', 'OLED', 'OLED'), M('gram', 'جرام', 'Gram'), M('soundbar', 'ساوند بار', 'Soundbar')
+      ]
+    },
+    {
+      id: 'lenovo', nameAr: 'لينوفو', nameFr: 'Lenovo', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#E2231A', letter: 'LE',
+      aliases: ['lenovo', 'لينوفو'],
+      models: [
+        M('thinkpad', 'ثينك باد', 'ThinkPad'), M('ideapad', 'آيديا باد', 'IdeaPad'), M('legion', 'ليجون', 'Legion')
+      ]
+    },
+    {
+      id: 'hp', nameAr: 'إتش بي', nameFr: 'HP', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#0096D6', letter: 'HP',
+      aliases: ['hp', 'hewlett', 'إتش بي', 'اتش بي'],
+      models: [
+        M('pavilion', 'بافيليون', 'Pavilion'), M('elitebook', 'إيليت بوك', 'EliteBook'), M('omen', 'أومن', 'OMEN')
+      ]
+    },
+    {
+      id: 'dell', nameAr: 'ديل', nameFr: 'Dell', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#007DB8', letter: 'DE',
+      aliases: ['dell', 'ديل'],
+      models: [
+        M('xps', 'XPS', 'XPS'), M('inspiron', 'إنسبايرون', 'Inspiron'), M('alienware', 'أليان وير', 'Alienware')
+      ]
+    },
+    {
+      id: 'asus', nameAr: 'أسوس', nameFr: 'ASUS', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#000000', letter: 'AS',
+      aliases: ['asus', 'أسوس', 'اسوس'],
+      models: [
+        M('zenbook', 'زين بوك', 'Zenbook'), M('vivobook', 'فيفو بوك', 'Vivobook'), M('rog', 'ROG', 'ROG')
+      ]
+    },
+    {
+      id: 'nokia', nameAr: 'نوكيا', nameFr: 'Nokia', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#124191', letter: 'NK',
+      aliases: ['nokia', 'نوكيا'],
+      models: [
+        M('g-series', 'سلسلة G', 'G Series'), M('x-series', 'سلسلة X', 'X Series'), M('c-series', 'سلسلة C', 'C Series')
+      ]
+    },
+    {
+      id: 'tecno', nameAr: 'تكنو', nameFr: 'TECNO', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#00AEEF', letter: 'TE',
+      aliases: ['tecno', 'تكنو'],
+      models: [
+        M('spark', 'سبارك', 'Spark'), M('camon', 'كامون', 'Camon'), M('phantom', 'فانتوم', 'Phantom')
+      ]
+    },
+    {
+      id: 'infinix', nameAr: 'إنفينيكس', nameFr: 'Infinix', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#111111', letter: 'IX',
+      aliases: ['infinix', 'إنفينيكس', 'انفينكس'],
+      models: [
+        M('note', 'نوت', 'Note'), M('hot', 'هوت', 'Hot'), M('zero', 'زيرو', 'Zero')
+      ]
+    },
+    {
+      id: 'itel', nameAr: 'ايتل', nameFr: 'itel', sector: 'electronics',
+      categories: ['إلكترونيات'], color: '#FF6A00', letter: 'IT',
+      aliases: ['itel', 'ايتل', 'أيتل'],
+      models: [
+        M('a-series', 'سلسلة A', 'A Series'), M('p-series', 'سلسلة P', 'P Series'), M('s-series', 'سلسلة S', 'S Series')
+      ]
+    },
+
+    /* ── أثاث ومعارض ── */
+    {
+      id: 'ikea', nameAr: 'إيكيا', nameFr: 'IKEA', sector: 'furniture',
+      categories: ['أثاث'], color: '#0051BA', letter: 'IK',
+      aliases: ['ikea', 'إيكيا', 'ايكيا'],
+      models: [
+        M('billy', 'بيلي', 'Billy'), M('malm', 'مالم', 'Malm'), M('kallax', 'كالاكس', 'Kallax')
+      ]
+    },
+    {
+      id: 'home-centre', nameAr: 'هوم سنتر', nameFr: 'Home Centre', sector: 'furniture',
+      categories: ['أثاث'], color: '#C8102E', letter: 'HC',
+      aliases: ['home centre', 'homecentre', 'هوم سنتر'],
+      models: [
+        M('living', 'معيشة', 'Living'), M('bedroom', 'غرف نوم', 'Bedroom'), M('dining', 'سفرة', 'Dining')
+      ]
+    },
+    {
+      id: 'pan-emirates', nameAr: 'بان إميريتس', nameFr: 'Pan Emirates', sector: 'furniture',
+      categories: ['أثاث'], color: '#8B0000', letter: 'PE',
+      aliases: ['pan emirates', 'بان إميريتس', 'بان امارات'],
+      models: [
+        M('sofa', 'كنب', 'Sofa'), M('dining', 'سفرة', 'Dining'), M('office', 'مكتب', 'Office')
+      ]
+    },
+    {
+      id: 'danube', nameAr: 'دانوب', nameFr: 'Danube', sector: 'furniture',
+      categories: ['أثاث'], color: '#003399', letter: 'DN',
+      aliases: ['danube', 'دانوب'],
+      models: [
+        M('home', 'منزلي', 'Home'), M('kitchen', 'مطبخ', 'Kitchen'), M('decor', 'ديكور', 'Décor')
+      ]
+    },
+
+    /* ── مجوهرات وساعات ── */
+    {
+      id: 'rolex', nameAr: 'رولكس', nameFr: 'Rolex', sector: 'jewelry',
+      categories: ['مجوهرات', 'ذهب', 'أزياء'], color: '#006039', letter: 'RX',
+      aliases: ['rolex', 'رولكس'],
+      models: [
+        M('submariner', 'سابمارينر', 'Submariner'), M('datejust', 'داتجست', 'Datejust'), M('daytona', 'دايتونا', 'Daytona')
+      ]
+    },
+    {
+      id: 'cartier', nameAr: 'كارتييه', nameFr: 'Cartier', sector: 'jewelry',
+      categories: ['مجوهرات', 'ذهب', 'أزياء'], color: '#C4A35A', letter: 'CA',
+      aliases: ['cartier', 'كارتييه', 'كارتيي'],
+      models: [
+        M('love', 'لوف', 'Love'), M('tank', 'تانك', 'Tank'), M('juste', 'جوست', 'Juste un Clou')
+      ]
+    },
+    {
+      id: 'swatch', nameAr: 'سواتش', nameFr: 'Swatch', sector: 'jewelry',
+      categories: ['مجوهرات', 'ذهب', 'أزياء'], color: '#E30613', letter: 'SW',
+      aliases: ['swatch', 'سواتش'],
+      models: [
+        M('originals', 'أوريجينال', 'Originals'), M('irony', 'آيروني', 'Irony'), M('sistem51', 'سيستم 51', 'Sistem51')
+      ]
+    },
+    {
+      id: 'casio', nameAr: 'كاسيو', nameFr: 'Casio', sector: 'jewelry',
+      categories: ['مجوهرات', 'ذهب', 'أزياء', 'إلكترونيات'], color: '#1A1A1A', letter: 'CS',
+      aliases: ['casio', 'كاسيو', 'g-shock', 'جي شوك'],
+      models: [
+        M('g-shock', 'جي شوك', 'G-Shock'), M('edifice', 'إيديفيس', 'Edifice'), M('sheen', 'شين', 'Sheen')
+      ]
+    },
+    {
+      id: 'tissot', nameAr: 'تيسو', nameFr: 'Tissot', sector: 'jewelry',
+      categories: ['مجوهرات', 'ذهب', 'أزياء'], color: '#C4A35A', letter: 'TI',
+      aliases: ['tissot', 'تيسو'],
+      models: [
+        M('prx', 'PRX', 'PRX'), M('seastar', 'سي ستار', 'Seastar'), M('tradition', 'تراديسيون', 'Tradition')
+      ]
+    },
+    {
+      id: 'pandora', nameAr: 'باندورا', nameFr: 'Pandora', sector: 'jewelry',
+      categories: ['مجوهرات', 'ذهب', 'أزياء'], color: '#6B2D5C', letter: 'PD',
+      aliases: ['pandora', 'باندورا'],
+      models: [
+        M('charm', 'تشارم', 'Charm'), M('bracelet', 'سوار', 'Bracelet'), M('ring', 'خاتم', 'Ring')
+      ]
+    }
+  ];
+
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /** اختصار الاسم تحت صورة الشعار (NIKE / TOYOTA / BMW…) */
+  function abbrName(brand) {
+    if (!brand) return '';
+    if (brand.abbr) return String(brand.abbr).toUpperCase();
+    var fr = String(brand.nameFr || '').trim();
+    if (fr) {
+      var parts = fr.replace(/[^a-zA-Z0-9\s&-]/g, ' ').trim().split(/[\s-]+/).filter(Boolean);
+      if (parts.length) {
+        var main = parts[0];
+        if (main.length <= 2 && parts[1]) main = parts[0] + parts[1];
+        if (main.length > 10) main = main.slice(0, 10);
+        return main.toUpperCase();
+      }
+    }
+    if (brand.letter != null && String(brand.letter).trim() !== '') {
+      return String(brand.letter).toUpperCase();
+    }
+    return String(brand.id || '?').slice(0, 8).toUpperCase();
+  }
+
+  /** رمز داخل الشعار (حروف الشارة) */
+  function markGlyph(brand) {
+    if (!brand) return '?';
+    if (brand.letter != null && String(brand.letter).trim() !== '') {
+      return String(brand.letter).toUpperCase().slice(0, 4);
+    }
+    return abbrName(brand).slice(0, 3);
+  }
+
+  /** شعارات سيارات حقيقية (PNG عام من Carlogos) — slug الملف */
+  var AUTO_LOGO_SLUG = {
+    toyota: 'toyota', mercedes: 'mercedes-benz', bmw: 'bmw', hyundai: 'hyundai',
+    kia: 'kia', nissan: 'nissan', volkswagen: 'volkswagen', peugeot: 'peugeot',
+    renault: 'renault', ford: 'ford', chevrolet: 'chevrolet', dacia: 'dacia',
+    honda: 'honda', mazda: 'mazda', mitsubishi: 'mitsubishi', suzuki: 'suzuki',
+    audi: 'audi', 'land-rover': 'land-rover', jeep: 'jeep', volvo: 'volvo',
+    skoda: 'skoda', opel: 'opel', geely: 'geely', chery: 'chery', byd: 'byd',
+    tesla: 'tesla'
+  };
+
+  /** أيقونات Simple Icons (مسارات الماركة الرسمية المبسّطة) عند توفرها */
+  var SIMPLE_ICON_SLUG = {
+    nike: 'nike', adidas: 'adidas', puma: 'puma', zara: 'zara', uniqlo: 'uniqlo',
+    dior: 'dior', reebok: 'reebok', 'new-balance': 'newbalance',
+    'under-armour': 'underarmour', apple: 'apple', samsung: 'samsung',
+    xiaomi: 'xiaomi', huawei: 'huawei', oppo: 'oppo', vivo: 'vivo',
+    honor: 'honor', sony: 'sony', lg: 'lg', lenovo: 'lenovo', hp: 'hp',
+    dell: 'dell', asus: 'asus', nokia: 'nokia', ikea: 'ikea', pandora: 'pandora',
+    mercedes: 'mercedes', bmw: 'bmw'
+  };
+
+  /** نطاق الموقع الرسمي — أيقونة العلامة من الموقع عند غياب مصدر أفضل */
+  var BRAND_DOMAIN = {
+    nike: 'nike.com', adidas: 'adidas.com', puma: 'puma.com', zara: 'zara.com',
+    'h-m': 'hm.com', 'lc-waikiki': 'lcwaikiki.com', defacto: 'defacto.com.tr',
+    gucci: 'gucci.com', mango: 'mango.com', 'pull-bear': 'pullandbear.com',
+    bershka: 'bershka.com', uniqlo: 'uniqlo.com', guess: 'guess.com',
+    'calvin-klein': 'calvinklein.com', 'tommy-hilfiger': 'tommy.com',
+    lacoste: 'lacoste.com', levis: 'levi.com', 'ralph-lauren': 'ralphlauren.com',
+    chanel: 'chanel.com', 'louis-vuitton': 'louisvuitton.com', prada: 'prada.com',
+    dior: 'dior.com', 'new-balance': 'newbalance.com', 'under-armour': 'underarmour.com',
+    reebok: 'reebok.com', converse: 'converse.com', vans: 'vans.com',
+    asics: 'asics.com', skechers: 'skechers.com', 'ray-ban': 'ray-ban.com',
+    oakley: 'oakley.com', persol: 'persol.com', carrera: 'carreraworld.com',
+    police: 'policelifestyle.com', 'tom-ford': 'tomford.com',
+    apple: 'apple.com', samsung: 'samsung.com', xiaomi: 'mi.com',
+    huawei: 'huawei.com', oppo: 'oppo.com', vivo: 'vivo.com', realme: 'realme.com',
+    honor: 'honor.com', sony: 'sony.com', lg: 'lg.com', lenovo: 'lenovo.com',
+    hp: 'hp.com', dell: 'dell.com', asus: 'asus.com', nokia: 'nokia.com',
+    tecno: 'tecno-mobile.com', infinix: 'infinixmobility.com', itel: 'itel-mobile.com',
+    ikea: 'ikea.com', 'home-centre': 'homecentre.com', 'pan-emirates': 'panemirates.com',
+    danube: 'danubeco.com', rolex: 'rolex.com', cartier: 'cartier.com',
+    swatch: 'swatch.com', casio: 'casio.com', tissot: 'tissot.com', pandora: 'pandora.net'
+  };
+
+  function carlogoUrl(slug) {
+    return 'https://www.carlogos.org/car-logos/' + slug + '-logo.png';
+  }
+
+  function simpleIconUrl(slug) {
+    return 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/' + slug + '.svg';
+  }
+
+  function siteIconUrl(domain) {
+    return 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(domain) + '&sz=128';
+  }
+
+  /** رابط الشعار الحقيقي — بدون رسوم تقريبية مزيّفة */
+  function logoUrl(brand) {
+    if (!brand) return '';
+    if (brand.logoUrl) return String(brand.logoUrl);
+    var id = String(brand.id || '').toLowerCase();
+    if (AUTO_LOGO_SLUG[id]) return carlogoUrl(AUTO_LOGO_SLUG[id]);
+    if (SIMPLE_ICON_SLUG[id]) return simpleIconUrl(SIMPLE_ICON_SLUG[id]);
+    var domain = brand.domain || BRAND_DOMAIN[id];
+    if (domain) return siteIconUrl(domain);
+    return '';
+  }
+
+  /** مونوغرام نظيف فقط كاحتياطي عند فشل التحميل — ليس تقليداً لشعار */
+  function monogramMark(brand, size) {
+    var fill = (brand && brand.color) || '#111111';
+    var letter = String((brand && brand.nameFr) || (brand && brand.id) || '?').replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()
+      || String((brand && brand.letter) || '?').charAt(0).toUpperCase();
+    var isAuto = brand && brand.sector === 'auto';
+    var cx = size / 2;
+    var cy = size / 2;
+    var pad = Math.round(size * 0.08);
+    var mark = size - pad * 2;
+    var fs = Math.round(size * 0.36);
+    var shape;
+    if (isAuto) {
+      shape = '<circle cx="' + cx + '" cy="' + cy + '" r="' + (mark / 2) + '" fill="' + esc(fill) + '"/>'
+        + '<circle cx="' + cx + '" cy="' + cy + '" r="' + (mark / 2 - Math.max(1, size * 0.05)) + '" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="' + Math.max(1, size * 0.03) + '"/>';
+    } else {
+      var r = Math.round(size * 0.18);
+      shape = '<rect x="' + pad + '" y="' + pad + '" width="' + mark + '" height="' + mark + '" rx="' + r + '" fill="' + esc(fill) + '"/>';
+    }
+    return shape
+      + '<text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-family="Arial Black, Helvetica Neue, Arial, sans-serif" font-weight="800" font-size="' + fs + '">' + esc(letter) + '</text>';
+  }
+
+  /** احتياطي SVG (مونوغرام فقط). اسم الماركة يُعرض تحت الشعار في الواجهة. */
+  function logoSvg(brand, size) {
+    size = size || 72;
+    var label = (brand && (brand.nameFr || brand.nameAr)) || 'brand';
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" role="img" aria-label="' + esc(label) + '">'
+      + monogramMark(brand, size)
+      + '</svg>';
+  }
+
+  function logoDataUri(brand, size) {
+    try {
+      return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(logoSvg(brand, size || 96));
+    } catch (e) {
+      return '';
+    }
+  }
+
+  /** صورة شعار: رابط حقيقي أولاً، ثم مونوغرام عند فشل التحميل */
+  function logoImgHtml(brand, size, opts) {
+    opts = opts || {};
+    var name = displayName(brand, !!opts.fr) || (brand && (brand.nameFr || brand.nameAr)) || 'brand';
+    var fb = logoDataUri(brand, size * 2);
+    var url = logoUrl(brand);
+    var src = url || fb;
+    var cls = opts.className ? ' class="' + esc(opts.className) + '"' : '';
+    var style = opts.style ? ' style="' + esc(opts.style) + '"' : '';
+    var onerr = url
+      ? ' data-fallback="' + esc(fb) + '" onerror="if(this.dataset.fallback){this.onerror=null;this.src=this.dataset.fallback}"'
+      : '';
+    var loading = url ? ' loading="lazy" decoding="async" referrerpolicy="no-referrer"' : '';
+    return '<img' + cls + ' src="' + esc(src) + '" alt="' + esc(name) + '" width="' + size + '" height="' + size + '"' + style + onerr + loading + '/>';
+  }
+
+  /** بلاطة: شعار الماركة الحقيقي فوق + اسم الماركة تحت */
+  function tileButtonHtml(brand, fr, opts) {
+    opts = opts || {};
+    var on = !!opts.active;
+    var name = displayName(brand, fr);
+    var size = opts.imgSize || 72;
+    return '<button type="button" class="rzq-brand-tile' + (on ? ' is-on' : '') + '" data-brand-id="' + esc(brand.id) + '" title="' + esc(name) + '" role="listitem" aria-label="' + esc(name) + '" aria-pressed="' + (on ? 'true' : 'false') + '">'
+      + '<span class="rzq-brand-tile-logo">'
+      +   logoImgHtml(brand, size, { fr: fr })
+      + '</span>'
+      + '<span class="rzq-brand-tile-name rzq-brand-tile-abbr">' + esc(name) + '</span>'
+      + '</button>';
+  }
+
+  function listAll() {
+    return BRANDS.slice();
+  }
+
+  function getById(id) {
+    if (!id) return null;
+    var sid = String(id).toLowerCase();
+    for (var i = 0; i < BRANDS.length; i++) {
+      if (String(BRANDS[i].id).toLowerCase() === sid) return BRANDS[i];
+    }
+    return null;
+  }
+
+  function normalizeCat(cat) {
+    return String(cat || '').trim();
+  }
+
+  /** ماركات تظهر لقسم معيّن (مفتاح القسم مثل سيارات / أزياء) */
+  function forCategory(catKey) {
+    var key = normalizeCat(catKey);
+    if (!key) return listAll();
+    return BRANDS.filter(function (b) {
+      return (b.categories || []).some(function (c) {
+        return c === key || key.indexOf(c) >= 0 || c.indexOf(key) >= 0;
+      });
+    });
+  }
+
+  function forSector(sector) {
+    var s = String(sector || '');
+    return BRANDS.filter(function (b) { return b.sector === s; });
+  }
+
+  function modelsOf(brandId) {
+    var b = getById(brandId);
+    return b && Array.isArray(b.models) ? b.models.slice() : [];
+  }
+
+  function getModel(brandId, modelId) {
+    var models = modelsOf(brandId);
+    var mid = String(modelId || '').toLowerCase();
+    for (var i = 0; i < models.length; i++) {
+      if (String(models[i].id).toLowerCase() === mid) return models[i];
+    }
+    return null;
+  }
+
+  function displayName(brand, fr) {
+    if (!brand) return '';
+    return fr ? (brand.nameFr || brand.nameAr) : (brand.nameAr || brand.nameFr);
+  }
+
+  function modelName(model, fr) {
+    if (!model) return '';
+    return fr ? (model.nameFr || model.nameAr) : (model.nameAr || model.nameFr);
+  }
+
+  function searchMatch(brand, q) {
+    if (!brand || !q) return false;
+    var s = String(q).toLowerCase();
+    var blob = [
+      brand.id, brand.nameAr, brand.nameFr
+    ].concat(brand.aliases || []).join(' ').toLowerCase();
+    return blob.indexOf(s) >= 0;
+  }
+
+  function findByAlias(text) {
+    var t = String(text || '').toLowerCase().trim();
+    if (!t) return null;
+    for (var i = 0; i < BRANDS.length; i++) {
+      if (searchMatch(BRANDS[i], t)) return BRANDS[i];
+      var names = [BRANDS[i].nameAr, BRANDS[i].nameFr].concat(BRANDS[i].aliases || []);
+      for (var j = 0; j < names.length; j++) {
+        if (t.indexOf(String(names[j]).toLowerCase()) >= 0) return BRANDS[i];
+      }
+    }
+    return null;
+  }
+
+  /** شارة HTML صغيرة للبطاقات — شعار + اسم معاً */
+  function chipHtml(brandId, opts) {
+    opts = opts || {};
+    var brand = getById(brandId);
+    if (!brand) return '';
+    var fr = !!opts.fr;
+    var model = opts.modelId ? getModel(brandId, opts.modelId) : null;
+    var label = displayName(brand, fr);
+    if (model) label += ' · ' + modelName(model, fr);
+    var size = opts.size || 22;
+    return '<span class="rzq-brand-chip" title="' + esc(label) + '" style="display:inline-flex;align-items:center;gap:6px;padding:3px 8px 3px 4px;border-radius:999px;background:rgba(15,35,71,.06);border:1px solid rgba(15,35,71,.1);font-size:11px;font-weight:700;color:#0F2347;max-width:100%">'
+      + logoImgHtml(brand, size, { fr: fr, className: 'rzq-brand-chip-logo', style: 'border-radius:50%;flex-shrink:0;object-fit:contain;background:#fff' })
+      + '<span class="rzq-brand-chip-name" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(label) + '</span>'
+      + '</span>';
+  }
+
+  /**
+   * بطاقة مدمجة: شعار الماركة فوق + اسم الماركة تحت (أو صف أفقي إن opts.inline)
+   */
+  function logoNameHtml(brandId, opts) {
+    opts = opts || {};
+    var brand = getById(brandId);
+    if (!brand) return '';
+    var fr = !!opts.fr;
+    var size = opts.size || 36;
+    var name = displayName(brand, fr);
+    var model = opts.modelId ? getModel(brandId, opts.modelId) : null;
+    var sub = model ? modelName(model, fr) : '';
+    if (opts.inline) {
+      return '<div class="rzq-brand-logo-name is-inline" data-brand-id="' + esc(brand.id) + '" title="' + esc(name) + '">'
+        + logoImgHtml(brand, size, { fr: fr, className: 'rzq-brand-logo-name-img' })
+        + '<span class="rzq-brand-logo-name-text">'
+        +   '<span class="rzq-brand-logo-name-main">' + esc(name) + '</span>'
+        +   (sub ? '<span class="rzq-brand-logo-name-sub">' + esc(sub) + '</span>' : '')
+        + '</span>'
+        + '</div>';
+    }
+    return '<div class="rzq-brand-logo-name is-stack" data-brand-id="' + esc(brand.id) + '" title="' + esc(name) + '">'
+      + logoImgHtml(brand, size, { fr: fr, className: 'rzq-brand-logo-name-img' })
+      + '<span class="rzq-brand-logo-name-main">' + esc(name) + '</span>'
+      + '</div>';
+  }
+
+  /**
+   * يملأ <select> للماركات حسب القسم.
+   * @returns {number} عدد الخيارات المضافة
+   */
+  var CUSTOM_BRAND_ID = '__custom__';
+
+  function isCustomBrandId(id) {
+    return String(id || '') === CUSTOM_BRAND_ID;
+  }
+
+  /** خيار «ماركة غير موجودة في الكتالوج» — اسم + شعار من الإنترنت */
+  function appendCustomBrandOption(selectEl, fr) {
+    if (!selectEl) return;
+    var exists = false;
+    for (var i = 0; i < selectEl.options.length; i++) {
+      if (selectEl.options[i].value === CUSTOM_BRAND_ID) { exists = true; break; }
+    }
+    if (exists) return;
+    var opt = document.createElement('option');
+    opt.value = CUSTOM_BRAND_ID;
+    opt.textContent = fr ? 'Marque absente du catalogue (nom + logo web)…' : 'ماركة غير موجودة في الكتالوج (اسم + شعار من الإنترنت)…';
+    selectEl.appendChild(opt);
+  }
+
+  /** يقبل رابط صورة أو موقعاً ويُرجع https صالحاً أو '' */
+  function normalizeHttpLogoUrl(raw) {
+    var s = String(raw || '').trim();
+    if (!s) return '';
+    if (/^data:image\//i.test(s)) return s.slice(0, 400000);
+    if (!/^https?:\/\//i.test(s)) {
+      if (/^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}(?:[/:?#]|$)/i.test(s)) s = 'https://' + s;
+      else return '';
+    }
+    // بدون الاعتماد على URL() (قد لا يتوفر في بعض سياقات الاختبار)
+    var m = /^https?:\/\/([^\/?#]+)(\/[^?#]*)?(\?[^#]*)?(#.*)?$/i.exec(s);
+    if (!m) return '';
+    var host = m[1];
+    if (!host || host.indexOf('.') < 0) return '';
+    return s.slice(0, 500);
+  }
+
+  function _latinBrandSlug(name) {
+    var s = String(name || '').trim().toLowerCase();
+    // أبقِ اللاتيني فقط لاشتقاق نطاق محتمل
+    s = s.replace(/[^a-z0-9\s-]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!s) return '';
+    return s.replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  }
+
+  function _domainFromInput(nameOrSite) {
+    var raw = String(nameOrSite || '').trim();
+    if (!raw) return '';
+    var asUrl = normalizeHttpLogoUrl(raw);
+    if (asUrl && !/^data:/i.test(asUrl)) {
+      try {
+        var host = new URL(asUrl).hostname.replace(/^www\./i, '');
+        // إن كان الرابط صورة مباشرة على CDN معروف للشعارات، لا نعتبره «نطاق ماركة»
+        if (/\.(png|jpe?g|webp|svg|gif|ico)(\?|$)/i.test(asUrl)
+          || /\/favicons\?/i.test(asUrl)
+          || /icons\.duckduckgo\.com/i.test(asUrl)) {
+          return '';
+        }
+        return host;
+      } catch (e1) { /* ignore */ }
+    }
+    var slug = _latinBrandSlug(raw);
+    return slug ? (slug.replace(/-/g, '') + '.com') : '';
+  }
+
+  /**
+   * مرشّحو شعار من الإنترنت لاسم ماركة أو رابط موقع/صورة.
+   * الأولوية: رابط صورة مباشر → أيقونة الموقع → تخمين نطاق من الاسم اللاتيني.
+   */
+  function internetLogoCandidates(nameOrSite) {
+    var raw = String(nameOrSite || '').trim();
+    var out = [];
+    var seen = {};
+    function push(u) {
+      var n = normalizeHttpLogoUrl(u);
+      if (!n || /^data:/i.test(n) || seen[n]) return;
+      seen[n] = 1;
+      out.push(n);
+    }
+    if (!raw) return out;
+    var direct = normalizeHttpLogoUrl(raw);
+    if (direct && !/^data:/i.test(direct)) {
+      if (/\.(png|jpe?g|webp|svg|gif|ico)(\?|$)/i.test(direct)
+        || /\/favicons\?/i.test(direct)
+        || /\/logo/i.test(direct)
+        || /icons\.duckduckgo\.com/i.test(direct)
+        || /google\.com\/s2\/favicons/i.test(direct)) {
+        push(direct);
+      }
+    }
+    var domain = '';
+    if (direct && !/^data:/i.test(direct)) {
+      try { domain = new URL(direct).hostname.replace(/^www\./i, ''); } catch (e2) { domain = ''; }
+    }
+    if (!domain) domain = _domainFromInput(raw);
+    if (domain) {
+      push(siteIconUrl(domain));
+      push('https://icons.duckduckgo.com/ip3/' + domain + '.ico');
+    }
+    var slug = _latinBrandSlug(raw);
+    if (slug) {
+      var compact = slug.replace(/-/g, '');
+      [compact + '.com', compact + '.net', slug + '.com'].forEach(function (d) {
+        if (d === domain) return;
+        push(siteIconUrl(d));
+      });
+      // إن وُجدت في كتالوج رزق تحت اسم/alias — استخدم شعارها الحقيقي
+      var known = findByAlias(raw) || findByAlias(slug) || findByAlias(compact);
+      if (known) {
+        var knownUrl = logoUrl(known);
+        if (knownUrl) push(knownUrl);
+      }
+    }
+    return out;
+  }
+
+  /** يجرّب مرشّحي الشعار حتى ينجح تحميل صورة */
+  function resolveInternetLogo(nameOrSite, done) {
+    done = typeof done === 'function' ? done : function () {};
+    var list = internetLogoCandidates(nameOrSite);
+    if (!list.length) { done(''); return; }
+    var i = 0;
+    function tryNext() {
+      if (i >= list.length) { done(''); return; }
+      var url = list[i++];
+      var img = new Image();
+      var settled = false;
+      var timer = setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        tryNext();
+      }, 3500);
+      img.onload = function () {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        // رفض أيقونات 16px الفارغة تقريباً إن أمكن
+        if ((img.naturalWidth || 0) < 8 && (img.naturalHeight || 0) < 8) {
+          tryNext();
+          return;
+        }
+        done(url);
+      };
+      img.onerror = function () {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        tryNext();
+      };
+      img.referrerPolicy = 'no-referrer';
+      img.src = url;
+    }
+    tryNext();
+  }
+
+  function fillBrandSelect(selectEl, catKey, fr, selectedId) {
+    if (!selectEl) return 0;
+    var brands = forCategory(catKey);
+    var allLbl = fr ? '— Marque —' : '— الماركة —';
+    var keepCustom = isCustomBrandId(selectedId);
+    selectEl.innerHTML = '<option value="">' + esc(allLbl) + '</option>'
+      + brands.map(function (b) {
+        var sel = selectedId && String(selectedId) === String(b.id) ? ' selected' : '';
+        return '<option value="' + esc(b.id) + '"' + sel + '>' + esc(displayName(b, fr)) + '</option>';
+      }).join('');
+    appendCustomBrandOption(selectEl, fr);
+    if (keepCustom) selectEl.value = CUSTOM_BRAND_ID;
+    return brands.length;
+  }
+
+  /** تصغير شعار مرفوع إلى ≤256px ثم data-URI */
+  function logoFileToDataUri(file, done) {
+    done = typeof done === 'function' ? done : function () {};
+    if (!file || !file.type || String(file.type).indexOf('image/') !== 0) {
+      done('');
+      return;
+    }
+    var url = '';
+    try { url = URL.createObjectURL(file); } catch (e0) { done(''); return; }
+    var img = new Image();
+    img.onload = function () {
+      try {
+        var max = 256;
+        var scale = Math.min(1, max / Math.max(img.width || 1, img.height || 1));
+        var c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round((img.width || 1) * scale));
+        c.height = Math.max(1, Math.round((img.height || 1) * scale));
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        done(c.toDataURL('image/png'));
+      } catch (e1) {
+        done('');
+      }
+      try { URL.revokeObjectURL(url); } catch (e2) {}
+    };
+    img.onerror = function () {
+      try { URL.revokeObjectURL(url); } catch (e3) {}
+      done('');
+    };
+    img.src = url;
+  }
+
+  /** معاينة: شعار كتالوج أو شعار مخصّص + الاسم */
+  function brandFormPreviewHtml(opts) {
+    opts = opts || {};
+    var fr = !!opts.fr;
+    if (opts.brandId && !isCustomBrandId(opts.brandId)) {
+      return logoNameHtml(opts.brandId, { fr: fr, modelId: opts.modelId || '', size: opts.size || 40 });
+    }
+    var name = String(opts.customName || '').trim();
+    var logo = String(opts.customLogo || '').trim();
+    if (!name && !logo) return '';
+    var sz = opts.size || 40;
+    var img = logo
+      ? '<img src="' + esc(logo) + '" alt="' + esc(name || 'brand') + '" width="' + sz + '" height="' + sz + '" style="width:' + sz + 'px;height:' + sz + 'px;object-fit:contain;border-radius:8px;background:#fff;border:1px solid rgba(15,35,71,.1)" loading="lazy" decoding="async" referrerpolicy="no-referrer"/>'
+      : '<span style="width:' + sz + 'px;height:' + sz + 'px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:#0F2347;color:#fff;font-weight:800;font-size:14px">' + esc((name || '?').charAt(0)) + '</span>';
+    return '<div class="rzq-brand-logo-name is-inline" style="display:inline-flex;align-items:center;gap:8px">'
+      + img
+      + '<span class="rzq-brand-logo-name-main" style="font-size:13px;font-weight:800;color:#0F2347">' + esc(name || (fr ? 'Marque' : 'ماركة')) + '</span>'
+      + '</div>';
+  }
+
+  /** عرض ماركة إعلان/منتج: كتالوج أو اسم+شعار مخصّص */
+  function itemBrandHtml(item, opts) {
+    opts = opts || {};
+    item = item || {};
+    var fr = !!opts.fr;
+    if (item.brandId && getById(item.brandId)) {
+      return logoNameHtml(item.brandId, { fr: fr, modelId: item.modelId || '', size: opts.size || 36, inline: !!opts.inline });
+    }
+    var name = fr
+      ? (item.brandNameFr || item.brandName || '')
+      : (item.brandName || item.brandNameFr || '');
+    return brandFormPreviewHtml({
+      customName: name,
+      customLogo: item.brandLogo || '',
+      fr: fr,
+      size: opts.size || 36
+    });
+  }
+
+  function fillModelSelect(selectEl, brandId, fr, selectedId) {
+    if (!selectEl) return 0;
+    var models = modelsOf(brandId);
+    var allLbl = fr ? '— Modèle —' : '— الموديل —';
+    selectEl.innerHTML = '<option value="">' + esc(allLbl) + '</option>'
+      + models.map(function (m) {
+        var sel = selectedId && String(selectedId) === String(m.id) ? ' selected' : '';
+        return '<option value="' + esc(m.id) + '"' + sel + '>' + esc(modelName(m, fr)) + '</option>';
+      }).join('');
+    selectEl.disabled = !brandId;
+    return models.length;
+  }
+
+  /** شريط أفقي احترافي: صورة الشعار فوق + اختصار الاسم تحت */
+  function stripHtml(catKey, fr, opts) {
+    opts = opts || {};
+    var brands = forCategory(catKey);
+    if (!brands.length) return '';
+    var active = opts.activeId || '';
+    var head = opts.heading != null
+      ? opts.heading
+      : (fr ? 'Shop by Brand' : 'تسوّق حسب الماركة');
+    var headHtml = head
+      ? '<div class="rzq-brand-strip-head"><span class="rzq-brand-strip-head-label">' + esc(head) + '</span></div>'
+      : '';
+    return '<div class="rzq-brand-strip-panel">'
+      + headHtml
+      + '<div class="rzq-brand-strip rzq-brand-tile-strip" role="list" aria-label="' + esc(head || (fr ? 'Marques' : 'الماركات')) + '">'
+      + brands.map(function (b) {
+        return tileButtonHtml(b, fr, {
+          active: active && String(active) === String(b.id),
+          imgSize: opts.imgSize || 64
+        });
+      }).join('')
+      + '</div></div>';
+  }
+
+  /** حرف أول لاختصار الماركة (لاتيني أولاً ليتوافق مع الاختصار تحت الشعار) */
+  function brandLetter(brand, fr) {
+    var latin = String((brand && brand.nameFr) || '').trim();
+    var ar = String((brand && brand.nameAr) || '').trim();
+    var prefer = latin || ar || String((brand && brand.id) || '');
+    if (fr === false && !latin && ar) prefer = ar;
+    var ch = prefer.charAt(0);
+    if (!ch) return '#';
+    if (/[a-zA-Z]/.test(ch)) return ch.toUpperCase();
+    return ch;
+  }
+
+  /**
+   * قائمة فلتر الماركات (صفحة كل الإعلانات): أحرف + صف شعار مع الاسم
+   * opts: activeId, letter, query, heading
+   */
+  function filterListHtml(catKey, fr, opts) {
+    opts = opts || {};
+    var brands = forCategory(catKey);
+    if (!brands.length) return '';
+    var active = opts.activeId || '';
+    var letter = opts.letter || '';
+    var query = String(opts.query || '').trim().toLowerCase();
+    /* لا عنوان تقني للزائر — القسم نفسه يحمل تسمية «الماركة» */
+    var head = opts.heading != null ? opts.heading : '';
+
+    var lettersMap = {};
+    brands.forEach(function (b) {
+      lettersMap[brandLetter(b, fr)] = 1;
+    });
+    var letters = Object.keys(lettersMap).sort(function (a, b) {
+      var aLat = /[A-Z]/.test(a), bLat = /[A-Z]/.test(b);
+      if (aLat && bLat) return a.localeCompare(b);
+      if (aLat) return -1;
+      if (bLat) return 1;
+      return a.localeCompare(b, 'ar');
+    });
+
+    var filtered = brands.filter(function (b) {
+      if (letter && brandLetter(b, fr) !== letter) return false;
+      if (query) {
+        var blob = [b.id, b.nameAr, b.nameFr].concat(b.aliases || []).join(' ').toLowerCase();
+        if (blob.indexOf(query) < 0) return false;
+      }
+      return true;
+    });
+
+    var lettersHtml = '<div class="rzq-brand-letters" role="toolbar" aria-label="' + (fr ? 'Brand letters' : 'أحرف الماركات') + '">'
+      + '<button type="button" class="rzq-brand-letter-btn' + (!letter ? ' is-on' : '') + '" data-brand-letter="" title="' + (fr ? 'All' : 'الكل') + '">' + (fr ? 'All' : 'الكل') + '</button>'
+      + letters.map(function (L) {
+        var on = letter && String(letter) === String(L);
+        return '<button type="button" class="rzq-brand-letter-btn' + (on ? ' is-on' : '') + '" data-brand-letter="' + esc(L) + '" title="' + esc(L) + '">' + esc(L) + '</button>';
+      }).join('')
+      + '</div>';
+
+    var listHtml = '<div class="rzq-brand-filter-list rzq-brand-tile-grid" role="list" aria-label="' + (fr ? 'Brands' : 'الماركات') + '">'
+      + (filtered.length ? filtered.map(function (b) {
+        return tileButtonHtml(b, fr, {
+          active: active && String(active) === String(b.id),
+          imgSize: 52
+        });
+      }).join('') : ('<div class="rzq-brand-filter-empty">' + (fr ? 'No brands for this letter' : 'لا ماركات لهذا الحرف') + '</div>'))
+      + '</div>';
+
+    return '<div class="rzq-brand-filter-panel">'
+      + (head ? '<div class="rzq-brand-filter-head">' + esc(head) + '</div>' : '')
+      + '<div class="rzq-brand-filter-search-wrap">'
+      +   '<input type="search" class="rzq-brand-filter-search" data-brand-search="1" placeholder="' + (fr ? 'Search brand…' : 'ابحث عن ماركة…') + '" value="' + esc(opts.query || '') + '"/>'
+      + '</div>'
+      + lettersHtml
+      + listHtml
+      + '</div>';
+  }
+
+  global.RizqBrands = {
+    list: listAll,
+    getById: getById,
+    forCategory: forCategory,
+    forSector: forSector,
+    modelsOf: modelsOf,
+    getModel: getModel,
+    displayName: displayName,
+    modelName: modelName,
+    abbrName: abbrName,
+    searchMatch: searchMatch,
+    findByAlias: findByAlias,
+    brandLetter: brandLetter,
+    CUSTOM_BRAND_ID: CUSTOM_BRAND_ID,
+    isCustomBrandId: isCustomBrandId,
+    appendCustomBrandOption: appendCustomBrandOption,
+    logoFileToDataUri: logoFileToDataUri,
+    normalizeHttpLogoUrl: normalizeHttpLogoUrl,
+    internetLogoCandidates: internetLogoCandidates,
+    resolveInternetLogo: resolveInternetLogo,
+    brandFormPreviewHtml: brandFormPreviewHtml,
+    itemBrandHtml: itemBrandHtml,
+    logoUrl: logoUrl,
+    logoSvg: logoSvg,
+    logoDataUri: logoDataUri,
+    logoImgHtml: logoImgHtml,
+    chipHtml: chipHtml,
+    logoNameHtml: logoNameHtml,
+    tileButtonHtml: tileButtonHtml,
+    fillBrandSelect: fillBrandSelect,
+    fillModelSelect: fillModelSelect,
+    stripHtml: stripHtml,
+    filterListHtml: filterListHtml,
+    sectors: {
+      auto: 'auto', fashion: 'fashion', sports: 'sports', eyewear: 'eyewear',
+      electronics: 'electronics', furniture: 'furniture', jewelry: 'jewelry'
+    }
+  };
+})(typeof window !== 'undefined' ? window : this);

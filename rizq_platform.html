@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<title>عن رزق — من نحن ولماذا رزق | À propos de Rizq</title>
+<meta name="description" content="من نحن ولماذا رزق — تعريف بمنصة رزق وسوق موريتانيا الإلكتروني، مع روابط الخصوصية وسياسة المنصة."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --navy:#0D1B2A; --royal:#1B3A6B; --gold:#C9A84C; --gold-dk:#a07820;
+  --bg:#f4f7fb; --text:#0D1B2A; --muted:#5b6b85;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Cairo','Segoe UI',sans-serif;
+  background:
+    radial-gradient(ellipse 90% 50% at 100% 0%, rgba(201,168,76,.12), transparent 55%),
+    linear-gradient(180deg,#eef3fa 0%, var(--bg) 40%, #e8eef8 100%);
+  color:var(--text); min-height:100vh; line-height:1.7;
+}
+nav{
+  max-width:920px;margin:0 auto;padding:16px 5%;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+.brand img{width:40px;height:40px;border-radius:10px}
+.brand strong{display:block;font-size:18px;font-weight:800;color:var(--navy)}
+.brand span{display:block;font-size:10px;letter-spacing:1.2px;color:var(--gold-dk);font-weight:700}
+.nav-links{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;font-weight:700}
+.nav-links a{color:var(--muted);text-decoration:none}
+.nav-links a:hover{color:var(--royal)}
+.lang{
+  font-size:11px;border:1.5px solid rgba(27,58,107,.2);color:var(--royal);
+  padding:6px 12px;border-radius:10px;background:#fff;cursor:pointer;font-weight:800;font-family:inherit;
+}
+main{max-width:920px;margin:0 auto;padding:12px 5% 64px}
+.hero{
+  padding:28px 0 10px; margin-bottom:28px;
+}
+.hero .eyebrow{
+  display:inline-block;font-size:11px;font-weight:800;letter-spacing:1.5px;
+  color:var(--gold-dk);margin-bottom:10px;text-transform:uppercase;
+}
+.hero h1{
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:clamp(34px,6vw,48px);line-height:1.15;color:var(--navy);margin-bottom:10px;
+}
+.hero h1 em{font-style:italic;color:var(--gold-dk)}
+.hero p{font-size:15px;color:var(--muted);max-width:540px}
+.jump{
+  display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 8px;
+}
+.jump a{
+  text-decoration:none;font-size:12.5px;font-weight:800;
+  padding:8px 14px;border-radius:999px;border:1.5px solid rgba(27,58,107,.16);
+  background:#fff;color:var(--royal);
+}
+.jump a:hover{border-color:rgba(201,168,76,.55);background:#fffdf6}
+section{
+  background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:22px;
+  padding:28px 24px;margin:18px 0;box-shadow:0 10px 28px rgba(13,27,42,.05);
+  scroll-margin-top:20px;
+}
+.sec-tag{font-size:11px;font-weight:800;color:var(--gold-dk);letter-spacing:.8px;margin-bottom:8px}
+section h2{
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-size:clamp(24px,3.5vw,30px);color:var(--navy);margin-bottom:12px;font-weight:700;
+}
+section h2 span{color:var(--gold-dk)}
+.lead{font-size:15px;color:#1e3a62;line-height:1.95;margin-bottom:18px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 8px}
+.chip{
+  font-size:12px;font-weight:800;padding:6px 12px;border-radius:999px;
+  background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.04));
+  border:1px solid rgba(201,168,76,.35);color:var(--royal);
+}
+.why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:8px}
+.why-card{
+  border:1.5px solid rgba(201,168,76,.28);border-radius:16px;padding:16px 14px;
+  background:linear-gradient(180deg,#fff,#fbfaf6);
+}
+.why-ico{font-size:22px;margin-bottom:8px}
+.why-card h3{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.why-card p{font-size:12.5px;color:var(--muted);line-height:1.7}
+.legal-row{
+  display:flex;flex-wrap:wrap;gap:10px;margin-top:22px;padding-top:18px;
+  border-top:1px solid rgba(27,58,107,.08);
+}
+.legal-row a{
+  font-size:13px;font-weight:800;text-decoration:none;color:var(--royal);
+  padding:8px 12px;border-radius:10px;background:#f3f6fb;border:1px solid rgba(27,58,107,.1);
+}
+.legal-row a:hover{border-color:rgba(201,168,76,.45);background:#fffdf6}
+.back{
+  display:inline-flex;margin-top:18px;font-size:13.5px;font-weight:800;
+  color:#fff;text-decoration:none;padding:12px 20px;border-radius:12px;
+  background:linear-gradient(135deg,#e8c96a,#C9A84C);color:#1a1200;
+}
+footer{
+  max-width:920px;margin:0 auto;padding:8px 5% 40px;
+  font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:12px;
+  justify-content:space-between;align-items:center;
+}
+footer a{color:var(--royal);font-weight:700;text-decoration:none}
+[data-lang="fr"] [data-ar]{display:none}
+[data-lang="ar"] [data-fr]{display:none}
+html[data-lang="fr"]{direction:ltr}
+@media(max-width:760px){
+  .why-grid{grid-template-columns:1fr}
+  .nav-links{display:none}
+}
+</style>
+</head>
+<body data-lang="ar" id="page">
+<nav>
+  <a class="brand" href="rizq_landing_v8.html">
+    <img src="rizq-mark-512.png?v=23.0" width="40" height="40" alt="رزق"/>
+    <div>
+      <strong data-ar>رزق</strong><strong data-fr>Rizq</strong>
+      <span>RIZQ PLATFORM</span>
+    </div>
+  </a>
+  <div class="nav-links">
+    <a href="#who" data-ar>من نحن</a><a href="#who" data-fr>À propos</a>
+    <a href="#why" data-ar>لماذا رزق</a><a href="#why" data-fr>Pourquoi Rizq</a>
+    <a href="rizq_legal.html#s3" data-ar>الخصوصية</a><a href="rizq_legal.html#s3" data-fr>Confidentialité</a>
+    <a href="rizq_about.html" data-ar>الشركة</a><a href="rizq_about.html" data-fr>Société</a>
+  </div>
+  <button class="lang" type="button" id="langBtn">FR</button>
+</nav>
+
+<main>
+  <header class="hero">
+    <div class="eyebrow" data-ar>سياسة وتعريف المنصة</div>
+    <div class="eyebrow" data-fr>Identité &amp; politique de la plateforme</div>
+    <h1 data-ar>عن <em>رزق</em></h1>
+    <h1 data-fr>À propos de <em>Rizq</em></h1>
+    <p data-ar>تعريف مختصر بالمنصة ولماذا يثق بها الناس — مع روابط الخصوصية وسياسة الاستخدام.</p>
+    <p data-fr>Une présentation courte de la plateforme et des raisons de confiance — avec les liens confidentialité et conditions.</p>
+    <div class="jump">
+      <a href="#who" data-ar>من نحن</a><a href="#who" data-fr>À propos</a>
+      <a href="#why" data-ar>لماذا رزق</a><a href="#why" data-fr>Pourquoi Rizq</a>
+      <a href="rizq_legal.html#s3" data-ar>سياسة الخصوصية</a><a href="rizq_legal.html#s3" data-fr>Confidentialité</a>
+      <a href="rizq_legal.html#s2" data-ar>شروط الاستخدام</a><a href="rizq_legal.html#s2" data-fr>Conditions</a>
+    </div>
+  </header>
+
+  <section id="who">
+    <p class="sec-tag" data-ar>من نحن</p>
+    <p class="sec-tag" data-fr>À propos</p>
+    <h2 data-ar>رزق — سوق موريتانيا الإلكتروني</h2>
+    <h2 data-fr>Rizq — le marché électronique mauritanien</h2>
+    <p class="lead" data-ar><strong>رزق</strong> سوق موريتانيا الإلكتروني للإعلانات والأعمال. من الإعلان الفردي إلى المحلات والمعارض والمكاتب، وصولاً إلى غرفة المناقصات وغرفة الاستثمارات — فضاء ثقة طوّرته <a href="rizq_about.html">ADMINIA SARL</a> ليجمع البائع والمشتري في كل الولايات. <em style="color:var(--gold-dk);font-style:normal;font-weight:800">كل ما تحتاجه… في مكان واحد، بأمان ووضوح.</em></p>
+    <p class="lead" data-fr><strong>Rizq</strong> est le marché électronique mauritanien des annonces et des affaires. De l’annonce individuelle aux boutiques, showrooms et bureaux, jusqu’à la salle des appels d’offres et la salle des investissements — un espace de confiance développé par <a href="rizq_about.html">ADMINIA SARL</a> qui réunit vendeurs et acheteurs dans toutes les wilayas. <em style="color:var(--gold-dk);font-style:normal;font-weight:800">Tout ce qu’il vous faut… au même endroit, en sécurité et en clarté.</em></p>
+    <div class="chips">
+      <span class="chip" data-ar>🏪 +17 قسم</span><span class="chip" data-fr>🏪 +17 catégories</span>
+      <span class="chip" data-ar>🛡️ آمن 100%</span><span class="chip" data-fr>🛡️ 100% sécurisé</span>
+      <span class="chip" data-ar>📍 كل الولايات</span><span class="chip" data-fr>📍 Toutes les wilayas</span>
+      <span class="chip" data-ar>⚡ مجاني للبدء</span><span class="chip" data-fr>⚡ Gratuit pour démarrer</span>
+      <span class="chip" data-ar>📋 غرفة مناقصات B2B</span><span class="chip" data-fr>📋 Appels d'offres B2B</span>
+      <span class="chip" data-ar>📈 غرفة الاستثمارات</span><span class="chip" data-fr>📈 Investissements</span>
+    </div>
+  </section>
+
+  <section id="why">
+    <p class="sec-tag" data-ar>لماذا رزق؟</p>
+    <p class="sec-tag" data-fr>Pourquoi Rizq ?</p>
+    <h2 data-ar>لماذا يثق الناس بـ<span>رزق؟</span></h2>
+    <h2 data-fr>Pourquoi faire confiance à <span>Rizq?</span></h2>
+    <p class="lead" data-ar>سوق موريتاني يثق به الناس — بيع، تسوّق، وأنمِ عملك بوضوح وطمأنينة.</p>
+    <p class="lead" data-fr>Un marché mauritanien de confiance — vendez, achetez et développez votre activité en toute sérénité.</p>
+    <div class="why-grid">
+      <article class="why-card">
+        <div class="why-ico" aria-hidden="true">🛡️</div>
+        <h3 data-ar>ثقة تليق بسوق موريتانيا</h3>
+        <h3 data-fr>Une confiance digne du marché</h3>
+        <p data-ar>رزق سوق جادّ للبيع والشراء — وضوح في التعامل، طمأنينة في التجربة، وسوق واحد يجمعك بالمشترين والبائعين.</p>
+        <p data-fr>Rizq, un marché sérieux pour acheter et vendre — clarté, sérénité, et un lieu qui relie vendeurs et acheteurs.</p>
+      </article>
+      <article class="why-card">
+        <div class="why-ico" aria-hidden="true">🗂️</div>
+        <h3 data-ar>سوق يغطي كل حاجة</h3>
+        <h3 data-fr>Un marché complet</h3>
+        <p data-ar>من العقارات إلى الإبل، من الدراعة إلى الحفارات — كل ما تبحث عنه في مكان واحد.</p>
+        <p data-fr>De l’immobilier au bétail, de la mode aux engins — tout ce que vous cherchez au même endroit.</p>
+      </article>
+      <article class="why-card">
+        <div class="why-ico" aria-hidden="true">⚡</div>
+        <h3 data-ar>انشر في أقل من دقيقة</h3>
+        <h3 data-fr>Publiez en moins d’une minute</h3>
+        <p data-ar>صوّر، ضع السعر، انشر — إعلانك يصل لمشترين يبحثون الآن على رزق.</p>
+        <p data-fr>Photographiez, fixez le prix, publiez — votre annonce atteint des acheteurs actifs sur Rizq.</p>
+      </article>
+    </div>
+    <div class="legal-row">
+      <a href="rizq_legal.html#s3" data-ar>سياسة الخصوصية</a><a href="rizq_legal.html#s3" data-fr>Confidentialité</a>
+      <a href="rizq_legal.html#s2" data-ar>شروط الاستخدام</a><a href="rizq_legal.html#s2" data-fr>Conditions d'utilisation</a>
+      <a href="rizq_legal.html" data-ar>سياسة المنصة</a><a href="rizq_legal.html" data-fr>Politique de la plateforme</a>
+      <a href="rizq_about.html" data-ar>الشركة المالكة</a><a href="rizq_about.html" data-fr>Société propriétaire</a>
+    </div>
+  </section>
+
+  <a class="back" href="rizq_landing_v8.html" data-ar>← العودة إلى رزق</a>
+  <a class="back" href="rizq_landing_v8.html" data-fr>← Retour à Rizq</a>
+</main>
+
+<footer>
+  <span data-ar>© 2026 رزق | Rizq</span><span data-fr>© 2026 Rizq</span>
+  <a href="rizq_legal.html#s3" data-ar>الخصوصية</a><a href="rizq_legal.html#s3" data-fr>Confidentialité</a>
+</footer>
+
+<script>
+(function(){
+  var page = document.getElementById('page');
+  var btn = document.getElementById('langBtn');
+  function apply(lang){
+    page.setAttribute('data-lang', lang);
+    document.documentElement.setAttribute('lang', lang);
+    document.documentElement.setAttribute('dir', lang === 'fr' ? 'ltr' : 'rtl');
+    document.documentElement.setAttribute('data-lang', lang);
+    btn.textContent = lang === 'ar' ? 'FR' : 'AR';
+    try { localStorage.setItem('rizq_lang', lang); } catch(e){}
+  }
+  var saved = 'ar';
+  try { saved = localStorage.getItem('rizq_lang') || 'ar'; } catch(e){}
+  apply(saved === 'fr' ? 'fr' : 'ar');
+  btn.addEventListener('click', function(){
+    apply(page.getAttribute('data-lang') === 'ar' ? 'fr' : 'ar');
+  });
+})();
+</script>
+</body>
+</html>

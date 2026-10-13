@@ -198,7 +198,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 }
 
 /* ── VISIT STRIP: شريط أفقي بدل الشريط الجانبي (هوية "زوروا المعرض") ── */
-.visit-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0 30px;position:relative;z-index:5}
+.visit-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:28px 0 24px;position:relative;z-index:5}
 @media(max-width:900px){.visit-strip{grid-template-columns:1fr;margin-top:16px}}
 .info-card{background:#fff;border-radius:var(--radius);padding:20px;border:1px solid #ece3d1;border-top:3px solid var(--gold);box-shadow:0 14px 32px rgba(27,58,107,.1)}
 .info-card-title{font-size:12.5px;font-weight:800;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:1px}
@@ -415,7 +415,46 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 <!-- ══ MAIN ══ -->
 <div class="main-wrap">
 
-  <!-- VISIT STRIP — بديل الشريط الجانبي التقليدي: شريط أفقي بهوية "زيارة المعرض" -->
+  <!-- EXHIBITION FLOOR — قاعة العرض الرئيسية -->
+  <main class="exhibit-floor">
+
+      <!-- Category Tabs -->
+      <div class="cat-tabs" id="cat-tabs" role="tablist">
+        <div class="cat-tabs-cats" id="cat-tabs-cats">
+          <button class="cat-tab active" onclick="filterCat(this,'all')" id="cat-all">الكل</button>
+          <button class="cat-tab" onclick="filterCat(this,'سيارات')" id="cat-cars">🚗 سيارات</button>
+          <button class="cat-tab" onclick="filterCat(this,'إلكترونيات')" id="cat-elec">💻 إلكترونيات</button>
+          <button class="cat-tab" onclick="filterCat(this,'أثاث')" id="cat-furn">🛋️ أثاث</button>
+          <button class="cat-tab" onclick="filterCat(this,'معدات')" id="cat-equip">⚙️ معدات</button>
+          <button class="cat-tab" onclick="filterCat(this,'مجوهرات')" id="cat-jewel">💎 مجوهرات</button>
+        </div>
+        <div class="cat-tabs-shop" id="sr-shop-cluster" aria-label="المفضلة والسلة">
+          <button type="button" class="sss-btn sss-wish" onclick="toggleShowroomWish()" id="sr-wish-btn">
+            <span>❤</span><span id="sr-wish-lbl">المفضلة</span><span class="sss-count" id="sr-wish-count" hidden>0</span>
+          </button>
+          <a class="sss-btn sss-cart" href="rizq_cart.html" id="sr-cart-btn">
+            <span>🛒</span><span id="sr-cart-lbl">السلة</span><span class="sss-count" id="sr-cart-count" hidden>0</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Catalog -->
+      <div id="catalog-section">
+        <div class="catalog-header">
+          <div class="section-title" id="catalog-title-lbl">الكتالوج</div>
+          <span class="item-count" id="items-shown-count"></span>
+        </div>
+        <div class="catalog-grid" id="catalog-grid">
+          <!-- items rendered by JS -->
+        </div>
+        <div id="catalog-empty" style="display:none;text-align:center;padding:48px 20px;color:#9a9484">
+          <div style="font-size:48px;margin-bottom:12px">📦</div>
+          <div style="font-size:15px;font-weight:700" id="empty-title-lbl">لا يوجد عروض في هذا القسم</div>
+          <div style="font-size:13px;margin-top:6px" id="empty-sub-lbl">جرّب قسماً آخر أو تواصل مع المعرض مباشرة</div>
+        </div>
+      </div>
+
+  <!-- VISIT STRIP — معلومات المعرض بعد الكتالوج (البضاعة أولاً) -->
   <div class="visit-strip" id="info-section">
 
       <!-- Contact Info -->
@@ -511,45 +550,6 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
       </div>
 
   </div>
-
-  <!-- EXHIBITION FLOOR — قاعة العرض الرئيسية -->
-  <main class="exhibit-floor">
-
-      <!-- Category Tabs -->
-      <div class="cat-tabs" id="cat-tabs" role="tablist">
-        <div class="cat-tabs-cats" id="cat-tabs-cats">
-          <button class="cat-tab active" onclick="filterCat(this,'all')" id="cat-all">الكل</button>
-          <button class="cat-tab" onclick="filterCat(this,'سيارات')" id="cat-cars">🚗 سيارات</button>
-          <button class="cat-tab" onclick="filterCat(this,'إلكترونيات')" id="cat-elec">💻 إلكترونيات</button>
-          <button class="cat-tab" onclick="filterCat(this,'أثاث')" id="cat-furn">🛋️ أثاث</button>
-          <button class="cat-tab" onclick="filterCat(this,'معدات')" id="cat-equip">⚙️ معدات</button>
-          <button class="cat-tab" onclick="filterCat(this,'مجوهرات')" id="cat-jewel">💎 مجوهرات</button>
-        </div>
-        <div class="cat-tabs-shop" id="sr-shop-cluster" aria-label="المفضلة والسلة">
-          <button type="button" class="sss-btn sss-wish" onclick="toggleShowroomWish()" id="sr-wish-btn">
-            <span>❤</span><span id="sr-wish-lbl">المفضلة</span><span class="sss-count" id="sr-wish-count" hidden>0</span>
-          </button>
-          <a class="sss-btn sss-cart" href="rizq_cart.html" id="sr-cart-btn">
-            <span>🛒</span><span id="sr-cart-lbl">السلة</span><span class="sss-count" id="sr-cart-count" hidden>0</span>
-          </a>
-        </div>
-      </div>
-
-      <!-- Catalog -->
-      <div id="catalog-section">
-        <div class="catalog-header">
-          <div class="section-title" id="catalog-title-lbl">الكتالوج</div>
-          <span class="item-count" id="items-shown-count"></span>
-        </div>
-        <div class="catalog-grid" id="catalog-grid">
-          <!-- items rendered by JS -->
-        </div>
-        <div id="catalog-empty" style="display:none;text-align:center;padding:48px 20px;color:#9a9484">
-          <div style="font-size:48px;margin-bottom:12px">📦</div>
-          <div style="font-size:15px;font-weight:700" id="empty-title-lbl">لا يوجد عروض في هذا القسم</div>
-          <div style="font-size:13px;margin-top:6px" id="empty-sub-lbl">جرّب قسماً آخر أو تواصل مع المعرض مباشرة</div>
-        </div>
-      </div>
 
       <!-- Reviews -->
       <div style="margin-top:36px" id="reviews-section">

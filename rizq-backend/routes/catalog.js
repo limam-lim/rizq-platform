@@ -63,6 +63,17 @@ function mountCatalogRoutes(app, deps) {
       const single = await saveCatalogImage(id, b.image);
       catImages = single ? [single] : [];
     }
+    let brandLogo = null;
+    if (typeof b.brandLogo === 'string' && b.brandLogo.trim()) {
+      try {
+        brandLogo = await saveCatalogImage(id + '-brand', b.brandLogo);
+      } catch (eLogo) {
+        brandLogo = null;
+      }
+      if (!brandLogo && /^https?:\/\//i.test(b.brandLogo.trim())) {
+        brandLogo = String(b.brandLogo).trim().slice(0, 500);
+      }
+    }
     const rec = {
       id,
       accountId: b.accountId,
@@ -72,6 +83,13 @@ function mountCatalogRoutes(app, deps) {
       price: String(b.price || '').slice(0, 40),
       cat: String(b.cat || '').slice(0, 80),
       topicId: String(b.topicId || '').slice(0, 48),
+      brandId: String(b.brandId || '').slice(0, 48),
+      brandName: String(b.brandName || '').slice(0, 80),
+      brandNameFr: String(b.brandNameFr || '').slice(0, 80),
+      modelId: String(b.modelId || '').slice(0, 48),
+      modelName: String(b.modelName || '').slice(0, 80),
+      modelNameFr: String(b.modelNameFr || '').slice(0, 80),
+      brandLogo,
       desc: String(b.desc || '').slice(0, 3000),
       descFr: String(b.descFr || '').slice(0, 3000),
       stock: String(b.stock || '').slice(0, 20),
@@ -141,12 +159,30 @@ function mountCatalogRoutes(app, deps) {
     const isOwner = !!(item.accountId && verifyAccountOwner(item.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
     const b = req.body || {};
-    const editable = ['name', 'nameFr', 'price', 'cat', 'topicId', 'desc', 'descFr', 'stock', 'variants', 'sku', 'unit', 'emoji'];
+    const editable = ['name', 'nameFr', 'price', 'cat', 'topicId', 'desc', 'descFr', 'stock', 'variants', 'sku', 'unit', 'emoji', 'brandId', 'brandName', 'brandNameFr', 'modelId', 'modelName', 'modelNameFr'];
     editable.forEach((k) => {
       if (typeof b[k] !== 'string') return;
       const max = (k === 'desc' || k === 'descFr') ? 3000 : (k === 'variants' ? 300 : (k === 'sku' ? 64 : (k === 'unit' ? 40 : (k === 'topicId' ? 48 : (k === 'cat' ? 80 : 200)))));
       item[k] = b[k].slice(0, max);
     });
+    // شعار ماركة مخصّص (data-URI أو URL موجود) — مسار منفصل لأنه قد يكون طويلاً
+    if (typeof b.brandLogo === 'string') {
+      const rawLogo = b.brandLogo.trim();
+      if (!rawLogo) {
+        item.brandLogo = null;
+      } else {
+        let nextLogo = null;
+        try {
+          nextLogo = await saveCatalogImage(item.id + '-brand', rawLogo);
+        } catch (eLogoPatch) {
+          nextLogo = null;
+        }
+        if (!nextLogo && /^https?:\/\//i.test(rawLogo)) {
+          nextLogo = rawLogo.slice(0, 500);
+        }
+        if (nextLogo) item.brandLogo = nextLogo;
+      }
+    }
     // لا نسمح للمالك بتضخيم sold — للأدمن فقط
     if (isAdmin && typeof b.sold !== 'undefined' && Number.isFinite(Number(b.sold))) item.sold = Number(b.sold);
     if (Array.isArray(b.images)) {

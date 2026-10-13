@@ -745,7 +745,19 @@ main, .page-content.active, .main-content, .results-area,
     <!-- ── Rizq ADS — إعلان فيديو ── -->
     <div class="panel" id="panel-video-ads">
       <div class="sec-title" data-t="rads-title">🎬 Rizq ADS — إعلان فيديو في الرئيسية</div>
-      <p class="sec-sub" data-t="rads-hint">أعلن بفيديو يظهر لكل زوار منصة رزق في الموضع المميز بالصفحة الرئيسية — اختر باقة، ادفع، وارفع رابط فيديوك، وسيتم تفعيله بعد مراجعة الإدارة.</p>
+      <p class="sec-sub" data-t="rads-hint">موضعان على الرئيسية: الشاشة الكبيرة وشريط البطاقات. اختر الباقة وادفع ثم ألصق رابط فيديوك من لوحة حسابك — يفحصه المراقب الذكي ثم نوافق أو نرفض قبل النشر.</p>
+      <div class="rads-placements" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 16px">
+        <div style="border:1.5px solid rgba(201,168,76,.45);border-radius:12px;padding:12px 14px;background:linear-gradient(180deg,#fffdf6,#fff)">
+          <div style="font-size:11px;font-weight:800;color:#a07820;margin-bottom:4px" data-t="rads-place1-label">الموضع ١</div>
+          <div style="font-size:13px;font-weight:800;color:#1B3A6B" data-t="rads-place1-h">الشاشة الكبيرة</div>
+          <div style="font-size:11.5px;color:#64748b;margin-top:4px;line-height:1.5" data-t="rads-place1-p">فيديو عريض أعلى الصفحة الرئيسية — أول ما يراه الزائر.</div>
+        </div>
+        <div style="border:1.5px solid rgba(148,163,184,.5);border-radius:12px;padding:12px 14px;background:#f8fafc">
+          <div style="font-size:11px;font-weight:800;color:#64748b;margin-bottom:4px" data-t="rads-place2-label">الموضع ٢</div>
+          <div style="font-size:13px;font-weight:800;color:#1B3A6B" data-t="rads-place2-h">شريط البطاقات</div>
+          <div style="font-size:11.5px;color:#64748b;margin-top:4px;line-height:1.5" data-t="rads-place2-p">بطاقات فيديو تحت الشاشة الكبيرة — باقاتك تحدد أي موضع يظهر فيه إعلانك.</div>
+        </div>
+      </div>
       <div class="settings-card" style="margin-bottom:18px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1.5px solid rgba(201,168,76,.45)">
         <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px">
           <div>
@@ -807,7 +819,7 @@ main, .page-content.active, .main-content, .results-area,
       <div id="pay-video-url-wrap" style="display:none;margin-bottom:18px">
         <label style="font-weight:700;color:#1B3A6B;margin-bottom:6px;display:block;font-size:12.5px">🎬 <span data-t="pay-video-url-label">رابط الفيديو الإعلاني</span></label>
         <input id="pay-video-url" dir="ltr" data-ph="pay-video-url-ph" placeholder="https://youtu.be/... أو رابط Facebook" style="font-family:monospace;font-size:12px;width:100%;box-sizing:border-box;padding:10px 12px;border:1.5px solid #e0e8ff;border-radius:10px"/>
-        <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="pay-video-url-hint">سيُعرض هذا الفيديو في الموضع المميز بالصفحة الرئيسية لكل زوار المنصة بعد موافقة الإدارة</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="pay-video-url-hint">ألصق رابط يوتيوب أو فيسبوك — يُفحص المحتوى ثم نوافق أو نرفض قبل ظهوره في الموضع المحدد بباقتك (الشاشة الكبيرة أو شريط البطاقات)</div>
       </div>
       <div style="border:2px dashed rgba(27,58,107,.2);border-radius:12px;padding:16px;text-align:center;cursor:pointer" onclick="document.getElementById('pay-receipt-file').click()" id="pay-upload-zone">
         <div style="font-size:28px;margin-bottom:6px">🧾</div>
@@ -2534,7 +2546,7 @@ function submitPayment(){
   }).then(function(){
     closePayModal();
     showToast(isVideo
-      ? _t2('✅ تم إرسال طلب Rizq ADS — سيتم مراجعته وتفعيل فيديوك في الرئيسية خلال 24 ساعة','✅ Votre demande Rizq ADS a été envoyée — elle sera examinée et votre vidéo activée en page d\'accueil sous 24h')
+      ? _t2('✅ تم إرسال طلب Rizq ADS — يُفحص المحتوى ثم نوافق أو نرفض قبل النشر في الرئيسية','✅ Votre demande Rizq ADS a été envoyée — le contenu sera contrôlé, puis approuvé ou refusé avant publication')
       : _t2('✅ تم إرسال طلبك — سيتم مراجعته وتفعيل باقتك خلال 24 ساعة','✅ Votre demande a été envoyée — elle sera examinée et votre forfait activé dans les 24 heures'));
   }).catch(function(err){
     showToast((err && err.msg) || _t2('تعذّر إرسال الطلب — حاول مرة أخرى','Échec de l\'envoi de la demande — veuillez réessayer'));
