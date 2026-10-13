@@ -11,7 +11,7 @@
     { key: 'store', href: 'rizq_landing_v8.html#rzq-disc-store', hdr: 'stores', ico: '🏪', order: 3, always: true, landingHref: '#rzq-disc-store' },
     { key: 'corp', href: 'rizq_landing_v8.html#rzq-disc-corp', hdr: 'showrooms', ico: '🏬', order: 4, landingHref: '#rzq-disc-corp' },
     { key: 'office', href: 'rizq_landing_v8.html#rzq-disc-office', hdr: 'offices', ico: '💼', order: 6, landingHref: '#rzq-disc-office' },
-    { key: 'tenders', href: 'rizq_landing_v8.html#rzq-disc-tenders', hdr: 'tenders', ico: '📋', order: 7, labelAr: 'المناقصات', labelFr: 'Appels d\'offres', landingHref: '#rzq-disc-tenders' },
+    { key: 'tenders', href: 'rizq_landing_v8.html#rzq-disc-tenders', hdr: 'tenders', ico: '📑', order: 7, labelAr: 'المناقصات', labelFr: 'Appels d\'offres', landingHref: '#rzq-disc-tenders' },
     { key: 'investments', href: 'rizq_landing_v8.html#rzq-disc-investments', hdr: 'investments', ico: '📈', order: 8, labelAr: 'الاستثمارات', labelFr: 'Investissements', landingHref: '#rzq-disc-investments' }
   ];
   /** زر نشر بين المعارض والمكاتب على الشريط الرئيسي (سطح المكتب/تابلت) */
@@ -23,7 +23,8 @@
     { href: 'rizq_post.html', hdr: 'post', key: 'post', ico: '➕' },
     { href: 'rizq_landing_v8.html#pricing', hdr: 'packs', key: 'packs', ico: '💎', landingHref: '#pricing' },
     { href: 'rizq_legal.html', hdr: 'legal', key: 'legal', ico: '⚖️' },
-    { href: 'rizq_landing_v8.html#about', hdr: 'about', key: 'about', ico: 'ℹ️', landingHref: '#about' }
+    { href: 'rizq_platform.html#who', hdr: 'about', key: 'about', ico: 'ℹ️' },
+    { href: 'rizq_platform.html#why', hdr: 'why', key: 'why', ico: '❓' }
   ];
 
   /** عناصر ثابتة في «المزيد» على الجوال (بعد أقسام MODULES) */
@@ -33,7 +34,8 @@
     { href: 'rizq_post.html', hdr: 'post', ico: '➕' },
     { href: 'rizq_landing_v8.html#pricing', hdr: 'packs', ico: '💎', landingHref: '#pricing' },
     { href: 'rizq_legal.html', hdr: 'legal', ico: '⚖️' },
-    { href: 'rizq_landing_v8.html#about', hdr: 'about', ico: 'ℹ️', landingHref: '#about' }
+    { href: 'rizq_platform.html#who', hdr: 'about', ico: 'ℹ️' },
+    { href: 'rizq_platform.html#why', hdr: 'why', ico: '❓' }
   ];
 
   /** روابط سطح المكتب الثابتة — الإعلانات بعد الرئيسية مباشرة */
@@ -53,7 +55,8 @@
     post: { ar: 'نشر (+)', fr: 'Publier (+)' },
     packs: { ar: 'الباقات', fr: 'Forfaits' },
     legal: { ar: 'المواد القانونية', fr: 'Mentions légales' },
-    about: { ar: 'من نحن', fr: 'À propos' }
+    about: { ar: 'من نحن', fr: 'À propos' },
+    why: { ar: 'لماذا رزق', fr: 'Pourquoi Rizq' }
   };
 
   function isLanding() {

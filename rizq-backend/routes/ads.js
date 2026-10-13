@@ -220,6 +220,12 @@ function mountAdsRoutes(app, deps) {
       category: String(b.category).slice(0, 60),
       categoryLabel: String(b.categoryLabel || '').slice(0, 60),
       subcat: String(b.subcat || '').slice(0, 80),
+      brandId: String(b.brandId || '').slice(0, 48),
+      brandName: String(b.brandName || '').slice(0, 80),
+      brandNameFr: String(b.brandNameFr || '').slice(0, 80),
+      modelId: String(b.modelId || '').slice(0, 48),
+      modelName: String(b.modelName || '').slice(0, 80),
+      modelNameFr: String(b.modelNameFr || '').slice(0, 80),
       emoji: String(b.emoji || '').slice(0, 8),
       wilaya: String(b.wilaya || '').slice(0, 60),
       // موقع GPS اختياري — إن وُجد يُفضَّل على مركز الولاية في خريطة التفاصيل
@@ -265,11 +271,20 @@ function mountAdsRoutes(app, deps) {
     let list = readAds().filter((a) => a.status === 'active' && !String(a.accountId || '').startsWith('acc_demo') && !/^RZQ-2026-1000\d$/i.test(String(a.id || '')));
     if (q.category) list = list.filter((a) => a.category === q.category);
     if (q.subcat) list = list.filter((a) => a.subcat === q.subcat);
+    if (q.brandId) list = list.filter((a) => String(a.brandId || '') === String(q.brandId));
+    if (q.modelId) list = list.filter((a) => String(a.modelId || '') === String(q.modelId));
     if (q.wilaya) list = list.filter((a) => a.wilaya === q.wilaya);
     if (q.accountId) list = list.filter((a) => a.accountId === q.accountId);
     if (q.search) {
       const s = String(q.search).toLowerCase();
-      list = list.filter((a) => (a.title + ' ' + a.desc).toLowerCase().indexOf(s) !== -1);
+      list = list.filter((a) => {
+        const blob = [
+          a.title, a.desc, a.titleFr, a.descFr,
+          a.brandId, a.brandName, a.brandNameFr,
+          a.modelId, a.modelName, a.modelNameFr
+        ].join(' ').toLowerCase();
+        return blob.indexOf(s) !== -1;
+      });
     }
     list = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     const limit = Math.max(1, Math.min(200, Number(q.limit) || 60));
@@ -353,7 +368,7 @@ function mountAdsRoutes(app, deps) {
     const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
     const b = req.body || {};
-    const editable = ['title', 'desc', 'titleFr', 'descFr', 'price', 'originalPrice', 'subcat', 'wilaya', 'condition'];
+    const editable = ['title', 'desc', 'titleFr', 'descFr', 'price', 'originalPrice', 'subcat', 'wilaya', 'condition', 'brandId', 'brandName', 'brandNameFr', 'modelId', 'modelName', 'modelNameFr'];
     editable.forEach((k) => { if (typeof b[k] === 'string') ad[k] = b[k].slice(0, (k === 'desc' || k === 'descFr') ? 5000 : 200); });
     if (Object.prototype.hasOwnProperty.call(b, 'stockQty')) {
       ad.stockQty = (b.stockQty !== null && b.stockQty !== '' && Number.isFinite(Number(b.stockQty)) && Number(b.stockQty) >= 0)

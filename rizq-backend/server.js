@@ -226,6 +226,8 @@ const LOCAL_DEV_ORIGINS = [
   'http://127.0.0.1:5173',
   'http://localhost:8080',
   'http://127.0.0.1:8080',
+  'http://localhost:8765',
+  'http://127.0.0.1:8765',
 ];
 /* أمان خارجي: أصول التطوير المحلية تُضاف فقط خارج الإنتاج */
 if (!isProdEnv()) {
@@ -1829,7 +1831,7 @@ function genDashToken() {
 const ACCOUNT_PUBLIC_FIELDS = [
   'id', 'type', 'name', 'city', 'address', 'desc', 'promo_video', 'promo_video_extra', 'category',
   'activityId', 'activity', 'storeTopics',
-  'facebook', 'thumb', 'tagline', 'status', 'approvedAt', 'createdAt',
+  'facebook', 'thumb', 'cover', 'tagline', 'status', 'approvedAt', 'createdAt',
 ];
 function toPublicAccount(acc) {
   const viewerId = null;
@@ -2023,6 +2025,7 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     whatsapp: String(b.whatsapp || '').slice(0, 60),
     facebook: String(b.facebook || '').slice(0, 300),
     thumb: String(b.thumb || '').slice(0, 2_000_000), // صورة base64 مصغّرة
+    cover: String(b.cover || '').slice(0, 2_000_000), // غلاف هيرو الصفحة العامة
     tagline: stripBidiControls(String(b.tagline || '')).normalize('NFC').slice(0, 50),
     // إصلاح 13/08/2026: حقلا التوثيق (NNI + صورة بطاقة التعريف/جواز السفر)
     // كانا يُجمَعان في واجهة التسجيل (rizq_landing_v8.html) لكن لا يصلان

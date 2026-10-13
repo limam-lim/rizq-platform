@@ -53,6 +53,15 @@
       + '.rzq-ft-collapse-wrap{max-height:0;overflow:hidden;transition:max-height .4s ease}'
       + '@media (prefers-reduced-motion: reduce){.rzq-ft-collapse-wrap{transition:none}}'
       + 'footer.rzq-ft-compact{padding-top:14px!important;transition:padding-top .35s ease}'
+      /* أسفل الفوتر يحتاج فراغاً كافياً حتى لا تُقطع شارة ADMINIA ونصوص الحقوق */
+      + 'html body footer.rizq-footer,html body footer{'
+      + 'padding-bottom:36px!important;box-sizing:border-box!important;'
+      + 'overflow:visible!important}'
+      + 'html body footer.rizq-footer .footer-bottom,'
+      + 'html body footer .footer-bottom{'
+      + 'padding:14px 0 8px!important;margin-bottom:0!important;'
+      + 'align-items:flex-start!important;row-gap:12px!important}'
+      + 'html body footer .rzq-ft-adminia-stack{padding-bottom:4px!important}'
       + 'html body footer,html body footer.rizq-footer{'
       + 'background:linear-gradient(180deg,#0D1B2A,#071020)!important;'
       + 'background-blend-mode:normal!important}'
@@ -70,7 +79,7 @@
       + '@media (max-width:900px){footer.rizq-footer .footer-grid{'
       + 'grid-template-columns:1fr 1fr 1fr!important;gap:22px!important}}'
       + '@media (max-width:600px){footer.rizq-footer .footer-grid{'
-      + 'grid-template-columns:1fr!important;gap:20px!important}}';
+      + 'grid-template-columns:1fr!important;gap:20px!important}}'
     var style = document.getElementById('rzq-ft-toggle-css');
     if (!style) {
       style = document.createElement('style');
@@ -103,8 +112,10 @@
     var fb = (scope || document).querySelector('.footer-bottom');
     if (!fb || fb.dataset.rzqSlim) return;
     fb.dataset.rzqSlim = '1';
-    fb.style.padding = '12px 0';
-    fb.style.gap = '8px';
+    /* لا نضغط الحشو السفلي إلى صفر — كان يقطع ويدجت ADMINIA والنصوص */
+    fb.style.padding = '14px 0 10px';
+    fb.style.gap = '10px';
+    fb.style.alignItems = 'flex-start';
     fb.querySelectorAll('.footer-copy').forEach(function (p) { p.style.fontSize = '10.5px'; });
     var icon = fb.querySelector('[style*="34px"]');
     if (icon) {
@@ -112,7 +123,7 @@
       icon.style.height = '26px';
       icon.style.fontSize = '7px';
       var box = icon.parentElement;
-      if (box) { box.style.padding = '6px 14px'; box.style.gap = '9px'; }
+      if (box) { box.style.padding = '8px 14px'; box.style.gap = '9px'; }
       var textWrap = icon.nextElementSibling;
       if (textWrap && textWrap.children.length >= 2) {
         textWrap.children[0].style.fontSize = '11px';

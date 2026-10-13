@@ -108,17 +108,38 @@ body{font-family:var(--font);background:linear-gradient(180deg,#eef2f7 0%,#f5f7f
   padding:8px 5% 28px;
 }
 .ads-preview-inner{
-  max-width:1040px;margin:0 auto;display:grid;grid-template-columns:1.1fr 1fr;gap:22px;align-items:center;
+  max-width:1040px;margin:0 auto;display:grid;grid-template-columns:1.15fr 1fr;gap:22px;align-items:center;
   background:#fff;border:1.5px solid #1B3A6B;border-radius:20px;
   padding:18px;box-shadow:0 8px 28px rgba(27,58,107,.08);
 }
 @media(max-width:860px){.ads-preview-inner{grid-template-columns:1fr}}
+.ads-preview-stage{display:flex;flex-direction:column;gap:10px;min-width:0}
 .phone-frame{
   position:relative;border-radius:16px;overflow:hidden;
   background:linear-gradient(160deg,#0f2347,#1B3A6B);
   border:1px solid rgba(201,168,76,.35);
   box-shadow:0 12px 28px rgba(15,35,71,.25);
   aspect-ratio:16/9;
+}
+.ads-strip-demo{
+  display:grid;grid-template-columns:repeat(5,1fr);gap:6px;
+}
+.ads-strip-demo .mini{
+  aspect-ratio:9/16;border-radius:10px;background:linear-gradient(160deg,#1B3A6B,#0D1B2A);
+  border:1px solid rgba(13,27,42,.14);position:relative;overflow:hidden;
+  box-shadow:0 4px 10px rgba(13,27,42,.12);
+}
+.ads-strip-demo .mini::after{
+  content:'▶';position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);
+  width:16px;height:16px;border-radius:50%;background:#e11d48;color:#fff;
+  font-size:7px;display:grid;place-items:center;line-height:1;
+}
+.ads-strip-demo .mini-lbl{
+  position:absolute;inset-inline-start:4px;bottom:4px;z-index:1;
+  font-size:7px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.5);
+}
+.ads-strip-cap{
+  font-size:11px;font-weight:800;color:#1B3A6B;text-align:center;margin-top:2px;
 }
 .phone-frame .slot-badge{
   position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:2;
@@ -156,7 +177,7 @@ body{font-family:var(--font);background:linear-gradient(180deg,#eef2f7 0%,#f5f7f
 .sec-head h2{font-family:var(--display);font-size:clamp(24px,3.2vw,34px);font-weight:700;color:var(--navy);margin-bottom:8px}
 .sec-head p{color:var(--ink-soft);font-size:14px;line-height:1.7}
 
-.place-grid{max-width:1080px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.place-grid{max-width:920px;margin:0 auto;display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
 @media(max-width:860px){.place-grid{grid-template-columns:1fr}}
 .place-card{
   position:relative;overflow:hidden;border-radius:20px;background:#fff;
@@ -164,10 +185,20 @@ body{font-family:var(--font);background:linear-gradient(180deg,#eef2f7 0%,#f5f7f
   transition:transform .25s,box-shadow .25s;
 }
 .place-card:hover{transform:translateY(-6px);box-shadow:0 14px 32px rgba(27,58,107,.14)}
+.place-card .tier-pill{
+  position:absolute;top:12px;inset-inline-start:12px;z-index:2;
+  font-size:10.5px;font-weight:900;padding:4px 10px;border-radius:999px;
+}
+.place-card.is-gold .tier-pill{background:linear-gradient(135deg,#E8C96A,#C9A84C);color:#0f2347}
+.place-card.is-silver .tier-pill{background:#e8eef8;color:#1B3A6B;border:1px solid rgba(27,58,107,.16)}
+.place-card.is-gold{border-color:rgba(201,168,76,.55)}
 .place-visual{
   height:128px;position:relative;
   background:linear-gradient(145deg,#1B3A6B,#0f2347);
   display:flex;align-items:center;justify-content:center;
+}
+.place-card.is-gold .place-visual{
+  background:linear-gradient(145deg,#0a1525,#1B3A6B 55%,#0a1525);
 }
 .place-visual::after{
   content:'';position:absolute;inset:0;
@@ -312,7 +343,9 @@ html[dir="ltr"] .pricing-features{text-align:left}
         <a href="rizq_ads_info.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🎬</span><div><strong data-hdr="rizqads">Rizq ADS</strong></div></a>
         <a href="rizq_landing_v8.html#pricing" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong data-hdr="packs">الباقات</strong></div></a>
         <a href="rizq_legal.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">⚖️</span><div><strong>المواد القانونية</strong></div></a>
-        <a href="rizq_landing_v8.html#about" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">ℹ️</span><div><strong>من نحن</strong></div></a>
+        <a href="rizq_platform.html#who" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">ℹ️</span><div><strong>من نحن</strong></div></a>
+        <a href="rizq_platform.html#why" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">❓</span><div><strong>لماذا رزق</strong></div></a>
+        <a href="rizq_about.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🏛️</span><div><strong>الشركة المالكة</strong></div></a>
       </div>
     </li>
   </ul>
@@ -333,7 +366,7 @@ html[dir="ltr"] .pricing-features{text-align:left}
     <div class="ads-brand" data-t="brand">رزق ADS</div>
     <div class="ads-badge"><span class="dot"></span> <span data-t="badge">منتج إعلاني منفصل عن الإعلانات المبوبة</span></div>
     <h1 data-t="hero-h1">أعلن حيث <span>يبحث الناس</span></h1>
-    <p class="lead" data-t="hero-p">موضع فيديو واحد على الصفحة الرئيسية، بانرات واضحة، وإبراز مضبوط — بدون خلط مع عروض المستخدمين.</p>
+    <p class="lead" data-t="hero-p">موضعان على الرئيسية: شاشة كبيرة أعلى الصفحة + شريط بطاقات فيديو تحتها — منفصلان عن شبكة الإعلانات المبوبة.</p>
     <div class="ads-hero-ctas">
       <a href="rizq_register.html?mode=seller" class="btn-gold" data-t="cta1">🚀 اطلب حملة</a>
       <a href="#ads-placements" class="btn-ghost" data-t="cta2">شاهد المواضع</a>
@@ -344,21 +377,31 @@ html[dir="ltr"] .pricing-features{text-align:left}
 
 <section class="ads-preview-strip">
   <div class="ads-preview-inner">
-    <div class="phone-frame reveal-init">
-      <span class="slot-badge" data-t="slot-badge">مساحة واحدة في الرئيسية · رزق ADS</span>
-      <div class="slot-body">
-        <div class="play" aria-hidden="true">▶</div>
-        <div class="slot-title" data-t="slot-title">إعلانك هنا — أول ما يراه الزائر</div>
-        <div class="slot-sub" data-t="slot-sub">موريتانيا · موضع مميّز</div>
+    <div class="ads-preview-stage reveal-init">
+      <div class="phone-frame">
+        <span class="slot-badge" data-t="slot-badge">الشاشة الكبيرة</span>
+        <div class="slot-body">
+          <div class="play" aria-hidden="true">▶</div>
+          <div class="slot-title" data-t="slot-title">إعلانك هنا — أول ما يراه الزائر</div>
+          <div class="slot-sub" data-t="slot-sub">أعلى الصفحة الرئيسية</div>
+        </div>
       </div>
+      <div class="ads-strip-demo" aria-hidden="true">
+        <div class="mini"><span class="mini-lbl">فيديو</span></div>
+        <div class="mini"><span class="mini-lbl">فيديو</span></div>
+        <div class="mini"><span class="mini-lbl">فيديو</span></div>
+        <div class="mini"><span class="mini-lbl">فيديو</span></div>
+        <div class="mini"><span class="mini-lbl">فيديو</span></div>
+      </div>
+      <p class="ads-strip-cap" data-t="strip-cap">شريط البطاقات تحت الشاشة</p>
     </div>
     <div class="preview-copy reveal-init">
-      <h3 data-t="preview-h">الموضع الأول على رزق</h3>
-      <p data-t="preview-p">خانة فيديو واحدة في الصفحة الرئيسية — حضور قوي وواضح، منفصل تمامًا عن شبكة الإعلانات المبوبة.</p>
+      <h3 data-t="preview-h">موضعان على رزق</h3>
+      <p data-t="preview-p">شاشة عريضة في أعلى الرئيسية، وشريط بطاقات فيديو تحتها — حضور أوضح وأسعار أبسط، بدون خلط مع عروض المستخدمين.</p>
       <ul>
-        <li data-t="preview-li1">ظهور فوري لكل زائر</li>
-        <li data-t="preview-li2">مراجعة وتفعيل خلال 24 ساعة</li>
-        <li data-t="preview-li3">إحصائيات مشاهدات ونقرات</li>
+        <li data-t="preview-li1">ظهور لكل زائر على الرئيسية</li>
+        <li data-t="preview-li2">ألصق رابط الفيديو من لوحة حسابك</li>
+        <li data-t="preview-li3">فحص وموافقة قبل النشر — أو رفض إن لزم</li>
       </ul>
     </div>
   </div>
@@ -367,29 +410,24 @@ html[dir="ltr"] .pricing-features{text-align:left}
 <section class="sec" id="ads-placements" style="background:#fff">
   <div class="sec-head reveal-init">
     <span class="tag" data-t="tag-placements">المواضع</span>
-    <h2 data-t="placements-h2">أنواع المواضع الإعلانية</h2>
-    <p data-t="placements-p">ثلاثة مواضع واضحة — ليس كروسل مئات الإعلانات تحت «تصفّح»</p>
+    <h2 data-t="placements-h2">موضعان إعلانيان بالفيديو</h2>
+    <p data-t="placements-p">شاشة كبيرة أعلى الصفحة · شريط بطاقات تحتها — منفصلان عن شبكة «تصفّح»</p>
   </div>
   <div class="place-grid">
-    <article class="place-card reveal-init">
+    <article class="place-card is-gold reveal-init">
+      <span class="tier-pill" data-t="place1-tier">الموضع ١</span>
       <div class="place-visual"><span class="ico">▶️</span></div>
       <div class="place-body">
-        <h3 data-t="place1-h">مساحة الفيديو</h3>
-        <p data-t="place1-p">الخانة الأولى في الصفحة الرئيسية — مساحة إعلانية واحدة مميزة يراها كل زائر.</p>
+        <h3 data-t="place1-h">الشاشة الكبيرة</h3>
+        <p data-t="place1-p">فيديو عريض في أعلى الصفحة الرئيسية — أول ما يراه الزائر قبل أي شبكة إعلانات.</p>
       </div>
     </article>
-    <article class="place-card reveal-init">
-      <div class="place-visual"><span class="ico">🖼️</span></div>
+    <article class="place-card is-silver reveal-init">
+      <span class="tier-pill" data-t="place2-tier">الموضع ٢</span>
+      <div class="place-visual"><span class="ico">📱</span></div>
       <div class="place-body">
-        <h3 data-t="place2-h">بانر الصفحة</h3>
-        <p data-t="place2-p">مساحات بصرية داخل الصفحات والأقسام الرئيسية بحضور واضح.</p>
-      </div>
-    </article>
-    <article class="place-card reveal-init">
-      <div class="place-visual"><span class="ico">⭐</span></div>
-      <div class="place-body">
-        <h3 data-t="place3-h">إعلان مميز</h3>
-        <p data-t="place3-p">إبراز مضبوط ومنفصل عن شبكة عروض المستخدمين.</p>
+        <h3 data-t="place2-h">شريط البطاقات</h3>
+        <p data-t="place2-p">بطاقات فيديو عمودية تحت الشاشة الكبيرة — حضور إضافي بجانب الشاشة الرئيسية.</p>
       </div>
     </article>
   </div>
@@ -397,18 +435,18 @@ html[dir="ltr"] .pricing-features{text-align:left}
 
 <section class="sec" style="background:#fff">
   <div class="sec-head reveal-init">
-    <span class="tag" data-t="tag-how">كيف يعمل</span>
+    <span class="tag" data-t="tag-how">الخطوات</span>
     <h2 data-t="how-h2">كيف يعمل</h2>
     <p data-t="how-p">ثلاث خطوات بسيطة لبدء حملتك على رزق</p>
   </div>
   <div class="how-grid">
-    <div class="how-card reveal-init"><div class="how-num">1</div><h3 data-t="how1-h">اختر الموضع</h3><p data-t="how1-p">فيديو، بانر، أو إعلان مميز حسب هدفك</p></div>
-    <div class="how-card reveal-init"><div class="how-num">2</div><h3 data-t="how2-h">ارفع الإبداع</h3><p data-t="how2-p">فيديو أو صورة — مراجعة خلال 24 ساعة</p></div>
-    <div class="how-card reveal-init"><div class="how-num">3</div><h3 data-t="how3-h">تابع النتائج</h3><p data-t="how3-p">مشاهدات ونقرات وتواصل من لوحة حسابك</p></div>
+    <div class="how-card reveal-init"><div class="how-num">1</div><h3 data-t="how1-h">اختر الموضع</h3><p data-t="how1-p">الشاشة الكبيرة أو شريط البطاقات — حسب باقتك</p></div>
+    <div class="how-card reveal-init"><div class="how-num">2</div><h3 data-t="how2-h">ألصق رابط الفيديو</h3><p data-t="how2-p">من لوحة حسابك — يوتيوب أو فيسبوك (بدون رفع ملف)</p></div>
+    <div class="how-card reveal-init"><div class="how-num">3</div><h3 data-t="how3-h">مراجعة ثم نشر</h3><p data-t="how3-p">مراقب ذكي يفحص المحتوى — نوافق أو نرفض قبل الظهور</p></div>
   </div>
   <div class="feat-row">
     <div class="feat-mini reveal-init"><div class="ring">📹</div><h4 data-t="feat1-h">فيديو يعمل تلقائياً</h4><p data-t="feat1-p">حضور على مدار الساعة</p></div>
-    <div class="feat-mini reveal-init"><div class="ring">🎯</div><h4 data-t="feat2-h">استهداف دقيق</h4><p data-t="feat2-p">في سياق من يبحث للشراء</p></div>
+    <div class="feat-mini reveal-init"><div class="ring">🛡️</div><h4 data-t="feat2-h">فحص قبل النشر</h4><p data-t="feat2-p">مراقب ذكي + موافقة بشرية</p></div>
     <div class="feat-mini reveal-init"><div class="ring">📊</div><h4 data-t="feat3-h">إحصائيات واضحة</h4><p data-t="feat3-p">مشاهدات ونقرات وتواصل</p></div>
     <div class="feat-mini reveal-init"><div class="ring">✓</div><h4 data-t="feat4-h">شارة موثّق</h4><p data-t="feat4-p">ثقة أعلى للزبون</p></div>
   </div>
@@ -418,7 +456,7 @@ html[dir="ltr"] .pricing-features{text-align:left}
   <div class="sec-head reveal-init">
     <span class="tag" data-t="tag-packages">باقات رزق ADS</span>
     <h2 data-t="pricing-h2">باقات الإعلان بالفيديو</h2>
-    <p data-t="pricing-p">أسعار واضحة — اختر الباقة المناسبة وابدأ خلال 24 ساعة من المراجعة</p>
+    <p data-t="pricing-p">أسعار واضحة — اختر الباقة، ألصق الرابط، ويُنشر بعد الموافقة</p>
   </div>
   <div class="pricing-grid" id="ads-pricing-grid" data-rizq-pkg-ads="1">
     <!-- fallback يُستبدل ديناميكياً بنفس ألوان الرئيسية -->
@@ -430,7 +468,7 @@ html[dir="ltr"] .pricing-features{text-align:left}
     <div class="trust-row">
       <div class="trust-item"><span>🔒</span><span data-t="note-text">متاح لأي حساب تجاري موثّق في رزق</span></div>
       <div class="trust-sep" aria-hidden="true"></div>
-      <div class="trust-item"><span>⏱️</span><span class="gold" data-t="note-gold">تفعيل الباقة خلال 24 ساعة</span></div>
+      <div class="trust-item"><span>🛡️</span><span class="gold" data-t="note-gold">يُفعَّل بعد الموافقة على المحتوى</span></div>
     </div>
     <div class="trust-cta">
       <span data-t="existing-text">اشتركت بالفعل أو تريد تفعيل إعلانك؟</span>
@@ -452,6 +490,8 @@ html[dir="ltr"] .pricing-features{text-align:left}
         <li><a href="rizq_browse.html" data-t="footer-l-browse">تصفّح الإعلانات</a></li>
         <li><a href="rizq_ads_info.html" data-t="brand">رزق ADS</a></li>
         <li><a href="rizq_landing_v8.html#pricing" data-t="footer-l-prices">الأسعار</a></li>
+        <li><a href="rizq_platform.html#who" data-t="footer-l-about">من نحن</a></li>
+        <li><a href="rizq_platform.html#why" data-t="footer-l-why">لماذا رزق</a></li>
       </ul>
     </div>
     <div>
@@ -460,6 +500,7 @@ html[dir="ltr"] .pricing-features{text-align:left}
         <li><a href="rizq_help.html" data-t="footer-help1">مركز المساعدة</a></li>
         <li><a href="rizq_legal.html#s3" data-t="footer-help2">سياسة الخصوصية</a></li>
         <li><a href="rizq_legal.html#s2" data-t="footer-help3">شروط الاستخدام</a></li>
+        <li><a href="rizq_about.html" data-t="footer-l-company">الشركة المالكة</a></li>
       </ul>
     </div>
     <div>

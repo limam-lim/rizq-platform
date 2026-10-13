@@ -72,8 +72,8 @@ function patchFile(file) {
   });
 
   // من نحن على الصفحة الرئيسية — رابط مطلق يعمل من أي مكان
-  const aboutRe = /(<a\s+href=")#about("\s+data-t="ft-q5")/g;
-  const aboutNext = html.replace(aboutRe, '$1rizq_landing_v8.html#about$2');
+  const aboutRe = /(<a\s+href=")(?:#about|rizq_landing_v8\.html#about)("\s+data-t="ft-q5b?")/g;
+  const aboutNext = html.replace(aboutRe, '$1rizq_platform.html#who$2');
   if (aboutNext !== html) { html = aboutNext; changed = true; }
 
   if (changed) fs.writeFileSync(path.join(ROOT, file), html, 'utf8');

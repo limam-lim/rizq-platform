@@ -431,12 +431,164 @@
     if (!el) return;
     var safe = safeMediaUrl(thumb);
     if (safe) {
-      el.innerHTML = '<img src="' + esc(safe) + '" alt="" width="88" height="88" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"/>';
+      el.innerHTML = '<img src="' + esc(safe) + '" alt="" width="88" height="88" decoding="async" fetchpriority="high" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"/>';
+      var img = el.querySelector('img');
+      if (img && emoji) {
+        img.addEventListener('error', function () {
+          el.textContent = emoji;
+          el.classList.remove('is-storefront');
+        }, { once: true });
+      }
     } else if (emoji) {
       el.textContent = emoji;
     } else {
       el.textContent = '';
     }
+  }
+
+  function ensureStorefrontLightbox() {
+    var box = document.getElementById('rzq-storefront-lb');
+    if (box) return box;
+    box = document.createElement('div');
+    box.id = 'rzq-storefront-lb';
+    box.className = 'rzq-storefront-lb';
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-modal', 'true');
+    box.setAttribute('aria-hidden', 'true');
+    box.innerHTML =
+      '<div class="rzq-storefront-lb-panel">' +
+        '<button type="button" class="rzq-storefront-lb-close" aria-label="إغلاق">×</button>' +
+        '<figure class="rzq-storefront-lb-figure">' +
+          '<img class="rzq-storefront-lb-img" alt="" />' +
+          '<figcaption class="rzq-storefront-lb-cap"></figcaption>' +
+        '</figure>' +
+      '</div>';
+    document.body.appendChild(box);
+    function close() {
+      box.classList.remove('is-open');
+      box.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('rzq-storefront-lb-on');
+    }
+    box.addEventListener('click', function (e) {
+      if (e.target === box) close();
+    });
+    var closeBtn = box.querySelector('.rzq-storefront-lb-close');
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && box.classList.contains('is-open')) close();
+    });
+    box._rzqClose = close;
+    return box;
+  }
+
+  /**
+   * دائرة الشعار/واجهة المحل: تعرض صورة الواجهة، وبالضغط تنبثق صورة مهذبة.
+   * يُفضَّل cover (غلاف الواجهة)، ثم thumb.
+   */
+  function wireStorefrontLogo(el, opts) {
+    if (!el) return;
+    opts = opts || {};
+    var facade = safeMediaUrl(opts.cover) || safeMediaUrl(opts.thumb) || '';
+    var circle = safeMediaUrl(opts.cover) || safeMediaUrl(opts.thumb) || '';
+    var name = String(opts.name || '').trim();
+    var kind = String(opts.kind || 'store');
+    var fr = !!opts.fr;
+    var emoji = opts.emoji || (kind === 'corp' || kind === 'showroom' ? '🏛️' : '🏪');
+    setLogo(el, circle, emoji);
+    el.classList.toggle('is-storefront', !!facade);
+    el.setAttribute('role', facade ? 'button' : 'img');
+    el.tabIndex = facade ? 0 : -1;
+    var tip = fr
+      ? (kind === 'corp' || kind === 'showroom' ? 'Voir la vitrine du showroom' : 'Voir la façade de la boutique')
+      : (kind === 'corp' || kind === 'showroom' ? 'عرض واجهة المعرض' : 'عرض واجهة المحل');
+    if (facade) {
+      el.title = tip;
+      el.setAttribute('aria-label', tip + (name ? ' — ' + name : ''));
+    } else {
+      el.removeAttribute('title');
+      el.removeAttribute('aria-label');
+    }
+    el._rzqStorefront = { url: facade, name: name, kind: kind, fr: fr };
+    if (el._rzqStorefrontBound) return;
+    el._rzqStorefrontBound = true;
+    function open() {
+      var data = el._rzqStorefront || {};
+      if (!data.url) return;
+      var box = ensureStorefrontLightbox();
+      var img = box.querySelector('.rzq-storefront-lb-img');
+      var cap = box.querySelector('.rzq-storefront-lb-cap');
+      if (img) {
+        img.src = data.url;
+        img.alt = data.name || '';
+      }
+      if (cap) {
+        var label = data.fr
+          ? ((data.kind === 'corp' || data.kind === 'showroom') ? 'Vitrine du showroom' : 'Façade de la boutique')
+          : ((data.kind === 'corp' || data.kind === 'showroom') ? 'واجهة المعرض' : 'واجهة المحل');
+        cap.textContent = data.name ? (label + ' — ' + data.name) : label;
+      }
+      box.classList.add('is-open');
+      box.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('rzq-storefront-lb-on');
+    }
+    el.addEventListener('click', function (e) {
+      if (!(el._rzqStorefront && el._rzqStorefront.url)) return;
+      e.preventDefault();
+      open();
+    });
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        if (!(el._rzqStorefront && el._rzqStorefront.url)) return;
+        e.preventDefault();
+        open();
+      }
+    });
+  }
+
+  /**
+   * خلفية هيرو المحل/المعرض = غلاف مخصّص (cover) من الداشبورد.
+   * يُفضَّل cover؛ يمكن تمرير cover || thumb من الصفحة حتى لا يظهر الكحلي الفارغ.
+   */
+  function setHeroPhoto(heroEl, cover) {
+    if (!heroEl) return false;
+    var safe = safeMediaUrl(cover);
+    var slot = heroEl.querySelector('.hero-photo') || heroEl.querySelector('[data-hero-photo]');
+    if (!safe) {
+      heroEl.classList.remove('has-hero-photo');
+      if (slot) {
+        slot.innerHTML = '';
+        slot.hidden = true;
+        if (typeof slot.removeAttribute === 'function') slot.removeAttribute('style');
+        else if (slot.style) {
+          slot.style.backgroundImage = '';
+          slot.style.backgroundSize = '';
+          slot.style.backgroundPosition = '';
+        }
+      }
+      return false;
+    }
+    if (!slot) {
+      slot = document.createElement('div');
+      slot.className = 'hero-photo';
+      slot.setAttribute('aria-hidden', 'true');
+      heroEl.insertBefore(slot, heroEl.firstChild);
+    }
+    slot.hidden = false;
+    /* أظهر الطبقة فوراً حتى قبل اكتمال تحميل الصورة — يمنع وميض الكحلي */
+    heroEl.classList.add('has-hero-photo');
+    slot.style.backgroundImage = 'url("' + String(safe).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '")';
+    slot.style.backgroundSize = 'cover';
+    slot.style.backgroundPosition = 'center';
+    var img = slot.querySelector('img');
+    if (!img) {
+      img = document.createElement('img');
+      img.alt = '';
+      img.decoding = 'async';
+      img.setAttribute('fetchpriority', 'high');
+      slot.appendChild(img);
+    }
+    if (img.getAttribute('src') !== safe) img.src = safe;
+    return true;
   }
 
   /**
@@ -1012,6 +1164,8 @@
     withStoreId: withStoreId,
     wireStoreLinks: wireStoreLinks,
     setLogo: setLogo,
+    wireStorefrontLogo: wireStorefrontLogo,
+    setHeroPhoto: setHeroPhoto,
     introVideoSlots: introVideoSlots,
     promoVideosOf: promoVideosOf,
     openProductDetail: openProductDetail,

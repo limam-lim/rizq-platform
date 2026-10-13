@@ -226,8 +226,8 @@ function auditLinks() {
   });
   if (!broken.length) ok('Broken file links', 'header/footer/landing/dashboards OK');
   else fail('Broken file links', [...new Set(broken)].slice(0, 15).join(', '));
-  const uniqueHash = [...new Set(hashMissing)].filter((h) => !/#(pricing|about|virtual-offices)$/.test(h));
-  if (!uniqueHash.length) ok('Landing hash targets', '#pricing #about present');
+  const uniqueHash = [...new Set(hashMissing)].filter((h) => !/#(pricing|virtual-offices)$/.test(h));
+  if (!uniqueHash.length) ok('Landing hash targets', '#pricing present (about → rizq_platform)');
   else warn('Landing hash without id', uniqueHash.slice(0, 10).join(', '));
 }
 

@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=30.9"/>
-<link rel="stylesheet" href="rizq_ad_cards.css?v=3.7"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=4.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.9"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.3"/>
@@ -1435,12 +1435,13 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
 }
 .hero-vid-cta-link:hover{transform:translateY(-2px);filter:brightness(1.06);box-shadow:0 8px 20px rgba(201,168,76,.4);color:var(--royal-dark)}
 .hero-vid-cta-link.hero-vid-cta-ghost{
-  background:transparent;color:rgba(232,214,160,.92);
-  border:1px solid rgba(201,168,76,.38);
-  box-shadow:none;
+  background:#fff;color:#0D1B2A;
+  border:1.5px solid #C9A84C;
+  box-shadow:0 2px 10px rgba(13,27,42,.08);
 }
 .hero-vid-cta-link.hero-vid-cta-ghost:hover{
-  background:rgba(201,168,76,.12);color:var(--gold-light);border-color:rgba(201,168,76,.6);
+  background:#f7f1e1;color:#0D1B2A;border-color:#a8892e;
+  box-shadow:0 4px 14px rgba(13,27,42,.12);filter:none;
 }
 .hero-vid-cta-sep{display:none}
 @media(max-width:640px){
@@ -1450,6 +1451,205 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   .hero-vid-ph-line1{font-size:13px}
   .hero-vid-cta-bar{gap:8px}
   .hero-vid-cta-link{font-size:11px;padding:8px 14px}
+}
+
+/* ── الموضع الثاني: شريط بطاقات بعرض شبكة «أبرز العروض» (1200px) ── */
+.rizq-vid-strip{
+  width:min(1200px,calc(100vw - 32px))!important;
+  max-width:min(1200px,calc(100vw - 32px))!important;
+  margin:10px auto 8px;padding:8px 0 4px;
+  background:transparent;border:none;border-radius:0;
+  box-shadow:none;position:relative;z-index:20;
+  box-sizing:border-box;
+}
+.hero-after-promo-tail{
+  width:100%;max-width:min(960px,86vw);margin:0 auto;
+  display:flex;flex-direction:column;align-items:center;
+  gap:14px;padding:4px 14px 8px;box-sizing:border-box;
+}
+.hero-after-promo-tail > .hero-vid-cta-bar{
+  width:100%;max-width:min(780px,78vw);margin:0 auto;
+}
+.hero-after-promo-tail > .hero-stats-bar{width:100%}
+.rizq-vid-strip-head{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;
+  margin-bottom:4px;padding:0 4px;
+}
+.rizq-vid-strip-title{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  font-size:clamp(13.5px,1.7vw,15.5px);font-weight:800;color:#0D1B2A;
+  font-family:'Cairo','Segoe UI',sans-serif;
+}
+.rizq-vid-strip-playico{
+  display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;
+  background:#e11d48;color:#fff;font-size:10px;flex-shrink:0;
+}
+.rizq-vid-strip-tier{
+  font-size:10.5px;font-weight:800;color:#1B3A6B;
+  background:#e8eef8;border:1px solid rgba(27,58,107,.16);
+  padding:3px 9px;border-radius:999px;
+}
+.rizq-vid-strip-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rizq-vid-strip-count{font-size:12.5px;font-weight:700;color:#5b6b85}
+.rizq-vid-strip-nav{display:flex;gap:6px}
+.rizq-vid-strip-btn{
+  border:1.5px solid rgba(13,27,42,.2);background:#fff;color:#0D1B2A;
+  border-radius:10px;padding:6px 12px;font:inherit;font-size:12px;font-weight:800;
+  cursor:pointer;font-family:'Cairo','Segoe UI',sans-serif;
+  transition:border-color .2s,background .2s,opacity .2s;
+}
+.rizq-vid-strip-btn:hover:not(:disabled){border-color:#1B3A6B;background:#f7f9fc}
+.rizq-vid-strip-btn:disabled{opacity:.35;cursor:default}
+.rizq-vid-strip-hint{
+  margin:0 4px 10px;font-size:11.5px;font-weight:600;color:#7a879c;
+  font-family:'Cairo','Segoe UI',sans-serif;
+}
+.rizq-vid-strip-track{
+  display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+  padding:2px 0 8px;scrollbar-width:thin;
+}
+.rizq-vid-strip-track::-webkit-scrollbar{height:6px}
+.rizq-vid-strip-track::-webkit-scrollbar-thumb{background:rgba(27,58,107,.25);border-radius:6px}
+/* 7 بطاقات أكبر ظاهرة بعرض listings (1200px) */
+.rizq-vcard{
+  flex:0 0 calc((100% - 72px) / 7);scroll-snap-align:start;min-width:0;
+  display:flex;flex-direction:column;gap:7px;cursor:pointer;
+}
+.rizq-vcard-thumb{
+  position:relative;aspect-ratio:9/16;border-radius:14px;overflow:hidden;
+  background:linear-gradient(160deg,#1B3A6B,#0D1B2A);
+  border:1px solid rgba(13,27,42,.12);
+  box-shadow:0 8px 18px rgba(13,27,42,.12);
+}
+.rizq-vcard-thumb video{
+  width:100%;height:100%;object-fit:cover;display:block;background:#0a1525;
+}
+.rizq-vcard-shade{
+  position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:linear-gradient(180deg,rgba(0,0,0,.08),transparent 40%,rgba(0,0,0,.55));
+  transition:opacity .25s;
+}
+.rizq-vcard.is-playing .rizq-vcard-shade{opacity:.35}
+.rizq-vcard-tag{
+  position:absolute;top:8px;inset-inline-start:8px;z-index:2;
+  font-size:10px;font-weight:800;color:#0f2347;background:#E8C96A;
+  padding:3px 7px;border-radius:8px;font-family:'Cairo',sans-serif;
+}
+.rizq-vcard-play{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;
+  width:40px;height:40px;border-radius:50%;border:none;pointer-events:none;
+  background:#e11d48;color:#fff;font-size:14px;
+  display:grid;place-items:center;box-shadow:0 6px 16px rgba(185,28,28,.4);
+  transition:opacity .2s,transform .2s;
+}
+.rizq-vcard.is-playing .rizq-vcard-play{opacity:0;transform:translate(-50%,-50%) scale(.8);pointer-events:none}
+/* أزرار الاختصار على الفيديو — يمين سفلي: تشغيل · كتم · تكبير · تواصل */
+.rizq-vcard-actions{
+  position:absolute;right:4px;bottom:6px;top:auto;z-index:4;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;
+  max-height:70%;
+  opacity:0;pointer-events:none;transform:translateY(4px);
+  transition:opacity .2s ease,transform .2s ease;
+}
+.rizq-vcard.is-playing .rizq-vcard-actions,
+.rizq-vcard:hover .rizq-vcard-actions,
+.rizq-vcard:focus-within .rizq-vcard-actions{
+  opacity:1;pointer-events:auto;transform:none;
+}
+.rizq-vcard-act{
+  display:flex;flex-direction:column;align-items:center;gap:0;
+  border:none;background:transparent;padding:0;cursor:pointer;flex:0 0 auto;
+  font-family:'Cairo','Segoe UI',sans-serif;color:#fff;
+  text-decoration:none;
+}
+.rizq-vcard-act-ico{
+  width:28px;height:28px;border-radius:50%;
+  display:grid;place-items:center;font-size:12px;line-height:1;
+  background:rgba(30,30,30,.55);border:1px solid rgba(255,255,255,.28);
+  backdrop-filter:blur(4px);box-shadow:0 3px 8px rgba(0,0,0,.25);
+  transition:transform .15s,background .15s,filter .15s;
+}
+.rizq-vcard-act:hover .rizq-vcard-act-ico{transform:scale(1.06);background:rgba(20,20,20,.7)}
+.rizq-vcard-act.is-on .rizq-vcard-act-ico{background:rgba(201,168,76,.85);border-color:rgba(255,255,255,.45);color:#0f2347}
+.rizq-vcard-act--fs .rizq-vcard-act-ico{
+  background:rgba(201,168,76,.82);border-color:rgba(255,255,255,.5);color:#0f2347;font-size:13px;
+}
+.rizq-vcard-act--fs:hover .rizq-vcard-act-ico{filter:brightness(1.08);background:rgba(201,168,76,.95)}
+.rizq-vcard-act--contact .rizq-vcard-act-ico{
+  background:#2563eb;border-color:rgba(255,255,255,.4);font-size:12px;
+}
+.rizq-vcard-act--contact:hover .rizq-vcard-act-ico{filter:brightness(1.08);background:#1d4ed8}
+.rizq-vcard-act-lbl{
+  font-size:8px;font-weight:800;line-height:1;text-align:center;
+  text-shadow:0 1px 3px rgba(0,0,0,.65);max-width:44px;
+}
+/* تكبير البطاقة — نافذة كبيرة فوق الصفحة */
+.rizq-vstrip-lb{
+  position:fixed;inset:0;z-index:10050;display:none;
+  align-items:center;justify-content:center;
+  background:rgba(8,14,28,.78);backdrop-filter:blur(6px);
+  padding:min(4vw,28px);box-sizing:border-box;
+}
+.rizq-vstrip-lb.is-open{display:flex}
+.rizq-vstrip-lb-panel{
+  position:relative;width:min(420px,92vw);max-height:min(88vh,760px);
+  aspect-ratio:9/16;background:#0a1525;border-radius:18px;overflow:hidden;
+  box-shadow:0 24px 60px rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.12);
+}
+.rizq-vstrip-lb-panel video{
+  width:100%;height:100%;object-fit:cover;display:block;background:#0a1525;
+}
+.rizq-vstrip-lb-close{
+  position:absolute;top:10px;inset-inline-end:10px;z-index:3;
+  width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.28);
+  background:rgba(0,0,0,.55);color:#fff;font-size:18px;cursor:pointer;
+  display:grid;place-items:center;font-family:inherit;
+}
+.rizq-vstrip-lb-close:hover{background:rgba(201,168,76,.9);color:#0f2347;border-color:rgba(255,255,255,.5)}
+.rizq-vstrip-lb-tools{
+  position:absolute;inset-inline-end:10px;bottom:14px;z-index:3;
+  display:flex;flex-direction:column;gap:8px;
+}
+.rizq-vstrip-lb-tools button{
+  width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.3);
+  background:rgba(20,20,20,.6);color:#fff;font-size:15px;cursor:pointer;
+  display:grid;place-items:center;backdrop-filter:blur(4px);
+}
+.rizq-vstrip-lb-tools button:hover{background:rgba(201,168,76,.9);color:#0f2347}
+.rizq-vstrip-lb-cap{
+  position:absolute;left:12px;right:56px;bottom:14px;z-index:2;
+  color:#fff;font:800 15px/1.35 'Cairo',sans-serif;
+  text-shadow:0 1px 4px rgba(0,0,0,.55);pointer-events:none;
+}
+body.rizq-vstrip-lb-on{overflow:hidden}
+/* عنوان على الفيديو — ركن أيسر سفلي بعيداً عن أزرار التواصل يمين */
+.rizq-vcard-cap{
+  position:absolute;left:8px;right:auto;bottom:8px;z-index:2;color:#fff;
+  max-width:calc(100% - 56px);text-align:left;
+  font-size:12px;font-weight:800;line-height:1.3;pointer-events:none;
+  text-shadow:0 1px 4px rgba(0,0,0,.5);font-family:'Cairo',sans-serif;
+}
+.rizq-vcard-name{
+  font-size:13px;font-weight:800;color:#0D1B2A;line-height:1.3;padding-inline:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-family:'Cairo','Segoe UI',sans-serif;
+}
+.rizq-vcard-sub{
+  font-size:11.5px;font-weight:600;color:#5b6b85;padding-inline:2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  font-family:'Cairo','Segoe UI',sans-serif;
+}
+@media(max-width:699px){
+  .rizq-vid-strip,
+  .hero-after-promo-tail,
+  .hero-after-promo-tail > .hero-vid-cta-bar{
+    width:100%!important;max-width:100%!important;
+  }
+  .rizq-vid-strip{margin:6px auto 0;padding:6px 0 2px;border-radius:0;background:transparent;box-shadow:none;border:none}
+  .rizq-vid-strip-hint{display:none}
+  .rizq-vcard{flex-basis:min(168px,52vw)}
+  .rizq-vid-strip-btn{padding:6px 10px;font-size:11.5px}
 }
 
 /* ── SEARCH BAR (Amazon style) ── */
@@ -2570,8 +2770,9 @@ html[dir="ltr"] .listings-section .section-desc{
   border-color:rgba(201,168,76,.55);box-shadow:0 4px 14px rgba(201,168,76,.28)
 }
 /* بطاقات أصغر — واجهة الإعلانات المميزة */
+.landing-ads-grid{align-items:stretch}
 .landing-ads-grid .listing-card{
-  display:flex;flex-direction:column;min-height:0;border-radius:14px!important
+  display:flex;flex-direction:column;min-height:0;height:100%;border-radius:14px!important
 }
 .landing-ads-grid .l-img{height:96px!important;font-size:34px}
 .landing-ads-grid .l-body{padding:8px 9px 10px!important}
@@ -2892,6 +3093,49 @@ main, .page-content.active, .main-content, .results-area,
 .rizq-sub-cta{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;max-width:420px;margin:0 auto}
 .rizq-sub-cta .btn-primary{box-shadow:0 10px 28px rgba(201,168,76,.38)}
 .rizq-sub-cta-sub{margin:0;font-size:13.5px;font-weight:700;color:var(--royal,#1B3A6B);line-height:1.55;opacity:.92}
+/* زرّا التصفّح + امتلك واجهتك على نفس الخط */
+.rizq-dual-cta{
+  display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:stretch;
+  max-width:780px;margin:18px auto 0;padding:0 8px;box-sizing:border-box;
+}
+.rizq-dual-cta .landing-ads-browse-full,
+.rizq-dual-cta .rizq-dual-cta-own{
+  flex:1 1 260px;max-width:360px;min-width:min(100%,240px);
+  margin:0;text-align:center;box-sizing:border-box;
+  padding:14px 22px;border-radius:12px;font-size:14px;font-weight:800;
+  text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  white-space:normal;line-height:1.35;
+}
+/* تصفّح الدليل = ثانوي | امتلك الواجهة = أساسي */
+.rizq-dual-cta .landing-ads-browse-full{
+  color:#0F2347!important;
+  background:#fff!important;
+  border:1.5px solid rgba(15,35,71,.18)!important;
+  box-shadow:0 4px 14px rgba(15,35,71,.06);
+}
+.rizq-dual-cta .landing-ads-browse-full:hover{
+  border-color:rgba(201,168,76,.55)!important;
+  background:#fffcf5!important;
+  box-shadow:0 8px 20px rgba(15,35,71,.1);
+  color:#0F2347!important;
+}
+.rizq-dual-cta .rizq-dual-cta-own{
+  color:#0f2347!important;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  border:1px solid rgba(201,168,76,.55);
+  box-shadow:0 8px 22px rgba(201,168,76,.32);
+  transition:transform .2s,box-shadow .2s;
+}
+.rizq-dual-cta .rizq-dual-cta-own:hover{
+  transform:translateY(-2px);
+  box-shadow:0 12px 28px rgba(201,168,76,.4);
+  color:#0f2347!important;
+}
+.rizq-dual-cta + .rizq-sub-cta-sub{margin-top:12px;text-align:center}
+@media(max-width:560px){
+  .rizq-dual-cta .landing-ads-browse-full,
+  .rizq-dual-cta .rizq-dual-cta-own{flex:1 1 100%;max-width:100%}
+}
 .cat-card,.listing-card,.ad-card,.product-card,.price-card{
   border:1px solid rgba(226,232,240,0.8);
   box-shadow:0 10px 30px -10px rgba(0,0,0,0.08);
@@ -3102,14 +3346,15 @@ html[dir="ltr"] .vo-spec-enter .vo-spec-arrow{display:inline-block;transform:sca
   background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.6);
   transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,168,76,.16);
 }
-.cta-chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px;position:relative;z-index:2}
+.cta-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px;position:relative;z-index:2}
 .cta-chip{
-  font-size:10px;font-weight:600;color:rgba(255,255,255,.74);
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
-  padding:4px 10px;border-radius:10px;letter-spacing:.15px;
+  font-size:12px;font-weight:700;color:#f3f6fb;
+  background:rgba(255,255,255,.08);border:1px solid rgba(232,201,106,.35);
+  padding:6px 12px;border-radius:10px;letter-spacing:.1px;
+  text-shadow:0 1px 2px rgba(0,0,0,.25);
 }
-.cta-note{font-size:10.5px;color:rgba(255,255,255,.72);display:flex;align-items:center;gap:6px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2;letter-spacing:.15px}
-.cta-section .telecom-tag{font-size:9px;padding:3px 9px;letter-spacing:.4px;font-weight:600}
+.cta-note{font-size:12px;color:rgba(255,255,255,.88);display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2;letter-spacing:.1px;font-weight:600}
+.cta-section .telecom-tag{font-size:10.5px;padding:4px 10px;letter-spacing:.3px;font-weight:700;color:#E8C96A;border-color:rgba(232,201,106,.4);background:rgba(201,168,76,.12)}
 @media(max-width:640px){
   .cta-btns{grid-template-columns:1fr;max-width:100%}
   .cta-btns .btn-primary{grid-column:1}
@@ -3176,7 +3421,7 @@ html[dir="rtl"] .diamond-pitch-grid{text-align:right;direction:rtl}
 .pkg-popular{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);font-size:10px;font-weight:800;padding:5px 14px;border-radius:20px;white-space:nowrap}
 
 /* Footer */
-footer{background:linear-gradient(180deg,var(--dark),var(--royal-deep));border-top:1px solid rgba(201,168,76,.1);padding:60px 5% 0}
+footer{background:linear-gradient(180deg,var(--dark),var(--royal-deep));border-top:1px solid rgba(201,168,76,.1);padding:60px 5% 36px}
 .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr;gap:32px;max-width:1200px;margin:0 auto;padding-bottom:50px}
 .footer-col-title{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;font-family:Georgia,serif}
 .footer-desc{font-size:13px;color:rgba(255,255,255,.82);line-height:1.85;margin-top:14px;max-width:280px}
@@ -3678,7 +3923,24 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 
 /* ── DISCOVERY STRIPS — "آخر المحلات/المكاتب/المعارض" (شريط اكتشاف حي) ── */
 /* المسار يبقى LTR لحساب scrollLeft؛ اتجاه الحركة يُقلَب في JS حسب اللغة */
-.rzq-disc-wrap{margin-top:44px;direction:ltr}
+.rzq-disc-wrap{margin-top:44px;direction:ltr;text-align:center}
+.rzq-disc-wrap .rzq-disc-strip{text-align:initial}
+.rzq-disc-live-head{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
+  margin:0 auto 14px;padding:8px 16px 8px 12px;direction:rtl;
+  background:
+    linear-gradient(135deg,rgba(232,201,106,.16),transparent 40%),
+    linear-gradient(145deg,#07111f 0%,#0D1B2A 42%,#1B3A6B 100%);
+  border:1px solid rgba(201,168,76,.42);border-radius:8px;
+  font-size:12.5px;color:rgba(255,255,255,.92);letter-spacing:.3px;
+  font-family:Georgia,'Noto Naskh Arabic',serif;font-weight:600;
+  box-shadow:0 10px 28px rgba(7,17,31,.28),inset 0 1px 0 rgba(255,255,255,.12);
+  max-width:100%;box-sizing:border-box
+}
+html[dir="ltr"] .rzq-disc-live-head{direction:ltr}
+.rzq-disc-live-head .live-label-sub{
+  font-size:12.5px;font-weight:600;color:rgba(255,255,255,.9);line-height:1.4
+}
 .rzq-disc-strip{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-ms-overflow-style:none;padding-bottom:4px;direction:ltr}
 .rzq-disc-strip::-webkit-scrollbar{display:none}
 .rzq-disc-track{display:inline-flex;gap:16px;padding:2px;direction:ltr}
@@ -3691,12 +3953,27 @@ html[dir="ltr"] .rzq-disc-body{text-align:left;direction:ltr}
 .rzq-disc-name{font-size:13.5px;font-weight:700;color:#1B3A6B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rzq-disc-tag{font-size:11.5px;color:#5b6b85;margin-top:4px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .rzq-disc-badge{display:inline-block;font-size:10px;font-weight:700;color:var(--gold-dk,#8a6f2a);background:rgba(201,168,76,.14);border:1px solid rgba(201,168,76,.35);border-radius:10px;padding:2px 9px;margin-top:6px}
-.rzq-disc-empty{direction:inherit;text-align:center;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);border:1.5px dashed rgba(201,168,76,.4);border-radius:16px;padding:32px 20px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
+.rzq-disc-empty{
+  direction:inherit;text-align:center;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%,rgba(201,168,76,.16),transparent 55%),
+    linear-gradient(145deg,#0D1B2A 0%,#152a4a 48%,#1B3A6B 100%);
+  border:1px solid rgba(201,168,76,.35);border-radius:18px;
+  padding:28px 20px 22px;box-shadow:0 10px 32px rgba(13,27,42,.22)
+}
 html[dir="rtl"] .rzq-disc-empty{direction:rtl}
 html[dir="ltr"] .rzq-disc-empty{direction:ltr}
-.rzq-disc-empty-icon{font-size:34px;margin-bottom:10px}
-.rzq-disc-empty-title{font-size:15px;font-weight:700;color:#fff;margin-bottom:6px}
-.rzq-disc-empty-desc{font-size:13.5px;color:rgba(255,255,255,.9);max-width:420px;margin:0 auto 16px;line-height:1.75;font-weight:600}
+.rzq-disc-empty-icon{font-size:30px;margin-bottom:8px;line-height:1;opacity:.95}
+.rzq-disc-empty-title{font-size:16px;font-weight:800;color:#fff;margin:0 0 8px;letter-spacing:.01em}
+.rzq-disc-empty-desc{font-size:13.5px;color:rgba(255,255,255,.88);max-width:440px;margin:0 auto;line-height:1.7;font-weight:600}
+.rzq-disc-empty-examples{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:18px}
+.rzq-disc-empty-examples .rzq-disc-card{
+  width:min(200px,46vw);background:#fff;border:1px solid rgba(255,255,255,.2);
+  box-shadow:0 8px 22px rgba(0,0,0,.18);text-decoration:none;color:inherit
+}
+.rzq-disc-empty-examples .rzq-disc-card:hover{transform:translateY(-2px)}
+.rzq-disc-empty-examples .rzq-disc-badge{background:rgba(15,35,71,.06);color:#0F2347;border-color:rgba(15,35,71,.12)}
+.rzq-disc-ex-label{width:100%;font-size:11.5px;font-weight:700;color:rgba(255,255,255,.72);margin:0 0 2px}
 @media(max-width:640px){.rzq-disc-card{width:170px}.rzq-disc-img{height:100px}}
 
 /* ── Style Ideas — شريط إطلالات فاخر (هوية رزق كحلي/ذهبي) ── */
@@ -3792,6 +4069,78 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rizq-style-card[data-sty-gender="girls"] .rizq-style-badge{
   color:#8a3a5c;background:#ffffff;border-color:rgba(138,58,92,.28)
 }
+/* شريط احترافي: صورة الشعار فوق + اختصار الاسم تحت (مثل أمازون / كتالوج الماركات) */
+.rzq-landing-brand-strip-wrap{margin:8px 0 16px}
+.rzq-landing-brand-strip-wrap .rzq-brand-strip-panel{
+  background:#fff;
+  border:1px solid rgba(15,35,71,.1);
+  border-radius:14px;
+  padding:14px 14px 12px;
+  box-shadow:0 2px 14px rgba(15,35,71,.05)
+}
+.rzq-landing-brand-strip-wrap .rzq-brand-strip-head{margin:0 0 12px;padding:0 2px}
+.rzq-landing-brand-strip-wrap .rzq-brand-strip-head-label{
+  font-size:15px;font-weight:800;color:#0F2347;letter-spacing:.01em
+}
+.rzq-landing-brand-strip-wrap .rzq-brand-strip,
+.rzq-landing-brand-strip-wrap .rzq-brand-tile-strip{
+  display:flex;flex-wrap:nowrap;gap:14px;overflow-x:auto;padding:4px 2px 10px;
+  -webkit-overflow-scrolling:touch;scrollbar-width:thin
+}
+.rzq-brand-tile{
+  flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:8px;
+  width:96px;min-height:118px;padding:12px 8px 10px;
+  border:1px solid rgba(15,35,71,.1);border-radius:14px;background:#fff;
+  cursor:pointer;font-family:inherit;color:#0F2347;
+  transition:border-color .2s,box-shadow .2s,transform .15s
+}
+.rzq-brand-tile-logo{
+  width:64px;height:64px;display:flex;align-items:center;justify-content:center;
+  background:#fff;border-radius:14px;border:1px solid rgba(15,35,71,.08);
+  box-sizing:border-box;padding:6px
+}
+.rzq-brand-tile-logo img{
+  width:100%;height:100%;display:block;object-fit:contain;border-radius:0
+}
+.rizq-brand-tile-name,
+.rzq-brand-tile-abbr{
+  font-size:11px;font-weight:800;letter-spacing:0;text-transform:none;
+  max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;
+  color:#111;line-height:1.2
+}
+.rzq-brand-tile:hover,
+.rzq-brand-tile.is-on{
+  border-color:var(--gold,#C9A84C);
+  box-shadow:0 4px 16px rgba(15,35,71,.1),0 0 0 2px rgba(201,168,76,.18);
+  transform:translateY(-2px)
+}
+/* على بطاقة الإطلالة: شعار فوق + اختصار تحت */
+.rizq-style-mosaic{position:relative}
+.rizq-style-brand-row{
+  display:flex;align-items:center;justify-content:flex-start;
+  margin:0 0 6px;min-width:0
+}
+.rizq-style-brand-row .rzq-brand-logo-name.is-stack{
+  display:inline-flex;flex-direction:column;align-items:center;gap:4px;min-width:0
+}
+.rizq-style-brand-row .rzq-brand-logo-name.is-inline{
+  display:inline-flex;flex-direction:row;align-items:center;gap:8px;min-width:0;max-width:100%
+}
+.rizq-style-brand-row .rzq-brand-logo-name-img{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;display:block;
+  background:#fff;border:1px solid rgba(15,35,71,.1);
+  box-shadow:0 1px 4px rgba(15,35,71,.08);object-fit:contain
+}
+.rizq-style-brand-row .rzq-brand-logo-name-main{
+  font-size:12px;font-weight:800;letter-spacing:0;text-transform:none;
+  color:#111;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;
+  padding-bottom:1px
+}
+.rizq-style-brand-row .rzq-brand-logo-name-sub{
+  font-size:10.5px;font-weight:600;color:#5b6b85;line-height:1.35;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+
 /* شريط أنماط/نماذج — حركة مثل المباشر + مظهر فاخر */
 .rizq-styles-track-wrap{
   position:relative;
@@ -3837,8 +4186,11 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 /* بطاقات أنماط الأزياء + أنماط المعارض — أصغر + حواف ذهبية + جسم أبيض ناصع */
 .rizq-style-card{
   display:flex;flex-direction:column;
-  width:214px;min-width:214px;max-width:214px;
-  flex:0 0 214px;
+  width:220px;min-width:220px;max-width:220px;
+  flex:0 0 220px;
+  /* ارتفاع يكفي للماركة + عنوان سطرين + وصف واضح بدون قصّ الحروف */
+  min-height:348px;
+  height:348px;
   background:#ffffff!important;
   border:1.5px solid rgba(201,168,76,.5);
   border-radius:10px;
@@ -3850,6 +4202,12 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   transition:transform .32s cubic-bezier(.23,1,.32,1),box-shadow .32s,border-color .32s;
   cursor:default;
 }
+.rizq-style-card .rizq-style-body{flex:1 1 auto;min-height:0;overflow:visible}
+.rizq-style-card .rizq-style-brand-row{
+  min-height:48px;height:48px;margin:0 0 6px;overflow:visible;
+  display:flex;align-items:center;justify-content:flex-start;flex-shrink:0
+}
+.rizq-style-card .rizq-style-cta{margin-top:auto;flex-shrink:0}
 .rizq-style-card::after{
   content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;
   background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.35) 48%,transparent 62%);
@@ -3924,30 +4282,42 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   .rizq-style-tile{animation:none}
 }
 .rizq-style-body{
-  padding:11px 11px 12px;display:flex;flex-direction:column;gap:4px;flex:1;
+  padding:10px 12px 12px;display:flex;flex-direction:column;gap:5px;flex:1;
   background:#ffffff!important;
+  min-height:0;
 }
 .rizq-style-badge{
-  display:inline-flex;align-self:flex-start;
-  font-size:9px;font-weight:800;letter-spacing:.25px;
+  display:inline-flex;align-self:flex-start;flex-shrink:0;
+  font-size:10px;font-weight:800;letter-spacing:.2px;
   color:var(--royal,#1B3A6B);background:#ffffff;
-  border:1px solid rgba(27,58,107,.16);border-radius:10px;padding:2px 7px;margin-bottom:1px
+  border:1px solid rgba(27,58,107,.16);border-radius:10px;padding:3px 8px;margin-bottom:0;
+  line-height:1.35
 }
 .rizq-style-card[data-sty-gender="women"] .rizq-style-badge{
   color:#6b2d4a;background:#ffffff;border-color:rgba(107,45,74,.28)
 }
 .rizq-style-name{
-  font-size:13px;font-weight:800;color:var(--royal,#1B3A6B);
-  line-height:1.3;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden
+  font-size:13.5px;font-weight:800;color:var(--royal,#1B3A6B);
+  /* خط عربي أوضح — يمنع قصّ الحروف السفلية */
+  line-height:1.5;
+  max-height:calc(1.5em * 2);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  word-break:break-word;overflow-wrap:anywhere;
+  padding-bottom:1px
 }
-.rizq-style-meta{font-size:10.5px;color:#5b6b85;line-height:1.4;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.rizq-style-meta{
+  font-size:11.5px;color:#3d4f66;line-height:1.5;
+  max-height:calc(1.5em * 2);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  word-break:break-word;overflow-wrap:anywhere;
+  padding-bottom:1px
+}
 .rizq-style-cta{
-  margin-top:auto;padding-top:6px;
-  font-size:11px;font-weight:700;color:var(--gold-dk,#8a6f2a);
+  margin-top:auto;padding-top:8px;
+  font-size:12px;font-weight:700;color:var(--gold-dk,#8a6f2a);
   display:inline-flex;align-items:center;gap:3px;
   text-decoration:none;cursor:pointer;align-self:flex-start;
-  position:relative;z-index:1;
+  position:relative;z-index:1;line-height:1.4;
 }
 .rizq-style-cta:hover{color:var(--gold,#C9A84C);text-decoration:none}
 .rizq-style-cta:focus-visible{outline:2px solid rgba(201,168,76,.75);outline-offset:2px;border-radius:4px}
@@ -3990,8 +4360,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   }
   .rizq-styles-empty{font-size:12px;padding:18px 12px}
   .rizq-style-card{
-    width:156px!important;min-width:156px!important;max-width:156px!important;
-    flex:0 0 156px!important;
+    width:168px!important;min-width:168px!important;max-width:168px!important;
+    flex:0 0 168px!important;
+    min-height:300px!important;height:300px!important;
     border-radius:10px;
     box-shadow:0 4px 14px rgba(13,27,42,.08);
   }
@@ -3999,11 +4370,11 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   .rizq-style-mosaic{height:100px;gap:2px}
   .rizq-style-tile{font-size:18px}
   .rizq-style-tile:first-child{font-size:26px}
-  .rizq-style-body{padding:7px 7px 9px;gap:3px}
-  .rizq-style-badge{font-size:8px;padding:1px 5px;margin-bottom:0}
-  .rizq-style-name{font-size:10.5px;font-weight:700;-webkit-line-clamp:2}
-  .rizq-style-meta{font-size:9.5px;display:none}
-  .rizq-style-cta{font-size:10px;padding-top:4px}
+  .rizq-style-body{padding:8px 9px 10px;gap:4px}
+  .rizq-style-badge{font-size:9px;padding:2px 6px;margin-bottom:0}
+  .rizq-style-name{font-size:12px;font-weight:800;line-height:1.45;-webkit-line-clamp:2}
+  .rizq-style-meta{font-size:10.5px;line-height:1.45;-webkit-line-clamp:2;display:-webkit-box}
+  .rizq-style-cta{font-size:11px;padding-top:6px}
 }
 
 /* ── شريط "قريباً" — اهتمام حقيقي بالأقسام المغلقة (طلب Limam 03/08/2026) ── */
@@ -4082,7 +4453,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_account_route.js?v=23.0"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
 <script src="rizq_ux_polish.js?v=23.1"></script>
-<script src="rizq_ad_cards.js?v=3.10"></script>
+<script src="rizq_ad_cards.js?v=3.11"></script>
 </head>
 <body>
 
@@ -4188,7 +4559,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="4" data-nav-tier="thumb"><a href="#rzq-disc-corp" data-hdr="showrooms"><span class="rizq-hdr-ico" aria-hidden="true">🏬</span><span class="rizq-hdr-lbl" data-hdr="showrooms" data-t="nav-showrooms">المعارض</span></a></li>
     <li class="rizq-nav-post nav-phone-post-li" data-nav-order="5" data-nav-tier="thumb"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post" aria-label="نشر"><span class="rizq-hdr-ico" aria-hidden="true">➕</span><span class="rizq-hdr-lbl" data-hdr="post" data-t="nav-post">نشر</span></a></li>
     <li class="rizq-nav-module" data-rizq-module="office" data-nav-order="6" data-nav-tier="secondary"><a href="#rzq-disc-office" data-hdr="offices"><span class="rizq-hdr-ico" aria-hidden="true">🏢</span><span class="rizq-hdr-lbl" data-hdr="offices" data-t="nav-offices">المكاتب</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="7" data-nav-tier="secondary"><a href="#rzq-disc-tenders" data-hdr="tenders"><span class="rizq-hdr-ico" aria-hidden="true">📋</span><span class="rizq-hdr-lbl" data-hdr="tenders" data-t="nav-tenders">المناقصات</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="7" data-nav-tier="secondary"><a href="#rzq-disc-tenders" data-hdr="tenders"><span class="rizq-hdr-ico" aria-hidden="true">📑</span><span class="rizq-hdr-lbl" data-hdr="tenders" data-t="nav-tenders">المناقصات</span></a></li>
     <li class="rizq-nav-module" data-rizq-module="investments" data-nav-order="8" data-nav-tier="secondary"><a href="#rzq-disc-investments" data-hdr="investments"><span class="rizq-hdr-ico" aria-hidden="true">📈</span><span class="rizq-hdr-lbl" data-hdr="investments" data-t="nav-investments">الاستثمارات</span></a></li>
     <li class="rizq-nav-packs nav-phone-packs-li" data-nav-order="9" data-nav-tier="secondary"><a href="#pricing" data-hdr="packs"><span class="rizq-hdr-ico" aria-hidden="true">💎</span><span class="rizq-hdr-lbl" data-hdr="packs" data-t="nav-packs">الباقات</span></a></li>
     <li class="nav-dropdown-li" id="nav-more-li" data-nav-order="10" data-nav-tier="secondary">
@@ -4199,7 +4570,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <a href="rizq_ads_info.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🎬</span><div><strong data-hdr="rizqads">Rizq ADS</strong></div></a>
         <a href="#pricing" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong data-t="dd-packs">الباقات</strong></div></a>
         <a href="rizq_legal.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">⚖️</span><div><strong data-t="dd-legal">المواد القانونية</strong></div></a>
-        <a href="#about" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">ℹ️</span><div><strong data-t="dd-about">من نحن</strong></div></a>
+        <a href="rizq_platform.html#who" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">ℹ️</span><div><strong data-t="dd-about">من نحن</strong></div></a>
+        <a href="rizq_platform.html#why" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">❓</span><div><strong data-t="dd-why">لماذا رزق</strong></div></a>
         <a href="rizq_about.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🏛️</span><div><strong data-t="dd-company">الشركة المالكة</strong></div></a>
       </div>
     </li>
@@ -4244,7 +4616,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <a class="rizq-search-cat" role="listitem" href="rizq_browse.html?q=%D8%A5%D9%84%D9%83%D8%AA%D8%B1%D9%88%D9%86%D9%8A%D8%A7%D8%AA">📱 إلكترونيات</a>
         <a class="rizq-search-cat" role="listitem" href="rizq_browse.html?q=%D8%B7%D8%A7%D9%82%D8%A9">⚡ طاقة</a>
         <a class="rizq-search-cat" role="listitem" href="rizq_browse.html?q=%D8%B1%D8%AD%D9%84%D8%A7%D8%AA">✈️ رحلات</a>
-        <a class="rizq-search-cat" role="listitem" href="#rzq-disc-tenders">📋 مناقصات</a>
+        <a class="rizq-search-cat" role="listitem" href="#rzq-disc-tenders">📑 مناقصات</a>
         <a class="rizq-search-cat" role="listitem" href="#rzq-disc-investments">📈 استثمار</a>
       </div>
       <p class="rizq-search-hint" data-t="search-theater-hint">Esc للإغلاق · اكتب ثم Enter</p>
@@ -4381,7 +4753,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <!-- شريط العروض — هامش ~2سم من يمين/يسار الشاشة -->
   <div class="hero-listings-section hero-promo-strip" id="hero-listings" aria-label="شريط العروض المميزة">
     <div class="listings-label">
-      <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">آخر الإعلانات على رزق — عروض تخطف الأنظار</span></span>
+      <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">أحدث الإعلانات على رزق — عروض تخطف الأنظار</span></span>
     </div>
     <div class="cards-track-wrap">
       <div class="cards-track" id="cards-track">
@@ -4444,7 +4816,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           </a>
           <a href="rizq_tenders.html?demo=1" class="hero-biz-btn hero-biz-tender" data-space-portal="tenders" data-rizq-module="tenders" aria-label="نموذج غرفة المناقصات">
             <span class="hero-biz-badge" data-t="hbiz-tender-badge">جديد</span>
-            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📋</span></span>
+            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📑</span></span>
             <span class="hero-biz-text">
               <span class="hero-biz-label" data-t="hbiz-tenders">المناقصات</span>
               <span class="hero-biz-hint" data-t="hbiz-tenders-hint">فرص أعمال حقيقية</span>
@@ -4501,14 +4873,37 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           </div>
           <div class="hero-vid-views" id="hero-vid-views"></div>
         </div>
-        <div class="hero-vid-cta-bar">
-          <a href="rizq_ads_info.html" class="hero-vid-cta-link">📢 احجز مساحتك الإعلانية</a>
-          <span class="hero-vid-cta-sep">·</span>
-          <a href="rizq_ads_info.html" class="hero-vid-cta-link hero-vid-cta-ghost">تعرف على Rizq ADS</a>
+      </div>
+  </div><!-- /hero-after-promo-inner — الشريط بعرض listings خارج الحاوية الضيقة -->
+
+  <!-- الموضع الثاني فضي — عرض 1200px بمحاذاة «أبرز العروض» -->
+  <section class="rizq-vid-strip" id="rizq-vid-strip" aria-label="إعلانات الفيديو — الموضع الثاني" data-rizq-ads-strip="1">
+    <div class="rizq-vid-strip-head">
+      <div class="rizq-vid-strip-title">
+        <span class="rizq-vid-strip-playico" aria-hidden="true">▶</span>
+        <span data-t="vstrip-title">اكتشف العروض الجديدة بالفيديو</span>
+        <span class="rizq-vid-strip-tier" data-t="vstrip-tier">شريط الفيديو</span>
+      </div>
+      <div class="rizq-vid-strip-tools">
+        <span class="rizq-vid-strip-count" id="rizq-vid-strip-count" aria-live="polite"></span>
+        <div class="rizq-vid-strip-nav">
+          <button type="button" class="rizq-vid-strip-btn" id="rizq-vid-strip-prev" disabled aria-label="السابق">السابق</button>
+          <button type="button" class="rizq-vid-strip-btn" id="rizq-vid-strip-next" aria-label="التالي">التالي</button>
         </div>
       </div>
+    </div>
+    <p class="rizq-vid-strip-hint" data-t="vstrip-hint">مرّر الماوس للتشغيل</p>
+    <div class="rizq-vid-strip-track" id="rizq-vid-strip-track" tabindex="0"></div>
+  </section>
 
-      <!-- إحصائيات المنصة — مباشرة تحت إعلان الفيديو -->
+  <div class="hero-after-promo-tail">
+      <div class="hero-vid-cta-bar">
+        <a href="rizq_ads_info.html" class="hero-vid-cta-link">📢 احجز مساحتك الإعلانية</a>
+        <span class="hero-vid-cta-sep">·</span>
+        <a href="rizq_ads_info.html" class="hero-vid-cta-link hero-vid-cta-ghost">تعرف على Rizq ADS</a>
+      </div>
+
+      <!-- إحصائيات المنصة -->
       <div class="hero-stats-bar fade-in" id="platform-stats" aria-label="إحصائيات المنصة">
         <div class="h-stat h-stat-ads" data-stat="ads">
           <span class="h-stat-num" data-live="adsActive" data-target="0">0</span>
@@ -4605,10 +5000,11 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- ── شريط اكتشاف حي: آخر المحلات المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-store"></div>
-      <div class="rizq-sub-cta" style="margin-top:24px">
-        <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=store" onclick="return goSubscribePackage('stores')" class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vs-btn1">✨ امتلك واجهة محلك الإلكترونية</a>
-        <p class="rizq-sub-cta-sub" data-t="vs-btn1-sub">اشترك الآن. سوقك الإلكتروني يبدأ من هنا.</p>
+      <div class="rizq-dual-cta">
+        <a class="landing-ads-browse-full" href="rizq_directory.html?type=store" data-t="browse-stores">عرض كل المحلات ←</a>
+        <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=store" onclick="return goSubscribePackage('stores')" class="rizq-dual-cta-own" data-t="vs-btn1">امتلك واجهة محلك الإلكترونية</a>
       </div>
+      <p class="rizq-sub-cta-sub" data-t="vs-btn1-sub">اشترك الآن. سوقك الإلكتروني يبدأ من هنا.</p>
     </div>
   </div>
 </section>
@@ -4631,6 +5027,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-sty-gender="boys" id="sty-tab-boys" onclick="setStyleGender('boys')">👦 <span data-t="sty-boys">أولاد</span></button>
       <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-sty-gender="girls" id="sty-tab-girls" onclick="setStyleGender('girls')">👧 <span data-t="sty-girls">بنات</span></button>
     </div>
+    <!-- شعارات الماركات فوق صور أنماط الإطلالات — تشجيع البحث والشراء -->
+    <div class="rzq-landing-brand-strip-wrap fade-in" id="rizq-styles-brand-strip" aria-label="ماركات الأزياء"></div>
     <div class="rizq-styles-track-wrap fade-in">
       <div class="rizq-styles-rail" id="rizq-styles-rail" role="list" aria-labelledby="sty-tab-men"></div>
     </div>
@@ -4681,11 +5079,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- ── شريط اكتشاف حي: آخر المعارض المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-corp"></div>
-      <div class="rizq-sub-cta" style="margin-top:24px">
+      <div class="rizq-dual-cta">
+        <a class="landing-ads-browse-full" href="rizq_directory.html?type=corp" data-t="browse-showrooms">عرض كل المعارض ←</a>
         <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=corp" onclick="return goSubscribePackage('corp')"
-           class="btn-primary" style="font-size:15px;padding:16px 32px;text-decoration:none;display:inline-flex;align-items:center;gap:8px" data-t="vsh-btn1">✨ امتلك واجهة كتالوج معرضك الإلكتروني</a>
-        <p class="rizq-sub-cta-sub" data-t="vsh-btn1-sub">اشترك الآن. عرضك يصل حيث يبحث الجادّون.</p>
+           class="rizq-dual-cta-own" data-t="vsh-btn1">امتلك واجهة كتالوج معرضك الإلكتروني</a>
       </div>
+      <p class="rizq-sub-cta-sub" data-t="vsh-btn1-sub">اشترك الآن. عرضك يصل حيث يبحث الجادّون.</p>
     </div>
 
   </div>
@@ -4711,6 +5110,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="building" id="srm-tab-building" onclick="setShowroomModelCat('building')">🏗️ <span data-t="srm-building">مواد بناء</span></button>
       <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="jewelry" id="srm-tab-jewelry" onclick="setShowroomModelCat('jewelry')">💎 <span data-t="srm-jewelry">مجوهرات</span></button>
     </div>
+    <!-- شعارات الماركات فوق صور أنماط المعارض (سيارات → تويوتا/مرسيدس، إلكترونيات → آبل/سامسونج…) -->
+    <div class="rzq-landing-brand-strip-wrap fade-in" id="rizq-srm-brand-strip" aria-label="ماركات المعارض"></div>
     <div class="rizq-styles-track-wrap fade-in">
       <div class="rizq-styles-rail" id="rizq-srm-rail" role="list" aria-labelledby="srm-tab-cars"></div>
     </div>
@@ -4812,10 +5213,11 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- ── شريط اكتشاف حي: آخر المكاتب المفتوحة على رزق ── -->
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-office"></div>
-      <div class="rizq-sub-cta" style="margin-top:24px">
-        <a id="vo-create-btn" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office" onclick="return goSubscribePackage('offices')" class="btn-primary" style="font-size:15px;padding:16px 36px;text-decoration:none;display:inline-flex;align-items:center;gap:9px;border-radius:12px;font-family:inherit;font-weight:700" data-t="vo-btn1">✨ امتلك واجهتك المهنية الإلكترونية</a>
-        <p class="rizq-sub-cta-sub" data-t="vo-btn1-sub">اشترك الآن. حضورك المهني لا يتوقف.</p>
+      <div class="rizq-dual-cta">
+        <a class="landing-ads-browse-full" href="rizq_directory.html?type=office" data-t="browse-offices">عرض كل المكاتب ←</a>
+        <a id="vo-create-btn" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office" onclick="return goSubscribePackage('offices')" class="rizq-dual-cta-own" data-t="vo-btn1">امتلك واجهتك المهنية الإلكترونية</a>
       </div>
+      <p class="rizq-sub-cta-sub" data-t="vo-btn1-sub">اشترك الآن. حضورك المهني لا يتوقف.</p>
     </div>
 
   </div>
@@ -4850,7 +5252,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- بطاقات الميزات -->
     <div class="fade-in rizq-feat-row rizq-feat-row-3">
       <div class="rizq-feat-card">
-        <div class="rizq-feat-ico"><div class="cat-icon-box">📋</div></div>
+        <div class="rizq-feat-ico"><div class="cat-icon-box">📑</div></div>
         <div class="rizq-feat-title" data-t-fr="Des besoins qui trouvent réponse">احتياجك يجد أفضل عرض</div>
         <div class="rizq-feat-desc" data-t-fr="Atteignez des fournisseurs sérieux et recevez des offres à la hauteur de votre projet.">صل إلى موردين جادّين واستقبل عروضاً تليق بمشروعك.</div>
       </div>
@@ -4965,15 +5367,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div id="top-sellers-mount"></div>
     </div>
 
-    <!-- 🆕 وصل حديثاً (آخر الإعلانات المنشورة على المنصة) -->
-    <div id="new-arrivals-block" style="margin-top:40px;display:none">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-        <span style="font-size:20px">🆕</span>
-        <h3 style="font-size:17px;font-weight:700;color:var(--navy);margin:0" data-t-fr="Nouvelles annonces">وصل حديثاً</h3>
-      </div>
-      <div id="new-arrivals-mount"></div>
-    </div>
-
     <!-- 👀 تابع التصفح (إعلانات شاهدها هذا الزائر سابقاً) -->
     <div id="recently-viewed-block" style="margin-top:40px;display:none">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
@@ -4995,63 +5388,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
 </section>
 
-<!-- ══ WHY RIZQ ══ -->
-<section class="why-section" id="about">
-  <div class="why-bg-text">رزق</div>
-  <!-- ══ ABOUT INTRO CARD ══ -->
-  <div class="about-intro fade-in" style="max-width:820px;margin:0 auto 56px;position:relative;z-index:1">
-    <div class="about-card-inner" style="background:#fff;border:1px solid rgba(201,168,76,.22);border-radius:28px;position:relative;overflow:hidden;box-shadow:0 16px 56px rgba(27,58,107,.09),0 2px 12px rgba(201,168,76,.10);text-align:center">
-
-      <!-- Gold shimmer top bar -->
-      <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent 0%,var(--gold) 25%,var(--gold-light) 50%,var(--gold) 75%,transparent 100%);border-radius:28px 28px 0 0"></div>
-
-      <!-- Decorative oversized quote -->
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:96px;line-height:.8;color:var(--gold);opacity:.15;position:absolute;top:18px;left:28px;font-weight:900;pointer-events:none;user-select:none">"</div>
-      <div style="font-family:Georgia,'Times New Roman',serif;font-size:96px;line-height:.8;color:var(--gold);opacity:.15;position:absolute;bottom:54px;right:28px;font-weight:900;pointer-events:none;user-select:none;transform:rotate(180deg)">"</div>
-
-      <!-- Country badge -->
-      <div style="display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(201,168,76,.05));border:1px solid rgba(201,168,76,.35);border-radius:10px;padding:5px 16px;margin-bottom:24px">
-        <span style="font-size:16px">🇲🇷</span>
-        <span style="font-size:11.5px;font-weight:800;color:var(--gold-dk);letter-spacing:1.5px;text-transform:uppercase" data-t-fr="N°1 en Mauritanie">الأولى في موريتانيا</span>
-      </div>
-
-      <!-- Main description — translated by data-t engine -->
-      <p data-t="about-intro" style="font-size:17px;line-height:2.05;color:#1e3a62;font-weight:400;margin:0 0 32px;position:relative;z-index:1;padding:0 16px;font-family:'Segoe UI','Cairo','Arial',sans-serif"><strong style="color:var(--royal);font-size:1.05em">رزق</strong> — سوق موريتانيا الإلكتروني للإعلانات والأعمال. من الإعلان الفردي إلى المحلات والمعارض والمكاتب، وصولاً إلى غرفة المناقصات وغرفة الاستثمارات — فضاء ثقة طوّرته <strong style="color:var(--royal)"><a href="rizq_about.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">ADMINIA SARL</a></strong> ليجمع البائع والمشتري في كل الولايات. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ما تحتاجه… في مكان واحد، بأمان ووضوح.</em></p>
-      <!-- Divider -->
-      <div style="height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,.25),transparent);margin-bottom:28px"></div>
-
-      <!-- Stat chips — سطر واحد: الاستثمارات مباشرة بعد B2B -->
-      <div class="about-stat-chips">
-        <span class="about-stat-chip" data-t-fr="🏪 +17 catégories">🏪 +17 قسم</span>
-        <span class="about-stat-chip" data-t-fr="🛡️ 100% sécurisé">🛡️ آمن 100%</span>
-        <span class="about-stat-chip" data-t-fr="📍 Toutes les wilayas">📍 كل الولايات</span>
-        <span class="about-stat-chip" data-t-fr="⚡ Gratuit pour démarrer">⚡ مجاني للبدء</span>
-        <span class="about-stat-chip" data-t-fr="📋 Salle des appels d'offres B2B">📋 غرفة مناقصات B2B</span>
-        <span class="about-stat-chip" data-t-fr="📈 Salle des investissements">📈 غرفة الاستثمارات</span>
-      </div>
-
-      <!-- ADMINIA signature line -->
-      <div style="font-size:12.5px;color:#8fa0bc;letter-spacing:.3px;position:relative;z-index:1">
-        <span data-t-fr="Développé par">طوّرته</span>
-        &nbsp;
-        <strong style="color:var(--royal);font-weight:800;letter-spacing:.5px"><a href="rizq_about.html" style="color:inherit;text-decoration:none">ADMINIA SARL</a></strong>
-        &nbsp;·&nbsp;
-        <span style="color:var(--gold);font-weight:700" data-t-fr="Mauritanie 🇲🇷">موريتانيا 🇲🇷</span>
-      </div>
-
-    </div>
-  </div>
-  <div class="section-header fade-in">
-    <p class="section-tag">لماذا <span>رزق</span>؟</p>
-    <h2 class="section-title" data-t="s-why-title">لماذا يثق الناس بـ<span>رزق؟</span></h2>
-    <p class="section-desc" data-t="s-why-desc">سوق موريتاني يثق به الناس — بيع، تسوّق، وأنمِ عملك بوضوح وطمأنينة</p>
-  </div>
-  <div class="why-grid">
-    <div class="why-card fade-in"><div class="why-icon"><div class="cat-icon-box">🛡️</div></div><h3 class="why-title" data-t="why1-title">ثقة تليق بسوق موريتانيا</h3><p class="why-desc" data-t="why1-desc">رزق سوق جادّ للبيع والشراء — وضوح في التعامل، طمأنينة في التجربة، وسوق واحد يجمعك بالمشترين والبائعين.</p></div>
-    <div class="why-card fade-in"><div class="why-icon"><div class="cat-icon-box">🗂️</div></div><h3 class="why-title" data-t="why2-title">سوق يغطي كل حاجة</h3><p class="why-desc" data-t="why2-desc">من العقارات إلى الإبل، من الدراعة إلى الحفارات — كل ما تبحث عنه في مكان واحد.</p></div>
-    <div class="why-card fade-in"><div class="why-icon"><div class="cat-icon-box">⚡</div></div><h3 class="why-title" data-t="why3-title">انشر في أقل من دقيقة</h3><p class="why-desc" data-t="why3-desc">صوّر، ضع السعر، انشر — إعلانك يصل لمشترين يبحثون الآن على رزق.</p></div>
-  </div>
-</section>
+<!-- من نحن / لماذا رزق — نُقلا إلى rizq_platform.html (الفوتر + المزيد) لتقليل النصوص الترويجية على الرئيسية -->
 
 <!-- ══ DAILY PRICES BOARD ══ -->
 <section class="section" id="prices" style="background:var(--bg-section)">
@@ -5137,7 +5474,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <span class="ptab-lbl" data-t-fr="Entreprises &amp; showrooms">الشركات والمعارض</span>
     </button>
     <button class="ptab-card" data-ptab="tender" onclick="switchPriceTab('tender',this)">
-      <span class="ptab-icon">💼</span>
+      <span class="ptab-icon">📑</span>
       <span class="ptab-lbl" data-t-fr="Appels d'offres">غرفة المناقصة</span>
     </button>
     <button class="ptab-card" data-ptab="investment" onclick="switchPriceTab('investment',this)">
@@ -5215,8 +5552,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
 
     <div class="cta-chips">
-      <span class="cta-chip" data-t="cta-chip1">✓ مجاني للبدء</span>
-      <span class="cta-chip" data-t="cta-chip2">✓ مناقصات واستثمارات بحذر</span>
+      <span class="cta-chip" data-t="cta-chip1">✓ التسجيل مجاني</span>
+      <span class="cta-chip" data-t="cta-chip2">✓ مناقصات واستثمارات متاحة</span>
       <span class="cta-chip" data-t="cta-chip3">✓ ثقة وأمان من أول خطوة</span>
     </div>
 
@@ -5224,7 +5561,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <span class="telecom-tag" data-t="cta-trust1">ثقة</span>
       <span class="telecom-tag" data-t="cta-trust2">أمان</span>
       <span class="telecom-tag" data-t="cta-trust3">شفافية</span>
-      <span data-t="cta-note">&nbsp;سجّل بحرّية &nbsp;|&nbsp; مجاني تماماً</span>
+      <span data-t="cta-note">&nbsp;ابدأ الآن — بلا رسوم خفية</span>
     </p>
   </div>
 </section>
@@ -5257,7 +5594,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
     <div>
       <h4 class="footer-col-title" data-t="ft-quick">روابط سريعة</h4>
-      <ul class="footer-links"><li><a href="rizq_landing_v8.html" data-t="ft-q1">الرئيسية</a></li><li><a href="rizq_browse.html" data-t="ft-q2">تصفّح الإعلانات</a></li><li><a href="rizq_post.html" data-t="ft-q3">انشر إعلانك</a></li><li><a href="rizq_landing_v8.html#pricing" data-t="ft-q4">الأسعار</a></li><li><a href="rizq_about.html" data-t="ft-q5">الشركة المالكة</a></li><li><a href="rizq_landing_v8.html#about" data-t="ft-q5b">من نحن</a></li></ul>
+      <ul class="footer-links"><li><a href="rizq_landing_v8.html" data-t="ft-q1">الرئيسية</a></li><li><a href="rizq_browse.html" data-t="ft-q2">تصفّح الإعلانات</a></li><li><a href="rizq_post.html" data-t="ft-q3">انشر إعلانك</a></li><li><a href="rizq_landing_v8.html#pricing" data-t="ft-q4">الأسعار</a></li><li><a href="rizq_platform.html#who" data-t="ft-q5b">من نحن</a></li><li><a href="rizq_platform.html#why" data-t="ft-q5c">لماذا رزق</a></li><li><a href="rizq_about.html" data-t="ft-q5">الشركة المالكة</a></li></ul>
     </div>
     <div>
       <h4 class="footer-col-title" data-t="ft-topcats">أبرز الأقسام</h4>
@@ -6014,6 +6351,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 </div><!-- /#modal -->
 
 <script src="rizq_categories_config.js?v=23.0" defer></script>
+<script src="rizq_brands_catalog.js?v=8" defer></script>
 <script>
 var isAr = true;
 
@@ -6357,7 +6695,7 @@ function syncAllMarquees(){
 function liveListingsLabelHtml(fr){
   return fr
     ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">En direct</strong></span><span class="live-label-sub" data-t="promo-strip-sub">Dernières annonces sur Rizq — offres qui impressionnent</span>'
-    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">آخر الإعلانات على رزق — عروض تخطف الأنظار</span>';
+    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">أحدث الإعلانات على رزق — عروض تخطف الأنظار</span>';
 }
 function paintLiveListingsLabel(){
   var el = document.querySelector('.listings-label > span');
@@ -6401,11 +6739,15 @@ function buildCards(){
     const actions = (window.RizqAdCards && typeof RizqAdCards.actionsHtml === 'function')
       ? RizqAdCards.actionsHtml(a, { fr: !isAr })
       : '';
+    const brandSlot = (window.RizqAdCards && typeof RizqAdCards.brandSlotHtml === 'function')
+      ? RizqAdCards.brandSlotHtml(a, { fr: !isAr, size: 18 })
+      : '<div class="rzq-ad-brand-slot is-empty" aria-hidden="true"></div>';
     c.innerHTML=`
       ${media}
       <div class="ad-card-body">
         <div class="ad-cat">${_escCard(d.cat)}</div>
         <div class="ad-title">${_escCard(d.title)}</div>
+        ${brandSlot}
         <div class="ad-footer">
           <span class="ad-loc">${_escCard(d.loc)}</span>
         </div>
@@ -6520,12 +6862,16 @@ function _landingAdCardHtml(a, fr){
   var actions = (window.RizqAdCards && typeof RizqAdCards.actionsHtml === 'function')
     ? RizqAdCards.actionsHtml(a, { fr: !!fr })
     : '';
+  var brandSlot = (window.RizqAdCards && typeof RizqAdCards.brandSlotHtml === 'function')
+    ? RizqAdCards.brandSlotHtml(a, { fr: !!fr, size: 18 })
+    : '<div class="rzq-ad-brand-slot is-empty" aria-hidden="true"></div>';
   return ''
     + '<div class="listing-card' + (pin ? ' pin' : '') + ' fade-in" role="listitem" data-ad-id="' + idAttr + '" data-featured="' + (pin ? '1' : '0') + '" onclick="if(event.target.closest && event.target.closest(\'.rzq-adx-nav,.rzq-adx-fav,.rzq-adx-wa,.rzq-adx-tel,.rzq-adx-actions\')) return; ' + openFn + '">'
     + media
     + '<div class="l-body">'
     +   '<p class="l-cat">' + cat + '</p>'
     +   '<h3 class="l-title">' + title + '</h3>'
+    +   brandSlot
     +   '<span class="l-loc">' + loc + '</span>'
     +   actions
     + '</div></div>';
@@ -6858,6 +7204,89 @@ function rizqOpenStyleLook(ev, primaryId, fallbackHref){
 window.rizqOpenStyleItem = rizqOpenStyleItem;
 window.rizqOpenStyleLook = rizqOpenStyleLook;
 
+function _styResolveBrandId(ad){
+  if(!ad || !window.RizqBrands) return '';
+  if(ad.brandId && RizqBrands.getById(ad.brandId)) return String(ad.brandId);
+  var blob = [ad.brandName, ad.brandNameFr, ad.title, ad.titleFR, ad.titleFr, ad.modelName, ad.modelNameFr]
+    .filter(Boolean).join(' ');
+  try {
+    var hit = RizqBrands.findByAlias(blob);
+    if(hit && hit.id) return String(hit.id);
+  } catch(e){}
+  var s = String(blob || '').toLowerCase();
+  if(/iphone|آيفون|ايفون|macbook|airpods|\bapple\b|آبل/.test(s)) return 'apple';
+  if(/samsung|سامسونج|galaxy/.test(s)) return 'samsung';
+  if(/toyota|تويوتا|كامري|كورولا|هايلوكس|لاند\s*كروزر/.test(s)) return 'toyota';
+  if(/mercedes|مرسيدس|بنز/.test(s)) return 'mercedes';
+  if(/hyundai|هيونداي|هونداي|توسان/.test(s)) return 'hyundai';
+  if(/nike|نايك|اير\s*ماكس|jordan/.test(s)) return 'nike';
+  if(/adidas|أديداس|اديداس|ultraboost/.test(s)) return 'adidas';
+  if(/ساعة|watch|montre|g-?shock/.test(s)) return 'casio';
+  if(/ذهب|خاتم|سوار|مجوهر|bijou|gold/.test(s)) return 'pandora';
+  if(/نظار|ray-?ban|lunette/.test(s)) return 'ray-ban';
+  if(/حقيبة|bag|sac\b/.test(s)) return 'guess';
+  if(/حذاء|shoe|sneaker|كوتشي/.test(s)) return 'nike';
+  return '';
+}
+function _styBrandLogoNameHtml(ad, fr, opts){
+  opts = opts || {};
+  if(!window.RizqBrands) return '';
+  var brandId = _styResolveBrandId(ad);
+  if(!brandId) return '';
+  var modelId = (ad && ad.modelId) || '';
+  if(typeof RizqBrands.logoNameHtml === 'function'){
+    return RizqBrands.logoNameHtml(brandId, { fr: !!fr, modelId: modelId, size: opts.size || 36, inline: !!opts.inline });
+  }
+  if(typeof RizqBrands.chipHtml === 'function'){
+    return RizqBrands.chipHtml(brandId, { fr: !!fr, modelId: modelId, size: opts.size || 22 });
+  }
+  return '';
+}
+/** ماركة للإطلالة/النموذج: شعار + اسم — من المنتج أولاً، وإلا اختيار ثابت من كتالوج القسم */
+function _styBrandChipForLook(items, fr, catKey){
+  items = Array.isArray(items) ? items : (items ? [items] : []);
+  var i, html, ad, brandId;
+  for(i = 0; i < items.length; i++){
+    html = _styBrandLogoNameHtml(items[i], fr);
+    if(html) return html;
+  }
+  if(!window.RizqBrands || typeof RizqBrands.forCategory !== 'function') return '';
+  var brands = RizqBrands.forCategory(catKey || 'أزياء');
+  if(!brands.length) brands = RizqBrands.list();
+  if(!brands.length) return '';
+  ad = items[0] || {};
+  var key = String(ad.id != null ? ad.id : (ad.title || '0'));
+  var hash = 0;
+  for(i = 0; i < key.length; i++) hash = ((hash << 5) - hash) + key.charCodeAt(i) | 0;
+  brandId = brands[Math.abs(hash) % brands.length].id;
+  if(typeof RizqBrands.logoNameHtml === 'function'){
+    return RizqBrands.logoNameHtml(brandId, { fr: !!fr, size: 36 });
+  }
+  return RizqBrands.chipHtml(brandId, { fr: !!fr, size: 22 });
+}
+/** وصف قصير واضح للبطاقة — بدون قصّ منتصف الكلمات */
+function _styClearMeta(items, fr){
+  items = Array.isArray(items) ? items.filter(Boolean) : [];
+  if(!items.length) return fr ? 'Sélection Rizq' : 'اختيار رزق';
+  var prices = [];
+  var i, d, p;
+  for(i = 0; i < items.length; i++){
+    d = (typeof trAd === 'function') ? trAd(items[i]) : items[i];
+    p = d && (d.price || items[i].price);
+    if(p) prices.push(String(p).replace(/\s*MRU\s*/i,' ').trim());
+  }
+  var n = items.length;
+  var countLbl = fr
+    ? (n + ' offre' + (n > 1 ? 's' : ''))
+    : (n + ' عروض');
+  if(prices.length){
+    return countLbl + (fr ? ' · dès ' : ' · تبدأ من ') + prices[0];
+  }
+  d = (typeof trAd === 'function') ? trAd(items[0]) : items[0];
+  var title = String((d && (d.title || items[0].title)) || '').trim();
+  if(title.length > 48) title = title.slice(0, 45).trim() + '…';
+  return title || countLbl;
+}
 function _styBuildCardHtml(opts){
   opts = opts || {};
   var attrs = ' class="rizq-style-card" role="listitem"';
@@ -6872,10 +7301,14 @@ function _styBuildCardHtml(opts){
   var fromView = opts.fromViewLbl
     ? '<div class="rizq-style-from-view">'+_styEsc(opts.fromViewLbl)+'</div>'
     : '';
+  var brandRow = opts.brandHtml
+    ? '<div class="rizq-style-brand-row" aria-label="الماركة">'+opts.brandHtml+'</div>'
+    : '';
   return '<article'+attrs+'>'
-    + '<div class="rizq-style-mosaic">'+ (opts.tilesHtml || '') +'</div>'
+    + '<div class="rizq-style-mosaic">'+(opts.tilesHtml || '')+'</div>'
     + '<div class="rizq-style-body">'
     +   fromView
+    +   brandRow
     +   '<div class="rizq-style-badge">'+_styEsc(opts.badge || '')+'</div>'
     +   '<div class="rizq-style-name">'+_styEsc(opts.name || '')+'</div>'
     +   '<div class="rizq-style-meta">'+_styEsc(opts.meta || '')+'</div>'
@@ -7042,6 +7475,67 @@ function _styStartAutoRefresh(){
   } catch(e2){}
 }
 
+/* شريط شعارات الماركات فوق أنماط الأزياء / نماذج المعارض */
+function _landingBrandFr(){
+  try {
+    if(typeof isAr !== 'undefined') return !isAr;
+    return (localStorage.getItem('rizq_lang')||'ar') === 'fr';
+  } catch(e){ return false; }
+}
+function _landingBrandCatForSrm(cat){
+  var meta = (typeof RIZQ_SRM_CATS !== 'undefined' && RIZQ_SRM_CATS[cat]) ? RIZQ_SRM_CATS[cat] : null;
+  if(meta && meta.dirCat) return meta.dirCat;
+  if(cat === 'cars') return 'سيارات';
+  if(cat === 'electronics') return 'إلكترونيات';
+  return '';
+}
+function _landingBrandBrowse(brandId, catKey){
+  if(!brandId) return;
+  var fr = _landingBrandFr();
+  var q = brandId;
+  try {
+    if(window.RizqBrands){
+      var b = RizqBrands.getById(brandId);
+      q = RizqBrands.displayName(b, fr) || brandId;
+    }
+  } catch(e){}
+  var params = new URLSearchParams();
+  if(catKey) params.set('cat', catKey);
+  if(q) params.set('q', q);
+  try { window.location.href = 'rizq_browse.html?' + params.toString(); } catch(e2){}
+}
+function _fillLandingBrandStrip(mountId, catKey, ariaAr, ariaFr){
+  var mount = document.getElementById(mountId);
+  if(!mount) return;
+  var fr = _landingBrandFr();
+  mount.setAttribute('aria-label', fr ? ariaFr : ariaAr);
+  if(!window.RizqBrands || typeof RizqBrands.stripHtml !== 'function'){
+    mount.innerHTML = '';
+    mount.style.display = 'none';
+    return;
+  }
+  var html = catKey ? RizqBrands.stripHtml(catKey, fr, {
+    heading: fr ? 'Shop by Brand' : 'تسوّق حسب الماركة',
+    imgSize: 64
+  }) : '';
+  if(!html){
+    mount.innerHTML = '';
+    mount.style.display = 'none';
+    return;
+  }
+  mount.style.display = '';
+  mount.innerHTML = html;
+  mount.querySelectorAll('[data-brand-id]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      _landingBrandBrowse(btn.getAttribute('data-brand-id')||'', catKey);
+    });
+  });
+}
+function refreshLandingBrandStrips(){
+  _fillLandingBrandStrip('rizq-styles-brand-strip', 'أزياء', 'ماركات الأزياء', 'Marques mode');
+  var srmCat = (typeof _rizqSrmCat !== 'undefined') ? _rizqSrmCat : 'cars';
+  _fillLandingBrandStrip('rizq-srm-brand-strip', _landingBrandCatForSrm(srmCat), 'ماركات المعارض', 'Marques showroom');
+}
 function setStyleGender(gender){
   if(!RIZQ_STYLE_GENDERS[gender]) gender = 'men';
   _rizqStyleGender = gender;
@@ -7053,6 +7547,7 @@ function setStyleGender(gender){
   var rail = document.getElementById('rizq-styles-rail');
   if(rail) rail.setAttribute('aria-labelledby', _styTabIdFor(gender));
   buildStyleIdeas(false);
+  try { refreshLandingBrandStrips(); } catch(eBrand){}
 }
 function _styAdKind(a){
   if(!a) return '';
@@ -7127,6 +7622,7 @@ function buildStyleIdeas(reshuffle){
         seed: true,
         tilesHtml: seedTiles,
         fromViewLbl: fromViewLbl,
+        brandHtml: _styBrandChipForLook(seedItems, fr, 'أزياء'),
         badge: genderBadge0,
         name: seedName,
         meta: fr ? 'Inspiré par votre consultation' : 'مستوحى من مشاهدتك',
@@ -7168,11 +7664,6 @@ function buildStyleIdeas(reshuffle){
     }
     if(items.length < 3) return; /* لا بطاقة ناقصة ولا خلط أجناس */
     var name = fr ? tpl.fr : tpl.ar;
-    var metaParts = items.map(function(a){
-      var d = (typeof trAd === 'function') ? trAd(a) : a;
-      return String((d && (d.title || a.title)) || '').slice(0, 28);
-    }).filter(Boolean);
-    if(!metaParts.length) metaParts = [fr ? 'Suggestion Rizq' : 'اقتراح رزق'];
     var href;
     if(primary && primary.id){
       href = 'rizq_browse.html?id=' + encodeURIComponent(primary.id);
@@ -7191,9 +7682,10 @@ function buildStyleIdeas(reshuffle){
     cards.push(_styBuildCardHtml({
       gender: gender,
       tilesHtml: tiles,
+      brandHtml: _styBrandChipForLook(items, fr, 'أزياء'),
       badge: genderBadge,
       name: name,
-      meta: metaParts.join(' · '),
+      meta: _styClearMeta(items, fr),
       cta: cta,
       href: href,
       primaryId: primary && primary.id != null ? primary.id : ''
@@ -7235,14 +7727,16 @@ function buildStyleIdeas(reshuffle){
       tilesEx += _styTileHtml(itemsEx[tj], emEx[tj], itemsEx[tj] && itemsEx[tj].bg);
     }
     var dEx = (typeof trAd === 'function') ? trAd(adEx) : adEx;
-    var nameEx = String((dEx && (dEx.title || adEx.title)) || (fr ? 'Look Rizq' : 'إطلالة رزق')).slice(0, 42);
+    var nameEx = String((dEx && (dEx.title || adEx.title)) || (fr ? 'Look Rizq' : 'إطلالة رزق'));
+    if(nameEx.length > 52) nameEx = nameEx.slice(0, 49).trim() + '…';
     var hrefEx = 'rizq_browse.html?id=' + encodeURIComponent(adEx.id);
     cards.push(_styBuildCardHtml({
       gender: gender,
       tilesHtml: tilesEx,
+      brandHtml: _styBrandChipForLook(itemsEx, fr, 'أزياء'),
       badge: _styGenderBadge(gender, fr),
       name: nameEx,
-      meta: fr ? 'Suggestion continue' : 'اقتراح متواصل',
+      meta: _styClearMeta(itemsEx, fr),
       cta: cta,
       href: hrefEx,
       primaryId: adEx.id
@@ -7475,6 +7969,7 @@ function setShowroomModelCat(cat){
   var rail = document.getElementById('rizq-srm-rail');
   if(rail) rail.setAttribute('aria-labelledby', _srmTabIdFor(cat));
   buildShowroomModels(false);
+  try { refreshLandingBrandStrips(); } catch(eBrand){}
 }
 function buildShowroomModels(reshuffle){
   var rail = document.getElementById('rizq-srm-rail');
@@ -7511,7 +8006,7 @@ function buildShowroomModels(reshuffle){
     if(tileItems.length < 3) return; /* لا بطاقة ببلاطات جامدة */
     var href = primary && primary.id
       ? ('rizq_browse.html?id=' + encodeURIComponent(primary.id))
-      : ('rizq_showroom_directory.html?cat=' + encodeURIComponent(meta.dirCat));
+      : ('rizq_directory.html?type=corp&cat=' + encodeURIComponent(meta.dirCat));
     var tiles = '';
     for(var ti=0; ti<3; ti++){
       var adT = tileItems[ti];
@@ -7519,10 +8014,17 @@ function buildShowroomModels(reshuffle){
         ? _styTileHtml(adT, (tplEmoji||[])[ti] || adT.emoji, adT.bg)
         : '';
     }
+    var brandCatSrm = (typeof _landingBrandCatForSrm === 'function')
+      ? _landingBrandCatForSrm(cat)
+      : (cat === 'electronics' ? 'إلكترونيات' : (cat === 'cars' ? 'سيارات' : ''));
+    var brandHtmlSrm = (typeof _styBrandChipForLook === 'function')
+      ? _styBrandChipForLook(tileItems, fr, brandCatSrm || 'سيارات')
+      : ((typeof _styBrandLogoNameHtml === 'function') ? _styBrandLogoNameHtml(primary, fr) : '');
     cards.push((typeof _styBuildCardHtml === 'function')
       ? _styBuildCardHtml({
           srmCat: cat,
           tilesHtml: tiles,
+          brandHtml: brandHtmlSrm,
           badge: badge,
           name: name,
           meta: metaLine,
@@ -7533,6 +8035,7 @@ function buildShowroomModels(reshuffle){
       : '<article class="rizq-style-card" role="listitem" data-srm-cat="'+cat+'">'
         + '<div class="rizq-style-mosaic">'+tiles+'</div>'
         + '<div class="rizq-style-body">'
+        +   (brandHtmlSrm ? '<div class="rizq-style-brand-row">'+brandHtmlSrm+'</div>' : '')
         +   '<div class="rizq-style-badge">'+esc(badge)+'</div>'
         +   '<div class="rizq-style-name">'+esc(name)+'</div>'
         +   '<div class="rizq-style-meta">'+esc(metaLine)+'</div>'
@@ -7547,11 +8050,7 @@ function buildShowroomModels(reshuffle){
     if(!items.length) return;
     if(items[0] && items[0].id != null) usedPrimary[String(items[0].id)] = 1;
     var name = fr ? tpl.fr : tpl.ar;
-    var metaParts = items.map(function(a){
-      var d = (typeof trAd === 'function') ? trAd(a) : a;
-      return String((d && (d.title || a.title)) || '').slice(0, 28);
-    }).filter(Boolean);
-    renderTrioCard(items, name, metaParts.join(' · ') || (fr ? 'Suggestion Rizq Showroom' : 'اقتراح معرض رزق'), tpl.emoji);
+    renderTrioCard(items, name, _styClearMeta(items, fr), tpl.emoji);
   });
 
   /* بطاقات إضافية لسلسلة أفقية متواصلة */
@@ -7574,12 +8073,9 @@ function buildShowroomModels(reshuffle){
       }
     }
     var dS = (typeof trAd === 'function') ? trAd(adS) : adS;
-    var nameS = String((dS && (dS.title || adS.title)) || (fr ? 'Modèle Rizq' : 'نموذج رزق')).slice(0, 42);
-    var metaS = itemsS.map(function(a){
-      var d = (typeof trAd === 'function') ? trAd(a) : a;
-      return String((d && d.title) || '').slice(0, 22);
-    }).filter(Boolean).join(' · ');
-    renderTrioCard(itemsS, nameS, metaS || (fr ? 'Sélection continue' : 'اقتراح متواصل'), emojiSrm[sx % emojiSrm.length]);
+    var nameS = String((dS && (dS.title || adS.title)) || (fr ? 'Modèle Rizq' : 'نموذج رزق'));
+    if(nameS.length > 52) nameS = nameS.slice(0, 49).trim() + '…';
+    renderTrioCard(itemsS, nameS, _styClearMeta(itemsS, fr), emojiSrm[sx % emojiSrm.length]);
   }
 
   if(!cards.length){
@@ -7599,6 +8095,14 @@ function buildShowroomModels(reshuffle){
 }
 try { buildShowroomModels(false); } catch(eSrm) {}
 try { _srmStartAutoRefresh(); } catch(eSrmAuto) {}
+try { refreshLandingBrandStrips(); } catch(eBrandBoot) {}
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', function(){
+    try { refreshLandingBrandStrips(); } catch(e){}
+  });
+} else {
+  try { refreshLandingBrandStrips(); } catch(e){}
+}
 
 // ── QCAT PORTAL ──
 var QCAT_DATA = (typeof RizqCategories !== 'undefined') ? RizqCategories.qcatData() : {
@@ -8495,6 +8999,7 @@ function applyList(list){
     if(typeof buildLandingAds==='function') buildLandingAds(true);
     if(typeof buildStyleIdeas==='function') buildStyleIdeas(false);
     if(typeof buildShowroomModels==='function') buildShowroomModels(false);
+    if(typeof refreshLandingBrandStrips==='function') refreshLandingBrandStrips();
     var heroSec=document.getElementById('hero-listings');
     if(heroSec) heroSec.style.display=ADS.length?'':'none';
     renderTickerFromAds();
@@ -8893,10 +9398,10 @@ const LANG = {
     'hero-ai-smart': '✨ رزق ذكي — مساعدك على المنصة',
     'about-intro': '<strong style="color:var(--royal);font-size:1.05em">رزق</strong> — سوق موريتانيا الإلكتروني للإعلانات والأعمال. من الإعلان الفردي إلى المحلات والمعارض والمكاتب، وصولاً إلى غرفة المناقصات وغرفة الاستثمارات — فضاء ثقة طوّرته <strong style="color:var(--royal)"><a href="rizq_about.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">ADMINIA SARL</a></strong> ليجمع البائع والمشتري في كل الولايات. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ما تحتاجه… في مكان واحد، بأمان ووضوح.</em>',
     'nav-stores': 'المحلات', 'nav-offices': 'المكاتب', 'nav-showrooms': 'المعارض', 'nav-tenders': 'المناقصات', 'nav-more': 'المزيد ▾', 'nav-legal-dd': 'المادة القانونية', 'nav-legal-mobile': '⚖️ الإشعار القانوني', 'nav-packages': 'الباقات',
-    'dd-stores': 'المحلات', 'dd-offices': 'المكاتب', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'الإعلانات', 'dd-tenders': 'المناقصات', 'dd-packs': 'الباقات', 'dd-legal': 'المادة القانونية', 'dd-about': 'من نحن', 'dd-company': 'الشركة المالكة',
+    'dd-stores': 'المحلات', 'dd-offices': 'المكاتب', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'الإعلانات', 'dd-tenders': 'المناقصات', 'dd-packs': 'الباقات', 'dd-legal': 'المادة القانونية', 'dd-about': 'من نحن', 'dd-why': 'لماذا رزق', 'dd-company': 'الشركة المالكة',
     'vsh-title': 'معرضك على <span>رزق</span>: كتالوج فاخر ومشترون جادّون',
     'vsh-desc': 'سيارات وإلكترونيات وأثاث ومعدات تصل لمشترين جادّين يبحثون الآن.',
-    'vsh-btn1': '✨ امتلك واجهة كتالوج معرضك الإلكتروني',
+    'vsh-btn1': 'امتلك واجهة كتالوج معرضك الإلكتروني',
     'vsh-btn1-sub': 'اشترك الآن. عرضك يصل حيث يبحث الجادّون.',
     'vsh-card1-title': 'عرض يبيع قبل الرسالة', 'vsh-card1-desc': 'صور وأسعار تُقنع المشتري من أول نظرة قبل أن يراسلك.',
     'vsh-card2-title': 'تواصل بثقة عبر رزق', 'vsh-card2-desc': 'مشترون جادّون يصلون إليك مع خصوصية محمية دائماً.',
@@ -8907,16 +9412,16 @@ const LANG = {
     'prices-tab-food': '🍚 مواد غذائية', 'prices-tab-fuel': '⛽ محروقات', 'prices-tab-currencies': '💱 عملات',
     'prices-note': 'الأسعار تقريبية وتعكس متوسط السوق المحلي — <a href="#" onclick="openModal(\'register\');return false" style="color:var(--royal);font-weight:700">انشر منتجاتك على رزق الآن ←</a>',
     'cta-badge1': 'انضم الآن', 'cta-badge2': 'أفراد · محلات · معارض · مكاتب · مناقصات', 'cta-btn3': '🏢 افتح محلك أو معرضك',
-    'cta-btn4': '📋 المناقصات',
+    'cta-btn4': '📑 المناقصات',
     'cta-hubs-label': 'اختر مساحتك على رزق',
     'cta-hub-stores': 'المحلات', 'cta-hub-offices': 'المكاتب', 'cta-hub-showrooms': 'المعارض', 'cta-hub-tenders': 'المناقصات', 'cta-hub-investments': 'الاستثمارات',
     'cta-hub-hint-stores': 'بيع وتسوّق يومي', 'cta-hub-hint-offices': 'خدمات مهنية', 'cta-hub-hint-showrooms': 'عروض راقية', 'cta-hub-hint-tenders': 'فرص أعمال', 'cta-hub-hint-investments': 'نمو مدروس',
-    'cta-chip1': '✓ مجاني للبدء', 'cta-chip2': '✓ مناقصات واستثمارات بحذر', 'cta-chip3': '✓ ثقة وأمان من أول خطوة',
+    'cta-chip1': '✓ التسجيل مجاني', 'cta-chip2': '✓ مناقصات واستثمارات متاحة', 'cta-chip3': '✓ ثقة وأمان من أول خطوة',
     'cta-trust1': 'ثقة', 'cta-trust2': 'أمان', 'cta-trust3': 'شفافية',
     'vs-title': 'افتح محلك على <span>رزق</span> بواجهة كاملة لعملائك',
     'vs-desc': 'واجهتك باسمك: منتجاتك وثقة زبائنك في مكان يليق بمحلك.',
-    'vs-btn1': '✨ امتلك واجهة محلك الإلكترونية',
-    'vs-btn1-sub': 'اشترك الآن. سوقك الإلكتروني يبدأ من هنا.',
+    'vs-btn1': 'امتلك واجهة محلك الإلكترونية',
+    'vs-btn1-sub': 'اشترك الآن — سوقك الإلكتروني يبدأ من هنا.',
     'vs-card1-title': 'واجهة احترافية لمحلك', 'vs-card1-desc': 'شعار واسم تجاري وموقع واضح يبني ثقة الزبون من أول زيارة.',
     'vs-card2-title': 'كتالوج منظم بالصور', 'vs-card2-desc': 'منتجات بأسعار وصور واضحة يتصفّحها الزبون بسهولة قبل التواصل.',
     'vs-card3-title': 'نمو يُرى كل يوم', 'vs-card3-desc': 'زبائن أكثر وطلبات أوضح. محلك يكبر بثقة على رزق.',
@@ -8931,8 +9436,8 @@ const LANG = {
     'vo-feat2-title': 'تواصل مباشر وسهل', 'vo-feat2-desc': 'واتساب وإيميل وهاتف: الزبون يصل إليك بنقرة واحدة.',
     'vo-feat3-title': 'شارة مكتب موثّق', 'vo-feat3-desc': 'شارة ذهبية على رزق تمنح عملاءك ثقة فورية في خدماتك.',
     'vo-feat4-title': 'خدماتك معروضة بوضوح', 'vo-feat4-desc': 'قائمة مرتّبة بما تقدّمه. يختار الزبون ما يناسبه ويتواصل مباشرة.',
-    'vo-btn1': '✨ امتلك واجهتك المهنية الإلكترونية',
-    'vo-btn1-sub': 'اشترك الآن. حضورك المهني لا يتوقف.',
+    'vo-btn1': 'امتلك واجهتك المهنية الإلكترونية',
+    'vo-btn1-sub': 'اشترك الآن — حضورك المهني لا يتوقف.',
     'vt-title': 'غرفة المناقصات على <span>رزق</span>',
     'vi-title': 'غرفة الاستثمارات على <span>رزق</span>',
     'vt-btn': '✨ امتلك مقعدك في غرفة المناقصات',
@@ -8961,7 +9466,7 @@ const LANG = {
     'hbiz-trust': 'ثقتك أولاً: رزق ينشر فقط · تتواصل مع البائع مباشرة · عاين قبل أن تدفع',
     'hbiz-browse': 'ابحث أو تصفّح الأقسام',
     'hbiz-browse-sub': 'عقارات، سيارات، ذهب… ابدأ من هنا خلال ثوانٍ',
-    'promo-strip-sub': 'آخر الإعلانات على رزق — عروض تخطف الأنظار',
+    'promo-strip-sub': 'أحدث الإعلانات على رزق — عروض تخطف الأنظار',
     'hero-tagline': 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي — كل شيء في مكان واحد',
     'hbiz-stores-hint': 'بيع أقوى كل يوم',
     'hbiz-offices-hint': 'عملاء يبحثون عنك',
@@ -8972,6 +9477,9 @@ const LANG = {
     'hbiz-tender-badge': 'جديد',
     'hbiz-new': 'جديد',
     'hbiz-cta': 'ثم ابدأ مجاناً — انشر إعلانك أو افتح محلك خلال دقائق',
+    'vstrip-title': 'اكتشف العروض الجديدة بالفيديو',
+    'vstrip-tier': 'شريط الفيديو',
+    'vstrip-hint': 'مرّر الماوس للتشغيل',
     'stat-ads': 'إعلان نشط', 'stat-cats': 'قسماً رئيسياً', 'stat-subs': 'فرعاً متخصصاً', 'stat-wilayas': 'ولاية موريتانية', 'stat-free': 'النشر الأساسي',
     's-cats-title': 'كل ما تحتاجه في <span>مكان واحد</span>',
     's-cats-desc': 'من الدراعة إلى السيارة — كل ما يبحث عنه الموريتاني في مكان واحد',
@@ -8979,7 +9487,10 @@ const LANG = {
     's-lst-title': 'أبرز العروض على <span>رزق</span>',
     's-lst-desc': 'فرص منتقاة تليق بذوقك — اكتشف أفضل ما يعرضه السوق الآن',
     'view-all': 'عرض الكل في نافذة ←',
-    'browse-full': '📂 عرض كل الإعلانات ←',
+    'browse-full': 'عرض كل الإعلانات ←',
+    'browse-stores': 'عرض كل المحلات ←',
+    'browse-showrooms': 'عرض كل المعارض ←',
+    'browse-offices': 'عرض كل المكاتب ←',
     'f-fashion': 'موضة',
     's-why-title': 'لماذا يثق الناس بـ<span>رزق؟</span>',
     's-why-desc': 'سوق موريتاني يثق به الناس — بيع، تسوّق، وأنمِ عملك بوضوح وطمأنينة',
@@ -8994,9 +9505,9 @@ const LANG = {
     'cta-title': 'جاهز تبدأ على رزق؟<br/><span>بيع، تسوّق، وأدر عملك من منصة واحدة</span>',
     'cta-desc': 'سجّل مجاناً وانشر إعلانك الأول اليوم — أو افتح محلك ومعرضك من حساب واحد.',
     'cta-btn1': '🚀 سجّل الآن — مجاناً', 'cta-btn2': '📲 التطبيق قريباً', 'cta-btn-invest': '📈 الاستثمارات',
-    'cta-note': '&nbsp;سجّل بحرّية &nbsp;|&nbsp; مجاني تماماً',
+    'cta-note': '&nbsp;ابدأ الآن — بلا رسوم خفية',
     'ft-quick': 'روابط سريعة', 'ft-topcats': 'أبرز الأقسام', 'ft-help': 'المساعدة',
-    'ft-q1':'الرئيسية','ft-q2':'تصفّح الإعلانات','ft-q3':'انشر إعلانك','ft-q4':'الأسعار','ft-q5':'الشركة المالكة','ft-q5b':'من نحن',
+    'ft-q1':'الرئيسية','ft-q2':'تصفّح الإعلانات','ft-q3':'انشر إعلانك','ft-q4':'الأسعار','ft-q5b':'من نحن','ft-q5c':'لماذا رزق','ft-q5':'الشركة المالكة',
     'ft-tc1':'🏠 منازل وعقارات','ft-tc2':'🚗 سيارات وقطع غيار','ft-tc3':'🚛 شاحنات ومعدات','ft-tc4':'📱 هواتف وإلكترونيات','ft-tc5':'🐄 ماشية وحيوانات',
     'ft-h1':'مركز المساعدة','ft-h2':'سياسة الخصوصية','ft-h3':'شروط الاستخدام','ft-h4':'الإبلاغ عن إعلان','ft-h5':'تواصل معنا',
     'ft-desc': 'سوق موريتانيا الإلكتروني للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات.',
@@ -9034,11 +9545,11 @@ const LANG = {
     'hero-ai-smart': '✨ Rizq IA — votre assistant',
     'about-intro': '<strong style="color:var(--royal);font-size:1.05em">Rizq</strong> — le marché électronique mauritanien des annonces et des affaires. De l\'annonce individuelle aux boutiques, showrooms et bureaux, jusqu\'à la salle des appels d\'offres et la salle des investissements — un espace de confiance développé par <strong style="color:var(--royal)"><a href="rizq_about.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">ADMINIA SARL</a></strong> qui réunit vendeurs et acheteurs dans toutes les wilayas. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">Tout ce qu\'il vous faut… au même endroit, en sécurité et en clarté.</em>',
     'nav-stores': 'Boutiques', 'nav-offices': 'Bureaux', 'nav-showrooms': 'Showrooms', 'nav-tenders': 'A-doffres', 'nav-more': 'Plus ▾', 'nav-legal-dd': 'Mentions légales', 'nav-legal-mobile': '⚖️ Avis légal', 'nav-packages': 'Forfaits',
-    'dd-stores': 'Boutiques', 'dd-offices': 'Bureaux', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'Annonces', 'dd-tenders': 'Appels d\'offres', 'dd-packs': 'Forfaits', 'dd-legal': 'Mentions légales', 'dd-about': 'À propos', 'dd-company': 'Société propriétaire',
+    'dd-stores': 'Boutiques', 'dd-offices': 'Bureaux', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'Annonces', 'dd-tenders': 'Appels d\'offres', 'dd-packs': 'Forfaits', 'dd-legal': 'Mentions légales', 'dd-about': 'À propos', 'dd-why': 'Pourquoi Rizq', 'dd-company': 'Société propriétaire',
     'vsh-title': 'Votre showroom sur <span>Rizq</span> : catalogue premium et acheteurs sérieux',
     'vsh-desc': 'Voitures, électronique, meubles et équipements pour des acheteurs sérieux, dès maintenant.',
-    'vsh-btn1': '✨ Possédez la vitrine catalogue de votre showroom',
-    'vsh-btn1-sub': 'Abonnez-vous. Votre offre atteint les acheteurs sérieux.',
+    'vsh-btn1': 'Possédez la vitrine catalogue de votre showroom',
+    'vsh-btn1-sub': 'Abonnez-vous — votre offre atteint les acheteurs sérieux.',
     'vsh-card1-title': 'Une offre qui convainc avant le message', 'vsh-card1-desc': 'Photos et prix qui séduisent au premier regard, avant même qu\'on vous contacte.',
     'vsh-card2-title': 'Contactez en confiance via Rizq', 'vsh-card2-desc': 'Des acheteurs sérieux vous rejoignent, avec une confidentialité toujours protégée.',
     'vsh-card3-title': 'Badge Showroom vérifié', 'vsh-card3-desc': 'Un badge officiel sur Rizq visible sur vos offres pour renforcer la confiance.',
@@ -9048,16 +9559,16 @@ const LANG = {
     'prices-tab-food': '🍚 Denrées alimentaires', 'prices-tab-fuel': '⛽ Carburants', 'prices-tab-currencies': '💱 Devises',
     'prices-note': 'Les prix sont indicatifs et reflètent la moyenne du marché local — <a href="#" onclick="openModal(\'register\');return false" style="color:var(--royal);font-weight:700">Publiez vos produits sur Rizq →</a>',
     'cta-badge1': 'Rejoignez-nous', 'cta-badge2': 'Particuliers · Boutiques · Showrooms · Bureaux · Appels d\'offres', 'cta-btn3': '🏢 Ma boutique / showroom',
-    'cta-btn4': '📋 Appels d\'offres',
+    'cta-btn4': '📑 Appels d\'offres',
     'cta-hubs-label': 'Choisissez votre espace sur Rizq',
     'cta-hub-stores': 'Boutiques', 'cta-hub-offices': 'Bureaux', 'cta-hub-showrooms': 'Showrooms', 'cta-hub-tenders': 'Appels d\'offres', 'cta-hub-investments': 'Investissements',
     'cta-hub-hint-stores': 'Vente au quotidien', 'cta-hub-hint-offices': 'Services pro', 'cta-hub-hint-showrooms': 'Offres premium', 'cta-hub-hint-tenders': 'Opportunités', 'cta-hub-hint-investments': 'Croissance',
-    'cta-chip1': '✓ Gratuit pour commencer', 'cta-chip2': '✓ Appels d\'offres & investissements prudents', 'cta-chip3': '✓ Confiance et sécurité dès le départ',
+    'cta-chip1': '✓ Inscription gratuite', 'cta-chip2': '✓ Appels d\'offres et investissements disponibles', 'cta-chip3': '✓ Confiance et sécurité dès le départ',
     'cta-trust1': 'Confiance', 'cta-trust2': 'Sécurité', 'cta-trust3': 'Transparence',
     'vs-title': 'Ouvrez votre boutique sur <span>Rizq</span> avec une vitrine complète pour vos clients',
     'vs-desc': 'Votre vitrine à votre nom : produits et confiance clients dans un espace digne de votre boutique.',
-    'vs-btn1': '✨ Possédez la vitrine électronique de votre boutique',
-    'vs-btn1-sub': 'Abonnez-vous. Votre marché électronique commence ici.',
+    'vs-btn1': 'Possédez la vitrine électronique de votre boutique',
+    'vs-btn1-sub': 'Abonnez-vous — votre marché électronique commence ici.',
     'vs-card1-title': 'Une vitrine professionnelle', 'vs-card1-desc': 'Logo, nom commercial et emplacement clairs pour inspirer confiance dès la première visite.',
     'vs-card2-title': 'Catalogue photo organisé', 'vs-card2-desc': 'Produits avec prix et photos clairs que le client consulte facilement avant de vous contacter.',
     'vs-card3-title': 'Une croissance visible chaque jour', 'vs-card3-desc': 'Plus de clients et des demandes plus claires. Votre boutique grandit sur Rizq.',
@@ -9072,8 +9583,8 @@ const LANG = {
     'vo-feat2-title': 'Contact direct et simple', 'vo-feat2-desc': 'WhatsApp, e-mail et téléphone : le client vous joint en un clic.',
     'vo-feat3-title': 'Badge Bureau certifié', 'vo-feat3-desc': 'Un badge or sur Rizq qui inspire immédiatement confiance à vos clients.',
     'vo-feat4-title': 'Vos services bien présentés', 'vo-feat4-desc': 'Une liste claire de ce que vous offrez. Le client choisit et vous contacte directement.',
-    'vo-btn1': '✨ Possédez votre vitrine professionnelle en ligne',
-    'vo-btn1-sub': 'Abonnez-vous. Votre présence pro ne s\'arrête pas.',
+    'vo-btn1': 'Possédez votre vitrine professionnelle en ligne',
+    'vo-btn1-sub': 'Abonnez-vous — votre présence pro ne s\'arrête pas.',
     'vt-title': 'La salle des appels d\'offres sur <span>Rizq</span>',
     'vi-title': 'La salle des investissements sur <span>Rizq</span>',
     'vt-btn': '✨ Réservez votre place dans la salle des appels d\'offres',
@@ -9113,6 +9624,9 @@ const LANG = {
     'hbiz-tender-badge': 'Nouveau',
     'hbiz-new': 'Nouveau',
     'hbiz-cta': 'Puis commencez gratuitement — publiez une annonce ou ouvrez votre boutique en quelques minutes',
+    'vstrip-title': 'Découvrez les nouvelles offres en vidéo',
+    'vstrip-tier': 'Bandeau vidéo',
+    'vstrip-hint': 'Survolez pour lire',
     'stat-ads': 'annonces actives', 'stat-cats': 'catégories', 'stat-subs': 'sous-catégories', 'stat-wilayas': 'wilayas', 'stat-free': 'Publication de base',
     's-cats-title': 'Tout ce dont vous avez besoin en <span>un seul endroit</span>',
     's-cats-desc': 'De la daraa à la voiture — tout ce que cherche le Mauritanien, au même endroit',
@@ -9120,7 +9634,10 @@ const LANG = {
     's-lst-title': 'Les meilleures offres sur <span>Rizq</span>',
     's-lst-desc': 'Des opportunités choisies pour vous — découvrez le meilleur du marché maintenant',
     'view-all': 'Tout voir en fenêtre →',
-    'browse-full': '📂 Voir toutes les annonces →',
+    'browse-full': 'Voir toutes les annonces →',
+    'browse-stores': 'Voir toutes les boutiques →',
+    'browse-showrooms': 'Voir tous les showrooms →',
+    'browse-offices': 'Voir tous les bureaux →',
     'f-fashion': 'Mode',
     's-why-title': 'Pourquoi faire confiance à <span>Rizq?</span>',
     's-why-desc': 'Un marché mauritanien de confiance — vendez, achetez et développez votre activité en toute sérénité',
@@ -9135,9 +9652,9 @@ const LANG = {
     'cta-title': 'Prêt à commencer sur Rizq?<br/><span>Vendez, achetez et gérez depuis une seule plateforme</span>',
     'cta-desc': 'Inscrivez-vous gratuitement et publiez votre première annonce — ou ouvrez boutique et showroom depuis un seul compte.',
     'cta-btn1': '🚀 S\'inscrire — Gratuit', 'cta-btn2': '📲 L\'app bientôt', 'cta-btn-invest': '📈 Investissements',
-    'cta-note': '&nbsp;Inscrivez-vous librement &nbsp;|&nbsp; Totalement gratuit',
+    'cta-note': '&nbsp;Commencez maintenant — sans frais cachés',
     'ft-quick': 'Liens rapides', 'ft-topcats': 'Meilleures catégories', 'ft-help': 'Aide',
-    'ft-q1':'Accueil','ft-q2':'Parcourir les annonces','ft-q3':'Publier une annonce','ft-q4':'Tarifs','ft-q5':'Société propriétaire','ft-q5b':'À propos',
+    'ft-q1':'Accueil','ft-q2':'Parcourir les annonces','ft-q3':'Publier une annonce','ft-q4':'Tarifs','ft-q5b':'À propos','ft-q5c':'Pourquoi Rizq','ft-q5':'Société propriétaire',
     'ft-tc1':'🏠 Immobilier','ft-tc2':'🚗 Voitures & pièces','ft-tc3':'🚛 Camions & engins','ft-tc4':'📱 Téléphones & électronique','ft-tc5':'🐄 Bétail & animaux',
     'ft-h1':'Centre d\'aide','ft-h2':'Politique de confidentialité','ft-h3':'Conditions d\'utilisation','ft-h4':'Signaler une annonce','ft-h5':'Contactez-nous',
     'ft-desc': 'Le marché électronique mauritanien des annonces et des affaires : boutiques, showrooms, appels d\'offres et investissements.',
@@ -9442,8 +9959,8 @@ function applyLandingLang(toAr) {
   var theaterClose = document.querySelector('#rizq-search-panel [data-rizq-close-search]');
   if (theaterClose) theaterClose.setAttribute('aria-label', isAr ? 'إغلاق' : 'Fermer');
   var theaterCats = {
-    ar: ['🏠 عقارات','🚗 سيارات','🪙 ذهب','📱 إلكترونيات','⚡ طاقة','✈️ رحلات','📋 مناقصات','📈 استثمار'],
-    fr: ['🏠 Immobilier','🚗 Voitures','🪙 Or','📱 Électronique','⚡ Énergie','✈️ Voyages','📋 Appels d\'offres','📈 Investissement']
+    ar: ['🏠 عقارات','🚗 سيارات','🪙 ذهب','📱 إلكترونيات','⚡ طاقة','✈️ رحلات','📑 مناقصات','📈 استثمار'],
+    fr: ['🏠 Immobilier','🚗 Voitures','🪙 Or','📱 Électronique','⚡ Énergie','✈️ Voyages','📑 Appels d\'offres','📈 Investissement']
   };
   var catLabels = isAr ? theaterCats.ar : theaterCats.fr;
   document.querySelectorAll('#rizq-search-panel .rizq-search-cat').forEach(function(a, i){
@@ -9656,6 +10173,7 @@ function applyLandingLang(toAr) {
   if(typeof buildFeaturedCards==='function') buildFeaturedCards();
   if(typeof buildStyleIdeas==='function') buildStyleIdeas(false);
   if(typeof buildShowroomModels==='function') buildShowroomModels(false);
+  if(typeof refreshLandingBrandStrips==='function') refreshLandingBrandStrips();
   // إصلاح حقيقي: شريط أسعار السوق المتحرك (#price-ticker) كان يُترجم في لوحة الأسعار
   // الثابتة فقط (renderPrices) دون إعادة بنائه في شكله المتحرك — يبقى عربياً بعد التبديل
   if(typeof renderPriceTicker==='function') renderPriceTicker();
@@ -10426,8 +10944,8 @@ function applyFullTranslation(lang) {
 
   // ── Footer links (quick links + top cats + help) ──
   const ftLinks = document.querySelectorAll('.footer-links');
-  const ftQuickFR = ['Accueil','Parcourir les annonces','Publier une annonce','Tarifs','À propos'];
-  const ftQuickAR = ['الرئيسية','تصفّح الإعلانات','انشر إعلانك','الأسعار','الشركة المالكة','من نحن'];
+  const ftQuickFR = ['Accueil','Parcourir les annonces','Publier une annonce','Tarifs','À propos','Pourquoi Rizq','Société propriétaire'];
+  const ftQuickAR = ['الرئيسية','تصفّح الإعلانات','انشر إعلانك','الأسعار','من نحن','لماذا رزق','الشركة المالكة'];
   const ftCatsFR  = ['🏠 Immobilier','🚗 Voitures & pièces','🚛 Camions & engins','📱 Téléphones & électronique','🐄 Bétail & animaux'];
   const ftCatsAR  = ['🏠 منازل وعقارات','🚗 سيارات وقطع غيار','🚛 شاحنات ومعدات','📱 هواتف وإلكترونيات','🐄 ماشية وحيوانات'];
   const ftHelpFR  = ['Centre d\'aide','Politique de confidentialité','Conditions d\'utilisation','Signaler une annonce','Contactez-nous'];
@@ -13919,7 +14437,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_packages_ui.js?v=23.0"></script>
 <script src="rizq_merchant_activities.js?v=23.0"></script>
 <script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo7"></script>
+<script src="rizq_video_ads.js?v=promo14"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=24.1"></script>
 <script src="rizq_disclaimer.js"></script>
@@ -13980,11 +14498,13 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
        قواعد واحدة:
          1) عنصر جاهز للعرض فقط (حساب موافق + صورة + جملة، أو مناقصة/استثمار منشور)
          2) ترتيب بالأحدث أولاً
-         3) إن قلّ العدد عن MIN_READY (3) → حالة فارغة «كن أول من…»
-         4) وإلا شريط حتى MAX_CARDS (20) مع تمرير تلقائي ── -->
+         3) إن وُجد محل/معرض/مكتب واحد جاهز → شريط «مباشر» بلا خلفية فارغة
+         4) إن لم يوجد أي حساب حقيقي → عيّنات عرض حيّة (لا بانر «كن أول…»)
+         5) المناقصات/الاستثمارات تبقى بعتبة 3 للعناصر المنشورة ── -->
   <script>
   (function(){
-    var DISCOVERY_MIN_READY = 3;
+    var DISCOVERY_MIN_READY_ACCOUNTS = 1;
+    var DISCOVERY_MIN_READY_FEEDS = 3;
     var DISCOVERY_MAX_CARDS = 20;
 
     function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -13992,31 +14512,121 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 
     var TYPE_CFG = {
       store: { page:'rizq_store.html',   icon:'🏪', badge:{ar:'محل',fr:'Boutique'},
-        emptyTitle:{ar:'🌟 كن أول من يفتح محله هنا',fr:'🌟 Soyez le premier à ouvrir votre boutique ici'},
+        emptyTitle:{ar:'كن أول من يفتح محله هنا',fr:'Soyez le premier à ouvrir votre boutique ici'},
         emptyDesc:{ar:'محلات رزق التجارية ستظهر هنا فور فتحها — سجّل الآن واستفد من الفترة المجانية.',fr:'Les boutiques Rizq apparaîtront ici dès leur ouverture — inscrivez-vous maintenant et profitez de la période gratuite.'},
-        emptyCta:{ar:'🏪 افتح محلك الآن',fr:'🏪 Ouvrez votre boutique maintenant'},
+        emptyCta:{ar:'افتح محلك الآن',fr:'Ouvrez votre boutique maintenant'},
         bizType:'store' },
       office: { page:'rizq_office.html', icon:'🏢', badge:{ar:'مكتب',fr:'Bureau'},
-        emptyTitle:{ar:'🌟 كن أول من يفتح مكتبه هنا',fr:'🌟 Soyez le premier à ouvrir votre bureau ici'},
+        emptyTitle:{ar:'كن أول من يفتح مكتبه هنا',fr:'Soyez le premier à ouvrir votre bureau ici'},
         emptyDesc:{ar:'المكاتب الافتراضية ستظهر هنا فور فتحها — سجّل الآن واستفد من الفترة المجانية.',fr:'Les bureaux virtuels apparaîtront ici dès leur ouverture — inscrivez-vous maintenant et profitez de la période gratuite.'},
-        emptyCta:{ar:'🏢 أنشئ مكتبك الآن',fr:'🏢 Créez votre bureau maintenant'},
+        emptyCta:{ar:'أنشئ مكتبك الآن',fr:'Créez votre bureau maintenant'},
         bizType:'office' },
       corp: { page:'rizq_showroom.html', icon:'🏬', badge:{ar:'معرض',fr:'Showroom'},
-        emptyTitle:{ar:'🌟 كن أول من يفتح معرضه هنا',fr:'🌟 Soyez le premier à ouvrir votre showroom ici'},
+        emptyTitle:{ar:'كن أول من يفتح معرضه هنا',fr:'Soyez le premier à ouvrir votre showroom ici'},
         emptyDesc:{ar:'المعارض ستظهر هنا فور فتحها — سجّل الآن واستفد من الفترة المجانية.',fr:'Les showrooms apparaîtront ici dès leur ouverture — inscrivez-vous maintenant et profitez de la période gratuite.'},
-        emptyCta:{ar:'🏬 أنشئ معرضك الآن',fr:'🏬 Créez votre showroom maintenant'},
+        emptyCta:{ar:'أنشئ معرضك الآن',fr:'Créez votre showroom maintenant'},
         bizType:'corp' },
-      tenders: { page:'rizq_tenders.html', icon:'📋', badge:{ar:'مناقصة',fr:'Appel d\'offres'},
-        emptyTitle:{ar:'🌟 كن أول من ينشر مناقصته هنا',fr:'🌟 Soyez le premier à publier un appel d\'offres'},
+      tenders: { page:'rizq_tenders.html', icon:'📑', badge:{ar:'مناقصة',fr:'Appel d\'offres'},
+        emptyTitle:{ar:'كن أول من ينشر مناقصته هنا',fr:'Soyez le premier à publier un appel d\'offres'},
         emptyDesc:{ar:'المناقصات المفتوحة ستظهر هنا فور نشرها — اشترك في الغرفة وابدأ.',fr:'Les appels d\'offres ouverts apparaîtront ici dès leur publication.'},
-        emptyCta:{ar:'📋 انشر مناقصة',fr:'📋 Publier un AO'},
+        emptyCta:{ar:'انشر مناقصة',fr:'Publier un AO'},
         bizType:'tenders' },
       investments: { page:'rizq_investments.html', icon:'📈', badge:{ar:'استثمار',fr:'Investissement'},
-        emptyTitle:{ar:'🌟 كن أول من ينشر فرصته الاستثمارية هنا',fr:'🌟 Soyez le premier à publier une opportunité'},
+        emptyTitle:{ar:'كن أول من ينشر فرصته الاستثمارية هنا',fr:'Soyez le premier à publier une opportunité'},
         emptyDesc:{ar:'فرص الاستثمار ستظهر هنا فور نشرها ومراجعتها — ادخل الغرفة وابدأ.',fr:'Les opportunités d\'investissement apparaîtront ici dès publication et revue.'},
-        emptyCta:{ar:'📈 انشر فرصة',fr:'📈 Publier une opportunité'},
+        emptyCta:{ar:'انشر فرصة',fr:'Publier une opportunité'},
         bizType:'investments' }
     };
+
+    /** معاينات عند الفراغ التام فقط (لا حسابات جاهزة ولا عيّنات عرض) */
+    var EMPTY_EXAMPLES = {
+      store: [
+        { href:'rizq_store.html?demo=1', nameAr:'محل نموذجي على رزق', nameFr:'Boutique modèle Rizq', tagAr:'إلكترونيات وتقنية', tagFr:'Électronique & tech', icon:'🏪' },
+        { href:'rizq_store.html?demo=1', nameAr:'واجهة محل بالصور والاسم', nameFr:'Vitrine photo + nom', tagAr:'أزياء وموضة', tagFr:'Mode', icon:'👗' }
+      ],
+      corp: [
+        { href:'rizq_showroom.html?demo=1', nameAr:'معرض نموذجي على رزق', nameFr:'Showroom modèle Rizq', tagAr:'معارض سيارات', tagFr:'Showroom auto', icon:'🚗' },
+        { href:'rizq_showroom.html?demo=1', nameAr:'كتالوج معرض بالصور', nameFr:'Catalogue showroom', tagAr:'أثاث وإلكترونيات', tagFr:'Meubles & tech', icon:'🏬' }
+      ],
+      office: [
+        { href:'rizq_office.html?demo=1', nameAr:'مكتب محاماة نموذجي', nameFr:'Cabinet d\'avocats modèle', tagAr:'محامون وقانون', tagFr:'Avocats & droit', icon:'⚖️' },
+        { href:'rizq_office.html?demo=1', nameAr:'مكتب خدمات إدارية', nameFr:'Bureau administratif', tagAr:'خدمات إدارية', tagFr:'Services admin.', icon:'🏛️' }
+      ]
+    };
+
+    /** احتياطي واجهة إن تعذّر الـ API — نفس أسماء بذور التخرج (acc_grad_*) */
+    function showcaseAccounts(type){
+      var now = Date.now();
+      var mk = function(id, name, tagline, city, thumb, offsetHrs){
+        return {
+          id: id, type: type, status: 'approved', graduationDemo: true,
+          name: name, tagline: tagline, city: city, thumb: thumb || '',
+          approvedAt: new Date(now - offsetHrs * 3600000).toISOString()
+        };
+      };
+      if(type === 'store'){
+        return [
+          mk('acc_grad_store_01', 'تقنية الشنقيط', 'هواتف وإكسسوارات أصلية بأسعار واضحة', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-store01/480/360', 2),
+          mk('acc_grad_store_02', 'أناقة موريتانيا', 'دراعة وأزياء رجالية ونسائية', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-store02/480/360', 8),
+          mk('acc_grad_store_03', 'سوق الأمل للأغذية', 'تموين يومي ومواد غذائية جملة وتجزئة', 'نواذيبو', 'https://picsum.photos/seed/rizq-grad-store03/480/360', 14),
+          mk('acc_grad_store_04', 'ذهبيات روصو', 'ذهب ومجوهرات بأوزان وأسعار معلنة', 'روصو', 'https://picsum.photos/seed/rizq-grad-store04/480/360', 20),
+          mk('acc_grad_store_05', 'بيت الديكور', 'أثاث ومفروشات منزلية عصرية', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-store05/480/360', 30)
+        ];
+      }
+      if(type === 'corp'){
+        return [
+          mk('acc_grad_corp_01', 'معرض أمل للسيارات', 'سيارات جديدة ومستعملة موثّقة بالوثائق', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-corp01/480/360', 3),
+          mk('acc_grad_corp_02', 'معرض المحيط للإلكترونيات', 'أجهزة وشاشات وكمبيوترات للجملة والتجزئة', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-corp02/480/360', 12),
+          mk('acc_grad_corp_03', 'معرض الواحة للأثاث', 'أطقم وصالات ومكاتب للشركات والمنازل', 'نواذيبو', 'https://picsum.photos/seed/rizq-grad-corp03/480/360', 22)
+        ];
+      }
+      if(type === 'office'){
+        return [
+          mk('acc_grad_office_01', 'مكتب أطوار للعقارات', 'بيع وإيجار واستشارات عقارية في كل الولايات', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-office01/480/360', 5),
+          mk('acc_grad_office_02', 'مكتب النخبة للمحاماة', 'استشارات وقضايا مدنية وتجارية', 'نواكشوط', 'https://picsum.photos/seed/rizq-grad-office02/480/360', 16),
+          mk('acc_grad_office_03', 'وكالة الصدى الإدارية', 'خدمات إدارية ومعاملات بسرعة ووضوح', 'روصو', 'https://picsum.photos/seed/rizq-grad-office03/480/360', 28)
+        ];
+      }
+      return [];
+    }
+
+    /** صياغة مميّزة لكل قسم — نفس إيقاع شريط الإعلانات: [أحدث … على رزق] — [ميزة القسم] */
+    function liveHeadHTML(type, fr){
+      var sub = {
+        ads: {
+          ar: 'أحدث الإعلانات على رزق — عروض تخطف الأنظار',
+          fr: 'Dernières annonces sur Rizq — offres qui impressionnent'
+        },
+        store: {
+          ar: 'أحدث المحلات على رزق — واجهات تفتح أبوابها للزبائن',
+          fr: 'Dernières boutiques sur Rizq — des vitrines ouvertes aux clients'
+        },
+        corp: {
+          ar: 'أحدث المعارض على رزق — كتالوج يلفت أنظار الجادّين',
+          fr: 'Derniers showrooms sur Rizq — un catalogue qui attire les acheteurs sérieux'
+        },
+        office: {
+          ar: 'أحدث المكاتب على رزق — حضور مهني يصل لطالبي الخدمة',
+          fr: 'Derniers bureaux sur Rizq — une présence pro qui trouve ses clients'
+        },
+        tenders: {
+          ar: 'أحدث المناقصات على رزق — فرص توريد وتعاقد حقيقية',
+          fr: 'Derniers appels d\'offres sur Rizq — de vraies opportunités de contrat'
+        },
+        investments: {
+          ar: 'أحدث الاستثمارات على رزق — شراكات نمو بثقة ووضوح',
+          fr: 'Derniers investissements sur Rizq — des partenariats de croissance en confiance'
+        }
+      }[type] || {
+        ar: 'مباشر على رزق — ما يستحق انتباهك الآن',
+        fr: 'En direct sur Rizq — ce qui mérite votre attention'
+      };
+      var live = fr ? 'En direct' : 'مباشر';
+      return '<div class="rzq-disc-live-head">'
+        + '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">'+live+'</strong></span>'
+        + '<span class="live-label-sub">'+esc(fr ? sub.fr : sub.ar)+'</span>'
+        + '</div>';
+    }
 
     var TENDER_CAT = {
       'سيارات':{ar:'🚗 سيارات',fr:'🚗 Voitures'},
@@ -14073,19 +14683,45 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
     }
 
     function emptyHTML(cfg, fr){
+      var samples = EMPTY_EXAMPLES[cfg.bizType] || [];
+      var exLabel = fr
+        ? 'Aperçu — cliquez une carte pour ouvrir la page'
+        : 'معاينة — اضغط البطاقة لفتح الصفحة';
+      var examples = '';
+      if(samples.length){
+        examples = '<div class="rzq-disc-empty-examples">'
+          + '<p class="rzq-disc-ex-label">'+esc(exLabel)+'</p>'
+          + samples.map(function(ex){
+            var name = fr ? ex.nameFr : ex.nameAr;
+            var tag = fr ? ex.tagFr : ex.tagAr;
+            return '<a class="rzq-disc-card" href="'+esc(ex.href)+'">'
+              + '<div class="rzq-disc-img"><div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px;background:linear-gradient(145deg,#eef2f7,#dfe7f2)">'+ex.icon+'</div></div>'
+              + '<div class="rzq-disc-body">'
+              +   '<div class="rzq-disc-name">'+esc(name)+'</div>'
+              +   (tag ? '<div class="rzq-disc-tag">'+esc(tag)+'</div>' : '')
+              +   '<span class="rzq-disc-badge">'+(fr?'Démo':'مثال')+'</span>'
+              + '</div></a>';
+          }).join('')
+          + '</div>';
+      }
       return '<div class="rzq-disc-empty">'
         + '<div class="rzq-disc-empty-icon">'+cfg.icon+'</div>'
         + '<div class="rzq-disc-empty-title">'+esc(cfg.emptyTitle[fr?'fr':'ar'])+'</div>'
         + '<div class="rzq-disc-empty-desc">'+esc(cfg.emptyDesc[fr?'fr':'ar'])+'</div>'
+        + examples
         + '</div>';
     }
 
-    function mountStrip(mount, cardsHTML, cfg, fr){
+    function mountStrip(mount, cardsHTML, cfg, fr, opts){
+      opts = opts || {};
       if(!cardsHTML){
         mount.innerHTML = emptyHTML(cfg, fr);
         return;
       }
-      mount.innerHTML = '<div class="rzq-disc-strip">'
+      /* عند وجود محلات/حسابات: لا خلفية فارغة ولا نص «كن أول…» — شريط مباشر فقط */
+      var head = opts.liveType ? liveHeadHTML(opts.liveType, fr) : '';
+      mount.innerHTML = head
+        + '<div class="rzq-disc-strip">'
         + '<div class="rzq-disc-track">' + cardsHTML + cardsHTML + '</div>'
         + '</div>';
       initAutoScroll(mount.querySelector('.rzq-disc-strip'));
@@ -14152,7 +14788,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       return _backendAccountsPromise;
     }
 
-    /** حسابات (محل/مكتب/معرض): موافَق + اسم + صورة + جملة — الأحدث موافقة أولاً */
+    /** حسابات (محل/مكتب/معرض): موافَق + اسم + جملة — الأحدث موافقة أولاً؛ شريط مباشر بلا بانر فارغ */
     function renderStrip(mountId, type){
       var mount = document.getElementById(mountId);
       if(!mount) return;
@@ -14167,20 +14803,26 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         remoteAccs.forEach(function(a){ if(a && a.id && !known[a.id]){ known[a.id]=true; merged.push(a); } });
         var list = merged.filter(function(a){
           if(!a || String(a.id||'').indexOf('acc_demo')===0) return false;
-          return a.status==='approved' && a.type===type && a.name && a.thumb && a.tagline;
+          if(String(a.id||'').indexOf('acc_showcase_')===0) return false;
+          /* صورة اختيارية: الاسم + الجملة يكفيان للظهور الحي */
+          return a.status==='approved' && a.type===type && a.name && a.tagline;
         });
         list.sort(function(a,b){ return new Date(b.approvedAt||0) - new Date(a.approvedAt||0); });
 
-        if(list.length < DISCOVERY_MIN_READY){
+        /* إن وُجدت محلات حقيقية → شريط مباشر فقط (تختفي الخلفية والنص الفارغ) */
+        if(list.length < DISCOVERY_MIN_READY_ACCOUNTS){
+          list = showcaseAccounts(type);
+        }
+        if(!list.length){
           mountStrip(mount, '', cfg, fr);
           return;
         }
         var cardsHTML = list.slice(0, DISCOVERY_MAX_CARDS).map(function(a){ return cardHTML(a, cfg, fr); }).join('');
-        mountStrip(mount, cardsHTML, cfg, fr);
+        mountStrip(mount, cardsHTML, cfg, fr, { liveType: type });
       });
     }
 
-    /** مناقصات / استثمارات: نفس العتبة والترتيب من public-stats */
+    /** مناقصات / استثمارات: عتبة أعلى للعناصر المنشورة */
     function renderFeedStrip(mountId, kind){
       var mount = document.getElementById(mountId);
       if(!mount) return;
@@ -14198,14 +14840,14 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         .then(function(data){
           var teasers = data && data.ok && Array.isArray(data.teasers) ? data.teasers : [];
           var count = data && data.ok ? Number(data.count||teasers.length) : 0;
-          if(count < DISCOVERY_MIN_READY || teasers.length < DISCOVERY_MIN_READY){
+          if(count < DISCOVERY_MIN_READY_FEEDS || teasers.length < DISCOVERY_MIN_READY_FEEDS){
             mountStrip(mount, '', cfg, fr);
             return;
           }
           var cardsHTML = teasers.slice(0, DISCOVERY_MAX_CARDS).map(function(row){
             return kind==='tenders' ? tenderCardHTML(row, fr) : investmentCardHTML(row, fr);
           }).join('');
-          mountStrip(mount, cardsHTML, cfg, fr);
+          mountStrip(mount, cardsHTML, cfg, fr, { liveType: kind });
         })
         .catch(function(){ mountStrip(mount, '', cfg, fr); });
     }
@@ -14334,27 +14976,6 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         }).catch(function(){ return false; });
     }
 
-    // ── 🆕 "وصل حديثاً" — آخر الإعلانات النشطة على كامل المنصة (مهمة #261،
-    // طلب Limam: ميزات خفيفة على غرار أمازون/AliExpress). GET /api/ads يُرجع
-    // بيانات مُرتَّبة بالفعل تنازلياً حسب createdAt — لا حاجة لفرز إضافي. ──
-    function renderNewArrivals(){
-      var block = document.getElementById('new-arrivals-block');
-      var mount = document.getElementById('new-arrivals-mount');
-      if(!block || !mount || !window.RIZQ_BACKEND_BASE) return Promise.resolve(false);
-      var fr = isFr();
-      return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/ads?limit=10')
-        .then(function(r){ return r.ok ? r.json() : null; })
-        .then(function(data){
-          var ads = data && data.ok && Array.isArray(data.ads) ? data.ads : [];
-          if(ads.length < 3) return false; // نفس حد "لا يستحق شريطاً كاملاً" المعتمَد في بقية الأشرطة
-          var cardsHTML = ads.map(function(a){ return recentlyViewedCardHTML(a, fr); }).join('');
-          mount.innerHTML = '<div class="rzq-disc-strip"><div class="rzq-disc-track">' + cardsHTML + '</div></div>';
-          initAutoScroll(mount.querySelector('.rzq-disc-strip'));
-          block.style.display = '';
-          return true;
-        }).catch(function(){ return false; });
-    }
-
     // ── ❤️ "المفضلة لديك" — تقرأ localStorage['rizq_wishlist'] (مُصلَحة هذه
     // الجولة في browse/search/listing لتُخزَّن فعلياً بدل Set في الذاكرة كانت
     // تُفرَّغ مع كل تحميل صفحة) وتجلب بياناتها الحيّة دفعة واحدة عبر
@@ -14429,7 +15050,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
     function renderLiveActivitySection(){
       var section = document.getElementById('rizq-live-activity');
       if(!section) return;
-      Promise.all([renderEndingSoon(), renderTopSellers(), renderNewArrivals(), renderRecentlyViewed(), renderWishlist()]).then(function(results){
+      Promise.all([renderEndingSoon(), renderTopSellers(), renderRecentlyViewed(), renderWishlist()]).then(function(results){
         section.style.display = results.some(Boolean) ? '' : 'none';
       });
     }

@@ -22,7 +22,7 @@
     stores: '🏪',
     offices: '🏢',
     showrooms: '🏬',
-    tenders: '📋',
+    tenders: '📑',
     investments: '📈',
     post: '➕',
     more: '⋯',
@@ -145,7 +145,11 @@
   }
 
   function aboutHref() {
-    return 'rizq_landing_v8.html#about';
+    return 'rizq_platform.html#who';
+  }
+
+  function whyHref() {
+    return 'rizq_platform.html#why';
   }
 
   function desktopMoreMenuHtml() {
@@ -155,7 +159,8 @@
       '<a href="' + packagesHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong data-hdr="packs">' + t2('الباقات', 'Forfaits') + '</strong></div></a>' +
       '<a href="rizq_legal.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">⚖️</span><div><strong data-hdr="legal">' + t2('المواد القانونية', 'Mentions légales') + '</strong></div></a>' +
       '<a href="' + aboutHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">ℹ️</span><div><strong data-hdr="about">' + t2('من نحن', 'À propos') + '</strong></div></a>' +
-      '<a href="rizq_about.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🏛️</span><div><strong data-hdr="about">' + t2('الشركة المالكة', 'Société') + '</strong></div></a>';
+      '<a href="' + whyHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">❓</span><div><strong data-hdr="why">' + t2('لماذا رزق', 'Pourquoi Rizq') + '</strong></div></a>' +
+      '<a href="rizq_about.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🏛️</span><div><strong data-hdr="company">' + t2('الشركة المالكة', 'Société') + '</strong></div></a>';
   }
 
   function moduleHref(key) {
@@ -181,7 +186,7 @@
       item(moduleHref('corp'), 'showrooms', '🏬', 'المعارض', 'Showrooms') +
       item(moduleHref('office'), 'offices', '💼', 'المكاتب', 'Bureaux') +
       item(adsHref(), 'ads', '📢', 'الإعلانات', 'Annonces') +
-      item(moduleHref('tenders'), 'tenders', '📋', 'المناقصات', 'A-doffres') +
+      item(moduleHref('tenders'), 'tenders', '📑', 'المناقصات', 'A-doffres') +
       item(moduleHref('investments'), 'investments', '📈', 'الاستثمارات', 'Investissements') +
       item(packagesHref(), 'packs', '💎', 'الباقات', 'Forfaits') +
       item('rizq_legal.html', 'legal', '⚖️', 'المواد القانونية', 'Mentions légales') +
@@ -681,6 +686,7 @@
     rizq_office: 'offices',
     rizq_showroom: 'showrooms',
     rizq_showroom_directory: 'showrooms',
+    rizq_directory: 'showrooms',
     rizq_corp: 'showrooms',
     rizq_tenders: 'tenders',
     rizq_investments: 'investments',
@@ -748,6 +754,16 @@
     if (isLanding()) {
       if (h && HASH_TO_NAV[h]) return HASH_TO_NAV[h];
       return 'home';
+    }
+    if (k === 'rizq_directory' || k === 'directory') {
+      try {
+        var tp = new URLSearchParams(location.search || '').get('type');
+        if (tp === 'store') return 'stores';
+        if (tp === 'office') return 'offices';
+        return 'showrooms';
+      } catch (e) {
+        return 'showrooms';
+      }
     }
     if (PAGE_TO_NAV[k]) return PAGE_TO_NAV[k];
     if (h && HASH_TO_NAV[h]) return HASH_TO_NAV[h];

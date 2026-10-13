@@ -514,11 +514,40 @@
     }
   }
 
+  /**
+   * مساحة ماركة ثابتة الارتفاع — حتى البطاقات بلا ماركة تبقى بنفس القياس
+   */
+  function brandSlotHtml(ad, opts) {
+    opts = opts || {};
+    var fr = !!opts.fr;
+    var inner = '';
+    try {
+      if (ad && global.RizqBrands) {
+        var brandId = ad.brandId || '';
+        if (!brandId && typeof global.RizqBrands.findByAlias === 'function') {
+          var hit = global.RizqBrands.findByAlias([ad.title, ad.titleFR, ad.titleFr, ad.brandName, ad.brandNameFr].join(' '));
+          if (hit && hit.id) brandId = hit.id;
+        }
+        if (brandId && typeof global.RizqBrands.chipHtml === 'function') {
+          inner = global.RizqBrands.chipHtml(brandId, {
+            fr: fr,
+            modelId: ad.modelId || '',
+            size: opts.size || 18
+          });
+        }
+      }
+    } catch (e) { inner = ''; }
+    return '<div class="rzq-ad-brand-slot' + (inner ? ' has-brand' : ' is-empty') + '" aria-hidden="' + (inner ? 'false' : 'true') + '">'
+      + (inner || '')
+      + '</div>';
+  }
+
   var api = {
     esc: esc,
     imagesOf: imagesOf,
     mediaHtml: mediaHtml,
     actionsHtml: actionsHtml,
+    brandSlotHtml: brandSlotHtml,
     bindOne: bindOne,
     bindAll: bindAll,
     bindActions: bindActions,
