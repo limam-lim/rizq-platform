@@ -477,6 +477,17 @@ main, .page-content.active, .main-content, .results-area,
         </div>
       </div>
       <div id="ad-brand-preview" style="margin-top:10px;min-height:28px"></div>
+      <div id="ad-brand-custom-wrap" style="display:none;margin-top:12px;padding:12px;border:1px solid rgba(15,35,71,.1);border-radius:12px;background:#f8fafc">
+        <div style="margin-bottom:10px">
+          <label class="form-label" for="ad-brand-custom-name" data-t-fr="Nom de la marque">اسم الماركة</label>
+          <input class="form-input" id="ad-brand-custom-name" type="text" maxlength="80" placeholder="مثال: تقنية الأمل" data-ph-fr="Ex. : Tech Al-Amal" oninput="_paintBrandPreview()"/>
+        </div>
+        <div>
+          <label class="form-label" for="ad-brand-logo-file" data-t-fr="Logo de la marque (optionnel)">شعار الماركة (اختياري)</label>
+          <input class="form-input" id="ad-brand-logo-file" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onchange="_onAdBrandLogoFile(this)"/>
+          <p style="font-size:11px;color:var(--text-muted);margin:6px 0 0" data-t-fr="PNG ou JPG — enregistré avec l'annonce">PNG أو JPG — يُحفظ مع الإعلان</p>
+        </div>
+      </div>
     </div>
     <div class="nav-btns">
       <button class="btn-next" id="btn-next-1" data-t-fr="Suivant — Détails ←" onclick="goStep(2)" disabled>التالي — التفاصيل ←</button>
@@ -793,6 +804,7 @@ const SUBCATS = {};
 const SUBCATS_FR = {};
 let selCat='', selSubcat='', selCondition='جديد', selPlan='مجاني';
 let selBrand='', selModel='';
+let selBrandLogo='';
 let photosData=new Array(10).fill(null);
 const emojis=['📷','🛋️','🍳','🛁','🌇','🅿️','📸','🖼️','🏠','✨'];
 let currentStep=1;
@@ -818,20 +830,55 @@ function _refreshBrandPicker(catKey){
     wrap.style.display = 'none';
     selBrand = '';
     selModel = '';
+    selBrandLogo = '';
     brandSel.value = '';
     modelSel.innerHTML = '<option value="">'+(fr?'— Modèle —':'— الموديل —')+'</option>';
     modelSel.disabled = true;
+    var customWrap = document.getElementById('ad-brand-custom-wrap');
+    if(customWrap) customWrap.style.display = 'none';
+    var customName = document.getElementById('ad-brand-custom-name');
+    if(customName) customName.value = '';
+    var logoFile = document.getElementById('ad-brand-logo-file');
+    if(logoFile) logoFile.value = '';
     if(preview) preview.innerHTML = '';
   }
 }
 function _paintBrandPreview(){
   var preview = document.getElementById('ad-brand-preview');
+  var customWrap = document.getElementById('ad-brand-custom-wrap');
+  var isCustom = typeof RizqBrands !== 'undefined' && RizqBrands.isCustomBrandId(selBrand);
+  if(customWrap) customWrap.style.display = isCustom ? 'block' : 'none';
   if(!preview) return;
   if(typeof RizqBrands === 'undefined' || !selBrand){
     preview.innerHTML = '';
     return;
   }
-  preview.innerHTML = RizqBrands.chipHtml(selBrand, { fr: _postLangFr(), modelId: selModel, size: 26 });
+  if(isCustom && typeof RizqBrands.brandFormPreviewHtml === 'function'){
+    preview.innerHTML = RizqBrands.brandFormPreviewHtml({
+      brandId: selBrand,
+      customName: (document.getElementById('ad-brand-custom-name')||{}).value || '',
+      customLogo: selBrandLogo || '',
+      fr: _postLangFr()
+    });
+    return;
+  }
+  if(typeof RizqBrands.brandFormPreviewHtml === 'function'){
+    preview.innerHTML = RizqBrands.brandFormPreviewHtml({ brandId: selBrand, modelId: selModel, fr: _postLangFr() });
+  } else {
+    preview.innerHTML = RizqBrands.chipHtml(selBrand, { fr: _postLangFr(), modelId: selModel, size: 26 });
+  }
+}
+function _onAdBrandLogoFile(input){
+  var file = input && input.files && input.files[0];
+  if(!file || typeof RizqBrands === 'undefined' || typeof RizqBrands.logoFileToDataUri !== 'function'){
+    selBrandLogo = '';
+    _paintBrandPreview();
+    return;
+  }
+  RizqBrands.logoFileToDataUri(file, function(dataUri){
+    selBrandLogo = dataUri || '';
+    _paintBrandPreview();
+  });
 }
 function _bindBrandPickers(){
   var brandSel = document.getElementById('ad-brand');
@@ -842,7 +889,17 @@ function _bindBrandPickers(){
       selBrand = brandSel.value || '';
       selModel = '';
       if(typeof RizqBrands !== 'undefined'){
-        RizqBrands.fillModelSelect(modelSel, selBrand, _postLangFr(), '');
+        if(RizqBrands.isCustomBrandId(selBrand)){
+          if(modelSel){
+            modelSel.innerHTML = '<option value="">'+(_postLangFr()?'— Modèle —':'— الموديل —')+'</option>';
+            modelSel.disabled = true;
+          }
+        } else {
+          RizqBrands.fillModelSelect(modelSel, selBrand, _postLangFr(), '');
+          selBrandLogo = '';
+          var logoFile = document.getElementById('ad-brand-logo-file');
+          if(logoFile) logoFile.value = '';
+        }
       }
       _paintBrandPreview();
     });
@@ -1464,8 +1521,13 @@ function updatePreview(){
   var catLabel = catMeta ? (_frP ? catMeta.nameFr : catMeta.nameAr) : selCat;
   var brandLbl='';
   if(selBrand && typeof RizqBrands!=='undefined'){
-    brandLbl=' · '+RizqBrands.displayName(RizqBrands.getById(selBrand), _postLangFr());
-    if(selModel) brandLbl+=' / '+RizqBrands.modelName(RizqBrands.getModel(selBrand, selModel), _postLangFr());
+    if(RizqBrands.isCustomBrandId(selBrand)){
+      var _cnPrev = ((document.getElementById('ad-brand-custom-name')||{}).value || '').trim();
+      if(_cnPrev) brandLbl=' · '+_cnPrev;
+    } else {
+      brandLbl=' · '+RizqBrands.displayName(RizqBrands.getById(selBrand), _postLangFr());
+      if(selModel) brandLbl+=' / '+RizqBrands.modelName(RizqBrands.getModel(selBrand, selModel), _postLangFr());
+    }
   }
   document.getElementById('prev-cat').textContent=(catLabel?'📋 '+catLabel:'')+' '+(selSubcat?'› '+selSubcat:'')+brandLbl;
   document.getElementById('prev-title').textContent=title;
@@ -1516,6 +1578,13 @@ function publishAd(){
   }
   // ══ تجميع بيانات الإعلان ══
   if(!validateAdTextFields(true)) return;
+  if(typeof RizqBrands !== 'undefined' && RizqBrands.isCustomBrandId(selBrand)){
+    var _customBrandName = ((document.getElementById('ad-brand-custom-name')||{}).value || '').trim();
+    if(!_customBrandName){
+      showToast(_postLangFr() ? '⚠️ Saisissez le nom de la marque' : '⚠️ أدخل اسم الماركة', 'error');
+      return;
+    }
+  }
   var f = finalizeAdTextFields(collectAdTextFields());
   var title    = f.title;
   var desc     = f.desc;
@@ -1550,18 +1619,27 @@ function publishAd(){
     category: catKeyNorm,
     categoryLabel: categoryLabel,
     subcat:   selSubcat || '',
-    brandId:  selBrand || '',
-    brandName: (typeof RizqBrands !== 'undefined' && selBrand)
-      ? RizqBrands.displayName(RizqBrands.getById(selBrand), false)
-      : '',
-    brandNameFr: (typeof RizqBrands !== 'undefined' && selBrand)
-      ? RizqBrands.displayName(RizqBrands.getById(selBrand), true)
-      : '',
-    modelId:  selModel || '',
-    modelName: (typeof RizqBrands !== 'undefined' && selBrand && selModel)
+    brandId:  (typeof RizqBrands !== 'undefined' && RizqBrands.isCustomBrandId(selBrand)) ? '' : (selBrand || ''),
+    brandName: (function(){
+      if(typeof RizqBrands === 'undefined' || !selBrand) return '';
+      if(RizqBrands.isCustomBrandId(selBrand)){
+        return ((document.getElementById('ad-brand-custom-name')||{}).value || '').trim().slice(0, 80);
+      }
+      return RizqBrands.displayName(RizqBrands.getById(selBrand), false);
+    })(),
+    brandNameFr: (function(){
+      if(typeof RizqBrands === 'undefined' || !selBrand) return '';
+      if(RizqBrands.isCustomBrandId(selBrand)){
+        return ((document.getElementById('ad-brand-custom-name')||{}).value || '').trim().slice(0, 80);
+      }
+      return RizqBrands.displayName(RizqBrands.getById(selBrand), true);
+    })(),
+    brandLogo: (typeof RizqBrands !== 'undefined' && RizqBrands.isCustomBrandId(selBrand)) ? (selBrandLogo || '') : '',
+    modelId:  (typeof RizqBrands !== 'undefined' && RizqBrands.isCustomBrandId(selBrand)) ? '' : (selModel || ''),
+    modelName: (typeof RizqBrands !== 'undefined' && selBrand && selModel && !RizqBrands.isCustomBrandId(selBrand))
       ? RizqBrands.modelName(RizqBrands.getModel(selBrand, selModel), false)
       : '',
-    modelNameFr: (typeof RizqBrands !== 'undefined' && selBrand && selModel)
+    modelNameFr: (typeof RizqBrands !== 'undefined' && selBrand && selModel && !RizqBrands.isCustomBrandId(selBrand))
       ? RizqBrands.modelName(RizqBrands.getModel(selBrand, selModel), true)
       : '',
     emoji:    catEmoji,
@@ -1790,7 +1868,16 @@ var _editAdId = null;
         selSubcat = ad.subcat || selSubcat;
         selBrand = ad.brandId || '';
         selModel = ad.modelId || '';
+        selBrandLogo = ad.brandLogo || '';
+        if(!selBrand && (ad.brandName || ad.brandLogo) && typeof RizqBrands !== 'undefined'){
+          selBrand = RizqBrands.CUSTOM_BRAND_ID;
+        }
         _refreshBrandPicker(selCat);
+        var customNameEl = document.getElementById('ad-brand-custom-name');
+        if(customNameEl && typeof RizqBrands !== 'undefined' && RizqBrands.isCustomBrandId(selBrand)){
+          customNameEl.value = ad.brandName || '';
+        }
+        _paintBrandPreview();
         if(typeof renderPostCategories === 'function') renderPostCategories();
 
         // صور حقيقية موجودة (روابط خادم فعلية /uploads/ads/...، لا base64) —
@@ -1848,6 +1935,24 @@ function saveAdEdit(){
   var coords   = (typeof collectAdCoords === 'function') ? collectAdCoords() : {lat:null,lon:null};
 
   if(!wilaya){ showToast(_postLangFr() ? '⚠️ Wilaya requise' : '⚠️ الولاية مطلوبة'); return; }
+  if(typeof RizqBrands !== 'undefined' && RizqBrands.isCustomBrandId(selBrand)){
+    var _editCustomBrand = ((document.getElementById('ad-brand-custom-name')||{}).value || '').trim();
+    if(!_editCustomBrand){
+      showToast(_postLangFr() ? '⚠️ Saisissez le nom de la marque' : '⚠️ أدخل اسم الماركة', 'error');
+      return;
+    }
+  }
+
+  var _isCustomBrand = typeof RizqBrands !== 'undefined' && RizqBrands.isCustomBrandId(selBrand);
+  var _brandNameEdit = '';
+  var _brandNameFrEdit = '';
+  if(_isCustomBrand){
+    _brandNameEdit = ((document.getElementById('ad-brand-custom-name')||{}).value || '').trim().slice(0, 80);
+    _brandNameFrEdit = _brandNameEdit;
+  } else if(selBrand && typeof RizqBrands !== 'undefined'){
+    _brandNameEdit = RizqBrands.displayName(RizqBrands.getById(selBrand), false);
+    _brandNameFrEdit = RizqBrands.displayName(RizqBrands.getById(selBrand), true);
+  }
 
   var body = {
     title: title, desc: desc, titleFr: titleFr, descFr: descFr,
@@ -1856,6 +1961,15 @@ function saveAdEdit(){
     lat: coords.lat, lon: coords.lon,
     images: photosData.filter(function(p){ return !!p; }),
     condition: selCondition || '',
+    brandId: _isCustomBrand ? '' : (selBrand || ''),
+    brandName: _brandNameEdit,
+    brandNameFr: _brandNameFrEdit,
+    brandLogo: _isCustomBrand ? (selBrandLogo || '') : '',
+    modelId: _isCustomBrand ? '' : (selModel || ''),
+    modelName: (!_isCustomBrand && selBrand && selModel && typeof RizqBrands !== 'undefined')
+      ? RizqBrands.modelName(RizqBrands.getModel(selBrand, selModel), false) : '',
+    modelNameFr: (!_isCustomBrand && selBrand && selModel && typeof RizqBrands !== 'undefined')
+      ? RizqBrands.modelName(RizqBrands.getModel(selBrand, selModel), true) : '',
     hidePhone: !!_collectPostOptionFlags().hidePhone,
     negotiable: !!_collectPostOptionFlags().negotiable,
     urgent: !!_collectPostOptionFlags().urgent

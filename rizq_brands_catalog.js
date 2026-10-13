@@ -1098,16 +1098,109 @@
    * يملأ <select> للماركات حسب القسم.
    * @returns {number} عدد الخيارات المضافة
    */
+  var CUSTOM_BRAND_ID = '__custom__';
+
+  function isCustomBrandId(id) {
+    return String(id || '') === CUSTOM_BRAND_ID;
+  }
+
+  /** خيار «ماركة أخرى» لإدخال الاسم + الشعار يدوياً من لوحات التحكم */
+  function appendCustomBrandOption(selectEl, fr) {
+    if (!selectEl) return;
+    var exists = false;
+    for (var i = 0; i < selectEl.options.length; i++) {
+      if (selectEl.options[i].value === CUSTOM_BRAND_ID) { exists = true; break; }
+    }
+    if (exists) return;
+    var opt = document.createElement('option');
+    opt.value = CUSTOM_BRAND_ID;
+    opt.textContent = fr ? 'Autre marque (nom + logo)…' : 'ماركة أخرى (اسم + شعار)…';
+    selectEl.appendChild(opt);
+  }
+
   function fillBrandSelect(selectEl, catKey, fr, selectedId) {
     if (!selectEl) return 0;
     var brands = forCategory(catKey);
     var allLbl = fr ? '— Marque —' : '— الماركة —';
+    var keepCustom = isCustomBrandId(selectedId);
     selectEl.innerHTML = '<option value="">' + esc(allLbl) + '</option>'
       + brands.map(function (b) {
         var sel = selectedId && String(selectedId) === String(b.id) ? ' selected' : '';
         return '<option value="' + esc(b.id) + '"' + sel + '>' + esc(displayName(b, fr)) + '</option>';
       }).join('');
+    appendCustomBrandOption(selectEl, fr);
+    if (keepCustom) selectEl.value = CUSTOM_BRAND_ID;
     return brands.length;
+  }
+
+  /** تصغير شعار مرفوع إلى ≤256px ثم data-URI */
+  function logoFileToDataUri(file, done) {
+    done = typeof done === 'function' ? done : function () {};
+    if (!file || !file.type || String(file.type).indexOf('image/') !== 0) {
+      done('');
+      return;
+    }
+    var url = '';
+    try { url = URL.createObjectURL(file); } catch (e0) { done(''); return; }
+    var img = new Image();
+    img.onload = function () {
+      try {
+        var max = 256;
+        var scale = Math.min(1, max / Math.max(img.width || 1, img.height || 1));
+        var c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round((img.width || 1) * scale));
+        c.height = Math.max(1, Math.round((img.height || 1) * scale));
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        done(c.toDataURL('image/png'));
+      } catch (e1) {
+        done('');
+      }
+      try { URL.revokeObjectURL(url); } catch (e2) {}
+    };
+    img.onerror = function () {
+      try { URL.revokeObjectURL(url); } catch (e3) {}
+      done('');
+    };
+    img.src = url;
+  }
+
+  /** معاينة: شعار كتالوج أو شعار مخصّص + الاسم */
+  function brandFormPreviewHtml(opts) {
+    opts = opts || {};
+    var fr = !!opts.fr;
+    if (opts.brandId && !isCustomBrandId(opts.brandId)) {
+      return logoNameHtml(opts.brandId, { fr: fr, modelId: opts.modelId || '', size: opts.size || 40 });
+    }
+    var name = String(opts.customName || '').trim();
+    var logo = String(opts.customLogo || '').trim();
+    if (!name && !logo) return '';
+    var sz = opts.size || 40;
+    var img = logo
+      ? '<img src="' + esc(logo) + '" alt="' + esc(name || 'brand') + '" width="' + sz + '" height="' + sz + '" style="width:' + sz + 'px;height:' + sz + 'px;object-fit:contain;border-radius:8px;background:#fff;border:1px solid rgba(15,35,71,.1)"/>'
+      : '<span style="width:' + sz + 'px;height:' + sz + 'px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:#0F2347;color:#fff;font-weight:800;font-size:14px">' + esc((name || '?').charAt(0)) + '</span>';
+    return '<div class="rzq-brand-logo-name is-inline" style="display:inline-flex;align-items:center;gap:8px">'
+      + img
+      + '<span class="rzq-brand-logo-name-main" style="font-size:13px;font-weight:800;color:#0F2347">' + esc(name || (fr ? 'Marque' : 'ماركة')) + '</span>'
+      + '</div>';
+  }
+
+  /** عرض ماركة إعلان/منتج: كتالوج أو اسم+شعار مخصّص */
+  function itemBrandHtml(item, opts) {
+    opts = opts || {};
+    item = item || {};
+    var fr = !!opts.fr;
+    if (item.brandId && getById(item.brandId)) {
+      return logoNameHtml(item.brandId, { fr: fr, modelId: item.modelId || '', size: opts.size || 36, inline: !!opts.inline });
+    }
+    var name = fr
+      ? (item.brandNameFr || item.brandName || '')
+      : (item.brandName || item.brandNameFr || '');
+    return brandFormPreviewHtml({
+      customName: name,
+      customLogo: item.brandLogo || '',
+      fr: fr,
+      size: opts.size || 36
+    });
   }
 
   function fillModelSelect(selectEl, brandId, fr, selectedId) {
@@ -1234,6 +1327,12 @@
     searchMatch: searchMatch,
     findByAlias: findByAlias,
     brandLetter: brandLetter,
+    CUSTOM_BRAND_ID: CUSTOM_BRAND_ID,
+    isCustomBrandId: isCustomBrandId,
+    appendCustomBrandOption: appendCustomBrandOption,
+    logoFileToDataUri: logoFileToDataUri,
+    brandFormPreviewHtml: brandFormPreviewHtml,
+    itemBrandHtml: itemBrandHtml,
     logoUrl: logoUrl,
     logoSvg: logoSvg,
     logoDataUri: logoDataUri,

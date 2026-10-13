@@ -207,6 +207,18 @@ function mountAdsRoutes(app, deps) {
     let id = (typeof b.id === 'string' && /^RZQ-\d{4}-\d{4,6}$/.test(b.id)) ? b.id : genAdId();
     while (list.some((a) => a.id === id)) id = genAdId(); // تفادي تصادم نادر في المعرّف
     const images = await saveAdImages(id, b.images);
+    let brandLogo = null;
+    if (typeof b.brandLogo === 'string' && b.brandLogo.trim()) {
+      try {
+        const logoUrls = await saveAdImages(id + '-brand', [b.brandLogo]);
+        brandLogo = (logoUrls && logoUrls[0]) || null;
+      } catch (eLogo) {
+        brandLogo = null;
+      }
+      if (!brandLogo && /^https?:\/\//i.test(b.brandLogo.trim())) {
+        brandLogo = String(b.brandLogo).trim().slice(0, 500);
+      }
+    }
     const rec = {
       id,
       title: String(b.title).slice(0, 200),
@@ -226,6 +238,7 @@ function mountAdsRoutes(app, deps) {
       modelId: String(b.modelId || '').slice(0, 48),
       modelName: String(b.modelName || '').slice(0, 80),
       modelNameFr: String(b.modelNameFr || '').slice(0, 80),
+      brandLogo,
       emoji: String(b.emoji || '').slice(0, 8),
       wilaya: String(b.wilaya || '').slice(0, 60),
       // موقع GPS اختياري — إن وُجد يُفضَّل على مركز الولاية في خريطة التفاصيل
@@ -370,6 +383,24 @@ function mountAdsRoutes(app, deps) {
     const b = req.body || {};
     const editable = ['title', 'desc', 'titleFr', 'descFr', 'price', 'originalPrice', 'subcat', 'wilaya', 'condition', 'brandId', 'brandName', 'brandNameFr', 'modelId', 'modelName', 'modelNameFr'];
     editable.forEach((k) => { if (typeof b[k] === 'string') ad[k] = b[k].slice(0, (k === 'desc' || k === 'descFr') ? 5000 : 200); });
+    if (typeof b.brandLogo === 'string') {
+      const rawLogo = b.brandLogo.trim();
+      if (!rawLogo) {
+        ad.brandLogo = null;
+      } else {
+        let nextLogo = null;
+        try {
+          const logoUrls = await saveAdImages(ad.id + '-brand', [rawLogo]);
+          nextLogo = (logoUrls && logoUrls[0]) || null;
+        } catch (eLogoPatch) {
+          nextLogo = null;
+        }
+        if (!nextLogo && /^https?:\/\//i.test(rawLogo)) {
+          nextLogo = rawLogo.slice(0, 500);
+        }
+        if (nextLogo) ad.brandLogo = nextLogo;
+      }
+    }
     if (Object.prototype.hasOwnProperty.call(b, 'stockQty')) {
       ad.stockQty = (b.stockQty !== null && b.stockQty !== '' && Number.isFinite(Number(b.stockQty)) && Number(b.stockQty) >= 0)
         ? Math.floor(Number(b.stockQty)) : null;

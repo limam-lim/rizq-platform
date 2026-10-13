@@ -96,5 +96,38 @@ const adsJs = fs.readFileSync(path.join(__dirname, '..', 'rizq-backend/routes/ad
 assert(adsJs.includes('brandId'));
 assert(adsJs.includes('modelId'));
 assert(adsJs.includes('a.brandName'));
+assert(adsJs.includes('brandLogo'));
+
+assert.strictEqual(B.CUSTOM_BRAND_ID, '__custom__');
+assert(B.isCustomBrandId('__custom__'));
+assert(!B.isCustomBrandId('toyota'));
+const customPrev = B.brandFormPreviewHtml({
+  brandId: B.CUSTOM_BRAND_ID,
+  customName: 'تقنية الأمل',
+  customLogo: 'data:image/png;base64,abc',
+  fr: false
+});
+assert(customPrev.indexOf('تقنية الأمل') >= 0, 'custom brand preview name');
+assert(customPrev.indexOf('data:image/png') >= 0, 'custom brand preview logo');
+const itemHtml = B.itemBrandHtml({ brandName: 'معرض الأمل', brandLogo: 'https://example.com/logo.png' }, { fr: false });
+assert(itemHtml.indexOf('معرض الأمل') >= 0, 'itemBrandHtml custom name');
+assert(itemHtml.indexOf('example.com/logo.png') >= 0, 'itemBrandHtml custom logo');
+
+const storeDash = fs.readFileSync(path.join(__dirname, '..', 'rizq_dashboard_store.html'), 'utf8');
+assert(storeDash.includes('prod-brand-custom-name'));
+assert(storeDash.includes('prod-brand-logo-file'));
+assert(storeDash.includes('brandLogo'));
+assert(storeDash.includes('isCustomBrandId'));
+const corpDash = fs.readFileSync(path.join(__dirname, '..', 'rizq_dashboard_corp.html'), 'utf8');
+assert(corpDash.includes('pr-brand-custom-name'));
+assert(corpDash.includes('pr-brand-logo-file'));
+assert(corpDash.includes('brandLogo'));
+assert(postHtml.includes('ad-brand-custom-name'));
+assert(postHtml.includes('ad-brand-logo-file'));
+assert(postHtml.includes('brandLogo'));
+
+const catalogJs = fs.readFileSync(path.join(__dirname, '..', 'rizq-backend/routes/catalog.js'), 'utf8');
+assert(catalogJs.includes('brandLogo'));
+assert(catalogJs.includes("id + '-brand'") || catalogJs.includes('id + "-brand"'));
 
 console.log('OK: brands catalog + post/browse/backend wiring smoke passed');
