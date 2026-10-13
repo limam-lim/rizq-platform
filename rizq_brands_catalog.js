@@ -1,8 +1,8 @@
 /**
  * rizq_brands_catalog.js — كتالوج الماركات + الموديلات (إلهام Milanuncios / coche.net)
  * سيارات · أزياء · ملابس رياضية · نظارات وإكسسوارات
- * العرض الاحترافي: صورة الشعار (شارة) فوق + اختصار الاسم تحتها (مثل المتاجر الكبيرة).
- * الشارات هندسية أصلية بألوان الماركة — ليست نسخاً لشعارات تجارية محمية.
+ * العرض: رمز الماركة (سيمبول) فوق + اسم الماركة تحته.
+ * الرموز هندسية أصلية مستوحاة من هوية الماركة — ليست نسخاً لشعارات تجارية محمية.
  */
 (function (global) {
   'use strict';
@@ -833,31 +833,118 @@
   }
 
   /**
-   * صورة الشعار فقط (شارة ملوّنة). اختصار الاسم يُعرض تحتها في الواجهة.
+   * رموز هندسية أصلية (سيمبول) — شكل مميّز لكل ماركة معروفة، لا حروف داخل الشعار.
+   * الماركات الأخرى: حرف واحد فقط كمونوغرام داخل شارة نظيفة.
    */
-  function logoSvg(brand, size) {
-    size = size || 72;
-    var glyph = markGlyph(brand);
-    var fill = brand.color || '#111111';
-    var isAuto = brand.sector === 'auto';
+  function symbolInner(brand, size) {
+    var id = String((brand && brand.id) || '').toLowerCase();
+    var s = size;
+    var c = s / 2;
+    var stroke = Math.max(1.2, s * 0.045);
+    switch (id) {
+      case 'bmw':
+        return '<circle cx="' + c + '" cy="' + c + '" r="' + (s * 0.46) + '" fill="#1C69D4"/>'
+          + '<circle cx="' + c + '" cy="' + c + '" r="' + (s * 0.38) + '" fill="#fff"/>'
+          + '<path d="M' + c + ' ' + (c - s * 0.38) + ' A' + (s * 0.38) + ' ' + (s * 0.38) + ' 0 0 1 ' + c + ' ' + (c + s * 0.38) + ' Z" fill="#1C69D4"/>'
+          + '<path d="M' + (c - s * 0.38) + ' ' + c + ' A' + (s * 0.38) + ' ' + (s * 0.38) + ' 0 0 1 ' + (c + s * 0.38) + ' ' + c + ' Z" fill="#1C69D4" opacity=".35"/>'
+          + '<circle cx="' + c + '" cy="' + c + '" r="' + (s * 0.38) + '" fill="none" stroke="#111" stroke-width="' + (stroke * 0.6) + '"/>';
+      case 'toyota':
+        return '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.42) + '" ry="' + (s * 0.28) + '" fill="none" stroke="#EB0A1E" stroke-width="' + stroke + '"/>'
+          + '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.18) + '" ry="' + (s * 0.42) + '" fill="none" stroke="#EB0A1E" stroke-width="' + stroke + '"/>'
+          + '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.42) + '" ry="' + (s * 0.42) + '" fill="none" stroke="#EB0A1E" stroke-width="' + (stroke * 0.85) + '"/>';
+      case 'mercedes':
+        return '<circle cx="' + c + '" cy="' + c + '" r="' + (s * 0.44) + '" fill="#111" stroke="#C9A84C" stroke-width="' + (stroke * 0.7) + '"/>'
+          + '<path d="M' + c + ' ' + (c - s * 0.32) + ' L' + (c + s * 0.28) + ' ' + (c + s * 0.2) + ' L' + (c - s * 0.28) + ' ' + (c + s * 0.2) + ' Z" fill="none" stroke="#fff" stroke-width="' + stroke + '" stroke-linejoin="round"/>'
+          + '<line x1="' + c + '" y1="' + c + '" x2="' + c + '" y2="' + (c - s * 0.32) + '" stroke="#fff" stroke-width="' + (stroke * 0.9) + '"/>'
+          + '<line x1="' + c + '" y1="' + c + '" x2="' + (c + s * 0.28) + '" y2="' + (c + s * 0.2) + '" stroke="#fff" stroke-width="' + (stroke * 0.9) + '"/>'
+          + '<line x1="' + c + '" y1="' + c + '" x2="' + (c - s * 0.28) + '" y2="' + (c + s * 0.2) + '" stroke="#fff" stroke-width="' + (stroke * 0.9) + '"/>';
+      case 'audi':
+        return '<g fill="none" stroke="#222" stroke-width="' + stroke + '">'
+          + '<circle cx="' + (c - s * 0.27) + '" cy="' + c + '" r="' + (s * 0.14) + '"/>'
+          + '<circle cx="' + (c - s * 0.09) + '" cy="' + c + '" r="' + (s * 0.14) + '"/>'
+          + '<circle cx="' + (c + s * 0.09) + '" cy="' + c + '" r="' + (s * 0.14) + '"/>'
+          + '<circle cx="' + (c + s * 0.27) + '" cy="' + c + '" r="' + (s * 0.14) + '"/>'
+          + '</g>';
+      case 'volkswagen':
+        return '<circle cx="' + c + '" cy="' + c + '" r="' + (s * 0.44) + '" fill="#001E50"/>'
+          + '<circle cx="' + c + '" cy="' + c + '" r="' + (s * 0.36) + '" fill="none" stroke="#fff" stroke-width="' + stroke + '"/>'
+          + '<path d="M' + (c - s * 0.18) + ' ' + (c - s * 0.12) + ' L' + (c - s * 0.08) + ' ' + (c + s * 0.18) + ' L' + c + ' ' + (c - s * 0.06) + ' L' + (c + s * 0.08) + ' ' + (c + s * 0.18) + ' L' + (c + s * 0.18) + ' ' + (c - s * 0.12) + '" fill="none" stroke="#fff" stroke-width="' + stroke + '" stroke-linejoin="round" stroke-linecap="round"/>';
+      case 'hyundai':
+        return '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.44) + '" ry="' + (s * 0.3) + '" fill="#002C5F"/>'
+          + '<path d="M' + (c - s * 0.22) + ' ' + (c + s * 0.08) + ' Q' + c + ' ' + (c - s * 0.22) + ' ' + (c + s * 0.22) + ' ' + (c + s * 0.08) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 1.15) + '" stroke-linecap="round"/>';
+      case 'honda':
+        return '<rect x="' + (s * 0.12) + '" y="' + (s * 0.18) + '" width="' + (s * 0.76) + '" height="' + (s * 0.64) + '" rx="' + (s * 0.12) + '" fill="#E40521"/>'
+          + '<path d="M' + (c - s * 0.18) + ' ' + (c + s * 0.18) + ' V' + (c - s * 0.16) + ' Q' + c + ' ' + (c - s * 0.28) + ' ' + (c + s * 0.18) + ' ' + (c - s * 0.16) + ' V' + (c + s * 0.18) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 1.2) + '" stroke-linecap="round"/>';
+      case 'nissan':
+        return '<circle cx="' + c + '" cy="' + c + '" r="' + (s * 0.44) + '" fill="#C3002F"/>'
+          + '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.3) + '" ry="' + (s * 0.14) + '" fill="none" stroke="#fff" stroke-width="' + stroke + '"/>'
+          + '<line x1="' + (c - s * 0.3) + '" y1="' + c + '" x2="' + (c + s * 0.3) + '" y2="' + c + '" stroke="#fff" stroke-width="' + (stroke * 0.7) + '"/>';
+      case 'ford':
+        return '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.46) + '" ry="' + (s * 0.3) + '" fill="#003478"/>'
+          + '<path d="M' + (c - s * 0.22) + ' ' + (c + s * 0.06) + ' Q' + (c - s * 0.1) + ' ' + (c - s * 0.16) + ' ' + c + ' ' + (c + s * 0.02) + ' Q' + (c + s * 0.12) + ' ' + (c + s * 0.14) + ' ' + (c + s * 0.24) + ' ' + (c - s * 0.04) + '" fill="none" stroke="#fff" stroke-width="' + (stroke * 1.1) + '" stroke-linecap="round"/>';
+      case 'kia':
+        return '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.44) + '" ry="' + (s * 0.28) + '" fill="#05141F"/>'
+          + '<path d="M' + (c - s * 0.2) + ' ' + (c + s * 0.08) + ' L' + (c - s * 0.06) + ' ' + (c - s * 0.1) + ' L' + (c + s * 0.08) + ' ' + (c + s * 0.08) + ' M' + (c + s * 0.02) + ' ' + (c - s * 0.02) + ' L' + (c + s * 0.22) + ' ' + (c - s * 0.02) + '" fill="none" stroke="#fff" stroke-width="' + stroke + '" stroke-linecap="round" stroke-linejoin="round"/>';
+      case 'tesla':
+        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.08) + '" width="' + (s * 0.84) + '" height="' + (s * 0.84) + '" rx="' + (s * 0.14) + '" fill="#111"/>'
+          + '<path d="M' + (c - s * 0.28) + ' ' + (c - s * 0.08) + ' Q' + c + ' ' + (c - s * 0.32) + ' ' + (c + s * 0.28) + ' ' + (c - s * 0.08) + ' L' + c + ' ' + (c + s * 0.28) + ' Z" fill="#E31937"/>';
+      case 'apple':
+        return '<rect x="' + (s * 0.06) + '" y="' + (s * 0.06) + '" width="' + (s * 0.88) + '" height="' + (s * 0.88) + '" rx="' + (s * 0.2) + '" fill="#222"/>'
+          + '<path d="M' + (c + s * 0.06) + ' ' + (c - s * 0.28) + ' C' + (c + s * 0.18) + ' ' + (c - s * 0.28) + ' ' + (c + s * 0.22) + ' ' + (c - s * 0.12) + ' ' + (c + s * 0.1) + ' ' + (c - s * 0.08) + ' C' + (c - s * 0.02) + ' ' + (c - s * 0.22) + ' ' + (c - s * 0.06) + ' ' + (c - s * 0.28) + ' ' + (c + s * 0.06) + ' ' + (c - s * 0.28) + ' Z" fill="#fff"/>'
+          + '<path d="M' + (c + s * 0.02) + ' ' + (c - s * 0.04) + ' C' + (c + s * 0.28) + ' ' + (c - s * 0.04) + ' ' + (c + s * 0.3) + ' ' + (c + s * 0.32) + ' ' + (c + s * 0.08) + ' ' + (c + s * 0.32) + ' C' + (c - s * 0.02) + ' ' + (c + s * 0.32) + ' ' + (c - s * 0.08) + ' ' + (c + s * 0.22) + ' ' + (c - s * 0.16) + ' ' + (c + s * 0.32) + ' C' + (c - s * 0.3) + ' ' + (c + s * 0.2) + ' ' + (c - s * 0.28) + ' ' + (c - s * 0.06) + ' ' + (c - s * 0.08) + ' ' + (c - s * 0.06) + ' C' + (c + s * 0.02) + ' ' + (c - s * 0.18) + ' ' + (c + s * 0.18) + ' ' + (c - s * 0.16) + ' ' + (c + s * 0.02) + ' ' + (c - s * 0.04) + ' Z" fill="#fff"/>';
+      case 'samsung':
+        return '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.44) + '" ry="' + (s * 0.26) + '" fill="#1428A0"/>'
+          + '<ellipse cx="' + c + '" cy="' + c + '" rx="' + (s * 0.3) + '" ry="' + (s * 0.14) + '" fill="none" stroke="#fff" stroke-width="' + stroke + '"/>';
+      case 'nike':
+        return '<rect x="' + (s * 0.06) + '" y="' + (s * 0.06) + '" width="' + (s * 0.88) + '" height="' + (s * 0.88) + '" rx="' + (s * 0.18) + '" fill="#111"/>'
+          + '<path d="M' + (c - s * 0.32) + ' ' + (c + s * 0.06) + ' Q' + (c - s * 0.02) + ' ' + (c + s * 0.28) + ' ' + (c + s * 0.34) + ' ' + (c - s * 0.16) + ' Q' + (c + s * 0.06) + ' ' + (c + s * 0.18) + ' ' + (c - s * 0.32) + ' ' + (c + s * 0.06) + ' Z" fill="#fff"/>';
+      case 'adidas':
+        return '<rect x="' + (s * 0.06) + '" y="' + (s * 0.06) + '" width="' + (s * 0.88) + '" height="' + (s * 0.88) + '" rx="' + (s * 0.18) + '" fill="#000"/>'
+          + '<path d="M' + (c - s * 0.28) + ' ' + (c + s * 0.22) + ' L' + (c - s * 0.1) + ' ' + (c - s * 0.22) + ' L' + (c - s * 0.02) + ' ' + (c - s * 0.08) + ' L' + (c - s * 0.18) + ' ' + (c + s * 0.22) + ' Z" fill="#fff"/>'
+          + '<path d="M' + (c - s * 0.08) + ' ' + (c + s * 0.22) + ' L' + (c + s * 0.08) + ' ' + (c - s * 0.1) + ' L' + (c + s * 0.16) + ' ' + (c + s * 0.04) + ' L' + (c + s * 0.02) + ' ' + (c + s * 0.22) + ' Z" fill="#fff"/>'
+          + '<path d="M' + (c + s * 0.1) + ' ' + (c + s * 0.22) + ' L' + (c + s * 0.24) + ' ' + (c + s * 0.02) + ' L' + (c + s * 0.32) + ' ' + (c + s * 0.14) + ' L' + (c + s * 0.2) + ' ' + (c + s * 0.22) + ' Z" fill="#fff"/>';
+      case 'puma':
+        return '<rect x="' + (s * 0.06) + '" y="' + (s * 0.06) + '" width="' + (s * 0.88) + '" height="' + (s * 0.88) + '" rx="' + (s * 0.18) + '" fill="#111"/>'
+          + '<path d="M' + (c - s * 0.3) + ' ' + (c + s * 0.18) + ' Q' + (c - s * 0.1) + ' ' + (c - s * 0.28) + ' ' + (c + s * 0.3) + ' ' + (c - s * 0.1) + ' Q' + (c + s * 0.05) + ' ' + (c + s * 0.05) + ' ' + (c - s * 0.3) + ' ' + (c + s * 0.18) + ' Z" fill="#fff"/>';
+      case 'ray-ban':
+        return '<rect x="' + (s * 0.08) + '" y="' + (s * 0.28) + '" width="' + (s * 0.84) + '" height="' + (s * 0.44) + '" rx="' + (s * 0.08) + '" fill="#111"/>'
+          + '<circle cx="' + (c - s * 0.18) + '" cy="' + c + '" r="' + (s * 0.14) + '" fill="#C9A84C"/>'
+          + '<circle cx="' + (c + s * 0.18) + '" cy="' + c + '" r="' + (s * 0.14) + '" fill="#C9A84C"/>';
+      default:
+        return null;
+    }
+  }
+
+  function monogramMark(brand, size) {
+    var fill = (brand && brand.color) || '#111111';
+    var letter = String((brand && brand.nameFr) || (brand && brand.id) || '?').replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()
+      || String((brand && brand.letter) || '?').charAt(0).toUpperCase();
+    var isAuto = brand && brand.sector === 'auto';
     var cx = size / 2;
     var cy = size / 2;
     var pad = Math.round(size * 0.08);
     var mark = size - pad * 2;
-    var fs = glyph.length > 3 ? Math.round(size * 0.2)
-      : glyph.length > 2 ? Math.round(size * 0.24)
-      : Math.round(size * 0.32);
+    var fs = Math.round(size * 0.36);
     var shape;
     if (isAuto) {
       shape = '<circle cx="' + cx + '" cy="' + cy + '" r="' + (mark / 2) + '" fill="' + esc(fill) + '"/>'
-        + '<circle cx="' + cx + '" cy="' + cy + '" r="' + (mark / 2 - Math.max(1, size * 0.045)) + '" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="' + Math.max(1, size * 0.028) + '"/>';
+        + '<circle cx="' + cx + '" cy="' + cy + '" r="' + (mark / 2 - Math.max(1, size * 0.05)) + '" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="' + Math.max(1, size * 0.03) + '"/>';
     } else {
-      var r = Math.round(size * 0.16);
+      var r = Math.round(size * 0.18);
       shape = '<rect x="' + pad + '" y="' + pad + '" width="' + mark + '" height="' + mark + '" rx="' + r + '" fill="' + esc(fill) + '"/>';
     }
-    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" role="img" aria-label="' + esc(brand.nameFr || brand.nameAr || glyph) + '">'
-      + shape
-      + '<text x="50%" y="52%" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-family="Arial Black, Helvetica Neue, Arial, sans-serif" font-weight="800" font-size="' + fs + '">' + esc(glyph) + '</text>'
+    return shape
+      + '<text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-family="Arial Black, Helvetica Neue, Arial, sans-serif" font-weight="800" font-size="' + fs + '">' + esc(letter) + '</text>';
+  }
+
+  /** صورة الشعار فقط (سيمبول). اسم الماركة يُعرض تحتها في الواجهة. */
+  function logoSvg(brand, size) {
+    size = size || 72;
+    var label = (brand && (brand.nameFr || brand.nameAr)) || 'brand';
+    var inner = symbolInner(brand, size);
+    if (!inner) inner = monogramMark(brand, size);
+    return '<svg xmlns="http://www.w3.org/2000/svg" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" role="img" aria-label="' + esc(label) + '">'
+      + inner
       + '</svg>';
   }
 
@@ -869,18 +956,17 @@
     }
   }
 
-  /** بلاطة: صورة الشعار فوق + اختصار الاسم تحت */
+  /** بلاطة: سيمبول الماركة فوق + اسم الماركة تحت */
   function tileButtonHtml(brand, fr, opts) {
     opts = opts || {};
     var on = !!opts.active;
     var name = displayName(brand, fr);
-    var abbr = abbrName(brand);
     var size = opts.imgSize || 72;
     return '<button type="button" class="rzq-brand-tile' + (on ? ' is-on' : '') + '" data-brand-id="' + esc(brand.id) + '" title="' + esc(name) + '" role="listitem" aria-label="' + esc(name) + '" aria-pressed="' + (on ? 'true' : 'false') + '">'
       + '<span class="rzq-brand-tile-logo">'
       +   '<img src="' + esc(logoDataUri(brand, size * 2)) + '" alt="' + esc(name) + '" width="' + size + '" height="' + size + '"/>'
       + '</span>'
-      + '<span class="rzq-brand-tile-abbr">' + esc(abbr) + '</span>'
+      + '<span class="rzq-brand-tile-name rzq-brand-tile-abbr">' + esc(name) + '</span>'
       + '</button>';
   }
 
@@ -1083,9 +1169,8 @@
     var active = opts.activeId || '';
     var letter = opts.letter || '';
     var query = String(opts.query || '').trim().toLowerCase();
-    var head = opts.heading != null
-      ? opts.heading
-      : (fr ? 'Filter by brand' : 'فلتر حسب الماركة');
+    /* لا عنوان تقني للزائر — القسم نفسه يحمل تسمية «الماركة» */
+    var head = opts.heading != null ? opts.heading : '';
 
     var lettersMap = {};
     brands.forEach(function (b) {
@@ -1116,7 +1201,7 @@
       }).join('')
       + '</div>';
 
-    var listHtml = '<div class="rzq-brand-filter-list rzq-brand-tile-grid" role="list" aria-label="' + esc(head) + '">'
+    var listHtml = '<div class="rzq-brand-filter-list rzq-brand-tile-grid" role="list" aria-label="' + (fr ? 'Brands' : 'الماركات') + '">'
       + (filtered.length ? filtered.map(function (b) {
         return tileButtonHtml(b, fr, {
           active: active && String(active) === String(b.id),

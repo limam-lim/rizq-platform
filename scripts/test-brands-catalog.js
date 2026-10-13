@@ -55,15 +55,26 @@ assert(logoName.indexOf('data:image/svg+xml') >= 0, 'logoName logo uri');
 const strip = B.stripHtml('أزياء', false, { heading: 'تسوّق حسب الماركة' });
 assert(strip.indexOf('تسوّق حسب الماركة') >= 0, 'strip heading');
 assert(strip.indexOf('rzq-brand-tile-logo') >= 0, 'strip logo tile');
-assert(strip.indexOf('rzq-brand-tile-abbr') >= 0, 'strip abbr under logo');
-assert(B.abbrName(B.getById('nike')) === 'NIKE', 'nike abbr');
+assert(strip.indexOf('rzq-brand-tile-name') >= 0 || strip.indexOf('rzq-brand-tile-abbr') >= 0, 'strip name under logo');
+assert(strip.indexOf('نايك') >= 0 || strip.indexOf('Nike') >= 0, 'strip shows brand name');
 assert(strip.indexOf('data-brand-id="nike"') >= 0, 'strip includes nike');
 
 const fl = B.filterListHtml('سيارات', false, { activeId: 'toyota', letter: 'T' });
 assert(fl.indexOf('rzq-brand-tile') >= 0, 'filter brand tiles');
 assert(fl.indexOf('rzq-brand-letter-btn') >= 0, 'filter letter buttons');
-assert(fl.indexOf('TOYOTA') >= 0 || fl.indexOf('data-brand-id="toyota"') >= 0, 'filter has toyota');
+assert(fl.indexOf('تويوتا') >= 0 || fl.indexOf('data-brand-id="toyota"') >= 0, 'filter has toyota name/id');
 assert(fl.indexOf('rzq-brand-tile-logo') >= 0, 'filter tile logo');
+assert(fl.indexOf('الشعار فوق') < 0, 'no technical heading for visitors');
+
+const bmwLogo = B.logoSvg(B.getById('bmw'), 72);
+assert(bmwLogo.indexOf('<circle') >= 0, 'bmw symbol uses shapes');
+assert(!/>BMW</.test(bmwLogo), 'bmw logo is not letter text BMW');
+
+const dynSrc = fs.readFileSync(path.join(__dirname, '..', 'rizq_dyn_filters.js'), 'utf8');
+assert(dynSrc.indexOf('سنة التصنيع') >= 0, 'dyn filters year');
+assert(dynSrc.indexOf('علبة التروس') >= 0, 'dyn filters gearbox');
+assert(dynSrc.indexOf('ساعات العمل') >= 0, 'dyn filters hours');
+assert(dynSrc.indexOf('برو ماكس') >= 0, 'dyn filters phone variant');
 
 const postHtml = fs.readFileSync(path.join(__dirname, '..', 'rizq_post.html'), 'utf8');
 assert(postHtml.includes('rizq_brands_catalog.js'));
