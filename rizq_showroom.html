@@ -97,7 +97,7 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 }
 .showroom-hero.has-hero-videos .hero-videos{display:flex}
 .showroom-hero.has-hero-videos .hero-scroll-cue{bottom:10px;opacity:.45}
-.hero-video-card{flex:1 1 220px;min-width:200px;max-width:270px;background:rgba(6,17,28,.55);border:1px solid rgba(201,168,76,.4);border-radius:16px;overflow:hidden;backdrop-filter:blur(10px);box-shadow:0 12px 32px rgba(0,0,0,.35);animation:rzSrHeroVidIn .7s ease both}
+.hero-video-card{position:relative;flex:1 1 220px;min-width:200px;max-width:270px;background:rgba(6,17,28,.55);border:1px solid rgba(201,168,76,.4);border-radius:16px;overflow:hidden;backdrop-filter:blur(10px);box-shadow:0 12px 32px rgba(0,0,0,.35);animation:rzSrHeroVidIn .7s ease both}
 .hero-video-card:nth-child(2){animation-delay:.12s}
 @keyframes rzSrHeroVidIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .hero-video-card .hero-video-mount{min-height:0}
@@ -105,7 +105,28 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .hero-video-card .rzq-iv-frame{border-radius:0;aspect-ratio:16/9;min-height:0;width:100%;box-shadow:none;animation:none}
 .hero-video-card .rzq-iv-badge{display:none}
 .hero-video-card .rzq-iv-src{display:none}
-.hero-video-caption{display:block;padding:8px 12px 9px;font-size:12px;font-weight:700;letter-spacing:.02em;color:rgba(232,201,106,.95);text-align:center;background:rgba(0,0,0,.32)}
+.hero-video-caption{
+  position:absolute;left:10px;right:10px;bottom:10px;z-index:3;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:auto;margin:0;padding:8px 12px;border-radius:10px;
+  border:1px solid rgba(232,201,106,.4);
+  background:rgba(6,17,28,.28);backdrop-filter:blur(7px);
+  color:rgba(255,255,255,.94);font:inherit;font-size:12px;font-weight:700;
+  letter-spacing:.02em;text-align:center;cursor:pointer;
+  opacity:0;transform:translateY(8px);
+  transition:opacity .22s ease,transform .22s ease,background .2s ease,border-color .2s ease;
+  pointer-events:none
+}
+.hero-video-card:hover .hero-video-caption,
+.hero-video-card:focus-within .hero-video-caption{
+  opacity:1;transform:none;pointer-events:auto
+}
+.hero-video-caption:hover{
+  background:rgba(6,17,28,.48);border-color:rgba(232,201,106,.7);color:#E8C96A
+}
+@media (hover:none){
+  .hero-video-caption{opacity:.9;transform:none;pointer-events:auto;background:rgba(6,17,28,.4)}
+}
 @media(max-width:900px){
   .showroom-hero-stage{flex-direction:column;gap:14px}
   .hero-cover{padding-bottom:18px}
@@ -425,11 +446,11 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   <div class="hero-videos" id="showroom-hero-videos" aria-label="فيديوهات المعرض">
     <div class="hero-video-card" id="sr-hero-intro-card" style="display:none">
       <div class="hero-video-mount" id="sr-hero-intro-video-mount"></div>
-      <span class="hero-video-caption" id="sr-hero-intro-caption">فيديو تعريفي</span>
+      <button type="button" class="hero-video-caption" id="sr-hero-intro-caption">فيديو تعريفي</button>
     </div>
     <div class="hero-video-card" id="sr-hero-extra-card" style="display:none">
       <div class="hero-video-mount" id="sr-hero-extra-video-mount"></div>
-      <span class="hero-video-caption" id="sr-hero-extra-caption">فيديو إضافي</span>
+      <button type="button" class="hero-video-caption" id="sr-hero-extra-caption">فيديو إضافي</button>
     </div>
   </div>
   <div class="hero-scroll-cue">⌄</div>
