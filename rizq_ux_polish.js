@@ -272,15 +272,37 @@
     }
   }
 
+  /** على صفحات المحل/المعرض/السلة ذات ?id= اعرض عدّاد ذلك البائع فقط */
+  function pageSellerScopeId() {
+    try {
+      var path = String((location.pathname || '') + (location.href || '')).toLowerCase();
+      if (!/rizq_(store|products|cart|showroom)/.test(path)) return '';
+      var p = new URLSearchParams(location.search);
+      return p.get('id') || p.get('store') || p.get('showroom') || p.get('corp') || '';
+    } catch (e) {
+      return '';
+    }
+  }
+
   function cartCount() {
-    return cartItems().reduce(function (s, c) {
+    var items = cartItems();
+    var sid = pageSellerScopeId();
+    if (sid && window.RizqStoreCommerce && typeof RizqStoreCommerce.cartQtyForSeller === 'function') {
+      return RizqStoreCommerce.cartQtyForSeller(items, sid);
+    }
+    if (sid) {
+      items = items.filter(function (c) {
+        return String((c && (c.storeId || c.accountId)) || '') === String(sid);
+      });
+    }
+    return items.reduce(function (s, c) {
       return s + (Number(c.qty) || 1);
     }, 0);
   }
 
   function updateCartBadges() {
     var n = cartCount();
-    document.querySelectorAll('[data-rizq-cart-count], #nav-cart-count').forEach(function (el) {
+    document.querySelectorAll('[data-rizq-cart-count], #nav-cart-count, #sr-cart-count').forEach(function (el) {
       el.textContent = n > 99 ? '99+' : String(n);
       if (el.hasAttribute('hidden')) el.hidden = n < 1;
       el.classList.toggle('is-empty', n < 1);

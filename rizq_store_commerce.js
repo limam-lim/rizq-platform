@@ -163,10 +163,35 @@
   function storeIdFromUrl() {
     try {
       var params = new URLSearchParams(location.search);
-      return params.get('id') || params.get('store') || '';
+      return params.get('id') || params.get('store') || params.get('showroom') || params.get('corp') || '';
     } catch (e) {
       return '';
     }
+  }
+
+  /** معرّف البائع على سطر السلة (محل أو معرض) */
+  function cartLineSellerId(line) {
+    if (!line) return '';
+    return String(line.storeId || line.accountId || '');
+  }
+
+  /**
+   * سلة الزائر واحدة في localStorage، لكن واجهة كل محل/معرض تعرض فقط أسطره.
+   * بدون sellerId تُعاد كل الأسطر (السلة العامة).
+   */
+  function cartLinesForSeller(items, sellerId) {
+    var list = Array.isArray(items) ? items : [];
+    if (!sellerId) return list.slice();
+    var sid = String(sellerId);
+    return list.filter(function (c) {
+      return cartLineSellerId(c) === sid;
+    });
+  }
+
+  function cartQtyForSeller(items, sellerId) {
+    return cartLinesForSeller(items, sellerId).reduce(function (s, c) {
+      return s + (Number(c.qty) || 0);
+    }, 0);
   }
 
   function withStoreId(href, storeId) {
@@ -718,6 +743,9 @@
     mapRawProduct: mapRawProduct,
     pageSlice: pageSlice,
     storeIdFromUrl: storeIdFromUrl,
+    cartLineSellerId: cartLineSellerId,
+    cartLinesForSeller: cartLinesForSeller,
+    cartQtyForSeller: cartQtyForSeller,
     withStoreId: withStoreId,
     wireStoreLinks: wireStoreLinks,
     setLogo: setLogo,

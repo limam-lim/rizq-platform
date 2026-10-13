@@ -979,7 +979,19 @@ function addToCart(id) {
 }
 
 function updateCartCount() {
-  const t = cart.reduce((s,c) => s+c.qty, 0);
+  var sid = '';
+  try {
+    sid = window._rizqProductsStoreId
+      || (window.RizqStoreCommerce && RizqStoreCommerce.storeIdFromUrl && RizqStoreCommerce.storeIdFromUrl())
+      || new URLSearchParams(location.search).get('id')
+      || '';
+  } catch (eSid) {}
+  const t = (window.RizqStoreCommerce && typeof RizqStoreCommerce.cartQtyForSeller === 'function')
+    ? RizqStoreCommerce.cartQtyForSeller(cart, sid)
+    : cart.reduce(function(s,c){
+        if (sid && String(c.storeId || c.accountId || '') !== String(sid)) return s;
+        return s + (Number(c.qty) || 0);
+      }, 0);
   const el = document.getElementById('nav-cart-count');
   if (el) el.textContent = t;
   const sideCart = document.getElementById('prod-cart-count');
