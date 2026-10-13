@@ -588,6 +588,16 @@
       slot.appendChild(img);
     }
     if (img.getAttribute('src') !== safe) img.src = safe;
+    try{
+      var sid = '';
+      try{
+        var q = new URLSearchParams(location.search);
+        sid = q.get('id') || q.get('store') || '';
+      }catch(eQ){}
+      if(sid && safe && safe.indexOf('data:') !== 0){
+        sessionStorage.setItem('rizq_store_cover_' + sid, String(safe).slice(0, 2000));
+      }
+    }catch(eCache){}
     return true;
   }
 
