@@ -1094,7 +1094,7 @@
   }
 
   /**
-   * بطاقة مدمجة: الشعار فوق + الاختصار تحت (أو صف أفقي إن opts.inline)
+   * بطاقة مدمجة: سيمبول الماركة فوق + اسم الماركة تحت (أو صف أفقي إن opts.inline)
    */
   function logoNameHtml(brandId, opts) {
     opts = opts || {};
@@ -1103,21 +1103,20 @@
     var fr = !!opts.fr;
     var size = opts.size || 36;
     var name = displayName(brand, fr);
-    var abbr = abbrName(brand);
     var model = opts.modelId ? getModel(brandId, opts.modelId) : null;
     var sub = model ? modelName(model, fr) : '';
     if (opts.inline) {
       return '<div class="rzq-brand-logo-name is-inline" data-brand-id="' + esc(brand.id) + '" title="' + esc(name) + '">'
         + '<img class="rzq-brand-logo-name-img" src="' + esc(logoDataUri(brand, size * 2)) + '" alt="' + esc(name) + '" width="' + size + '" height="' + size + '"/>'
         + '<span class="rzq-brand-logo-name-text">'
-        +   '<span class="rzq-brand-logo-name-main">' + esc(abbr) + '</span>'
+        +   '<span class="rzq-brand-logo-name-main">' + esc(name) + '</span>'
         +   (sub ? '<span class="rzq-brand-logo-name-sub">' + esc(sub) + '</span>' : '')
         + '</span>'
         + '</div>';
     }
     return '<div class="rzq-brand-logo-name is-stack" data-brand-id="' + esc(brand.id) + '" title="' + esc(name) + '">'
       + '<img class="rzq-brand-logo-name-img" src="' + esc(logoDataUri(brand, size * 2)) + '" alt="' + esc(name) + '" width="' + size + '" height="' + size + '"/>'
-      + '<span class="rzq-brand-logo-name-main">' + esc(abbr) + '</span>'
+      + '<span class="rzq-brand-logo-name-main">' + esc(name) + '</span>'
       + '</div>';
   }
 
