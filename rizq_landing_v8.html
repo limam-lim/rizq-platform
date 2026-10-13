@@ -4044,6 +4044,22 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rzq-landing-brand-strip-wrap .rzq-brand-strip-btn.is-on{
   border-color:var(--gold,#C9A84C);box-shadow:0 0 0 3px rgba(201,168,76,.18);transform:translateY(-1px)
 }
+/* رمز الماركة + اسمها فوق صورة الإطلالة / نموذج المعرض */
+.rizq-style-mosaic{position:relative}
+.rizq-style-brand-bar{
+  position:absolute;top:0;inset-inline:0;z-index:6;
+  display:flex;align-items:center;justify-content:flex-start;
+  padding:5px 6px;
+  background:linear-gradient(180deg,rgba(8,16,32,.78) 0%,rgba(8,16,32,.35) 70%,transparent 100%);
+  pointer-events:none
+}
+.rizq-style-brand-bar .rzq-brand-chip{
+  background:rgba(255,255,255,.95)!important;
+  border-color:rgba(201,168,76,.45)!important;
+  box-shadow:0 2px 8px rgba(0,0,0,.25);
+  max-width:92%;
+  font-size:10px!important
+}
 
 /* شريط أنماط/نماذج — حركة مثل المباشر + مظهر فاخر */
 .rizq-styles-track-wrap{
@@ -6242,7 +6258,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 </div><!-- /#modal -->
 
 <script src="rizq_categories_config.js?v=23.0" defer></script>
-<script src="rizq_brands_catalog.js?v=1" defer></script>
+<script src="rizq_brands_catalog.js?v=2" defer></script>
 <script>
 var isAr = true;
 
@@ -7087,6 +7103,57 @@ function rizqOpenStyleLook(ev, primaryId, fallbackHref){
 window.rizqOpenStyleItem = rizqOpenStyleItem;
 window.rizqOpenStyleLook = rizqOpenStyleLook;
 
+function _styResolveBrandId(ad){
+  if(!ad || !window.RizqBrands) return '';
+  if(ad.brandId && RizqBrands.getById(ad.brandId)) return String(ad.brandId);
+  var blob = [ad.brandName, ad.brandNameFr, ad.title, ad.titleFR, ad.titleFr, ad.modelName, ad.modelNameFr]
+    .filter(Boolean).join(' ');
+  try {
+    var hit = RizqBrands.findByAlias(blob);
+    if(hit && hit.id) return String(hit.id);
+  } catch(e){}
+  var s = String(blob || '').toLowerCase();
+  if(/iphone|آيفون|ايفون|macbook|airpods|\bapple\b|آبل/.test(s)) return 'apple';
+  if(/samsung|سامسونج|galaxy/.test(s)) return 'samsung';
+  if(/toyota|تويوتا|كامري|كورولا|هايلوكس|لاند\s*كروزر/.test(s)) return 'toyota';
+  if(/mercedes|مرسيدس|بنز/.test(s)) return 'mercedes';
+  if(/hyundai|هيونداي|هونداي|توسان/.test(s)) return 'hyundai';
+  if(/nike|نايك|اير\s*ماكس|jordan/.test(s)) return 'nike';
+  if(/adidas|أديداس|اديداس|ultraboost/.test(s)) return 'adidas';
+  if(/ساعة|watch|montre|g-?shock/.test(s)) return 'casio';
+  if(/ذهب|خاتم|سوار|مجوهر|bijou|gold/.test(s)) return 'pandora';
+  if(/نظار|ray-?ban|lunette/.test(s)) return 'ray-ban';
+  if(/حقيبة|bag|sac\b/.test(s)) return 'guess';
+  if(/حذاء|shoe|sneaker|كوتشي/.test(s)) return 'nike';
+  return '';
+}
+function _styBrandChipHtml(ad, fr, opts){
+  opts = opts || {};
+  if(!window.RizqBrands || typeof RizqBrands.chipHtml !== 'function') return '';
+  var brandId = _styResolveBrandId(ad);
+  if(!brandId) return '';
+  var modelId = (ad && ad.modelId) || '';
+  return RizqBrands.chipHtml(brandId, { fr: !!fr, modelId: modelId, size: opts.size || 20 });
+}
+/** ماركة للإطلالة/النموذج: من المنتج أولاً، وإلا اختيار ثابت من كتالوج القسم */
+function _styBrandChipForLook(items, fr, catKey){
+  items = Array.isArray(items) ? items : (items ? [items] : []);
+  var i, html, ad, brandId;
+  for(i = 0; i < items.length; i++){
+    html = _styBrandChipHtml(items[i], fr);
+    if(html) return html;
+  }
+  if(!window.RizqBrands || typeof RizqBrands.forCategory !== 'function') return '';
+  var brands = RizqBrands.forCategory(catKey || 'أزياء');
+  if(!brands.length) brands = RizqBrands.list();
+  if(!brands.length) return '';
+  ad = items[0] || {};
+  var key = String(ad.id != null ? ad.id : (ad.title || '0'));
+  var hash = 0;
+  for(i = 0; i < key.length; i++) hash = ((hash << 5) - hash) + key.charCodeAt(i) | 0;
+  brandId = brands[Math.abs(hash) % brands.length].id;
+  return RizqBrands.chipHtml(brandId, { fr: !!fr, size: 20 });
+}
 function _styBuildCardHtml(opts){
   opts = opts || {};
   var attrs = ' class="rizq-style-card" role="listitem"';
@@ -7101,8 +7168,12 @@ function _styBuildCardHtml(opts){
   var fromView = opts.fromViewLbl
     ? '<div class="rizq-style-from-view">'+_styEsc(opts.fromViewLbl)+'</div>'
     : '';
+  var brandChip = opts.brandHtml || '';
+  var brandBar = brandChip
+    ? '<div class="rizq-style-brand-bar">'+brandChip+'</div>'
+    : '';
   return '<article'+attrs+'>'
-    + '<div class="rizq-style-mosaic">'+ (opts.tilesHtml || '') +'</div>'
+    + '<div class="rizq-style-mosaic">'+ brandBar + (opts.tilesHtml || '') +'</div>'
     + '<div class="rizq-style-body">'
     +   fromView
     +   '<div class="rizq-style-badge">'+_styEsc(opts.badge || '')+'</div>'
@@ -7415,6 +7486,7 @@ function buildStyleIdeas(reshuffle){
         seed: true,
         tilesHtml: seedTiles,
         fromViewLbl: fromViewLbl,
+        brandHtml: _styBrandChipForLook(seedItems, fr, 'أزياء'),
         badge: genderBadge0,
         name: seedName,
         meta: fr ? 'Inspiré par votre consultation' : 'مستوحى من مشاهدتك',
@@ -7479,6 +7551,7 @@ function buildStyleIdeas(reshuffle){
     cards.push(_styBuildCardHtml({
       gender: gender,
       tilesHtml: tiles,
+      brandHtml: _styBrandChipForLook(items, fr, 'أزياء'),
       badge: genderBadge,
       name: name,
       meta: metaParts.join(' · '),
@@ -7528,6 +7601,7 @@ function buildStyleIdeas(reshuffle){
     cards.push(_styBuildCardHtml({
       gender: gender,
       tilesHtml: tilesEx,
+      brandHtml: _styBrandChipForLook(itemsEx, fr, 'أزياء'),
       badge: _styGenderBadge(gender, fr),
       name: nameEx,
       meta: fr ? 'Suggestion continue' : 'اقتراح متواصل',
@@ -7808,10 +7882,17 @@ function buildShowroomModels(reshuffle){
         ? _styTileHtml(adT, (tplEmoji||[])[ti] || adT.emoji, adT.bg)
         : '';
     }
+    var brandCatSrm = (typeof _landingBrandCatForSrm === 'function')
+      ? _landingBrandCatForSrm(cat)
+      : (cat === 'electronics' ? 'إلكترونيات' : (cat === 'cars' ? 'سيارات' : ''));
+    var brandHtmlSrm = (typeof _styBrandChipForLook === 'function')
+      ? _styBrandChipForLook(tileItems, fr, brandCatSrm || 'سيارات')
+      : ((typeof _styBrandChipHtml === 'function') ? _styBrandChipHtml(primary, fr) : '');
     cards.push((typeof _styBuildCardHtml === 'function')
       ? _styBuildCardHtml({
           srmCat: cat,
           tilesHtml: tiles,
+          brandHtml: brandHtmlSrm,
           badge: badge,
           name: name,
           meta: metaLine,
@@ -7820,7 +7901,7 @@ function buildShowroomModels(reshuffle){
           primaryId: primary && primary.id != null ? primary.id : ''
         })
       : '<article class="rizq-style-card" role="listitem" data-srm-cat="'+cat+'">'
-        + '<div class="rizq-style-mosaic">'+tiles+'</div>'
+        + '<div class="rizq-style-mosaic">'+(brandHtmlSrm ? '<div class="rizq-style-brand-bar">'+brandHtmlSrm+'</div>' : '')+tiles+'</div>'
         + '<div class="rizq-style-body">'
         +   '<div class="rizq-style-badge">'+esc(badge)+'</div>'
         +   '<div class="rizq-style-name">'+esc(name)+'</div>'
