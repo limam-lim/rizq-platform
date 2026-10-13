@@ -308,6 +308,109 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 @media(max-width:900px){.visit-strip{grid-template-columns:1fr;margin-top:16px}}
 .info-card{background:#fff;border-radius:var(--radius);padding:20px;border:1px solid #ece3d1;border-top:3px solid var(--gold);box-shadow:0 14px 32px rgba(27,58,107,.1)}
 .info-card-title{font-size:12.5px;font-weight:800;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:1px}
+
+/* غرفة الطلبات + التقييمات — شريط أفقي تحت الكتالوج بنفس ترتيب المحل */
+.showroom-under-band{
+  display:grid;
+  grid-template-columns:1.08fr 0.92fr;
+  gap:12px;
+  margin:20px 0 8px;
+  align-items:stretch;
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  padding:12px;
+  border-radius:20px;
+  background:
+    radial-gradient(ellipse at 90% 0%, rgba(201,168,76,.06), transparent 42%),
+    linear-gradient(165deg,#ffffff 0%,#faf7f0 100%);
+  border:1px solid rgba(27,58,107,.08);
+  box-shadow:0 12px 40px rgba(15,35,65,.06);
+}
+#showroom-service-desk.showroom-desk-hz{
+  margin:0;
+  padding:12px 12px 10px;
+  border-radius:14px;
+  box-shadow:none;
+  border:1px solid rgba(27,58,107,.08);
+  background:#fff;
+  height:100%;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+.showroom-desk-eyebrow{
+  font-size:9.5px;letter-spacing:1.2px;font-weight:900;color:#C9A84C;margin-bottom:4px
+}
+.showroom-desk-hint{
+  font-size:11.5px;color:#6a7a8a;margin:0 0 8px;line-height:1.45
+}
+.showroom-desk-form{
+  display:grid!important;
+  grid-template-columns:1fr 1fr;
+  gap:7px 8px;
+  width:100%;
+  flex:1 1 auto;
+  align-content:start;
+}
+.showroom-desk-field{display:flex;flex-direction:column;gap:2px;min-width:0}
+.showroom-desk-field label{font-size:11px;font-weight:800;color:#0F2347}
+.showroom-desk-field .req-input,
+.showroom-desk-field input.req-input,
+.showroom-desk-field textarea.req-input{
+  display:block;width:100%;margin:0;padding:8px 10px;
+  border:1.5px solid #ece3d1;border-radius:8px;font-size:12.5px;font-family:inherit;
+  box-sizing:border-box;min-height:36px;background:#fff;resize:vertical
+}
+.showroom-desk-span2{grid-column:1/-1}
+.showroom-desk-actions{
+  grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:2px
+}
+.showroom-desk-note{
+  font-size:11px;color:#6a7a8a;line-height:1.45;margin:0;flex:1 1 160px;
+  padding:8px 10px;border-radius:8px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)
+}
+#showroom-service-desk #sr-req-submit,
+.showroom-desk-actions #sr-req-submit{
+  flex:0 1 200px;width:auto;padding:10px 12px;border:none;border-radius:9px;
+  background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:12.5px;
+  cursor:pointer;font-family:inherit;min-height:38px
+}
+#reviews-section.showroom-reviews-hz{
+  margin:0;
+  padding:12px 12px 10px;
+  background:#fff;
+  border:1px solid rgba(27,58,107,.08);
+  border-radius:14px;
+  box-shadow:none;
+  height:100%;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+#reviews-section .showroom-reviews-inner{
+  background:transparent!important;border:none!important;border-radius:0!important;
+  box-shadow:none!important;padding:0!important;flex:1 1 auto;
+  display:flex;flex-direction:column;
+}
+#reviews-section .showroom-reviews-summary{
+  display:flex;align-items:flex-start;gap:12px;margin-bottom:8px;flex-wrap:wrap
+}
+#reviews-section .showroom-reviews-score{text-align:center;min-width:72px}
+#reviews-section #rev-score{font-size:28px;font-weight:900;color:var(--navy);line-height:1}
+#reviews-section .showroom-reviews-stars{color:#F5A623;font-size:14px;margin:3px 0}
+#reviews-section #rev-count-txt{font-size:11px;color:#6a7a8a}
+#reviews-section #reviews-list{flex:1 1 auto}
+@media(max-width:800px){
+  .showroom-under-band{grid-template-columns:1fr;gap:12px;padding:12px;border-radius:16px}
+  #showroom-service-desk.showroom-desk-hz,
+  #reviews-section.showroom-reviews-hz{padding:12px 10px 10px;border-radius:12px}
+  .showroom-desk-form{grid-template-columns:1fr}
+  .showroom-desk-span2{grid-column:auto}
+  .showroom-desk-actions #sr-req-submit{flex:1 1 100%;width:100%}
+}
 .info-row{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start}
 .info-icon{font-size:18px;flex-shrink:0;margin-top:2px}
 .info-label{font-size:11px;color:#9a9484;margin-bottom:2px;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
@@ -573,7 +676,77 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
         </div>
       </div>
 
-  <!-- VISIT STRIP — معلومات المعرض بعد الكتالوج (البضاعة أولاً) -->
+    <!-- غرفة الطلبات + التقييمات — أفقيان تحت الكتالوج بنفس ترتيب المحل -->
+    <div class="showroom-under-band" id="showroom-under-band">
+      <section class="info-card showroom-desk-hz" id="showroom-service-desk" style="border-top:3px solid var(--gold);display:flex!important" aria-label="غرفة الطلبات">
+        <div class="showroom-desk-eyebrow" id="sr-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
+        <div class="info-card-title" data-desk="title" id="sr-req-title" style="margin-bottom:4px;padding-bottom:0;border-bottom:none">📩 طلب من المعرض</div>
+        <p class="showroom-desk-hint" data-desk="hint" id="sr-req-hint">أدخل اسمك ورقم هاتفك — بياناتك تصل للمعرض مباشرة. الوثائق عبر واتساب أو الإيميل.</p>
+        <div id="sr-req-form" class="showroom-desk-form">
+          <div class="showroom-desk-field">
+            <label for="rf-name" id="sr-lbl-name">الاسم الكامل *</label>
+            <input class="req-input" id="rf-name" autocomplete="name" placeholder="مثال: أحمد ولد محمد"/>
+          </div>
+          <div class="showroom-desk-field">
+            <label for="rf-phone" id="sr-lbl-phone">رقم الهاتف *</label>
+            <input dir="ltr" class="req-input" id="rf-phone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233"/>
+          </div>
+          <div class="showroom-desk-field">
+            <label for="rf-whatsapp" id="sr-lbl-wa">واتساب (إن اختلف)</label>
+            <input dir="ltr" class="req-input" id="rf-whatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر"/>
+          </div>
+          <div class="showroom-desk-field">
+            <label for="rf-email" id="sr-lbl-email">البريد (اختياري)</label>
+            <input dir="ltr" class="req-input" id="rf-email" type="email" autocomplete="email" placeholder="name@email.com"/>
+          </div>
+          <div class="showroom-desk-field showroom-desk-span2">
+            <label for="rf-service" id="sr-lbl-svc">المنتج / الموضوع</label>
+            <input class="req-input" id="rf-service" placeholder="مثال: استفسار عن سيارة أو جهاز"/>
+          </div>
+          <div class="showroom-desk-field showroom-desk-span2">
+            <label for="rf-msg" id="sr-lbl-msg">رسالتك للمعرض</label>
+            <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" rows="2"></textarea>
+          </div>
+          <div class="showroom-desk-actions">
+            <p class="showroom-desk-note" id="sr-docs-hint">📎 الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
+            <button type="button" id="sr-req-submit" onclick="submitShowroomServiceReq()">📤 إرسال الطلب للمعرض</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="showroom-reviews-hz" id="reviews-section" aria-label="تقييمات الزبائن">
+        <div class="info-card-title" style="margin-bottom:8px" id="reviews-title-lbl">⭐ تقييمات الزبائن</div>
+        <div class="showroom-reviews-inner">
+          <div class="showroom-reviews-summary">
+            <div class="showroom-reviews-score">
+              <div id="rev-score">—</div>
+              <div class="showroom-reviews-stars">☆☆☆☆☆</div>
+              <div id="rev-count-txt">0 تقييم</div>
+            </div>
+            <div id="showroom-rating-breakdown" style="flex:1;min-width:120px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="font-size:12px;color:#8a8474;width:20px">5★</span>
+                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
+                <span style="font-size:12px;color:#8a8474">0%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="font-size:12px;color:#8a8474;width:20px">4★</span>
+                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
+                <span style="font-size:12px;color:#8a8474">0%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:12px;color:#8a8474;width:20px">3★</span>
+                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
+                <span style="font-size:12px;color:#8a8474">0%</span>
+              </div>
+            </div>
+          </div>
+          <div id="reviews-list"></div>
+        </div>
+      </section>
+    </div>
+
+  <!-- VISIT STRIP — معلومات المعرض بعد الكتالوج وشريط الطلبات (مثل ترتيب المحل) -->
   <div class="visit-strip" id="info-section">
 
       <!-- Contact Info -->
@@ -629,28 +802,6 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
         <div id="showroom-pay-box"></div>
       </div>
 
-      <div class="info-card" id="showroom-service-desk" style="border-top:3px solid var(--gold);display:block!important">
-        <div style="font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:6px" id="sr-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
-        <div class="info-card-title" data-desk="title" id="sr-req-title" style="margin-bottom:6px">📩 طلب من المعرض</div>
-        <p style="font-size:12.5px;color:#6a7a8a;margin-bottom:14px;line-height:1.55" data-desk="hint" id="sr-req-hint">أدخل اسمك ورقم هاتفك — بياناتك تصل للمعرض مباشرة. الوثائق عبر واتساب أو الإيميل.</p>
-        <div id="sr-req-form" style="display:block!important">
-          <label for="rf-name" id="sr-lbl-name" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">الاسم الكامل *</label>
-          <input class="req-input" id="rf-name" autocomplete="name" placeholder="مثال: أحمد ولد محمد" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #ece3d1;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-phone" id="sr-lbl-phone" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رقم الهاتف *</label>
-          <input dir="ltr" class="req-input" id="rf-phone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #ece3d1;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-whatsapp" id="sr-lbl-wa" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">واتساب (إن اختلف)</label>
-          <input dir="ltr" class="req-input" id="rf-whatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #ece3d1;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-email" id="sr-lbl-email" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">البريد الإلكتروني (اختياري)</label>
-          <input dir="ltr" class="req-input" id="rf-email" type="email" autocomplete="email" placeholder="name@email.com" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #ece3d1;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-service" id="sr-lbl-svc" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">المنتج / الموضوع</label>
-          <input class="req-input" id="rf-service" placeholder="مثال: استفسار عن سيارة أو جهاز" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #ece3d1;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
-          <label for="rf-msg" id="sr-lbl-msg" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رسالتك للمعرض</label>
-          <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" style="display:block;width:100%;min-height:80px;margin-bottom:12px;padding:11px 12px;border:1.5px solid #ece3d1;border-radius:10px;font-size:13.5px;font-family:inherit;resize:vertical;box-sizing:border-box;background:#fff"></textarea>
-          <p id="sr-docs-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:0 0 12px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)">📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
-          <button type="button" id="sr-req-submit" onclick="submitShowroomServiceReq()" style="width:100%;padding:13px;border:none;border-radius:11px;background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit">📤 إرسال الطلب للمعرض</button>
-        </div>
-      </div>
-
       <!-- About — الفيديو التعريفي يعيش هنا مع نص «عن المعرض» -->
       <div class="info-card" id="about-section">
         <div class="info-card-title" id="about-title-lbl">📖 عن المعرض</div>
@@ -669,38 +820,6 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
       </div>
 
   </div>
-
-      <!-- Reviews -->
-      <div style="margin-top:36px" id="reviews-section">
-        <div class="section-title" style="margin-bottom:16px" id="reviews-title-lbl">⭐ تقييمات الزبائن</div>
-        <div style="background:#fff;border-radius:var(--radius);border:1px solid #ece3d1;border-top:3px solid var(--gold);padding:20px;box-shadow:0 8px 24px rgba(27,58,107,.06)">
-          <div style="display:flex;align-items:center;gap:20px;margin-bottom:20px;flex-wrap:wrap">
-            <div style="text-align:center">
-              <div style="font-size:52px;font-weight:900;color:var(--navy);line-height:1" id="rev-score">—</div>
-              <div style="color:#F5A623;font-size:20px;margin:4px 0">★★★★★</div>
-              <div style="font-size:12px;color:#8a8474" id="rev-count-txt">0 تقييم</div>
-            </div>
-            <div style="flex:1;min-width:160px">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-                <span style="font-size:12px;color:#8a8474;width:20px">5★</span>
-                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:85%;height:100%;background:#F5A623;border-radius:4px"></div></div>
-                <span style="font-size:12px;color:#8a8474">85%</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-                <span style="font-size:12px;color:#8a8474;width:20px">4★</span>
-                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:10%;height:100%;background:#F5A623;border-radius:4px"></div></div>
-                <span style="font-size:12px;color:#8a8474">10%</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <span style="font-size:12px;color:#8a8474;width:20px">3★</span>
-                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:5%;height:100%;background:#F5A623;border-radius:4px"></div></div>
-                <span style="font-size:12px;color:#8a8474">5%</span>
-              </div>
-            </div>
-          </div>
-          <div id="reviews-list"></div>
-        </div>
-      </div>
 
 </main>
 </div>
@@ -1206,7 +1325,7 @@ function applyAccountData(){
       RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('sr-req-form') });
     }
     var deskRoot = document.getElementById('showroom-service-desk');
-    if(deskRoot) deskRoot.style.display = 'block';
+    if(deskRoot) deskRoot.style.display = 'flex';
   }
   if(typeof RizqAccountPayments !== 'undefined' && Array.isArray(_acc.paymentMethods) && _acc.paymentMethods.length){
     var payWrap = document.getElementById('showroom-payment-methods');
@@ -1815,10 +1934,10 @@ function applyLang(){
   _setTxt('sr-lbl-name', 'الاسم الكامل *', 'Nom complet *');
   _setTxt('sr-lbl-phone', 'رقم الهاتف *', 'Téléphone *');
   _setTxt('sr-lbl-wa', 'واتساب (إن اختلف)', 'WhatsApp (si différent)');
-  _setTxt('sr-lbl-email', 'البريد الإلكتروني (اختياري)', 'E-mail (optionnel)');
+  _setTxt('sr-lbl-email', 'البريد (اختياري)', 'E-mail (optionnel)');
   _setTxt('sr-lbl-svc', 'المنتج / الموضوع', 'Produit / objet');
   _setTxt('sr-lbl-msg', 'رسالتك للمعرض', 'Votre message');
-  _setTxt('sr-docs-hint', '📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.', '📎 Vous pouvez envoyer les documents via WhatsApp ou e-mail après l’envoi.');
+  _setTxt('sr-docs-hint', '📎 الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.', '📎 Documents via WhatsApp ou e-mail après l’envoi.');
   _setTxt('sr-req-submit', '📤 إرسال الطلب للمعرض', '📤 Envoyer la demande');
   var ph = isFr ? {
     'rf-name':'Ex. : Ahmed Ould Mohamed','rf-phone':'Ex. : 22244112233',
