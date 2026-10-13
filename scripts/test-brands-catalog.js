@@ -115,16 +115,28 @@ assert(itemHtml.indexOf('example.com/logo.png') >= 0, 'itemBrandHtml custom logo
 
 const storeDash = fs.readFileSync(path.join(__dirname, '..', 'rizq_dashboard_store.html'), 'utf8');
 assert(storeDash.includes('prod-brand-custom-name'));
+assert(storeDash.includes('prod-brand-logo-url'));
+assert(storeDash.includes('fetchStoreBrandLogoFromWeb'));
 assert(storeDash.includes('prod-brand-logo-file'));
 assert(storeDash.includes('brandLogo'));
 assert(storeDash.includes('isCustomBrandId'));
 const corpDash = fs.readFileSync(path.join(__dirname, '..', 'rizq_dashboard_corp.html'), 'utf8');
 assert(corpDash.includes('pr-brand-custom-name'));
+assert(corpDash.includes('pr-brand-logo-url'));
+assert(corpDash.includes('fetchCorpBrandLogoFromWeb'));
 assert(corpDash.includes('pr-brand-logo-file'));
 assert(corpDash.includes('brandLogo'));
 assert(postHtml.includes('ad-brand-custom-name'));
+assert(postHtml.includes('ad-brand-logo-url'));
+assert(postHtml.includes('_fetchAdBrandLogoFromWeb'));
 assert(postHtml.includes('ad-brand-logo-file'));
 assert(postHtml.includes('brandLogo'));
+
+assert(typeof B.normalizeHttpLogoUrl === 'function');
+assert(typeof B.internetLogoCandidates === 'function');
+assert.strictEqual(B.normalizeHttpLogoUrl('samsung.com'), 'https://samsung.com');
+assert(B.internetLogoCandidates('samsung.com').some((u) => /google\.com\/s2\/favicons/.test(u)), 'favicon candidate');
+assert(B.internetLogoCandidates('https://example.com/logo.png')[0].indexOf('logo.png') >= 0, 'direct image url');
 
 const catalogJs = fs.readFileSync(path.join(__dirname, '..', 'rizq-backend/routes/catalog.js'), 'utf8');
 assert(catalogJs.includes('brandLogo'));

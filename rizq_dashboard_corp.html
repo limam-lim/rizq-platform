@@ -303,7 +303,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_packages_config.js?v=16.3"></script>
 <script src="rizq_merchant_activities.js?v=1"></script>
-<script src="rizq_brands_catalog.js?v=5"></script>
+<script src="rizq_brands_catalog.js?v=6"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
 <script src="rizq_disclaimer.js"></script>
@@ -595,14 +595,22 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
           </div>
           <div id="pr-brand-preview" style="margin:8px 0 4px;min-height:28px"></div>
           <div id="pr-brand-custom-wrap" style="display:none;margin:8px 0 12px;padding:12px;border:1px solid rgba(15,35,71,.1);border-radius:12px;background:#f8fafc">
+            <p style="font-size:12px;color:#334155;margin:0 0 10px;line-height:1.5">الماركة غير موجودة في كتالوج رزق؟ أدخل اسمها واجلب شعارها من الإنترنت (رابط الموقع أو رابط الصورة).</p>
             <div class="form-group" style="margin-bottom:10px">
-              <label class="form-label" for="pr-brand-custom-name">اسم الماركة</label>
-              <input class="form-input" id="pr-brand-custom-name" type="text" maxlength="80" placeholder="مثال: معرض الأمل" oninput="paintCorpBrandPreview()"/>
+              <label class="form-label" for="pr-brand-custom-name">اسم الماركة الجديدة</label>
+              <input class="form-input" id="pr-brand-custom-name" type="text" maxlength="80" placeholder="مثال: Samsung أو ماركة محلية" oninput="paintCorpBrandPreview()"/>
+            </div>
+            <div class="form-group" style="margin-bottom:10px">
+              <label class="form-label" for="pr-brand-logo-url">رابط الشعار أو موقع الماركة (من الإنترنت)</label>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <input class="form-input" id="pr-brand-logo-url" type="url" maxlength="500" placeholder="https://example.com أو رابط صورة الشعار" style="flex:1;min-width:180px" oninput="onCorpBrandLogoUrlInput()"/>
+                <button type="button" class="btn btn-outline" onclick="fetchCorpBrandLogoFromWeb()" style="white-space:nowrap">🌐 جلب الشعار</button>
+              </div>
+              <p style="font-size:11px;color:var(--text-muted);margin:6px 0 0">الصق رابط الموقع أو صورة الشعار، أو اكتب اسم الماركة باللاتينية ثم اضغط «جلب الشعار»</p>
             </div>
             <div class="form-group" style="margin-bottom:0">
-              <label class="form-label" for="pr-brand-logo-file">شعار الماركة (اختياري)</label>
+              <label class="form-label" for="pr-brand-logo-file">أو ارفع ملفاً محلياً (اختياري)</label>
               <input class="form-input" id="pr-brand-logo-file" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onchange="onCorpBrandLogoFile(this)"/>
-              <p style="font-size:11px;color:var(--text-muted);margin:6px 0 0">PNG أو JPG — يظهر مع المنتج في المعرض</p>
             </div>
           </div>
           <div class="form-group"><label class="form-label" data-t="pr-desc-label">وصف المنتج</label><textarea class="form-input" id="pr-desc" placeholder="اكتب وصفاً مختصراً للمنتج..." data-ph="pr-desc-ph"></textarea></div>
@@ -2597,6 +2605,7 @@ function saveProduct(){
         RizqBrands.fillModelSelect(document.getElementById('pr-model'), '', false, '');
       }
       var _cn = document.getElementById('pr-brand-custom-name'); if(_cn) _cn.value='';
+      var _lu = document.getElementById('pr-brand-logo-url'); if(_lu) _lu.value='';
       var _lf = document.getElementById('pr-brand-logo-file'); if(_lf) _lf.value='';
       window._prBrandLogo = '';
       paintCorpBrandPreview();
@@ -2644,15 +2653,59 @@ function paintCorpBrandPreview(){
     ? RizqBrands.brandFormPreviewHtml({ brandId: brandId, modelId: modelId, fr: false })
     : '';
 }
+function onCorpBrandLogoUrlInput(){
+  var raw = ((document.getElementById('pr-brand-logo-url')||{}).value || '').trim();
+  if(!raw){
+    if(window._prBrandLogo && /^https?:\/\//i.test(window._prBrandLogo)) window._prBrandLogo = '';
+    paintCorpBrandPreview();
+    return;
+  }
+  var url = window.RizqBrands && typeof RizqBrands.normalizeHttpLogoUrl === 'function'
+    ? RizqBrands.normalizeHttpLogoUrl(raw) : raw;
+  if(url && (/^https?:\/\//i.test(url)) && (/\.(png|jpe?g|webp|svg|gif|ico)(\?|$)/i.test(url) || /favicons\?/i.test(url) || /\/logo/i.test(url) || /icons\.duckduckgo/i.test(url))){
+    window._prBrandLogo = url;
+    var logoFile = document.getElementById('pr-brand-logo-file');
+    if(logoFile) logoFile.value = '';
+  }
+  paintCorpBrandPreview();
+}
+function fetchCorpBrandLogoFromWeb(){
+  if(!window.RizqBrands || typeof RizqBrands.resolveInternetLogo !== 'function'){
+    showToast(_t2('تعذّر جلب الشعار','Impossible de récupérer le logo'),'error');
+    return;
+  }
+  var name = ((document.getElementById('pr-brand-custom-name')||{}).value || '').trim();
+  var site = ((document.getElementById('pr-brand-logo-url')||{}).value || '').trim();
+  var query = site || name;
+  if(!query){
+    showToast(_t2('أدخل اسم الماركة أو رابط موقعها','Saisissez le nom ou l\'URL du site'),'error');
+    return;
+  }
+  showToast(_t2('جاري جلب الشعار من الإنترنت…','Récupération du logo…'),'info');
+  RizqBrands.resolveInternetLogo(query, function(url){
+    if(!url){
+      showToast(_t2('لم يُعثر على شعار — الصق رابط صورة الشعار مباشرة','Logo introuvable — collez l\'URL de l\'image'),'error');
+      return;
+    }
+    window._prBrandLogo = url;
+    var urlEl = document.getElementById('pr-brand-logo-url');
+    if(urlEl) urlEl.value = url;
+    var logoFile = document.getElementById('pr-brand-logo-file');
+    if(logoFile) logoFile.value = '';
+    paintCorpBrandPreview();
+    showToast(_t2('تم جلب الشعار من الإنترنت ✅','Logo récupéré ✅'),'success');
+  });
+}
 function onCorpBrandLogoFile(input){
   var file = input && input.files && input.files[0];
   if(!file || !window.RizqBrands || typeof RizqBrands.logoFileToDataUri !== 'function'){
-    window._prBrandLogo = '';
     paintCorpBrandPreview();
     return;
   }
   RizqBrands.logoFileToDataUri(file, function(dataUri){
     window._prBrandLogo = dataUri || '';
+    var urlEl = document.getElementById('pr-brand-logo-url');
+    if(urlEl && dataUri) urlEl.value = '';
     paintCorpBrandPreview();
   });
 }
@@ -2671,6 +2724,8 @@ function onCorpBrandChange(){
       window._prBrandLogo = '';
       var logoFile = document.getElementById('pr-brand-logo-file');
       if(logoFile) logoFile.value = '';
+      var logoUrl = document.getElementById('pr-brand-logo-url');
+      if(logoUrl) logoUrl.value = '';
     }
   }
   paintCorpBrandPreview();
@@ -2701,6 +2756,8 @@ function editProd(i){
       var customNameEl = document.getElementById('pr-brand-custom-name');
       if(customNameEl) customNameEl.value = (!_editBrandId || RizqBrands.isCustomBrandId(_editBrandId)) ? (p.brandName || '') : '';
       window._prBrandLogo = p.brandLogo || '';
+      var logoUrlEl = document.getElementById('pr-brand-logo-url');
+      if(logoUrlEl) logoUrlEl.value = (p.brandLogo && /^https?:\/\//i.test(p.brandLogo)) ? p.brandLogo : '';
       paintCorpBrandPreview();
     }
   }catch(eEd){}

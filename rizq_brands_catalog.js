@@ -1104,7 +1104,7 @@
     return String(id || '') === CUSTOM_BRAND_ID;
   }
 
-  /** خيار «ماركة أخرى» لإدخال الاسم + الشعار يدوياً من لوحات التحكم */
+  /** خيار «ماركة غير موجودة في الكتالوج» — اسم + شعار من الإنترنت */
   function appendCustomBrandOption(selectEl, fr) {
     if (!selectEl) return;
     var exists = false;
@@ -1114,8 +1114,143 @@
     if (exists) return;
     var opt = document.createElement('option');
     opt.value = CUSTOM_BRAND_ID;
-    opt.textContent = fr ? 'Autre marque (nom + logo)…' : 'ماركة أخرى (اسم + شعار)…';
+    opt.textContent = fr ? 'Marque absente du catalogue (nom + logo web)…' : 'ماركة غير موجودة في الكتالوج (اسم + شعار من الإنترنت)…';
     selectEl.appendChild(opt);
+  }
+
+  /** يقبل رابط صورة أو موقعاً ويُرجع https صالحاً أو '' */
+  function normalizeHttpLogoUrl(raw) {
+    var s = String(raw || '').trim();
+    if (!s) return '';
+    if (/^data:image\//i.test(s)) return s.slice(0, 400000);
+    if (!/^https?:\/\//i.test(s)) {
+      if (/^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}(?:[/:?#]|$)/i.test(s)) s = 'https://' + s;
+      else return '';
+    }
+    // بدون الاعتماد على URL() (قد لا يتوفر في بعض سياقات الاختبار)
+    var m = /^https?:\/\/([^\/?#]+)(\/[^?#]*)?(\?[^#]*)?(#.*)?$/i.exec(s);
+    if (!m) return '';
+    var host = m[1];
+    if (!host || host.indexOf('.') < 0) return '';
+    return s.slice(0, 500);
+  }
+
+  function _latinBrandSlug(name) {
+    var s = String(name || '').trim().toLowerCase();
+    // أبقِ اللاتيني فقط لاشتقاق نطاق محتمل
+    s = s.replace(/[^a-z0-9\s-]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!s) return '';
+    return s.replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  }
+
+  function _domainFromInput(nameOrSite) {
+    var raw = String(nameOrSite || '').trim();
+    if (!raw) return '';
+    var asUrl = normalizeHttpLogoUrl(raw);
+    if (asUrl && !/^data:/i.test(asUrl)) {
+      try {
+        var host = new URL(asUrl).hostname.replace(/^www\./i, '');
+        // إن كان الرابط صورة مباشرة على CDN معروف للشعارات، لا نعتبره «نطاق ماركة»
+        if (/\.(png|jpe?g|webp|svg|gif|ico)(\?|$)/i.test(asUrl)
+          || /\/favicons\?/i.test(asUrl)
+          || /icons\.duckduckgo\.com/i.test(asUrl)) {
+          return '';
+        }
+        return host;
+      } catch (e1) { /* ignore */ }
+    }
+    var slug = _latinBrandSlug(raw);
+    return slug ? (slug.replace(/-/g, '') + '.com') : '';
+  }
+
+  /**
+   * مرشّحو شعار من الإنترنت لاسم ماركة أو رابط موقع/صورة.
+   * الأولوية: رابط صورة مباشر → أيقونة الموقع → تخمين نطاق من الاسم اللاتيني.
+   */
+  function internetLogoCandidates(nameOrSite) {
+    var raw = String(nameOrSite || '').trim();
+    var out = [];
+    var seen = {};
+    function push(u) {
+      var n = normalizeHttpLogoUrl(u);
+      if (!n || /^data:/i.test(n) || seen[n]) return;
+      seen[n] = 1;
+      out.push(n);
+    }
+    if (!raw) return out;
+    var direct = normalizeHttpLogoUrl(raw);
+    if (direct && !/^data:/i.test(direct)) {
+      if (/\.(png|jpe?g|webp|svg|gif|ico)(\?|$)/i.test(direct)
+        || /\/favicons\?/i.test(direct)
+        || /\/logo/i.test(direct)
+        || /icons\.duckduckgo\.com/i.test(direct)
+        || /google\.com\/s2\/favicons/i.test(direct)) {
+        push(direct);
+      }
+    }
+    var domain = '';
+    if (direct && !/^data:/i.test(direct)) {
+      try { domain = new URL(direct).hostname.replace(/^www\./i, ''); } catch (e2) { domain = ''; }
+    }
+    if (!domain) domain = _domainFromInput(raw);
+    if (domain) {
+      push(siteIconUrl(domain));
+      push('https://icons.duckduckgo.com/ip3/' + domain + '.ico');
+    }
+    var slug = _latinBrandSlug(raw);
+    if (slug) {
+      var compact = slug.replace(/-/g, '');
+      [compact + '.com', compact + '.net', slug + '.com'].forEach(function (d) {
+        if (d === domain) return;
+        push(siteIconUrl(d));
+      });
+      // إن وُجدت في كتالوج رزق تحت اسم/alias — استخدم شعارها الحقيقي
+      var known = findByAlias(raw) || findByAlias(slug) || findByAlias(compact);
+      if (known) {
+        var knownUrl = logoUrl(known);
+        if (knownUrl) push(knownUrl);
+      }
+    }
+    return out;
+  }
+
+  /** يجرّب مرشّحي الشعار حتى ينجح تحميل صورة */
+  function resolveInternetLogo(nameOrSite, done) {
+    done = typeof done === 'function' ? done : function () {};
+    var list = internetLogoCandidates(nameOrSite);
+    if (!list.length) { done(''); return; }
+    var i = 0;
+    function tryNext() {
+      if (i >= list.length) { done(''); return; }
+      var url = list[i++];
+      var img = new Image();
+      var settled = false;
+      var timer = setTimeout(function () {
+        if (settled) return;
+        settled = true;
+        tryNext();
+      }, 3500);
+      img.onload = function () {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        // رفض أيقونات 16px الفارغة تقريباً إن أمكن
+        if ((img.naturalWidth || 0) < 8 && (img.naturalHeight || 0) < 8) {
+          tryNext();
+          return;
+        }
+        done(url);
+      };
+      img.onerror = function () {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        tryNext();
+      };
+      img.referrerPolicy = 'no-referrer';
+      img.src = url;
+    }
+    tryNext();
   }
 
   function fillBrandSelect(selectEl, catKey, fr, selectedId) {
@@ -1176,7 +1311,7 @@
     if (!name && !logo) return '';
     var sz = opts.size || 40;
     var img = logo
-      ? '<img src="' + esc(logo) + '" alt="' + esc(name || 'brand') + '" width="' + sz + '" height="' + sz + '" style="width:' + sz + 'px;height:' + sz + 'px;object-fit:contain;border-radius:8px;background:#fff;border:1px solid rgba(15,35,71,.1)"/>'
+      ? '<img src="' + esc(logo) + '" alt="' + esc(name || 'brand') + '" width="' + sz + '" height="' + sz + '" style="width:' + sz + 'px;height:' + sz + 'px;object-fit:contain;border-radius:8px;background:#fff;border:1px solid rgba(15,35,71,.1)" loading="lazy" decoding="async" referrerpolicy="no-referrer"/>'
       : '<span style="width:' + sz + 'px;height:' + sz + 'px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:#0F2347;color:#fff;font-weight:800;font-size:14px">' + esc((name || '?').charAt(0)) + '</span>';
     return '<div class="rzq-brand-logo-name is-inline" style="display:inline-flex;align-items:center;gap:8px">'
       + img
@@ -1331,6 +1466,9 @@
     isCustomBrandId: isCustomBrandId,
     appendCustomBrandOption: appendCustomBrandOption,
     logoFileToDataUri: logoFileToDataUri,
+    normalizeHttpLogoUrl: normalizeHttpLogoUrl,
+    internetLogoCandidates: internetLogoCandidates,
+    resolveInternetLogo: resolveInternetLogo,
     brandFormPreviewHtml: brandFormPreviewHtml,
     itemBrandHtml: itemBrandHtml,
     logoUrl: logoUrl,
