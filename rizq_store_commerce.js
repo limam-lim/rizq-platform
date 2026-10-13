@@ -248,7 +248,14 @@
     if (!el) return;
     var safe = safeMediaUrl(thumb);
     if (safe) {
-      el.innerHTML = '<img src="' + esc(safe) + '" alt="" width="88" height="88" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"/>';
+      el.innerHTML = '<img src="' + esc(safe) + '" alt="" width="88" height="88" decoding="async" fetchpriority="high" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"/>';
+      var img = el.querySelector('img');
+      if (img && emoji) {
+        img.addEventListener('error', function () {
+          el.textContent = emoji;
+          el.classList.remove('is-storefront');
+        }, { once: true });
+      }
     } else if (emoji) {
       el.textContent = emoji;
     } else {
@@ -357,7 +364,7 @@
 
   /**
    * خلفية هيرو المحل/المعرض = غلاف مخصّص (cover) من الداشبورد.
-   * منفصل عن thumb (بطاقة الشريط/الشعار). بدون غلاف يبقى التدرّج الافتراضي.
+   * يُفضَّل cover؛ يمكن تمرير cover || thumb من الصفحة حتى لا يظهر الكحلي الفارغ.
    */
   function setHeroPhoto(heroEl, cover) {
     if (!heroEl) return false;
@@ -368,6 +375,12 @@
       if (slot) {
         slot.innerHTML = '';
         slot.hidden = true;
+        if (typeof slot.removeAttribute === 'function') slot.removeAttribute('style');
+        else if (slot.style) {
+          slot.style.backgroundImage = '';
+          slot.style.backgroundSize = '';
+          slot.style.backgroundPosition = '';
+        }
       }
       return false;
     }
@@ -378,6 +391,11 @@
       heroEl.insertBefore(slot, heroEl.firstChild);
     }
     slot.hidden = false;
+    /* أظهر الطبقة فوراً حتى قبل اكتمال تحميل الصورة — يمنع وميض الكحلي */
+    heroEl.classList.add('has-hero-photo');
+    slot.style.backgroundImage = 'url("' + String(safe).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '")';
+    slot.style.backgroundSize = 'cover';
+    slot.style.backgroundPosition = 'center';
     var img = slot.querySelector('img');
     if (!img) {
       img = document.createElement('img');
@@ -387,7 +405,6 @@
       slot.appendChild(img);
     }
     if (img.getAttribute('src') !== safe) img.src = safe;
-    heroEl.classList.add('has-hero-photo');
     return true;
   }
 
