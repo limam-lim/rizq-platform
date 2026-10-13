@@ -351,12 +351,12 @@ body.rizq-empty-office .rating-inline{display:none!important}
 .main-wrap{
   max-width:1140px;margin:0 auto;padding:36px 24px;
   display:grid;gap:26px;align-items:start;
-  /* يمين = الموقع/الساعات/التقييمات | يسار = الخدمات (RTL مثل المحلات) */
+  /* يمين = الموقع/الساعات | يسار = الخدمات + شريط الطلبات/التقييمات (RTL مثل المحلات) */
   grid-template-columns:minmax(300px,360px) minmax(0,1fr);
   grid-template-areas:"side main";
 }
 .main-wrap > aside#info-section{grid-area:side}
-.main-wrap > .office-main{grid-area:main;min-width:0}
+.main-wrap > .office-main{grid-area:main;min-width:0;display:flex;flex-direction:column;gap:0}
 
 /* ════════ SECTION ════════ */
 .section-head{display:flex;align-items:center;gap:12px;margin-bottom:24px}
@@ -395,9 +395,9 @@ body.rizq-empty-office .rating-inline{display:none!important}
 /* Request form — الحقول ظاهرة دائماً (لا طيّ) */
 .req-box{margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(14,116,144,.04),rgba(201,168,76,.04));border-radius:14px;border:1px solid rgba(14,116,144,.18)}
 .req-form{display:none;margin-top:14px}
-.req-form.open{display:block!important;visibility:visible!important}
+.req-form.open{display:grid!important;visibility:visible!important}
 #office-service-desk{
-  margin-top:18px;padding:22px 20px;
+  margin-top:0;padding:22px 20px;
   background:linear-gradient(145deg,rgba(15,35,71,.04),rgba(201,168,76,.1));
   border:1.5px solid rgba(201,168,76,.35);
   border-radius:16px;
@@ -410,6 +410,103 @@ body.rizq-empty-office .rating-inline{display:none!important}
 }
 #office-service-desk #req-title{font-size:16px;font-weight:900;color:#0F2347;margin-bottom:6px}
 #office-service-desk #req-sub{font-size:13px;color:#4a5568;line-height:1.55;margin-bottom:14px}
+
+/* غرفة الطلبات + التقييمات — شريط أفقي تحت الخدمات بنفس ترتيب المحل */
+.office-under-band{
+  display:grid;
+  grid-template-columns:1.08fr 0.92fr;
+  gap:12px;
+  margin:0 0 20px;
+  align-items:stretch;
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  padding:12px;
+  border-radius:20px;
+  background:
+    radial-gradient(ellipse at 90% 0%, rgba(201,168,76,.07), transparent 42%),
+    linear-gradient(165deg,#ffffff 0%,#f4fafc 100%);
+  border:1px solid rgba(14,116,144,.12);
+  box-shadow:0 12px 40px rgba(15,35,65,.06);
+}
+#office-service-desk.office-desk-hz{
+  margin:0;
+  padding:12px 12px 10px;
+  border-radius:14px;
+  box-shadow:none;
+  border:1px solid rgba(14,116,144,.14);
+  background:#fff;
+  height:100%;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+.office-desk-eyebrow{
+  font-size:9.5px;letter-spacing:1.2px;font-weight:900;color:#C9A84C;margin-bottom:4px
+}
+#office-service-desk.office-desk-hz #req-title{
+  font-size:14px;margin-bottom:4px
+}
+#office-service-desk.office-desk-hz #req-sub{
+  font-size:11.5px;margin:0 0 8px;line-height:1.45
+}
+#office-service-desk.office-desk-hz .desk-step{margin-bottom:8px}
+#office-service-desk.office-desk-hz #desk-wait-hint{
+  font-size:12px!important;padding:10px!important;margin-top:6px!important
+}
+#req-form.office-desk-form{
+  grid-template-columns:1fr 1fr;
+  gap:7px 8px;
+  width:100%;
+  flex:1 1 auto;
+  align-content:start;
+  margin-top:8px;
+}
+.office-desk-field{display:flex;flex-direction:column;gap:2px;min-width:0}
+.office-desk-field .req-field-lbl{font-size:11px;margin:0}
+.office-desk-field .req-input{
+  margin-bottom:0;padding:8px 10px;border-radius:8px;font-size:12.5px;min-height:36px
+}
+.office-desk-span2{grid-column:1/-1}
+.office-desk-actions{
+  grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin-top:2px
+}
+.office-desk-note{
+  font-size:11px;color:#6a7a8a;line-height:1.45;margin:0;flex:1 1 140px;
+  padding:8px 10px;border-radius:8px;background:rgba(14,116,144,.04);border:1px solid rgba(14,116,144,.1)
+}
+#office-service-desk.office-desk-hz #req-submit-btn{
+  flex:0 1 180px;width:auto;padding:10px 12px;border-radius:9px;font-size:12.5px;min-height:38px
+}
+#office-service-desk.office-desk-hz #req-prf-btn{
+  flex:0 1 160px;width:auto;margin-top:0!important;padding:10px 12px;font-size:12px
+}
+#reviews-section.office-reviews-hz{
+  margin:0;
+  padding:12px 12px 10px;
+  background:#fff;
+  border:1px solid rgba(14,116,144,.14);
+  border-radius:14px;
+  box-shadow:none;
+  height:100%;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+#reviews-section.office-reviews-hz .section-head{margin-bottom:10px}
+#reviews-section.office-reviews-hz .section-ttl{font-size:14px}
+#reviews-section #office-reviews-body{flex:1 1 auto;min-width:0}
+@media(max-width:800px){
+  .office-under-band{grid-template-columns:1fr;gap:12px;padding:12px;border-radius:16px}
+  #office-service-desk.office-desk-hz,
+  #reviews-section.office-reviews-hz{padding:12px 10px 10px;border-radius:12px}
+  #req-form.office-desk-form{grid-template-columns:1fr}
+  .office-desk-span2{grid-column:auto}
+  #office-service-desk.office-desk-hz #req-submit-btn,
+  #office-service-desk.office-desk-hz #req-prf-btn{flex:1 1 100%;width:100%}
+}
 .desk-step{
   display:inline-flex;align-items:center;gap:6px;
   font-size:11px;font-weight:900;letter-spacing:.4px;
@@ -895,7 +992,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
 <!-- ════ MAIN ════ -->
 <div class="main-wrap">
 
-  <!-- ── SIDEBAR يمين RTL: الموقع والساعات والتقييمات ── -->
+  <!-- ── SIDEBAR يمين RTL: الموقع والساعات والدفع (التقييمات تحت الخدمات مثل المحل) ── -->
   <aside class="sidebar-sticky" id="info-section">
     <div class="contact-card fade-in">
       <div class="open-badge-new closed" id="open-badge" data-t="open-badge">جارٍ التحقق...</div>
@@ -949,18 +1046,6 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
       </div>
     </div>
 
-    <!-- REVIEWS -->
-    <div class="card fade-in" id="reviews-section">
-      <div class="section-head">
-        <div class="section-bar"></div>
-        <div class="section-ttl" id="reviews-section-ttl" data-t="reviews-section-ttl">آراء الزبائن</div>
-        <span class="section-sub" style="color:var(--teal)" id="reviews-section-sub" data-t="reviews-section-sub"></span>
-      </div>
-      <div id="office-reviews-body">
-        <p style="font-size:13px;color:var(--muted);padding:8px 0" id="office-reviews-empty">لا توجد آراء حتى الآن.</p>
-      </div>
-    </div>
-
     <!-- RIZQ PROMO CARD -->
     <div class="promo-card fade-in">
       <div style="font-size:20px;margin-bottom:8px">🚀</div>
@@ -1011,36 +1096,63 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
           <button type="button" class="rizq-prf-trigger-gold" style="margin-top:8px;width:100%" onclick="issueOfficePrefactureFromCalc()" id="calc-prf-btn" data-t="calc-prf-btn">PREFACTUR · فاتورة قبل</button>
         </div>
       </div>
+    </div>
 
-      <!-- الخطوة 2: بيانات الزبون (تُفتح بعد اختيار الخدمة) -->
-      <div class="req-box" id="office-service-desk">
+    <!-- غرفة الطلبات + التقييمات — أفقيان تحت الخدمات بنفس ترتيب المحل -->
+    <div class="office-under-band" id="office-under-band">
+      <section class="req-box office-desk-hz" id="office-service-desk" aria-label="غرفة الطلبات">
         <div class="desk-step" id="desk-step-lbl" data-t="desk-step-lbl">② الخطوة 2 — بياناتك للتواصل</div>
-        <div style="font-size:10px;letter-spacing:1.5px;font-weight:900;color:#C9A84C;margin-bottom:6px" id="desk-brand-eyebrow" data-t="desk-brand-eyebrow">SERVICE DESK · غرفة الطلبات</div>
+        <div class="office-desk-eyebrow" id="desk-brand-eyebrow" data-t="desk-brand-eyebrow">SERVICE DESK · غرفة الطلبات</div>
         <div id="req-title" data-desk="title" data-t="req-title">📩 طلب خدمة</div>
         <div id="req-sub" data-desk="hint" data-t="req-sub">بعد اختيار الخدمة أعلاه: أدخل اسمك ورقم هاتفك وسنتواصل معك</div>
         <div id="desk-wait-hint" data-t="desk-wait-hint" style="padding:14px 12px;border-radius:12px;background:rgba(27,58,107,.04);border:1px dashed rgba(27,58,107,.2);font-size:13px;color:#4a5568;line-height:1.55;margin-top:10px">
           ⬆️ اختر أولاً <strong>الخدمة</strong> و<strong>الخيار الأساسي/الموسّع</strong> في المقدّر أعلاه — ثم يفتح هنا حقول الاسم والهاتف والإيميل تلقائياً.
         </div>
-        <div class="req-form" id="req-form" style="margin-top:16px">
-          <label class="req-field-lbl" for="rf-name" data-t="rf-lbl-name">الاسم الكامل *</label>
-          <input class="req-input" id="rf-name" name="buyerName" autocomplete="name" placeholder="مثال: أحمد ولد محمد" data-ph="rf-name-ph"/>
-          <label class="req-field-lbl" for="rf-phone" data-t="rf-lbl-phone">رقم الهاتف *</label>
-          <input dir="ltr" class="req-input" id="rf-phone" name="buyerPhone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233" data-ph="rf-phone-ph"/>
-          <label class="req-field-lbl" for="rf-whatsapp" data-t="rf-lbl-whatsapp">واتساب (إن اختلف عن الهاتف)</label>
-          <input dir="ltr" class="req-input" id="rf-whatsapp" name="buyerWhatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر" data-ph="rf-whatsapp-ph"/>
-          <label class="req-field-lbl" for="rf-email" data-t="rf-lbl-email">البريد الإلكتروني (اختياري)</label>
-          <input dir="ltr" class="req-input" id="rf-email" name="buyerEmail" type="email" autocomplete="email" placeholder="name@email.com" data-ph="rf-email"/>
-          <label class="req-field-lbl" for="rf-service" data-t="rf-lbl-service">الخدمة المطلوبة</label>
-          <select class="req-input" id="rf-service" name="service">
-            <option value="" id="rf-svc-opt0" data-t="rf-svc-opt0">اختر الخدمة...</option>
-          </select>
-          <label class="req-field-lbl" for="rf-msg" data-t="rf-lbl-msg">تفاصيل الطلب</label>
-          <textarea class="req-input" id="rf-msg" name="message" placeholder="اكتب باختصار ماذا تحتاج..." style="min-height:80px;resize:vertical" data-ph="rf-msg"></textarea>
-          <div id="rf-docs-hint" data-desk="docs-hint" data-t="rf-docs-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:4px 0 12px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)">📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</div>
-          <button type="button" class="req-btn" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب للمكتب</button>
-          <button type="button" class="rizq-prf-trigger" style="margin-top:8px;width:100%" onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn" data-t="req-prf-btn">PREFACTUR · فاتورة قبل الخدمة</button>
+        <div class="req-form office-desk-form" id="req-form">
+          <div class="office-desk-field">
+            <label class="req-field-lbl" for="rf-name" data-t="rf-lbl-name">الاسم الكامل *</label>
+            <input class="req-input" id="rf-name" name="buyerName" autocomplete="name" placeholder="مثال: أحمد ولد محمد" data-ph="rf-name-ph"/>
+          </div>
+          <div class="office-desk-field">
+            <label class="req-field-lbl" for="rf-phone" data-t="rf-lbl-phone">رقم الهاتف *</label>
+            <input dir="ltr" class="req-input" id="rf-phone" name="buyerPhone" type="tel" autocomplete="tel" placeholder="مثال: 22244112233" data-ph="rf-phone-ph"/>
+          </div>
+          <div class="office-desk-field">
+            <label class="req-field-lbl" for="rf-whatsapp" data-t="rf-lbl-whatsapp">واتساب (إن اختلف)</label>
+            <input dir="ltr" class="req-input" id="rf-whatsapp" name="buyerWhatsapp" type="tel" placeholder="نفس الرقم أو رقم واتساب آخر" data-ph="rf-whatsapp-ph"/>
+          </div>
+          <div class="office-desk-field">
+            <label class="req-field-lbl" for="rf-email" data-t="rf-lbl-email">البريد (اختياري)</label>
+            <input dir="ltr" class="req-input" id="rf-email" name="buyerEmail" type="email" autocomplete="email" placeholder="name@email.com" data-ph="rf-email"/>
+          </div>
+          <div class="office-desk-field office-desk-span2">
+            <label class="req-field-lbl" for="rf-service" data-t="rf-lbl-service">الخدمة المطلوبة</label>
+            <select class="req-input" id="rf-service" name="service">
+              <option value="" id="rf-svc-opt0" data-t="rf-svc-opt0">اختر الخدمة...</option>
+            </select>
+          </div>
+          <div class="office-desk-field office-desk-span2">
+            <label class="req-field-lbl" for="rf-msg" data-t="rf-lbl-msg">تفاصيل الطلب</label>
+            <textarea class="req-input" id="rf-msg" name="message" placeholder="اكتب باختصار ماذا تحتاج..." rows="2" style="resize:vertical" data-ph="rf-msg"></textarea>
+          </div>
+          <div class="office-desk-actions">
+            <div id="rf-docs-hint" class="office-desk-note" data-desk="docs-hint" data-t="rf-docs-hint">📎 الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</div>
+            <button type="button" class="req-btn" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب للمكتب</button>
+            <button type="button" class="rizq-prf-trigger" onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn" data-t="req-prf-btn">PREFACTUR · فاتورة قبل</button>
+          </div>
         </div>
-      </div>
+      </section>
+
+      <section class="office-reviews-hz" id="reviews-section" aria-label="آراء الزبائن">
+        <div class="section-head">
+          <div class="section-bar"></div>
+          <div class="section-ttl" id="reviews-section-ttl" data-t="reviews-section-ttl">آراء الزبائن</div>
+          <span class="section-sub" style="color:var(--teal)" id="reviews-section-sub" data-t="reviews-section-sub"></span>
+        </div>
+        <div id="office-reviews-body">
+          <p style="font-size:13px;color:var(--muted);padding:8px 0" id="office-reviews-empty">لا توجد آراء حتى الآن.</p>
+        </div>
+      </section>
     </div>
 
     <!-- TRUST -->
@@ -1278,7 +1390,7 @@ function openBuyerFieldsStep(opts){
   if(wait) wait.style.display = 'none';
   if(form){
     form.classList.add('open');
-    form.style.display = 'block';
+    form.style.display = 'grid';
   }
   if(desk){
     desk.classList.add('is-active');
@@ -2018,7 +2130,7 @@ function openMaps(){
               ? 'Ouvrez votre page depuis le tableau de bord (Partager / Voir la page) pour afficher votre formulaire personnalisé.'
               : 'افتح صفحتك من الداشبورد ← مشاركة / عرض الصفحة لترى نموذجك بهويتك.';
             var form = document.getElementById('req-form');
-            if(form){ form.style.display = 'block'; form.classList.add('open'); form.classList.remove('collapsed'); }
+            if(form){ form.style.display = 'grid'; form.classList.add('open'); form.classList.remove('collapsed'); }
           }
           var svcs = document.getElementById('svc-list');
           if(svcs) svcs.innerHTML = '<p class="rzq-empty" style="padding:24px;text-align:center;color:#6a7a8a">—</p>';
