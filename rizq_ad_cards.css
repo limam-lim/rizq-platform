@@ -31,15 +31,44 @@
   display:flex!important;
   align-items:center;
   justify-content:center;
+  flex:0 0 26px!important;
   width:100%;
-  height:26px;
-  min-height:26px;
-  max-height:26px;
+  height:26px!important;
+  min-height:26px!important;
+  max-height:26px!important;
   margin:2px 0 4px!important;
-  overflow:hidden;
+  overflow:hidden!important;
   box-sizing:border-box;
+  flex-shrink:0!important;
 }
-.rzq-ad-brand-slot.is-empty{visibility:hidden}
+.rzq-ad-brand-slot.is-empty{
+  visibility:hidden;
+  pointer-events:none;
+}
+/* شبكات الهبوط: مدّ البطاقات لنفس ارتفاع الصف */
+.landing-ads-grid,
+.listings-grid{
+  align-items:stretch!important;
+}
+.cards-track{
+  align-items:stretch!important;
+}
+/* بطاقات الشريط الحي: ارتفاع موحّد صريح (لا يعتمد على محتوى الماركة) */
+#hero-listings .cards-track .ad-card:has(.rzq-adx-media),
+.cards-track .ad-card:has(.rzq-adx-media){
+  height:318px!important;
+  min-height:318px!important;
+  max-height:318px!important;
+  align-self:stretch!important;
+}
+@media (max-width:768px){
+  #hero-listings .cards-track .ad-card:has(.rzq-adx-media),
+  .cards-track .ad-card:has(.rzq-adx-media){
+    height:248px!important;
+    min-height:248px!important;
+    max-height:248px!important;
+  }
+}
 .rzq-ad-brand-slot .rzq-brand-chip{
   max-width:100%;
   font-size:10px!important;
