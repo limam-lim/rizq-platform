@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=30.9"/>
-<link rel="stylesheet" href="rizq_ad_cards.css?v=3.7"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=3.8"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.9"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.3"/>
@@ -2770,8 +2770,9 @@ html[dir="ltr"] .listings-section .section-desc{
   border-color:rgba(201,168,76,.55);box-shadow:0 4px 14px rgba(201,168,76,.28)
 }
 /* بطاقات أصغر — واجهة الإعلانات المميزة */
+.landing-ads-grid{align-items:stretch}
 .landing-ads-grid .listing-card{
-  display:flex;flex-direction:column;min-height:0;border-radius:14px!important
+  display:flex;flex-direction:column;min-height:0;height:100%;border-radius:14px!important
 }
 .landing-ads-grid .l-img{height:96px!important;font-size:34px}
 .landing-ads-grid .l-body{padding:8px 9px 10px!important}
@@ -4139,6 +4140,8 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   display:flex;flex-direction:column;
   width:214px;min-width:214px;max-width:214px;
   flex:0 0 214px;
+  min-height:292px;
+  height:292px;
   background:#ffffff!important;
   border:1.5px solid rgba(201,168,76,.5);
   border-radius:10px;
@@ -4150,6 +4153,12 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   transition:transform .32s cubic-bezier(.23,1,.32,1),box-shadow .32s,border-color .32s;
   cursor:default;
 }
+.rizq-style-card .rizq-style-body{flex:1 1 auto;min-height:0}
+.rizq-style-card .rizq-style-brand-row{
+  min-height:44px;height:44px;margin:0 0 4px;overflow:hidden;
+  display:flex;align-items:center;justify-content:flex-start
+}
+.rizq-style-card .rizq-style-cta{margin-top:auto}
 .rizq-style-card::after{
   content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;
   background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.35) 48%,transparent 62%);
@@ -4382,7 +4391,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_account_route.js?v=23.0"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
 <script src="rizq_ux_polish.js?v=23.1"></script>
-<script src="rizq_ad_cards.js?v=3.10"></script>
+<script src="rizq_ad_cards.js?v=3.11"></script>
 </head>
 <body>
 
@@ -6677,11 +6686,15 @@ function buildCards(){
     const actions = (window.RizqAdCards && typeof RizqAdCards.actionsHtml === 'function')
       ? RizqAdCards.actionsHtml(a, { fr: !isAr })
       : '';
+    const brandSlot = (window.RizqAdCards && typeof RizqAdCards.brandSlotHtml === 'function')
+      ? RizqAdCards.brandSlotHtml(a, { fr: !isAr, size: 18 })
+      : '<div class="rzq-ad-brand-slot is-empty" aria-hidden="true"></div>';
     c.innerHTML=`
       ${media}
       <div class="ad-card-body">
         <div class="ad-cat">${_escCard(d.cat)}</div>
         <div class="ad-title">${_escCard(d.title)}</div>
+        ${brandSlot}
         <div class="ad-footer">
           <span class="ad-loc">${_escCard(d.loc)}</span>
         </div>
@@ -6796,12 +6809,16 @@ function _landingAdCardHtml(a, fr){
   var actions = (window.RizqAdCards && typeof RizqAdCards.actionsHtml === 'function')
     ? RizqAdCards.actionsHtml(a, { fr: !!fr })
     : '';
+  var brandSlot = (window.RizqAdCards && typeof RizqAdCards.brandSlotHtml === 'function')
+    ? RizqAdCards.brandSlotHtml(a, { fr: !!fr, size: 18 })
+    : '<div class="rzq-ad-brand-slot is-empty" aria-hidden="true"></div>';
   return ''
     + '<div class="listing-card' + (pin ? ' pin' : '') + ' fade-in" role="listitem" data-ad-id="' + idAttr + '" data-featured="' + (pin ? '1' : '0') + '" onclick="if(event.target.closest && event.target.closest(\'.rzq-adx-nav,.rzq-adx-fav,.rzq-adx-wa,.rzq-adx-tel,.rzq-adx-actions\')) return; ' + openFn + '">'
     + media
     + '<div class="l-body">'
     +   '<p class="l-cat">' + cat + '</p>'
     +   '<h3 class="l-title">' + title + '</h3>'
+    +   brandSlot
     +   '<span class="l-loc">' + loc + '</span>'
     +   actions
     + '</div></div>';

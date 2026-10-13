@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="rizq_header.css?v=30.9"/>
-  <link rel="stylesheet" href="rizq_ad_cards.css?v=3.7"/>
+  <link rel="stylesheet" href="rizq_ad_cards.css?v=3.8"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.5"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
   <meta charset="UTF-8"/>
@@ -280,8 +280,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;heigh
   cursor:pointer;transition:transform .2s,box-shadow .22s,border-color .2s;
   position:relative;background:#fff;overflow:hidden;
   box-shadow:0 4px 14px rgba(15,31,61,.05);
-  align-self:start;height:auto!important;min-height:min-content;max-height:none;
+  align-self:stretch;height:100%;min-height:0;max-height:none;
 }
+#result-list-body{align-items:stretch}
 .rc:hover{transform:translateY(-3px);box-shadow:0 14px 32px rgba(15,31,61,.12);border-color:rgba(201,168,76,.45)}
 .rc.active{border-color:var(--gold);box-shadow:0 0 0 2px rgba(201,168,76,.28),0 12px 28px rgba(15,31,61,.1)}
 .rc-thumb{
@@ -1289,7 +1290,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_terms_gate.js"></script>
 <script src="rizq_auth_gate.js?v=19.3" defer></script>
 <script src="rizq_ux_polish.js?v=17.0"></script>
-<script src="rizq_ad_cards.js?v=3.9"></script>
+<script src="rizq_ad_cards.js?v=3.11"></script>
 <script src="rizq_categories_config.js?v=20"></script>
 <script src="rizq_brands_catalog.js?v=5"></script>
 <style>
@@ -2503,7 +2504,11 @@ function _adCardHtml(a, fr){
     <div class="rc-body">
       ${catLabel?`<div class="rc-cat">${catLabel}</div>`:''}
       <div class="rc-title">${escapeHtml(_title)}</div>
-      ${(a.brandId && window.RizqBrands)?`<div class="rc-brand" style="margin:4px 0 6px">${RizqBrands.chipHtml(a.brandId,{fr:!!fr,modelId:a.modelId,size:20})}</div>`:''}
+      ${(window.RizqAdCards&&typeof RizqAdCards.brandSlotHtml==='function')
+        ? RizqAdCards.brandSlotHtml(a,{fr:!!fr,size:18})
+        : ((a.brandId && window.RizqBrands)
+          ? `<div class="rzq-ad-brand-slot has-brand">${RizqBrands.chipHtml(a.brandId,{fr:!!fr,modelId:a.modelId,size:18})}</div>`
+          : `<div class="rzq-ad-brand-slot is-empty" aria-hidden="true"></div>`)}
       <div class="rc-meta">
         <span class="rc-loc">${escapeHtml(_loc)}</span>
         ${/* شارة مميّز على الصورة (rzq-adx-badge) — لا تُكرر بجانب أزرار الاتصال */''}

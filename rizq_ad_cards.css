@@ -8,13 +8,16 @@
   --rzq-adx-ink:#0a1424;
 }
 
-/* ── بطاقة شبه مربّعة (أقصر عمودياً) ── */
+/* ── بطاقة شبه مربّعة — نفس القياس دائماً ── */
 .ad-card:has(.rzq-adx-media),
 .listing-card:has(.rzq-adx-media),
 .rc:has(.rzq-adx-media){
   display:flex!important;
   flex-direction:column!important;
-  overflow:visible!important;
+  align-self:stretch!important;
+  height:100%!important;
+  min-height:100%;
+  overflow:hidden!important;
   border:1px solid rgba(201,168,76,.42)!important;
   background:
     linear-gradient(165deg,rgba(201,168,76,.1),transparent 32%),
@@ -23,6 +26,29 @@
     0 10px 28px rgba(0,0,0,.32),
     inset 0 1px 0 rgba(255,255,255,.07)!important;
 }
+/* صف الماركة — ارتفاع ثابت حتى لو فارغ (يمنع تفاوت البطاقات) */
+.rzq-ad-brand-slot{
+  display:flex!important;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  height:26px;
+  min-height:26px;
+  max-height:26px;
+  margin:2px 0 4px!important;
+  overflow:hidden;
+  box-sizing:border-box;
+}
+.rzq-ad-brand-slot.is-empty{visibility:hidden}
+.rzq-ad-brand-slot .rzq-brand-chip{
+  max-width:100%;
+  font-size:10px!important;
+  padding:2px 6px 2px 3px!important;
+  background:rgba(255,255,255,.1)!important;
+  border-color:rgba(201,168,76,.35)!important;
+  color:#fff!important;
+}
+.rzq-ad-brand-slot .rzq-brand-chip-name{color:#fff!important}
 /* إلغاء قيود الشبكة القديمة — صورة أقصر قليلاً لبطاقة أقرب للمربع */
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .l-img.rzq-adx-media,
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .rzq-adx-media{
@@ -255,7 +281,7 @@
 .ad-card:has(.rzq-adx-media) .ad-card-body,
 .listing-card:has(.rzq-adx-media) .l-body,
 .rc:has(.rzq-adx-media) .rc-body{
-  flex:0 0 auto;
+  flex:1 1 auto;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -265,6 +291,17 @@
   position:relative;
   z-index:1;
   background:transparent!important;
+  min-height:0;
+}
+.ad-card:has(.rzq-adx-media) .ad-title,
+.listing-card:has(.rzq-adx-media) .l-title,
+.rc:has(.rzq-adx-media) .rc-title{
+  min-height:calc(1.25em * 2);
+}
+.ad-card:has(.rzq-adx-media) .rzq-adx-actions,
+.listing-card:has(.rzq-adx-media) .rzq-adx-actions,
+.rc:has(.rzq-adx-media) .rzq-adx-actions{
+  margin-top:auto!important;
 }
 
 .ad-card:has(.rzq-adx-media) .ad-cat,
@@ -307,10 +344,17 @@
   justify-content:center;
   gap:3px;
   width:100%;
+  min-height:16px;
   font-size:9px!important;
   font-weight:600!important;
   color:rgba(255,255,255,.72)!important;
   margin:0 0 6px!important;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ad-card:has(.rzq-adx-media) .ad-footer,
+.rc:has(.rzq-adx-media) .rc-meta{
+  min-height:16px;
+  width:100%;
 }
 .ad-card:has(.rzq-adx-media) .ad-loc::before,
 .listing-card:has(.rzq-adx-media) .l-loc::before,
