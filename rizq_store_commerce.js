@@ -493,14 +493,16 @@
     var name = String(opts.name || '').trim();
     var kind = String(opts.kind || 'store');
     var fr = !!opts.fr;
-    var emoji = opts.emoji || (kind === 'corp' || kind === 'showroom' ? '🏛️' : '🏪');
+    var emoji = opts.emoji || (kind === 'corp' || kind === 'showroom' ? '🏛️' : (kind === 'office' ? '🛡️' : '🏪'));
     setLogo(el, circle, emoji);
     el.classList.toggle('is-storefront', !!facade);
     el.setAttribute('role', facade ? 'button' : 'img');
     el.tabIndex = facade ? 0 : -1;
     var tip = fr
-      ? (kind === 'corp' || kind === 'showroom' ? 'Voir la vitrine du showroom' : 'Voir la façade de la boutique')
-      : (kind === 'corp' || kind === 'showroom' ? 'عرض واجهة المعرض' : 'عرض واجهة المحل');
+      ? (kind === 'corp' || kind === 'showroom' ? 'Voir la vitrine du showroom'
+        : (kind === 'office' ? 'Voir la façade du bureau' : 'Voir la façade de la boutique'))
+      : (kind === 'corp' || kind === 'showroom' ? 'عرض واجهة المعرض'
+        : (kind === 'office' ? 'عرض واجهة المكتب' : 'عرض واجهة المحل'));
     if (facade) {
       el.title = tip;
       el.setAttribute('aria-label', tip + (name ? ' — ' + name : ''));
@@ -523,8 +525,10 @@
       }
       if (cap) {
         var label = data.fr
-          ? ((data.kind === 'corp' || data.kind === 'showroom') ? 'Vitrine du showroom' : 'Façade de la boutique')
-          : ((data.kind === 'corp' || data.kind === 'showroom') ? 'واجهة المعرض' : 'واجهة المحل');
+          ? ((data.kind === 'corp' || data.kind === 'showroom') ? 'Vitrine du showroom'
+            : (data.kind === 'office' ? 'Façade du bureau' : 'Façade de la boutique'))
+          : ((data.kind === 'corp' || data.kind === 'showroom') ? 'واجهة المعرض'
+            : (data.kind === 'office' ? 'واجهة المكتب' : 'واجهة المحل'));
         cap.textContent = data.name ? (label + ' — ' + data.name) : label;
       }
       box.classList.add('is-open');
@@ -546,8 +550,8 @@
   }
 
   /**
-   * خلفية هيرو المحل/المعرض = غلاف مخصّص (cover) من الداشبورد.
-   * يُفضَّل cover؛ يمكن تمرير cover || thumb من الصفحة حتى لا يظهر الكحلي الفارغ.
+   * خلفية هيرو المحل/المكتب/المعرض = غلاف مخصّص (cover) من الداشبورد.
+   * يُفضَّل cover؛ يمكن تمرير cover || thumb حتى لا يظهر الكحلي الفارغ.
    */
   function setHeroPhoto(heroEl, cover) {
     if (!heroEl) return false;
@@ -592,9 +596,11 @@
       var sid = '';
       try{
         var q = new URLSearchParams(location.search);
-        sid = q.get('id') || q.get('store') || '';
+        sid = q.get('id') || q.get('store') || q.get('office') || q.get('corp') || q.get('showroom') || '';
       }catch(eQ){}
       if(sid && safe && safe.indexOf('data:') !== 0){
+        sessionStorage.setItem('rizq_hero_cover_' + sid, String(safe).slice(0, 2000));
+        /* توافق مع مفتاح الكاش القديم للمحل */
         sessionStorage.setItem('rizq_store_cover_' + sid, String(safe).slice(0, 2000));
       }
     }catch(eCache){}

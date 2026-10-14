@@ -23,6 +23,7 @@
 <link rel="preload" href="rizq_header.js?v=27.0" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>معرض رزق | Showroom Rizq</title>
+<link rel="preload" as="image" href="rizq-assets/demo-heroes/showroom-industrial.jpg"/>
 <style>
 :root{
   --navy:#1B3A6B;--navy2:#0F2347;--gold:#C9A84C;--gold2:#E8C96A;
@@ -62,11 +63,12 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 @media(max-width:768px){.nav-disclaimer{display:none}}
 
 /* ── HERO: واجهة درامية "افتتاح معرض" — قياسات موحّدة للمراكز ── */
-.showroom-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:radial-gradient(ellipse 1200px 700px at 50% -10%,#1B3A6B 0%,#0F2347 45%,#06111C 100%);display:flex;flex-direction:column;justify-content:center}
+.showroom-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:#06111C;display:flex;flex-direction:column;justify-content:center}
+.showroom-hero:not(.has-hero-photo){background:radial-gradient(ellipse 1200px 700px at 50% -10%,#1B3A6B 0%,#0F2347 45%,#06111C 100%)}
 .showroom-hero .hero-photo{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#06111C center/cover no-repeat}
 .showroom-hero .hero-photo img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.06);animation:rzSrHeroKen 22s ease-in-out infinite alternate}
 @keyframes rzSrHeroKen{from{transform:scale(1.06) translate3d(0,0,0)}to{transform:scale(1.12) translate3d(-1.5%,-1%,0)}}
-.showroom-hero .hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,rgba(6,17,28,.88) 0%,rgba(15,35,71,.58) 42%,rgba(6,17,28,.8) 100%)}
+.showroom-hero .hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,rgba(6,17,28,.72) 0%,rgba(15,35,71,.4) 48%,rgba(6,17,28,.62) 100%)}
 .showroom-hero.has-hero-photo{background:#06111C}
 .showroom-hero.has-hero-photo .hero-beams,
 .showroom-hero.has-hero-photo .hero-floor,
@@ -531,6 +533,47 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   <div class="hero-beams"></div>
   <div class="hero-floor"></div>
   <div class="hero-glints"><span></span><span></span><span></span><span></span><span></span></div>
+  <script>
+  /* غلاف مبكر للمعرض — أجهزة منزلية/صناعية (يختلف عن محل الأزياء) */
+  (function(){
+    try{
+      var q = new URLSearchParams(location.search);
+      var id = q.get('id') || q.get('corp') || q.get('showroom') || '';
+      var hero = document.getElementById('showroom-hero');
+      if(!hero) return;
+      var DEMO_COVER = 'rizq-assets/demo-heroes/showroom-industrial.jpg';
+      var cover = '';
+      if(id){
+        var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+        for(var i=0;i<accs.length;i++){
+          var a = accs[i];
+          if(a && a.id === id && (a.type === 'corp' || a.type === 'showroom') && (a.cover || a.thumb)){
+            cover = String(a.cover || a.thumb || '');
+            break;
+          }
+        }
+      }
+      if(!cover){
+        try{ cover = String(sessionStorage.getItem('rizq_hero_cover_' + id) || ''); }catch(eS){}
+      }
+      if(!cover && (!id || id === 'demo-corp-001' || id === 'demo_showroom' || q.get('demo') === '1')){
+        cover = DEMO_COVER;
+      }
+      if(!cover || /javascript:/i.test(cover) || /[\s<>"']/.test(cover)) return;
+      var okAbs = /^(https?:\/\/|\/|\.\/|data:image\/)/i.test(cover);
+      var okRel = /^[A-Za-z0-9_./-]+$/.test(cover) && cover.indexOf('..') < 0;
+      if(!okAbs && !okRel) return;
+      var slot = hero.querySelector('[data-hero-photo]');
+      if(!slot) return;
+      slot.hidden = false;
+      hero.classList.add('has-hero-photo');
+      slot.style.backgroundImage = 'url("' + cover.replace(/\\/g,'\\\\').replace(/"/g,'\\"') + '")';
+      slot.style.backgroundSize = 'cover';
+      slot.style.backgroundPosition = 'center';
+      try{ if(id) sessionStorage.setItem('rizq_hero_cover_' + id, cover.slice(0, 2000)); }catch(eC){}
+    }catch(e){}
+  })();
+  </script>
   <div class="hero-cover">
     <div class="showroom-hero-stage">
       <div class="showroom-profile">
@@ -1076,7 +1119,9 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
     planName: 'سنوية',
     promo_video: 'rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4',
     promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ',
-    cover: 'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?auto=format&fit=crop&w=1600&q=80'
+    /* أجهزة منزلية + صناعية — تختلف عن خلفية محل الأزياء */
+    cover: 'rizq-assets/demo-heroes/showroom-industrial.jpg',
+    thumb: 'rizq-assets/demo-heroes/showroom-appliances.jpg'
   };
   var items = [
     { id: 'SR1', name: 'سيارة SUV 2022', nameFr: 'SUV 2022', cat: 'سيارات', price: '2,850,000 MRU', emoji: '🚗', stock: 2, specs: 'بيانات عرض', featured: true },
@@ -2011,7 +2056,7 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 </style>
 <script src="rizq_video_ads.js"></script>
 <script src="rizq_intro_video.js?v=29.7"></script>
-<script src="rizq_store_commerce.js?v=29.2"></script>
+<script src="rizq_store_commerce.js?v=29.5"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
 <script>
 /* فيديو تعريفي — تركيب أولي + احتياط إن تأخّر applyAccountData */

@@ -11,6 +11,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <link rel="stylesheet" href="rizq-theme.css?v=23.0"/>
+  <link rel="preload" as="image" href="rizq-assets/demo-fashion/demo-daraa-boutique-navy.jpg"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
@@ -192,7 +193,7 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   .store-hero .hero-photo img{animation:none;transform:none}
 }
 @keyframes rzHeroKen{from{transform:scale(1.06) translate3d(0,0,0)}to{transform:scale(1.12) translate3d(-1.5%,-1%,0)}}
-.store-hero .hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,rgba(13,27,42,.88) 0%,rgba(13,27,42,.62) 42%,rgba(13,27,42,.78) 100%)}
+.store-hero .hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,rgba(13,27,42,.72) 0%,rgba(13,27,42,.42) 48%,rgba(13,27,42,.62) 100%)}
 .store-hero.has-hero-photo{background:#0D1B2A}
 .store-hero.has-hero-photo .hero-beams,
 .store-hero.has-hero-photo .hero-floor,
@@ -1200,7 +1201,7 @@ footer{
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=29.4" defer></script>
+  <script src="rizq_store_commerce.js?v=29.5" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.0" defer></script>
   <script src="rizq_auth_gate.js?v=23.0" defer></script>
@@ -1251,13 +1252,14 @@ footer{
   <div class="hero-floor"></div>
   <div class="hero-glints"><span></span><span></span><span></span><span></span><span></span></div>
   <script>
-  /* غلاف مبكر من الكاش — يمنع وميض الخلفية القديمة قبل صورة الغلاف */
+  /* غلاف مبكر من الكاش/المحل النموذجي — يمنع وميض الخلفية الكحلية قبل الصورة */
   (function(){
     try{
       var q = new URLSearchParams(location.search);
       var id = q.get('id') || q.get('store') || '';
       var hero = document.getElementById('store-hero');
       if(!hero) return;
+      var DEMO_COVER = 'rizq-assets/demo-fashion/demo-daraa-boutique-navy.jpg';
       var cover = '';
       if(id){
         var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
@@ -1270,10 +1272,16 @@ footer{
         }
       }
       if(!cover){
-        try{ cover = String(sessionStorage.getItem('rizq_store_cover_' + id) || ''); }catch(eS){}
+        try{ cover = String(sessionStorage.getItem('rizq_hero_cover_' + id) || sessionStorage.getItem('rizq_store_cover_' + id) || ''); }catch(eS){}
+      }
+      /* معاينة المحل بلا غلاف محفوظ → صورة أزياء محلية فورية (بلا انتظار Unsplash) */
+      if(!cover && (!id || id === 'demo_store' || q.get('demo') === '1')){
+        cover = DEMO_COVER;
       }
       if(!cover || /javascript:/i.test(cover) || /[\s<>"']/.test(cover)) return;
-      if(!/^(https?:\/\/|\/|data:image\/)/i.test(cover)) return;
+      var okAbs = /^(https?:\/\/|\/|\.\/|data:image\/)/i.test(cover);
+      var okRel = /^[A-Za-z0-9_./-]+$/.test(cover) && cover.indexOf('..') < 0;
+      if(!okAbs && !okRel) return;
       var slot = hero.querySelector('[data-hero-photo]');
       if(!slot) return;
       slot.hidden = false;
@@ -1281,7 +1289,12 @@ footer{
       slot.style.backgroundImage = 'url("' + cover.replace(/\\/g,'\\\\').replace(/"/g,'\\"') + '")';
       slot.style.backgroundSize = 'cover';
       slot.style.backgroundPosition = 'center';
-      try{ if(id) sessionStorage.setItem('rizq_store_cover_' + id, cover.slice(0, 2000)); }catch(eC){}
+      try{
+        if(id){
+          sessionStorage.setItem('rizq_hero_cover_' + id, cover.slice(0, 2000));
+          sessionStorage.setItem('rizq_store_cover_' + id, cover.slice(0, 2000));
+        }
+      }catch(eC){}
     }catch(e){}
   })();
   </script>
@@ -2306,9 +2319,9 @@ function rizqShare(title, url) {
         /* تعريفي: بضع ثوانٍ من داشبورد المحل · إضافي: كما كان (يوتيوب) */
         promo_video: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4',
         promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ',
-        /* غلاف هيرو + صورة واجهة — تظهر مباشرة عند فتح المحل */
-        cover: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80',
-        thumb: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=400&q=80'
+        /* غلاف هيرو محلي فوري — يمنع وميض الكحلي قبل اكتمال الشبكة */
+        cover: 'rizq-assets/demo-fashion/demo-daraa-boutique-navy.jpg',
+        thumb: 'rizq-assets/demo-fashion/demo-daraa-boutique-navy.jpg'
       };
       var products = [
         { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 12, variants: 'S, M, L, XL, XXL', unit: 'قطعة', desc: '' },
