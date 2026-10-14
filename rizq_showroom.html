@@ -98,6 +98,7 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   display:none;position:absolute;z-index:4;inset:0;pointer-events:none
 }
 .showroom-hero.has-hero-videos .hero-videos{display:block}
+.showroom-hero.has-hero-videos .hero-cover{padding:56px 24px 132px}
 .showroom-hero.has-hero-videos .hero-scroll-cue{bottom:8px;opacity:.4}
 .hero-video-card{
   position:absolute;bottom:12px;width:min(210px,28vw);max-width:230px;min-width:0;
@@ -139,6 +140,7 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 @media(max-width:900px){
   .showroom-hero-stage{flex-direction:column;gap:14px}
   .hero-cover{padding:40px 16px 64px}
+  .showroom-hero.has-hero-videos .hero-cover{padding:40px 16px 118px}
   .hero-video-card{width:min(132px,38vw);bottom:8px;border-radius:10px}
   .hero-video-card--intro{right:8px}
   .hero-video-card--extra{left:8px}
@@ -182,7 +184,7 @@ body.rzq-storefront-lb-on{overflow:hidden}
 @media(max-width:640px){
   .showroom-hero{min-height:0!important;height:auto!important}
   .hero-cover{padding:18px 14px 14px!important;min-height:0!important}
-  .showroom-hero.has-hero-videos .hero-cover{padding:18px 14px 88px!important}
+  .showroom-hero.has-hero-videos .hero-cover{padding:18px 14px 100px!important}
   .showroom-hero.has-hero-videos .hero-video-card{width:min(118px,36vw);bottom:6px}
   .showroom-hero.has-hero-videos .hero-video-card--intro{right:6px}
   .showroom-hero.has-hero-videos .hero-video-card--extra{left:6px}

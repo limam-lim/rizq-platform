@@ -67,6 +67,7 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
   display:none;position:absolute;z-index:4;inset:0;pointer-events:none
 }
 .corp-hero.has-hero-videos .hero-videos{display:block}
+.corp-hero.has-hero-videos .hero-cover{padding:56px 24px 132px;min-height:360px}
 .corp-hero .hero-video-card{
   position:absolute;bottom:12px;width:min(210px,28vw);max-width:230px;min-width:0;
   background:rgba(6,17,28,.55);border:1px solid rgba(201,168,76,.4);
@@ -106,12 +107,13 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 }
 @media(max-width:900px){
   .corp-hero .hero-cover{padding:40px 16px 72px;min-height:280px}
+  .corp-hero.has-hero-videos .hero-cover{padding:40px 16px 118px;min-height:300px}
   .corp-hero .hero-video-card{width:min(132px,38vw);bottom:8px;border-radius:10px}
   .corp-hero .hero-video-card--intro{right:8px}
   .corp-hero .hero-video-card--extra{left:8px}
 }
 @media(max-width:640px){
-  .corp-hero.has-hero-videos .hero-cover{padding:18px 14px 88px!important;min-height:0!important}
+  .corp-hero.has-hero-videos .hero-cover{padding:18px 14px 100px!important;min-height:0!important}
   .corp-hero .hero-video-card{width:min(118px,36vw);bottom:6px}
   .corp-hero .hero-video-card--intro{right:6px}
   .corp-hero .hero-video-card--extra{left:6px}

@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=30.9"/>
-<link rel="stylesheet" href="rizq_ad_cards.css?v=4.1"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.9"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.3"/>
@@ -2777,7 +2777,12 @@ html[dir="ltr"] .listings-section .section-desc{
 .landing-ads-grid .listing-card{
   display:flex;flex-direction:column;min-height:0;height:100%;border-radius:14px!important
 }
-.landing-ads-grid .l-img{height:96px!important;font-size:34px}
+.landing-ads-grid .l-img:not(.rzq-adx-media){height:96px!important;font-size:34px}
+.landing-ads-grid .listing-card:has(.rzq-adx-media) .l-img.rzq-adx-media{
+  height:auto!important;min-height:210px!important;max-height:none!important;
+  aspect-ratio:3 / 4!important;flex:1 1 70%!important;font-size:inherit!important
+}
+.landing-ads-grid .listing-card:has(.rzq-adx-media) .l-body{padding:4px 7px 6px!important;max-height:108px}
 .landing-ads-grid .l-body{padding:8px 9px 10px!important}
 .landing-ads-grid .l-cat{font-size:9.5px!important;margin-bottom:2px!important}
 .landing-ads-grid .l-title{
@@ -2911,8 +2916,13 @@ html[dir="ltr"] .listings-section .section-desc{
     gap:10px!important;
   }
   .listings-grid .listing-card .l-desc{display:none!important}
-  .listings-grid .listing-card .l-img{height:64px!important;font-size:24px!important}
+  .listings-grid .listing-card .l-img:not(.rzq-adx-media){height:64px!important;font-size:24px!important}
+  .listings-grid .listing-card:has(.rzq-adx-media) .l-img.rzq-adx-media{
+    height:auto!important;min-height:200px!important;max-height:none!important;
+    aspect-ratio:3 / 4!important;flex:1 1 70%!important
+  }
   .listings-grid .listing-card .l-title{font-size:11px!important;-webkit-line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+  .listings-grid .listing-card:has(.rzq-adx-media) .l-body{padding:3px 6px 5px!important;max-height:96px}
   .listings-grid .listing-card .l-body{padding:7px 8px!important}
   .listings-grid .listing-card .lc-hover{display:none!important}
 }
@@ -3024,9 +3034,14 @@ html[dir="ltr"] .listings-section .section-desc{
     position:relative!important;top:auto!important;left:auto!important;right:auto!important;
     z-index:2!important;margin:0!important;width:100%!important;flex:0 0 auto!important;align-self:stretch!important;
   }
-  #hero-listings .cards-track .ad-card-img{
+  #hero-listings .cards-track .ad-card-img:not(.rzq-adx-media){
     height:84px!important;min-height:84px!important;max-height:84px!important;
     aspect-ratio:auto!important;border-radius:12px 12px 0 0!important;
+  }
+  #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .ad-card-img.rzq-adx-media,
+  #hero-listings .cards-track .ad-card-img.rzq-adx-media{
+    height:auto!important;min-height:168px!important;max-height:none!important;
+    aspect-ratio:4 / 5!important;border-radius:12px 12px 0 0!important;
   }
   #hero-listings .cards-track .ad-card-body{padding:6px 7px!important}
   #hero-listings .cards-track .ad-title{font-size:10.5px!important}

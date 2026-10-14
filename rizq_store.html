@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_header.css?v=27.1"/>
-<link rel="stylesheet" href="rizq_ad_cards.css?v=26.8"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
 <link rel="stylesheet" href="rizq_product_detail.css?v=28.5"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.9"/>
 <link rel="preload" href="rizq_header.js?v=27.0" as="script"/>
@@ -217,6 +217,7 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   display:none;position:absolute;z-index:4;inset:0;pointer-events:none
 }
 .store-hero.has-hero-videos .hero-videos{display:block}
+.store-hero.has-hero-videos .hero-cover{padding:56px 24px 132px}
 .store-hero.has-hero-videos .hero-scroll-cue{bottom:8px;opacity:.4}
 .hero-video-card{
   position:absolute;bottom:12px;width:min(210px,28vw);max-width:230px;min-width:0;
@@ -258,6 +259,7 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 @media(max-width:900px){
   .store-hero-stage{flex-direction:column;gap:14px}
   .hero-cover{padding:40px 16px 64px}
+  .store-hero.has-hero-videos .hero-cover{padding:40px 16px 118px}
   .hero-video-card{width:min(132px,38vw);bottom:8px;border-radius:10px}
   .hero-video-card--intro{right:8px}
   .hero-video-card--extra{left:8px}
@@ -299,7 +301,7 @@ body.rzq-storefront-lb-on{overflow:hidden}
 @media(max-width:640px){
   .store-hero{min-height:0!important;height:auto!important}
   .hero-cover{padding:18px 14px 14px!important;min-height:0!important}
-  .store-hero.has-hero-videos .hero-cover{padding:18px 14px 88px!important}
+  .store-hero.has-hero-videos .hero-cover{padding:18px 14px 100px!important}
   .store-hero.has-hero-videos .hero-video-card{width:min(118px,36vw);bottom:6px}
   .store-hero.has-hero-videos .hero-video-card--intro{right:6px}
   .store-hero.has-hero-videos .hero-video-card--extra{left:6px}
