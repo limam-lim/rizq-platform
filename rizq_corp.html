@@ -668,6 +668,14 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
           <input class="req-input" id="rf-service" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
           <label for="rf-msg" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رسالتك</label>
           <textarea class="req-input" id="rf-msg" style="display:block;width:100%;min-height:80px;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;resize:vertical;box-sizing:border-box;background:#fff"></textarea>
+          <div id="rf-doc-upload" data-desk="doc-upload" style="margin:4px 0 12px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px dashed rgba(27,58,107,.22)">
+            <div data-desk="doc-title" style="font-size:12.5px;font-weight:700;color:#1B3A6B;margin-bottom:4px">رفع بيان الدفع (اختياري)</div>
+            <div data-desk="doc-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin-bottom:8px">صورة أو PDF — يُحفظ على المنصة لحماية حقوق الطرفين.</div>
+            <input type="file" id="rf-doc-file" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" multiple hidden />
+            <button type="button" data-desk="doc-pick" id="rf-doc-pick" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;border:1px solid rgba(27,58,107,.25);background:#fff;color:#1B3A6B;font-size:12.5px;font-weight:700;cursor:pointer">📎 اختر صورة أو PDF</button>
+            <div id="rf-doc-list" hidden></div>
+            <div id="rf-doc-error" style="display:none;margin-top:6px;font-size:11.5px;color:#b91c1c"></div>
+          </div>
           <button type="button" id="corp-req-submit" onclick="submitCorpServiceReq()" style="width:100%;padding:13px;border:none;border-radius:11px;background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit">📤 إرسال الطلب</button>
         </div>
       </div>
@@ -1875,7 +1883,7 @@ window._rizqProfile = (function() {
 </script>
 <script src="rizq_intro_video.js?v=29.7"></script>
 <script src="rizq_store_commerce.js?v=2"></script>
-<script src="rizq_service_desk.js?v=1.1"></script>
+<script src="rizq_service_desk.js?v=1.2"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
 <script src="rizq_account_payments.js"></script>
 <script>

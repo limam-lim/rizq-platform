@@ -654,7 +654,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
       <section class="info-card showroom-desk-hz" id="showroom-service-desk" style="border-top:3px solid var(--gold);display:flex!important" aria-label="غرفة الطلبات">
         <div class="showroom-desk-eyebrow" id="sr-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
         <div class="info-card-title" data-desk="title" id="sr-req-title" style="margin-bottom:4px;padding-bottom:0;border-bottom:none">📩 طلب من المعرض</div>
-        <p class="showroom-desk-hint" data-desk="hint" id="sr-req-hint">أدخل اسمك ورقم هاتفك — بياناتك تصل للمعرض مباشرة. الوثائق عبر واتساب أو الإيميل.</p>
+        <p class="showroom-desk-hint" data-desk="hint" id="sr-req-hint">أدخل اسمك ورقم هاتفك — بياناتك تصل للمعرض مباشرة. يمكنك رفع بيان الدفع (صورة أو PDF) على المنصة.</p>
         <div id="sr-req-form" class="showroom-desk-form">
           <div class="showroom-desk-field">
             <label for="rf-name" id="sr-lbl-name">الاسم الكامل *</label>
@@ -681,7 +681,14 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
             <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" rows="2"></textarea>
           </div>
           <div class="showroom-desk-actions">
-            <p class="showroom-desk-note" id="sr-docs-hint">📎 الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
+            <div id="rf-doc-upload" class="showroom-desk-note" data-desk="doc-upload" style="border-style:dashed">
+              <div data-desk="doc-title" style="font-size:12.5px;font-weight:700;color:#1B3A6B;margin-bottom:4px">رفع بيان الدفع (اختياري)</div>
+              <div data-desk="doc-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin-bottom:8px">صورة أو PDF — يُحفظ على المنصة لحماية حقوق الطرفين.</div>
+              <input type="file" id="rf-doc-file" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" multiple hidden />
+              <button type="button" data-desk="doc-pick" id="rf-doc-pick" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;border:1px solid rgba(27,58,107,.25);background:#fff;color:#1B3A6B;font-size:12.5px;font-weight:700;cursor:pointer">📎 اختر صورة أو PDF</button>
+              <div id="rf-doc-list" hidden></div>
+              <div id="rf-doc-error" style="display:none;margin-top:6px;font-size:11.5px;color:#b91c1c"></div>
+            </div>
             <button type="button" id="sr-req-submit" onclick="submitShowroomServiceReq()">📤 إرسال الطلب للمعرض</button>
           </div>
         </div>
@@ -932,7 +939,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 <script src="rizq_auth_gate.js" defer></script>
 <script src="rizq_contact_gate.js" defer></script>
 <script src="rizq_account_payments.js" defer></script>
-  <script src="rizq_service_desk.js?v=1.1" defer></script>
+  <script src="rizq_service_desk.js?v=1.2" defer></script>
 <script src="rizq_packages_config.js" defer></script>
 <script src="rizq_packages_ui.js?v=23.0" defer></script>
 <script src="rizq_i18n_data.js" defer></script>
@@ -1064,7 +1071,7 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
     serviceDesk: {
       enabled: true,
       formTitle: fr ? 'Demande — Showroom Prestige' : 'طلب من معرض بريستيج',
-      formHint: fr ? 'Coordonnées envoyées au showroom. Documents via WhatsApp/e-mail.' : 'بياناتك تصل للمعرض. الوثائق عبر واتساب أو الإيميل.',
+      formHint: fr ? 'Coordonnées envoyées au showroom. Justificatif (image/PDF) sur la plateforme.' : 'بياناتك تصل للمعرض. يمكنك رفع بيان الدفع (صورة أو PDF) على المنصة.',
       docsChannel: 'whatsapp'
     },
     paymentMethods: [
@@ -1899,14 +1906,20 @@ function applyLang(){
   _setTxt('sr-pay-title', '🏦 طرق الدفع', '🏦 Moyens de paiement');
   _setTxt('sr-desk-eyebrow', 'SERVICE DESK · غرفة الطلبات', 'SERVICE DESK · Demandes');
   _setTxt('sr-req-title', '📩 طلب من المعرض', '📩 Demande au showroom');
-  _setTxt('sr-req-hint', 'أدخل اسمك ورقم هاتفك — بياناتك تصل للمعرض مباشرة. الوثائق عبر واتساب أو الإيميل.', 'Entrez votre nom et téléphone — vos données vont au showroom. Documents via WhatsApp ou e-mail.');
+  _setTxt('sr-req-hint', 'أدخل اسمك ورقم هاتفك — بياناتك تصل للمعرض مباشرة. يمكنك رفع بيان الدفع (صورة أو PDF) على المنصة.', 'Entrez votre nom et téléphone — vos données vont au showroom. Joignez un justificatif (image/PDF) sur la plateforme.');
   _setTxt('sr-lbl-name', 'الاسم الكامل *', 'Nom complet *');
   _setTxt('sr-lbl-phone', 'رقم الهاتف *', 'Téléphone *');
   _setTxt('sr-lbl-wa', 'واتساب (إن اختلف)', 'WhatsApp (si différent)');
   _setTxt('sr-lbl-email', 'البريد (اختياري)', 'E-mail (optionnel)');
   _setTxt('sr-lbl-svc', 'المنتج / الموضوع', 'Produit / objet');
   _setTxt('sr-lbl-msg', 'رسالتك للمعرض', 'Votre message');
-  _setTxt('sr-docs-hint', '📎 الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.', '📎 Documents via WhatsApp ou e-mail après l’envoi.');
+  if (window.RizqServiceDesk && typeof RizqServiceDesk.ensureDocUpload === 'function') {
+    RizqServiceDesk.ensureDocUpload(document.getElementById('sr-req-form'));
+  }
+  if (window.RizqServiceDesk && typeof RizqServiceDesk.applyPublicLabels === 'function') {
+    var _srDeskRoot = document.getElementById('showroom-service-desk');
+    RizqServiceDesk.applyPublicLabels(_srDeskRoot, window._rizqShowroomServiceDesk || {}, (window._rizqProfile && window._rizqProfile.name) || '');
+  }
   _setTxt('sr-req-submit', '📤 إرسال الطلب للمعرض', '📤 Envoyer la demande');
   var ph = isFr ? {
     'rf-name':'Ex. : Ahmed Ould Mohamed','rf-phone':'Ex. : 22244112233',

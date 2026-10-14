@@ -853,7 +853,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_contact_gate.js" defer></script>
   <script src="rizq_account_payments.js" defer></script>
-  <script src="rizq_service_desk.js?v=1.1" defer></script>
+  <script src="rizq_service_desk.js?v=1.2" defer></script>
   <script src="rizq_terms_gate.js?v=23.0" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.0" defer></script>
@@ -1121,7 +1121,14 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
             <textarea class="req-input" id="rf-msg" name="message" placeholder="اكتب باختصار ماذا تحتاج..." rows="2" style="resize:vertical" data-ph="rf-msg"></textarea>
           </div>
           <div class="office-desk-actions">
-            <div id="rf-docs-hint" class="office-desk-note" data-desk="docs-hint" data-t="rf-docs-hint">📎 الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</div>
+            <div id="rf-doc-upload" class="office-desk-note" data-desk="doc-upload" style="border-style:dashed">
+              <div data-desk="doc-title" style="font-size:12.5px;font-weight:700;color:#1B3A6B;margin-bottom:4px" data-t="rf-doc-title">رفع بيان الدفع (اختياري)</div>
+              <div data-desk="doc-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin-bottom:8px" data-t="rf-doc-hint">صورة أو PDF — يُحفظ على المنصة لحماية حقوق الطرفين.</div>
+              <input type="file" id="rf-doc-file" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" multiple hidden />
+              <button type="button" data-desk="doc-pick" id="rf-doc-pick" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;border:1px solid rgba(27,58,107,.25);background:#fff;color:#1B3A6B;font-size:12.5px;font-weight:700;cursor:pointer" data-t="rf-doc-pick">📎 اختر صورة أو PDF</button>
+              <div id="rf-doc-list" hidden></div>
+              <div id="rf-doc-error" style="display:none;margin-top:6px;font-size:11.5px;color:#b91c1c"></div>
+            </div>
             <button type="button" class="req-btn" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب للمكتب</button>
             <button type="button" class="rizq-prf-trigger" onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn" data-t="req-prf-btn">PREFACTUR · فاتورة قبل</button>
           </div>
@@ -1981,7 +1988,7 @@ function openMaps(){
           formTitle: isFr() ? 'Demande — Cabinet Al-Adala' : 'طلب استشارة — مكتب العدالة للمحاماة',
           formHint: isFr()
             ? 'Vos données restent confidentielles. Vous pouvez envoyer les documents via WhatsApp ou e-mail après l\'envoi.'
-            : 'بياناتك سرية. يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.',
+            : 'بياناتك سرية. يمكنك رفع بيان الدفع (صورة أو PDF) مباشرة على المنصة.',
           docsChannel: 'whatsapp'
         },
         paymentMethods: [

@@ -321,7 +321,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
 <script src="rizq_seller_onboarding.js"></script>
 <script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
-<script src="rizq_service_desk.js?v=1.1"></script>
+<script src="rizq_service_desk.js?v=1.2"></script>
 <script src="rizq_intro_video.js?v=29.7"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
@@ -492,7 +492,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
         <div class="card-header">
           <div class="card-title" data-t="desk-brand-title">✨ غرفة طلباتي — هويتي</div>
         </div>
-        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px;line-height:1.55" data-t="desk-brand-hint">سمِّ نموذج الطلب باسم معرضك أو شركتك. الزائر يشعر أنه على منصتك — ويمكنه إرسال الوثائق عبر واتساب أو إيميلك بعد الطلب.</p>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px;line-height:1.55" data-t="desk-brand-hint">سمِّ نموذج الطلب باسم معرضك أو شركتك. الزائر يشعر أنه على منصتك — ويمكنه رفع بيان الدفع (صورة أو PDF) مباشرة على المنصة.</p>
         <div class="form-group" style="margin-bottom:10px">
           <label class="form-label" data-t="desk-form-title-lbl">عنوان النموذج (اختياري)</label>
           <input class="form-input" id="desk-form-title" maxlength="120" data-ph="desk-form-title-ph" placeholder="مثال: طلب من معرض …"/>
@@ -1297,7 +1297,7 @@ var DEMO_ACC = {
   serviceDesk: {
     enabled: true,
     formTitle: 'طلب من معرض بريستيج',
-    formHint: 'بياناتك سرية. يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.',
+    formHint: 'بياناتك سرية. يمكنك رفع بيان الدفع (صورة أو PDF) مباشرة على المنصة.',
     docsChannel: 'whatsapp'
   }
 };
@@ -2240,12 +2240,16 @@ function renderCorpServiceRequests(){
       + (r.buyerEmail?'<a href="mailto:'+escapeHtml(r.buyerEmail)+'" style="color:#1B3A6B;font-weight:600">✉️ '+escapeHtml(r.buyerEmail)+'</a>':'')
       + (r.id?'<span style="color:#9aa5b8;font-family:monospace">'+escapeHtml(r.id)+'</span>':'')
       + '</div>'
+      + (window.RizqServiceDesk && typeof RizqServiceDesk.attachmentsHtml==='function' ? RizqServiceDesk.attachmentsHtml(r) : '')
       + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">'
       + '<button type="button" onclick="_rizqSetServiceReqStatus(\''+escapeHtml(r.id)+'\',\'in_progress\')" style="padding:6px 10px;border:none;border-radius:8px;background:#fef3c7;color:#92400e;font-size:11.5px;font-weight:700;cursor:pointer">'+_t2('قيد المعالجة','En cours')+'</button>'
       + '<button type="button" onclick="_rizqSetServiceReqStatus(\''+escapeHtml(r.id)+'\',\'done\')" style="padding:6px 10px;border:none;border-radius:8px;background:#d1fae5;color:#065f46;font-size:11.5px;font-weight:700;cursor:pointer">'+_t2('منجز','Terminé')+'</button>'
       + '<button type="button" onclick="_rizqSetServiceReqStatus(\''+escapeHtml(r.id)+'\',\'rejected\')" style="padding:6px 10px;border:none;border-radius:8px;background:#fee2e2;color:#991b1b;font-size:11.5px;font-weight:700;cursor:pointer">'+_t2('رفض','Refuser')+'</button>'
       + '</div></div>';
   }).join('');
+  if(window.RizqServiceDesk && typeof RizqServiceDesk.bindAttachmentButtons==='function'){
+    RizqServiceDesk.bindAttachmentButtons(el, function(){ return window.REAL_ACCESS_TOKEN || SESSION_TOKEN; });
+  }
 }
 
 function _rizqMergeServiceRequests(){
