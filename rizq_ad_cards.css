@@ -53,20 +53,20 @@
 .cards-track{
   align-items:stretch!important;
 }
-/* بطاقات الشريط الحي: ارتفاع موحّد — الصورة تأخذ الحصة الأكبر */
+/* بطاقات الشريط الحي: ارتفاع موحّد — الصورة هي البطل بهدوء */
 #hero-listings .cards-track .ad-card:has(.rzq-adx-media),
 .cards-track .ad-card:has(.rzq-adx-media){
-  height:348px!important;
-  min-height:348px!important;
-  max-height:348px!important;
+  height:368px!important;
+  min-height:368px!important;
+  max-height:368px!important;
   align-self:stretch!important;
 }
 @media (max-width:768px){
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media),
   .cards-track .ad-card:has(.rzq-adx-media){
-    height:300px!important;
-    min-height:300px!important;
-    max-height:300px!important;
+    height:318px!important;
+    min-height:318px!important;
+    max-height:318px!important;
   }
 }
 .rzq-ad-brand-slot .rzq-brand-chip{
@@ -82,16 +82,17 @@
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .l-img.rzq-adx-media,
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .rzq-adx-media{
   height:auto!important;
-  min-height:148px!important;
-  aspect-ratio:1 / 1.08!important;
+  min-height:168px!important;
+  aspect-ratio:4 / 5!important;
   font-size:inherit!important;
 }
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .l-body{
-  padding:7px 7px 7px!important;
+  padding:6px 8px 8px!important;
 }
 .listings-grid .listing-card:has(.rzq-adx-media) .l-img.rzq-adx-media{
   height:auto!important;
-  min-height:140px!important;
+  min-height:160px!important;
+  aspect-ratio:4 / 5!important;
 }
 .ad-card:has(.rzq-adx-media){
   width:200px;
@@ -124,23 +125,23 @@
 .ad-card-img.rzq-adx-media{
   height:auto;
   flex:1 1 auto;
-  aspect-ratio:1 / 1.08;
-  min-height:150px;
+  aspect-ratio:4 / 5;
+  min-height:176px;
   border-radius:13px 13px 0 0;
 }
 .listing-card .rzq-adx-media,
 .l-img.rzq-adx-media{
   height:auto!important;
-  aspect-ratio:1 / 1.08;
-  min-height:142px;
+  aspect-ratio:4 / 5;
+  min-height:160px;
   border-radius:13px 13px 0 0!important;
 }
 .rc .rzq-adx-media,
 .rc-thumb.rzq-adx-media{
   width:100%!important;
   height:auto!important;
-  min-height:140px;
-  aspect-ratio:1 / 1.08!important;
+  min-height:156px;
+  aspect-ratio:4 / 5!important;
   border-radius:13px 13px 0 0!important;
 }
 
@@ -159,17 +160,16 @@
 }
 .rzq-adx-slide img{
   width:100%;height:100%;object-fit:cover;object-position:center;
-  display:block;filter:saturate(1.06) contrast(1.04);
+  display:block;filter:saturate(1.04) contrast(1.03) brightness(1.02);
 }
 .rzq-adx-emoji{
-  font-size:40px;line-height:1;
-  filter:drop-shadow(0 4px 12px rgba(0,0,0,.35));
-  /* ارفع الأيقونة قليلاً حتى تغطيها شارة السعر من الأسفل */
-  transform:translateY(-10px);
+  font-size:44px;line-height:1;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,.3));
+  transform:translateY(-8px);
 }
 .rzq-adx-grad{
-  position:absolute;inset:auto 0 0 0;height:28%;z-index:2;pointer-events:none;
-  background:linear-gradient(to top,rgba(7,17,31,.55) 0%,rgba(7,17,31,.14) 55%,transparent 100%);
+  position:absolute;inset:auto 0 0 0;height:22%;z-index:2;pointer-events:none;
+  background:linear-gradient(to top,rgba(7,17,31,.42) 0%,rgba(7,17,31,.1) 55%,transparent 100%);
 }
 
 /* أسهم الكاروسيل — دوائر داكنة رقيقة */
@@ -329,7 +329,7 @@
   align-items:center;
   text-align:center;
   gap:0;
-  padding:7px 7px 7px!important;
+  padding:6px 8px 8px!important;
   position:relative;
   z-index:1;
   background:transparent!important;
