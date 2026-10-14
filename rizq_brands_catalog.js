@@ -572,12 +572,14 @@
     },
     {
       id: 'samsung', nameAr: 'سامسونج', nameFr: 'Samsung', sector: 'electronics',
-      categories: ['إلكترونيات'], color: '#1428A0', letter: 'S',
+      categories: ['إلكترونيات', 'معدات-منزل'], color: '#1428A0', letter: 'S',
       aliases: ['samsung', 'سامسونج'],
       models: [
         M('galaxy-s24', 'Galaxy S24', 'Galaxy S24'), M('galaxy-s23', 'Galaxy S23', 'Galaxy S23'),
         M('galaxy-a', 'Galaxy A', 'Galaxy A'), M('galaxy-tab', 'Galaxy Tab', 'Galaxy Tab'),
-        M('galaxy-watch', 'Galaxy Watch', 'Galaxy Watch'), M('buds', 'Buds', 'Buds')
+        M('galaxy-watch', 'Galaxy Watch', 'Galaxy Watch'), M('buds', 'Buds', 'Buds'),
+        M('fridge', 'ثلاجة', 'Réfrigérateur'), M('washer', 'غسالة', 'Lave-linge'),
+        M('ac', 'مكيف', 'Climatiseur')
       ]
     },
     {
@@ -641,10 +643,12 @@
     },
     {
       id: 'lg', nameAr: 'إل جي', nameFr: 'LG', sector: 'electronics',
-      categories: ['إلكترونيات'], color: '#A50034', letter: 'LG',
+      categories: ['إلكترونيات', 'معدات-منزل'], color: '#A50034', letter: 'LG',
       aliases: ['lg', 'إل جي', 'ال جي'],
       models: [
-        M('oled', 'OLED', 'OLED'), M('gram', 'جرام', 'Gram'), M('soundbar', 'ساوند بار', 'Soundbar')
+        M('oled', 'OLED', 'OLED'), M('gram', 'جرام', 'Gram'), M('soundbar', 'ساوند بار', 'Soundbar'),
+        M('fridge', 'ثلاجة', 'Réfrigérateur'), M('washer', 'غسالة', 'Lave-linge'),
+        M('ac', 'مكيف', 'Climatiseur')
       ]
     },
     {
@@ -709,6 +713,107 @@
       aliases: ['itel', 'ايتل', 'أيتل'],
       models: [
         M('a-series', 'سلسلة A', 'A Series'), M('p-series', 'سلسلة P', 'P Series'), M('s-series', 'سلسلة S', 'S Series')
+      ]
+    },
+
+    /* ── معدات منزل / كهربائية منزلية ── */
+    {
+      id: 'bosch', nameAr: 'بوش', nameFr: 'Bosch', sector: 'appliances',
+      categories: ['معدات-منزل'], color: '#E20015', letter: 'BO',
+      aliases: ['bosch', 'بوش'],
+      models: [
+        M('fridge', 'ثلاجة', 'Réfrigérateur'), M('washer', 'غسالة', 'Lave-linge'),
+        M('oven', 'فرن', 'Four'), M('dishwasher', 'غسالة صحون', 'Lave-vaisselle')
+      ]
+    },
+    {
+      id: 'whirlpool', nameAr: 'ويرلبول', nameFr: 'Whirlpool', sector: 'appliances',
+      categories: ['معدات-منزل'], color: '#111111', letter: 'WH',
+      aliases: ['whirlpool', 'ويرلبول', 'وورلبول'],
+      models: [
+        M('fridge', 'ثلاجة', 'Réfrigérateur'), M('washer', 'غسالة', 'Lave-linge'),
+        M('dryer', 'مجفف', 'Sèche-linge'), M('microwave', 'مايكروويف', 'Micro-ondes')
+      ]
+    },
+    {
+      id: 'midea', nameAr: 'ميديا', nameFr: 'Midea', sector: 'appliances',
+      categories: ['معدات-منزل'], color: '#0055A5', letter: 'MD',
+      aliases: ['midea', 'ميديا'],
+      models: [
+        M('ac', 'مكيف', 'Climatiseur'), M('fridge', 'ثلاجة', 'Réfrigérateur'),
+        M('washer', 'غسالة', 'Lave-linge'), M('microwave', 'مايكروويف', 'Micro-ondes')
+      ]
+    },
+    {
+      id: 'beko', nameAr: 'بيكو', nameFr: 'Beko', sector: 'appliances',
+      categories: ['معدات-منزل'], color: '#00ADEF', letter: 'BK',
+      aliases: ['beko', 'بيكو'],
+      models: [
+        M('fridge', 'ثلاجة', 'Réfrigérateur'), M('washer', 'غسالة', 'Lave-linge'),
+        M('oven', 'فرن', 'Four'), M('dishwasher', 'غسالة صحون', 'Lave-vaisselle')
+      ]
+    },
+    {
+      id: 'daikin', nameAr: 'دايكن', nameFr: 'Daikin', sector: 'appliances',
+      categories: ['معدات-منزل'], color: '#00A0E3', letter: 'DK',
+      aliases: ['daikin', 'دايكن', 'دايكين'],
+      models: [
+        M('split', 'سبليت', 'Split'), M('inverter', 'إنفرتر', 'Inverter'),
+        M('cassette', 'كاسيت', 'Cassette')
+      ]
+    },
+    {
+      id: 'hisense', nameAr: 'هايسنس', nameFr: 'Hisense', sector: 'appliances',
+      categories: ['معدات-منزل', 'إلكترونيات'], color: '#00ADEF', letter: 'HS',
+      aliases: ['hisense', 'هايسنس'],
+      models: [
+        M('fridge', 'ثلاجة', 'Réfrigérateur'), M('ac', 'مكيف', 'Climatiseur'),
+        M('tv', 'تلفزيون', 'TV'), M('washer', 'غسالة', 'Lave-linge')
+      ]
+    },
+    {
+      id: 'tcl', nameAr: 'تي سي إل', nameFr: 'TCL', sector: 'appliances',
+      categories: ['معدات-منزل', 'إلكترونيات'], color: '#E50012', letter: 'TC',
+      aliases: ['tcl', 'تي سي إل', 'تى سى ال'],
+      models: [
+        M('tv', 'تلفزيون', 'TV'), M('ac', 'مكيف', 'Climatiseur'),
+        M('fridge', 'ثلاجة', 'Réfrigérateur'), M('washer', 'غسالة', 'Lave-linge')
+      ]
+    },
+    {
+      id: 'philips', nameAr: 'فيليبس', nameFr: 'Philips', sector: 'appliances',
+      categories: ['معدات-منزل', 'صحة'], color: '#0B5ED7', letter: 'PH',
+      aliases: ['philips', 'فيليبس', 'فيلبس'],
+      models: [
+        M('iron', 'مكواة', 'Fer'), M('blender', 'خلاط', 'Mixeur'),
+        M('care', 'عناية', 'Soin'), M('airfryer', 'قلاية هوائية', 'Airfryer')
+      ]
+    },
+    {
+      id: 'moulinex', nameAr: 'مولينكس', nameFr: 'Moulinex', sector: 'appliances',
+      categories: ['معدات-منزل'], color: '#E30613', letter: 'MX',
+      aliases: ['moulinex', 'مولينكس'],
+      models: [
+        M('blender', 'خلاط', 'Mixeur'), M('processor', 'محضّر', 'Robot'),
+        M('cooker', 'طباخ', 'Cuiseur'), M('coffee', 'قهوة', 'Café')
+      ]
+    },
+    {
+      id: 'dyson', nameAr: 'دايسون', nameFr: 'Dyson', sector: 'appliances',
+      categories: ['معدات-منزل'], color: '#111111', letter: 'DY',
+      aliases: ['dyson', 'دايسون'],
+      models: [
+        M('vac', 'مكنسة', 'Aspirateur'), M('hair', 'مجفف شعر', 'Sèche-cheveux'),
+        M('purifier', 'منقّي هواء', 'Purificateur')
+      ]
+    },
+    {
+      id: 'sharp', nameAr: 'شارب', nameFr: 'Sharp', sector: 'appliances',
+      categories: ['معدات-منزل', 'إلكترونيات'], color: '#E2001A', letter: 'SH',
+      aliases: ['sharp', 'شارب'],
+      models: [
+        M('fridge', 'ثلاجة', 'Réfrigérateur'), M('ac', 'مكيف', 'Climatiseur'),
+        M('microwave', 'مايكروويف', 'Micro-ondes'), M('tv', 'تلفزيون', 'TV')
       ]
     },
 
