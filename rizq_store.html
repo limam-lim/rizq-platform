@@ -299,6 +299,10 @@ body.rzq-storefront-lb-on{overflow:hidden}
 @media(max-width:640px){
   .store-hero{min-height:0!important;height:auto!important}
   .hero-cover{padding:18px 14px 14px!important;min-height:0!important}
+  .store-hero.has-hero-videos .hero-cover{padding:18px 14px 88px!important}
+  .store-hero.has-hero-videos .hero-video-card{width:min(118px,36vw);bottom:6px}
+  .store-hero.has-hero-videos .hero-video-card--intro{right:6px}
+  .store-hero.has-hero-videos .hero-video-card--extra{left:6px}
   .store-logo-wrap{width:56px;height:56px;font-size:26px}
   .store-name{font-size:18px!important}
   .store-tagline{font-size:12px!important;margin-top:2px!important}
@@ -813,18 +817,17 @@ html[dir="ltr"] .wish-btn{right:auto;left:8px}
 }
 .add-btn:hover{background:var(--gold);color:#0D1B2A;transform:scale(1.1)}
 
-/* ====== MAP PLACEHOLDER ====== */
+/* ====== MAP PLACEHOLDER (معاينة OSM عبر rizq_map_preview.js) ====== */
 .map-placeholder{
-  height:110px;border-radius:12px;
+  height:160px;border-radius:12px;
   background:
     linear-gradient(145deg,rgba(27,58,107,.08),rgba(201,168,76,.1)),
     linear-gradient(135deg,#e8eef8,#dce6f2);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:6px;cursor:pointer;border:1px solid rgba(27,58,107,.12);
+  display:block;cursor:pointer;border:1px solid rgba(27,58,107,.12);
   transition:all .3s;
 }
 .map-placeholder:hover{border-color:rgba(201,168,76,.45);transform:translateY(-1px);box-shadow:0 8px 20px rgba(27,58,107,.1)}
-.map-placeholder .map-icon{font-size:28px}
+.map-placeholder .map-icon{font-size:22px;line-height:1}
 .map-placeholder .map-text{font-size:13px;font-weight:700;color:var(--navy)}
 .map-placeholder .map-addr{font-size:12px;color:#6a7a8a;max-width:90%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
@@ -945,7 +948,7 @@ footer{
   #store-packages .rpkg-card,#store-packages .pricing-card,#store-packages-grid .rizq-pkg-card{
     padding:14px 12px!important;border-radius:12px!important;
   }
-  .map-placeholder{height:130px}
+  .map-placeholder{height:150px}
   .rzq-empty,.products-grid > .rzq-empty{min-height:160px;padding:28px 16px!important}
   .cat-tabs{flex-wrap:wrap;gap:8px;align-items:stretch}
   .cat-tabs-shop{
@@ -1199,6 +1202,7 @@ footer{
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
   <script src="rizq_store_commerce.js?v=29.5" defer></script>
+  <script src="rizq_map_preview.js?v=1.0" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.1" defer></script>
   <script src="rizq_auth_gate.js?v=23.0" defer></script>
@@ -1414,7 +1418,7 @@ footer{
           <div><div class="info-label" data-t="info-label-email">البريد الإلكتروني</div><div class="info-value"><span id="info-value-email-el" class="rzq-contact-masked" onclick="rizqRequireAuth(function(){document.getElementById('info-value-email-el').classList.add('shown')},'reasonGeneric')">—</span></div></div>
         </div>
         <div style="margin-top:14px">
-          <div class="map-placeholder" onclick="openMaps()">
+          <div class="map-placeholder" id="store-map-preview" onclick="openMaps()" role="button" tabindex="0" aria-label="عرض على الخريطة">
             <div class="map-icon">🗺️</div>
             <div class="map-text" data-t="map-text">عرض على الخريطة</div>
             <div class="map-addr" id="map-addr-el">—</div>
@@ -2628,6 +2632,7 @@ function rizqShare(title, url) {
           setText('meta-location-el', '📍 ' + addr);
           setText('info-value-address-el', addr);
           setText('map-addr-el', addr);
+          if(window.RizqMapPreview) RizqMapPreview.paint('#store-map-preview', addr);
         }
 
         // ── بيانات التواصل: تُحمَّل حصرياً عبر Contact Gate (API) ──
@@ -2775,7 +2780,10 @@ function rizqShare(title, url) {
                 if(acc.desc) setText('about-txt', acc.desc);
                 if(acc.name) document.title = acc.name + (fr?' — Rizq':' — رزق');
                 var addr = acc.address || acc.city || '';
-                if(addr){ setText('meta-location-el','📍 '+addr); setText('info-value-address-el', addr); setText('map-addr-el', addr); }
+                if(addr){
+                  setText('meta-location-el','📍 '+addr); setText('info-value-address-el', addr); setText('map-addr-el', addr);
+                  if(window.RizqMapPreview) RizqMapPreview.paint('#store-map-preview', addr);
+                }
                 if(typeof window._rizqApplyStoreVisualIdentity === 'function') window._rizqApplyStoreVisualIdentity(acc);
                 if(typeof mountStorePromoVideo === 'function') mountStorePromoVideo(acc);
                 if(window.RizqStoreCommerce) RizqStoreCommerce.wireStoreLinks(id);
@@ -3272,8 +3280,8 @@ function filterCat(btn, cat){
 function openMaps(){
   var addr = ((document.querySelector('.map-addr') || {}).textContent || '').trim();
   if(!addr || addr === '—') return;
-  var q = encodeURIComponent(addr);
-  window.open('https://www.google.com/maps/search/?api=1&query=' + q, '_blank');
+  if(window.RizqMapPreview){ RizqMapPreview.open(addr); return; }
+  window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addr), '_blank');
 }
 
 /* Show Rizq promo overlay */

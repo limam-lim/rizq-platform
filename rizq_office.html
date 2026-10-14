@@ -249,6 +249,10 @@ a{text-decoration:none;color:inherit}
 @media(max-width:640px){
   .office-hero{min-height:0!important;height:auto!important}
   .office-hero .hero-cover{padding:18px 14px 14px!important;min-height:0!important}
+  .office-hero.has-hero-videos .hero-cover{padding:18px 14px 88px!important}
+  .office-hero.has-hero-videos .hero-video-card{width:min(118px,36vw);bottom:6px}
+  .office-hero.has-hero-videos .hero-video-card--intro{right:6px}
+  .office-hero.has-hero-videos .hero-video-card--extra{left:6px}
   .office-logo{width:56px;height:56px;font-size:26px}
   .office-hero .hero-floor,.office-hero .hero-scroll-cue,.office-hero .hero-glints{display:none!important}
   .office-name,.hero-office-name,#hero-office-name{font-size:18px!important}
@@ -545,8 +549,8 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .about-stat-lbl{font-size:11px;color:var(--muted);margin-top:3px}
 
 /* ════════ MAP + LOCATION INFO (store-like) ════════ */
-.map-placeholder{height:160px;border-radius:14px;background:linear-gradient(135deg,var(--bg2),var(--bg));border:2px dashed rgba(14,116,144,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all .3s}
-.map-placeholder:hover{border-color:rgba(14,116,144,.45);background:rgba(14,116,144,.04);transform:translateY(-2px)}
+.map-placeholder{height:160px;border-radius:14px;background:linear-gradient(135deg,var(--bg2),var(--bg));border:2px solid rgba(14,116,144,.2);display:block;cursor:pointer;transition:all .3s}
+.map-placeholder:hover{border-color:rgba(14,116,144,.45);transform:translateY(-2px)}
 .loc-info-row{
   display:flex!important;flex-direction:row!important;align-items:flex-start!important;justify-content:flex-start!important;gap:10px;
   padding:10px 0;border-bottom:1px solid #f0f3f8;font-size:13px;
@@ -870,6 +874,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
   <script src="rizq_mr_payment_catalog.js?v=1.1" defer></script>
   <script src="rizq_account_payments.js?v=28.3" defer></script>
   <script src="rizq_store_commerce.js?v=29.5" defer></script>
+  <script src="rizq_map_preview.js?v=1.0" defer></script>
   <script src="rizq_service_desk.js?v=1.2" defer></script>
   <script src="rizq_terms_gate.js?v=23.0" defer></script>
   <script src="rizq_pwa.js" defer></script>
@@ -1073,8 +1078,8 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
         </div>
       </div>
       <div style="margin-top:14px">
-        <div class="map-placeholder" onclick="openMaps()">
-          <div style="font-size:40px">🗺️</div>
+        <div class="map-placeholder" id="office-map-preview" onclick="openMaps()" role="button" tabindex="0" aria-label="عرض على الخريطة">
+          <div style="font-size:22px">🗺️</div>
           <div style="font-size:14px;font-weight:700;color:var(--teal)" id="map-addr" data-t="map-addr">—</div>
           <div style="font-size:12px;color:var(--muted)" id="map-hint" data-t="map-hint">انقر لفتح الخريطة</div>
         </div>
@@ -1649,6 +1654,7 @@ function submitReq(){
 function openMaps(){
   var addrEl = document.getElementById('map-addr');
   var address = addrEl ? addrEl.textContent.trim() : 'نواكشوط، موريتانيا';
+  if(window.RizqMapPreview){ RizqMapPreview.open(address); return; }
   window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(address), '_blank', 'noopener');
 }
 
@@ -2280,6 +2286,7 @@ function openMaps(){
           clearMock(['hero-tag1','map-addr','contact-info-addr']);
           setText('hero-tag1', '📍 ' + addr);
           setText('map-addr', addr);
+          if(window.RizqMapPreview) RizqMapPreview.paint('#office-map-preview', addr);
           setText('contact-info-addr', addr);
         }
 
@@ -2497,7 +2504,10 @@ function openMaps(){
                 }
                 if(acc.name) document.title = acc.name + (fr?' — Rizq Office':' — رزق أوفيس');
                 var addr = acc.address || acc.city || '';
-                if(addr){ setText('hero-tag1','📍 '+addr); setText('map-addr', addr); setText('contact-info-addr', addr); }
+                if(addr){
+                  setText('hero-tag1','📍 '+addr); setText('map-addr', addr); setText('contact-info-addr', addr);
+                  if(window.RizqMapPreview) RizqMapPreview.paint('#office-map-preview', addr);
+                }
                 if(acc.thumb){
                   var logoEl = document.getElementById('hc-logo');
                   if(logoEl){

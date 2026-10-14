@@ -182,6 +182,10 @@ body.rzq-storefront-lb-on{overflow:hidden}
 @media(max-width:640px){
   .showroom-hero{min-height:0!important;height:auto!important}
   .hero-cover{padding:18px 14px 14px!important;min-height:0!important}
+  .showroom-hero.has-hero-videos .hero-cover{padding:18px 14px 88px!important}
+  .showroom-hero.has-hero-videos .hero-video-card{width:min(118px,36vw);bottom:6px}
+  .showroom-hero.has-hero-videos .hero-video-card--intro{right:6px}
+  .showroom-hero.has-hero-videos .hero-video-card--extra{left:6px}
   .showroom-logo{width:56px;height:56px;font-size:26px}
   .hero-floor,.hero-scroll-cue,.hero-glints{display:none!important}
   .showroom-name,#sr-name,.sr-name{font-size:18px!important}
@@ -392,8 +396,8 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 .hours-day{color:#5a6472;font-weight:600}
 .hours-time{color:var(--navy);font-weight:700}
 .hours-closed{color:var(--red)}
-.map-placeholder{background:#faf6ec;border-radius:10px;padding:14px;text-align:center;cursor:pointer;border:1px solid #ece3d1;transition:background .2s}
-.map-placeholder:hover{background:#f5eddb}
+.map-placeholder{height:150px;background:#faf6ec;border-radius:10px;text-align:center;cursor:pointer;border:1px solid #ece3d1;transition:background .2s;display:block;overflow:hidden}
+.map-placeholder:hover{border-color:#d4c4a0}
 .map-icon{font-size:28px;margin-bottom:6px}
 .map-text{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:2px}
 .map-addr{font-size:11px;color:#8a8474}
@@ -795,7 +799,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
           </div>
         </div>
         <div style="margin-top:14px">
-          <div class="map-placeholder" onclick="openMaps()">
+          <div class="map-placeholder" id="showroom-map-preview" onclick="openMaps()" role="button" tabindex="0" aria-label="عرض على الخريطة">
             <div class="map-icon">🗺️</div>
             <div class="map-text" id="map-text-lbl">عرض على الخريطة</div>
             <div class="map-addr" id="info-city-lbl">نواكشوط، موريتانيا</div>
@@ -1749,7 +1753,9 @@ function _copyFallback(text){
 
 /* ── Maps ── */
 function openMaps(){
-  var city = document.getElementById('showroom-city').textContent || 'Nouakchott Mauritanie';
+  var cityEl = document.getElementById('info-city-lbl') || document.getElementById('showroom-city');
+  var city = (cityEl && cityEl.textContent) || 'Nouakchott Mauritanie';
+  if(window.RizqMapPreview){ RizqMapPreview.open(city); return; }
   window.open('https://maps.google.com/?q='+encodeURIComponent(city),'_blank');
 }
 
@@ -2069,6 +2075,7 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 <script src="rizq_video_ads.js"></script>
 <script src="rizq_intro_video.js?v=29.9"></script>
 <script src="rizq_store_commerce.js?v=29.5"></script>
+<script src="rizq_map_preview.js?v=1.0"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
 <script>
 /* فيديو تعريفي — تركيب أولي + احتياط إن تأخّر applyAccountData */
