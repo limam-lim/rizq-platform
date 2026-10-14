@@ -5,7 +5,7 @@ Local full-bleed hero backgrounds for public demo pages — first paint without 
 | File | Page | Subject |
 |------|------|---------|
 | `store-boutique-promo.jpg` | `rizq_store.html` | Boutique retail (classic promotional shop floor) |
-| `office-lawyer-justice.jpg` | `rizq_office.html` | Lawyer from behind + justice scales emblem |
+| `office-lawyer-justice.jpg` | `rizq_office.html` | Lawyer from behind + scales of justice emblem (no human statue) |
 | `showroom-appliances-promo.jpg` | `rizq_showroom.html` | Large + small home appliances showroom |
 
 Legacy alternates kept: `office-law-interior.jpg`, `showroom-appliances.jpg`, `showroom-industrial.jpg`.
