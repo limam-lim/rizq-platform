@@ -23,6 +23,7 @@
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
 <title data-t-fr="Bureaux — Rizq Office">المكاتب — رزق أوفيس</title>
+<link rel="preload" as="image" href="rizq-assets/demo-heroes/office-lawyer-justice.jpg"/>
 <style>
 :root{
   --navy:#1B3A6B; --navy2:#0F2347; --navy3:#06111C;
@@ -151,7 +152,18 @@ a{text-decoration:none;color:inherit}
 .nav-lang-btn:hover{background:rgba(201,168,76,.15)}
 
 /* ════════ HERO — نفس قياسات المعارض + هوية المكاتب (ثقة / خدمات / تركواز) ════════ */
-.office-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:radial-gradient(ellipse 1200px 700px at 50% -10%,#134e6f 0%,#0F2347 42%,#06111C 100%);display:flex;flex-direction:column;justify-content:center}
+.office-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:#06111C;display:flex;flex-direction:column;justify-content:center}
+.office-hero:not(.has-hero-photo){background:radial-gradient(ellipse 1200px 700px at 50% -10%,#134e6f 0%,#0F2347 42%,#06111C 100%)}
+.office-hero .hero-photo{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#06111C center/cover no-repeat}
+.office-hero .hero-photo img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.04);animation:rzOfHeroKen 28s ease-in-out infinite alternate}
+@keyframes rzOfHeroKen{from{transform:scale(1.02)}to{transform:scale(1.08)}}
+@media (prefers-reduced-motion:reduce){.office-hero .hero-photo img{animation:none;transform:none}}
+.office-hero .hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,rgba(6,17,28,.72) 0%,rgba(15,35,71,.4) 48%,rgba(6,17,28,.62) 100%)}
+.office-hero.has-hero-photo{background:#06111C}
+.office-hero.has-hero-photo .hero-beams,
+.office-hero.has-hero-photo .hero-floor,
+.office-hero.has-hero-photo .hero-glints{display:none}
+.office-hero.has-hero-photo .hero-pattern{opacity:.18}
 .office-hero .hero-beams{position:absolute;inset:0;background:conic-gradient(from 200deg at 50% 0%,transparent 0deg,rgba(14,116,144,.22) 8deg,transparent 20deg,transparent 340deg,rgba(201,168,76,.12) 352deg,transparent 360deg);mix-blend-mode:screen;pointer-events:none}
 .office-hero .hero-pattern{position:absolute;inset:0;background-image:radial-gradient(circle at 15% 30%,rgba(14,116,144,.18) 0%,transparent 50%),radial-gradient(circle at 85% 15%,rgba(201,168,76,.1) 0%,transparent 45%)}
 .office-hero .hero-glints span{position:absolute;width:3px;height:3px;border-radius:50%;background:#67e8f9;box-shadow:0 0 8px 2px rgba(103,232,249,.7);animation:rzOfGlint 3.4s ease-in-out infinite}
@@ -164,7 +176,10 @@ a{text-decoration:none;color:inherit}
 .office-hero .hero-floor{position:absolute;left:0;right:0;bottom:0;height:45%;background-image:linear-gradient(rgba(14,116,144,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(14,116,144,.18) 1px,transparent 1px);background-size:64px 40px;-webkit-mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);transform:perspective(280px) rotateX(58deg);transform-origin:bottom;opacity:.55}
 .office-hero .hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:56px 24px 48px;width:100%;box-sizing:border-box;min-height:inherit}
 .office-profile{display:flex;align-items:center;justify-content:center;gap:20px;max-width:920px;width:auto}
-.office-logo{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(103,232,249,.35),rgba(15,35,71,.55) 70%);border:2px solid rgba(14,116,144,.65);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;box-shadow:0 0 0 6px rgba(14,116,144,.1),0 0 28px rgba(14,116,144,.35),0 8px 20px rgba(0,0,0,.5);animation:rzOfPulse 3s ease-in-out infinite}
+.office-logo{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(103,232,249,.35),rgba(15,35,71,.55) 70%);border:2px solid rgba(14,116,144,.65);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;overflow:hidden;box-shadow:0 0 0 6px rgba(14,116,144,.1),0 0 28px rgba(14,116,144,.35),0 8px 20px rgba(0,0,0,.5);animation:rzOfPulse 3s ease-in-out infinite}
+.office-logo.is-storefront{cursor:pointer;animation:none}
+.office-logo.is-storefront:hover{filter:brightness(1.06)}
+.office-logo img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
 @keyframes rzOfPulse{0%,100%{box-shadow:0 0 0 6px rgba(14,116,144,.1),0 0 28px rgba(14,116,144,.35),0 8px 20px rgba(0,0,0,.5)}50%{box-shadow:0 0 0 11px rgba(14,116,144,.18),0 0 40px rgba(14,116,144,.5),0 8px 20px rgba(0,0,0,.5)}}
 .office-info{flex:0 1 auto;min-width:0;text-align:start}
 .office-eyebrow{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#67e8f9;margin-bottom:8px;display:block}
@@ -182,54 +197,54 @@ a{text-decoration:none;color:inherit}
 .office-hero .hero-scroll-cue{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;color:rgba(103,232,249,.55);font-size:20px;animation:rzOfBounce 2s ease-in-out infinite}
 @keyframes rzOfBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
 .office-type-label{display:none}
-/* فيديوهات الهيرو — نفس موضع/حجم المحلات */
+/* فيديوهات الهيرو — زوايا ثابتة: تعريفي يمين · إضافي يسار */
 .office-hero .hero-videos{
-  display:none;position:absolute;z-index:4;bottom:12px;inset-inline-end:12px;
-  align-items:stretch;gap:10px;max-width:min(560px,72vw);width:auto;pointer-events:auto
+  display:none;position:absolute;z-index:4;inset:0;pointer-events:none
 }
-.office-hero.has-hero-videos .hero-videos{display:flex}
+.office-hero.has-hero-videos .hero-videos{display:block}
 .office-hero.has-hero-videos .hero-scroll-cue{bottom:8px;opacity:.4}
 .office-hero .hero-video-card{
-  position:relative;flex:0 1 250px;min-width:210px;max-width:270px;
+  position:absolute;bottom:12px;width:min(210px,28vw);max-width:230px;min-width:0;
   background:rgba(6,17,28,.55);border:1px solid rgba(103,232,249,.4);
   border-radius:14px;overflow:hidden;backdrop-filter:blur(8px);
-  box-shadow:0 10px 24px rgba(0,0,0,.32);animation:rzOfHeroVidIn .7s ease both
+  box-shadow:0 10px 24px rgba(0,0,0,.32);animation:rzOfHeroVidIn .7s ease both;
+  pointer-events:auto
 }
-.office-hero .hero-video-card:nth-child(2){animation-delay:.12s}
+.office-hero .hero-video-card--intro{right:12px;left:auto}
+.office-hero .hero-video-card--extra{left:12px;right:auto;animation-delay:.12s}
 @keyframes rzOfHeroVidIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .office-hero .hero-video-card .hero-video-mount{min-height:0}
 .office-hero .hero-video-card .rzq-iv-wrap{max-width:100%;width:100%;margin:0}
 .office-hero .hero-video-card .rzq-iv-frame{border-radius:0;aspect-ratio:16/9;min-height:0;width:100%;box-shadow:none;animation:none}
-.office-hero .hero-video-card .rzq-iv-badge,.office-hero .hero-video-card .rzq-iv-src{display:none}
+.office-hero .hero-video-card .rzq-iv-badge,
+.office-hero .hero-video-card .rzq-iv-src,
+.office-hero .hero-video-card .rzq-iv-play-label,
+.office-hero .hero-video-card .rzq-iv-dash-hint,
+.office-hero .hero-video-caption{display:none!important}
 .office-hero .hero-video-card .rzq-iv-play{
-  width:40px!important;height:40px!important;font-size:16px!important;
+  width:36px!important;height:36px!important;font-size:14px!important;
   opacity:.22!important;background:rgba(255,255,255,.16)!important;color:rgba(255,255,255,.9)!important;
   border:1px solid rgba(255,255,255,.28)!important;box-shadow:none!important;
   transition:opacity .22s ease,transform .22s ease,background .2s ease!important
 }
-.office-hero .hero-video-card .rzq-iv-badge,
-.office-hero .hero-video-card .rzq-iv-play-label,
-.office-hero .hero-video-caption{display:none!important}
-.office-hero .hero-video-card .rzq-iv-sound,
-.office-hero .hero-video-card .rzq-iv-dash-hint{
-  opacity:0!important;transition:opacity .22s ease!important;pointer-events:none!important;
-  font-size:10px!important;padding:4px 8px!important;bottom:6px!important;left:6px!important;
-  border-radius:8px!important;max-width:calc(100% - 12px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+.office-hero .hero-video-card .rzq-iv-sound.is-on,
+.office-hero .hero-video-card .rzq-iv-fs.is-on{
+  opacity:.92!important;pointer-events:auto!important;
+  width:30px!important;height:30px!important;padding:0!important;font-size:13px!important;
+  border-radius:50%!important;bottom:6px!important;max-width:none!important;
+  display:inline-flex!important
 }
-.office-hero .hero-video-card:hover .rzq-iv-sound.is-on,
-.office-hero .hero-video-card:focus-within .rzq-iv-sound.is-on{
-  opacity:1!important;pointer-events:auto!important
-}
+.office-hero .hero-video-card .rzq-iv-sound{left:6px!important;right:auto!important}
+.office-hero .hero-video-card .rzq-iv-fs{right:6px!important;left:auto!important}
 .office-hero .hero-video-card:hover .rzq-iv-play,
 .office-hero .hero-video-card:focus-within .rzq-iv-play{
   opacity:.9!important;background:rgba(255,255,255,.28)!important;color:#fff!important
 }
 @media(max-width:900px){
-  .office-hero .hero-videos{
-    position:relative;inset:auto;bottom:auto;margin:6px auto 0;max-width:100%;
-    justify-content:center;padding:0 10px 6px;gap:8px
-  }
-  .office-hero .hero-video-card{flex:1 1 calc(50% - 8px);min-width:140px;max-width:240px}
+  .office-hero .hero-cover{padding:40px 16px 64px}
+  .office-hero .hero-video-card{width:min(132px,38vw);bottom:8px;border-radius:10px}
+  .office-hero .hero-video-card--intro{right:8px}
+  .office-hero .hero-video-card--extra{left:8px}
 }
 @media(max-width:640px){
   .office-hero{min-height:0!important;height:auto!important}
@@ -852,11 +867,13 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
   <script src="rizq_subscription_engine.js" defer></script>
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_contact_gate.js" defer></script>
-  <script src="rizq_account_payments.js" defer></script>
-  <script src="rizq_service_desk.js?v=1.1" defer></script>
+  <script src="rizq_mr_payment_catalog.js?v=1.1" defer></script>
+  <script src="rizq_account_payments.js?v=28.3" defer></script>
+  <script src="rizq_store_commerce.js?v=29.5" defer></script>
+  <script src="rizq_service_desk.js?v=1.2" defer></script>
   <script src="rizq_terms_gate.js?v=23.0" defer></script>
   <script src="rizq_pwa.js" defer></script>
-  <script src="rizq_footer_toggle.js?v=23.0" defer></script>
+  <script src="rizq_footer_toggle.js?v=23.1" defer></script>
   <script src="rizq_auth_gate.js?v=23.0" defer></script>
 </head>
 <body data-t-ns="office">
@@ -878,10 +895,54 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
 
 <!-- ════ HERO — قياسات المعارض + هوية المكاتب ════ -->
 <div class="office-hero" id="office-hero">
+  <div class="hero-photo" data-hero-photo aria-hidden="true" hidden></div>
   <div class="hero-pattern"></div>
   <div class="hero-beams"></div>
   <div class="hero-floor"></div>
   <div class="hero-glints"><span></span><span></span><span></span><span></span><span></span></div>
+  <script>
+  /* غلاف مبكر للمكتب — نفس أسلوب المحل لمنع وميض الخلفية قبل الصورة */
+  (function(){
+    try{
+      var q = new URLSearchParams(location.search);
+      var id = q.get('id') || q.get('office') || '';
+      var hero = document.getElementById('office-hero');
+      if(!hero) return;
+      var DEMO_COVER = 'rizq-assets/demo-heroes/office-lawyer-justice.jpg';
+      var isDemo = !id || id === 'demo_law' || q.get('demo') === '1' || q.get('sample') === 'law';
+      var cover = '';
+      if(isDemo){
+        cover = DEMO_COVER;
+      } else {
+        if(id){
+          var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+          for(var i=0;i<accs.length;i++){
+            var a = accs[i];
+            if(a && a.id === id && a.type === 'office' && (a.cover || a.thumb)){
+              cover = String(a.cover || a.thumb || '');
+              break;
+            }
+          }
+        }
+        if(!cover){
+          try{ cover = String(sessionStorage.getItem('rizq_hero_cover_' + id) || ''); }catch(eS){}
+        }
+      }
+      if(!cover || /javascript:/i.test(cover) || /[\s<>"']/.test(cover)) return;
+      var okAbs = /^(https?:\/\/|\/|\.\/|data:image\/)/i.test(cover);
+      var okRel = /^[A-Za-z0-9_./-]+$/.test(cover) && cover.indexOf('..') < 0;
+      if(!okAbs && !okRel) return;
+      var slot = hero.querySelector('[data-hero-photo]');
+      if(!slot) return;
+      slot.hidden = false;
+      hero.classList.add('has-hero-photo');
+      slot.style.backgroundImage = 'url("' + cover.replace(/\\/g,'\\\\').replace(/"/g,'\\"') + '")';
+      slot.style.backgroundSize = 'cover';
+      slot.style.backgroundPosition = 'center';
+      try{ if(id) sessionStorage.setItem('rizq_hero_cover_' + id, cover.slice(0, 2000)); }catch(eC){}
+    }catch(e){}
+  })();
+  </script>
   <div class="hero-cover">
     <div class="office-profile">
       <div class="office-logo" id="hc-logo">🛡️</div>
@@ -913,10 +974,10 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
     </div>
   </div>
   <div class="hero-videos" id="office-hero-videos" aria-label="فيديوهات المكتب">
-    <div class="hero-video-card" id="office-hero-intro-card" style="display:none">
+    <div class="hero-video-card hero-video-card--intro" id="office-hero-intro-card" style="display:none">
       <div class="hero-video-mount" id="office-hero-intro-video-mount"></div>
     </div>
-    <div class="hero-video-card" id="office-hero-extra-card" style="display:none">
+    <div class="hero-video-card hero-video-card--extra" id="office-hero-extra-card" style="display:none">
       <div class="hero-video-mount" id="office-hero-extra-video-mount"></div>
     </div>
   </div>
@@ -1121,7 +1182,14 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
             <textarea class="req-input" id="rf-msg" name="message" placeholder="اكتب باختصار ماذا تحتاج..." rows="2" style="resize:vertical" data-ph="rf-msg"></textarea>
           </div>
           <div class="office-desk-actions">
-            <div id="rf-docs-hint" class="office-desk-note" data-desk="docs-hint" data-t="rf-docs-hint">📎 الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</div>
+            <div id="rf-doc-upload" class="office-desk-note" data-desk="doc-upload" style="border-style:dashed">
+              <div data-desk="doc-title" style="font-size:12.5px;font-weight:700;color:#1B3A6B;margin-bottom:4px" data-t="rf-doc-title">رفع بيان الدفع (اختياري)</div>
+              <div data-desk="doc-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin-bottom:8px" data-t="rf-doc-hint">صورة أو PDF — يُحفظ على المنصة لحماية حقوق الطرفين.</div>
+              <input type="file" id="rf-doc-file" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" multiple hidden />
+              <button type="button" data-desk="doc-pick" id="rf-doc-pick" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;border:1px solid rgba(27,58,107,.25);background:#fff;color:#1B3A6B;font-size:12.5px;font-weight:700;cursor:pointer" data-t="rf-doc-pick">📎 اختر صورة أو PDF</button>
+              <div id="rf-doc-list" hidden></div>
+              <div id="rf-doc-error" style="display:none;margin-top:6px;font-size:11.5px;color:#b91c1c"></div>
+            </div>
             <button type="button" class="req-btn" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب للمكتب</button>
             <button type="button" class="rizq-prf-trigger" onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn" data-t="req-prf-btn">PREFACTUR · فاتورة قبل</button>
           </div>
@@ -1608,7 +1676,7 @@ function openMaps(){
 })();
 </script>
 
-  <script src="rizq_intro_video.js?v=29.7"></script>
+  <script src="rizq_intro_video.js?v=29.9"></script>
   <script>
   /* فيديو تعريفي + إضافي في ركن الهيرو — نفس موضع المحلات/المعارض */
   window.mountOfficeIntroVideo = function(url, officeId, accHint){
@@ -1637,7 +1705,7 @@ function openMaps(){
         if(extraCard) extraCard.style.display = 'none';
         return;
       }
-      var sig = [id, introUrl, extraUrl, fr ? 'fr' : 'ar', 'hero'].join('|');
+      var sig = [id, introUrl, extraUrl, fr ? 'fr' : 'ar', 'hero-corners-v2'].join('|');
       if (window.__rzqOfficeIntroSig === sig && introMount.querySelector('.rzq-iv-wrap')) {
         if(hero) hero.classList.add('has-hero-videos');
         return;
@@ -1981,7 +2049,7 @@ function openMaps(){
           formTitle: isFr() ? 'Demande — Cabinet Al-Adala' : 'طلب استشارة — مكتب العدالة للمحاماة',
           formHint: isFr()
             ? 'Vos données restent confidentielles. Vous pouvez envoyer les documents via WhatsApp ou e-mail après l\'envoi.'
-            : 'بياناتك سرية. يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.',
+            : 'بياناتك سرية. يمكنك رفع بيان الدفع (صورة أو PDF) مباشرة على المنصة.',
           docsChannel: 'whatsapp'
         },
         paymentMethods: [
@@ -1991,6 +2059,9 @@ function openMaps(){
         /* فيديو تعريفي + إضافي على الهيرو مثل المحلات */
         promo_video: 'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4',
         promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ',
+        /* غلاف هيرو محلي — نفس أسلوب المحل (صورة خلفية + طبقة تغميق) */
+        cover: 'rizq-assets/demo-heroes/office-lawyer-justice.jpg',
+        thumb: 'rizq-assets/demo-heroes/office-lawyer-justice.jpg',
         services: [
           { name: isFr() ? 'Consultation juridique' : 'استشارة قانونية', desc: isFr() ? 'Entretien confidentiel 45 min' : 'جلسة سرية 45 دقيقة', price: 15000, emoji: '⚖️', duration: isFr() ? '45 min' : '45 د' },
           { name: isFr() ? 'Rédaction de contrat' : 'صياغة عقد', desc: isFr() ? 'Contrats civils / commerciaux' : 'عقود مدنية وتجارية', price: 45000, emoji: '📜', duration: isFr() ? '3–5 jours' : '3–5 أيام' },
@@ -2031,10 +2102,22 @@ function openMaps(){
           serviceDesk: acc.serviceDesk, paymentMethods: acc.paymentMethods,
           promo_video: acc.promo_video || '',
           promo_video_extra: acc.promo_video_extra || '',
+          cover: acc.cover || '',
+          thumb: acc.thumb || '',
           _demo: true
         });
         localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
       }catch(e){}
+      try{
+        if(window.RizqStoreCommerce && typeof RizqStoreCommerce.setHeroPhoto === 'function'){
+          RizqStoreCommerce.setHeroPhoto(document.getElementById('office-hero'), acc.cover || acc.thumb || '');
+        }
+        if(window.RizqStoreCommerce && typeof RizqStoreCommerce.wireStorefrontLogo === 'function'){
+          RizqStoreCommerce.wireStorefrontLogo(document.getElementById('hc-logo'), {
+            cover: acc.cover, thumb: acc.thumb, name: acc.name, kind: 'office', fr: isFr(), emoji: '🛡️'
+          });
+        }
+      }catch(eHero){}
       try{
         if(typeof window.mountOfficeIntroVideo === 'function'){
           window.mountOfficeIntroVideo(acc.promo_video || '', id, acc);
@@ -2172,6 +2255,24 @@ function openMaps(){
         setText('hc-type', acc.activity ? ('🏢 ' + acc.activity) : null);
         if(acc.desc){ setText('hero-desc', acc.desc); setText('about-txt', acc.desc); }
         if(acc.name) document.title = acc.name + (isFr() ? ' — Rizq Office' : ' — رزق أوفيس');
+        /* غلاف الهيرو + شعار الواجهة — نفس أسلوب المحل */
+        try{
+          if(window.RizqStoreCommerce && typeof RizqStoreCommerce.setHeroPhoto === 'function'){
+            RizqStoreCommerce.setHeroPhoto(document.getElementById('office-hero'), acc.cover || acc.thumb || '');
+          }
+          if(window.RizqStoreCommerce && typeof RizqStoreCommerce.wireStorefrontLogo === 'function'){
+            RizqStoreCommerce.wireStorefrontLogo(document.getElementById('hc-logo'), {
+              cover: acc.cover, thumb: acc.thumb, name: acc.name, kind: 'office', fr: isFr(), emoji: '🛡️'
+            });
+          } else if(acc.cover || acc.thumb){
+            var logoEl = document.getElementById('hc-logo');
+            var src = acc.cover || acc.thumb;
+            if(logoEl && src && window.RizqStoreCommerce && RizqStoreCommerce.safeMediaUrl){
+              var safe = RizqStoreCommerce.safeMediaUrl(src);
+              if(safe) logoEl.innerHTML = '<img src="'+esc(safe)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"/>';
+            }
+          }
+        }catch(eHeroBind){}
 
         // ── الموقع ──
         var addr = acc.address || acc.city || '';

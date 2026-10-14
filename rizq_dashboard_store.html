@@ -369,9 +369,10 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
 <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_store_topics.js?v=27.0"></script>
 <script src="rizq_store_commerce.js?v=29.0"></script>
-<script src="rizq_intro_video.js?v=29.7"></script>
-<script src="rizq_account_payments.js?v=28.2"></script>
-<script src="rizq_service_desk.js?v=1.0"></script>
+<script src="rizq_intro_video.js?v=29.9"></script>
+<script src="rizq_mr_payment_catalog.js?v=1.1"></script>
+<script src="rizq_account_payments.js?v=28.3"></script>
+<script src="rizq_service_desk.js?v=1.2"></script>
 <script src="rizq_invoice_engine.js"></script>
 
   <script src="rizq_i18n_data.js"></script>
@@ -592,7 +593,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
         <div class="card-header">
           <div class="card-title">✨ غرفة طلباتي — هويتي</div>
         </div>
-        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px;line-height:1.55">سمِّ نموذج الطلب باسم محلك. الزائر يشعر أنه على منصتك — ويمكنه إرسال الوثائق عبر واتساب أو إيميلك بعد الطلب.</p>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px;line-height:1.55">سمِّ نموذج الطلب باسم محلك. الزائر يشعر أنه على منصتك — ويمكنه رفع بيان الدفع (صورة أو PDF) مباشرة على المنصة.</p>
         <div class="form-group" style="margin-bottom:10px">
           <label class="form-label">عنوان النموذج (اختياري)</label>
           <input class="form-input" id="desk-form-title" maxlength="120" placeholder="مثال: طلب خدمة لدى محل …"/>
@@ -983,6 +984,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
           <button onclick="showAddMyPayModal()" style="background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border:none;padding:8px 16px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer" data-t="mypay-add-btn">+ إضافة طريقة دفع</button>
         </div>
         <p style="font-size:13px;color:#2C3A4F;margin-bottom:16px" data-t="mypay-hint">هذه الرموز يراها زبائنك عند تصفح محلك/مكتبك — يستخدمونها لتحويل ثمن مشترياتهم إليك مباشرة.</p>
+        <div id="mr-pay-catalog-ref" style="margin-bottom:14px;padding:12px 14px;border-radius:12px;background:#f8faff;border:1px solid #e0e8f5"></div>
         <div id="my-payment-list"></div>
       </div>
 
@@ -1009,8 +1011,8 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
             </div>
             <div id="mypay-bank-fields">
               <div style="margin-bottom:10px">
-                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-bank-label">اسم البنك / الخدمة</label>
-                <input id="mypay-bank" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;box-sizing:border-box" data-ph="mypay-bank-ph" placeholder="مثال: بنك الصداقة، بنكيلي، سداد..."/>
+                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-bank-label">اسم البنك / المحفظة (كتالوج موريتانيا)</label>
+                <input id="mypay-bank" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;box-sizing:border-box" data-ph="mypay-bank-ph" placeholder="أو اكتب اسماً مخصصاً..."/>
               </div>
               <div style="margin-bottom:10px">
                 <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-code-label">🔢 رمز الدفع (إن وُجد)</label>
@@ -1162,7 +1164,7 @@ const DEMO_ACCOUNT = {
   serviceDesk: {
     enabled: true,
     formTitle: 'طلب خدمة — محل النجمة',
-    formHint: 'بياناتك سرية. يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.',
+    formHint: 'بياناتك سرية. يمكنك رفع بيان الدفع (صورة أو PDF) مباشرة على المنصة.',
     docsChannel: 'whatsapp'
   }
 };
@@ -3046,12 +3048,16 @@ function renderStoreServiceRequests(){
       + (r.buyerEmail?'<a href="mailto:'+escapeHtml(r.buyerEmail)+'" style="color:#1B3A6B;font-weight:600">✉️ '+escapeHtml(r.buyerEmail)+'</a>':'')
       + (r.id?'<span style="color:#9aa5b8;font-family:monospace">'+escapeHtml(r.id)+'</span>':'')
       + '</div>'
+      + (window.RizqServiceDesk && typeof RizqServiceDesk.attachmentsHtml==='function' ? RizqServiceDesk.attachmentsHtml(r) : '')
       + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">'
       + '<button type="button" onclick="_rizqSetServiceReqStatus(\''+escapeHtml(r.id)+'\',\'in_progress\')" style="padding:6px 10px;border:none;border-radius:8px;background:#fef3c7;color:#92400e;font-size:11.5px;font-weight:700;cursor:pointer">'+_t2('قيد المعالجة','En cours')+'</button>'
       + '<button type="button" onclick="_rizqSetServiceReqStatus(\''+escapeHtml(r.id)+'\',\'done\')" style="padding:6px 10px;border:none;border-radius:8px;background:#d1fae5;color:#065f46;font-size:11.5px;font-weight:700;cursor:pointer">'+_t2('منجز','Terminé')+'</button>'
       + '<button type="button" onclick="_rizqSetServiceReqStatus(\''+escapeHtml(r.id)+'\',\'rejected\')" style="padding:6px 10px;border:none;border-radius:8px;background:#fee2e2;color:#991b1b;font-size:11.5px;font-weight:700;cursor:pointer">'+_t2('رفض','Refuser')+'</button>'
       + '</div></div>';
   }).join('');
+  if(window.RizqServiceDesk && typeof RizqServiceDesk.bindAttachmentButtons==='function'){
+    RizqServiceDesk.bindAttachmentButtons(el, function(){ return window.REAL_ACCESS_TOKEN || SESSION_TOKEN; });
+  }
 }
 
 function _rizqMergeServiceRequests(){

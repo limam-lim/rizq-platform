@@ -1,11 +1,21 @@
 /**
  * rizq_service_desk.js — غرفة الطلبات الموحّدة (مكتب / محل / معرض)
  * - نموذج موحّد: اسم كامل، هاتف، واتساب، إيميل، خدمة، رسالة
- * - القالب/العنوان اختياري يسمّيه المشترك
- * - الوثائق عبر واتساب / إيميل واجهة المشترك (بدون رفع ملفات في النموذج)
+ * - رفع بيان دفع اختياري على المنصة (صورة أو PDF) — أثر ثابت لحماية الطرفين
+ * - واتساب/إيميل يبقى قناة تواصل، لا بديل وحيد للوثيقة
  */
 (function (global) {
   'use strict';
+
+  var MAX_DOC_BYTES = 5 * 1024 * 1024;
+  var MAX_DOC_COUNT = 3;
+  var ALLOWED_DOC_TYPES = {
+    'image/jpeg': true,
+    'image/jpg': true,
+    'image/png': true,
+    'image/webp': true,
+    'application/pdf': true,
+  };
 
   function esc(s) {
     return String(s == null ? '' : s)
@@ -34,12 +44,12 @@
 
   function normalizeDesk(desk) {
     desk = desk || {};
-    var ch = String(desk.docsChannel || 'whatsapp').toLowerCase();
+    var ch = String(desk.docsChannel || 'platform').toLowerCase();
     return {
       enabled: desk.enabled !== false,
       formTitle: String(desk.formTitle || '').trim().slice(0, 120),
       formHint: String(desk.formHint || '').trim().slice(0, 240),
-      docsChannel: (ch === 'email' || ch === 'both' || ch === 'whatsapp') ? ch : 'whatsapp',
+      docsChannel: (ch === 'email' || ch === 'both' || ch === 'whatsapp' || ch === 'platform') ? ch : 'platform',
     };
   }
 
@@ -53,55 +63,246 @@
     }
     var hint = desk.formHint
       || t(
-        'أدخل بياناتك وسنتواصل معك. الوثائق تُرسل عبر واتساب أو إيميل المكتب مباشرة.',
-        'Saisissez vos coordonnées. Les documents partent via WhatsApp ou e-mail du professionnel.'
+        'أدخل بياناتك وسنتواصل معك. يمكنك رفع بيان الدفع (صورة أو PDF) مباشرة على المنصة.',
+        'Saisissez vos coordonnées. Vous pouvez joindre un justificatif de paiement (image ou PDF) sur la plateforme.'
       );
     var titleEl = root.querySelector('[data-desk="title"]') || root.querySelector('#req-title');
     var hintEl = root.querySelector('[data-desk="hint"]') || root.querySelector('#req-sub');
     if (titleEl) titleEl.textContent = '📩 ' + title;
     if (hintEl) hintEl.textContent = hint;
+    refreshDocUploadLabels(root);
+  }
+
+  function refreshDocUploadLabels(root) {
+    root = root || document;
+    var zone = (root.querySelector && root.querySelector('#rf-doc-upload')) || document.getElementById('rf-doc-upload');
+    if (!zone) return;
+    var title = zone.querySelector('[data-desk="doc-title"]');
+    var hint = zone.querySelector('[data-desk="doc-hint"]');
+    var btn = zone.querySelector('[data-desk="doc-pick"]');
+    if (title) {
+      title.textContent = t('رفع بيان الدفع (اختياري)', 'Justificatif de paiement (optionnel)');
+    }
+    if (hint) {
+      hint.textContent = t(
+        'صورة أو PDF — يُحفظ على المنصة لحماية حقوق الطرفين (حد أقصى 5MB لكل ملف، حتى 3 ملفات).',
+        'Image ou PDF — conservé sur la plateforme pour protéger les deux parties (5 Mo max / fichier, jusqu’à 3).'
+      );
+    }
+    if (btn) {
+      btn.textContent = t('📎 اختر صورة أو PDF', '📎 Choisir image ou PDF');
+    }
+  }
+
+  function readFileAsDataUrl(file) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () { resolve(String(reader.result || '')); };
+      reader.onerror = function () { reject(new Error(t('تعذّر قراءة الملف', 'Lecture du fichier impossible'))); };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function validateDocFile(file) {
+    if (!file) return { ok: false, error: t('لم يُختر ملف', 'Aucun fichier') };
+    var mime = String(file.type || '').toLowerCase();
+    if (!ALLOWED_DOC_TYPES[mime]) {
+      var name = String(file.name || '').toLowerCase();
+      if (/\.(jpe?g|png|webp|pdf)$/.test(name)) {
+        mime = name.endsWith('.pdf') ? 'application/pdf'
+          : name.endsWith('.png') ? 'image/png'
+          : name.endsWith('.webp') ? 'image/webp'
+          : 'image/jpeg';
+      } else {
+        return {
+          ok: false,
+          error: t('المسموح: صورة (JPG/PNG/WebP) أو PDF فقط', 'Autorisé : image (JPG/PNG/WebP) ou PDF'),
+        };
+      }
+    }
+    if (file.size > MAX_DOC_BYTES) {
+      return {
+        ok: false,
+        error: t('حجم الملف كبير جداً (الحد 5MB)', 'Fichier trop volumineux (max 5 Mo)'),
+      };
+    }
+    return { ok: true, mime: mime };
+  }
+
+  function getPendingDocs(form) {
+    form = form || document.getElementById('req-form') || document.getElementById('store-req-form');
+    if (!form) return [];
+    return Array.isArray(form._rizqPendingDocs) ? form._rizqPendingDocs : [];
+  }
+
+  function setPendingDocs(form, list) {
+    if (!form) return;
+    form._rizqPendingDocs = Array.isArray(list) ? list : [];
+    renderDocList(form);
+  }
+
+  function renderDocList(form) {
+    var zone = form && form.querySelector('#rf-doc-upload');
+    if (!zone) return;
+    var listEl = zone.querySelector('#rf-doc-list');
+    if (!listEl) return;
+    var docs = getPendingDocs(form);
+    if (!docs.length) {
+      listEl.innerHTML = '';
+      listEl.hidden = true;
+      return;
+    }
+    listEl.hidden = false;
+    listEl.innerHTML = docs.map(function (d, i) {
+      var label = esc(d.name || ('doc-' + (i + 1)));
+      var sizeKb = Math.max(1, Math.round((d.bytes || 0) / 1024));
+      return '<div class="rf-doc-item" style="display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px 8px;border-radius:8px;background:rgba(27,58,107,.05);margin-top:6px;font-size:12px">'
+        + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📄 ' + label + ' <span style="color:#6a7a8a">(' + sizeKb + ' KB)</span></span>'
+        + '<button type="button" data-doc-remove="' + i + '" style="border:none;background:transparent;color:#b91c1c;font-weight:700;cursor:pointer;padding:2px 6px">'
+        + esc(t('حذف', 'Retirer')) + '</button></div>';
+    }).join('');
+    listEl.querySelectorAll('[data-doc-remove]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var idx = Number(btn.getAttribute('data-doc-remove'));
+        var next = getPendingDocs(form).slice();
+        if (idx >= 0 && idx < next.length) next.splice(idx, 1);
+        setPendingDocs(form, next);
+      });
+    });
+  }
+
+  function wireDocUploadHandlers(form, zone) {
+    if (!form || !zone || zone.getAttribute('data-wired') === '1') return;
+    zone.setAttribute('data-wired', '1');
+    if (!Array.isArray(form._rizqPendingDocs)) form._rizqPendingDocs = [];
+
+    var input = zone.querySelector('#rf-doc-file');
+    var pick = zone.querySelector('#rf-doc-pick');
+    var errEl = zone.querySelector('#rf-doc-error');
+
+    function showErr(msg) {
+      if (!errEl) return;
+      if (!msg) { errEl.style.display = 'none'; errEl.textContent = ''; return; }
+      errEl.style.display = 'block';
+      errEl.textContent = msg;
+    }
+
+    if (pick && input) {
+      pick.addEventListener('click', function () { input.click(); });
+      input.addEventListener('change', function () {
+        showErr('');
+        var files = Array.prototype.slice.call(input.files || [], 0);
+        input.value = '';
+        if (!files.length) return;
+        var current = getPendingDocs(form).slice();
+        var room = MAX_DOC_COUNT - current.length;
+        if (room <= 0) {
+          showErr(t('الحد الأقصى 3 ملفات', 'Maximum 3 fichiers'));
+          return;
+        }
+        files = files.slice(0, room);
+        var chain = Promise.resolve();
+        files.forEach(function (file) {
+          chain = chain.then(function () {
+            var check = validateDocFile(file);
+            if (!check.ok) {
+              showErr(check.error);
+              return;
+            }
+            return readFileAsDataUrl(file).then(function (dataUrl) {
+              current.push({
+                name: String(file.name || 'payment-proof').slice(0, 80),
+                bytes: file.size || 0,
+                mime: check.mime,
+                dataUrl: dataUrl,
+              });
+              setPendingDocs(form, current);
+            });
+          });
+        });
+        chain.catch(function (err) {
+          showErr((err && err.message) || t('تعذّر رفع الملف', 'Échec du téléversement'));
+        });
+      });
+    }
+  }
+
+  function ensureDocUpload(form) {
+    if (!form) return null;
+    var existing = form.querySelector('#rf-doc-upload');
+    if (existing) {
+      refreshDocUploadLabels(form);
+      wireDocUploadHandlers(form, existing);
+      return existing;
+    }
+
+    // استبدال تلميح واتساب/إيميل القديم إن وُجد
+    var oldHint = form.querySelector('#rf-docs-hint')
+      || form.querySelector('[data-desk="docs-hint"]')
+      || form.querySelector('.store-desk-note')
+      || form.querySelector('.office-desk-note')
+      || form.querySelector('.showroom-desk-note');
+
+    var zone = document.createElement('div');
+    zone.id = 'rf-doc-upload';
+    zone.setAttribute('data-desk', 'doc-upload');
+    zone.style.cssText = 'margin:4px 0 10px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px dashed rgba(27,58,107,.22)';
+    zone.innerHTML = ''
+      + '<div data-desk="doc-title" style="font-size:12.5px;font-weight:700;color:#1B3A6B;margin-bottom:4px"></div>'
+      + '<div data-desk="doc-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin-bottom:8px"></div>'
+      + '<input type="file" id="rf-doc-file" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" multiple hidden />'
+      + '<button type="button" data-desk="doc-pick" id="rf-doc-pick" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;border:1px solid rgba(27,58,107,.25);background:#fff;color:#1B3A6B;font-size:12.5px;font-weight:700;cursor:pointer"></button>'
+      + '<div id="rf-doc-list" hidden></div>'
+      + '<div id="rf-doc-error" style="display:none;margin-top:6px;font-size:11.5px;color:#b91c1c;line-height:1.45"></div>';
+
+    if (oldHint && oldHint.parentNode) {
+      oldHint.parentNode.replaceChild(zone, oldHint);
+    } else {
+      var actions = form.querySelector('.store-desk-actions')
+        || form.querySelector('.office-desk-actions')
+        || form.querySelector('.showroom-desk-actions');
+      var btn = form.querySelector('#req-submit-btn')
+        || form.querySelector('#store-req-submit')
+        || form.querySelector('#sr-req-submit');
+      if (actions && btn) actions.insertBefore(zone, btn);
+      else if (btn) form.insertBefore(zone, btn);
+      else form.appendChild(zone);
+    }
+
+    refreshDocUploadLabels(form);
+    wireDocUploadHandlers(form, zone);
+    return zone;
   }
 
   function ensureExtraFields(form) {
-    if (!form || form.getAttribute('data-desk-enhanced') === '1') return;
-    form.setAttribute('data-desk-enhanced', '1');
+    if (!form) return;
+    if (form.getAttribute('data-desk-enhanced') !== '1') {
+      form.setAttribute('data-desk-enhanced', '1');
 
-    var phone = form.querySelector('#rf-phone');
-    if (phone && !form.querySelector('#rf-whatsapp')) {
-      var wa = document.createElement('input');
-      wa.id = 'rf-whatsapp';
-      wa.className = phone.className || 'req-input';
-      wa.setAttribute('dir', 'ltr');
-      wa.placeholder = t('واتساب (إن اختلف عن الهاتف)', 'WhatsApp (si différent)');
-      wa.setAttribute('data-ph', 'rf-whatsapp');
-      phone.insertAdjacentElement('afterend', wa);
+      var phone = form.querySelector('#rf-phone');
+      if (phone && !form.querySelector('#rf-whatsapp')) {
+        var wa = document.createElement('input');
+        wa.id = 'rf-whatsapp';
+        wa.className = phone.className || 'req-input';
+        wa.setAttribute('dir', 'ltr');
+        wa.placeholder = t('واتساب (إن اختلف عن الهاتف)', 'WhatsApp (si différent)');
+        wa.setAttribute('data-ph', 'rf-whatsapp');
+        phone.insertAdjacentElement('afterend', wa);
+      }
+      if (!form.querySelector('#rf-email')) {
+        var email = document.createElement('input');
+        email.id = 'rf-email';
+        email.type = 'email';
+        email.className = (phone && phone.className) || 'req-input';
+        email.setAttribute('dir', 'ltr');
+        email.placeholder = t('البريد الإلكتروني (اختياري)', 'E-mail (optionnel)');
+        email.setAttribute('data-ph', 'rf-email');
+        var after = form.querySelector('#rf-whatsapp') || phone;
+        if (after) after.insertAdjacentElement('afterend', email);
+        else form.appendChild(email);
+      }
     }
-    if (!form.querySelector('#rf-email')) {
-      var email = document.createElement('input');
-      email.id = 'rf-email';
-      email.type = 'email';
-      email.className = (phone && phone.className) || 'req-input';
-      email.setAttribute('dir', 'ltr');
-      email.placeholder = t('البريد الإلكتروني (اختياري)', 'E-mail (optionnel)');
-      email.setAttribute('data-ph', 'rf-email');
-      var after = form.querySelector('#rf-whatsapp') || phone;
-      if (after) after.insertAdjacentElement('afterend', email);
-      else form.appendChild(email);
-    }
-
-    if (!form.querySelector('#rf-docs-hint')) {
-      var note = document.createElement('div');
-      note.id = 'rf-docs-hint';
-      note.setAttribute('data-desk', 'docs-hint');
-      note.style.cssText = 'font-size:11.5px;color:#6a7a8a;line-height:1.55;margin:4px 0 10px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)';
-      note.textContent = t(
-        '📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.',
-        '📎 Vous pouvez envoyer les documents via WhatsApp ou e-mail après l\'envoi.'
-      );
-      var btn = form.querySelector('#req-submit-btn');
-      if (btn) form.insertBefore(note, btn);
-      else form.appendChild(note);
-    }
+    ensureDocUpload(form);
   }
 
   function collectForm(form) {
@@ -137,7 +338,9 @@
 
   function openDocsChannel(opts) {
     opts = opts || {};
-    var channel = opts.docsChannel || 'whatsapp';
+    if (opts.skip || opts.hasAttachments) return;
+    var channel = opts.docsChannel || 'platform';
+    if (channel === 'platform') return;
     var name = opts.buyerName || '';
     var phone = opts.buyerPhone || '';
     var svc = opts.service || '';
@@ -146,8 +349,7 @@
       + (reqId ? ' #' + reqId : '')
       + ' — ' + name
       + (phone ? ' — ' + phone : '')
-      + (svc ? ' — ' + svc : '')
-      + t('\n(أرفق الوثائق هنا إن لزم)', '\n(Joindre les documents si besoin)');
+      + (svc ? ' — ' + svc : '');
 
     if (channel === 'email' || channel === 'both') {
       var mailBtn = document.getElementById('act-email') || document.querySelector('a[href^="mailto:"]');
@@ -158,7 +360,7 @@
           + '&body=' + encodeURIComponent(text), '_blank', 'noopener');
       }
     }
-    if (channel === 'whatsapp' || channel === 'both' || channel === 'email') {
+    if (channel === 'whatsapp' || channel === 'both') {
       var wa = document.getElementById('act-wa-top') || document.getElementById('sticky-wa')
         || document.querySelector('a[href*="wa.me"]');
       var waNum = '';
@@ -168,7 +370,7 @@
           waNum = waNum.split('?')[0].replace(/\D/g, '');
         } catch (e) { waNum = ''; }
       }
-      if (waNum && (channel === 'whatsapp' || channel === 'both' || !opts.emailOpened)) {
+      if (waNum) {
         window.open('https://wa.me/' + waNum + '?text=' + encodeURIComponent(text), '_blank', 'noopener');
       }
     }
@@ -176,10 +378,17 @@
 
   function submit(opts) {
     opts = opts || {};
-    var data = opts.data || collectForm(opts.form);
+    var form = opts.form
+      || document.getElementById('req-form')
+      || document.getElementById('store-req-form')
+      || document.getElementById('sr-req-form')
+      || document.getElementById('corp-req-form');
+    var data = opts.data || collectForm(form);
     var check = validate(data);
     if (!check.ok) return Promise.reject(new Error(check.error));
 
+    ensureDocUpload(form);
+    var pending = getPendingDocs(form);
     var accountId = opts.accountId || '';
     var desk = normalizeDesk(opts.desk);
     var payload = {
@@ -194,6 +403,10 @@
       source: opts.source || 'office',
       paymentPreference: opts.paymentPreference || '',
     };
+    if (pending.length) {
+      payload.attachments = pending.map(function (d) { return d.dataUrl; });
+      payload.attachmentNames = pending.map(function (d) { return d.name; });
+    }
 
     var base = backendBase();
     var send = base && accountId
@@ -205,7 +418,20 @@
       : Promise.resolve({ ok: false, status: 0, body: { error: 'offline' } });
 
     return send.then(function (res) {
+      if (!res.ok && res.body && res.body.error) {
+        var code = res.body.code || res.body.error;
+        if (code === 'doc_too_large') {
+          throw new Error(t('بيان الدفع كبير جداً (الحد 5MB)', 'Justificatif trop volumineux (max 5 Mo)'));
+        }
+        if (code === 'doc_type_not_allowed' || code === 'doc_mime_mismatch') {
+          throw new Error(t('المسموح صورة أو PDF فقط', 'Image ou PDF uniquement'));
+        }
+        if (res.status >= 400 && res.body.error && res.body.error !== 'offline') {
+          throw new Error(String(res.body.error));
+        }
+      }
       var reqId = res.body && (res.body.id || (res.body.request && res.body.request.id));
+      var hasAtt = !!(pending.length || (res.body && res.body.request && res.body.request.hasAttachments));
       // احتياطي محلي إن تعذّر الخادم
       if (!res.ok) {
         try {
@@ -216,11 +442,17 @@
             id: localId,
             createdAt: new Date().toISOString(),
             status: 'new',
+            hasAttachments: !!pending.length,
+            attachmentsMeta: pending.map(function (d) {
+              return { name: d.name, bytes: d.bytes, mime: d.mime };
+            }),
             _local: true,
           }));
           localStorage.setItem(key, JSON.stringify(list.slice(0, 80)));
           reqId = localId;
         } catch (e) { /* ignore */ }
+      } else {
+        setPendingDocs(form, []);
       }
       openDocsChannel({
         docsChannel: (res.body && res.body.request && res.body.request.docsChannel) || desk.docsChannel,
@@ -228,15 +460,23 @@
         buyerPhone: data.buyerPhone,
         service: data.service,
         requestId: reqId,
+        hasAttachments: hasAtt,
       });
+      var msg = hasAtt
+        ? t(
+          'تم استلام طلبك' + (reqId ? ' (' + reqId + ')' : '') + ' مع بيان الدفع على المنصة.',
+          'Demande reçue' + (reqId ? ' (' + reqId + ')' : '') + ' avec justificatif sur la plateforme.'
+        )
+        : t(
+          'تم استلام طلبك' + (reqId ? ' (' + reqId + ')' : '') + ' — يمكنك رفع بيان الدفع لاحقاً أو إرساله عبر واتساب/إيميل.',
+          'Demande reçue' + (reqId ? ' (' + reqId + ')' : '') + ' — joignez un justificatif plus tard ou via WhatsApp/e-mail.'
+        );
       return {
         ok: true,
         id: reqId,
         serverOk: !!res.ok,
-        message: t(
-          'تم استلام طلبك' + (reqId ? ' (' + reqId + ')' : '') + ' — يمكنك إرسال الوثائق عبر واتساب أو الإيميل.',
-          'Demande reçue' + (reqId ? ' (' + reqId + ')' : '') + ' — envoyez les documents via WhatsApp ou e-mail.'
-        ),
+        hasAttachments: hasAtt,
+        message: msg,
       };
     });
   }
@@ -265,6 +505,63 @@
       },
       body: JSON.stringify({ status: status }),
     }).then(function (r) { return r.json(); });
+  }
+
+  function openAttachment(requestId, attId, token) {
+    var base = backendBase();
+    if (!base || !requestId || !attId || !token) {
+      return Promise.reject(new Error('missing'));
+    }
+    return fetch(
+      base + '/api/service-requests/' + encodeURIComponent(requestId)
+        + '/attachments/' + encodeURIComponent(attId),
+      { headers: { 'x-account-token': token } }
+    ).then(function (r) {
+      if (!r.ok) throw new Error('download_failed');
+      return r.blob().then(function (blob) {
+        var url = URL.createObjectURL(blob);
+        window.open(url, '_blank', 'noopener');
+        setTimeout(function () { try { URL.revokeObjectURL(url); } catch (e) { /* ignore */ } }, 60000);
+        return true;
+      });
+    });
+  }
+
+  function attachmentsHtml(request, tokenGetter) {
+    var atts = (request && Array.isArray(request.attachments)) ? request.attachments : [];
+    if (!atts.length) {
+      if (request && request.hasAttachments) {
+        return '<span style="font-size:12px;color:#0F766E;font-weight:600">📎 '
+          + esc(t('بيان دفع مرفق', 'Justificatif joint')) + '</span>';
+      }
+      return '';
+    }
+    return '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px">'
+      + atts.map(function (a) {
+        var label = esc(a.originalName || a.id || t('بيان دفع', 'Justificatif'));
+        var rid = esc(request.id || '');
+        var aid = esc(a.id || '');
+        return '<button type="button" class="rf-open-att" data-req="' + rid + '" data-att="' + aid + '"'
+          + ' style="padding:5px 10px;border:1px solid rgba(15,118,110,.35);border-radius:8px;background:rgba(15,118,110,.08);color:#0F766E;font-size:11.5px;font-weight:700;cursor:pointer">'
+          + '📎 ' + label + '</button>';
+      }).join('')
+      + '</div>';
+  }
+
+  function bindAttachmentButtons(root, getToken) {
+    root = root || document;
+    var nodes = root.querySelectorAll ? root.querySelectorAll('.rf-open-att') : [];
+    Array.prototype.forEach.call(nodes, function (btn) {
+      if (btn.getAttribute('data-bound') === '1') return;
+      btn.setAttribute('data-bound', '1');
+      btn.addEventListener('click', function () {
+        var token = typeof getToken === 'function' ? getToken() : getToken;
+        openAttachment(btn.getAttribute('data-req'), btn.getAttribute('data-att'), token)
+          .catch(function () {
+            alert(t('تعذّر فتح بيان الدفع', 'Impossible d’ouvrir le justificatif'));
+          });
+      });
+    });
   }
 
   function saveDeskSettings(accountId, token, desk) {
@@ -400,12 +697,25 @@
       var el = (root.querySelector && root.querySelector('#' + id)) || document.getElementById(id);
       if (el) el.value = '';
     });
+    var form = (root.querySelector && (
+      root.querySelector('#store-req-form')
+      || root.querySelector('#req-form')
+      || root.querySelector('#sr-req-form')
+      || root.querySelector('#corp-req-form')
+    )) || root;
+    if (form && form.id && (form.id === 'store-req-form' || form.id === 'req-form' || form.id === 'sr-req-form' || form.id === 'corp-req-form')) {
+      setPendingDocs(form, []);
+    } else if (form && form._rizqPendingDocs) {
+      setPendingDocs(form, []);
+    }
   }
 
   function enhanceOfficeForm(opts) {
     opts = opts || {};
-    var form = document.getElementById('req-form');
-    var box = form && form.closest('.req-box');
+    var form = document.getElementById('req-form')
+      || document.getElementById('store-req-form')
+      || document.getElementById('sr-req-form');
+    var box = form && (form.closest('.req-box') || form.closest('.info-card') || form.closest('#store-service-desk') || form.closest('#showroom-service-desk'));
     ensureExtraFields(form);
     applyPublicLabels(box || document, opts.desk, opts.accountName);
     var nameEl = document.getElementById('rf-name');
@@ -414,7 +724,14 @@
   }
 
   function bootAutofill() {
-    try { autofillBuyerFields({ force: false }); } catch (e) { /* ignore */ }
+    try {
+    var form = document.getElementById('store-req-form')
+      || document.getElementById('req-form')
+      || document.getElementById('sr-req-form')
+      || document.getElementById('corp-req-form');
+      if (form) ensureExtraFields(form);
+      autofillBuyerFields({ force: false });
+    } catch (e) { /* ignore */ }
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bootAutofill);
@@ -426,6 +743,7 @@
     normalizeDesk: normalizeDesk,
     enhanceOfficeForm: enhanceOfficeForm,
     applyPublicLabels: applyPublicLabels,
+    ensureDocUpload: ensureDocUpload,
     autofillBuyerFields: autofillBuyerFields,
     loadBuyerProfile: loadBuyerProfile,
     clearRequestMessageFields: clearRequestMessageFields,
@@ -436,5 +754,8 @@
     setStatus: setStatus,
     saveDeskSettings: saveDeskSettings,
     openDocsChannel: openDocsChannel,
+    openAttachment: openAttachment,
+    attachmentsHtml: attachmentsHtml,
+    bindAttachmentButtons: bindAttachmentButtons,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

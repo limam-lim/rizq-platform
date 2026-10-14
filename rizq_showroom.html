@@ -23,6 +23,7 @@
 <link rel="preload" href="rizq_header.js?v=27.0" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>معرض رزق | Showroom Rizq</title>
+<link rel="preload" as="image" href="rizq-assets/demo-heroes/showroom-appliances-promo.jpg"/>
 <style>
 :root{
   --navy:#1B3A6B;--navy2:#0F2347;--gold:#C9A84C;--gold2:#E8C96A;
@@ -62,11 +63,12 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 @media(max-width:768px){.nav-disclaimer{display:none}}
 
 /* ── HERO: واجهة درامية "افتتاح معرض" — قياسات موحّدة للمراكز ── */
-.showroom-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:radial-gradient(ellipse 1200px 700px at 50% -10%,#1B3A6B 0%,#0F2347 45%,#06111C 100%);display:flex;flex-direction:column;justify-content:center}
+.showroom-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:#06111C;display:flex;flex-direction:column;justify-content:center}
+.showroom-hero:not(.has-hero-photo){background:radial-gradient(ellipse 1200px 700px at 50% -10%,#1B3A6B 0%,#0F2347 45%,#06111C 100%)}
 .showroom-hero .hero-photo{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#06111C center/cover no-repeat}
 .showroom-hero .hero-photo img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.06);animation:rzSrHeroKen 22s ease-in-out infinite alternate}
 @keyframes rzSrHeroKen{from{transform:scale(1.06) translate3d(0,0,0)}to{transform:scale(1.12) translate3d(-1.5%,-1%,0)}}
-.showroom-hero .hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,rgba(6,17,28,.88) 0%,rgba(15,35,71,.58) 42%,rgba(6,17,28,.8) 100%)}
+.showroom-hero .hero-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,rgba(6,17,28,.72) 0%,rgba(15,35,71,.4) 48%,rgba(6,17,28,.62) 100%)}
 .showroom-hero.has-hero-photo{background:#06111C}
 .showroom-hero.has-hero-photo .hero-beams,
 .showroom-hero.has-hero-photo .hero-floor,
@@ -91,59 +93,55 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:56px 24px 72px;width:100%;box-sizing:border-box;min-height:inherit}
 .showroom-hero-stage{display:flex;align-items:center;justify-content:center;gap:clamp(18px,3vw,36px);max-width:920px;width:100%;position:relative;z-index:1;flex-wrap:wrap}
 .showroom-profile{display:flex;align-items:center;justify-content:center;gap:20px;max-width:720px;width:auto;flex:1 1 280px}
-/* بطاقات الفيديو — ركن الهيرو بحجم أوضح (قريب من السابق) */
+/* بطاقات الفيديو — زوايا ثابتة: تعريفي يمين · إضافي يسار (لا تنعكس مع اللغة) */
 .hero-videos{
-  display:none;position:absolute;z-index:4;bottom:12px;inset-inline-end:12px;
-  align-items:stretch;gap:10px;max-width:min(560px,72vw);width:auto;pointer-events:auto
+  display:none;position:absolute;z-index:4;inset:0;pointer-events:none
 }
-.showroom-hero.has-hero-videos .hero-videos{display:flex}
+.showroom-hero.has-hero-videos .hero-videos{display:block}
 .showroom-hero.has-hero-videos .hero-scroll-cue{bottom:8px;opacity:.4}
 .hero-video-card{
-  position:relative;flex:0 1 250px;min-width:210px;max-width:270px;
+  position:absolute;bottom:12px;width:min(210px,28vw);max-width:230px;min-width:0;
   background:rgba(6,17,28,.55);border:1px solid rgba(201,168,76,.4);
   border-radius:14px;overflow:hidden;backdrop-filter:blur(8px);
-  box-shadow:0 10px 24px rgba(0,0,0,.32);animation:rzSrHeroVidIn .7s ease both
+  box-shadow:0 10px 24px rgba(0,0,0,.32);animation:rzSrHeroVidIn .7s ease both;
+  pointer-events:auto
 }
-.hero-video-card:nth-child(2){animation-delay:.12s}
+.hero-video-card--intro{right:12px;left:auto}
+.hero-video-card--extra{left:12px;right:auto;animation-delay:.12s}
 @keyframes rzSrHeroVidIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .hero-video-card .hero-video-mount{min-height:0}
 .hero-video-card .rzq-iv-wrap{max-width:100%;width:100%;margin:0}
 .hero-video-card .rzq-iv-frame{border-radius:0;aspect-ratio:16/9;min-height:0;width:100%;box-shadow:none;animation:none}
-.hero-video-card .rzq-iv-badge{display:none}
-.hero-video-card .rzq-iv-src{display:none}
+.hero-video-card .rzq-iv-badge,
+.hero-video-card .rzq-iv-src,
+.hero-video-card .rzq-iv-play-label,
+.hero-video-card .rzq-iv-dash-hint,
+.hero-video-caption{display:none!important}
 .hero-video-card .rzq-iv-play{
-  width:40px!important;height:40px!important;font-size:16px!important;
+  width:36px!important;height:36px!important;font-size:14px!important;
   opacity:.22!important;background:rgba(255,255,255,.16)!important;color:rgba(255,255,255,.9)!important;
   border:1px solid rgba(255,255,255,.28)!important;box-shadow:none!important;
   transition:opacity .22s ease,transform .22s ease,background .2s ease!important
 }
-.hero-video-card .rzq-iv-badge,
-.hero-video-card .rzq-iv-play-label,
-.hero-video-caption{display:none!important}
-.hero-video-card .rzq-iv-sound,
-.hero-video-card .rzq-iv-dash-hint{
-  opacity:0!important;transition:opacity .22s ease!important;pointer-events:none!important
+.hero-video-card .rzq-iv-sound.is-on,
+.hero-video-card .rzq-iv-fs.is-on{
+  opacity:.92!important;pointer-events:auto!important;
+  width:30px!important;height:30px!important;padding:0!important;font-size:13px!important;
+  border-radius:50%!important;bottom:6px!important;max-width:none!important;
+  display:inline-flex!important
 }
-.hero-video-card .rzq-iv-sound{
-  font-size:10px!important;padding:4px 8px!important;bottom:6px!important;left:6px!important;
-  border-radius:8px!important;max-width:calc(100% - 12px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap
-}
-.hero-video-card:hover .rzq-iv-sound.is-on,
-.hero-video-card:focus-within .rzq-iv-sound.is-on{
-  opacity:1!important;pointer-events:auto!important
-}
+.hero-video-card .rzq-iv-sound{left:6px!important;right:auto!important}
+.hero-video-card .rzq-iv-fs{right:6px!important;left:auto!important}
 .hero-video-card:hover .rzq-iv-play,
 .hero-video-card:focus-within .rzq-iv-play{
   opacity:.9!important;background:rgba(255,255,255,.28)!important;color:#fff!important
 }
 @media(max-width:900px){
   .showroom-hero-stage{flex-direction:column;gap:14px}
-  .hero-cover{padding-bottom:18px}
-  .hero-videos{
-    position:relative;inset:auto;bottom:auto;margin:6px auto 0;max-width:100%;
-    justify-content:center;padding:0 10px 6px;gap:8px
-  }
-  .hero-video-card{flex:1 1 calc(50% - 8px);min-width:140px;max-width:240px}
+  .hero-cover{padding:40px 16px 64px}
+  .hero-video-card{width:min(132px,38vw);bottom:8px;border-radius:10px}
+  .hero-video-card--intro{right:8px}
+  .hero-video-card--extra{left:8px}
 }
 .showroom-logo{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.35),rgba(27,58,107,.5) 70%);border:2px solid rgba(201,168,76,.6);display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;box-shadow:0 0 0 6px rgba(201,168,76,.08),0 0 28px rgba(201,168,76,.35),0 8px 20px rgba(0,0,0,.5);animation:rzPulseRing 3s ease-in-out infinite;position:relative}
 .showroom-logo.is-storefront{cursor:pointer}
@@ -494,7 +492,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 /* ── FOOTER: يستخدم الآن .rizq-footer الموحّدة من rizq-theme.css ── */
 </style>
 <script src="rizq_pwa.js" defer></script>
-<script src="rizq_footer_toggle.js?v=23.0" defer></script>
+<script src="rizq_footer_toggle.js?v=23.1" defer></script>
 </head>
 <body>
 <!-- حقن الهيدر الموحّد قبل أول رسم — يمنع الشريط الأبيض فوق الهيرو ويسرّع الظهور -->
@@ -531,6 +529,49 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   <div class="hero-beams"></div>
   <div class="hero-floor"></div>
   <div class="hero-glints"><span></span><span></span><span></span><span></span><span></span></div>
+  <script>
+  /* غلاف مبكر للمعرض — أجهزة منزلية/صناعية (يختلف عن محل الأزياء) */
+  (function(){
+    try{
+      var q = new URLSearchParams(location.search);
+      var id = q.get('id') || q.get('corp') || q.get('showroom') || '';
+      var hero = document.getElementById('showroom-hero');
+      if(!hero) return;
+      var DEMO_COVER = 'rizq-assets/demo-heroes/showroom-appliances-promo.jpg';
+      var isDemo = !id || id === 'demo-corp-001' || id === 'demo_showroom' || q.get('demo') === '1';
+      var cover = '';
+      if(isDemo){
+        cover = DEMO_COVER;
+      } else {
+        if(id){
+          var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+          for(var i=0;i<accs.length;i++){
+            var a = accs[i];
+            if(a && a.id === id && (a.type === 'corp' || a.type === 'showroom') && (a.cover || a.thumb)){
+              cover = String(a.cover || a.thumb || '');
+              break;
+            }
+          }
+        }
+        if(!cover){
+          try{ cover = String(sessionStorage.getItem('rizq_hero_cover_' + id) || ''); }catch(eS){}
+        }
+      }
+      if(!cover || /javascript:/i.test(cover) || /[\s<>"']/.test(cover)) return;
+      var okAbs = /^(https?:\/\/|\/|\.\/|data:image\/)/i.test(cover);
+      var okRel = /^[A-Za-z0-9_./-]+$/.test(cover) && cover.indexOf('..') < 0;
+      if(!okAbs && !okRel) return;
+      var slot = hero.querySelector('[data-hero-photo]');
+      if(!slot) return;
+      slot.hidden = false;
+      hero.classList.add('has-hero-photo');
+      slot.style.backgroundImage = 'url("' + cover.replace(/\\/g,'\\\\').replace(/"/g,'\\"') + '")';
+      slot.style.backgroundSize = 'cover';
+      slot.style.backgroundPosition = 'center';
+      try{ if(id) sessionStorage.setItem('rizq_hero_cover_' + id, cover.slice(0, 2000)); }catch(eC){}
+    }catch(e){}
+  })();
+  </script>
   <div class="hero-cover">
     <div class="showroom-hero-stage">
       <div class="showroom-profile">
@@ -556,10 +597,10 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
     </div>
   </div>
   <div class="hero-videos" id="showroom-hero-videos" aria-label="فيديوهات المعرض">
-    <div class="hero-video-card" id="sr-hero-intro-card" style="display:none">
+    <div class="hero-video-card hero-video-card--intro" id="sr-hero-intro-card" style="display:none">
       <div class="hero-video-mount" id="sr-hero-intro-video-mount"></div>
     </div>
-    <div class="hero-video-card" id="sr-hero-extra-card" style="display:none">
+    <div class="hero-video-card hero-video-card--extra" id="sr-hero-extra-card" style="display:none">
       <div class="hero-video-mount" id="sr-hero-extra-video-mount"></div>
     </div>
   </div>
@@ -654,7 +695,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
       <section class="info-card showroom-desk-hz" id="showroom-service-desk" style="border-top:3px solid var(--gold);display:flex!important" aria-label="غرفة الطلبات">
         <div class="showroom-desk-eyebrow" id="sr-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
         <div class="info-card-title" data-desk="title" id="sr-req-title" style="margin-bottom:4px;padding-bottom:0;border-bottom:none">📩 طلب من المعرض</div>
-        <p class="showroom-desk-hint" data-desk="hint" id="sr-req-hint">أدخل اسمك ورقم هاتفك — بياناتك تصل للمعرض مباشرة. الوثائق عبر واتساب أو الإيميل.</p>
+        <p class="showroom-desk-hint" data-desk="hint" id="sr-req-hint">أدخل اسمك ورقم هاتفك — بياناتك تصل للمعرض مباشرة. يمكنك رفع بيان الدفع (صورة أو PDF) على المنصة.</p>
         <div id="sr-req-form" class="showroom-desk-form">
           <div class="showroom-desk-field">
             <label for="rf-name" id="sr-lbl-name">الاسم الكامل *</label>
@@ -681,7 +722,14 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
             <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" rows="2"></textarea>
           </div>
           <div class="showroom-desk-actions">
-            <p class="showroom-desk-note" id="sr-docs-hint">📎 الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
+            <div id="rf-doc-upload" class="showroom-desk-note" data-desk="doc-upload" style="border-style:dashed">
+              <div data-desk="doc-title" style="font-size:12.5px;font-weight:700;color:#1B3A6B;margin-bottom:4px">رفع بيان الدفع (اختياري)</div>
+              <div data-desk="doc-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin-bottom:8px">صورة أو PDF — يُحفظ على المنصة لحماية حقوق الطرفين.</div>
+              <input type="file" id="rf-doc-file" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" multiple hidden />
+              <button type="button" data-desk="doc-pick" id="rf-doc-pick" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;border:1px solid rgba(27,58,107,.25);background:#fff;color:#1B3A6B;font-size:12.5px;font-weight:700;cursor:pointer">📎 اختر صورة أو PDF</button>
+              <div id="rf-doc-list" hidden></div>
+              <div id="rf-doc-error" style="display:none;margin-top:6px;font-size:11.5px;color:#b91c1c"></div>
+            </div>
             <button type="button" id="sr-req-submit" onclick="submitShowroomServiceReq()">📤 إرسال الطلب للمعرض</button>
           </div>
         </div>
@@ -931,8 +979,9 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 <script src="rizq_site_banner.js" defer></script>
 <script src="rizq_auth_gate.js" defer></script>
 <script src="rizq_contact_gate.js" defer></script>
-<script src="rizq_account_payments.js" defer></script>
-  <script src="rizq_service_desk.js?v=1.1" defer></script>
+<script src="rizq_mr_payment_catalog.js?v=1.1" defer></script>
+<script src="rizq_account_payments.js?v=28.3" defer></script>
+<script src="rizq_service_desk.js?v=1.2" defer></script>
 <script src="rizq_packages_config.js" defer></script>
 <script src="rizq_packages_ui.js?v=23.0" defer></script>
 <script src="rizq_i18n_data.js" defer></script>
@@ -1064,7 +1113,7 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
     serviceDesk: {
       enabled: true,
       formTitle: fr ? 'Demande — Showroom Prestige' : 'طلب من معرض بريستيج',
-      formHint: fr ? 'Coordonnées envoyées au showroom. Documents via WhatsApp/e-mail.' : 'بياناتك تصل للمعرض. الوثائق عبر واتساب أو الإيميل.',
+      formHint: fr ? 'Coordonnées envoyées au showroom. Justificatif (image/PDF) sur la plateforme.' : 'بياناتك تصل للمعرض. يمكنك رفع بيان الدفع (صورة أو PDF) على المنصة.',
       docsChannel: 'whatsapp'
     },
     paymentMethods: [
@@ -1076,7 +1125,9 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
     planName: 'سنوية',
     promo_video: 'rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4',
     promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ',
-    cover: 'https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?auto=format&fit=crop&w=1600&q=80'
+    /* أجهزة كبيرة + صغيرة — خلفية ترويجية لمعرض الأجهزة */
+    cover: 'rizq-assets/demo-heroes/showroom-appliances-promo.jpg',
+    thumb: 'rizq-assets/demo-heroes/showroom-appliances-promo.jpg'
   };
   var items = [
     { id: 'SR1', name: 'سيارة SUV 2022', nameFr: 'SUV 2022', cat: 'سيارات', price: '2,850,000 MRU', emoji: '🚗', stock: 2, specs: 'بيانات عرض', featured: true },
@@ -1422,7 +1473,7 @@ function mountShowroomIntroVideo(){
   var intro = videos.find(function(v){ return v.kind === 'intro'; }) || videos[0];
   var extra = videos.find(function(v){ return v.kind === 'extra'; });
   if(intro && extra && intro.url === extra.url) extra = null;
-  var sig = [_showroomId, (intro && intro.url) || '', (extra && extra.url) || '', fr ? 'fr' : 'ar', 'hero'].join('|');
+  var sig = [_showroomId, (intro && intro.url) || '', (extra && extra.url) || '', fr ? 'fr' : 'ar', 'hero-corners-v2'].join('|');
   if (window.__rzqShowroomIntroSig === sig && introMount.querySelector('.rzq-iv-wrap')) {
     if(hero) hero.classList.add('has-hero-videos');
     return;
@@ -1899,14 +1950,20 @@ function applyLang(){
   _setTxt('sr-pay-title', '🏦 طرق الدفع', '🏦 Moyens de paiement');
   _setTxt('sr-desk-eyebrow', 'SERVICE DESK · غرفة الطلبات', 'SERVICE DESK · Demandes');
   _setTxt('sr-req-title', '📩 طلب من المعرض', '📩 Demande au showroom');
-  _setTxt('sr-req-hint', 'أدخل اسمك ورقم هاتفك — بياناتك تصل للمعرض مباشرة. الوثائق عبر واتساب أو الإيميل.', 'Entrez votre nom et téléphone — vos données vont au showroom. Documents via WhatsApp ou e-mail.');
+  _setTxt('sr-req-hint', 'أدخل اسمك ورقم هاتفك — بياناتك تصل للمعرض مباشرة. يمكنك رفع بيان الدفع (صورة أو PDF) على المنصة.', 'Entrez votre nom et téléphone — vos données vont au showroom. Joignez un justificatif (image/PDF) sur la plateforme.');
   _setTxt('sr-lbl-name', 'الاسم الكامل *', 'Nom complet *');
   _setTxt('sr-lbl-phone', 'رقم الهاتف *', 'Téléphone *');
   _setTxt('sr-lbl-wa', 'واتساب (إن اختلف)', 'WhatsApp (si différent)');
   _setTxt('sr-lbl-email', 'البريد (اختياري)', 'E-mail (optionnel)');
   _setTxt('sr-lbl-svc', 'المنتج / الموضوع', 'Produit / objet');
   _setTxt('sr-lbl-msg', 'رسالتك للمعرض', 'Votre message');
-  _setTxt('sr-docs-hint', '📎 الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.', '📎 Documents via WhatsApp ou e-mail après l’envoi.');
+  if (window.RizqServiceDesk && typeof RizqServiceDesk.ensureDocUpload === 'function') {
+    RizqServiceDesk.ensureDocUpload(document.getElementById('sr-req-form'));
+  }
+  if (window.RizqServiceDesk && typeof RizqServiceDesk.applyPublicLabels === 'function') {
+    var _srDeskRoot = document.getElementById('showroom-service-desk');
+    RizqServiceDesk.applyPublicLabels(_srDeskRoot, window._rizqShowroomServiceDesk || {}, (window._rizqProfile && window._rizqProfile.name) || '');
+  }
   _setTxt('sr-req-submit', '📤 إرسال الطلب للمعرض', '📤 Envoyer la demande');
   var ph = isFr ? {
     'rf-name':'Ex. : Ahmed Ould Mohamed','rf-phone':'Ex. : 22244112233',
@@ -2010,8 +2067,8 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 @media(max-width:600px){footer.rizq-footer .footer-grid{grid-template-columns:1fr!important}}
 </style>
 <script src="rizq_video_ads.js"></script>
-<script src="rizq_intro_video.js?v=29.7"></script>
-<script src="rizq_store_commerce.js?v=29.2"></script>
+<script src="rizq_intro_video.js?v=29.9"></script>
+<script src="rizq_store_commerce.js?v=29.5"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
 <script>
 /* فيديو تعريفي — تركيب أولي + احتياط إن تأخّر applyAccountData */
