@@ -7,8 +7,90 @@
 
   var ALLOWED_TYPES = ['bank', 'bankily', 'sedad', 'bimbam', 'mobile', 'cash', 'instore', 'custom'];
 
+  /** شعارات المحافظ الموريتانية — مثبتة محلياً لعرض عام دائم */
+  var LOGO_BASE = '/rizq-assets/pay-logos/';
+  var TYPE_LOGO = {
+    bankily: 'bankily.png',
+    sedad: 'sedad.png',
+    bimbam: 'bimbank.png'
+  };
+  var NAME_LOGO = {
+    'amanty bea': 'amanty_bea.png',
+    'attijari epay': 'attijari_epay.png',
+    'bamis digital': 'bamis_digital.png',
+    bankily: 'bankily.png',
+    'barid cash': 'barid_cash.png',
+    'bci pay': 'bci_pay.png',
+    'bfi cash': 'bfi_cash.png',
+    bimbank: 'bimbank.png',
+    bimbam: 'bimbank.png',
+    cdd: 'cdd.png',
+    'chinguitty mobile': 'chinguitty_mobile.png',
+    click: 'click.png',
+    ehsabi: 'ehsabi.png',
+    gazapay: 'gazapay.png',
+    masrivi: 'masrivi.png',
+    masrvi: 'masrivi.png',
+    mechili: 'mechili.png',
+    'moov money': 'moov_money.png',
+    rassidy: 'rassidy.png',
+    sedad: 'sedad.png'
+  };
+
   function localKey(accountId) {
     return 'rizq_my_payments_' + (accountId || 'demo');
+  }
+
+  function resolvePayLogo(method) {
+    if (!method) return '';
+    try {
+      if (global.RizqMrPaymentCatalog) {
+        if (method.bank && typeof global.RizqMrPaymentCatalog.findByName === 'function') {
+          var hit = global.RizqMrPaymentCatalog.findByName(method.bank);
+          if (hit && typeof global.RizqMrPaymentCatalog.logoUrl === 'function') {
+            return global.RizqMrPaymentCatalog.logoUrl(hit);
+          }
+          if (hit && hit.logo) return LOGO_BASE + hit.logo;
+        }
+      }
+    } catch (e) { /* ignore */ }
+    var bank = String(method.bank || '').trim().toLowerCase().replace(/\s+/g, ' ');
+    if (bank && NAME_LOGO[bank]) return LOGO_BASE + NAME_LOGO[bank];
+    var compact = bank.replace(/\s+/g, '');
+    if (compact) {
+      for (var key in NAME_LOGO) {
+        if (Object.prototype.hasOwnProperty.call(NAME_LOGO, key) && key.replace(/\s+/g, '') === compact) {
+          return LOGO_BASE + NAME_LOGO[key];
+        }
+      }
+    }
+    if (method.type && TYPE_LOGO[method.type]) return LOGO_BASE + TYPE_LOGO[method.type];
+    return '';
+  }
+
+  function payLogoHtml(method, size) {
+    var src = resolvePayLogo(method);
+    var px = size || 36;
+    if (!src) {
+      return '<span class="rzq-pay-logo rzq-pay-logo-emoji" style="width:' + px + 'px;height:' + px + 'px;font-size:'
+        + Math.round(px * 0.55) + 'px">' + typeIcon(method && method.type) + '</span>';
+    }
+    return '<img class="rzq-pay-logo" src="' + esc(src) + '" alt="' + esc((method && method.bank) || '') + '"'
+      + ' width="' + px + '" height="' + px + '" loading="lazy" decoding="async"'
+      + ' style="width:' + px + 'px;height:' + px + 'px;object-fit:contain;border-radius:9px;background:#fff;border:1px solid #e2e8f5;flex:0 0 ' + px + 'px"'
+      + ' onerror="this.style.display=\'none\'">';
+  }
+
+  function ensurePublicPayCss() {
+    if (document.getElementById('rzq-pay-public-logo-css')) return;
+    var s = document.createElement('style');
+    s.id = 'rzq-pay-public-logo-css';
+    s.textContent =
+      '.rzq-pay-public-card{display:flex;gap:10px;align-items:flex-start}'
+      + '.rzq-pay-public-card .rzq-pay-logo{margin-top:1px}'
+      + '.rzq-pay-logo-emoji{display:inline-flex;align-items:center;justify-content:center;border-radius:9px;background:#f0f4ff;border:1px solid #e2e8f5}'
+      + '.rzq-pay-opt-ico img.rzq-pay-logo{width:42px!important;height:42px!important;border-radius:12px;object-fit:contain;background:#fff;border:1px solid #e2e8f5}';
+    document.head.appendChild(s);
   }
 
   function westernDigits(value) {
@@ -338,10 +420,15 @@
     var methods = _pickerState.methods || [];
 
     if (_pickerState.step === 1) {
+      ensurePublicPayCss();
       var listHtml = methods.length
         ? methods.map(function (m, i) {
+          var logoSrc = resolvePayLogo(m);
+          var ico = logoSrc
+            ? '<img class="rzq-pay-logo" src="' + esc(logoSrc) + '" alt="" width="42" height="42" loading="lazy" decoding="async" onerror="this.outerHTML=\'<span>' + typeIcon(m.type) + '</span>\'">'
+            : typeIcon(m.type);
           return '<button type="button" class="rzq-pay-opt" data-pick-idx="' + i + '">'
-            + '<span class="rzq-pay-opt-ico">' + typeIcon(m.type) + '</span>'
+            + '<span class="rzq-pay-opt-ico">' + ico + '</span>'
             + '<span style="flex:1;min-width:0"><div class="rzq-pay-opt-name">' + esc(m.bank || typeLabel(m.type, fr)) + '</div>'
             + '<div class="rzq-pay-opt-sub">' + esc(typeLabel(m.type, fr)) + '</div></span>'
             + '<span class="rzq-pay-radio" aria-hidden="true"></span></button>';
@@ -411,6 +498,7 @@
       container.style.display = 'none';
       return;
     }
+    ensurePublicPayCss();
     container.style.display = '';
     var title = fr ? '💳 Payment options' : '💳 طرق الدفع المتاحة';
     var hint = fr
@@ -423,11 +511,14 @@
           + ' ' + phoneLtrHtml(c.value, 'font-family:monospace;font-size:12.5px;font-weight:800;color:#0f2347;background:#e8f0fe;padding:3px 8px;border-radius:6px;display:inline-block') + '</div>';
       }).join('');
       return '<div style="background:#fff;border:1.5px solid rgba(27,58,107,.12);border-radius:10px;padding:12px 14px;margin-bottom:8px">'
+        + '<div class="rzq-pay-public-card">'
+        + payLogoHtml(m, 40)
+        + '<div style="flex:1;min-width:0">'
         + '<div style="font-size:13px;font-weight:800;color:#1B3A6B">' + esc(m.bank || typeLabel(m.type, fr)) + '</div>'
         + '<div style="font-size:11px;color:#6a7a8a;margin-top:2px">' + esc(typeLabel(m.type, fr)) + '</div>'
         + chHtml
         + (m.note ? '<div style="font-size:11px;color:#4a5568;margin-top:6px;line-height:1.5">' + esc(m.note) + '</div>' : '')
-        + '</div>';
+        + '</div></div></div>';
     }).join('');
     container.innerHTML = '<div style="font-size:13px;font-weight:800;color:#1B3A6B;margin-bottom:8px">' + title + '</div>'
       + '<div style="font-size:12px;color:#6a7a8a;margin-bottom:10px;line-height:1.55">' + hint + '</div>'
@@ -449,6 +540,7 @@
       ? (selection.channelLabelFr || selection.channelKey)
       : (selection.channelLabelAr || selection.channelKey);
     var icon = selection.channelIcon || '💳';
+    ensurePublicPayCss();
     container.style.display = '';
     container.innerHTML =
       '<div style="font-size:12px;font-weight:800;color:#1B3A6B;margin-bottom:8px;letter-spacing:.3px">'
@@ -456,7 +548,9 @@
       + '</div>'
       + '<div style="background:linear-gradient(135deg,#fffdf6,#f4f7fc);border:1.5px solid #C9A84C;border-radius:14px;padding:14px 16px">'
       + '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px">'
-      + '<div style="font-size:14px;font-weight:900;color:#0f2347">' + esc(m.bank || typeLabel(m.type, fr)) + '</div>'
+      + '<div style="display:flex;align-items:center;gap:10px;min-width:0">'
+      + payLogoHtml(m, 36)
+      + '<div style="font-size:14px;font-weight:900;color:#0f2347">' + esc(m.bank || typeLabel(m.type, fr)) + '</div></div>'
       + '<span style="font-size:11px;font-weight:800;color:#0d1b2a;background:linear-gradient(135deg,#C9A84C,#E8C96A);padding:4px 10px;border-radius:999px">'
       + esc(typeLabel(m.type, fr)) + '</span></div>'
       + '<div style="font-size:12px;font-weight:700;color:#6a7a8a;margin-bottom:6px">' + icon + ' ' + esc(chLabel) + '</div>'
@@ -494,6 +588,7 @@
     setLocal: setLocal,
     syncFromBackend: syncFromBackend,
     persist: persist,
+    resolvePayLogo: resolvePayLogo,
     renderPublic: renderPublic,
     renderSelectedChannel: renderSelectedChannel,
     openBuyerPicker: openBuyerPicker,
