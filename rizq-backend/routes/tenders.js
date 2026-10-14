@@ -7,7 +7,8 @@
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const rateLimit = require('express-rate-limit');
+const { createLimiter } = require('../lib/rateLimitRedis');
+const rateLimit = createLimiter;
 
 function genTenderId() {
   return 'TND_' + Date.now() + '_' + crypto.randomBytes(4).toString('hex');

@@ -1,117 +1,58 @@
 /**
- * rizq-backend/db — SQLite (ملف واحد في data/rizq.db)
- * يستخدم node:sqlite المدمج في Node 22+ — بدون تبعيات native
+ * rizq-backend/db — Dual driver entry
+ * DB_DRIVER=sqlite (default) | postgres|pg
  */
-const fs = require('fs');
-const path = require('path');
-const { DatabaseSync } = require('node:sqlite');
+'use strict';
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
-const DB_FILE = path.join(DATA_DIR, 'rizq.db');
-const LEGACY_BUYERS = path.join(DATA_DIR, 'buyers.json');
+const engine = require('./engine');
 
-if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+if (engine.isPostgres) {
+  const fs = require('fs');
+  const sql = require('./sql');
+  const DATA_DIR = engine.DATA_DIR;
+  const DB_FILE = engine.DB_FILE;
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
-const db = new DatabaseSync(DB_FILE);
-db.exec('PRAGMA journal_mode = WAL');
-db.exec('PRAGMA foreign_keys = ON');
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS buyers (
-    id            TEXT PRIMARY KEY,
-    name          TEXT NOT NULL,
-    phone         TEXT NOT NULL UNIQUE,
-    email         TEXT NOT NULL DEFAULT '',
-    token         TEXT NOT NULL,
-    created_at    TEXT NOT NULL,
-    last_login_at TEXT NOT NULL
-  );
-  CREATE INDEX IF NOT EXISTS idx_buyers_phone ON buyers(phone);
-  CREATE INDEX IF NOT EXISTS idx_buyers_token ON buyers(token);
-
-  CREATE TABLE IF NOT EXISTS wishlist_items (
-    buyer_id  TEXT NOT NULL,
-    item_id   TEXT NOT NULL,
-    added_at  TEXT NOT NULL,
-    PRIMARY KEY (buyer_id, item_id),
-    FOREIGN KEY (buyer_id) REFERENCES buyers(id) ON DELETE CASCADE
-  );
-  CREATE INDEX IF NOT EXISTS idx_wishlist_buyer ON wishlist_items(buyer_id);
-
-  CREATE TABLE IF NOT EXISTS corp_api_integrations (
-    company_id        TEXT PRIMARY KEY,
-    api_key_hash      TEXT NOT NULL,
-    api_key_prefix    TEXT NOT NULL,
-    api_status        TEXT NOT NULL DEFAULT 'active'
-                      CHECK (api_status IN ('active', 'suspended')),
-    allowed_origin_ip TEXT,
-    last_used_at      TEXT,
-    created_at        TEXT NOT NULL,
-    updated_at        TEXT NOT NULL
-  );
-  CREATE INDEX IF NOT EXISTS idx_corp_api_prefix ON corp_api_integrations(api_key_prefix);
-  CREATE INDEX IF NOT EXISTS idx_corp_api_status ON corp_api_integrations(api_status);
-`);
-
-function migrateLegacyBuyersJson() {
-  const count = db.prepare('SELECT COUNT(*) AS n FROM buyers').get().n;
-  if (count > 0 || !fs.existsSync(LEGACY_BUYERS)) return 0;
-  let list;
-  try { list = JSON.parse(fs.readFileSync(LEGACY_BUYERS, 'utf8')); } catch (e) { return 0; }
-  if (!Array.isArray(list) || !list.length) return 0;
-  const ins = db.prepare(`
-    INSERT OR IGNORE INTO buyers (id, name, phone, email, token, created_at, last_login_at)
-    VALUES (@id, @name, @phone, @email, @token, @created_at, @last_login_at)
-  `);
-  let n = 0;
-  db.exec('BEGIN');
-  try {
-    list.forEach((b) => {
-      if (!b || !b.id || !b.phone || !b.token) return;
-      const r = ins.run({
-        id: String(b.id),
-        name: String(b.name || '').slice(0, 120),
-        phone: String(b.phone).replace(/\D/g, '').slice(-8),
-        email: String(b.email || '').slice(0, 120),
-        token: String(b.token),
-        created_at: b.createdAt || b.created_at || new Date().toISOString(),
-        last_login_at: b.lastLoginAt || b.last_login_at || new Date().toISOString(),
-      });
-      if (r.changes) n++;
-    });
-    db.exec('COMMIT');
-  } catch (e) {
-    try { db.exec('ROLLBACK'); } catch (e2) {}
-    throw e;
+  async function initSchema() {
+    await engine.ready();
+    try {
+      await sql.execScript(`
+        ALTER TABLE buyers ADD COLUMN IF NOT EXISTS phone_intl TEXT NOT NULL DEFAULT '';
+        ALTER TABLE buyers ADD COLUMN IF NOT EXISTS whatsapp TEXT NOT NULL DEFAULT '';
+        ALTER TABLE buyers ADD COLUMN IF NOT EXISTS pass_hash TEXT;
+        ALTER TABLE buyers ADD COLUMN IF NOT EXISTS email_lc TEXT NOT NULL DEFAULT '';
+      `);
+    } catch (e) {
+      console.warn('[rizq-db] pg buyer columns:', e.message);
+    }
+    console.log('[rizq-db] PostgreSQL driver active');
   }
-  if (n) console.log('[rizq-db] migrated ' + n + ' buyer(s) from buyers.json');
-  return n;
+
+  const ready = initSchema();
+
+  module.exports = {
+    get db() {
+      throw new Error('[rizq-db] sync DatabaseSync handle is SQLite-only — models use db/sql under postgres');
+    },
+    DB_FILE,
+    DATA_DIR,
+    ready,
+    close: () => engine.close(),
+    DRIVER: engine.DRIVER,
+    isPostgres: true,
+    sql,
+    engine,
+  };
+} else {
+  const sqlite = require('./index.sqlite');
+  module.exports = Object.assign({}, sqlite, {
+    ready: Promise.resolve({ driver: 'sqlite', isPostgres: false }),
+    close: async () => {
+      try { if (sqlite.db && typeof sqlite.db.close === 'function') sqlite.db.close(); } catch (e) { /* ignore */ }
+    },
+    DRIVER: 'sqlite',
+    isPostgres: false,
+    sql: require('./sql'),
+    engine,
+  });
 }
-
-migrateLegacyBuyersJson();
-
-function migrateBuyerColumns() {
-  try {
-    const cols = db.prepare('PRAGMA table_info(buyers)').all();
-    const names = cols.map((c) => c.name);
-    if (!names.includes('phone_intl')) {
-      db.exec("ALTER TABLE buyers ADD COLUMN phone_intl TEXT NOT NULL DEFAULT ''");
-    }
-    if (!names.includes('whatsapp')) {
-      db.exec("ALTER TABLE buyers ADD COLUMN whatsapp TEXT NOT NULL DEFAULT ''");
-    }
-    if (!names.includes('pass_hash')) {
-      db.exec('ALTER TABLE buyers ADD COLUMN pass_hash TEXT');
-    }
-    if (!names.includes('email_lc')) {
-      db.exec("ALTER TABLE buyers ADD COLUMN email_lc TEXT NOT NULL DEFAULT ''");
-      db.exec("UPDATE buyers SET email_lc = lower(trim(email)) WHERE email_lc = '' AND email != ''");
-      try { db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_buyers_email_lc ON buyers(email_lc) WHERE email_lc != \'\''); } catch (eIdx) { /* optional */ }
-    }
-  } catch (e) {
-    console.warn('[rizq-db] buyer column migration:', e.message);
-  }
-}
-migrateBuyerColumns();
-
-module.exports = { db, DB_FILE, DATA_DIR };

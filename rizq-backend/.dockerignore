@@ -1,0 +1,11 @@
+node_modules
+data
+uploads
+.env
+.env.*
+!.env.example
+*.log
+npm-debug.log*
+.git
+coverage
+scripts/tmp
