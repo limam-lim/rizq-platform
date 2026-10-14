@@ -187,35 +187,75 @@
       '.rzq-iv-poster{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;' +
         'background-size:cover;background-position:center;cursor:pointer;border:none;padding:0;width:100%;height:100%}' +
       '.rzq-iv-poster::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,17,28,.15),rgba(6,17,28,.55))}' +
-      /* زر تشغيل شفاف يختفي — بلا نصوص تغطي الفيديو على أي شاشة */
+      /* زر تشغيل شفاف — أيقونة فقط بلا نصوص تغطي الشاشة */
       '.rzq-iv-play{position:relative;z-index:2;width:56px;height:56px;border-radius:50%;' +
         'background:rgba(255,255,255,.18);color:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;' +
         'font-size:22px;box-shadow:none;border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(4px);' +
         'opacity:.35;transition:opacity .22s ease,transform .22s ease,background .2s ease}' +
       '.rzq-iv-poster:hover .rzq-iv-play,.rzq-iv-frame:focus-within .rzq-iv-play{opacity:.95;transform:scale(1.04);background:rgba(255,255,255,.28)}' +
       '.rzq-iv-play-label,.rzq-iv-badge,.rzq-iv-dash-hint{display:none!important}' +
-      '.rzq-iv-sound{position:absolute;bottom:10px;left:10px;z-index:3;display:none;background:rgba(10,22,40,.75);' +
-        'backdrop-filter:blur(6px);border:1px solid rgba(201,168,76,.5);color:#e8c96a;font-size:12px;font-weight:700;' +
-        'padding:7px 14px;border-radius:10px;cursor:pointer;transition:background .2s}' +
-      '.rzq-iv-sound.is-on{display:inline-flex}' +
-      '.rzq-iv-sound:hover{background:rgba(201,168,76,.25)}' +
-      '.rzq-iv-src{display:block;text-align:center;margin-top:10px;font-size:11.5px;color:rgba(27,58,107,.55);text-decoration:none;transition:color .2s}' +
-      '.rzq-iv-src:hover{color:#1B3A6B}' +
+      /* كتم + تكبير: رموز دائرية فقط (aria-label للنفاذية) */
+      '.rzq-iv-sound,.rzq-iv-fs{position:absolute;bottom:8px;z-index:4;display:none;align-items:center;justify-content:center;' +
+        'width:34px;height:34px;padding:0;border-radius:50%;cursor:pointer;' +
+        'background:rgba(10,22,40,.78);backdrop-filter:blur(6px);border:1px solid rgba(201,168,76,.5);' +
+        'color:#e8c96a;font-size:15px;line-height:1;box-shadow:0 4px 12px rgba(0,0,0,.35);' +
+        'transition:background .2s,transform .15s,opacity .2s}' +
+      '.rzq-iv-sound{left:8px}' +
+      '.rzq-iv-fs{right:8px}' +
+      '.rzq-iv-sound.is-on,.rzq-iv-fs.is-on{display:inline-flex}' +
+      '.rzq-iv-sound:hover,.rzq-iv-fs:hover{background:rgba(201,168,76,.35);transform:scale(1.06)}' +
+      '.rzq-iv-frame:fullscreen,.rzq-iv-frame:-webkit-full-screen{width:100vw;height:100vh;aspect-ratio:auto;border-radius:0;background:#000}' +
+      '.rzq-iv-frame:fullscreen iframe,.rzq-iv-frame:fullscreen video.rzq-iv-video,' +
+      '.rzq-iv-frame:-webkit-full-screen iframe,.rzq-iv-frame:-webkit-full-screen video.rzq-iv-video{object-fit:contain}' +
+      '.rzq-iv-src{display:none!important}' +
       '.store-video-frame .rzq-iv-wrap,.store-video-frame .rzq-iv-frame{max-width:100%;width:100%;height:100%;min-height:220px;box-sizing:border-box}' +
       '@media (max-width:900px){' +
         '.store-video-frame .rzq-iv-wrap,.store-video-frame .rzq-iv-frame{min-height:0!important;max-width:100%!important;width:100%!important}' +
         '.store-video-frame .rzq-iv-frame iframe,.store-video-frame .rzq-iv-frame video.rzq-iv-video{object-fit:contain!important}' +
-        '.rzq-iv-sound{max-width:calc(100% - 18px);overflow:hidden;text-overflow:ellipsis}' +
+        '.rzq-iv-sound,.rzq-iv-fs{width:30px;height:30px;font-size:13px;bottom:6px}' +
+        '.rzq-iv-sound{left:6px}.rzq-iv-fs{right:6px}' +
       '}' +
       '#p-promo-video-preview .rzq-iv-wrap,#p-promo-video-extra-preview .rzq-iv-wrap{max-width:none}' +
       '.rzq-iv-frame.is-live-dash{background:#0a1220}' +
       '.rzq-iv-dash-scale{position:absolute;inset:0;overflow:hidden;background:#f8faff}' +
       '.rzq-iv-dash-scale iframe{position:absolute;top:0;right:0;width:180%;height:180%;border:0;' +
         'transform:scale(.555);transform-origin:top right;background:#f8faff}' +
-      '.rzq-iv-dash-hint{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:4;' +
-        'background:rgba(10,22,40,.82);color:#E8C96A;font-size:11px;font-weight:800;padding:6px 12px;border-radius:999px;' +
-        'border:1px solid rgba(201,168,76,.45);white-space:nowrap;pointer-events:none}';
+      '.rzq-iv-dash-hint{display:none!important}';
     document.head.appendChild(s);
+  }
+
+  /** زر تكبير الشاشة — أيقونة فقط؛ يعمل على الإطار (فيديو أصلي أو iframe) */
+  function wireFullscreen(frameEl, btn, fr) {
+    if (!frameEl || !btn || btn.getAttribute('data-rzq-fs-wired') === '1') return;
+    btn.setAttribute('data-rzq-fs-wired', '1');
+    var exitLbl = fr ? 'Quitter' : 'إغلاق';
+    var enterLbl = fr ? 'Plein écran' : 'شاشة كاملة';
+    function syncFsIcon() {
+      var now = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      btn.textContent = now ? '✕' : '⛶';
+      btn.setAttribute('aria-label', now ? exitLbl : enterLbl);
+      btn.setAttribute('title', now ? exitLbl : enterLbl);
+    }
+    btn.addEventListener('click', function (ev) {
+      if (ev) { ev.preventDefault(); ev.stopPropagation(); }
+      var cur = document.fullscreenElement || document.webkitFullscreenElement;
+      try {
+        if (cur) {
+          if (document.exitFullscreen) document.exitFullscreen();
+          else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        } else if (frameEl.requestFullscreen) {
+          frameEl.requestFullscreen();
+        } else if (frameEl.webkitRequestFullscreen) {
+          frameEl.webkitRequestFullscreen();
+        } else {
+          var v = frameEl.querySelector('video.rzq-iv-video');
+          if (v && v.webkitEnterFullscreen) v.webkitEnterFullscreen();
+        }
+      } catch (eFs) {}
+      setTimeout(syncFsIcon, 80);
+    });
+    document.addEventListener('fullscreenchange', syncFsIcon);
+    document.addEventListener('webkitfullscreenchange', syncFsIcon);
   }
 
   /**
@@ -235,20 +275,24 @@
     var page = pack.page;
     var openLbl = fr ? 'Ouvrir le tableau de bord ↗' : 'افتح الداشبورد الكامل ↗';
 
+    var fsLbl = fr ? 'Plein écran' : 'شاشة كاملة';
     hostEl.innerHTML =
       '<div class="rzq-iv-wrap">' +
         '<div class="rzq-iv-frame is-live-dash" id="' + uid + '-frame">' +
           '<button type="button" class="rzq-iv-poster" id="' + uid + '-poster" style="background-image:url(\'' + String(poster).replace(/'/g, '%27') + '\')" aria-label="' + esc(playLbl) + '" title="' + esc(title) + '">' +
             '<span class="rzq-iv-play" aria-hidden="true">▶</span>' +
           '</button>' +
+          '<button type="button" class="rzq-iv-fs is-on" id="' + uid + '-fs" aria-label="' + esc(fsLbl) + '" title="' + esc(fsLbl) + '">⛶</button>' +
         '</div>' +
-        '<a class="rzq-iv-src" href="' + esc(page.replace('&embed=1', '').replace('?embed=1', '?demo=1')) + '" target="_blank" rel="noopener noreferrer">' +
-          esc(openLbl) +
-        '</a>' +
+        '<a class="rzq-iv-src" href="' + esc(page.replace('&embed=1', '').replace('?embed=1', '?demo=1')) + '" target="_blank" rel="noopener noreferrer" aria-label="' + esc(openLbl) + '">↗</a>' +
       '</div>';
 
     var frame = hostEl.querySelector('#' + uid + '-frame');
     var posterBtn = hostEl.querySelector('#' + uid + '-poster');
+    var fsBtnDash = hostEl.querySelector('#' + uid + '-fs');
+    if (fsBtnDash && frame) {
+      wireFullscreen(frame, fsBtnDash, fr);
+    }
 
     function showClipFallback() {
       if (!frame) return;
@@ -371,31 +415,41 @@
 
     var safeHref = safeExternalUrl(url);
     var a11yTitle = opts.title || '🎬 فيديو تعريفي';
+    var frUi = !!(opts.fr || opts.lang === 'fr' || /vidéo|présentation|supplémentaire/i.test(String(opts.title || '')));
+    var muteAria = opts.mutedLabel || (frUi ? 'Activer le son' : 'تفعيل الصوت');
+    var unmuteAria = opts.unmutedLabel || (frUi ? 'Couper le son' : 'كتم الصوت');
+    var fsAria = opts.fsLabel || (frUi ? 'Plein écran' : 'شاشة كاملة');
+    var linkAria = opts.linkLabel || (frUi ? 'Source' : 'المصدر');
     hostEl.innerHTML =
       '<div class="rzq-iv-wrap">' +
         '<div class="rzq-iv-frame" id="' + uid + '-frame">' +
           '<button type="button" class="rzq-iv-poster" id="' + uid + '-poster" style="' + posterBg + '" aria-label="' + esc(playLbl) + '" title="' + esc(a11yTitle) + '">' +
             '<span class="rzq-iv-play" aria-hidden="true">▶</span>' +
           '</button>' +
-          '<button type="button" class="rzq-iv-sound" id="' + uid + '-sound">🔇 ' + esc(opts.mutedLabel || 'اضغط لتفعيل الصوت') + '</button>' +
+          '<button type="button" class="rzq-iv-sound" id="' + uid + '-sound" aria-label="' + esc(muteAria) + '" title="' + esc(muteAria) + '">🔇</button>' +
+          '<button type="button" class="rzq-iv-fs" id="' + uid + '-fs" aria-label="' + esc(fsAria) + '" title="' + esc(fsAria) + '">⛶</button>' +
         '</div>' +
         (safeHref
-          ? ('<a class="rzq-iv-src" href="' + esc(safeHref) + '" target="_blank" rel="noopener noreferrer">' +
-              esc(opts.linkLabel || 'شاهد على المصدر الأصلي ↗') +
-            '</a>')
+          ? ('<a class="rzq-iv-src" href="' + esc(safeHref) + '" target="_blank" rel="noopener noreferrer" aria-label="' + esc(linkAria) + '">↗</a>')
           : '') +
       '</div>';
 
     var frame = hostEl.querySelector('#' + uid + '-frame');
     var poster = hostEl.querySelector('#' + uid + '-poster');
     var soundBtn = hostEl.querySelector('#' + uid + '-sound');
+    var fsBtn = hostEl.querySelector('#' + uid + '-fs');
 
     function syncSoundLabel() {
       if (!soundBtn) return;
       soundBtn.classList.add('is-on');
-      soundBtn.textContent = muted
-        ? ('🔇 ' + (opts.mutedLabel || 'اضغط لتفعيل الصوت'))
-        : ('🔊 ' + (opts.unmutedLabel || 'الصوت مفعّل'));
+      if (fsBtn) fsBtn.classList.add('is-on');
+      soundBtn.textContent = muted ? '🔇' : '🔊';
+      soundBtn.setAttribute('aria-label', muted ? muteAria : unmuteAria);
+      soundBtn.setAttribute('title', muted ? muteAria : unmuteAria);
+    }
+
+    if (frame && fsBtn) {
+      wireFullscreen(frame, fsBtn, frUi);
     }
 
     function loadNativePlayer(withSound) {
