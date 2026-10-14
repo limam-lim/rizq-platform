@@ -1192,7 +1192,7 @@ footer{
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_contact_gate.js" defer></script>
   <script src="rizq_account_payments.js?v=28.2" defer></script>
-  <script src="rizq_service_desk.js?v=1.1" defer></script>
+  <script src="rizq_service_desk.js?v=1.2" defer></script>
   <script src="rizq_terms_gate.js?v=23.0" defer></script>
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
@@ -1530,7 +1530,14 @@ footer{
             <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" rows="2"></textarea>
           </div>
           <div class="store-desk-actions">
-            <p class="store-desk-note">📎 الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.</p>
+            <div id="rf-doc-upload" data-desk="doc-upload" class="store-desk-note" style="border-style:dashed">
+              <div data-desk="doc-title" style="font-size:12.5px;font-weight:700;color:#1B3A6B;margin-bottom:4px">رفع بيان الدفع (اختياري)</div>
+              <div data-desk="doc-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin-bottom:8px">صورة أو PDF — يُحفظ على المنصة لحماية حقوق الطرفين.</div>
+              <input type="file" id="rf-doc-file" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" multiple hidden />
+              <button type="button" data-desk="doc-pick" id="rf-doc-pick" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;border:1px solid rgba(27,58,107,.25);background:#fff;color:#1B3A6B;font-size:12.5px;font-weight:700;cursor:pointer">📎 اختر صورة أو PDF</button>
+              <div id="rf-doc-list" hidden></div>
+              <div id="rf-doc-error" style="display:none;margin-top:6px;font-size:11.5px;color:#b91c1c"></div>
+            </div>
             <button type="button" id="store-req-submit" onclick="submitStoreServiceReq()">📤 إرسال الطلب</button>
           </div>
         </div>
@@ -2302,7 +2309,7 @@ function rizqShare(title, url) {
         serviceDesk: {
           enabled: true,
           formTitle: fr ? 'Commande — Boutique Al-Nour' : 'طلب شراء — محل النور',
-          formHint: fr ? 'Vos coordonnées restent chez le magasin. Documents via WhatsApp/e-mail.' : 'بياناتك تصل للمحل مباشرة. الوثائق عبر واتساب أو الإيميل.',
+          formHint: fr ? 'Vos coordonnées restent chez le magasin. Joignez un justificatif (image/PDF) sur la plateforme.' : 'بياناتك تصل للمحل مباشرة. يمكنك رفع بيان الدفع (صورة أو PDF) على المنصة.',
           docsChannel: 'whatsapp'
         },
         paymentMethods: [
@@ -3453,15 +3460,16 @@ if(typeof _t2 === 'undefined'){
       if(lab) lab.textContent = map[id][0];
       if(el.placeholder !== undefined) el.placeholder = map[id][1];
     });
-    var docs = root.querySelector('#store-req-form > p');
-    if(docs) docs.textContent = isFr
-      ? '📎 Vous pouvez envoyer les documents via WhatsApp ou e-mail après l’envoi.'
-      : '📎 يمكنك إرسال الوثائق عبر واتساب أو الإيميل بعد إرسال الطلب.';
+    if(window.RizqServiceDesk){
+      if(typeof RizqServiceDesk.ensureDocUpload === 'function'){
+        RizqServiceDesk.ensureDocUpload(document.getElementById('store-req-form'));
+      }
+      if(typeof RizqServiceDesk.applyPublicLabels === 'function'){
+        RizqServiceDesk.applyPublicLabels(root, window._rizqStoreServiceDesk || {}, (window._rizqProfile && window._rizqProfile.name) || '');
+      }
+    }
     var btn = document.getElementById('store-req-submit');
     if(btn) btn.textContent = isFr ? '📤 Envoyer la demande' : '📤 إرسال الطلب للمحل';
-    if(window.RizqServiceDesk && typeof RizqServiceDesk.applyPublicLabels === 'function'){
-      RizqServiceDesk.applyPublicLabels(root, window._rizqStoreServiceDesk || {}, (window._rizqProfile && window._rizqProfile.name) || '');
-    }
   }
 
   function applyStoreLang(lang){

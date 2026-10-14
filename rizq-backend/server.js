@@ -200,6 +200,11 @@ app.use('/uploads/receipts', forbidUploadPath(
   'وصول الدفع محمية — للمراجعة الإدارية فقط',
   'Reçus de paiement protégés — revue administrative uniquement'
 ));
+app.use('/uploads/service-docs', forbidUploadPath(
+  'service_docs_forbidden',
+  'مرفقات غرفة الطلبات محمية — لصاحب الحساب فقط',
+  'Pièces jointes du bureau de demandes protégées — titulaire uniquement'
+));
 app.use('/uploads/ads', gateUploadByStatus(
   (adId) => repos.ads.getById(adId),
   ['active', 'approved', 'published'],
