@@ -31,12 +31,12 @@
   display:flex!important;
   align-items:center;
   justify-content:center;
-  flex:0 0 26px!important;
+  flex:0 0 22px!important;
   width:100%;
-  height:26px!important;
-  min-height:26px!important;
-  max-height:26px!important;
-  margin:2px 0 4px!important;
+  height:22px!important;
+  min-height:22px!important;
+  max-height:22px!important;
+  margin:1px 0 2px!important;
   overflow:hidden!important;
   box-sizing:border-box;
   flex-shrink:0!important;
@@ -53,20 +53,20 @@
 .cards-track{
   align-items:stretch!important;
 }
-/* بطاقات الشريط الحي: ارتفاع موحّد صريح (لا يعتمد على محتوى الماركة) */
+/* بطاقات الشريط الحي: ارتفاع موحّد — الصورة تأخذ الحصة الأكبر */
 #hero-listings .cards-track .ad-card:has(.rzq-adx-media),
 .cards-track .ad-card:has(.rzq-adx-media){
-  height:336px!important;
-  min-height:336px!important;
-  max-height:336px!important;
+  height:348px!important;
+  min-height:348px!important;
+  max-height:348px!important;
   align-self:stretch!important;
 }
 @media (max-width:768px){
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media),
   .cards-track .ad-card:has(.rzq-adx-media){
-    height:268px!important;
-    min-height:268px!important;
-    max-height:268px!important;
+    height:300px!important;
+    min-height:300px!important;
+    max-height:300px!important;
   }
 }
 .rzq-ad-brand-slot .rzq-brand-chip{
@@ -78,20 +78,20 @@
   color:#fff!important;
 }
 .rzq-ad-brand-slot .rzq-brand-chip-name{color:#fff!important}
-/* إلغاء قيود الشبكة القديمة — صورة أقصر قليلاً لبطاقة أقرب للمربع */
+/* صورة أوضح وأطول — النص لا يطغى على المشهد */
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .l-img.rzq-adx-media,
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .rzq-adx-media{
   height:auto!important;
-  min-height:120px!important;
-  aspect-ratio:1.15 / 1!important;
+  min-height:148px!important;
+  aspect-ratio:1 / 1.08!important;
   font-size:inherit!important;
 }
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .l-body{
-  padding:10px 8px 8px!important;
+  padding:7px 7px 7px!important;
 }
 .listings-grid .listing-card:has(.rzq-adx-media) .l-img.rzq-adx-media{
   height:auto!important;
-  min-height:118px!important;
+  min-height:140px!important;
 }
 .ad-card:has(.rzq-adx-media){
   width:200px;
@@ -109,36 +109,38 @@
   color:#fff;
 }
 
-/* ── منطقة الصورة — أقصر قليلاً من المربع ── */
+/* ── منطقة الصورة — أوضح وأبرز من جسم النص ── */
 .rzq-adx-media{
   position:relative;
   overflow:hidden;
-  flex:0 0 auto;
+  flex:1 1 auto;
+  min-height:0;
   background:
-    radial-gradient(circle at 30% 20%,rgba(201,168,76,.14),transparent 45%),
+    radial-gradient(circle at 30% 20%,rgba(201,168,76,.1),transparent 42%),
     linear-gradient(160deg,#102038,#0a1628);
   transform:translateZ(0);
 }
 .ad-card .rzq-adx-media,
 .ad-card-img.rzq-adx-media{
   height:auto;
-  aspect-ratio:1.15 / 1;
-  min-height:128px;
+  flex:1 1 auto;
+  aspect-ratio:1 / 1.08;
+  min-height:150px;
   border-radius:13px 13px 0 0;
 }
 .listing-card .rzq-adx-media,
 .l-img.rzq-adx-media{
   height:auto!important;
-  aspect-ratio:1.15 / 1;
-  min-height:120px;
+  aspect-ratio:1 / 1.08;
+  min-height:142px;
   border-radius:13px 13px 0 0!important;
 }
 .rc .rzq-adx-media,
 .rc-thumb.rzq-adx-media{
   width:100%!important;
   height:auto!important;
-  min-height:118px;
-  aspect-ratio:1.15 / 1!important;
+  min-height:140px;
+  aspect-ratio:1 / 1.08!important;
   border-radius:13px 13px 0 0!important;
 }
 
@@ -156,7 +158,8 @@
   display:flex;align-items:center;justify-content:center;
 }
 .rzq-adx-slide img{
-  width:100%;height:100%;object-fit:cover;display:block;
+  width:100%;height:100%;object-fit:cover;object-position:center;
+  display:block;filter:saturate(1.06) contrast(1.04);
 }
 .rzq-adx-emoji{
   font-size:40px;line-height:1;
@@ -165,8 +168,8 @@
   transform:translateY(-10px);
 }
 .rzq-adx-grad{
-  position:absolute;inset:auto 0 0 0;height:48%;z-index:2;pointer-events:none;
-  background:linear-gradient(to top,rgba(7,17,31,.78) 0%,rgba(7,17,31,.22) 50%,transparent 100%);
+  position:absolute;inset:auto 0 0 0;height:28%;z-index:2;pointer-events:none;
+  background:linear-gradient(to top,rgba(7,17,31,.55) 0%,rgba(7,17,31,.14) 55%,transparent 100%);
 }
 
 /* أسهم الكاروسيل — دوائر داكنة رقيقة */
@@ -218,7 +221,7 @@
 
 /* نقاط الكاروسيل فوق شارة السعر */
 .rzq-adx-dots{
-  position:absolute;z-index:4;left:0;right:0;bottom:46px;
+  position:absolute;z-index:4;left:0;right:0;bottom:38px;
   display:flex;justify-content:center;gap:5px;pointer-events:none;
 }
 .rzq-adx-dot{
@@ -234,89 +237,99 @@
 }
 .rzq-adx-media:not(.has-multi) .rzq-adx-dots{display:none!important}
 
-/* شريط توسيط السعر — الكبسولة المستطيلة الذهبية الشفافة في الوسط */
+/* شريط السعر — أسفل الصورة بحجم أخف حتى تبقى الصورة واضحة */
 .rzq-adx-price{
   position:absolute;z-index:8;
-  left:0;right:0;bottom:10px;
+  left:0;right:0;bottom:8px;
   display:flex;justify-content:center;align-items:center;
-  padding:0 12px;margin:0;
+  padding:0 10px;margin:0;
   background:transparent;border:none;box-shadow:none;
   pointer-events:none;
 }
 .rzq-adx-price-pill{
   display:inline-block;
-  max-width:100%;
-  padding:5px 10px;border-radius:3px;
-  font-size:12px;font-weight:900;letter-spacing:.3px;color:#0a1424;
-  /* خلفية ذهبية معتمة — نص واضح فوق أي صورة فاتحة/داكنة */
-  background:linear-gradient(180deg,#FFE9A8 0%,#F0D078 55%,#D4A84A 100%);
-  border:1px solid rgba(255,248,220,.9);
+  max-width:92%;
+  padding:4px 9px;border-radius:4px;
+  font-size:11px;font-weight:900;letter-spacing:.2px;color:#0a1424;
+  background:linear-gradient(180deg,rgba(255,233,168,.96) 0%,rgba(240,208,120,.94) 55%,rgba(212,168,74,.96) 100%);
+  border:1px solid rgba(255,248,220,.85);
   box-shadow:
-    0 4px 14px rgba(0,0,0,.35),
-    0 0 0 1px rgba(201,168,76,.45),
-    inset 0 1px 0 rgba(255,255,255,.65);
+    0 3px 10px rgba(0,0,0,.28),
+    0 0 0 1px rgba(201,168,76,.35),
+    inset 0 1px 0 rgba(255,255,255,.55);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   font-family:'Cairo','Segoe UI',sans-serif;
   text-align:center;
-  text-shadow:0 1px 0 rgba(255,255,255,.4);
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
   -webkit-font-smoothing:antialiased;
 }
-/* كبسولة مميز — مستطيلة ذهبية شفافة */
-.rzq-adx-badge{
-  position:absolute;z-index:5;top:10px;right:10px;left:auto;
-  padding:2px 6px;border-radius:3px;font-size:9px;font-weight:800;
-  color:#FFF6D6;
-  background:linear-gradient(180deg,rgba(240,215,138,.42),rgba(201,168,76,.28));
-  border:1px solid rgba(240,215,138,.62);
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  box-shadow:0 2px 8px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,248,224,.2);
-  text-shadow:0 1px 2px rgba(0,0,0,.45);
+/* «مميز» — ثابت فيزيائياً أعلى يمين الصورة على كل الشاشات (لا يتأثر بـ RTL) */
+.rzq-adx-badge,
+.rzq-adx-media.has-seen .rzq-adx-badge,
+.ad-card .rzq-adx-badge,
+.listing-card .rzq-adx-badge,
+.rc .rzq-adx-badge{
+  position:absolute!important;
+  z-index:7!important;
+  top:8px!important;
+  right:8px!important;
+  left:auto!important;
+  inset:8px 8px auto auto!important;
+  padding:3px 8px!important;
+  border-radius:4px!important;
+  font-size:9.5px!important;
+  font-weight:900!important;
+  letter-spacing:.2px;
+  color:#0f2347!important;
+  background:linear-gradient(180deg,#FFE9A8,#E8C96A 55%,#C9A84C)!important;
+  border:1px solid rgba(255,248,220,.9)!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  box-shadow:0 3px 10px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.55)!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.35)!important;
 }
 
-/* علامة رزق شفافة — فوق السعر حتى لا تغطيه */
+/* علامة رزق شفافة — بعيداً عن وسط الصورة */
 .rzq-adx-wm{
   position:absolute;z-index:3;pointer-events:none;
-  inset-inline-end:8px;bottom:52px;
+  inset-inline-start:8px;bottom:40px;inset-inline-end:auto;
   font-family:'Cairo','Segoe UI',sans-serif;
-  font-size:10px;font-weight:800;letter-spacing:.2px;
-  color:rgba(255,255,255,.36);
-  text-shadow:0 1px 2px rgba(0,0,0,.35);
+  font-size:9px;font-weight:800;letter-spacing:.2px;
+  color:rgba(255,255,255,.28);
+  text-shadow:0 1px 2px rgba(0,0,0,.3);
   line-height:1;user-select:none;
 }
-.rzq-adx-media.has-seen .rzq-adx-wm{bottom:70px}
+.rzq-adx-media.has-seen .rzq-adx-wm{bottom:40px}
 
-/* شارة «شاهدته من قبل» — فوق السعر */
+/* «شاهدته من قبل» — شريط صغير أسفل الصورة لا يغطي وسطها ولا يحرّك «مميز» */
 .rzq-adx-seen{
   position:absolute;z-index:6;
-  bottom:52px;inset-inline-end:8px;
-  display:inline-flex;align-items:center;gap:5px;
-  max-width:calc(100% - 16px);
-  padding:4px 9px;border-radius:999px;
-  background:rgba(15,23,42,.62);
-  border:1px solid rgba(255,255,255,.16);
-  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  color:#fff;font-size:10px;font-weight:800;line-height:1;
+  bottom:36px;left:8px;right:auto;inset-inline-start:8px;inset-inline-end:auto;
+  display:inline-flex;align-items:center;gap:4px;
+  max-width:calc(100% - 20px);
+  padding:3px 7px;border-radius:999px;
+  background:rgba(15,23,42,.52);
+  border:1px solid rgba(255,255,255,.14);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  color:#fff;font-size:9px;font-weight:800;line-height:1;
   font-family:'Cairo','Segoe UI',sans-serif;
   white-space:nowrap;pointer-events:none;
-  box-shadow:0 2px 8px rgba(0,0,0,.22);
+  box-shadow:0 2px 6px rgba(0,0,0,.18);
 }
-.rzq-adx-seen-ico{font-size:11px;line-height:1;opacity:.95}
+.rzq-adx-seen-ico{font-size:10px;line-height:1;opacity:.95}
 .rzq-adx-seen-txt{overflow:hidden;text-overflow:ellipsis}
-.rzq-adx-media.has-seen .rzq-adx-badge{
-  top:46px;
-}
 
-/* ── جسم البطاقة — مضغوط أقرب للمربع ── */
+/* ── جسم البطاقة — مضغوط حتى تبقى الصورة هي البطل ── */
 .ad-card:has(.rzq-adx-media) .ad-card-body,
 .listing-card:has(.rzq-adx-media) .l-body,
 .rc:has(.rzq-adx-media) .rc-body{
-  flex:1 1 auto;
+  flex:0 0 auto;
   display:flex;
   flex-direction:column;
   align-items:center;
   text-align:center;
   gap:0;
-  padding:10px 8px 8px!important;
+  padding:7px 7px 7px!important;
   position:relative;
   z-index:1;
   background:transparent!important;
@@ -325,7 +338,7 @@
 .ad-card:has(.rzq-adx-media) .ad-title,
 .listing-card:has(.rzq-adx-media) .l-title,
 .rc:has(.rzq-adx-media) .rc-title{
-  min-height:calc(1.45em * 2);
+  min-height:0;
 }
 .ad-card:has(.rzq-adx-media) .rzq-adx-actions,
 .listing-card:has(.rzq-adx-media) .rzq-adx-actions,
@@ -338,13 +351,13 @@
 .rc:has(.rzq-adx-media) .rc-cat{
   display:block;
   width:100%;
-  font-size:10px!important;
+  font-size:9.5px!important;
   font-weight:700!important;
   letter-spacing:.2px;
   color:var(--rzq-adx-gold-light)!important;
-  margin:0 0 4px!important;
+  margin:0 0 2px!important;
   opacity:.95;
-  line-height:1.4!important;
+  line-height:1.3!important;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -354,18 +367,18 @@
 .listing-card:has(.rzq-adx-media) .l-title,
 .rc:has(.rzq-adx-media) .rc-title{
   width:100%;
-  font-size:12px!important;
+  font-size:11.5px!important;
   font-weight:800!important;
   color:#fff!important;
-  line-height:1.45!important;
-  margin:0 0 4px!important;
+  line-height:1.35!important;
+  margin:0 0 2px!important;
   overflow:hidden;
   display:-webkit-box;
   -webkit-line-clamp:2;
   -webkit-box-orient:vertical;
   word-break:break-word;
   overflow-wrap:anywhere;
-  padding-bottom:1px;
+  padding-bottom:0;
   text-shadow:0 1px 2px rgba(0,0,0,.28);
 }
 
@@ -377,12 +390,12 @@
   justify-content:center;
   gap:3px;
   width:100%;
-  min-height:18px;
-  font-size:10.5px!important;
+  min-height:16px;
+  font-size:10px!important;
   font-weight:600!important;
   color:rgba(255,255,255,.82)!important;
-  margin:0 0 6px!important;
-  line-height:1.4!important;
+  margin:0 0 4px!important;
+  line-height:1.3!important;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .ad-card:has(.rzq-adx-media) .ad-footer,
@@ -496,8 +509,8 @@
     width:200px;
   }
   .ad-card .rzq-adx-media{
-    min-height:128px;
-    aspect-ratio:1.15 / 1;
+    min-height:156px;
+    aspect-ratio:1 / 1.08;
   }
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media){
     width:190px!important;
@@ -515,11 +528,11 @@
   }
   #result-list-body .rc:has(.rzq-adx-media) .rzq-adx-media,
   #result-list-body .rc-thumb.rzq-adx-media{
-    aspect-ratio:1.32 / 1!important;
-    min-height:100px!important;
+    aspect-ratio:1 / 1.05!important;
+    min-height:132px!important;
   }
   #result-list-body .rc:has(.rzq-adx-media) .rc-body{
-    padding:7px 7px 6px!important;
+    padding:6px 7px 6px!important;
   }
   #result-list-body .rc:has(.rzq-adx-media) .rc-title{
     -webkit-line-clamp:2;
@@ -562,31 +575,32 @@
   .rzq-adx-media.has-multi .rzq-adx-nav{
     opacity:.8;pointer-events:auto;
   }
-  .ad-card .rzq-adx-media{min-height:96px}
-  .listing-card .rzq-adx-media{min-height:96px}
-  .rzq-adx-fav{width:24px;height:24px}
+  .ad-card .rzq-adx-media{min-height:118px}
+  .listing-card .rzq-adx-media{min-height:118px}
+  .rzq-adx-fav{width:24px;height:24px;top:8px;left:8px}
+  .rzq-adx-badge{top:8px!important;right:8px!important}
   .rzq-adx-nav{width:22px;height:22px}
   .rzq-adx-price-pill{font-size:10px;padding:3px 7px;border-radius:3px;font-weight:900}
   .rzq-adx-tel,
   .rzq-adx-actions .rzq-adx-wa{width:24px;height:24px}
   /* شريط المباشر على الهاتف: بطاقات أصغر وبعرض الشاشة (بدون هامش سطح مكتب) */
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media){
-    width:138px!important;
-    min-width:138px!important;
-    max-width:138px!important;
-    flex:0 0 138px!important;
+    width:146px!important;
+    min-width:146px!important;
+    max-width:146px!important;
+    flex:0 0 146px!important;
     border-radius:12px!important;
   }
   #hero-listings .cards-track .ad-card .rzq-adx-media{
-    min-height:96px!important;
+    min-height:118px!important;
     height:auto!important;
     max-height:none!important;
-    aspect-ratio:1.12 / 1!important;
+    aspect-ratio:1 / 1.08!important;
   }
   .ad-card:has(.rzq-adx-media) .ad-card-body,
   .listing-card:has(.rzq-adx-media) .l-body,
   .rc:has(.rzq-adx-media) .rc-body{
-    padding:7px 6px 6px!important;
+    padding:6px 6px 6px!important;
   }
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .ad-title,
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .rzq-adx-title{

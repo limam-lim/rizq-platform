@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=30.9"/>
-<link rel="stylesheet" href="rizq_ad_cards.css?v=4.0"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=4.1"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.9"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.3"/>
@@ -2035,9 +2035,10 @@ html[dir="ltr"] #all-ads-title{
 .aam-thumb .rizq-img-wrap,.aam-thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .aam-thumb > span{font-size:48px;line-height:1}
 .aam-badge{
-  position:absolute;top:8px;right:8px;z-index:1;
-  background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#0f2347;
-  font-size:9.5px;font-weight:800;padding:3px 8px;border-radius:6px
+  position:absolute;top:8px;right:8px;left:auto;z-index:7;
+  background:linear-gradient(180deg,#FFE9A8,#E8C96A 55%,#C9A84C);color:#0f2347;
+  font-size:9.5px;font-weight:900;padding:3px 8px;border-radius:4px;
+  box-shadow:0 3px 10px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.5)
 }
 .aam-fav{
   position:absolute;top:8px;left:8px;z-index:1;width:30px;height:30px;border-radius:50%;border:none;
@@ -2219,10 +2220,10 @@ html[dir="ltr"] .cards-track .ad-card{direction:ltr}
 .ad-card-img span{display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
 .ad-card-img span svg{width:32px;height:32px;display:block;stroke-width:1.6;filter:drop-shadow(0 4px 10px rgba(0,0,0,.35))}
 .ad-badge{
-  position:absolute;top:8px;inset-inline-end:8px;z-index:2;
-  background:linear-gradient(135deg,#F0D78A,#C9A84C,#a8842f);
-  color:#0f2347;font-size:9px;font-weight:900;padding:3px 8px;border-radius:10px;
-  box-shadow:0 4px 14px rgba(201,168,76,.4);letter-spacing:.2px
+  position:absolute;top:8px;right:8px;left:auto;inset-inline-end:8px;inset-inline-start:auto;z-index:7;
+  background:linear-gradient(135deg,#FFE9A8,#E8C96A,#C9A84C);
+  color:#0f2347;font-size:9.5px;font-weight:900;padding:3px 8px;border-radius:4px;
+  box-shadow:0 3px 10px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.5);letter-spacing:.2px
 }
 .ad-card-body{padding:10px 11px 12px;position:relative;z-index:1}
 .ad-cat{font-size:9.5px;color:#E8C96A;font-weight:700;margin-bottom:4px;letter-spacing:.5px;opacity:.95}
@@ -2785,7 +2786,7 @@ html[dir="ltr"] .listings-section .section-desc{
 }
 .landing-ads-grid .l-meta{font-size:10.5px!important;gap:4px!important}
 .landing-ads-grid .l-price{font-size:11.5px!important}
-.landing-ads-grid .l-badge{font-size:9px!important;padding:3px 7px!important;top:7px!important;right:7px!important}
+.landing-ads-grid .l-badge{font-size:9.5px!important;padding:3px 8px!important;top:8px!important;right:8px!important;left:auto!important;z-index:7!important;border-radius:4px!important}
 .landing-ads-grid .lad-fav{width:26px!important;height:26px!important;font-size:12px!important;top:7px!important;left:7px!important}
 .landing-ads-grid .lc-hover{padding:12px!important}
 .landing-ads-grid .lc-hover-title{font-size:12.5px!important}
@@ -2846,7 +2847,7 @@ html[dir="ltr"] .listings-section .section-desc{
 .lc-hover-btn-open:hover{transform:scale(1.02)}
 .lc-hover-btn-msg{padding:10px 14px;background:transparent;color:var(--gold);border:1.5px solid rgba(201,168,76,.4);border-radius:10px;font-size:18px;cursor:pointer;transition:all .3s}
 .lc-hover-btn-msg:hover{background:rgba(201,168,76,.1);border-color:var(--gold)}
-.l-badge{position:absolute;top:10px;right:10px;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);font-size:9.5px;font-weight:800;padding:3px 9px;border-radius:5px;z-index:3}
+.l-badge{position:absolute;top:8px;right:8px;left:auto;background:linear-gradient(180deg,#FFE9A8,#E8C96A 55%,#C9A84C);color:#0f2347;font-size:9.5px;font-weight:900;padding:3px 8px;border-radius:4px;z-index:7;box-shadow:0 3px 10px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.5)}
 .l-img{height:140px;display:flex;align-items:center;justify-content:center;font-size:38px;position:relative;background:linear-gradient(145deg,var(--royal),var(--royal-light));border-radius:14px 14px 0 0}
 .l-body{padding:12px 14px}
 .l-cat{font-size:10.5px;color:var(--gold);font-weight:600;margin-bottom:6px;letter-spacing:.5px}
