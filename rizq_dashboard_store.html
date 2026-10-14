@@ -371,6 +371,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
 <script src="rizq_store_commerce.js?v=29.0"></script>
 <script src="rizq_intro_video.js?v=29.7"></script>
 <script src="rizq_account_payments.js?v=28.2"></script>
+<script src="rizq_mr_payment_catalog.js?v=1.0"></script>
 <script src="rizq_service_desk.js?v=1.0"></script>
 <script src="rizq_invoice_engine.js"></script>
 
@@ -983,6 +984,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
           <button onclick="showAddMyPayModal()" style="background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border:none;padding:8px 16px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer" data-t="mypay-add-btn">+ إضافة طريقة دفع</button>
         </div>
         <p style="font-size:13px;color:#2C3A4F;margin-bottom:16px" data-t="mypay-hint">هذه الرموز يراها زبائنك عند تصفح محلك/مكتبك — يستخدمونها لتحويل ثمن مشترياتهم إليك مباشرة.</p>
+        <div id="mr-pay-catalog-ref" style="margin-bottom:14px;padding:12px 14px;border-radius:12px;background:#f8faff;border:1px solid #e0e8f5"></div>
         <div id="my-payment-list"></div>
       </div>
 
@@ -1009,8 +1011,8 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
             </div>
             <div id="mypay-bank-fields">
               <div style="margin-bottom:10px">
-                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-bank-label">اسم البنك / الخدمة</label>
-                <input id="mypay-bank" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;box-sizing:border-box" data-ph="mypay-bank-ph" placeholder="مثال: بنك الصداقة، بنكيلي، سداد..."/>
+                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-bank-label">اسم البنك / المحفظة (كتالوج موريتانيا)</label>
+                <input id="mypay-bank" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;box-sizing:border-box" data-ph="mypay-bank-ph" placeholder="أو اكتب اسماً مخصصاً..."/>
               </div>
               <div style="margin-bottom:10px">
                 <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px" data-t="mypay-code-label">🔢 رمز الدفع (إن وُجد)</label>
