@@ -227,20 +227,15 @@ a{text-decoration:none;color:inherit}
   border:1px solid rgba(255,255,255,.28)!important;box-shadow:none!important;
   transition:opacity .22s ease,transform .22s ease,background .2s ease!important
 }
-.office-hero .hero-video-card .rzq-iv-sound,
-.office-hero .hero-video-card .rzq-iv-fs{
-  opacity:0!important;transition:opacity .22s ease!important;pointer-events:none!important;
+.office-hero .hero-video-card .rzq-iv-sound.is-on,
+.office-hero .hero-video-card .rzq-iv-fs.is-on{
+  opacity:.92!important;pointer-events:auto!important;
   width:30px!important;height:30px!important;padding:0!important;font-size:13px!important;
-  border-radius:50%!important;bottom:6px!important;max-width:none!important
+  border-radius:50%!important;bottom:6px!important;max-width:none!important;
+  display:inline-flex!important
 }
 .office-hero .hero-video-card .rzq-iv-sound{left:6px!important;right:auto!important}
 .office-hero .hero-video-card .rzq-iv-fs{right:6px!important;left:auto!important}
-.office-hero .hero-video-card:hover .rzq-iv-sound.is-on,
-.office-hero .hero-video-card:focus-within .rzq-iv-sound.is-on,
-.office-hero .hero-video-card:hover .rzq-iv-fs.is-on,
-.office-hero .hero-video-card:focus-within .rzq-iv-fs.is-on{
-  opacity:1!important;pointer-events:auto!important
-}
 .office-hero .hero-video-card:hover .rzq-iv-play,
 .office-hero .hero-video-card:focus-within .rzq-iv-play{
   opacity:.9!important;background:rgba(255,255,255,.28)!important;color:#fff!important
@@ -1673,7 +1668,7 @@ function openMaps(){
 })();
 </script>
 
-  <script src="rizq_intro_video.js?v=29.8"></script>
+  <script src="rizq_intro_video.js?v=29.9"></script>
   <script>
   /* فيديو تعريفي + إضافي في ركن الهيرو — نفس موضع المحلات/المعارض */
   window.mountOfficeIntroVideo = function(url, officeId, accHint){
@@ -1702,7 +1697,7 @@ function openMaps(){
         if(extraCard) extraCard.style.display = 'none';
         return;
       }
-      var sig = [id, introUrl, extraUrl, fr ? 'fr' : 'ar', 'hero'].join('|');
+      var sig = [id, introUrl, extraUrl, fr ? 'fr' : 'ar', 'hero-corners-v2'].join('|');
       if (window.__rzqOfficeIntroSig === sig && introMount.querySelector('.rzq-iv-wrap')) {
         if(hero) hero.classList.add('has-hero-videos');
         return;

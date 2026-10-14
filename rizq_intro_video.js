@@ -426,8 +426,9 @@
           '<button type="button" class="rzq-iv-poster" id="' + uid + '-poster" style="' + posterBg + '" aria-label="' + esc(playLbl) + '" title="' + esc(a11yTitle) + '">' +
             '<span class="rzq-iv-play" aria-hidden="true">▶</span>' +
           '</button>' +
-          '<button type="button" class="rzq-iv-sound" id="' + uid + '-sound" aria-label="' + esc(muteAria) + '" title="' + esc(muteAria) + '">🔇</button>' +
-          '<button type="button" class="rzq-iv-fs" id="' + uid + '-fs" aria-label="' + esc(fsAria) + '" title="' + esc(fsAria) + '">⛶</button>' +
+          /* كتم + تكبير ظاهران من البداية على التعريفي والإضافي — رموز فقط */
+          '<button type="button" class="rzq-iv-sound is-on" id="' + uid + '-sound" aria-label="' + esc(muteAria) + '" title="' + esc(muteAria) + '">🔇</button>' +
+          '<button type="button" class="rzq-iv-fs is-on" id="' + uid + '-fs" aria-label="' + esc(fsAria) + '" title="' + esc(fsAria) + '">⛶</button>' +
         '</div>' +
         (safeHref
           ? ('<a class="rzq-iv-src" href="' + esc(safeHref) + '" target="_blank" rel="noopener noreferrer" aria-label="' + esc(linkAria) + '">↗</a>')
@@ -438,6 +439,7 @@
     var poster = hostEl.querySelector('#' + uid + '-poster');
     var soundBtn = hostEl.querySelector('#' + uid + '-sound');
     var fsBtn = hostEl.querySelector('#' + uid + '-fs');
+    var playerStarted = false;
 
     function syncSoundLabel() {
       if (!soundBtn) return;
@@ -448,8 +450,18 @@
       soundBtn.setAttribute('title', muted ? muteAria : unmuteAria);
     }
 
+    function ensurePlayer(withSound) {
+      if (playerStarted) return;
+      playerStarted = true;
+      loadPlayer(!!withSound);
+    }
+
     if (frame && fsBtn) {
       wireFullscreen(frame, fsBtn, frUi);
+      /* إن ضغط التكبير قبل التشغيل — شغّل ثم كبّر (مهم للفيديو الإضافي) */
+      fsBtn.addEventListener('click', function () {
+        try { ensurePlayer(false); } catch (eLoad) {}
+      }, true);
     }
 
     function loadNativePlayer(withSound) {
@@ -509,10 +521,16 @@
     }
 
     if (poster) {
-      poster.addEventListener('click', function () { loadPlayer(false); });
+      poster.addEventListener('click', function () { ensurePlayer(false); });
     }
     if (soundBtn) {
       soundBtn.addEventListener('click', function () {
+        if (!playerStarted) {
+          muted = false;
+          ensurePlayer(true);
+          syncSoundLabel();
+          return;
+        }
         muted = !muted;
         if (native) {
           var v = hostEl.querySelector('#' + uid + '-video');
@@ -539,7 +557,7 @@
 
     /* MP4 محلي: تشغيل صامت فوري حتى يظهر شرح الداشبورد بلا تأخير */
     if (native && opts.autoplay !== false) {
-      try { loadPlayer(false); } catch (eAuto) {}
+      try { ensurePlayer(false); } catch (eAuto) {}
     }
 
     return true;

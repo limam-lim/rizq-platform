@@ -242,20 +242,15 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   border:1px solid rgba(255,255,255,.28)!important;box-shadow:none!important;
   transition:opacity .22s ease,transform .22s ease,background .2s ease!important
 }
-.hero-video-card .rzq-iv-sound,
-.hero-video-card .rzq-iv-fs{
-  opacity:0!important;transition:opacity .22s ease!important;pointer-events:none!important;
+.hero-video-card .rzq-iv-sound.is-on,
+.hero-video-card .rzq-iv-fs.is-on{
+  opacity:.92!important;pointer-events:auto!important;
   width:30px!important;height:30px!important;padding:0!important;font-size:13px!important;
-  border-radius:50%!important;bottom:6px!important;max-width:none!important
+  border-radius:50%!important;bottom:6px!important;max-width:none!important;
+  display:inline-flex!important
 }
 .hero-video-card .rzq-iv-sound{left:6px!important;right:auto!important}
 .hero-video-card .rzq-iv-fs{right:6px!important;left:auto!important}
-.hero-video-card:hover .rzq-iv-sound.is-on,
-.hero-video-card:focus-within .rzq-iv-sound.is-on,
-.hero-video-card:hover .rzq-iv-fs.is-on,
-.hero-video-card:focus-within .rzq-iv-fs.is-on{
-  opacity:1!important;pointer-events:auto!important
-}
 .hero-video-card:hover .rzq-iv-play,
 .hero-video-card:focus-within .rzq-iv-play{
   opacity:.9!important;background:rgba(255,255,255,.28)!important;color:#fff!important
@@ -1968,7 +1963,7 @@ function rizqShare(title, url) {
 </script>
 
 
-  <script src="rizq_intro_video.js?v=29.8"></script>
+  <script src="rizq_intro_video.js?v=29.9"></script>
 
   <!-- ═══ نظام التقييمات/المراجعات الحقيقي لهذا المحل (RizqReviews) ═══
        يُفعَّل فقط إذا كان معرّف المحل في الرابط (?id= أو ?store=) يطابق
@@ -2426,7 +2421,7 @@ function rizqShare(title, url) {
       var extra = videos.find(function(v){ return v.kind === 'extra'; });
       if(!intro && extra){ intro = extra; extra = null; }
       if(!intro) intro = videos[0];
-      var promoSig = [(intro && intro.url) || '', (extra && extra.url) || '', fr ? 'fr' : 'ar', 'hero'].join('|');
+      var promoSig = [(intro && intro.url) || '', (extra && extra.url) || '', fr ? 'fr' : 'ar', 'hero-corners-v2'].join('|');
       if (hero && hero.getAttribute('data-rzq-promo-sig') === promoSig && introMount.querySelector('.rzq-iv-wrap')) {
         hero.classList.add('has-hero-videos');
         return;
