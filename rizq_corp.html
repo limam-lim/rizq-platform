@@ -58,10 +58,64 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 .nav-link:hover{background:rgba(201,168,76,0.1);color:var(--gold)}
 
 /* ──── HERO ──── */
-.corp-hero{position:relative;height:340px;overflow:hidden;background:linear-gradient(135deg,var(--navy2) 0%,var(--dark) 50%,var(--navy) 100%)}
-.hero-cover{position:absolute;inset:0;background:linear-gradient(135deg,rgba(27,58,107,0.85) 0%,rgba(201,168,76,0.12) 50%,rgba(13,27,42,0.9) 100%);display:flex;align-items:center;justify-content:center}
-.hero-pattern{position:absolute;inset:0;background-image:radial-gradient(circle at 20% 50%,rgba(201,168,76,0.1) 0%,transparent 60%),radial-gradient(circle at 80% 20%,rgba(27,58,107,0.3) 0%,transparent 50%)}
+.corp-hero{position:relative;min-height:340px;height:auto;overflow:hidden;background:linear-gradient(135deg,var(--navy2) 0%,var(--dark) 50%,var(--navy) 100%)}
+.hero-cover{position:relative;z-index:3;min-height:340px;background:linear-gradient(135deg,rgba(27,58,107,0.85) 0%,rgba(201,168,76,0.12) 50%,rgba(13,27,42,0.9) 100%);display:flex;align-items:center;justify-content:center;padding:56px 24px 72px;box-sizing:border-box}
+.hero-pattern{position:absolute;inset:0;z-index:1;background-image:radial-gradient(circle at 20% 50%,rgba(201,168,76,0.1) 0%,transparent 60%),radial-gradient(circle at 80% 20%,rgba(27,58,107,0.3) 0%,transparent 50%)}
 .corp-profile{display:flex;align-items:center;gap:20px;position:relative;z-index:1;padding:24px;flex-wrap:wrap;justify-content:center}
+/* فيديوهات الهيرو — زوايا ثابتة: تعريفي يمين · إضافي يسار (كل الشاشات) */
+.corp-hero .hero-videos{
+  display:none;position:absolute;z-index:4;inset:0;pointer-events:none
+}
+.corp-hero.has-hero-videos .hero-videos{display:block}
+.corp-hero .hero-video-card{
+  position:absolute;bottom:12px;width:min(210px,28vw);max-width:230px;min-width:0;
+  background:rgba(6,17,28,.55);border:1px solid rgba(201,168,76,.4);
+  border-radius:14px;overflow:hidden;backdrop-filter:blur(8px);
+  box-shadow:0 10px 24px rgba(0,0,0,.32);animation:rzCorpHeroVidIn .7s ease both;
+  pointer-events:auto
+}
+.corp-hero .hero-video-card--intro{right:12px;left:auto}
+.corp-hero .hero-video-card--extra{left:12px;right:auto;animation-delay:.12s}
+@keyframes rzCorpHeroVidIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.corp-hero .hero-video-card .hero-video-mount{min-height:0}
+.corp-hero .hero-video-card .rzq-iv-wrap{max-width:100%;width:100%;margin:0}
+.corp-hero .hero-video-card .rzq-iv-frame{border-radius:0;aspect-ratio:16/9;min-height:0;width:100%;box-shadow:none;animation:none}
+.corp-hero .hero-video-card .rzq-iv-badge,
+.corp-hero .hero-video-card .rzq-iv-src,
+.corp-hero .hero-video-card .rzq-iv-play-label,
+.corp-hero .hero-video-card .rzq-iv-dash-hint,
+.corp-hero .hero-video-caption{display:none!important}
+.corp-hero .hero-video-card .rzq-iv-play{
+  width:36px!important;height:36px!important;font-size:14px!important;
+  opacity:.22!important;background:rgba(255,255,255,.16)!important;color:rgba(255,255,255,.9)!important;
+  border:1px solid rgba(255,255,255,.28)!important;box-shadow:none!important;
+  transition:opacity .22s ease,transform .22s ease,background .2s ease!important
+}
+.corp-hero .hero-video-card .rzq-iv-sound.is-on,
+.corp-hero .hero-video-card .rzq-iv-fs.is-on{
+  opacity:.92!important;pointer-events:auto!important;
+  width:30px!important;height:30px!important;padding:0!important;font-size:13px!important;
+  border-radius:50%!important;bottom:6px!important;max-width:none!important;
+  display:inline-flex!important
+}
+.corp-hero .hero-video-card .rzq-iv-sound{left:6px!important;right:auto!important}
+.corp-hero .hero-video-card .rzq-iv-fs{right:6px!important;left:auto!important}
+.corp-hero .hero-video-card:hover .rzq-iv-play,
+.corp-hero .hero-video-card:focus-within .rzq-iv-play{
+  opacity:.9!important;background:rgba(255,255,255,.28)!important;color:#fff!important
+}
+@media(max-width:900px){
+  .corp-hero .hero-cover{padding:40px 16px 72px;min-height:280px}
+  .corp-hero .hero-video-card{width:min(132px,38vw);bottom:8px;border-radius:10px}
+  .corp-hero .hero-video-card--intro{right:8px}
+  .corp-hero .hero-video-card--extra{left:8px}
+}
+@media(max-width:640px){
+  .corp-hero.has-hero-videos .hero-cover{padding:18px 14px 88px!important;min-height:0!important}
+  .corp-hero .hero-video-card{width:min(118px,36vw);bottom:6px}
+  .corp-hero .hero-video-card--intro{right:6px}
+  .corp-hero .hero-video-card--extra{left:6px}
+}
 .corp-logo-wrap{width:120px;height:120px;border-radius:10px;border:3px solid var(--gold);background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:52px;flex-shrink:0;box-shadow:var(--shadow);backdrop-filter:blur(12px)}
 .corp-info{text-align:start;flex:0 1 auto;min-width:0}
 .corp-name{font-size:32px;font-weight:900;color:var(--white);letter-spacing:1px;margin-bottom:6px}
@@ -150,8 +204,8 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 .hours-day{color:#6a7a8a}
 .hours-time{font-weight:600;color:var(--navy)}
 .hours-closed{color:var(--red);font-weight:600}
-.map-placeholder{height:160px;border-radius:12px;background:linear-gradient(135deg,#e8eef8,#d0dce8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;border:1px solid #c0d0e0;transition:all .3s}
-.map-placeholder:hover{border-color:var(--navy);background:#d8e4f0}
+.map-placeholder{height:160px;border-radius:12px;background:linear-gradient(135deg,#e8eef8,#d0dce8);display:block;cursor:pointer;border:1px solid #c0d0e0;transition:all .3s;overflow:hidden}
+.map-placeholder:hover{border-color:var(--navy)}
 .map-placeholder .map-icon{font-size:40px}
 .map-placeholder .map-text{font-size:13px;font-weight:600;color:var(--navy)}
 .map-placeholder .map-addr{font-size:12px;color:#6a7a8a}
@@ -184,8 +238,8 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 .item-card{background:var(--white);border-radius:var(--radius);border:1px solid #e0e8f0;overflow:hidden;transition:all .3s;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.05)}
 .item-card:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:#c0d0e0}
 .item-img{height:170px;background:linear-gradient(135deg,#e8eef8,#f5f8ff);display:flex;align-items:center;justify-content:center;font-size:60px;position:relative;overflow:hidden}
-.item-badge-new{position:absolute;top:10px;right:10px;background:var(--navy);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px}
-.item-badge-hot{position:absolute;top:10px;right:10px;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px}
+.item-badge-new{position:absolute;top:8px;right:8px;left:auto;z-index:7;background:var(--navy);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px}
+.item-badge-hot{position:absolute;top:8px;right:8px;left:auto;z-index:7;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px}
 .item-body{padding:13px}
 .item-name{font-size:14px;font-weight:700;color:#1a2a3a;margin-bottom:4px;line-height:1.3}
 .item-cat{font-size:11px;color:#9aabbb;margin-bottom:8px}
@@ -255,7 +309,7 @@ footer{background:linear-gradient(135deg,var(--dark2),var(--navy2));padding:32px
 .corp-type-label{display:none}
 @media(max-width:800px){
   .content-grid{grid-template-columns:1fr}
-  .corp-hero{height:auto;padding:24px 0}
+  .corp-hero{height:auto}
   .corp-profile{flex-direction:column;align-items:center;text-align:center;gap:10px}
   .corp-info{text-align:center;display:flex;flex-direction:column;align-items:center}
   .corp-type-label{display:block;order:-1;margin:2px 0 6px;font-size:15px;font-weight:800;color:#E8C96A}
@@ -430,6 +484,7 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
   <script src="rizq_footer_toggle.js?v=23.1" defer></script>
   <script src="rizq_auth_gate.js" defer></script>
   <script src="rizq_contact_gate.js" defer></script>
+  <script src="rizq_map_preview.js?v=1.0" defer></script>
 </head>
 <body>
 <!-- حقن الهيدر الموحّد قبل أول رسم — يمنع الشريط الأبيض فوق الهيرو ويسرّع الظهور -->
@@ -454,7 +509,7 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
 </nav>
 
 <!-- CORP HERO -->
-<div class="corp-hero">
+<div class="corp-hero" id="corp-hero">
   <div class="hero-pattern"></div>
   <div class="hero-cover">
     <div class="corp-profile">
@@ -475,6 +530,14 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
           <span class="badge badge-corp" id="badge-corp-lbl">🏢 معرض / شركة</span>
         </div>
       </div>
+    </div>
+  </div>
+  <div class="hero-videos" id="corp-hero-videos" aria-label="فيديوهات المعرض">
+    <div class="hero-video-card hero-video-card--intro" id="corp-hero-intro-card" style="display:none">
+      <div class="hero-video-mount" id="corp-hero-intro-video-mount"></div>
+    </div>
+    <div class="hero-video-card hero-video-card--extra" id="corp-hero-extra-card" style="display:none">
+      <div class="hero-video-mount" id="corp-hero-extra-video-mount"></div>
     </div>
   </div>
 </div>
@@ -550,7 +613,7 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
           <div><div class="info-label" id="info-label-website">الموقع الإلكتروني</div><div class="info-value" id="info-website">www.riyada.mr</div></div>
         </div>
         <div style="margin-top:14px">
-          <div class="map-placeholder" onclick="openMaps()">
+          <div class="map-placeholder" id="corp-map-preview" onclick="openMaps()" role="button" tabindex="0" aria-label="عرض على الخريطة">
             <div class="map-icon">🗺️</div>
             <div class="map-text" id="map-text-lbl">عرض على الخريطة</div>
             <div class="map-addr" id="map-addr">نواكشوط، موريتانيا</div>
@@ -668,15 +731,23 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
           <input class="req-input" id="rf-service" style="display:block;width:100%;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;min-height:44px;background:#fff"/>
           <label for="rf-msg" style="display:block;font-size:12px;font-weight:800;color:#0F2347;margin-bottom:5px">رسالتك</label>
           <textarea class="req-input" id="rf-msg" style="display:block;width:100%;min-height:80px;margin-bottom:12px;padding:11px 12px;border:1.5px solid #e2e8f5;border-radius:10px;font-size:13.5px;font-family:inherit;resize:vertical;box-sizing:border-box;background:#fff"></textarea>
-          <div id="rf-doc-upload" data-desk="doc-upload" style="margin:4px 0 12px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px dashed rgba(27,58,107,.22)">
-            <div data-desk="doc-title" style="font-size:12.5px;font-weight:700;color:#1B3A6B;margin-bottom:4px">رفع بيان الدفع (اختياري)</div>
-            <div data-desk="doc-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin-bottom:8px">صورة أو PDF — يُحفظ على المنصة لحماية حقوق الطرفين.</div>
+          <div id="rf-doc-upload" data-desk="doc-upload" class="rzq-doc-zone">
+            <div class="rzq-doc-head">
+              <span class="rzq-doc-mark" aria-hidden="true">🧾</span>
+              <div class="rzq-doc-copy">
+                <div class="rzq-doc-title-row">
+                  <div data-desk="doc-title">رفع بيان الدفع</div>
+                  <span class="rzq-doc-badge" data-desk="doc-badge">اختياري</span>
+                </div>
+                <div data-desk="doc-hint">صورة أو PDF — يُحفظ على المنصة لحماية حقوق الطرفين.</div>
+              </div>
+            </div>
             <input type="file" id="rf-doc-file" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" multiple hidden />
-            <button type="button" data-desk="doc-pick" id="rf-doc-pick" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;border:1px solid rgba(27,58,107,.25);background:#fff;color:#1B3A6B;font-size:12.5px;font-weight:700;cursor:pointer">📎 اختر صورة أو PDF</button>
+            <button type="button" data-desk="doc-pick" id="rf-doc-pick" class="rzq-doc-pick"><span class="rzq-doc-pick-ico" aria-hidden="true">📎</span><span>اختر صورة أو PDF</span></button>
             <div id="rf-doc-list" hidden></div>
-            <div id="rf-doc-error" style="display:none;margin-top:6px;font-size:11.5px;color:#b91c1c"></div>
+            <div id="rf-doc-error" style="display:none;margin-top:7px;font-size:11.5px;color:#b91c1c"></div>
           </div>
-          <button type="button" id="corp-req-submit" onclick="submitCorpServiceReq()" style="width:100%;padding:13px;border:none;border-radius:11px;background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit">📤 إرسال الطلب</button>
+          <button type="button" id="corp-req-submit" class="rzq-desk-submit" onclick="submitCorpServiceReq()" style="width:100%;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);color:#fff;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;margin-top:10px">📤 إرسال الطلب</button>
         </div>
       </div>
 
@@ -1359,12 +1430,7 @@ function rebuildCorpCatTabs(cats){
         }
       }
       if(typeof window.mountCorpIntroVideo === 'function'){
-        window.mountCorpIntroVideo(acc.promo_video || '');
-      } else if(acc.promo_video && window.RizqIntroVideo){
-        RizqIntroVideo.loadAndMountForAccount(id, {
-          url: acc.promo_video,
-          mountOpts: { title: '🎬 فيديو تعريفي', linkLabel: 'شاهد على المصدر الأصلي ↗' }
-        });
+        window.mountCorpIntroVideo(acc.promo_video || '', acc);
       }
       if(acc.name) document.title = acc.name + ((localStorage.getItem('rizq_lang')||'ar')==='fr' ? ' | Rizq' : ' — رزق');
 
@@ -1515,12 +1581,7 @@ function rebuildCorpCatTabs(cats){
                 var vpe=document.getElementById('verified-plus-badge-lbl'); if(vpe) vpe.style.display=b.verifiedPlus?'inline-flex':'none';
               }
               if(typeof window.mountCorpIntroVideo === 'function'){
-                window.mountCorpIntroVideo(acc.promo_video || '');
-              } else if(window.RizqIntroVideo){
-                RizqIntroVideo.loadAndMountForAccount(id, {
-                  url: acc.promo_video || '',
-                  mountOpts: { title: '🎬 فيديو تعريفي', linkLabel: 'شاهد على المصدر الأصلي ↗' }
-                });
+                window.mountCorpIntroVideo(acc.promo_video || '', acc);
               }
             }
           }
@@ -1747,6 +1808,7 @@ function openRizqPromo(){
 }
 function openMaps(){
   var addr=(document.getElementById('map-addr')||{}).textContent||'نواكشوط موريتانيا';
+  if(window.RizqMapPreview){ RizqMapPreview.open(addr); return; }
   window.open('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(addr+' Mauritania'),'_blank');
 }
 function shareCorp(){
@@ -1883,37 +1945,70 @@ window._rizqProfile = (function() {
 </script>
 <script src="rizq_intro_video.js?v=29.9"></script>
 <script src="rizq_store_commerce.js?v=2"></script>
-<script src="rizq_service_desk.js?v=1.2"></script>
+<script src="rizq_service_desk.js?v=1.3"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
 <script src="rizq_mr_payment_catalog.js?v=1.1"></script>
 <script src="rizq_account_payments.js?v=28.3"></script>
 <script>
-/* فيديو تعريفي — localStorage + خادم عام عبر loadAndMountForAccount */
-window.mountCorpIntroVideo = function(url){
+/* فيديو تعريفي + إضافي في ركنَي الهيرو — مثل المحل/المكتب/المعرض */
+window.mountCorpIntroVideo = function(url, accHint){
   try{
     var corpId = (typeof RIZQ_CORP_ID !== 'undefined' && RIZQ_CORP_ID)
       || new URLSearchParams(location.search).get('id')
       || new URLSearchParams(location.search).get('corp')
       || '';
-    if(!corpId || !window.RizqIntroVideo) return;
+    if(!window.RizqIntroVideo) return;
+    var fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr';
     var isDemo = !!(corpId === 'demo-corp-001' || /^demo/i.test(corpId) || /^acc_promo_/.test(corpId) || new URLSearchParams(location.search).get('demo') === '1');
+    var acc = accHint || (typeof RIZQ_CORP_ACCOUNT !== 'undefined' && RIZQ_CORP_ACCOUNT) || {};
     var dashUrl = (RizqIntroVideo.demoDashboardVideo && RizqIntroVideo.demoDashboardVideo('corp')) || '';
-    var resolved = isDemo ? dashUrl : (url || (typeof RIZQ_CORP_ACCOUNT !== 'undefined' && RIZQ_CORP_ACCOUNT && RIZQ_CORP_ACCOUNT.promo_video) || dashUrl);
-    var lang = (localStorage.getItem('rizq_lang')||'ar') === 'fr' ? 'fr' : 'ar';
-    var sig = [corpId, resolved || '', lang].join('|');
-    var mountEl = document.getElementById('intro-video-mount');
-    if (window.__rzqCorpIntroSig === sig && mountEl && mountEl.querySelector('.rzq-iv-wrap')) return;
+    var introUrl = String((isDemo ? (dashUrl || url || acc.promo_video) : (url || acc.promo_video || dashUrl)) || '').trim();
+    var extraUrl = String(acc.promo_video_extra || '').trim();
+    if(isDemo && !extraUrl){
+      extraUrl = 'https://www.youtube.com/watch?v=eRsGyueVLvQ';
+    }
+    var hero = document.getElementById('corp-hero');
+    var introCard = document.getElementById('corp-hero-intro-card');
+    var extraCard = document.getElementById('corp-hero-extra-card');
+    var introMount = document.getElementById('corp-hero-intro-video-mount');
+    var extraMount = document.getElementById('corp-hero-extra-video-mount');
+    var aboutVid = document.getElementById('video-intro-section');
+    if(aboutVid) aboutVid.style.display = 'none';
+    if(!introMount || !introUrl){
+      if(hero) hero.classList.remove('has-hero-videos');
+      if(introCard) introCard.style.display = 'none';
+      if(extraCard) extraCard.style.display = 'none';
+      return;
+    }
+    var sig = [corpId, introUrl, extraUrl, fr ? 'fr' : 'ar', 'hero-corners-v2'].join('|');
+    if (window.__rzqCorpIntroSig === sig && introMount.querySelector('.rzq-iv-wrap')) {
+      if(hero) hero.classList.add('has-hero-videos');
+      return;
+    }
     window.__rzqCorpIntroSig = sig;
-    var opts = {
-      mountOpts: {
-        accountType: 'corp',
-        poster: (RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('corp')) || '',
-        title: lang === 'fr' ? '🎬 Vidéo de présentation' : '🎬 فيديو تعريفي',
-        linkLabel: lang === 'fr' ? 'Voir sur la source ↗' : 'شاهد على المصدر الأصلي ↗'
-      }
-    };
-    opts.url = resolved;
-    RizqIntroVideo.loadAndMountForAccount(corpId, opts);
+    var okIntro = RizqIntroVideo.mount(introMount, introUrl, {
+      accountType: 'corp',
+      poster: (RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('corp')) || '',
+      title: fr ? 'Vidéo de présentation' : 'فيديو تعريفي',
+      linkLabel: fr ? 'Source ↗' : 'المصدر ↗',
+      playLabel: fr ? 'Lire' : 'تشغيل',
+      mutedLabel: fr ? 'Activer le son' : 'اضغط لتفعيل الصوت',
+      unmutedLabel: fr ? 'Son activé' : 'الصوت مفعّل'
+    });
+    if(introCard) introCard.style.display = okIntro ? '' : 'none';
+    var okExtra = false;
+    if(extraUrl && extraMount && extraCard && extraUrl !== introUrl){
+      okExtra = RizqIntroVideo.mount(extraMount, extraUrl, {
+        title: fr ? 'Vidéo supplémentaire' : 'فيديو إضافي',
+        linkLabel: fr ? 'Source ↗' : 'المصدر ↗',
+        playLabel: fr ? 'Lire' : 'تشغيل'
+      });
+      extraCard.style.display = okExtra ? '' : 'none';
+    } else if(extraCard){
+      extraCard.style.display = 'none';
+      if(extraMount) extraMount.innerHTML = '';
+    }
+    if(hero) hero.classList.toggle('has-hero-videos', !!(okIntro || okExtra));
   }catch(e){}
 };
 window.mountCorpIntroVideo();

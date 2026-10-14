@@ -73,25 +73,167 @@
     refreshDocUploadLabels(root);
   }
 
+  function injectDocUploadCss() {
+    if (document.getElementById('rzq-doc-upload-css')) return;
+    var s = document.createElement('style');
+    s.id = 'rzq-doc-upload-css';
+    s.textContent =
+      '#rf-doc-upload.rzq-doc-zone{'
+      + 'position:relative;overflow:hidden;flex:1 1 210px;margin:0;padding:12px 12px 11px;'
+      + 'border-radius:14px;border:1.5px solid rgba(201,168,76,.38);'
+      + 'background:linear-gradient(145deg,#fffdf7 0%,#f7f9fc 55%,#eef3fb 100%);'
+      + 'box-shadow:0 6px 18px rgba(15,35,71,.06);transition:border-color .2s,box-shadow .2s,transform .15s'
+      + '}'
+      + '#rf-doc-upload.rzq-doc-zone::before{'
+      + 'content:"";position:absolute;inset:0 auto 0 0;width:4px;'
+      + 'background:linear-gradient(180deg,#C9A84C,#E8C96A,#1B3A6B)'
+      + '}'
+      + '#rf-doc-upload.rzq-doc-zone.is-drag{'
+      + 'border-color:#C9A84C;box-shadow:0 10px 26px rgba(201,168,76,.22);transform:translateY(-1px)'
+      + '}'
+      + '#rf-doc-upload .rzq-doc-head{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}'
+      + '#rf-doc-upload .rzq-doc-mark{'
+      + 'width:38px;height:38px;border-radius:11px;flex:0 0 38px;'
+      + 'display:inline-flex;align-items:center;justify-content:center;'
+      + 'background:linear-gradient(145deg,#0F2347,#1B3A6B);color:#E8C96A;'
+      + 'font-size:17px;box-shadow:0 4px 12px rgba(15,35,71,.22)'
+      + '}'
+      + '#rf-doc-upload .rzq-doc-title-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:3px}'
+      + '#rf-doc-upload [data-desk="doc-title"]{'
+      + 'font-size:13px;font-weight:900;color:#0F2347;margin:0;letter-spacing:.2px'
+      + '}'
+      + '#rf-doc-upload .rzq-doc-badge{'
+      + 'display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;'
+      + 'font-size:10px;font-weight:800;color:#8a6a1a;'
+      + 'background:rgba(201,168,76,.16);border:1px solid rgba(201,168,76,.35)'
+      + '}'
+      + '#rf-doc-upload [data-desk="doc-hint"]{'
+      + 'font-size:11.5px;color:#5c6b7a;line-height:1.55;margin:0'
+      + '}'
+      + '#rf-doc-upload .rzq-doc-pick{'
+      + 'display:inline-flex;align-items:center;justify-content:center;gap:7px;'
+      + 'margin-top:2px;padding:9px 14px;border-radius:11px;'
+      + 'border:1.5px solid rgba(27,58,107,.28);'
+      + 'background:linear-gradient(180deg,#ffffff,#f4f7fc);'
+      + 'color:#0F2347;font-size:12.5px;font-weight:800;cursor:pointer;'
+      + 'font-family:inherit;transition:border-color .2s,box-shadow .2s,transform .15s,background .2s'
+      + '}'
+      + '#rf-doc-upload .rzq-doc-pick:hover{'
+      + 'border-color:#C9A84C;background:linear-gradient(180deg,#fffef8,#fff8e8);'
+      + 'box-shadow:0 6px 16px rgba(201,168,76,.18);transform:translateY(-1px)'
+      + '}'
+      + '#rf-doc-upload .rzq-doc-pick-ico{font-size:14px;line-height:1}'
+      + '#rf-doc-upload .rf-doc-item{'
+      + 'display:flex;align-items:center;gap:8px;justify-content:space-between;'
+      + 'padding:8px 10px;border-radius:10px;margin-top:7px;'
+      + 'background:#fff;border:1px solid rgba(27,58,107,.1);'
+      + 'box-shadow:0 2px 8px rgba(15,35,71,.04);font-size:12px'
+      + '}'
+      + '#rf-doc-upload .rf-doc-item button{'
+      + 'border:none;background:rgba(185,28,28,.08);color:#b91c1c;'
+      + 'font-weight:800;cursor:pointer;padding:4px 9px;border-radius:8px;font-size:11px'
+      + '}'
+      + '.store-desk-actions #store-req-submit,'
+      + '.office-desk-actions #req-submit-btn,'
+      + '.showroom-desk-actions #sr-req-submit,'
+      + '#corp-req-submit.rzq-desk-submit{'
+      + 'position:relative;overflow:hidden;'
+      + 'background:linear-gradient(135deg,#0D1B2A 0%,#1B3A6B 58%,#234d8f 100%)!important;'
+      + 'border:1px solid rgba(201,168,76,.45)!important;'
+      + 'box-shadow:0 8px 20px rgba(15,35,71,.18);'
+      + 'transition:transform .15s,box-shadow .2s,filter .2s'
+      + '}'
+      + '.store-desk-actions #store-req-submit:hover,'
+      + '.office-desk-actions #req-submit-btn:hover,'
+      + '.showroom-desk-actions #sr-req-submit:hover,'
+      + '#corp-req-submit.rzq-desk-submit:hover{'
+      + 'transform:translateY(-1px);filter:brightness(1.04);'
+      + 'box-shadow:0 12px 26px rgba(15,35,71,.24)'
+      + '}';
+    document.head.appendChild(s);
+  }
+
+  function polishSubmitButtons(root) {
+    root = root || document;
+    ['#store-req-submit', '#req-submit-btn', '#sr-req-submit', '#corp-req-submit'].forEach(function (sel) {
+      var btn = root.querySelector ? root.querySelector(sel) : null;
+      if (!btn && typeof document !== 'undefined') btn = document.querySelector(sel);
+      if (!btn) return;
+      btn.classList.add('rzq-desk-submit');
+    });
+  }
+
   function refreshDocUploadLabels(root) {
     root = root || document;
     var zone = (root.querySelector && root.querySelector('#rf-doc-upload')) || document.getElementById('rf-doc-upload');
     if (!zone) return;
+    injectDocUploadCss();
+    upgradeDocUploadMarkup(zone);
+    polishSubmitButtons(root);
     var title = zone.querySelector('[data-desk="doc-title"]');
     var hint = zone.querySelector('[data-desk="doc-hint"]');
     var btn = zone.querySelector('[data-desk="doc-pick"]');
+    var badge = zone.querySelector('[data-desk="doc-badge"]');
     if (title) {
-      title.textContent = t('رفع بيان الدفع (اختياري)', 'Justificatif de paiement (optionnel)');
+      title.textContent = t('رفع بيان الدفع', 'Justificatif de paiement');
+    }
+    if (badge) {
+      badge.textContent = t('اختياري', 'Optionnel');
     }
     if (hint) {
       hint.textContent = t(
-        'صورة أو PDF — يُحفظ على المنصة لحماية حقوق الطرفين (حد أقصى 5MB لكل ملف، حتى 3 ملفات).',
-        'Image ou PDF — conservé sur la plateforme pour protéger les deux parties (5 Mo max / fichier, jusqu’à 3).'
+        'صورة أو PDF — يُحفظ على المنصة لحماية حقوق الطرفين (حد 5MB، حتى 3 ملفات).',
+        'Image ou PDF — conservé sur la plateforme (5 Mo max, jusqu’à 3 fichiers).'
       );
     }
     if (btn) {
-      btn.textContent = t('📎 اختر صورة أو PDF', '📎 Choisir image ou PDF');
+      btn.innerHTML = '<span class="rzq-doc-pick-ico" aria-hidden="true">📎</span><span>'
+        + esc(t('اختر صورة أو PDF', 'Choisir image ou PDF')) + '</span>';
     }
+  }
+
+  function upgradeDocUploadMarkup(zone) {
+    if (!zone || zone.getAttribute('data-desk-polished') === '1') return;
+    zone.setAttribute('data-desk-polished', '1');
+    zone.classList.add('rzq-doc-zone');
+    zone.removeAttribute('style');
+
+    var title = zone.querySelector('[data-desk="doc-title"]');
+    var hint = zone.querySelector('[data-desk="doc-hint"]');
+    var pick = zone.querySelector('[data-desk="doc-pick"]');
+    var input = zone.querySelector('#rf-doc-file');
+    var list = zone.querySelector('#rf-doc-list');
+    var err = zone.querySelector('#rf-doc-error');
+
+    if (!zone.querySelector('.rzq-doc-head')) {
+      var head = document.createElement('div');
+      head.className = 'rzq-doc-head';
+      head.innerHTML = ''
+        + '<span class="rzq-doc-mark" aria-hidden="true">🧾</span>'
+        + '<div class="rzq-doc-copy">'
+        + '<div class="rzq-doc-title-row">'
+        + '<div data-desk="doc-title"></div>'
+        + '<span class="rzq-doc-badge" data-desk="doc-badge"></span>'
+        + '</div>'
+        + '<div data-desk="doc-hint"></div>'
+        + '</div>';
+      zone.insertBefore(head, zone.firstChild);
+      if (title && title.parentNode) title.parentNode.removeChild(title);
+      if (hint && hint.parentNode) hint.parentNode.removeChild(hint);
+    }
+
+    if (pick) {
+      pick.classList.add('rzq-doc-pick');
+      pick.removeAttribute('style');
+    }
+    if (err) {
+      err.style.cssText = 'display:none;margin-top:7px;font-size:11.5px;color:#b91c1c;line-height:1.45';
+    }
+    /* keep input/list/err at end */
+    if (input) zone.appendChild(input);
+    if (pick) zone.appendChild(pick);
+    if (list) zone.appendChild(list);
+    if (err) zone.appendChild(err);
   }
 
   function readFileAsDataUrl(file) {
@@ -156,9 +298,12 @@
     listEl.innerHTML = docs.map(function (d, i) {
       var label = esc(d.name || ('doc-' + (i + 1)));
       var sizeKb = Math.max(1, Math.round((d.bytes || 0) / 1024));
-      return '<div class="rf-doc-item" style="display:flex;align-items:center;gap:8px;justify-content:space-between;padding:6px 8px;border-radius:8px;background:rgba(27,58,107,.05);margin-top:6px;font-size:12px">'
-        + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">📄 ' + label + ' <span style="color:#6a7a8a">(' + sizeKb + ' KB)</span></span>'
-        + '<button type="button" data-doc-remove="' + i + '" style="border:none;background:transparent;color:#b91c1c;font-weight:700;cursor:pointer;padding:2px 6px">'
+      var isPdf = String(d.mime || '').indexOf('pdf') >= 0 || /\.pdf$/i.test(d.name || '');
+      return '<div class="rf-doc-item">'
+        + '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'
+        + (isPdf ? '📄' : '🖼️') + ' ' + label
+        + ' <span style="color:#6a7a8a">(' + sizeKb + ' KB)</span></span>'
+        + '<button type="button" data-doc-remove="' + i + '">'
         + esc(t('حذف', 'Retirer')) + '</button></div>';
     }).join('');
     listEl.querySelectorAll('[data-doc-remove]').forEach(function (btn) {
@@ -171,10 +316,46 @@
     });
   }
 
+  function addPendingFiles(form, files, showErr) {
+    files = Array.prototype.slice.call(files || [], 0);
+    if (!files.length) return;
+    var current = getPendingDocs(form).slice();
+    var room = MAX_DOC_COUNT - current.length;
+    if (room <= 0) {
+      showErr(t('الحد الأقصى 3 ملفات', 'Maximum 3 fichiers'));
+      return;
+    }
+    files = files.slice(0, room);
+    var chain = Promise.resolve();
+    files.forEach(function (file) {
+      chain = chain.then(function () {
+        var check = validateDocFile(file);
+        if (!check.ok) {
+          showErr(check.error);
+          return;
+        }
+        return readFileAsDataUrl(file).then(function (dataUrl) {
+          current.push({
+            name: String(file.name || 'payment-proof').slice(0, 80),
+            bytes: file.size || 0,
+            mime: check.mime,
+            dataUrl: dataUrl,
+          });
+          setPendingDocs(form, current);
+        });
+      });
+    });
+    chain.catch(function (err) {
+      showErr((err && err.message) || t('تعذّر رفع الملف', 'Échec du téléversement'));
+    });
+  }
+
   function wireDocUploadHandlers(form, zone) {
     if (!form || !zone || zone.getAttribute('data-wired') === '1') return;
     zone.setAttribute('data-wired', '1');
     if (!Array.isArray(form._rizqPendingDocs)) form._rizqPendingDocs = [];
+    injectDocUploadCss();
+    upgradeDocUploadMarkup(zone);
 
     var input = zone.querySelector('#rf-doc-file');
     var pick = zone.querySelector('#rf-doc-pick');
@@ -193,38 +374,28 @@
         showErr('');
         var files = Array.prototype.slice.call(input.files || [], 0);
         input.value = '';
-        if (!files.length) return;
-        var current = getPendingDocs(form).slice();
-        var room = MAX_DOC_COUNT - current.length;
-        if (room <= 0) {
-          showErr(t('الحد الأقصى 3 ملفات', 'Maximum 3 fichiers'));
-          return;
-        }
-        files = files.slice(0, room);
-        var chain = Promise.resolve();
-        files.forEach(function (file) {
-          chain = chain.then(function () {
-            var check = validateDocFile(file);
-            if (!check.ok) {
-              showErr(check.error);
-              return;
-            }
-            return readFileAsDataUrl(file).then(function (dataUrl) {
-              current.push({
-                name: String(file.name || 'payment-proof').slice(0, 80),
-                bytes: file.size || 0,
-                mime: check.mime,
-                dataUrl: dataUrl,
-              });
-              setPendingDocs(form, current);
-            });
-          });
-        });
-        chain.catch(function (err) {
-          showErr((err && err.message) || t('تعذّر رفع الملف', 'Échec du téléversement'));
-        });
+        addPendingFiles(form, files, showErr);
       });
     }
+
+    ['dragenter', 'dragover'].forEach(function (ev) {
+      zone.addEventListener(ev, function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        zone.classList.add('is-drag');
+      });
+    });
+    zone.addEventListener('dragleave', function (e) {
+      e.preventDefault();
+      if (!zone.contains(e.relatedTarget)) zone.classList.remove('is-drag');
+    });
+    zone.addEventListener('drop', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      zone.classList.remove('is-drag');
+      showErr('');
+      addPendingFiles(form, e.dataTransfer && e.dataTransfer.files, showErr);
+    });
   }
 
   function ensureDocUpload(form) {
@@ -243,17 +414,26 @@
       || form.querySelector('.office-desk-note')
       || form.querySelector('.showroom-desk-note');
 
+    injectDocUploadCss();
     var zone = document.createElement('div');
     zone.id = 'rf-doc-upload';
+    zone.className = 'rzq-doc-zone';
     zone.setAttribute('data-desk', 'doc-upload');
-    zone.style.cssText = 'margin:4px 0 10px;padding:10px 12px;border-radius:10px;background:rgba(27,58,107,.04);border:1px dashed rgba(27,58,107,.22)';
     zone.innerHTML = ''
-      + '<div data-desk="doc-title" style="font-size:12.5px;font-weight:700;color:#1B3A6B;margin-bottom:4px"></div>'
-      + '<div data-desk="doc-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin-bottom:8px"></div>'
+      + '<div class="rzq-doc-head">'
+      + '<span class="rzq-doc-mark" aria-hidden="true">🧾</span>'
+      + '<div class="rzq-doc-copy">'
+      + '<div class="rzq-doc-title-row">'
+      + '<div data-desk="doc-title"></div>'
+      + '<span class="rzq-doc-badge" data-desk="doc-badge"></span>'
+      + '</div>'
+      + '<div data-desk="doc-hint"></div>'
+      + '</div></div>'
       + '<input type="file" id="rf-doc-file" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" multiple hidden />'
-      + '<button type="button" data-desk="doc-pick" id="rf-doc-pick" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;border:1px solid rgba(27,58,107,.25);background:#fff;color:#1B3A6B;font-size:12.5px;font-weight:700;cursor:pointer"></button>'
+      + '<button type="button" data-desk="doc-pick" id="rf-doc-pick" class="rzq-doc-pick"></button>'
       + '<div id="rf-doc-list" hidden></div>'
-      + '<div id="rf-doc-error" style="display:none;margin-top:6px;font-size:11.5px;color:#b91c1c;line-height:1.45"></div>';
+      + '<div id="rf-doc-error" style="display:none;margin-top:7px;font-size:11.5px;color:#b91c1c;line-height:1.45"></div>';
+    zone.setAttribute('data-desk-polished', '1');
 
     if (oldHint && oldHint.parentNode) {
       oldHint.parentNode.replaceChild(zone, oldHint);
@@ -733,6 +913,7 @@
       autofillBuyerFields({ force: false });
     } catch (e) { /* ignore */ }
   }
+  try { injectDocUploadCss(); } catch (eCss) { /* ignore */ }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bootAutofill);
   } else {

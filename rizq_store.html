@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_header.css?v=27.1"/>
-<link rel="stylesheet" href="rizq_ad_cards.css?v=26.7"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=26.8"/>
 <link rel="stylesheet" href="rizq_product_detail.css?v=28.5"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.9"/>
 <link rel="preload" href="rizq_header.js?v=27.0" as="script"/>
@@ -299,6 +299,10 @@ body.rzq-storefront-lb-on{overflow:hidden}
 @media(max-width:640px){
   .store-hero{min-height:0!important;height:auto!important}
   .hero-cover{padding:18px 14px 14px!important;min-height:0!important}
+  .store-hero.has-hero-videos .hero-cover{padding:18px 14px 88px!important}
+  .store-hero.has-hero-videos .hero-video-card{width:min(118px,36vw);bottom:6px}
+  .store-hero.has-hero-videos .hero-video-card--intro{right:6px}
+  .store-hero.has-hero-videos .hero-video-card--extra{left:6px}
   .store-logo-wrap{width:56px;height:56px;font-size:26px}
   .store-name{font-size:18px!important}
   .store-tagline{font-size:12px!important;margin-top:2px!important}
@@ -676,17 +680,15 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 }
 .store-desk-span2{grid-column:1/-1}
 .store-desk-actions{
-  grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-top:2px
+  grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,190px);
+  align-items:stretch;gap:10px;margin-top:4px
 }
-.store-desk-note{
-  font-size:11px;color:#6a7a8a;line-height:1.45;margin:0;flex:1 1 160px;
-  padding:8px 10px;border-radius:8px;background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.08)
-}
+.store-desk-note{margin:0;min-width:0}
 #store-service-desk #store-req-submit,
 .store-desk-actions #store-req-submit{
-  flex:0 1 180px;width:auto;padding:10px 12px;border:none;border-radius:9px;
-  background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#fff;font-weight:800;font-size:12.5px;
-  cursor:pointer;font-family:inherit;min-height:38px
+  width:100%;align-self:center;padding:12px 12px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,#0D1B2A,#1B3A6B);color:#fff;font-weight:800;font-size:12.5px;
+  cursor:pointer;font-family:inherit;min-height:48px;letter-spacing:.2px
 }
 #reviews-section.store-reviews-hz{
   margin:0;
@@ -727,7 +729,8 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   #reviews-section.store-reviews-hz{padding:12px 10px 10px;border-radius:12px}
   .store-desk-form{grid-template-columns:1fr}
   .store-desk-span2{grid-column:auto}
-  .store-desk-actions #store-req-submit{flex:1 1 100%;width:100%}
+  .store-desk-actions{grid-template-columns:1fr}
+  .store-desk-actions #store-req-submit{width:100%}
 }
 .product-img{
   height:150px;
@@ -813,18 +816,17 @@ html[dir="ltr"] .wish-btn{right:auto;left:8px}
 }
 .add-btn:hover{background:var(--gold);color:#0D1B2A;transform:scale(1.1)}
 
-/* ====== MAP PLACEHOLDER ====== */
+/* ====== MAP PLACEHOLDER (معاينة OSM عبر rizq_map_preview.js) ====== */
 .map-placeholder{
-  height:110px;border-radius:12px;
+  height:160px;border-radius:12px;
   background:
     linear-gradient(145deg,rgba(27,58,107,.08),rgba(201,168,76,.1)),
     linear-gradient(135deg,#e8eef8,#dce6f2);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:6px;cursor:pointer;border:1px solid rgba(27,58,107,.12);
+  display:block;cursor:pointer;border:1px solid rgba(27,58,107,.12);
   transition:all .3s;
 }
 .map-placeholder:hover{border-color:rgba(201,168,76,.45);transform:translateY(-1px);box-shadow:0 8px 20px rgba(27,58,107,.1)}
-.map-placeholder .map-icon{font-size:28px}
+.map-placeholder .map-icon{font-size:22px;line-height:1}
 .map-placeholder .map-text{font-size:13px;font-weight:700;color:var(--navy)}
 .map-placeholder .map-addr{font-size:12px;color:#6a7a8a;max-width:90%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
@@ -945,7 +947,7 @@ footer{
   #store-packages .rpkg-card,#store-packages .pricing-card,#store-packages-grid .rizq-pkg-card{
     padding:14px 12px!important;border-radius:12px!important;
   }
-  .map-placeholder{height:130px}
+  .map-placeholder{height:150px}
   .rzq-empty,.products-grid > .rzq-empty{min-height:160px;padding:28px 16px!important}
   .cat-tabs{flex-wrap:wrap;gap:8px;align-items:stretch}
   .cat-tabs-shop{
@@ -1193,12 +1195,13 @@ footer{
   <script src="rizq_contact_gate.js" defer></script>
   <script src="rizq_mr_payment_catalog.js?v=1.1" defer></script>
   <script src="rizq_account_payments.js?v=28.3" defer></script>
-  <script src="rizq_service_desk.js?v=1.2" defer></script>
+  <script src="rizq_service_desk.js?v=1.3" defer></script>
   <script src="rizq_terms_gate.js?v=23.0" defer></script>
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
   <script src="rizq_store_commerce.js?v=29.5" defer></script>
+  <script src="rizq_map_preview.js?v=1.0" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.1" defer></script>
   <script src="rizq_auth_gate.js?v=23.0" defer></script>
@@ -1414,7 +1417,7 @@ footer{
           <div><div class="info-label" data-t="info-label-email">البريد الإلكتروني</div><div class="info-value"><span id="info-value-email-el" class="rzq-contact-masked" onclick="rizqRequireAuth(function(){document.getElementById('info-value-email-el').classList.add('shown')},'reasonGeneric')">—</span></div></div>
         </div>
         <div style="margin-top:14px">
-          <div class="map-placeholder" onclick="openMaps()">
+          <div class="map-placeholder" id="store-map-preview" onclick="openMaps()" role="button" tabindex="0" aria-label="عرض على الخريطة">
             <div class="map-icon">🗺️</div>
             <div class="map-text" data-t="map-text">عرض على الخريطة</div>
             <div class="map-addr" id="map-addr-el">—</div>
@@ -1531,15 +1534,23 @@ footer{
             <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" rows="2"></textarea>
           </div>
           <div class="store-desk-actions">
-            <div id="rf-doc-upload" data-desk="doc-upload" class="store-desk-note" style="border-style:dashed">
-              <div data-desk="doc-title" style="font-size:12.5px;font-weight:700;color:#1B3A6B;margin-bottom:4px">رفع بيان الدفع (اختياري)</div>
-              <div data-desk="doc-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin-bottom:8px">صورة أو PDF — يُحفظ على المنصة لحماية حقوق الطرفين.</div>
+            <div id="rf-doc-upload" data-desk="doc-upload" class="store-desk-note rzq-doc-zone">
+              <div class="rzq-doc-head">
+                <span class="rzq-doc-mark" aria-hidden="true">🧾</span>
+                <div class="rzq-doc-copy">
+                  <div class="rzq-doc-title-row">
+                    <div data-desk="doc-title">رفع بيان الدفع</div>
+                    <span class="rzq-doc-badge" data-desk="doc-badge">اختياري</span>
+                  </div>
+                  <div data-desk="doc-hint">صورة أو PDF — يُحفظ على المنصة لحماية حقوق الطرفين.</div>
+                </div>
+              </div>
               <input type="file" id="rf-doc-file" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" multiple hidden />
-              <button type="button" data-desk="doc-pick" id="rf-doc-pick" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;border:1px solid rgba(27,58,107,.25);background:#fff;color:#1B3A6B;font-size:12.5px;font-weight:700;cursor:pointer">📎 اختر صورة أو PDF</button>
+              <button type="button" data-desk="doc-pick" id="rf-doc-pick" class="rzq-doc-pick"><span class="rzq-doc-pick-ico" aria-hidden="true">📎</span><span>اختر صورة أو PDF</span></button>
               <div id="rf-doc-list" hidden></div>
-              <div id="rf-doc-error" style="display:none;margin-top:6px;font-size:11.5px;color:#b91c1c"></div>
+              <div id="rf-doc-error" style="display:none;margin-top:7px;font-size:11.5px;color:#b91c1c"></div>
             </div>
-            <button type="button" id="store-req-submit" onclick="submitStoreServiceReq()">📤 إرسال الطلب</button>
+            <button type="button" id="store-req-submit" class="rzq-desk-submit" onclick="submitStoreServiceReq()">📤 إرسال الطلب للمحل</button>
           </div>
         </div>
       </section>
@@ -2628,6 +2639,7 @@ function rizqShare(title, url) {
           setText('meta-location-el', '📍 ' + addr);
           setText('info-value-address-el', addr);
           setText('map-addr-el', addr);
+          if(window.RizqMapPreview) RizqMapPreview.paint('#store-map-preview', addr);
         }
 
         // ── بيانات التواصل: تُحمَّل حصرياً عبر Contact Gate (API) ──
@@ -2775,7 +2787,10 @@ function rizqShare(title, url) {
                 if(acc.desc) setText('about-txt', acc.desc);
                 if(acc.name) document.title = acc.name + (fr?' — Rizq':' — رزق');
                 var addr = acc.address || acc.city || '';
-                if(addr){ setText('meta-location-el','📍 '+addr); setText('info-value-address-el', addr); setText('map-addr-el', addr); }
+                if(addr){
+                  setText('meta-location-el','📍 '+addr); setText('info-value-address-el', addr); setText('map-addr-el', addr);
+                  if(window.RizqMapPreview) RizqMapPreview.paint('#store-map-preview', addr);
+                }
                 if(typeof window._rizqApplyStoreVisualIdentity === 'function') window._rizqApplyStoreVisualIdentity(acc);
                 if(typeof mountStorePromoVideo === 'function') mountStorePromoVideo(acc);
                 if(window.RizqStoreCommerce) RizqStoreCommerce.wireStoreLinks(id);
@@ -3272,8 +3287,8 @@ function filterCat(btn, cat){
 function openMaps(){
   var addr = ((document.querySelector('.map-addr') || {}).textContent || '').trim();
   if(!addr || addr === '—') return;
-  var q = encodeURIComponent(addr);
-  window.open('https://www.google.com/maps/search/?api=1&query=' + q, '_blank');
+  if(window.RizqMapPreview){ RizqMapPreview.open(addr); return; }
+  window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addr), '_blank');
 }
 
 /* Show Rizq promo overlay */
