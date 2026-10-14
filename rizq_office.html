@@ -472,14 +472,11 @@ body.rizq-empty-office .rating-inline{display:none!important}
 }
 .office-desk-span2{grid-column:1/-1}
 .office-desk-actions{
-  grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin-top:2px
+  grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;margin-top:4px
 }
-.office-desk-note{
-  font-size:11px;color:#6a7a8a;line-height:1.45;margin:0;flex:1 1 140px;
-  padding:8px 10px;border-radius:8px;background:rgba(14,116,144,.04);border:1px solid rgba(14,116,144,.1)
-}
+.office-desk-note{margin:0;flex:1 1 210px}
 #office-service-desk.office-desk-hz #req-submit-btn{
-  flex:0 1 180px;width:auto;padding:10px 12px;border-radius:9px;font-size:12.5px;min-height:38px
+  flex:0 1 190px;align-self:center;width:auto;padding:12px 14px;border-radius:12px;font-size:13px;min-height:46px
 }
 #office-service-desk.office-desk-hz #req-prf-btn{
   flex:0 1 160px;width:auto;margin-top:0!important;padding:10px 12px;font-size:12px
@@ -870,7 +867,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
   <script src="rizq_mr_payment_catalog.js?v=1.1" defer></script>
   <script src="rizq_account_payments.js?v=28.3" defer></script>
   <script src="rizq_store_commerce.js?v=29.5" defer></script>
-  <script src="rizq_service_desk.js?v=1.2" defer></script>
+  <script src="rizq_service_desk.js?v=1.3" defer></script>
   <script src="rizq_terms_gate.js?v=23.0" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.1" defer></script>
@@ -1182,15 +1179,23 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
             <textarea class="req-input" id="rf-msg" name="message" placeholder="اكتب باختصار ماذا تحتاج..." rows="2" style="resize:vertical" data-ph="rf-msg"></textarea>
           </div>
           <div class="office-desk-actions">
-            <div id="rf-doc-upload" class="office-desk-note" data-desk="doc-upload" style="border-style:dashed">
-              <div data-desk="doc-title" style="font-size:12.5px;font-weight:700;color:#1B3A6B;margin-bottom:4px" data-t="rf-doc-title">رفع بيان الدفع (اختياري)</div>
-              <div data-desk="doc-hint" style="font-size:11.5px;color:#6a7a8a;line-height:1.55;margin-bottom:8px" data-t="rf-doc-hint">صورة أو PDF — يُحفظ على المنصة لحماية حقوق الطرفين.</div>
+            <div id="rf-doc-upload" class="office-desk-note rzq-doc-zone" data-desk="doc-upload">
+              <div class="rzq-doc-head">
+                <span class="rzq-doc-mark" aria-hidden="true">🧾</span>
+                <div class="rzq-doc-copy">
+                  <div class="rzq-doc-title-row">
+                    <div data-desk="doc-title" data-t="rf-doc-title">رفع بيان الدفع</div>
+                    <span class="rzq-doc-badge" data-desk="doc-badge">اختياري</span>
+                  </div>
+                  <div data-desk="doc-hint" data-t="rf-doc-hint">صورة أو PDF — يُحفظ على المنصة لحماية حقوق الطرفين.</div>
+                </div>
+              </div>
               <input type="file" id="rf-doc-file" accept="image/jpeg,image/png,image/webp,application/pdf,.jpg,.jpeg,.png,.webp,.pdf" multiple hidden />
-              <button type="button" data-desk="doc-pick" id="rf-doc-pick" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;border:1px solid rgba(27,58,107,.25);background:#fff;color:#1B3A6B;font-size:12.5px;font-weight:700;cursor:pointer" data-t="rf-doc-pick">📎 اختر صورة أو PDF</button>
+              <button type="button" data-desk="doc-pick" id="rf-doc-pick" class="rzq-doc-pick" data-t="rf-doc-pick"><span class="rzq-doc-pick-ico" aria-hidden="true">📎</span><span>اختر صورة أو PDF</span></button>
               <div id="rf-doc-list" hidden></div>
-              <div id="rf-doc-error" style="display:none;margin-top:6px;font-size:11.5px;color:#b91c1c"></div>
+              <div id="rf-doc-error" style="display:none;margin-top:7px;font-size:11.5px;color:#b91c1c"></div>
             </div>
-            <button type="button" class="req-btn" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب للمكتب</button>
+            <button type="button" class="req-btn rzq-desk-submit" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب للمكتب</button>
             <button type="button" class="rizq-prf-trigger" onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn" data-t="req-prf-btn">PREFACTUR · فاتورة قبل</button>
           </div>
         </div>
