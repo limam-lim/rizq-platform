@@ -53,15 +53,15 @@
       + '.rzq-ft-collapse-wrap{max-height:0;overflow:hidden;transition:max-height .4s ease}'
       + '@media (prefers-reduced-motion: reduce){.rzq-ft-collapse-wrap{transition:none}}'
       + 'footer.rzq-ft-compact{padding-top:14px!important;transition:padding-top .35s ease}'
-      /* أسفل الفوتر يحتاج فراغاً كافياً حتى لا تُقطع شارة ADMINIA ونصوص الحقوق */
+      /* أسفل الفوتر أعلى قليلاً حتى تظهر شارة الشركة كاملة فوق حافة الشاشة */
       + 'html body footer.rizq-footer,html body footer{'
-      + 'padding-bottom:36px!important;box-sizing:border-box!important;'
+      + 'padding-bottom:calc(56px + env(safe-area-inset-bottom,0px))!important;box-sizing:border-box!important;'
       + 'overflow:visible!important}'
       + 'html body footer.rizq-footer .footer-bottom,'
       + 'html body footer .footer-bottom{'
-      + 'padding:14px 0 8px!important;margin-bottom:0!important;'
+      + 'padding:14px 0 18px!important;margin-bottom:0!important;'
       + 'align-items:flex-start!important;row-gap:12px!important}'
-      + 'html body footer .rzq-ft-adminia-stack{padding-bottom:4px!important}'
+      + 'html body footer .rzq-ft-adminia-stack{padding-bottom:12px!important;margin-bottom:4px!important}'
       + 'html body footer,html body footer.rizq-footer{'
       + 'background:linear-gradient(180deg,#0D1B2A,#071020)!important;'
       + 'background-blend-mode:normal!important}'
@@ -112,8 +112,8 @@
     var fb = (scope || document).querySelector('.footer-bottom');
     if (!fb || fb.dataset.rzqSlim) return;
     fb.dataset.rzqSlim = '1';
-    /* لا نضغط الحشو السفلي إلى صفر — كان يقطع ويدجت ADMINIA والنصوص */
-    fb.style.padding = '14px 0 10px';
+    /* لا نضغط الحشو السفلي — شارة ADMINIA تحتاج فراغاً فوق حافة الشاشة */
+    fb.style.padding = '14px 0 18px';
     fb.style.gap = '10px';
     fb.style.alignItems = 'flex-start';
     fb.querySelectorAll('.footer-copy').forEach(function (p) { p.style.fontSize = '10.5px'; });
