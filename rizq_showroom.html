@@ -23,7 +23,7 @@
 <link rel="preload" href="rizq_header.js?v=27.0" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>معرض رزق | Showroom Rizq</title>
-<link rel="preload" as="image" href="rizq-assets/demo-heroes/showroom-industrial.jpg"/>
+<link rel="preload" as="image" href="rizq-assets/demo-heroes/showroom-appliances-promo.jpg"/>
 <style>
 :root{
   --navy:#1B3A6B;--navy2:#0F2347;--gold:#C9A84C;--gold2:#E8C96A;
@@ -541,23 +541,25 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
       var id = q.get('id') || q.get('corp') || q.get('showroom') || '';
       var hero = document.getElementById('showroom-hero');
       if(!hero) return;
-      var DEMO_COVER = 'rizq-assets/demo-heroes/showroom-industrial.jpg';
+      var DEMO_COVER = 'rizq-assets/demo-heroes/showroom-appliances-promo.jpg';
+      var isDemo = !id || id === 'demo-corp-001' || id === 'demo_showroom' || q.get('demo') === '1';
       var cover = '';
-      if(id){
-        var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
-        for(var i=0;i<accs.length;i++){
-          var a = accs[i];
-          if(a && a.id === id && (a.type === 'corp' || a.type === 'showroom') && (a.cover || a.thumb)){
-            cover = String(a.cover || a.thumb || '');
-            break;
+      if(isDemo){
+        cover = DEMO_COVER;
+      } else {
+        if(id){
+          var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+          for(var i=0;i<accs.length;i++){
+            var a = accs[i];
+            if(a && a.id === id && (a.type === 'corp' || a.type === 'showroom') && (a.cover || a.thumb)){
+              cover = String(a.cover || a.thumb || '');
+              break;
+            }
           }
         }
-      }
-      if(!cover){
-        try{ cover = String(sessionStorage.getItem('rizq_hero_cover_' + id) || ''); }catch(eS){}
-      }
-      if(!cover && (!id || id === 'demo-corp-001' || id === 'demo_showroom' || q.get('demo') === '1')){
-        cover = DEMO_COVER;
+        if(!cover){
+          try{ cover = String(sessionStorage.getItem('rizq_hero_cover_' + id) || ''); }catch(eS){}
+        }
       }
       if(!cover || /javascript:/i.test(cover) || /[\s<>"']/.test(cover)) return;
       var okAbs = /^(https?:\/\/|\/|\.\/|data:image\/)/i.test(cover);
@@ -1119,9 +1121,9 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
     planName: 'سنوية',
     promo_video: 'rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4',
     promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ',
-    /* أجهزة منزلية + صناعية — تختلف عن خلفية محل الأزياء */
-    cover: 'rizq-assets/demo-heroes/showroom-industrial.jpg',
-    thumb: 'rizq-assets/demo-heroes/showroom-appliances.jpg'
+    /* أجهزة كبيرة + صغيرة — خلفية ترويجية لمعرض الأجهزة */
+    cover: 'rizq-assets/demo-heroes/showroom-appliances-promo.jpg',
+    thumb: 'rizq-assets/demo-heroes/showroom-appliances-promo.jpg'
   };
   var items = [
     { id: 'SR1', name: 'سيارة SUV 2022', nameFr: 'SUV 2022', cat: 'سيارات', price: '2,850,000 MRU', emoji: '🚗', stock: 2, specs: 'بيانات عرض', featured: true },

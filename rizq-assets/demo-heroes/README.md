@@ -1,12 +1,11 @@
-# Demo hero covers (local)
+# Demo hero covers (local promotional)
 
-Local full-bleed hero backgrounds for public pages — avoids dark-navy flash
-and Unsplash latency on first paint.
+Local full-bleed hero backgrounds for public demo pages — first paint without navy flash.
 
-| File | Used on | Subject |
-|------|---------|---------|
-| `office-law-interior.jpg` | `rizq_office.html` demo | Professional office interior |
-| `showroom-appliances.jpg` | `rizq_showroom.html` demo | Home appliances / retail floor |
-| `showroom-industrial.jpg` | showroom thumb / alternate | Industrial equipment |
+| File | Page | Subject |
+|------|------|---------|
+| `store-boutique-promo.jpg` | `rizq_store.html` | Boutique retail (classic promotional shop floor) |
+| `office-lawyer-justice.jpg` | `rizq_office.html` | Lawyer from behind + justice scales emblem |
+| `showroom-appliances-promo.jpg` | `rizq_showroom.html` | Large + small home appliances showroom |
 
-Store fashion demos stay under `rizq-assets/demo-fashion/`.
+Legacy alternates kept: `office-law-interior.jpg`, `showroom-appliances.jpg`, `showroom-industrial.jpg`.

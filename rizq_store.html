@@ -11,7 +11,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <link rel="stylesheet" href="rizq-theme.css?v=23.0"/>
-  <link rel="preload" as="image" href="rizq-assets/demo-fashion/demo-daraa-boutique-navy.jpg"/>
+  <link rel="preload" as="image" href="rizq-assets/demo-heroes/store-boutique-promo.jpg"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
@@ -1259,24 +1259,26 @@ footer{
       var id = q.get('id') || q.get('store') || '';
       var hero = document.getElementById('store-hero');
       if(!hero) return;
-      var DEMO_COVER = 'rizq-assets/demo-fashion/demo-daraa-boutique-navy.jpg';
+      var DEMO_COVER = 'rizq-assets/demo-heroes/store-boutique-promo.jpg';
+      var isDemo = !id || id === 'demo_store' || q.get('demo') === '1';
       var cover = '';
-      if(id){
-        var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
-        for(var i=0;i<accs.length;i++){
-          var a = accs[i];
-          if(a && a.id === id && a.type === 'store' && (a.cover || a.thumb)){
-            cover = String(a.cover || a.thumb || '');
-            break;
+      /* المعاينة دائماً بالغلاف الترويجي الحالي — لا كاش قديم */
+      if(isDemo){
+        cover = DEMO_COVER;
+      } else {
+        if(id){
+          var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+          for(var i=0;i<accs.length;i++){
+            var a = accs[i];
+            if(a && a.id === id && a.type === 'store' && (a.cover || a.thumb)){
+              cover = String(a.cover || a.thumb || '');
+              break;
+            }
           }
         }
-      }
-      if(!cover){
-        try{ cover = String(sessionStorage.getItem('rizq_hero_cover_' + id) || sessionStorage.getItem('rizq_store_cover_' + id) || ''); }catch(eS){}
-      }
-      /* معاينة المحل بلا غلاف محفوظ → صورة أزياء محلية فورية (بلا انتظار Unsplash) */
-      if(!cover && (!id || id === 'demo_store' || q.get('demo') === '1')){
-        cover = DEMO_COVER;
+        if(!cover){
+          try{ cover = String(sessionStorage.getItem('rizq_hero_cover_' + id) || sessionStorage.getItem('rizq_store_cover_' + id) || ''); }catch(eS){}
+        }
       }
       if(!cover || /javascript:/i.test(cover) || /[\s<>"']/.test(cover)) return;
       var okAbs = /^(https?:\/\/|\/|\.\/|data:image\/)/i.test(cover);
@@ -2319,9 +2321,9 @@ function rizqShare(title, url) {
         /* تعريفي: بضع ثوانٍ من داشبورد المحل · إضافي: كما كان (يوتيوب) */
         promo_video: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4',
         promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ',
-        /* غلاف هيرو محلي فوري — يمنع وميض الكحلي قبل اكتمال الشبكة */
-        cover: 'rizq-assets/demo-fashion/demo-daraa-boutique-navy.jpg',
-        thumb: 'rizq-assets/demo-fashion/demo-daraa-boutique-navy.jpg'
+        /* غلاف هيرو ترويجي للمحل (واجهة بوتيك) — محلي فوري بلا وميض كحلي */
+        cover: 'rizq-assets/demo-heroes/store-boutique-promo.jpg',
+        thumb: 'rizq-assets/demo-heroes/store-boutique-promo.jpg'
       };
       var products = [
         { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 12, variants: 'S, M, L, XL, XXL', unit: 'قطعة', desc: '' },

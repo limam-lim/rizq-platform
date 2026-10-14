@@ -23,7 +23,7 @@
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
 <title data-t-fr="Bureaux — Rizq Office">المكاتب — رزق أوفيس</title>
-<link rel="preload" as="image" href="rizq-assets/demo-heroes/office-law-interior.jpg"/>
+<link rel="preload" as="image" href="rizq-assets/demo-heroes/office-lawyer-justice.jpg"/>
 <style>
 :root{
   --navy:#1B3A6B; --navy2:#0F2347; --navy3:#06111C;
@@ -907,23 +907,25 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
       var id = q.get('id') || q.get('office') || '';
       var hero = document.getElementById('office-hero');
       if(!hero) return;
-      var DEMO_COVER = 'rizq-assets/demo-heroes/office-law-interior.jpg';
+      var DEMO_COVER = 'rizq-assets/demo-heroes/office-lawyer-justice.jpg';
+      var isDemo = !id || id === 'demo_law' || q.get('demo') === '1' || q.get('sample') === 'law';
       var cover = '';
-      if(id){
-        var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
-        for(var i=0;i<accs.length;i++){
-          var a = accs[i];
-          if(a && a.id === id && a.type === 'office' && (a.cover || a.thumb)){
-            cover = String(a.cover || a.thumb || '');
-            break;
+      if(isDemo){
+        cover = DEMO_COVER;
+      } else {
+        if(id){
+          var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+          for(var i=0;i<accs.length;i++){
+            var a = accs[i];
+            if(a && a.id === id && a.type === 'office' && (a.cover || a.thumb)){
+              cover = String(a.cover || a.thumb || '');
+              break;
+            }
           }
         }
-      }
-      if(!cover){
-        try{ cover = String(sessionStorage.getItem('rizq_hero_cover_' + id) || ''); }catch(eS){}
-      }
-      if(!cover && (!id || id === 'demo_law' || q.get('demo') === '1' || q.get('sample') === 'law')){
-        cover = DEMO_COVER;
+        if(!cover){
+          try{ cover = String(sessionStorage.getItem('rizq_hero_cover_' + id) || ''); }catch(eS){}
+        }
       }
       if(!cover || /javascript:/i.test(cover) || /[\s<>"']/.test(cover)) return;
       var okAbs = /^(https?:\/\/|\/|\.\/|data:image\/)/i.test(cover);
@@ -2050,8 +2052,8 @@ function openMaps(){
         promo_video: 'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4',
         promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ',
         /* غلاف هيرو محلي — نفس أسلوب المحل (صورة خلفية + طبقة تغميق) */
-        cover: 'rizq-assets/demo-heroes/office-law-interior.jpg',
-        thumb: 'rizq-assets/demo-heroes/office-law-interior.jpg',
+        cover: 'rizq-assets/demo-heroes/office-lawyer-justice.jpg',
+        thumb: 'rizq-assets/demo-heroes/office-lawyer-justice.jpg',
         services: [
           { name: isFr() ? 'Consultation juridique' : 'استشارة قانونية', desc: isFr() ? 'Entretien confidentiel 45 min' : 'جلسة سرية 45 دقيقة', price: 15000, emoji: '⚖️', duration: isFr() ? '45 min' : '45 د' },
           { name: isFr() ? 'Rédaction de contrat' : 'صياغة عقد', desc: isFr() ? 'Contrats civils / commerciaux' : 'عقود مدنية وتجارية', price: 45000, emoji: '📜', duration: isFr() ? '3–5 jours' : '3–5 أيام' },
