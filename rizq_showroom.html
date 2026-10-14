@@ -338,14 +338,15 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 }
 .showroom-desk-span2{grid-column:1/-1}
 .showroom-desk-actions{
-  grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:stretch;justify-content:space-between;gap:10px;margin-top:4px
+  grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,200px);
+  align-items:stretch;gap:10px;margin-top:4px
 }
-.showroom-desk-note{margin:0;flex:1 1 210px}
+.showroom-desk-note{margin:0;min-width:0}
 #showroom-service-desk #sr-req-submit,
 .showroom-desk-actions #sr-req-submit{
-  flex:0 1 200px;align-self:center;width:auto;padding:12px 14px;border:none;border-radius:12px;
-  background:linear-gradient(135deg,#0D1B2A,#1B3A6B);color:#fff;font-weight:800;font-size:13px;
-  cursor:pointer;font-family:inherit;min-height:46px
+  width:100%;align-self:center;padding:12px 12px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,#0D1B2A,#1B3A6B);color:#fff;font-weight:800;font-size:12.5px;
+  cursor:pointer;font-family:inherit;min-height:48px
 }
 #reviews-section.showroom-reviews-hz{
   margin:0;
@@ -379,7 +380,8 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   #reviews-section.showroom-reviews-hz{padding:12px 10px 10px;border-radius:12px}
   .showroom-desk-form{grid-template-columns:1fr}
   .showroom-desk-span2{grid-column:auto}
-  .showroom-desk-actions #sr-req-submit{flex:1 1 100%;width:100%}
+  .showroom-desk-actions{grid-template-columns:1fr}
+  .showroom-desk-actions #sr-req-submit{width:100%}
 }
 .info-row{display:flex;gap:12px;margin-bottom:12px;align-items:flex-start}
 .info-icon{font-size:18px;flex-shrink:0;margin-top:2px}

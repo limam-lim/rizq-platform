@@ -149,9 +149,6 @@
       + '#corp-req-submit.rzq-desk-submit:hover{'
       + 'transform:translateY(-1px);filter:brightness(1.04);'
       + 'box-shadow:0 12px 26px rgba(15,35,71,.24)'
-      + '}'
-      + '@media (max-width:800px){'
-      + '#rf-doc-upload.rzq-doc-zone{flex:1 1 100%}'
       + '}';
     document.head.appendChild(s);
   }
