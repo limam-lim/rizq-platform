@@ -21,7 +21,8 @@
        (top:-4px;right:-4px) وأي حلقة توهّج نضيفها الآن. أُزيل overflow:hidden،
        وأُضيفت حلقة نبض ذهبية متحركة حول الزر (::before) تلفت الانتباه فعلياً
        عبر الحركة، لا فقط عبر شكل ثابت. */
-    '#rizq-chat-toggle{position:fixed;bottom:28px;right:28px;width:64px;height:64px;border-radius:50%;',
+    /* bottom أعلى قليلاً حتى لا يُقطع الزر خلف شريط مهام ويندوز / حافة الشاشة */
+    '#rizq-chat-toggle{position:fixed;bottom:calc(52px + env(safe-area-inset-bottom,0px));right:28px;width:64px;height:64px;border-radius:50%;',
     'background:radial-gradient(circle at 35% 30%,#2a5aa8 0%,#1B3A6B 55%,#0F2347 100%);border:3px solid #C9A84C;',
     'cursor:grab;box-shadow:0 8px 32px rgba(27,58,107,.28),inset 0 0 14px rgba(201,168,76,.18);display:flex;align-items:center;',
     'justify-content:center;z-index:400;transition:transform .3s cubic-bezier(.34,1.56,.64,1),box-shadow .3s;}',
@@ -157,7 +158,7 @@
     '.rw-quick-btn{font-size:.68rem;padding:4px 8px;}}',
     '@media(max-width:768px) and (min-width:441px){',
     '#rizq-chat-window{top:68px;bottom:16px;width:min(300px,calc(100vw - 32px));}}',
-    '#rizq-prompt-bubbles{position:fixed;bottom:100px;right:28px;z-index:500;pointer-events:none}',
+    '#rizq-prompt-bubbles{position:fixed;bottom:calc(124px + env(safe-area-inset-bottom,0px));right:28px;z-index:500;pointer-events:none}',
     'html[dir="ltr"] #rizq-prompt-bubbles{right:auto;left:28px}',
     '.rw-prompt-bubble{position:relative;background:#fff;border:1.5px solid rgba(201,168,76,.35);',
     'border-radius:14px 14px 4px 14px;padding:10px 14px;font-size:12px;font-weight:700;color:#1B3A6B;',
