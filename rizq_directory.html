@@ -69,8 +69,8 @@ html.rizq-app-nav:has(#rizq-desk-nav) .dir-hero{padding-top:16px}
 
 /* بوابات مضغوطة أفقياً — أيقونة + اسم */
 .dir-type-gate{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;
-  max-width:720px;margin:0 auto 10px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;
+  max-width:920px;margin:0 auto 10px;
 }
 .dir-gate{
   position:relative;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;
@@ -420,6 +420,38 @@ var TYPE_META = {
     reg: 'rizq_register.html?mode=seller&preBiz=office',
     regCtaAr: '🚀 أنشئ مكتبك الآن', regCtaFr: '🚀 Créez votre bureau',
     ownAr: '✨ امتلك واجهتك المهنية على رزق', ownFr: '✨ Possédez votre vitrine professionnelle'
+  },
+  tenders: {
+    page: 'rizq_tenders.html',
+    icon: '📑',
+    ar: 'المناقصات', fr: 'Appels d\'offres',
+    hintAr: 'فرص أعمال معتمدة', hintFr: 'Opportunités validées',
+    titleAr: 'دليل <span>المناقصات</span>', titleFr: 'Annuaire des <span>appels d\'offres</span>',
+    subAr: 'كل المناقصات المعتمدة على رزق — تصفّح حسب الفئة أو الولاية. للإرسال استخدم غرفة المناقصات.',
+    subFr: 'Tous les appels d\'offres validés sur Rizq — filtrez par catégorie ou wilaya. Pour publier, ouvrez la salle des appels d\'offres.',
+    emptyAr: 'لا مناقصات مطابقة للفلتر حالياً.',
+    emptyFr: 'Aucun appel d\'offres ne correspond aux filtres.',
+    ctaAr: 'فتح غرفة المناقصات ←', ctaFr: 'Ouvrir la salle →',
+    reg: 'rizq_tenders.html?demo=1',
+    regCtaAr: '🚀 أرسل مناقصة', regCtaFr: '🚀 Publier un appel',
+    ownAr: '✨ أرسل مناقصتك عبر غرفة المناقصات', ownFr: '✨ Publiez via la salle des appels d\'offres',
+    feed: true
+  },
+  investments: {
+    page: 'rizq_investments.html',
+    icon: '📈',
+    ar: 'الاستثمارات', fr: 'Investissements',
+    hintAr: 'فرص نمو معتمدة', hintFr: 'Croissance validée',
+    titleAr: 'دليل <span>الاستثمارات</span>', titleFr: 'Annuaire des <span>investissements</span>',
+    subAr: 'كل فرص الاستثمار المعتمدة على رزق — تصفّح حسب القطاع أو الولاية. للإرسال استخدم غرفة الاستثمارات.',
+    subFr: 'Toutes les opportunités d\'investissement validées — filtrez par secteur ou wilaya. Pour publier, ouvrez la salle des investissements.',
+    emptyAr: 'لا فرص استثمار مطابقة للفلتر حالياً.',
+    emptyFr: 'Aucune opportunité ne correspond aux filtres.',
+    ctaAr: 'فتح غرفة الاستثمارات ←', ctaFr: 'Ouvrir la salle →',
+    reg: 'rizq_investments.html?demo=1',
+    regCtaAr: '🚀 أرسل فرصة استثمار', regCtaFr: '🚀 Publier une opportunité',
+    ownAr: '✨ أرسل فرصتك عبر غرفة الاستثمارات', ownFr: '✨ Publiez via la salle des investissements',
+    feed: true
   }
 };
 
@@ -436,6 +468,14 @@ var DIR_EXAMPLES = {
   office: [
     { href: 'rizq_office.html?demo=1', nameAr: 'مكتب محاماة نموذجي', nameFr: 'Cabinet d\'avocats modèle', actAr: 'محامون وقانون', actFr: 'Avocats & droit', cityAr: 'نواكشوط', cityFr: 'Nouakchott', icon: '⚖️' },
     { href: 'rizq_office.html?demo=1', nameAr: 'مكتب خدمات إدارية', nameFr: 'Bureau administratif', actAr: 'خدمات إدارية', actFr: 'Services admin.', cityAr: 'نواكشوط', cityFr: 'Nouakchott', icon: '🏛️' }
+  ],
+  tenders: [
+    { href: 'rizq_tenders.html?demo=1', nameAr: 'مناقصة توريد نموذجية', nameFr: 'Appel d\'offres modèle', actAr: 'توريد ومعدات', actFr: 'Fournitures', cityAr: 'نواكشوط', cityFr: 'Nouakchott', icon: '📑' },
+    { href: 'rizq_tenders.html?demo=1', nameAr: 'مناقصة خدمات', nameFr: 'Appel services', actAr: 'خدمات مهنية', actFr: 'Services pro', cityAr: 'نواذيبو', cityFr: 'Nouadhibou', icon: '📋' }
+  ],
+  investments: [
+    { href: 'rizq_investments.html?demo=1', nameAr: 'فرصة استثمار نموذجية', nameFr: 'Opportunité modèle', actAr: 'تجارة وعقار', actFr: 'Commerce & immo', cityAr: 'نواكشوط', cityFr: 'Nouakchott', icon: '📈' },
+    { href: 'rizq_investments.html?demo=1', nameAr: 'شراكة نمو محلية', nameFr: 'Partenariat local', actAr: 'زراعة وخدمات', actFr: 'Agri & services', cityAr: 'روصو', cityFr: 'Rosso', icon: '🤝' }
   ]
 };
 
@@ -489,11 +529,16 @@ function _dirCatLabel(cat, fr){
 
 var _params = new URLSearchParams(location.search);
 var _typeRaw = (_params.get('type') || 'corp').toLowerCase();
+if (_typeRaw === 'tender') _typeRaw = 'tenders';
+if (_typeRaw === 'investment' || _typeRaw === 'invest') _typeRaw = 'investments';
 var _type = TYPE_META[_typeRaw] ? _typeRaw : 'corp';
 var _catRaw = _params.get('cat') || '';
 var _catFilter = '';
 var _accounts = [];
 var _loaded = false;
+var _feedCats = [];
+var BUSINESS_TYPES = ['store', 'corp', 'office'];
+var FEED_TYPES = ['tenders', 'investments'];
 /** نفس أسلوب صفحة الإعلانات: دفعة 24 + تحميل المزيد / تمرير */
 var DIR_PAGE_SIZE = 24;
 var _visibleCount = DIR_PAGE_SIZE;
@@ -507,6 +552,10 @@ function escapeHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'
 function _backendBase(){ return (typeof window.RIZQ_BACKEND_BASE==='string' && window.RIZQ_BACKEND_BASE) || 'http://localhost:3000'; }
 
 function _setCatFilterFromParam(){
+  if(TYPE_META[_type] && TYPE_META[_type].feed){
+    _catFilter = _catRaw ? String(_catRaw) : '';
+    return;
+  }
   if(window.RizqMerchantActivities && typeof RizqMerchantActivities.normalizeDirectoryFilter === 'function'){
     _catFilter = RizqMerchantActivities.normalizeDirectoryFilter(_catRaw, _type);
     return;
@@ -523,7 +572,8 @@ function typeHref(type, cat){
 function renderTypeTabs(){
   var fr = _rizqLang()==='fr';
   var wrap = document.getElementById('dir-type-tabs');
-  wrap.innerHTML = ['store','corp','office'].map(function(t){
+  var tabs = BUSINESS_TYPES.concat(FEED_TYPES);
+  wrap.innerHTML = tabs.map(function(t){
     var m = TYPE_META[t];
     var active = _type===t ? ' active' : '';
     var label = fr ? m.fr : m.ar;
@@ -539,8 +589,14 @@ function renderTypeTabs(){
 function renderCatChips(){
   var fr = _rizqLang()==='fr';
   var wrap = document.getElementById('dir-cats');
-  var sectors = _dirSectors();
   var allChip = '<a class="dir-cat-chip'+(_catFilter===''?' active':'')+'" href="'+typeHref(_type)+'">'+(fr?'📋 Tous':'📋 الكل')+'</a>';
+  if (TYPE_META[_type] && TYPE_META[_type].feed) {
+    wrap.innerHTML = allChip + (_feedCats || []).map(function(c){
+      return '<a class="dir-cat-chip'+(_catFilter===c?' active':'')+'" href="'+typeHref(_type,c)+'">'+escapeHtml(c)+'</a>';
+    }).join('');
+    return;
+  }
+  var sectors = _dirSectors();
   wrap.innerHTML = allChip + sectors.map(function(s){
     var id = s.id;
     var label = s.name || s.label || _dirSectorLabel(id, fr);
@@ -562,7 +618,11 @@ function renderHero(){
     own.textContent = fr ? m.ownFr : m.ownAr;
   }
   var flabel = document.getElementById('dir-filter-label');
-  if(flabel) flabel.textContent = fr ? 'Filtrer par spécialité' : 'تصفية حسب الاختصاص';
+  if(flabel){
+    if(_type === 'tenders') flabel.textContent = fr ? 'Filtrer par catégorie' : 'تصفية حسب الفئة';
+    else if(_type === 'investments') flabel.textContent = fr ? 'Filtrer par secteur' : 'تصفية حسب القطاع';
+    else flabel.textContent = fr ? 'Filtrer par spécialité' : 'تصفية حسب الاختصاص';
+  }
   var sel = document.getElementById('dir-wilaya');
   if(sel && sel.options.length){
     sel.options[0].textContent = fr ? 'Toutes les wilayas' : 'كل الولايات';
@@ -572,7 +632,11 @@ function renderHero(){
     }
   }
   var search = document.getElementById('dir-search');
-  if(search) search.placeholder = fr ? 'Rechercher par nom ou activité…' : 'ابحث بالاسم أو النشاط…';
+  if(search){
+    if(_type === 'tenders') search.placeholder = fr ? 'Rechercher un appel d\'offres…' : 'ابحث في المناقصات…';
+    else if(_type === 'investments') search.placeholder = fr ? 'Rechercher une opportunité…' : 'ابحث في الاستثمارات…';
+    else search.placeholder = fr ? 'Rechercher par nom ou activité…' : 'ابحث بالاسم أو النشاط…';
+  }
 }
 
 function _cityOf(a){
@@ -588,10 +652,18 @@ function renderDirectory(){
 
   var q = (document.getElementById('dir-search').value || '').trim().toLowerCase();
   var wilaya = (document.getElementById('dir-wilaya').value || '').trim();
+  var isFeed = !!(TYPE_META[_type] && TYPE_META[_type].feed);
   var list = _accounts.filter(function(a){
-    if(a.type !== _type) return false;
+    if(isFeed){
+      if(a.type !== _type) return false;
+    } else if(a.type !== _type){
+      return false;
+    }
     if(_catFilter){
-      if(window.RizqMerchantActivities && typeof RizqMerchantActivities.accountMatchesDirectoryFilter === 'function'){
+      if(isFeed){
+        var feedCat = String(a.category || a.sector || a.activity || '');
+        if(feedCat !== _catFilter) return false;
+      } else if(window.RizqMerchantActivities && typeof RizqMerchantActivities.accountMatchesDirectoryFilter === 'function'){
         if(!RizqMerchantActivities.accountMatchesDirectoryFilter(a, _catFilter)) return false;
       } else if(a.category !== _catFilter && String(a.activity||'') !== _catFilter){
         return false;
@@ -602,7 +674,7 @@ function renderDirectory(){
       if(city.indexOf(wilaya) === -1 && wilaya.indexOf(city) === -1) return false;
     }
     if(q){
-      var hay = [a.name, a.activity, a.tagline, a.category, a.activityId, _cityOf(a)].join(' ').toLowerCase();
+      var hay = [a.name, a.activity, a.tagline, a.category, a.sector, a.stage, a.capital, a.activityId, _cityOf(a), a.deadline].join(' ').toLowerCase();
       if(hay.indexOf(q) === -1) return false;
     }
     return true;
@@ -645,22 +717,38 @@ function renderDirectory(){
 
   function _cardHTML(a){
     var thumb = _accountThumb(a);
-    var _badges = (typeof RizqSub!=='undefined') ? RizqSub.getBadges(a.id) : {verified:false,premium:false};
+    var isFeedCard = !!(m.feed);
+    var _badges = (!isFeedCard && typeof RizqSub!=='undefined') ? RizqSub.getBadges(a.id) : {verified:false,premium:false};
     var badgeHTML = (_badges.verified?'<span class="dir-badge dir-badge-verified">✅ '+(fr?'Vérifié':'موثّق')+'</span>':'')
       + (_badges.premium?'<span class="dir-badge dir-badge-premium">🏅 '+(fr?'Premium':'مميّز')+'</span>':'');
     var typeLine = m.icon + ' ' + (fr ? m.fr : m.ar);
     if(a.activity) typeLine += ' · ' + escapeHtml(a.activity);
+    else if(a.sector) typeLine += ' · ' + escapeHtml(a.sector);
     else if(a.activityId && window.RizqMerchantActivities && typeof RizqMerchantActivities.displayName === 'function'){
       typeLine += ' · ' + escapeHtml(RizqMerchantActivities.displayName(a.activityId, fr ? 'fr' : 'ar'));
-    } else if(a.category) typeLine += ' · ' + escapeHtml(_dirCatLabel(a.category, fr));
+    } else if(a.category) typeLine += ' · ' + escapeHtml(isFeedCard ? a.category : _dirCatLabel(a.category, fr));
     var city = _cityOf(a);
-    return '<a class="dir-card" href="'+m.page+'?id='+encodeURIComponent(a.id)+'">'
+    var href = isFeedCard
+      ? (m.page + (a.id ? ('?focus=' + encodeURIComponent(a.id)) : ''))
+      : (m.page + '?id=' + encodeURIComponent(a.id));
+    var extra = '';
+    if(_type === 'tenders' && a.deadline){
+      extra = '<div class="dir-tagline">⏳ ' + (fr ? 'Échéance: ' : 'آخر أجل: ') + escapeHtml(String(a.deadline).slice(0, 10)) + '</div>';
+    } else if(_type === 'investments'){
+      var bits = [];
+      if(a.stage) bits.push(a.stage);
+      if(a.capital) bits.push(a.capital);
+      if(bits.length) extra = '<div class="dir-tagline">'+escapeHtml(bits.join(' · '))+'</div>';
+    } else if(a.tagline){
+      extra = '<div class="dir-tagline">'+escapeHtml(a.tagline)+'</div>';
+    }
+    return '<a class="dir-card" href="'+href+'">'
       + '<div class="dir-card-top"><div class="dir-thumb">'+thumb+'</div><div>'
       + '<div class="dir-name">'+escapeHtml(a.name||'')+(badgeHTML?'<span class="dir-badges-inline">'+badgeHTML+'</span>':'')+'</div>'
       + '<div class="dir-type">'+typeLine+'</div>'
       + '</div></div>'
       + (city ? '<div class="dir-city">📍 '+escapeHtml(city)+'</div>' : '')
-      + (a.tagline ? '<div class="dir-tagline">'+escapeHtml(a.tagline)+'</div>' : '')
+      + extra
       + '<div class="dir-cta">'+(fr?m.ctaFr:m.ctaAr)+'</div>'
       + '</a>';
   }
@@ -686,7 +774,6 @@ function renderDirectory(){
   if(!list.length){
     var noneOfType = !_accounts.some(function(a){ return a.type === _type; });
     if(noneOfType){
-      /* لا حاجة لمربع فارغ كبير — التسجيل من الهيدر؛ هنا أمثلة توضح البطاقات */
       var intro = fr
         ? 'Les boutiques/showrooms/bureaux apparaîtront ici avec photo et nom. Cliquez une carte pour ouvrir la page.'
         : 'كل محل أو معرض أو مكتب سيظهر هنا بصورته واسمه — اضغط البطاقة لفتح صفحته.';
@@ -699,6 +786,12 @@ function renderDirectory(){
       if(_type === 'office') intro = fr
         ? 'Les bureaux apparaîtront ici avec photo et nom. Cliquez une carte pour ouvrir la page.'
         : 'كل مكتب سيظهر هنا بصورته واسمه — اضغط البطاقة لفتح صفحته.';
+      if(_type === 'tenders') intro = fr
+        ? 'Les appels d\'offres validés apparaîtront ici. Cliquez une carte pour ouvrir la salle.'
+        : 'المناقصات المعتمدة تظهر هنا — اضغط البطاقة لفتح غرفة المناقصات.';
+      if(_type === 'investments') intro = fr
+        ? 'Les opportunités validées apparaîtront ici. Cliquez une carte pour ouvrir la salle.'
+        : 'فرص الاستثمار المعتمدة تظهر هنا — اضغط البطاقة لفتح غرفة الاستثمارات.';
       grid.innerHTML = '<p class="dir-empty-note">'+intro+'</p>' + _exampleCardsHTML();
       return;
     }
@@ -788,7 +881,84 @@ function _loadGraduationFixture(){
     .catch(function(){ return []; });
 }
 
+function _uniqCats(items, key){
+  var seen = {};
+  var out = [];
+  (items || []).forEach(function(it){
+    var v = String(it[key] || '').trim();
+    if(!v || seen[v]) return;
+    seen[v] = 1;
+    out.push(v);
+  });
+  return out.sort();
+}
+
+function _mapTenderRow(t){
+  return {
+    id: t.id,
+    type: 'tenders',
+    name: t.title || (t.category ? ('مناقصة — ' + t.category) : 'مناقصة'),
+    activity: t.category || '',
+    category: t.category || '',
+    city: t.city || '',
+    wilaya: t.city || '',
+    tagline: '',
+    deadline: t.deadline || '',
+    createdAt: t.createdAt || null
+  };
+}
+
+function _mapInvestRow(o){
+  return {
+    id: o.id,
+    type: 'investments',
+    name: o.title || o.sector || 'فرصة استثمار',
+    activity: o.sector || '',
+    sector: o.sector || '',
+    category: o.sector || '',
+    city: o.wilaya || '',
+    wilaya: o.wilaya || '',
+    stage: o.stage || '',
+    capital: o.capital || '',
+    tagline: o.summary || '',
+    createdAt: o.createdAt || null
+  };
+}
+
+function loadFeedDirectory(){
+  var base = _backendBase().replace(/\/$/,'');
+  var url = _type === 'investments' ? (base + '/api/investments') : (base + '/api/tenders');
+  fetch(url)
+    .then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(data){
+      var rows = [];
+      if(_type === 'investments'){
+        rows = (data && Array.isArray(data.opportunities) ? data.opportunities : []).map(_mapInvestRow);
+        _feedCats = _uniqCats(rows, 'sector');
+      } else {
+        rows = (data && Array.isArray(data.tenders) ? data.tenders : []).map(_mapTenderRow);
+        _feedCats = _uniqCats(rows, 'category');
+      }
+      _accounts = rows;
+      _loaded = true;
+      if(_catRaw && _feedCats.indexOf(_catRaw) >= 0) _catFilter = _catRaw;
+      else if(_catRaw && !_feedCats.length) _catFilter = _catRaw;
+      else if(_catRaw && _feedCats.indexOf(_catRaw) < 0) _catFilter = '';
+      renderDirectory();
+    })
+    .catch(function(){
+      _accounts = [];
+      _feedCats = [];
+      _loaded = true;
+      renderDirectory();
+    });
+}
+
 function loadAccounts(){
+  if(TYPE_META[_type] && TYPE_META[_type].feed){
+    loadFeedDirectory();
+    return;
+  }
   fetch(_backendBase().replace(/\/$/,'') + '/api/accounts/public')
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){

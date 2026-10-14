@@ -164,13 +164,14 @@
   }
 
   function moduleHref(key) {
-    /* شريط الاكتشاف على الرئيسية — حيث تظهر «كن أول من…» / البطاقات */
+    /* المحلات/المعارض/المكاتب: شريط الاكتشاف على الرئيسية.
+       المناقصات/الاستثمارات: دليل مستقل (التصفح) — الغرف تبقى عبر بوابات الهيرو. */
     var map = {
       store: isLanding() ? '#rzq-disc-store' : 'rizq_landing_v8.html#rzq-disc-store',
       corp: isLanding() ? '#rzq-disc-corp' : 'rizq_landing_v8.html#rzq-disc-corp',
       office: isLanding() ? '#rzq-disc-office' : 'rizq_landing_v8.html#rzq-disc-office',
-      tenders: isLanding() ? '#rzq-disc-tenders' : 'rizq_landing_v8.html#rzq-disc-tenders',
-      investments: isLanding() ? '#rzq-disc-investments' : 'rizq_landing_v8.html#rzq-disc-investments'
+      tenders: 'rizq_tenders_directory.html',
+      investments: 'rizq_investments_directory.html'
     };
     return map[key] || '#';
   }
@@ -689,7 +690,9 @@
     rizq_directory: 'showrooms',
     rizq_corp: 'showrooms',
     rizq_tenders: 'tenders',
+    rizq_tenders_directory: 'tenders',
     rizq_investments: 'investments',
+    rizq_investments_directory: 'investments',
     rizq_legal: 'legal',
     rizq_ads_info: 'ads'
   };
@@ -757,9 +760,11 @@
     }
     if (k === 'rizq_directory' || k === 'directory') {
       try {
-        var tp = new URLSearchParams(location.search || '').get('type');
+        var tp = String(new URLSearchParams(location.search || '').get('type') || '').toLowerCase();
         if (tp === 'store') return 'stores';
         if (tp === 'office') return 'offices';
+        if (tp === 'tenders' || tp === 'tender') return 'tenders';
+        if (tp === 'investments' || tp === 'investment' || tp === 'invest') return 'investments';
         return 'showrooms';
       } catch (e) {
         return 'showrooms';

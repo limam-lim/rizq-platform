@@ -11,8 +11,8 @@
     { key: 'store', href: 'rizq_landing_v8.html#rzq-disc-store', hdr: 'stores', ico: '🏪', order: 3, always: true, landingHref: '#rzq-disc-store' },
     { key: 'corp', href: 'rizq_landing_v8.html#rzq-disc-corp', hdr: 'showrooms', ico: '🏬', order: 4, landingHref: '#rzq-disc-corp' },
     { key: 'office', href: 'rizq_landing_v8.html#rzq-disc-office', hdr: 'offices', ico: '💼', order: 6, landingHref: '#rzq-disc-office' },
-    { key: 'tenders', href: 'rizq_landing_v8.html#rzq-disc-tenders', hdr: 'tenders', ico: '📑', order: 7, labelAr: 'المناقصات', labelFr: 'Appels d\'offres', landingHref: '#rzq-disc-tenders' },
-    { key: 'investments', href: 'rizq_landing_v8.html#rzq-disc-investments', hdr: 'investments', ico: '📈', order: 8, labelAr: 'الاستثمارات', labelFr: 'Investissements', landingHref: '#rzq-disc-investments' }
+    { key: 'tenders', href: 'rizq_tenders_directory.html', hdr: 'tenders', ico: '📑', order: 7, labelAr: 'المناقصات', labelFr: 'Appels d\'offres', landingHref: 'rizq_tenders_directory.html' },
+    { key: 'investments', href: 'rizq_investments_directory.html', hdr: 'investments', ico: '📈', order: 8, labelAr: 'الاستثمارات', labelFr: 'Investissements', landingHref: 'rizq_investments_directory.html' }
   ];
   /** زر نشر بين المعارض والمكاتب على الشريط الرئيسي (سطح المكتب/تابلت) */
   var POST_NAV_ORDER = 5;

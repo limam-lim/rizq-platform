@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>دليل المناقصات — رزق</title>
+<script>
+(function(){
+  var p = new URLSearchParams(location.search);
+  var cat = p.get('cat');
+  var q = 'type=tenders';
+  if(cat) q += '&cat=' + encodeURIComponent(cat);
+  location.replace('rizq_directory.html?' + q);
+})();
+</script>
+<meta http-equiv="refresh" content="0;url=rizq_directory.html?type=tenders"/>
+</head>
+<body>
+<p style="font-family:sans-serif;padding:24px;text-align:center">
+  <a href="rizq_directory.html?type=tenders">← دليل المناقصات</a>
+</p>
+</body>
+</html>
