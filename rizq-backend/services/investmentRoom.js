@@ -271,6 +271,44 @@ function listPublic(opts) {
   return { ok: true, opportunities: list, publicContact: PUBLIC_CONTACT };
 }
 
+/**
+ * تفاصيل فرصة واحدة للدليل → غرفة التفاصيل.
+ * unlockContacts=false: ملخص عام فقط (بدون وصف كامل ولا تواصل).
+ * unlockContacts=true: وصف كامل + تواصل صاحب الفرصة.
+ */
+function getPublicById(id, opts) {
+  const unlock = !!(opts && opts.unlockContacts);
+  const enterRoom = !!(opts && (opts.enterRoom || unlock));
+  const store = readInvestments();
+  const item = (store.opportunities || []).find((o) => o && o.id === id && isPublicStatus(o.status));
+  if (!item) return null;
+  const pub = toPublicOpportunity(item, unlock);
+  pub.roomLocked = !enterRoom;
+  if (enterRoom) {
+    pub.description = item.description || item.summary || '';
+    pub.descriptionFr = item.descriptionFr || item.summaryFr || '';
+    pub.accountId = item.accountId || null;
+    pub.imageCount = Array.isArray(item.images) ? item.images.length : 0;
+    pub.hasDocument = !!item.document;
+    pub.documentName = item.documentName || null;
+    pub.approvedAt = item.approvedAt || item.provisionallyApprovedAt || null;
+    pub.updatedAt = item.updatedAt || null;
+  } else {
+    pub.description = null;
+    pub.descriptionFr = null;
+  }
+  if (unlock) {
+    pub.contactEmail = item.contactEmail || null;
+    pub.contactPhone = item.contactPhone || null;
+    pub.ownerName = item.ownerName || null;
+  } else {
+    pub.contactEmail = null;
+    pub.contactPhone = null;
+    pub.ownerName = null;
+  }
+  return pub;
+}
+
 async function submitOpportunity(body) {
   const lang = body && body.lang === 'fr' ? 'fr' : 'ar';
   const title = sanitizeText(body && body.title, 140);
@@ -576,6 +614,7 @@ module.exports = {
   generatePlan,
   localPlan,
   listPublic,
+  getPublicById,
   listAdmin,
   submitOpportunity,
   decideOpportunity,

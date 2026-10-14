@@ -194,6 +194,32 @@ async function activateSubRequest(req, deps) {
       return { ok: true, category, result, accountName };
     }
 
+    if (category === 'investment') {
+      const pkgDef = findCatalogPackage(req.pkg);
+      const isTrial = isTrialPackage(req.pkg, req.price);
+      const { periodStart, periodEnd, now } = computeActivationPeriod(days, getAccountRecord(req.accountId + '::investment'));
+      const result = await syncAccountPackage({
+        accountId: req.accountId + '::investment',
+        accountName,
+        accountPhone,
+        accountEmail,
+        accountType,
+        pkgName: (pkgDef && pkgDef.name) || req.pkg || 'شهرية',
+        packageId: (pkgDef && pkgDef.id) || null,
+        price: Number(req.price) || 0,
+        days,
+        periodStart,
+        periodEnd,
+        activatedBy: 'admin',
+        paymentConfirmed: !isTrial,
+        paidAt: isTrial ? null : now.toISOString(),
+        isTrial,
+      });
+      if (!result.ok) return result;
+      maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts);
+      return { ok: true, category, result, accountName };
+    }
+
     if (category === 'verified_plus') {
       if (typeof readAccounts !== 'function' || typeof writeAccounts !== 'function') {
         return { ok: false, error: 'accounts_io_missing' };

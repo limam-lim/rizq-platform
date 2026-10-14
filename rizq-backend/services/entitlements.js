@@ -470,6 +470,130 @@ function resolveTenderPlanFromRef(ref) {
   return mapTenderPackageToPlanType(pseudo);
 }
 
+/** باقات غرفة الاستثمارات — دخول غرفة التفاصيل للمشتركين؛ كشف التواصل للمدفوعين */
+const INVESTMENT_PLANS = {
+  investment_trial: {
+    planType: 'investment_trial',
+    canViewInvestments: true,
+    canEnterDetailRoom: true,
+    canUnlockContacts: false,
+    canPostOpportunities: false,
+    priorityPlacement: false,
+    investmentAlerts: false,
+    vipSupport: false,
+    features: ['view_investments', 'enter_detail_room'],
+  },
+  investment_monthly: {
+    planType: 'investment_monthly',
+    canViewInvestments: true,
+    canEnterDetailRoom: true,
+    canUnlockContacts: true,
+    canPostOpportunities: true,
+    priorityPlacement: false,
+    investmentAlerts: false,
+    vipSupport: false,
+    features: ['view_investments', 'enter_detail_room', 'unlock_contacts', 'post_opportunities'],
+  },
+  investment_quarterly: {
+    planType: 'investment_quarterly',
+    canViewInvestments: true,
+    canEnterDetailRoom: true,
+    canUnlockContacts: true,
+    canPostOpportunities: true,
+    priorityPlacement: true,
+    investmentAlerts: false,
+    vipSupport: false,
+    features: ['view_investments', 'enter_detail_room', 'unlock_contacts', 'post_opportunities', 'priority_placement'],
+  },
+  investment_yearly: {
+    planType: 'investment_yearly',
+    canViewInvestments: true,
+    canEnterDetailRoom: true,
+    canUnlockContacts: true,
+    canPostOpportunities: true,
+    priorityPlacement: true,
+    investmentAlerts: true,
+    vipSupport: true,
+    features: ['view_investments', 'enter_detail_room', 'unlock_contacts', 'post_opportunities', 'priority_placement', 'investment_alerts', 'vip_support'],
+  },
+};
+
+const INVESTMENT_PUBLIC_ACCESS = {
+  planType: 'investment_public',
+  subscriptionStatus: 'no_subscription',
+  canViewInvestments: true,
+  canEnterDetailRoom: false,
+  canUnlockContacts: false,
+  canPostOpportunities: false,
+  priorityPlacement: false,
+  investmentAlerts: false,
+  vipSupport: false,
+  isTrial: false,
+  subscribed: false,
+};
+
+function mapInvestmentPackageToPlanType(rec) {
+  if (!rec) return 'investment_public';
+  const isTrial = !!(rec.isTrial || isTrialPackage(rec.pkgName, rec.price));
+  const id = String(rec.packageId || rec.pkgId || '').toLowerCase();
+  const name = String(rec.pkgName || '').toLowerCase();
+  if (isTrial || id === 'inv-trial' || /تجريب|trial|مجان/.test(name)) return 'investment_trial';
+  if (id === 'inv-quart' || /ربع|quarter|trimest/.test(name)) return 'investment_quarterly';
+  if (id === 'inv-year' || /سنو|year|annu/.test(name)) return 'investment_yearly';
+  if (id === 'inv-month' || /شهر|month|mensuel/.test(name)) return 'investment_monthly';
+  if (/استثمار|invest/.test(name)) return 'investment_monthly';
+  return 'investment_monthly';
+}
+
+/**
+ * صلاحيات غرفة الاستثمارات لحساب (أو زائر بلا حساب).
+ * الدليل عام؛ غرفة التفاصيل للمشتركين؛ كشف التواصل للمدفوعين فقط.
+ */
+function getInvestmentEntitlements(accountId) {
+  const rec = accountId ? getAccountRecord(String(accountId) + '::investment') : null;
+  if (!rec) {
+    return Object.assign({ accountId: accountId || null }, INVESTMENT_PUBLIC_ACCESS);
+  }
+  const subscriptionStatus = getSubscriptionStatus(rec);
+  const isActive = ACTIVE_STATUSES.includes(subscriptionStatus) || subscriptionStatus === 'active';
+  const planType = mapInvestmentPackageToPlanType(rec);
+  const plan = INVESTMENT_PLANS[planType] || INVESTMENT_PLANS.investment_trial;
+  const isTrial = !!(rec.isTrial || planType === 'investment_trial' || isTrialPackage(rec.pkgName, rec.price));
+  const isPaidActive = isActive && !isTrial && isPaymentConfirmed(rec);
+
+  return {
+    accountId,
+    planType: isActive ? planType : 'investment_public',
+    subscriptionStatus: isActive ? subscriptionStatus : 'no_subscription',
+    pkgName: rec.pkgName,
+    packageId: rec.packageId || rec.pkgId || null,
+    isTrial: isActive && isTrial,
+    subscribed: isActive,
+    periodEnd: rec.periodEnd || null,
+    canViewInvestments: true,
+    canEnterDetailRoom: isActive && !!plan.canEnterDetailRoom,
+    canUnlockContacts: isPaidActive && !!plan.canUnlockContacts,
+    canPostOpportunities: isPaidActive && !!plan.canPostOpportunities,
+    priorityPlacement: isPaidActive && !!plan.priorityPlacement,
+    investmentAlerts: isPaidActive && !!plan.investmentAlerts,
+    vipSupport: isPaidActive && !!plan.vipSupport,
+    features: isPaidActive ? (plan.features || []) : (isActive && isTrial ? INVESTMENT_PLANS.investment_trial.features : []),
+  };
+}
+
+function resolveInvestmentPlanFromRef(ref) {
+  const pkg = findCatalogPackage(ref);
+  const pkgName = typeof ref === 'string' ? ref : String((ref && ref.pkgName) || (ref && ref.name) || '');
+  const price = pkg ? pkg.price : (ref && ref.price);
+  const pseudo = {
+    pkgName: (pkg && pkg.name) || pkgName,
+    packageId: (pkg && pkg.id) || (ref && ref.packageId) || null,
+    price,
+    isTrial: isTrialPackage((pkg && pkg.name) || pkgName, price),
+  };
+  return mapInvestmentPackageToPlanType(pseudo);
+}
+
 /** خريطة packageId القياسية → planType (المصدر الأساسي) */
 const PACKAGE_ID_TO_PLAN = {
   'ind-free': 'free',
@@ -507,6 +631,7 @@ function mapPackageIdToPlanType(packageId, accountType) {
   if (/^cp-diam-pro$/.test(id)) return 'corp_diamond_pro';
   if (/^cp-diam/.test(id)) return 'corp_diamond';
   if (/^tnd-/.test(id)) return mapTenderPackageToPlanType({ packageId: id });
+  if (/^inv-/.test(id)) return mapInvestmentPackageToPlanType({ packageId: id });
   if (/^vid-/.test(id)) return mapMediaPackageToPlanType({ packageId: id });
   const type = String(accountType || 'individual').toLowerCase();
   if (type === 'store' || type === 'shop') return 'store_monthly';
@@ -775,6 +900,8 @@ module.exports = {
   CORP_PLANS,
   TENDER_PLANS,
   TENDER_PUBLIC_ACCESS,
+  INVESTMENT_PLANS,
+  INVESTMENT_PUBLIC_ACCESS,
   MEDIA_PLANS,
   mapMediaPackageToPlanType,
   getMediaEntitlements,
@@ -784,6 +911,9 @@ module.exports = {
   mapTenderPackageToPlanType,
   getTenderEntitlements,
   resolveTenderPlanFromRef,
+  mapInvestmentPackageToPlanType,
+  getInvestmentEntitlements,
+  resolveInvestmentPlanFromRef,
   DIAMOND_STANDARD_PLAN,
   DIAMOND_PRO_PLAN,
   AI_PAID_FEATURES,

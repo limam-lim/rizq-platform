@@ -691,8 +691,10 @@
     rizq_corp: 'showrooms',
     rizq_tenders: 'tenders',
     rizq_tenders_directory: 'tenders',
+    rizq_tender_detail: 'tenders',
     rizq_investments: 'investments',
     rizq_investments_directory: 'investments',
+    rizq_investment_detail: 'investments',
     rizq_legal: 'legal',
     rizq_ads_info: 'ads'
   };

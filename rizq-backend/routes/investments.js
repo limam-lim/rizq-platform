@@ -18,7 +18,36 @@ function mountInvestmentsRoutes(app, deps) {
     anthropic,
     verifyAccountOwner,
     extractAccountToken,
+    resolveOptionalAccountViewer,
+    getInvestmentEntitlements,
+    syncAccountPackage,
+    getAccountRecord,
+    findCatalogPackage,
+    isTrialPackage,
   } = deps;
+
+  const INVESTMENT_PACKAGE_NAME = 'باقة الاستثمار';
+
+  function resolveOptionalInvestViewer(req) {
+    if (typeof resolveOptionalAccountViewer === 'function') {
+      return resolveOptionalAccountViewer(req);
+    }
+    return null;
+  }
+
+  function getInvestAccessForViewer(accountId) {
+    if (typeof getInvestmentEntitlements === 'function') {
+      return getInvestmentEntitlements(accountId || null);
+    }
+    return {
+      subscribed: false,
+      isTrial: false,
+      canEnterDetailRoom: false,
+      canUnlockContacts: false,
+      canPostOpportunities: false,
+      planType: 'investment_public',
+    };
+  }
 
   const requireInvAdmin = typeof requireAdminPermission === 'function'
     ? requireAdminPermission('moderation')
@@ -60,7 +89,19 @@ function mountInvestmentsRoutes(app, deps) {
   /** GET /api/investments — فرص منشورة (بما فيها الموافقة المبدئية) */
   app.get('/api/investments', (req, res) => {
     try {
-      res.json(investmentRoom.listPublic({ unlockContacts: false }));
+      const viewerId = resolveOptionalInvestViewer(req);
+      const access = getInvestAccessForViewer(viewerId);
+      const pub = investmentRoom.listPublic({ unlockContacts: !!access.canUnlockContacts });
+      res.json(Object.assign({}, pub, {
+        access: {
+          contactsUnlocked: !!access.canUnlockContacts,
+          canEnterDetailRoom: !!access.canEnterDetailRoom,
+          canPost: !!access.canPostOpportunities,
+          isTrial: !!access.isTrial,
+          subscribed: !!access.subscribed,
+          planType: access.planType,
+        },
+      }));
     } catch (err) {
       res.status(500).json({ ok: false, error: 'list_failed' });
     }
@@ -172,6 +213,109 @@ function mountInvestmentsRoutes(app, deps) {
       });
     } catch (err) {
       res.status(500).json({ ok: false, error: 'send_failed' });
+    }
+  });
+
+  /**
+   * POST /api/investments/package/activate — أدمين — تفعيل باقة الاستثمار
+   * بمفتاح معزول accountId::investment (نفس نمط المناقصات).
+   */
+  app.post('/api/investments/package/activate', requireAdminPermission('payments'), async (req, res) => {
+    if (typeof syncAccountPackage !== 'function') {
+      return res.status(500).json({ error: 'sync_unavailable' });
+    }
+    const b = req.body || {};
+    if (!b.accountId) return res.status(400).json({ error: 'accountId مطلوب' });
+    const findPkg = typeof findCatalogPackage === 'function' ? findCatalogPackage : (() => null);
+    const trialFn = typeof isTrialPackage === 'function' ? isTrialPackage : (() => false);
+    const pkgName = b.pkgName || INVESTMENT_PACKAGE_NAME;
+    const pkgDef = findPkg(b.packageId || pkgName);
+    const days = Number(b.days) || (pkgDef && pkgDef.durationDays) || 30;
+    const price = Number(b.price) || (pkgDef && pkgDef.price) || 0;
+    const isTrial = b.isTrial === true || trialFn((pkgDef && pkgDef.name) || pkgName, price);
+    const now = new Date();
+    const periodEnd = new Date(now.getTime() + days * 86400000);
+    try {
+      const result = await syncAccountPackage({
+        accountId: b.accountId + '::investment',
+        accountName: b.accountName || b.accountId,
+        accountPhone: b.accountPhone || '',
+        accountEmail: b.accountEmail || '',
+        accountType: b.accountType || '',
+        pkgName: (pkgDef && pkgDef.name) || pkgName,
+        packageId: (pkgDef && pkgDef.id) || b.packageId || null,
+        price,
+        days,
+        periodStart: now.toISOString(),
+        periodEnd: periodEnd.toISOString(),
+        activatedBy: b.activatedBy || 'admin',
+        isTrial,
+        paymentConfirmed: !isTrial,
+        paidAt: isTrial ? null : now.toISOString(),
+      });
+      if (!result.ok) return res.status(400).json(result);
+      res.json({ ok: true, periodEnd: periodEnd.toISOString() });
+    } catch (err) {
+      console.error('[investments/package/activate] error:', err.message);
+      res.status(500).json({ error: 'فشل تفعيل باقة الاستثمار' });
+    }
+  });
+
+  /**
+   * GET /api/investments/package/status/:id — حالة باقة الاستثمار لصاحب الحساب.
+   */
+  app.get('/api/investments/package/status/:id', (req, res) => {
+    const token = (typeof extractAccountToken === 'function' ? extractAccountToken(req) : '') || '';
+    const acc = verifyAccountOwner && verifyAccountOwner(req.params.id, token);
+    if (!acc) return res.status(401).json({ error: 'unauthorized' });
+    const ent = getInvestAccessForViewer(req.params.id);
+    const rec = typeof getAccountRecord === 'function'
+      ? getAccountRecord(req.params.id + '::investment')
+      : null;
+    const safeRec = rec ? (() => { const { accessToken, ...rest } = rec; return rest; })() : null;
+    res.json({
+      ok: true,
+      subscribed: !!ent.subscribed,
+      isTrial: !!ent.isTrial,
+      contactsUnlocked: !!ent.canUnlockContacts,
+      canEnterDetailRoom: !!ent.canEnterDetailRoom,
+      canPost: !!ent.canPostOpportunities,
+      planType: ent.planType,
+      pkgName: ent.pkgName || null,
+      record: safeRec,
+    });
+  });
+
+  /**
+   * GET /api/investments/:id — غرفة تفاصيل فرصة واحدة.
+   * الدخول الكامل يتطلب باقة فعّالة؛ كشف التواصل يتطلب باقة مدفوعة.
+   * يُسجَّل بعد المسارات الثابتة (package/status، admin، …).
+   */
+  app.get('/api/investments/:id', (req, res) => {
+    try {
+      const viewerId = resolveOptionalInvestViewer(req);
+      const access = getInvestAccessForViewer(viewerId);
+      const enterRoom = !!access.canEnterDetailRoom || !!access.subscribed;
+      const unlock = !!access.canUnlockContacts;
+      const opportunity = investmentRoom.getPublicById(req.params.id, {
+        enterRoom,
+        unlockContacts: unlock,
+      });
+      if (!opportunity) return res.status(404).json({ ok: false, error: 'opportunity_not_found' });
+      res.json({
+        ok: true,
+        opportunity,
+        access: {
+          contactsUnlocked: unlock,
+          canEnterDetailRoom: enterRoom,
+          canPost: !!access.canPostOpportunities,
+          isTrial: !!access.isTrial,
+          subscribed: !!access.subscribed,
+          planType: access.planType,
+        },
+      });
+    } catch (err) {
+      res.status(500).json({ ok: false, error: 'detail_failed' });
     }
   });
 }

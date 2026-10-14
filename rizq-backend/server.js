@@ -694,6 +694,7 @@ const {
 const {
   getEntitlements,
   getTenderEntitlements,
+  getInvestmentEntitlements,
   getMediaEntitlements,
   assertCanPostAd,
   assertCanAddCatalogItem,
@@ -2338,7 +2339,7 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
     // activateSubscriptionForAccount العامة فتُلغي/تكتب فوق باقة الحساب
     // الحقيقية النشطة — بالضبط الخطأ الذي حذّرت منه تعليقات #219 أعلاه، وكان
     // لا يزال ممكناً فعلياً لأي طلب معزول يصل من جهاز غير جهاز الأدمن.
-    category: ['video', 'tender', 'ad_boost', 'verified_plus'].indexOf(b.category) !== -1 ? b.category : 'package',
+    category: ['video', 'tender', 'investment', 'ad_boost', 'verified_plus'].indexOf(b.category) !== -1 ? b.category : 'package',
     videoUrl: b.videoUrl ? String(b.videoUrl).slice(0, 500) : null,
     file: b.file ? String(b.file).slice(0, 200) : null,
     // لا نخزّن base64 الوصل في JSON — الملف على القرص فقط تحت uploads/receipts
@@ -2497,7 +2498,8 @@ app.get('/api/entitlements/:accountId', (req, res) => {
   const ent = getEntitlements(accountId, acc.type);
   const media = getMediaEntitlements(accountId);
   const tender = getTenderEntitlements(accountId);
-  res.json({ ok: true, entitlements: ent, media, tender });
+  const investment = getInvestmentEntitlements(accountId);
+  res.json({ ok: true, entitlements: ent, media, tender, investment });
 });
 
 /**
@@ -3097,6 +3099,12 @@ mountInvestmentsRoutes(app, {
   anthropic,
   verifyAccountOwner,
   extractAccountToken,
+  resolveOptionalAccountViewer,
+  getInvestmentEntitlements,
+  syncAccountPackage,
+  getAccountRecord,
+  findCatalogPackage: require('./services/catalogConfig').findCatalogPackage,
+  isTrialPackage: require('./services/catalogConfig').isTrialPackage,
 });
 
 // ══════════════════════════════════════════════════════════════════

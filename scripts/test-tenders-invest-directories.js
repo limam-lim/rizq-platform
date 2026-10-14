@@ -14,6 +14,12 @@ const dyn = read('rizq_dynamic_nav.js');
 const dir = read('rizq_directory.html');
 const tDir = read('rizq_tenders_directory.html');
 const iDir = read('rizq_investments_directory.html');
+const tDetail = read('rizq_tender_detail.html');
+const iDetail = read('rizq_investment_detail.html');
+const invRoutes = read('rizq-backend/routes/investments.js');
+const entitlements = read('rizq-backend/services/entitlements.js');
+const invRoom = read('rizq-backend/services/investmentRoom.js');
+const subAct = read('rizq-backend/services/subRequestActivation.js');
 
 assert(tDir.includes('type=tenders'), 'tenders redirect');
 assert(iDir.includes('type=investments'), 'investments redirect');
@@ -23,10 +29,18 @@ assert(dir.includes("investments:"), 'directory has investments type');
 assert(dir.includes('/api/tenders'), 'directory fetches tenders');
 assert(dir.includes('/api/investments'), 'directory fetches investments');
 assert(dir.includes("feed: true"), 'feed flag present');
+assert(dir.includes("page: 'rizq_tender_detail.html'"), 'directory tenders → detail room');
+assert(dir.includes("page: 'rizq_investment_detail.html'"), 'directory investments → detail room');
+assert(dir.includes("rizq_tender_detail.html?demo=1"), 'example cards → tender detail demo');
+assert(dir.includes("rizq_investment_detail.html?demo=1"), 'example cards → invest detail demo');
+assert(dir.includes("'?id='"), 'feed cards use ?id= for detail rooms');
+assert(!dir.includes("'?focus='"), 'feed cards no longer use ?focus= submit deep-link');
 
 assert(header.includes("tenders: 'rizq_tenders_directory.html'"), 'header tenders → directory');
 assert(header.includes("investments: 'rizq_investments_directory.html'"), 'header investments → directory');
 assert(header.includes("rizq_tenders_directory: 'tenders'"), 'header page map tenders directory');
+assert(header.includes("rizq_tender_detail: 'tenders'"), 'header page map tender detail');
+assert(header.includes("rizq_investment_detail: 'investments'"), 'header page map investment detail');
 
 assert(dyn.includes("href: 'rizq_tenders_directory.html'"), 'dynamic nav tenders');
 assert(dyn.includes("href: 'rizq_investments_directory.html'"), 'dynamic nav investments');
@@ -41,5 +55,19 @@ assert(landing.includes('href="rizq_tenders.html?demo=1"'), 'hero portal still r
 assert(landing.includes('href="rizq_investments.html?demo=1"'), 'hero portal still room investments');
 assert(landing.includes('hero-biz-tender'), 'hero tender portal class kept');
 assert(landing.includes('hero-biz-invest'), 'hero invest portal class kept');
+
+assert(tDetail.includes('/api/tenders/package/status/'), 'tender detail checks package');
+assert(tDetail.includes('/api/tenders/'), 'tender detail fetches item');
+assert(tDetail.includes('renderGate'), 'tender detail has gate');
+assert(iDetail.includes('/api/investments/package/status/'), 'invest detail checks package');
+assert(iDetail.includes('/api/investments/'), 'invest detail fetches item');
+assert(iDetail.includes('renderGate'), 'invest detail has gate');
+
+assert(entitlements.includes('getInvestmentEntitlements'), 'investment entitlements exported');
+assert(entitlements.includes('::investment'), 'investment package key isolated');
+assert(invRoom.includes('getPublicById'), 'investment getPublicById');
+assert(invRoutes.includes("/api/investments/package/status/:id"), 'invest package status route');
+assert(invRoutes.includes("/api/investments/:id"), 'invest detail route');
+assert(subAct.includes("category === 'investment'"), 'sub activation supports investment');
 
 console.log('test-tenders-invest-directories: OK');

@@ -65,10 +65,28 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://rizq.mr/rizq_tender_detail.html</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://rizq.mr/rizq_investments_directory.html</loc>
     <lastmod>2026-10-14</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://rizq.mr/rizq_investments.html</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://rizq.mr/rizq_investment_detail.html</loc>
+    <lastmod>2026-10-14</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
   </url>
   <url>
     <loc>https://rizq.mr/rizq_directory.html?type=tenders</loc>
