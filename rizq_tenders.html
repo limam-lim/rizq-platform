@@ -268,7 +268,7 @@ a[href="#tender-packages"]{display:none!important}
       <div class="tender-info">
         <span class="tender-eyebrow" data-t-fr="✨ RIZQ TENDERS">✨ RIZQ TENDERS</span>
         <div class="tender-name" data-t-fr="Salle des appels d'offres">غرفة المناقصات</div>
-        <div class="tender-tagline" data-t-fr="Publiez votre besoin et recevez des devis privés de commerçants réels — consultation gratuite ; contacts derrière abonnement.">انشر احتياجك واستقبل عروض أسعار خاصة من تجار حقيقيين — التصفح مجاني؛ التواصل خلف اشتراك.</div>
+        <div class="tender-tagline" data-t-fr="Salle de dépôt et de promotion — déposez votre appel ici. Pour consulter les appels ouverts, ouvrez l'annuaire.">غرفة إيداع وترويج — أودع مناقصتك هنا. لتصفّح المناقصات المفتوحة افتح الدليل.</div>
         <div class="tender-meta">
           <span class="meta-item" data-t-fr="🇲🇷 Mauritanie">🇲🇷 موريتانيا</span>
           <span class="meta-item" data-t-fr="🔒 Accès abonnés">🔒 تواصل للمشتركين</span>
@@ -287,8 +287,9 @@ a[href="#tender-packages"]{display:none!important}
 
 <div class="tender-cta-strip" role="navigation" aria-label="نشر مناقصة">
   <div class="tender-cta-strip-inner">
-    <span class="tcs-label" data-t-fr="Publiez votre besoin et recevez des devis privés">انشر احتياجك واستقبل عروض أسعار خاصة</span>
+    <span class="tcs-label" data-t-fr="Cette salle sert à déposer un appel — la consultation est dans l'annuaire">هذه الغرفة للإيداع والترويج — التصفّح في الدليل</span>
     <div class="tcs-actions">
+      <a class="tcs-btn ghost" href="rizq_tenders_directory.html" data-t-fr="📂 Annuaire">📂 الدليل</a>
       <a class="tcs-btn" href="#td-submit" data-t-fr="+ Publier un appel d'offres">+ انشر مناقصتك</a>
     </div>
   </div>
@@ -385,15 +386,23 @@ a[href="#tender-packages"]{display:none!important}
     </div>
   </div>
 
-  <div class="td-section-head" id="td-list">
-    <div class="eyebrow" data-t-fr="Appels ouverts">المناقصات</div>
-    <h2 data-t-fr="Appels d'offres ouverts">مناقصات مفتوحة</h2>
-    <p data-t-fr="Parcourez les besoins publiés. Les contacts restent derrière abonnement.">تصفّح الاحتياجات المنشورة. التواصل يبقى خلف اشتراك.</p>
+  <div class="td-section-head" id="td-browse-promo">
+    <div class="eyebrow" data-t-fr="Consultation">التصفّح</div>
+    <h2 data-t-fr="Les appels ouverts sont dans l'annuaire">المناقصات المفتوحة في الدليل</h2>
+    <p data-t-fr="Cette salle ne liste plus les appels — elle sert au dépôt et à la promotion. Ouvrez l'annuaire, puis la salle de détail (abonnés).">هذه الغرفة لم تعد تعرض القائمة — للإيداع والترويج فقط. افتح الدليل ثم غرفة التفاصيل للمشتركين.</p>
   </div>
-  <div class="cats" id="t-cats"></div>
-  <div class="list-head"><div class="t-count" id="t-count"></div></div>
-  <div id="t-access-banner"></div>
-  <div class="t-grid" id="t-grid"></div>
+  <div id="t-access-banner" style="display:none" aria-hidden="true"></div>
+  <div class="t-empty" id="t-browse-cta" style="margin-bottom:28px">
+    <div class="emo-ring"><div class="emo">📑</div></div>
+    <p data-t-fr="Parcourez tous les appels d'offres validés dans l'annuaire Rizq.">تصفّح كل المناقصات المعتمدة في دليل رزق.</p>
+    <div class="t-empty-actions">
+      <a class="tea-primary" href="rizq_tenders_directory.html" data-t-fr="📂 Ouvrir l'annuaire">📂 فتح الدليل</a>
+      <a class="tea-secondary" href="rizq_tender_detail.html?demo=1" data-t-fr="👁 Aperçu salle de détail">👁 معاينة غرفة التفاصيل</a>
+    </div>
+  </div>
+  <div class="cats" id="t-cats" hidden></div>
+  <div class="list-head" hidden><div class="t-count" id="t-count"></div></div>
+  <div class="t-grid" id="t-grid" hidden aria-hidden="true"></div>
 
   <div class="trust-row">
     <div class="trust-item">
@@ -439,7 +448,7 @@ a[href="#tender-packages"]{display:none!important}
       <h4 class="footer-col-title" data-t-fr="LIENS RAPIDES">روابط سريعة</h4>
       <ul class="footer-links">
         <li><a href="rizq_landing_v8.html" data-t-fr="Accueil">الرئيسية</a></li>
-        <li><a href="#t-grid" data-t-fr="Toutes les offres">كل المناقصات</a></li>
+        <li><a href="rizq_tenders_directory.html" data-t-fr="Annuaire des appels">دليل المناقصات</a></li>
         <li><a href="#td-submit" data-t-fr="Publier un appel d'offres">انشر مناقصتك</a></li>
         <li><a href="rizq_landing_v8.html#pricing" data-t-fr="Tarifs">الأسعار</a></li>
         <li><a href="rizq_platform.html#who" data-t-fr="À propos">من نحن</a></li>
@@ -449,11 +458,11 @@ a[href="#tender-packages"]{display:none!important}
     <div>
       <h4 class="footer-col-title" data-t-fr="MEILLEURES CATÉGORIES">أبرز الأقسام</h4>
       <ul class="footer-links">
-        <li><a href="rizq_tenders.html?cat=سيارات" data-t-fr="🚗 Voitures">🚗 سيارات</a></li>
-        <li><a href="rizq_tenders.html?cat=إلكترونيات" data-t-fr="📱 Électronique">📱 إلكترونيات</a></li>
-        <li><a href="rizq_tenders.html?cat=معدات" data-t-fr="⚙️ Équipements">⚙️ معدات</a></li>
-        <li><a href="rizq_tenders.html?cat=بناء" data-t-fr="🏗️ Matériaux de construction">🏗️ مواد بناء</a></li>
-        <li><a href="rizq_tenders.html?cat=أثاث" data-t-fr="🛋️ Meubles">🛋️ أثاث</a></li>
+        <li><a href="rizq_tenders_directory.html?cat=سيارات" data-t-fr="🚗 Voitures">🚗 سيارات</a></li>
+        <li><a href="rizq_tenders_directory.html?cat=إلكترونيات" data-t-fr="📱 Électronique">📱 إلكترونيات</a></li>
+        <li><a href="rizq_tenders_directory.html?cat=معدات" data-t-fr="⚙️ Équipements">⚙️ معدات</a></li>
+        <li><a href="rizq_tenders_directory.html?cat=بناء" data-t-fr="🏗️ Matériaux de construction">🏗️ مواد بناء</a></li>
+        <li><a href="rizq_tenders_directory.html?cat=أثاث" data-t-fr="🛋️ Meubles">🛋️ أثاث</a></li>
       </ul>
     </div>
     <div>
@@ -728,100 +737,26 @@ function _renderContactBlock(t, fr){
 }
 
 function renderTenders(){
+  /* لا عرض قائمة هنا — الدليل + غرفة التفاصيل */
   var fr = _rizqLang()==='fr';
   var grid = document.getElementById('t-grid');
   var countEl = document.getElementById('t-count');
   var catsEl = document.getElementById('t-cats');
   var bannerEl = document.getElementById('t-access-banner');
-
-  if(_gateState === 'login'){
-    if(catsEl) catsEl.style.display='none';
-    countEl.textContent='';
-    grid.innerHTML = '<div class="t-empty">'
-      + '<div class="emo-ring"><div class="emo">🔒</div></div>'
-      + '<h3 style="color:#151f30;margin:0 0 8px;font-size:19px">'+(fr?'Connexion requise':'يلزم تسجيل الدخول')+'</h3>'
-      + '<p style="color:#5b6472;max-width:420px;margin:0 auto 20px;font-size:14px;line-height:1.7">'+(fr?'Connectez-vous pour publier ou soumettre une offre.':'سجّل دخولك لنشر مناقصة أو تقديم عرض.')+'</p>'
-      + '<a href="rizq_landing_v8.html" style="display:inline-block;padding:12px 26px;border-radius:12px;background:linear-gradient(135deg,#C9A84C,#a9853a);color:#0f2347;font-weight:800;font-size:13.5px;text-decoration:none">'+(fr?'Aller au tableau de bord':'الذهاب إلى لوحة التحكم')+'</a>'
-      + '</div>';
-    if(bannerEl) bannerEl.innerHTML='';
-    return;
-  }
-  if(catsEl) catsEl.style.display='';
-
+  if(catsEl){ catsEl.hidden = true; catsEl.innerHTML = ''; }
+  if(countEl) countEl.textContent = '';
+  if(grid){ grid.hidden = true; grid.innerHTML = ''; }
   if(bannerEl){
     if(_isTenderDemoMode()){
+      bannerEl.style.display = '';
       bannerEl.innerHTML = '<div class="t-access-banner info">👁 '+(fr
-        ? 'Mode modèle — données fictives pour découvrir la salle. <a href="rizq_landing_v8.html#pricing" style="font-weight:800;color:inherit;text-decoration:underline">Abonnez-vous pour entrer</a>'
-        : 'وضع نموذج — بيانات وهمية لمعاينة الغرفة. <a href="rizq_landing_v8.html#pricing" style="font-weight:800;color:inherit;text-decoration:underline">اشترك للدخول الحقيقي</a>')+'</div>';
-    } else if(_tenderAccess.contactsUnlocked){
-      bannerEl.innerHTML = '<div class="t-access-banner info">✅ '+(fr?'Votre abonnement est actif — contacts débloqués et soumission d\'offres activée.':'اشتراكك فعّال — بيانات التواصل مكشوفة ويمكنك تقديم العروض.')+'</div>';
-    } else if(_tenderAccess.isTrial){
-      bannerEl.innerHTML = '<div class="t-access-banner warn">🔍 '+(fr?'Essai actif — consultation uniquement. Gérez l\'abonnement depuis votre tableau de bord.':'باقتك التجريبية فعّالة — للتصفّح فقط. إدارة الاشتراك من لوحة التحكم.')+'</div>';
-    } else if(!_getSession()){
-      bannerEl.innerHTML = '<div class="t-access-banner info">👀 '+(fr?'Consultation libre — connectez-vous depuis votre tableau de bord pour débloquer contacts et offres.':'تصفّح مجاني — سجّل دخولك من لوحة التحكم لكشف التواصل وتقديم العروض.')+'</div>';
+        ? 'Mode modèle — salle de dépôt. <a href="rizq_tenders_directory.html" style="font-weight:800;color:inherit;text-decoration:underline">Voir l\'annuaire</a>'
+        : 'وضع نموذج — غرفة إيداع. <a href="rizq_tenders_directory.html" style="font-weight:800;color:inherit;text-decoration:underline">افتح الدليل</a>')+'</div>';
     } else {
-      bannerEl.innerHTML = '<div class="t-access-banner warn">🔒 '+(fr?'Abonnement payant requis — activez-le depuis votre tableau de bord (Abonnement).':'يلزم اشتراك مدفوع — فعّله من لوحة التحكم ← اشتراكي.')+'</div>';
+      bannerEl.style.display = 'none';
+      bannerEl.innerHTML = '';
     }
   }
-
-  if(!_loaded){
-    countEl.textContent = fr ? 'Chargement…' : 'جاري التحميل…';
-    grid.innerHTML = '<div class="t-empty"><div class="emo-ring"><div class="emo">⏳</div></div><p>'+(fr?'Chargement des appels d\'offres…':'جاري تحميل المناقصات…')+'</p></div>';
-    return;
-  }
-
-  countEl.textContent = fr
-    ? (_tenders.length + (_tenders.length===1?' appel d\'offres ouvert':' appels d\'offres ouverts'))
-    : (_tenders.length + ' مناقصة مفتوحة');
-
-  if(!_tenders.length){
-    grid.innerHTML = '<div class="t-empty"><div class="emo-ring"><div class="emo">📋</div></div>'
-      + '<p>'+(fr?'Aucun appel d\'offres dans cette catégorie pour le moment.':'لا توجد مناقصات في هذه الفئة حالياً.')+'</p>'
-      + '<div class="t-empty-actions">'
-      + '<a class="tea-primary" href="rizq_landing_v8.html#rzq-disc-tenders">'+(fr?'🔍 Voir les appels d\'offres sur Rizq':'🔍 تصفّح المناقصات على رزق')+'</a>'
-      + '<button type="button" class="tea-secondary" onclick="openPostModal()">'+(fr?'+ Publier un appel d\'offres':'+ انشر مناقصتك')+'</button>'
-      + '</div></div>';
-    return;
-  }
-
-  var canBid = !!(_tenderAccess.canSubmitBid);
-  grid.innerHTML = _tenders.map(function(t){
-    var lab = CAT_LABELS[t.category] || {ar:'🏷️ أخرى',fr:'🏷️ Autre'};
-    var budget = (t.budgetMax>0)
-      ? (fr ? ('Budget : '+t.budgetMin.toLocaleString()+' – '+t.budgetMax.toLocaleString()+' MRU') : ('الميزانية: '+t.budgetMin.toLocaleString()+' – '+t.budgetMax.toLocaleString()+' MRU'))
-      : '';
-    var bidsLbl = fr ? (t.bidsCount+' offre(s) reçue(s)') : (t.bidsCount+' عرض مُقدَّم');
-    var thumb = (t.images && t.images.length) ? '<img class="t-card-thumb" src="'+t.images[0]+'"/>' : '';
-    var bidBtn = canBid
-      ? '<button class="t-btn primary" onclick="openBidModal(\''+t.id+'\')">'+(fr?'Soumettre une offre':'قدّم عرضك')+'</button>'
-      : '<button class="t-btn locked" onclick="openBidModal(\''+t.id+'\')" title="'+(fr?'Abonnement requis':'يلزم اشتراك')+'">🔒 '+(fr?'Offre (abonnement)':'عرض (اشتراك)')+'</button>';
-    var protoBtn = '<button type="button" class="t-btn" style="background:#fff;border:1px solid rgba(201,168,76,.45);color:#0F2347" onclick="openTenderProtocol(\''+t.id+'\')">'
-      + (fr ? '📄 Protocole admin' : '📄 توثيق إداري') + '</button>';
-    return '<div class="t-card">'
-      + '<span class="t-cat-tag">'+(fr?lab.fr:lab.ar)+'</span>'
-      + '<div class="t-title-row">'
-      + thumb
-      + '<div class="t-title" style="flex:1">'+escapeHtml(t.title)+'</div>'
-      + '</div>'
-      + (t.desc ? '<div class="t-desc">'+escapeHtml(t.desc)+'</div>' : '')
-      + _renderContactBlock(t, fr)
-      + '<div class="t-meta">'
-      + (t.city ? '<span>📍 '+escapeHtml(t.city)+'</span>' : '')
-      + '<span>🏢 '+escapeHtml(t.ownerName||'')+'</span>'
-      + '<span>💬 '+bidsLbl+'</span>'
-      + '</div>'
-      + (budget ? '<div class="t-budget">'+budget+'</div>' : '')
-      + '<div class="t-deadline '+_deadlineClass(t.deadline)+'">'+_fmtDeadline(t.deadline, fr)+'</div>'
-      + '<div class="t-actions">'+bidBtn+protoBtn+'</div>'
-      + '</div>';
-  }).join('');
-  grid.querySelectorAll('[data-contact-gate="1"]').forEach(function(el){
-    el.addEventListener('click', function(){
-      var ownerId = el.getAttribute('data-owner-id');
-      if(!ownerId || !window.RizqContactGate) return;
-      RizqContactGate.onMaskedContactClick(ownerId, 'tender', { lang: _rizqLang() });
-    });
-  });
 }
 
 function _isTenderDemoMode(){
@@ -880,44 +815,31 @@ function _showTenderDemoBanner(){
   if(!banner) return;
   var fr = _rizqLang()==='fr';
   banner.className = 't-access-banner info';
+  banner.style.display = '';
   banner.innerHTML = (fr
-    ? '👁 Mode modèle — données fictives pour découvrir la salle. '
-    : '👁 وضع نموذج — بيانات وهمية لمعاينة الغرفة. ')
-    + '<a href="rizq_landing_v8.html#pricing" style="font-weight:800;color:inherit;text-decoration:underline">'
-    + (fr ? 'Abonnez-vous pour entrer' : 'اشترك للدخول الحقيقي')
+    ? '👁 Mode modèle — salle de dépôt. '
+    : '👁 وضع نموذج — غرفة إيداع. ')
+    + '<a href="rizq_tenders_directory.html" style="font-weight:800;color:inherit;text-decoration:underline">'
+    + (fr ? "Voir l'annuaire" : 'افتح الدليل')
     + '</a>';
 }
 function loadTenders(){
+  /* غرفة الإيداع فقط — عرض المناقصات انتقل إلى الدليل + غرفة التفاصيل */
   _gateState = null;
+  _tenders = [];
+  _loaded = true;
   if(_isTenderDemoMode()){
-    _tenderAccess = { canBrowse: true, canContact: false, demo: true };
-    _tenders = _promoDemoTenders();
-    _loaded = true;
+    _tenderAccess = { canBrowse: true, canContact: false, demo: true, subscribed: false };
     _showTenderDemoBanner();
-    renderTenders();
-    return;
   }
-  var session = _getSession();
-  var url = _backendBase().replace(/\/$/,'') + '/api/tenders' + (_catFilter ? ('?cat='+encodeURIComponent(_catFilter)) : '');
-  function doFetch(headers){
-    fetch(url, { headers: headers || {} })
-      .then(function(res){
-        return res.json().catch(function(){ return null; }).then(function(data){ return {status:res.status, ok:res.ok, data:data}; });
-      })
-      .then(function(r){
-        if(r.status===401 && session){ _gateState='login'; _loaded=true; renderTenders(); return; }
-        _gateState = null;
-        if(r.data && r.data.access) _tenderAccess = r.data.access;
-        _tenders = (r.data && r.data.ok && Array.isArray(r.data.tenders)) ? r.data.tenders : [];
-        _loaded = true;
-        renderTenders();
-      })
-      .catch(function(){ _gateState=null; _tenders=[]; _loaded=true; renderTenders(); });
-  }
-  if(!session){ doFetch({}); return; }
-  _resolveRealAccessToken(session).then(function(realTok){
-    doFetch({ 'x-account-id': session.id, 'x-account-token': (realTok || session.token) });
-  });
+  try {
+    var focusId = new URLSearchParams(location.search).get('focus') || new URLSearchParams(location.search).get('id');
+    if(focusId && !_isTenderDemoMode()){
+      location.replace('rizq_tender_detail.html?id=' + encodeURIComponent(focusId));
+      return;
+    }
+  } catch (eFocus) {}
+  renderTenders();
 }
 
 /* ══ نشر مناقصة — لوحة إدخال بنفس أسلوب غرفة الاستثمارات ══ */

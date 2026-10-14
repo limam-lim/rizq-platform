@@ -56,6 +56,18 @@ assert(landing.includes('href="rizq_investments.html?demo=1"'), 'hero portal sti
 assert(landing.includes('hero-biz-tender'), 'hero tender portal class kept');
 assert(landing.includes('hero-biz-invest'), 'hero invest portal class kept');
 
+const tRoom = read('rizq_tenders.html');
+const iRoom = read('rizq_investments.html');
+assert(tRoom.includes('id="td-submit"'), 'tender room keeps deposit form');
+assert(tRoom.includes('rizq_tenders_directory.html'), 'tender room links to directory');
+assert(tRoom.includes('id="t-grid" hidden') || tRoom.includes('t-grid" id="t-grid" hidden') || /id="t-grid"[^>]*hidden/.test(tRoom), 'tender list grid hidden');
+assert(tRoom.includes('غرفة إيداع') || tRoom.includes('salle de dépôt') || tRoom.includes('للإيداع والترويج'), 'tender room is deposit-focused');
+assert(!/loadTenders[\s\S]*\/api\/tenders'/.test(tRoom.replace(/\s+/g,' ')) || tRoom.includes('عرض المناقصات انتقل'), 'tender load does not fetch list for display');
+assert(iRoom.includes('id="inv-submit"'), 'invest room keeps deposit form');
+assert(iRoom.includes('rizq_investments_directory.html'), 'invest room links to directory');
+assert(/id="inv-opp-grid"[^>]*hidden/.test(iRoom), 'invest opp grid hidden');
+assert(iRoom.includes('function renderOpps()'), 'invest renderOpps stubbed (no list)');
+
 assert(tDetail.includes('/api/tenders/package/status/'), 'tender detail checks package');
 assert(tDetail.includes('/api/tenders/'), 'tender detail fetches item');
 assert(tDetail.includes('renderGate'), 'tender detail has gate');
