@@ -22,7 +22,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_header.css?v=27.1"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
-<link rel="stylesheet" href="rizq_product_detail.css?v=28.5"/>
+<link rel="stylesheet" href="rizq_product_detail.css?v=28.6"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.9"/>
 <link rel="preload" href="rizq_header.js?v=27.0" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
@@ -1192,7 +1192,7 @@ footer{
   <script src="rizq_reviews_engine.js" defer></script>
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين (RizqSub.getBadges) -->
   <script src="rizq_subscription_engine.js" defer></script>
-  <script src="rizq_stock.js" defer></script>
+  <script src="rizq_stock.js?v=1.1" defer></script>
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_contact_gate.js" defer></script>
   <script src="rizq_mr_payment_catalog.js?v=1.1" defer></script>
@@ -1202,7 +1202,7 @@ footer{
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=29.5" defer></script>
+  <script src="rizq_store_commerce.js?v=29.6" defer></script>
   <script src="rizq_map_preview.js?v=1.0" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.1" defer></script>
@@ -2343,14 +2343,14 @@ function rizqShare(title, url) {
         thumb: 'rizq-assets/demo-heroes/store-boutique-promo.jpg'
       };
       var products = [
-        { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 12, variants: 'S, M, L, XL, XXL', unit: 'قطعة', desc: '' },
+        { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 47, variants: 'S, M, L, XL, XXL', sizeStock: { S: 8, M: 12, L: 15, XL: 10, XXL: 2 }, unit: 'قطعة', desc: '' },
         { id: 'P2', name: 'عطر شرقي 100مل', nameF: 'Parfum oriental 100ml', price: 18000, cat: 'عطور', emoji: '🧴', stock: 30, variants: '50مل, 100مل, 200مل', unit: 'زجاجة', desc: '' },
         { id: 'P3', name: 'حذاء رياضي', nameF: 'Baskets sport', price: 22000, cat: 'أحذية', emoji: '👟', stock: 4, variants: 'مقاس: 39, 40, 41, 42, 43, 44', unit: 'زوج', desc: '' },
         { id: 'P4', name: 'ساعة كلاسيكية', nameF: 'Montre classique', price: 35000, cat: 'إكسسوارات', emoji: '⌚', stock: 8, desc: '' },
         { id: 'P5', name: 'حقيبة جلدية', nameF: 'Sac en cuir', price: 28000, cat: 'إكسسوارات', emoji: '👜', stock: 6, desc: '' },
         { id: 'P6', name: 'نظارة شمسية', nameF: 'Lunettes de soleil', price: 9000, cat: 'إكسسوارات', emoji: '🕶️', stock: 20, desc: '' },
         { id: 'P7', name: 'قميص قطني', nameF: 'Chemise coton', price: 12000, cat: 'أزياء', emoji: '👔', stock: 15, variants: 'مقاس: S, M, L, XL · لون: أبيض, أزرق, أسود', unit: 'قطعة', desc: '' },
-        { id: 'P8', name: 'فستان سهرة', nameF: 'Robe de soirée', price: 55000, cat: 'أزياء', emoji: '👗', stock: 3, variants: 'S, M, L, XL', unit: 'قطعة', desc: '' },
+        { id: 'P8', name: 'فستان سهرة', nameF: 'Robe de soirée', price: 55000, cat: 'أزياء', emoji: '👗', stock: 5, variants: 'S, M, L, XL', sizeStock: { S: 0, M: 2, L: 2, XL: 1 }, unit: 'قطعة', desc: '' },
         { id: 'P9', name: 'صندل صيفي', nameF: 'Sandales été', price: 8000, cat: 'أحذية', emoji: '🩴', stock: 18, variants: '38, 39, 40, 41, 42', unit: 'زوج', desc: '' },
         { id: 'P10', name: 'عطر نسائي', nameF: 'Parfum femme', price: 21000, cat: 'عطور', emoji: '🌸', stock: 14, variants: '50مل, 100مل', unit: 'زجاجة', desc: '' },
         { id: 'P11', name: 'سوار ذهب مظهر', nameF: 'Bracelet doré', price: 15000, cat: 'إكسسوارات', emoji: '💍', stock: 9, desc: '' },
@@ -2360,7 +2360,7 @@ function rizqShare(title, url) {
         { id: 'P15', name: 'كريم عناية', nameF: 'Crème soin', price: 7000, cat: 'عطور', emoji: '🧴', stock: 25, variants: '50مل, 100مل, 200مل', unit: 'علبة', desc: '' },
         { id: 'P16', name: 'لعبة تعليمية', nameF: 'Jouet éducatif', price: 6500, cat: 'أطفال', emoji: '🧩', stock: 16, desc: '' },
         { id: 'P17', name: 'قبعة أنيقة', nameF: 'Casquette chic', price: 4500, cat: 'إكسسوارات', emoji: '🧢', stock: 22, desc: '' },
-        { id: 'P18', name: 'تيشيرت قطن', nameF: 'T-shirt coton', price: 5000, cat: 'أزياء', emoji: '👕', stock: 30, variants: 'S, M, L, XL, XXL', unit: 'قطعة', desc: '' }
+        { id: 'P18', name: 'تيشيرت قطن', nameF: 'T-shirt coton', price: 5000, cat: 'أزياء', emoji: '👕', stock: 30, variants: 'S, M, L, XL, XXL', sizeStock: { S: 5, M: 10, L: 8, XL: 5, XXL: 2 }, unit: 'قطعة', desc: '' }
       ];
       var demoTopics = window.RizqStoreTopics ? RizqStoreTopics.seedFromProducts(products) : [];
       var frMap = { 'أزياء':'Mode', 'عطور':'Parfums', 'أحذية':'Chaussures', 'إكسسوارات':'Accessoires', 'أطفال':'Enfants' };

@@ -324,6 +324,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
 <script src="rizq_profile_photo.js?v=2"></script>
 <script src="rizq_service_desk.js?v=1.3"></script>
 <script src="rizq_intro_video.js?v=29.9"></script>
+<script src="rizq_stock.js?v=1.1"></script>
 <script>if(window.RizqAccount)RizqAccount.bootstrapDashboard();</script>
 <script src="rizq_pwa.js" defer></script>
 </head>
@@ -600,7 +601,13 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
             <div class="form-group"><label class="form-label" data-t="pr-stock-label">الكمية المتوفرة (اختياري — للمنتجات غير الفريدة)</label><input class="form-input" id="pr-stock" type="number" placeholder="مثال: 8" data-ph="pr-stock-ph"/></div>
             <div class="form-group"><label class="form-label" data-t="pr-sold-label">عدد القطع المباعة (اختياري — لإظهار شعبية المنتج)</label><input class="form-input" id="pr-sold" type="number" placeholder="0"/></div>
           </div>
-          <div class="form-group"><label class="form-label" data-t="pr-variants-label">المقاسات / الأوزان / الألوان (اختياري)</label><input class="form-input" id="pr-variants" placeholder="مثال: S, M, L أو 1كغ، 5كغ أو أحمر، أسود" data-ph="pr-variants-ph"/></div>
+          <div class="form-group"><label class="form-label" data-t="pr-variants-label">المقاسات / الأوزان / الألوان (اختياري)</label><input class="form-input" id="pr-variants" placeholder="مثال: S, M, L أو 1كغ، 5كغ أو أحمر، أسود" data-ph="pr-variants-ph" oninput="rebuildCorpSizeStockUI()"/></div>
+          <div class="form-group" id="pr-size-stock-wrap" style="display:none">
+            <label class="form-label" data-t="pr-size-stock-label">كمية كل قياس في الاستوك</label>
+            <p style="font-size:11.5px;color:#64748b;margin:0 0 8px;line-height:1.5" data-t="pr-size-stock-hint">حدّد الكمية لكل مقاس. المجموع يحدّث «الكمية المتوفرة». القياس بصفر يظهر مشطوباً للزبون.</p>
+            <div id="pr-size-stock" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+            <div style="font-size:12px;font-weight:700;color:#1B3A6B;margin-top:8px" id="pr-size-stock-sum"></div>
+          </div>
           <!-- IMAGES -->
           <div class="form-group">
             <label class="form-label"><span data-t="pr-images-label">📸 صور المنتج</span> <span style="font-weight:400;color:var(--text-muted)" data-t="pr-images-hint">(حتى 8 صور — JPG/PNG)</span></label>
@@ -2113,6 +2120,85 @@ function saveProds(p){
   try{localStorage.setItem('rizq_corp_prods_'+(CORP_ACC&&CORP_ACC.id||'demo'), JSON.stringify(p));}catch(e){}
 }
 
+function _parseCorpVariantTokens(raw){
+  var s = String(raw == null ? '' : raw).trim();
+  if(!s) return [];
+  if(/[:：]/.test(s) && /مقاس|size|taille|وزن|weight|حجم|volume/i.test(s)){
+    var chunk = s.split(/[·•|]+/).find(function(c){ return /مقاس|size|taille|وزن|weight|حجم|volume/i.test(c); }) || s;
+    var parts = chunk.split(/[:：]/);
+    s = parts.length > 1 ? parts.slice(1).join(':') : chunk;
+  }
+  return s.split(/[,،|/·•]+/).map(function(x){ return x.trim(); }).filter(Boolean)
+    .filter(function(x){ return !/^(مقاس|size|taille|لون|color|وزن|weight)$/i.test(x); });
+}
+function rebuildCorpSizeStockUI(prefMap){
+  var wrap = document.getElementById('pr-size-stock-wrap');
+  var host = document.getElementById('pr-size-stock');
+  var sumEl = document.getElementById('pr-size-stock-sum');
+  var variantsEl = document.getElementById('pr-variants');
+  if(!wrap || !host) return;
+  var tokens = _parseCorpVariantTokens(variantsEl && variantsEl.value);
+  if(prefMap && typeof prefMap === 'object') window._corpSizeStockDraft = Object.assign({}, window._corpSizeStockDraft||{}, prefMap);
+  host.querySelectorAll('[data-size-key]').forEach(function(inp){
+    var k = inp.getAttribute('data-size-key');
+    var n = parseInt(inp.value, 10);
+    if(!window._corpSizeStockDraft) window._corpSizeStockDraft = {};
+    window._corpSizeStockDraft[k] = isNaN(n) ? 0 : Math.max(0, n);
+  });
+  if(!tokens.length){
+    wrap.style.display = 'none';
+    host.innerHTML = '';
+    if(sumEl) sumEl.textContent = '';
+    return;
+  }
+  wrap.style.display = '';
+  var draft = window._corpSizeStockDraft || {};
+  host.innerHTML = tokens.map(function(tok){
+    var val = Object.prototype.hasOwnProperty.call(draft, tok) ? draft[tok] : '';
+    return '<label style="display:flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid rgba(27,58,107,.14);border-radius:10px;background:#fff;min-width:110px">'
+      + '<span style="font-weight:800;color:#1B3A6B;min-width:36px;text-align:center">' + String(tok).replace(/</g,'&lt;') + '</span>'
+      + '<input type="number" min="0" step="1" data-size-key="' + String(tok).replace(/"/g,'&quot;') + '" value="' + (val === '' ? '' : val) + '"'
+      + ' placeholder="0" oninput="onCorpSizeStockInput()" style="width:64px;padding:6px 8px;border:1px solid rgba(27,58,107,.2);border-radius:8px;font:inherit;font-weight:700;text-align:center"/>'
+      + '<span style="font-size:11px;color:#64748b">قطعة</span></label>';
+  }).join('');
+  onCorpSizeStockInput();
+}
+function onCorpSizeStockInput(){
+  var host = document.getElementById('pr-size-stock');
+  var sumEl = document.getElementById('pr-size-stock-sum');
+  var stockEl = document.getElementById('pr-stock');
+  if(!host) return;
+  var draft = {};
+  var total = 0;
+  var hasAny = false;
+  host.querySelectorAll('[data-size-key]').forEach(function(inp){
+    var k = inp.getAttribute('data-size-key');
+    var n = parseInt(inp.value, 10);
+    if(isNaN(n) || n < 0) n = 0;
+    draft[k] = n;
+    total += n;
+    if(String(inp.value).trim() !== '') hasAny = true;
+  });
+  window._corpSizeStockDraft = draft;
+  if(sumEl) sumEl.textContent = hasAny ? ('مجموع الاستوك = ' + total) : '';
+  if(stockEl && hasAny) stockEl.value = String(total);
+}
+function collectCorpSizeStock(){
+  onCorpSizeStockInput();
+  var draft = window._corpSizeStockDraft || {};
+  var tokens = _parseCorpVariantTokens((document.getElementById('pr-variants')||{}).value);
+  if(!tokens.length) return null;
+  var map = {};
+  var anyTyped = false;
+  tokens.forEach(function(tok){
+    var n = Object.prototype.hasOwnProperty.call(draft, tok) ? parseInt(draft[tok], 10) : 0;
+    if(isNaN(n) || n < 0) n = 0;
+    map[tok] = n;
+    if(Object.prototype.hasOwnProperty.call(draft, tok) && String(draft[tok]).trim() !== '') anyTyped = true;
+  });
+  return anyTyped ? map : null;
+}
+
 // ══ مزامنة الكتالوج (منتجات الشركة) مع الخادم الحقيقي ══
 function _rizqSyncCatalogItem(prod){
   try{
@@ -2121,7 +2207,7 @@ function _rizqSyncCatalogItem(prod){
     var payload = {
       accountId: CORP_ACC.id, kind:'product',
       name: prod.name, price: prod.price, cat: prod.cat, desc: prod.desc,
-      stock: prod.stock, variants: prod.variants,
+      stock: prod.stock, variants: prod.variants, sizeStock: prod.sizeStock || null,
       // إصلاح 2026-08-04: كانت تُرسَل أول صورة فقط (image) رغم أن واجهة
       // الرفع هنا تدعم حتى 8 صور أصلاً — الخادم الآن يقبل images[] كاملة.
       images: prod.images || [],
@@ -2517,6 +2603,14 @@ function saveProduct(){
   var stock = document.getElementById('pr-stock') ? document.getElementById('pr-stock').value.trim() : '';
   var sold  = document.getElementById('pr-sold')  ? (parseInt(document.getElementById('pr-sold').value)||0) : 0;
   var variants = document.getElementById('pr-variants') ? document.getElementById('pr-variants').value.trim() : '';
+  var sizeStock = (typeof collectCorpSizeStock==='function' ? collectCorpSizeStock() : null);
+  if(sizeStock){
+    var _sum = 0;
+    Object.keys(sizeStock).forEach(function(k){ _sum += sizeStock[k]||0; });
+    stock = String(_sum);
+    var _stEl = document.getElementById('pr-stock');
+    if(_stEl) _stEl.value = stock;
+  }
   var brandId = (document.getElementById('pr-brand')||{}).value || '';
   var modelId = (document.getElementById('pr-model')||{}).value || '';
   var brandName='', brandNameFr='', modelName='', modelNameFr='';
@@ -2556,7 +2650,7 @@ function saveProduct(){
       prods[editIdx] = {
         id:old.id, _backendId: old._backendId||null, name:name, price:price, cat:cat, desc:desc,
         emoji:cat||'📦', images:(data.images&&data.images.length)?data.images:old.images, video:video,
-        stock:stock, sold:sold, variants:variants,
+        stock:stock, sold:sold, variants:variants, sizeStock:sizeStock,
         brandId:brandId, brandName:brandName, brandNameFr:brandNameFr,
         modelId:modelId, modelName:modelName, modelNameFr:modelNameFr,
         status:old.status, date:old.date
@@ -2566,7 +2660,7 @@ function saveProduct(){
       _savedProd = {
         id:data.id, _backendId:null, name:name, price:price, cat:cat, desc:desc,
         emoji:cat||'📦', images:data.images, video:video,
-        stock:stock, sold:sold, variants:variants,
+        stock:stock, sold:sold, variants:variants, sizeStock:sizeStock,
         brandId:brandId, brandName:brandName, brandNameFr:brandNameFr,
         modelId:modelId, modelName:modelName, modelNameFr:modelNameFr,
         status:status, date:new Date().toLocaleDateString('ar-MR-u-nu-latn')
@@ -2585,6 +2679,8 @@ function saveProduct(){
     ['pr-name','pr-price','pr-cat','pr-desc','pr-video','pr-stock','pr-sold','pr-variants'].forEach(function(id){
       var el=document.getElementById(id); if(el) el.value='';
     });
+    window._corpSizeStockDraft = {};
+    if(typeof rebuildCorpSizeStockUI==='function') rebuildCorpSizeStockUI({});
     try{
       if(window.RizqBrands){
         RizqBrands.fillBrandSelect(document.getElementById('pr-brand'), '', false, '');
@@ -2631,6 +2727,8 @@ function editProd(i){
   document.getElementById('pr-stock').value = p.stock||'';
   document.getElementById('pr-sold').value = p.sold||'';
   document.getElementById('pr-variants').value = p.variants||'';
+  window._corpSizeStockDraft = (p.sizeStock && typeof p.sizeStock === 'object') ? Object.assign({}, p.sizeStock) : {};
+  if(typeof rebuildCorpSizeStockUI==='function') rebuildCorpSizeStockUI(window._corpSizeStockDraft);
   try{
     if(window.RizqBrands){
       RizqBrands.fillBrandSelect(document.getElementById('pr-brand'), '', false, p.brandId||'');
@@ -3359,6 +3457,8 @@ function saveMyPayment(){
     ['pr-name','pr-price','pr-cat','pr-desc','pr-video','pr-emoji','pr-stock','pr-sold','pr-variants'].forEach(function(id){
       var el=document.getElementById(id); if(el) el.value='';
     });
+    window._corpSizeStockDraft = {};
+    if(typeof rebuildCorpSizeStockUI==='function') rebuildCorpSizeStockUI({});
     _pendingImgs=[];
     renderImgPreviews();
     window._editingProdIdx = null;

@@ -205,6 +205,17 @@
   border-color:#1B3A6B;box-shadow:0 0 0 1px #1B3A6B;
   background:linear-gradient(180deg,#fff,#f4f7fc);
 }
+.rzq-pd-vopt.is-oos,
+.rzq-pd-vopt:disabled.is-oos{
+  opacity:.48;cursor:not-allowed;pointer-events:none;
+  background:#f3f4f6;border-color:rgba(100,116,139,.28);color:#64748b;
+  box-shadow:none;text-decoration:line-through;
+}
+.rzq-pd-vopt.is-oos .rzq-pd-vopt-lab{text-decoration:line-through}
+.rzq-pd-vopt-qty{
+  display:inline-block;margin-inline-start:4px;padding:1px 5px;border-radius:999px;
+  font-size:10px;font-weight:800;background:rgba(180,83,9,.12);color:#b45309;
+}
 
 .rzq-pd-qty{
   display:flex;align-items:center;gap:8px;margin:0 0 8px;
