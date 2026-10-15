@@ -26,20 +26,22 @@
     0 10px 28px rgba(0,0,0,.32),
     inset 0 1px 0 rgba(255,255,255,.07)!important;
 }
-/* صف الماركة — رفيع؛ الفارغ لا يسرق مساحة من الصورة */
+/* صف الماركة — ارتفاع يكفي للشارة بلا تداخل مع العنوان/الموقع */
 .rzq-ad-brand-slot{
   display:flex!important;
   align-items:center;
   justify-content:center;
-  flex:0 0 18px!important;
+  flex:0 0 22px!important;
   width:100%;
-  height:18px!important;
-  min-height:18px!important;
-  max-height:18px!important;
-  margin:0!important;
+  height:22px!important;
+  min-height:22px!important;
+  max-height:22px!important;
+  margin:1px 0 2px!important;
   overflow:hidden!important;
   box-sizing:border-box;
   flex-shrink:0!important;
+  position:relative;
+  z-index:1;
 }
 .rzq-ad-brand-slot.is-empty{
   flex:0 0 0!important;
@@ -58,31 +60,41 @@
 .cards-track{
   align-items:stretch!important;
 }
-/* بطاقات الشريط الحي: ارتفاع موحّد — الصورة ≈ 70%+ من البطاقة */
+/* بطاقات الشريط الحي: ارتفاع موحّد — الصورة ≈ 65%+ مع جسم نصوص كامل */
 #hero-listings .cards-track .ad-card:has(.rzq-adx-media),
 .cards-track .ad-card:has(.rzq-adx-media){
-  height:380px!important;
-  min-height:380px!important;
-  max-height:380px!important;
+  height:400px!important;
+  min-height:400px!important;
+  max-height:400px!important;
   align-self:stretch!important;
 }
 @media (max-width:768px){
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media),
   .cards-track .ad-card:has(.rzq-adx-media){
-    height:340px!important;
-    min-height:340px!important;
-    max-height:340px!important;
+    height:360px!important;
+    min-height:360px!important;
+    max-height:360px!important;
   }
 }
 .rzq-ad-brand-slot .rzq-brand-chip{
   max-width:100%;
-  font-size:10px!important;
-  padding:2px 6px 2px 3px!important;
+  max-height:20px!important;
+  font-size:9.5px!important;
+  line-height:1!important;
+  padding:1px 6px 1px 2px!important;
+  gap:4px!important;
   background:rgba(255,255,255,.1)!important;
   border-color:rgba(201,168,76,.35)!important;
   color:#fff!important;
+  box-sizing:border-box;
 }
-.rzq-ad-brand-slot .rzq-brand-chip-name{color:#fff!important}
+.rzq-ad-brand-slot .rzq-brand-chip-logo,
+.rzq-ad-brand-slot .rzq-brand-chip img{
+  width:14px!important;
+  height:14px!important;
+  flex-shrink:0!important;
+}
+.rzq-ad-brand-slot .rzq-brand-chip-name{color:#fff!important;line-height:1.1!important}
 /* شبكة الهبوط: الصورة أطول بكثير من الجسم الكحلي */
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .l-img.rzq-adx-media,
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .rzq-adx-media,
@@ -98,7 +110,7 @@
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .l-body,
 .listings-grid .listing-card:has(.rzq-adx-media) .l-body{
   flex:0 0 auto!important;
-  padding:4px 7px 6px!important;
+  padding:6px 8px 8px!important;
 }
 .ad-card:has(.rzq-adx-media){
   width:200px;
@@ -327,7 +339,7 @@
 .rzq-adx-seen-ico{font-size:10px;line-height:1;opacity:.95}
 .rzq-adx-seen-txt{overflow:hidden;text-overflow:ellipsis}
 
-/* ── جسم البطاقة — شريط معلومات رفيع تحت الصورة فقط ── */
+/* ── جسم البطاقة — نصوص كاملة بلا قصّ علوي؛ الصورة تبقى الأكبر ── */
 .ad-card:has(.rzq-adx-media) .ad-card-body,
 .listing-card:has(.rzq-adx-media) .l-body,
 .rc:has(.rzq-adx-media) .rc-body{
@@ -337,14 +349,18 @@
   display:flex;
   flex-direction:column;
   align-items:center;
+  justify-content:flex-start;
   text-align:center;
-  gap:0;
-  padding:4px 7px 6px!important;
+  gap:2px;
+  padding:6px 8px 8px!important;
   position:relative;
   z-index:1;
   background:transparent!important;
   min-height:0;
-  max-height:108px;
+  /* يكفي: تصنيف + عنوان سطرين + ماركة + موقع + أزرار — بدون margin-top:auto الذي كان يقصّ الأعلى */
+  max-height:136px;
+  overflow:hidden;
+  box-sizing:border-box;
 }
 .ad-card:has(.rzq-adx-media) .ad-title,
 .listing-card:has(.rzq-adx-media) .l-title,
@@ -354,7 +370,8 @@
 .ad-card:has(.rzq-adx-media) .rzq-adx-actions,
 .listing-card:has(.rzq-adx-media) .rzq-adx-actions,
 .rc:has(.rzq-adx-media) .rzq-adx-actions{
-  margin-top:auto!important;
+  margin-top:2px!important;
+  flex-shrink:0;
 }
 
 .ad-card:has(.rzq-adx-media) .ad-cat,
@@ -366,12 +383,14 @@
   font-weight:700!important;
   letter-spacing:.2px;
   color:var(--rzq-adx-gold-light)!important;
-  margin:0 0 2px!important;
+  margin:0!important;
   opacity:.95;
-  line-height:1.3!important;
+  line-height:1.35!important;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
+  padding-top:1px;
+  flex-shrink:0;
 }
 
 .ad-card:has(.rzq-adx-media) .ad-title,
@@ -381,17 +400,18 @@
   font-size:11px!important;
   font-weight:800!important;
   color:#fff!important;
-  line-height:1.3!important;
-  margin:0 0 2px!important;
+  line-height:1.35!important;
+  margin:0!important;
   overflow:hidden;
   display:-webkit-box;
   -webkit-line-clamp:2;
   -webkit-box-orient:vertical;
   word-break:break-word;
   overflow-wrap:anywhere;
-  padding-bottom:0;
+  padding:1px 0 0;
   text-shadow:0 1px 2px rgba(0,0,0,.28);
-  max-height:2.7em;
+  max-height:calc(1.35em * 2 + 2px);
+  flex-shrink:0;
 }
 
 .ad-card:has(.rzq-adx-media) .ad-loc,
@@ -402,13 +422,14 @@
   justify-content:center;
   gap:3px;
   width:100%;
-  min-height:16px;
+  min-height:15px;
   font-size:10px!important;
   font-weight:600!important;
   color:rgba(255,255,255,.82)!important;
-  margin:0 0 4px!important;
+  margin:0!important;
   line-height:1.3!important;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  flex-shrink:0;
 }
 .ad-card:has(.rzq-adx-media) .ad-footer,
 .rc:has(.rzq-adx-media) .rc-meta{
@@ -547,8 +568,8 @@
     min-height:200px!important;
   }
   #result-list-body .rc:has(.rzq-adx-media) .rc-body{
-    padding:4px 7px 6px!important;
-    max-height:100px;
+    padding:6px 8px 8px!important;
+    max-height:136px;
   }
   #result-list-body .rc:has(.rzq-adx-media) .rc-title{
     -webkit-line-clamp:2;
@@ -619,8 +640,9 @@
   .ad-card:has(.rzq-adx-media) .ad-card-body,
   .listing-card:has(.rzq-adx-media) .l-body,
   .rc:has(.rzq-adx-media) .rc-body{
-    padding:3px 6px 5px!important;
-    max-height:96px;
+    padding:5px 7px 7px!important;
+    max-height:124px;
+    gap:2px;
   }
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .ad-title,
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .rzq-adx-title{
