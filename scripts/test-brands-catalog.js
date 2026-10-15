@@ -42,6 +42,12 @@ assert(B.searchMatch(B.getById('toyota'), 'تويوتا'));
 assert(B.searchMatch(B.getById('toyota'), 'toyota'));
 assert.strictEqual(B.findByAlias('مرسيدس').id, 'mercedes');
 assert.strictEqual(B.findByAlias('Nike').id, 'nike');
+assert.strictEqual(B.findByAlias('Under Armour jacket').id, 'under-armour');
+assert.strictEqual(
+  B.findByAlias('شقة فاخرة — نواكشوط الغربية Appartement Nouakchott Ouest'),
+  null,
+  'short alias ua must not match inside Nouakchott'
+);
 
 const chip = B.chipHtml('adidas', { fr: false, modelId: 'ultraboost' });
 assert(chip.indexOf('أديداس') >= 0 || chip.indexOf('ألترابوست') >= 0);
