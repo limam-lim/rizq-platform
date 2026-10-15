@@ -13,7 +13,8 @@ const civic = fs.readFileSync(path.join(root, 'rizq_civic_ticker.js'), 'utf8');
 assert.ok(landing.includes('rizq_marquee_kit.js'), 'landing loads marquee kit');
 assert.ok(landing.includes('RizqMarqueeKit.enhanceRafState'), 'landing enhances raf marquees');
 assert.ok(landing.includes('RizqMarqueeKit.enhanceDiscStrip'), 'landing enhances discovery strips');
-assert.ok(civic.includes('setEmergency'), 'civic wires emergency strip');
+assert.ok(!kitSrc.includes('rizq-emergency-strip'), 'emergency strip removed from kit');
+assert.ok(!civic.includes('setEmergency'), 'civic does not wire emergency strip');
 
 const els = new Map();
 function el(tag) {
@@ -38,7 +39,6 @@ function el(tag) {
     appendChild: function (c) { this.children.push(c); return c; },
     insertBefore: function (c) { this.children.unshift(c); return c; },
     querySelector: function (sel) {
-      if (sel === '.rzq-em-text') return this.children[0] && this.children[0].children && this.children[0].children[1];
       if (sel && sel.indexOf('rzq-mq-ctrls') >= 0) return this.children.find(function (x) { return x.className === 'rzq-mq-ctrls'; }) || null;
       if (sel && sel.indexOf('data-mq=') >= 0) {
         var m = /data-mq="([^"]+)"/.exec(sel);
@@ -85,17 +85,7 @@ sandbox.global = sandbox;
 vm.runInNewContext(kitSrc, sandbox);
 
 assert.ok(sandbox.RizqMarqueeKit, 'kit export');
-sandbox.RizqMarqueeKit.setEmergency([
-  { textAr: 'طوارئ تجريبية', textFr: 'Urgence test', link: '', priority: 'urgent' }
-]);
-const host = document.getElementById('rizq-emergency-strip');
-assert.ok(host, 'emergency host created');
-assert.ok(host.classList.contains('is-on'), 'emergency visible');
-assert.ok(document.documentElement.classList.contains('rizq-has-emergency'), 'html flag on');
-
-sandbox.RizqMarqueeKit.setEmergency([]);
-assert.ok(!host.classList.contains('is-on'), 'emergency hidden when empty');
-assert.ok(!document.documentElement.classList.contains('rizq-has-emergency'), 'html flag off');
+assert.ok(!sandbox.RizqMarqueeKit.setEmergency, 'no setEmergency API');
 
 const wrap = el('div');
 wrap.className = 'ticker-wrap';

@@ -59,40 +59,9 @@
       '.ticker-wrap,.price-ticker-wrap,.cards-track-wrap,',
       '.rizq-styles-rail-wrap,.rizq-srm-rail-wrap,.rizq-styles-track-wrap{position:relative}',
       '.rzq-disc-strip{position:relative}',
-      /* شريط طوارئ رقيق */
-      '#rizq-emergency-strip{',
-      '  display:none;width:100%;box-sizing:border-box;',
-      '  min-height:26px;padding:4px 12px;',
-      '  background:linear-gradient(90deg,#7f1d1d,#b91c1c,#7f1d1d);',
-      '  border-bottom:1px solid rgba(254,202,202,.35);',
-      '  color:#fff;font-size:12px;font-weight:700;line-height:1.35;',
-      '  position:fixed;left:0;right:0;z-index:9991;',
-      '  top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px));',
-      '  overflow:hidden;font-family:Cairo,Tahoma,sans-serif',
-      '}',
-      '#rizq-emergency-strip.is-on{display:block}',
-      '#rizq-emergency-strip .rzq-em-inner{',
-      '  display:flex;align-items:center;justify-content:center;gap:10px;',
-      '  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:1200px;margin:0 auto',
-      '}',
-      '#rizq-emergency-strip .rzq-em-ico{',
-      '  flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;',
-      '  width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.2);',
-      '  font-size:11px;font-weight:900;line-height:1',
-      '}',
-      '#rizq-emergency-strip a{color:#ffe4e6;text-decoration:underline;text-underline-offset:2px}',
-      'html.rizq-has-emergency{--rizq-emergency-h:26px}',
-      'html.rizq-has-emergency .ticker-wrap:not(.is-empty){',
-      '  top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-emergency-h,26px))!important',
-      '}',
-      'html.rizq-has-emergency .section-jump-bar{',
-      '  top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-emergency-h,26px) + var(--rizq-ticker-h,0px))!important',
-      '}',
       '@media(max-width:700px){',
       '  .' + CTRL_CLASS + '{inset-inline-end:4px}',
       '  .' + CTRL_CLASS + ' button{width:26px;height:26px;font-size:11px}',
-      '  #rizq-emergency-strip{font-size:11px;padding:3px 8px;min-height:24px}',
-      '  html.rizq-has-emergency{--rizq-emergency-h:24px}',
       '}'
     ].join('');
     (document.head || document.documentElement).appendChild(s);
@@ -303,73 +272,6 @@
     return api;
   }
 
-  /* ── شريط الطوارئ الرقيق ── */
-  function ensureEmergencyHost() {
-    var el = document.getElementById('rizq-emergency-strip');
-    if (el) return el;
-    el = document.createElement('div');
-    el.setAttribute('id', 'rizq-emergency-strip');
-    el.id = 'rizq-emergency-strip';
-    el.setAttribute('role', 'alert');
-    el.setAttribute('aria-live', 'assertive');
-    var inner = document.createElement('div');
-    inner.className = 'rzq-em-inner';
-    var ico = document.createElement('span');
-    ico.className = 'rzq-em-ico';
-    ico.setAttribute('aria-hidden', 'true');
-    ico.textContent = '!';
-    var text = document.createElement('span');
-    text.className = 'rzq-em-text';
-    inner.appendChild(ico);
-    inner.appendChild(text);
-    el.appendChild(inner);
-    var body = document.body;
-    if (!body) return null;
-    body.insertBefore(el, body.firstChild);
-    injectCSS();
-    return el;
-  }
-
-  function setEmergency(items) {
-    injectCSS();
-    var host = ensureEmergencyHost();
-    if (!host) return;
-    var list = Array.isArray(items) ? items.filter(Boolean) : [];
-    var textEl = host.querySelector('.rzq-em-text');
-    if (!list.length) {
-      host.classList.remove('is-on');
-      try {
-        document.documentElement.classList.remove('rizq-has-emergency');
-        document.documentElement.style.removeProperty('--rizq-emergency-h');
-      } catch (e) {}
-      if (textEl) textEl.textContent = '';
-      return;
-    }
-    var fr = isFr();
-    var parts = list.map(function (it) {
-      if (typeof it === 'string') return esc(it);
-      var t = fr ? (it.textFr || it.textAr || '') : (it.textAr || it.textFr || '');
-      var href = it.link ? String(it.link).trim() : '';
-      if (!t) return '';
-      if (href && /^(https?:\/\/|\/|#|\.\/)/i.test(href) && !/javascript:/i.test(href)) {
-        return '<a href="' + esc(href) + '" rel="noopener">' + esc(t) + '</a>';
-      }
-      return esc(t);
-    }).filter(Boolean);
-    if (!parts.length) {
-      setEmergency([]);
-      return;
-    }
-    if (textEl) textEl.innerHTML = parts.join(' <span aria-hidden="true">·</span> ');
-    host.classList.add('is-on');
-    host.setAttribute('aria-label', fr ? 'Urgences' : 'طوارئ');
-    try {
-      document.documentElement.classList.add('rizq-has-emergency');
-      var h = Math.max(24, Math.round(host.getBoundingClientRect().height || 26));
-      document.documentElement.style.setProperty('--rizq-emergency-h', h + 'px');
-    } catch (e2) {}
-  }
-
   function enhanceAllRaf() {
     var list = global._rzqMarquees;
     if (!Array.isArray(list)) return;
@@ -380,7 +282,6 @@
     enhanceRafState: enhanceRafState,
     enhanceDiscStrip: enhanceDiscStrip,
     enhanceAllRaf: enhanceAllRaf,
-    setEmergency: setEmergency,
     injectCSS: injectCSS
   };
 
