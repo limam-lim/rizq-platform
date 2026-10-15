@@ -69,6 +69,8 @@ assert.ok(civicJs.includes('color:rgba(255,255,255,.82)'));
 assert.ok(civicJs.includes('isDefaultAccent'));
 assert.ok(/id: 'civic_fb_emergency'[\s\S]*?color: '#C9A84C'/.test(civicJs));
 assert.ok(!/id: 'civic_fb_emergency'[\s\S]*?color: '#ef4444'/.test(civicJs));
+assert.ok(!civicJs.includes('setEmergency'));
+assert.ok(!fs.readFileSync(path.join(__dirname, '../../rizq_marquee_kit.js'), 'utf8').includes('rizq-emergency-strip'));
 // حركة الشريط عبر rAF في الصفحة — بلا CSS animation-duration من حقبة الـ compositor
 assert.ok(civicJs.includes('animation:none!important'));
 assert.ok(!civicJs.includes('--rzq-mq-dur'));

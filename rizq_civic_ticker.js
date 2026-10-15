@@ -241,12 +241,21 @@
     try {
       var th = Math.max(36, Math.round(wrap.getBoundingClientRect().height || 42));
       document.documentElement.style.setProperty('--rizq-ticker-h', th + 'px');
+      wrap.style.paddingTop = '';
+      wrap.style.paddingBottom = '';
     } catch (e) {}
 
     if (typeof global.syncMarqueeShift === 'function' && typeof global.requestAnimationFrame === 'function') {
       global.requestAnimationFrame(function () {
         global.syncMarqueeShift(inner);
-        global.requestAnimationFrame(function () { global.syncMarqueeShift(inner); });
+        global.requestAnimationFrame(function () {
+          global.syncMarqueeShift(inner);
+          try {
+            if (global.RizqMarqueeKit && inner._rzqMarquee) {
+              global.RizqMarqueeKit.enhanceRafState(inner._rzqMarquee);
+            }
+          } catch (eKit) {}
+        });
       });
     }
   }

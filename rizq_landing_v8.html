@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-rizq-strip="22.1">
+<html lang="ar" dir="rtl" data-rizq-strip="22.2">
 <head>
   <meta charset="UTF-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -4465,8 +4465,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   window.addEventListener('load', unlockRizqPage);
 })();
 </script>
+    <script src="rizq_marquee_kit.js?v=1.0"></script>
     <script src="rizq_announcements.js"></script>
-    <script src="rizq_civic_ticker.js"></script>
+    <script src="rizq_civic_ticker.js?v=1.2"></script>
 <script src="rizq_backend_config.js"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
@@ -6473,7 +6474,8 @@ function _rzqMarqueeTick(now){
       var state = _rzqMarquees[i];
       if(!state || !state.el || !state.el.isConnected) continue;
       if(state.paused || state.offscreen || state.half <= 1) continue;
-      state.pos += state.pxPerSec * dt;
+      var spd = Number(state.pxPerSec) || 0;
+      state.pos += spd * dt;
       if(state.pos >= state.half) state.pos -= state.half;
       if(state.pos < 0) state.pos += state.half;
       state.apply();
@@ -6535,8 +6537,8 @@ function _rzqBindMarqueePointerBoost(state){
     decayTimer = setTimeout(resetBoost, 900);
   }
   function onPointerSample(ev){
-    /* لا نمنع التسريع عند offscreen — إذا حرّك المستخدم المؤشر فوق الشريط فهو ظاهر له */
-    if(state.paused) return;
+    /* إيقاف عند المرور: لا تسريع تلقائي بالمؤشر — الأزرار/العجلة فقط */
+    if(state.paused || state.hoverPaused || state.userPaused) return;
     var t = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     if(lastX != null){
       var dx = ev.clientX - lastX;
@@ -6653,6 +6655,11 @@ function bindRafMarquee(el, opts){
   _rzqBindMarqueePointerBoost(state);
   state.remeasure();
   _rzqEnsureMarqueeLoop();
+  try{
+    if(window.RizqMarqueeKit && typeof RizqMarqueeKit.enhanceRafState === 'function'){
+      RizqMarqueeKit.enhanceRafState(state);
+    }
+  }catch(eKit){}
   return state;
 }
 function syncMarqueeShift(el){
@@ -6660,6 +6667,9 @@ function syncMarqueeShift(el){
   bindRafMarquee(el);
   if(el._rzqMarquee) el._rzqMarquee.remeasure();
   _rzqEnsureMarqueeLoop();
+  try{
+    if(window.RizqMarqueeKit && el._rzqMarquee) RizqMarqueeKit.enhanceRafState(el._rzqMarquee);
+  }catch(eKit2){}
 }
 function syncAllMarquees(){
   [
@@ -6674,6 +6684,7 @@ function syncAllMarquees(){
     if(cfg.el._rzqMarquee) cfg.el._rzqMarquee.remeasure();
   });
   _rzqEnsureMarqueeLoop();
+  try{ if(window.RizqMarqueeKit) RizqMarqueeKit.enhanceAllRaf(); }catch(eKit3){}
 }
 function liveListingsLabelHtml(fr){
   return fr
@@ -14835,10 +14846,23 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       var pos = 0;
       var basePx = 42; /* بكسل/ثانية — يتحرك حتى لو بطاقة واحدة */
       var boostPx = 0;
+      var dir = 1;
+      var userPaused = false;
+      var hoverPaused = false;
       var decayTimer = 0;
       var lastX = null;
       var lastT = 0;
       var lastTs = 0;
+      var ctl = {
+        get boostPx(){ return boostPx; },
+        set boostPx(v){ boostPx = v; },
+        get dir(){ return dir; },
+        set dir(v){ dir = v < 0 ? -1 : 1; },
+        get userPaused(){ return userPaused; },
+        set userPaused(v){ userPaused = !!v; },
+        get hoverPaused(){ return hoverPaused; },
+        set hoverPaused(v){ hoverPaused = !!v; }
+      };
       function isRtl(){ return document.documentElement.getAttribute('dir') !== 'ltr'; }
       function loopSpan(){
         var n = parseInt(track.getAttribute('data-loop-copies') || '2', 10) || 2;
@@ -14866,6 +14890,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
           var dx = clientX - lastX;
           var dt = Math.max(8, t - lastT);
           applyBoost(Math.abs(dx) / dt * 1000 * 0.42);
+          if(dx) dir = dx < 0 ? -1 : 1;
           if(drag){
             /* سحب يدوي يزيح الشريط فوراً */
             pos += isRtl() ? dx : -dx;
@@ -14900,8 +14925,9 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       strip.addEventListener('wheel', function(ev){
         var dx = Math.abs(ev.deltaX) > Math.abs(ev.deltaY) ? ev.deltaX : ev.deltaY;
         if(!dx) return;
+        dir = dx > 0 ? 1 : -1;
         applyBoost(Math.min(220, Math.abs(dx) * 2.4));
-        pos += isRtl() ? -dx * 0.35 : dx * 0.35;
+        pos += (isRtl() ? -dx : dx) * 0.35;
         apply();
       }, {passive:true});
       function step(ts){
@@ -14909,9 +14935,11 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         var dt = Math.min(48, ts - lastTs);
         lastTs = ts;
         var span = loopSpan();
-        if(!dragging && span > 1){
-          pos += (basePx + boostPx) * (dt / 1000);
+        var paused = !!(userPaused || hoverPaused);
+        if(!dragging && !paused && span > 1){
+          pos += (basePx + boostPx) * (dt / 1000) * (dir < 0 ? -1 : 1);
           if(pos >= span) pos -= span;
+          if(pos < 0) pos += span;
           apply();
         }
         requestAnimationFrame(step);
@@ -14920,6 +14948,11 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         pos = 0;
         apply();
       } catch (e0) {}
+      try{
+        if(window.RizqMarqueeKit && typeof RizqMarqueeKit.enhanceDiscStrip === 'function'){
+          RizqMarqueeKit.enhanceDiscStrip(strip, ctl);
+        }
+      }catch(eKitD){}
       requestAnimationFrame(step);
     }
 
