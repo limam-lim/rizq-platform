@@ -1150,7 +1150,16 @@
       if (searchMatch(BRANDS[i], t)) return BRANDS[i];
       var names = [BRANDS[i].nameAr, BRANDS[i].nameFr].concat(BRANDS[i].aliases || []);
       for (var j = 0; j < names.length; j++) {
-        if (t.indexOf(String(names[j]).toLowerCase()) >= 0) return BRANDS[i];
+        var n = String(names[j] || '').toLowerCase().trim();
+        if (!n) continue;
+        /* اختصارات قصيرة (مثل ua) لا تُطابق داخل كلمات — كانت تظهر «أندر آرمر» داخل «Nouakchott» */
+        if (n.length <= 3) {
+          var esc = n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          var re = new RegExp('(?:^|[^a-z0-9\\u0600-\\u06FF])' + esc + '(?:[^a-z0-9\\u0600-\\u06FF]|$)', 'i');
+          if (re.test(t)) return BRANDS[i];
+        } else if (t.indexOf(n) >= 0) {
+          return BRANDS[i];
+        }
       }
     }
     return null;

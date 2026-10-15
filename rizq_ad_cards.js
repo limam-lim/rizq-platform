@@ -524,15 +524,19 @@
     try {
       if (ad && global.RizqBrands) {
         var brandId = ad.brandId || '';
+        /* لا تمسح العنوان بحثاً عن ماركة — يسبب تطابقات خاطئة ويسرق حيز الصورة */
         if (!brandId && typeof global.RizqBrands.findByAlias === 'function') {
-          var hit = global.RizqBrands.findByAlias([ad.title, ad.titleFR, ad.titleFr, ad.brandName, ad.brandNameFr].join(' '));
-          if (hit && hit.id) brandId = hit.id;
+          var brandHint = [ad.brandName, ad.brandNameFr, ad.brand, ad.marque].filter(Boolean).join(' ');
+          if (brandHint) {
+            var hit = global.RizqBrands.findByAlias(brandHint);
+            if (hit && hit.id) brandId = hit.id;
+          }
         }
         if (brandId && typeof global.RizqBrands.chipHtml === 'function') {
           inner = global.RizqBrands.chipHtml(brandId, {
             fr: fr,
             modelId: ad.modelId || '',
-            size: opts.size || 18
+            size: opts.size || 16
           });
         }
       }
