@@ -35,7 +35,13 @@
   --radius:14px;--shadow:0 6px 24px rgba(0,0,0,.35);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;color:#1a2a3a;min-height:100vh}
+body{
+  font-family:'Cairo',system-ui,-apple-system,sans-serif;color:#1a2a3a;min-height:100vh;
+  background:
+    radial-gradient(ellipse 900px 420px at 100% 0%,rgba(201,168,76,.07),transparent 55%),
+    radial-gradient(ellipse 800px 380px at 0% 18%,rgba(27,58,107,.06),transparent 50%),
+    linear-gradient(180deg,#e6ecf5 0%,#f3f6fb 42%,#eef2f8 100%);
+}
 
 /* NAV */
 .topnav{background:linear-gradient(135deg,var(--dark2),var(--navy2));padding:0 20px;position:sticky;top:0;z-index:100;border-bottom:1px solid var(--border)}
@@ -59,36 +65,136 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 .bc-inner > span:not(.bc-sep){color:#0D1B2A !important;font-weight:900}
 .bc-sep{color:#4a5f78 !important;font-weight:800;font-size:16px}
 
-/* شريط هوية المحل */
+/* هيرو السلة — نفس لغة كتالوج المنتجات الفاخرة */
 .store-lux-strip{
-  position:relative;overflow:hidden;
+  position:relative;overflow:hidden;color:#fff;
+  min-height:clamp(220px,34vh,320px);
+  display:flex;align-items:flex-end;
   background:
-    radial-gradient(ellipse 900px 420px at 70% -20%,rgba(201,168,76,.22),transparent 55%),
-    linear-gradient(135deg,#06111C 0%,#0F2347 45%,#1B3A6B 100%);
-  border-bottom:1px solid rgba(201,168,76,.35);
-  color:#fff;
+    radial-gradient(ellipse 1100px 520px at 78% -8%,rgba(201,168,76,.28),transparent 58%),
+    radial-gradient(ellipse 900px 480px at 12% 110%,rgba(27,58,107,.55),transparent 55%),
+    linear-gradient(145deg,#040a12 0%,#0a1626 42%,#132a4a 100%);
+  border-bottom:1px solid rgba(201,168,76,.28);
+}
+.store-lux-strip .hero-photo{
+  position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+  background:#06111C center/cover no-repeat;
+}
+.store-lux-strip .hero-photo img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transform:scale(1.06);animation:rzCartHeroKen 26s ease-in-out infinite alternate;
+}
+@keyframes rzCartHeroKen{
+  from{transform:scale(1.04) translate3d(0,0,0)}
+  to{transform:scale(1.12) translate3d(-1.4%,-1%,0)}
+}
+@media (prefers-reduced-motion:reduce){
+  .store-lux-strip .hero-photo img{animation:none;transform:none}
+  .store-lux-shine,.store-lux-inner{animation:none!important}
+}
+.store-lux-strip .hero-photo::after{
+  content:'';position:absolute;inset:0;
+  background:
+    linear-gradient(105deg,rgba(4,10,18,.78) 0%,rgba(6,17,28,.38) 52%,rgba(4,10,18,.55) 100%),
+    linear-gradient(180deg,rgba(4,10,18,.08) 0%,rgba(4,10,18,.62) 100%);
+}
+.store-lux-strip.has-hero-photo{background:#06111C}
+.store-lux-veil{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(circle at 18% 30%,rgba(232,201,106,.12),transparent 42%),
+    radial-gradient(circle at 88% 70%,rgba(201,168,76,.1),transparent 38%);
+}
+.store-lux-shine{
+  position:absolute;inset:-20% -40%;z-index:1;pointer-events:none;
+  background:linear-gradient(115deg,transparent 40%,rgba(232,201,106,.14) 50%,transparent 60%);
+  animation:rzCartHeroShine 7.5s ease-in-out infinite;
+}
+@keyframes rzCartHeroShine{
+  0%,100%{transform:translateX(8%) rotate(8deg);opacity:.35}
+  50%{transform:translateX(-12%) rotate(8deg);opacity:.7}
 }
 .store-lux-inner{
-  max-width:1100px;margin:0 auto;padding:18px 16px;
-  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  position:relative;z-index:2;
+  max-width:1100px;width:100%;margin:0 auto;
+  padding:clamp(40px,6vh,72px) clamp(18px,4vw,28px) clamp(30px,4.5vh,48px);
+  display:flex;flex-direction:column;align-items:flex-start;gap:12px;
+  animation:rzCartHeroIn .7s ease both;
 }
-.store-lux-logo{
-  width:64px;height:64px;border-radius:18px;flex-shrink:0;
-  background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.45),rgba(27,58,107,.7));
-  border:2px solid rgba(201,168,76,.7);
-  box-shadow:0 0 0 4px rgba(201,168,76,.12),0 10px 22px rgba(0,0,0,.35);
-  display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;
+@keyframes rzCartHeroIn{
+  from{opacity:0;transform:translateY(18px)}
+  to{opacity:1;transform:none}
 }
-.store-lux-logo img{width:100%;height:100%;object-fit:cover;display:block}
-.store-lux-name{font-size:clamp(18px,2.6vw,24px);font-weight:900;letter-spacing:.2px;line-height:1.15;margin:0 0 4px}
-.store-lux-name span{background:linear-gradient(90deg,#E8C96A,#C9A84C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.store-lux-tag{font-size:12.5px;color:rgba(255,255,255,.72);line-height:1.5}
-.store-lux-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.store-lux-chip{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:5px 11px;border-radius:999px;font-size:11.5px;font-weight:800;
-  background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.35);color:#E8C96A;
-  text-decoration:none;
+.store-lux-kicker{
+  margin:0;font-size:11px;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:rgba(232,201,106,.78);
+}
+.store-lux-name{
+  font-size:clamp(34px,5.6vw,56px);font-weight:900;letter-spacing:.01em;
+  line-height:1.06;margin:0;max-width:16ch;position:relative;
+  color:#E8C96A;
+  text-shadow:0 2px 24px rgba(0,0,0,.45),0 0 40px rgba(201,168,76,.18);
+}
+.store-lux-name span{
+  color:#E8C96A;
+  background:linear-gradient(105deg,#F7E7B0 0%,#E8C96A 42%,#C9A84C 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.store-lux-name::after{
+  content:'';display:block;width:min(92px,28%);height:2px;margin-top:12px;
+  background:linear-gradient(90deg,rgba(232,201,106,.95),rgba(201,168,76,.15));
+  border-radius:2px;
+}
+[dir="ltr"] .store-lux-name::after{
+  background:linear-gradient(90deg,rgba(201,168,76,.15),rgba(232,201,106,.95));
+}
+.store-lux-tag{
+  margin:0;font-size:clamp(14px,1.7vw,16px);font-weight:500;
+  color:rgba(255,255,255,.82);line-height:1.55;max-width:42ch;
+}
+.store-lux-actions{
+  display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;margin-top:10px;
+}
+.store-lux-cta{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:44px;padding:10px 20px;
+  border-radius:12px;text-decoration:none;font-family:inherit;
+  font-size:14px;font-weight:800;color:#0D1B2A;
+  background:linear-gradient(135deg,#E8C96A,#C9A84C);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 10px 28px rgba(201,168,76,.28);
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.store-lux-cta:hover{
+  transform:translateY(-1px);
+  box-shadow:0 14px 32px rgba(201,168,76,.38);
+  color:#0D1B2A;
+}
+.store-lux-cta-ghost{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:44px;padding:10px 18px;border-radius:12px;text-decoration:none;
+  font-family:inherit;font-size:14px;font-weight:800;color:#E8C96A;
+  background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.4);
+  transition:background .2s ease, border-color .2s ease;
+}
+.store-lux-cta-ghost:hover{
+  background:rgba(201,168,76,.14);border-color:rgba(232,201,106,.65);color:#F3E0A6;
+}
+.store-lux-count{
+  font-size:13px;font-weight:700;color:rgba(255,255,255,.7);
+  letter-spacing:.02em;
+}
+.store-lux-logo{display:none!important}
+.store-lux-chip{display:none}
+#lux-count-chip.store-lux-count,
+.store-lux-count#lux-count-chip{display:inline}
+@media(max-width:768px){
+  .store-lux-strip{min-height:clamp(200px,32vh,260px)}
+  .store-lux-inner{padding:28px 16px 22px;gap:8px}
+  .store-lux-name{font-size:clamp(28px,8vw,36px);max-width:12ch}
+  .store-lux-tag{font-size:13.5px;max-width:none}
+  .store-lux-cta,.store-lux-cta-ghost{min-height:42px;padding:9px 16px;font-size:13.5px}
+  .store-lux-kicker{font-size:10px;letter-spacing:.14em}
 }
 .cart-item-img img{width:100%;height:100%;object-fit:cover;display:block;border-radius:inherit}
 
@@ -516,19 +622,21 @@ main, .page-content.active, .main-content, .results-area,
   </div>
 </div>
 
-<!-- هوية المحل -->
+<!-- هيرو السلة — كامل العرض -->
 <section class="store-lux-strip" id="store-lux-strip" aria-label="هوية المحل">
+  <div class="hero-photo" data-hero-photo aria-hidden="true"></div>
+  <div class="store-lux-veil" aria-hidden="true"></div>
+  <div class="store-lux-shine" aria-hidden="true"></div>
   <div class="store-lux-inner">
-    <div class="store-lux-logo" id="lux-store-logo">🏪</div>
-    <div style="flex:1;min-width:180px">
-      <div class="store-lux-name"><span id="lux-store-name">متجر النور</span></div>
-      <p class="store-lux-tag" id="lux-store-tag">سلة طلباتك — صورة المحل واسمه كما في الواجهة</p>
-      <div class="store-lux-meta">
-        <span class="store-lux-chip" id="lux-count-chip">0 منتج</span>
-        <a class="store-lux-chip" id="lux-back-store" href="rizq_store.html">↩ واجهة المحل</a>
-        <a class="store-lux-chip" id="lux-to-products" href="rizq_products.html">🛍 المنتجات</a>
-      </div>
+    <p class="store-lux-kicker" id="lux-store-kicker">رزق · سلة المشتريات</p>
+    <h1 class="store-lux-name"><span id="lux-store-name">متجر النور</span></h1>
+    <p class="store-lux-tag" id="lux-store-tag">راجع طلبك وأكمل التوصيل بخطوات واضحة</p>
+    <div class="store-lux-actions">
+      <a class="store-lux-cta" id="lux-back-store" href="rizq_store.html">واجهة المحل</a>
+      <a class="store-lux-cta-ghost" id="lux-to-products" href="rizq_products.html">المنتجات</a>
+      <span class="store-lux-count" id="lux-count-chip">0 في السلة</span>
     </div>
+    <div class="store-lux-logo" id="lux-store-logo" hidden aria-hidden="true">🏪</div>
   </div>
 </section>
 
@@ -894,8 +1002,8 @@ function autofillDeliveryFromAccount() {
   }
 }
 
-// روابط المحل/المنتجات + شريط الهوية
-(function bindStoreContext(){
+// روابط المحل/المنتجات + شريط الهوية (بعد defer لـ commerce إن أمكن)
+function bindStoreContext(){
   try{
     var params = new URLSearchParams(location.search);
     var storeId = params.get('id') || params.get('store') || params.get('showroom') || params.get('corp') || '';
@@ -923,16 +1031,33 @@ function autofillDeliveryFromAccount() {
       var demoShowroom = storeId === 'demo_showroom' || storeId === 'demo-corp-001'
         || (params.get('module') === 'showroom');
       if(demoShowroom){
-        acc = { name: fr ? 'Showroom Al-Riyada' : 'معرض الريادة', tagline: fr ? 'Panier showroom' : 'سلة المعرض', type: 'corp' };
+        acc = {
+          name: fr ? 'Showroom Al-Riyada' : 'معرض الريادة',
+          tagline: fr ? 'Vérifiez votre panier showroom et poursuivez la commande' : 'راجع سلة المعرض وأكمل الطلب بخطوات واضحة',
+          cover: 'rizq-assets/demo-heroes/showroom-appliances-promo.jpg',
+          thumb: 'rizq-assets/demo-heroes/showroom-appliances-promo.jpg',
+          type: 'corp'
+        };
         if(!storeId) storeId = 'demo-corp-001';
       } else {
-        acc = { name: fr ? 'Boutique Al-Nour' : 'متجر النور', tagline: fr ? 'Panier premium' : 'سلة طلباتك', type: 'store' };
+        acc = {
+          name: fr ? 'Boutique Al-Nour' : 'متجر النور',
+          tagline: fr ? 'Vérifiez votre commande et poursuivez la livraison' : 'راجع طلبك وأكمل التوصيل بخطوات واضحة',
+          cover: 'rizq-assets/demo-heroes/store-boutique-promo.jpg',
+          thumb: 'rizq-assets/demo-heroes/store-boutique-promo.jpg',
+          type: 'store'
+        };
         if(!storeId) storeId = 'demo_store';
       }
     }
     applyCartStoreBrand(acc || {}, storeId, fr);
   }catch(e){}
-})();
+}
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', bindStoreContext);
+} else {
+  bindStoreContext();
+}
 
 function _cartIsShowroomContext(acc, storeId){
   try{
@@ -957,21 +1082,56 @@ function applyCartStoreBrand(acc, storeId, fr){
     ? (fr ? 'Showroom Al-Riyada' : 'معرض الريادة')
     : (fr ? 'Boutique Al-Nour' : 'متجر النور'));
   var tag = (acc && (acc.tagline || acc.desc)) || (isShowroom
-    ? (fr ? 'Votre panier showroom — articles de ce showroom uniquement' : 'سلة المعرض — فقط ما أضفته من هذا المعرض')
-    : (fr ? 'Votre panier — articles de ce magasin uniquement' : 'سلة المحل — فقط ما أضفته من هذا المحل'));
+    ? (fr ? 'Vérifiez votre panier showroom et poursuivez la commande' : 'راجع سلة المعرض وأكمل الطلب بخطوات واضحة')
+    : (fr ? 'Vérifiez votre commande et poursuivez la livraison' : 'راجع طلبك وأكمل التوصيل بخطوات واضحة'));
   var luxName = document.getElementById('lux-store-name');
   var luxTag = document.getElementById('lux-store-tag');
+  var luxKicker = document.getElementById('lux-store-kicker');
   var luxLogo = document.getElementById('lux-store-logo');
+  var luxStrip = document.getElementById('store-lux-strip');
   var bcLink = document.getElementById('bc-store-link');
   var bcProd = document.getElementById('bc-products-link');
   var back = document.getElementById('lux-back-store');
   var toProd = document.getElementById('lux-to-products');
   if(luxName) luxName.textContent = name;
   if(luxTag) luxTag.textContent = tag;
-  if(window.RizqStoreCommerce) RizqStoreCommerce.setLogo(luxLogo, acc && acc.thumb, isShowroom ? '🏛️' : '🏪');
-  else if(luxLogo && acc && acc.thumb){
-    var t = String(acc.thumb).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
-    luxLogo.innerHTML = '<img src="'+t+'" alt=""/>';
+  if(luxKicker){
+    luxKicker.textContent = isShowroom
+      ? (fr ? 'Rizq · Panier showroom' : 'رزق · سلة المعرض')
+      : (fr ? 'Rizq · Panier' : 'رزق · سلة المشتريات');
+  }
+  var cover = (acc && (acc.cover || acc.thumb || acc.hero || acc.image)) || '';
+  if(!cover){
+    cover = isShowroom
+      ? 'rizq-assets/demo-heroes/showroom-appliances-promo.jpg'
+      : 'rizq-assets/demo-heroes/store-boutique-promo.jpg';
+  }
+  if(window.RizqStoreCommerce){
+    RizqStoreCommerce.setLogo(luxLogo, acc && (acc.thumb || acc.cover), isShowroom ? '🏛️' : '🏪');
+    RizqStoreCommerce.setHeroPhoto(luxStrip, cover);
+  } else {
+    if(luxLogo && (acc && (acc.thumb || acc.cover))){
+      var t = String(acc.thumb || acc.cover).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+      luxLogo.innerHTML = '<img src="'+t+'" alt=""/>';
+    }
+    /* احتياطي قبل تحميل commerce.js (defer) */
+    if(luxStrip && cover && !/javascript:/i.test(cover)){
+      var slot = luxStrip.querySelector('.hero-photo') || luxStrip.querySelector('[data-hero-photo]');
+      if(slot){
+        slot.hidden = false;
+        luxStrip.classList.add('has-hero-photo');
+        slot.style.backgroundImage = 'url("' + String(cover).replace(/\\/g,'\\\\').replace(/"/g,'\\"') + '")';
+        slot.style.backgroundSize = 'cover';
+        slot.style.backgroundPosition = 'center';
+        if(!slot.querySelector('img')){
+          var img = document.createElement('img');
+          img.alt = '';
+          img.src = cover;
+          img.decoding = 'async';
+          slot.appendChild(img);
+        }
+      }
+    }
   }
   var storeHref, productsHref;
   if(isShowroom){
@@ -980,8 +1140,8 @@ function applyCartStoreBrand(acc, storeId, fr){
       : 'rizq_landing_v8.html#rzq-disc-corp';
     productsHref = storeHref + '#catalog-section';
     if(bcLink) bcLink.setAttribute('data-t-fr', 'Showroom');
-    if(back) back.textContent = fr ? '↩ Vitrine showroom' : '↩ واجهة المعرض';
-    if(toProd) toProd.textContent = fr ? '🛍 Catalogue' : '🛍 العروض';
+    if(back) back.textContent = fr ? 'Vitrine showroom' : 'واجهة المعرض';
+    if(toProd) toProd.textContent = fr ? 'Catalogue' : 'العروض';
   } else {
     storeHref = storeId && storeId !== 'demo_store'
       ? ('rizq_store.html?id=' + encodeURIComponent(storeId))
@@ -989,6 +1149,8 @@ function applyCartStoreBrand(acc, storeId, fr){
     productsHref = storeId
       ? ('rizq_products.html?id=' + encodeURIComponent(storeId))
       : 'rizq_products.html';
+    if(back) back.textContent = fr ? 'Vitrine du magasin' : 'واجهة المحل';
+    if(toProd) toProd.textContent = fr ? 'Produits' : 'المنتجات';
   }
   if(bcLink){ bcLink.textContent = name; bcLink.href = storeHref; }
   if(bcProd) bcProd.href = productsHref;
