@@ -79,11 +79,13 @@
     s.id = 'rzq-doc-upload-css';
     s.textContent =
       '#rf-doc-upload.rzq-doc-zone{'
-      + 'position:relative;overflow:hidden;flex:1 1 210px;margin:0;padding:12px 12px 11px;'
+      + 'position:relative;overflow:visible;flex:1 1 100%;width:100%;max-width:100%;'
+      + 'box-sizing:border-box;margin:0;padding:12px 12px 11px;'
       + 'border-radius:14px;border:1.5px solid rgba(201,168,76,.38);'
       + 'background:linear-gradient(145deg,#fffdf7 0%,#f7f9fc 55%,#eef3fb 100%);'
       + 'box-shadow:0 6px 18px rgba(15,35,71,.06);transition:border-color .2s,box-shadow .2s,transform .15s'
       + '}'
+      + '#rf-doc-upload .rzq-doc-pick{max-width:100%;width:auto;white-space:normal}'
       + '#rf-doc-upload.rzq-doc-zone::before{'
       + 'content:"";position:absolute;inset:0 auto 0 0;width:4px;'
       + 'background:linear-gradient(180deg,#C9A84C,#E8C96A,#1B3A6B)'
