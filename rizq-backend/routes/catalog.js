@@ -82,6 +82,18 @@ function mountCatalogRoutes(app, deps) {
       descFr: String(b.descFr || '').slice(0, 3000),
       stock: String(b.stock || '').slice(0, 20),
       variants: String(b.variants || '').slice(0, 300),
+      sizeStock: (function () {
+        if (!b.sizeStock || typeof b.sizeStock !== 'object' || Array.isArray(b.sizeStock)) return null;
+        var out = {};
+        var keys = Object.keys(b.sizeStock).slice(0, 40);
+        keys.forEach(function (k) {
+          var key = String(k || '').trim().slice(0, 40);
+          if (!key) return;
+          var n = Number(b.sizeStock[k]);
+          out[key] = Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+        });
+        return Object.keys(out).length ? out : null;
+      })(),
       sku: String(b.sku || '').slice(0, 64),
       unit: String(b.unit || '').slice(0, 40),
       images: catImages,
@@ -153,6 +165,18 @@ function mountCatalogRoutes(app, deps) {
       const max = (k === 'desc' || k === 'descFr') ? 3000 : (k === 'variants' ? 300 : (k === 'sku' ? 64 : (k === 'unit' ? 40 : (k === 'topicId' ? 48 : (k === 'cat' ? 80 : 200)))));
       item[k] = b[k].slice(0, max);
     });
+    if (b.sizeStock === null) {
+      item.sizeStock = null;
+    } else if (b.sizeStock && typeof b.sizeStock === 'object' && !Array.isArray(b.sizeStock)) {
+      var outSs = {};
+      Object.keys(b.sizeStock).slice(0, 40).forEach(function (k) {
+        var key = String(k || '').trim().slice(0, 40);
+        if (!key) return;
+        var n = Number(b.sizeStock[k]);
+        outSs[key] = Number.isFinite(n) ? Math.max(0, Math.floor(n)) : 0;
+      });
+      item.sizeStock = Object.keys(outSs).length ? outSs : null;
+    }
     // لا نسمح للمالك بتضخيم sold — للأدمن فقط
     if (isAdmin && typeof b.sold !== 'undefined' && Number.isFinite(Number(b.sold))) item.sold = Number(b.sold);
     if (Array.isArray(b.images)) {

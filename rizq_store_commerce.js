@@ -117,6 +117,14 @@
     }
     if (p.unit != null) p.unit = String(p.unit).slice(0, 40);
     if (p.sku != null) p.sku = String(p.sku).slice(0, 64);
+    if (global.RizqStock && typeof RizqStock.normalizeSizeStock === 'function') {
+      var ss = RizqStock.normalizeSizeStock(p.sizeStock);
+      if (ss) {
+        p.sizeStock = ss;
+        var sum = RizqStock.sumSizeStock(ss);
+        if (sum != null && (p.stock == null || String(p.stock).trim() === '')) p.stock = sum;
+      }
+    }
     return p;
   }
 
@@ -142,6 +150,9 @@
       desc: desc,
       descF: descF,
       stock: p.stock,
+      sizeStock: (global.RizqStock && RizqStock.normalizeSizeStock)
+        ? (RizqStock.normalizeSizeStock(p.sizeStock) || null)
+        : (p.sizeStock || null),
       variants: p.variants || '',
       unit: p.unit || '',
       sku: p.sku || '',
@@ -697,16 +708,28 @@
     return root;
   }
 
-  function stockBadge(p, fr) {
+  function stockBadge(p, fr, selected) {
     var info = null;
-    if (global.RizqStock && typeof RizqStock.buyerLabel === 'function') {
+    if (global.RizqStock && typeof RizqStock.buyerLabelForSelection === 'function') {
+      info = RizqStock.buyerLabelForSelection(p, selected || _pdState.selected || {}, fr);
+    } else if (global.RizqStock && typeof RizqStock.buyerLabel === 'function') {
       info = RizqStock.buyerLabel(p.stock, fr);
     }
-    if (info) return '<span class="rzq-pd-badge ' + esc(info.level || 'in') + '">' + esc(info.text) + '</span>';
-    if (p.stock != null && String(p.stock).trim() !== '') {
-      return '<span class="rzq-pd-badge in">' + esc(String(p.stock)) + '</span>';
+    if (info) {
+      return '<span class="rzq-pd-badge ' + esc(info.level || 'in') + '" id="rzq-pd-stock-badge">'
+        + esc(info.text) + '</span>';
     }
-    return '<span class="rzq-pd-badge in">' + (fr ? 'En stock' : 'موجود في الاستوك') + '</span>';
+    if (p.stock != null && String(p.stock).trim() !== '') {
+      return '<span class="rzq-pd-badge in" id="rzq-pd-stock-badge">' + esc(String(p.stock)) + '</span>';
+    }
+    return '<span class="rzq-pd-badge in" id="rzq-pd-stock-badge">' + (fr ? 'En stock' : 'موجود في الاستوك') + '</span>';
+  }
+
+  function optionStockMeta(p, value) {
+    if (!global.RizqStock || !RizqStock.hasSizeStock(p)) return { qty: null, oos: false };
+    var q = RizqStock.sizeQty(p, value);
+    if (q == null) return { qty: null, oos: false };
+    return { qty: q, oos: q <= 0 };
   }
 
   function renderDetailHtml(p, opts) {
@@ -744,11 +767,22 @@
           + '<div class="rzq-pd-variant-opts" role="listbox" aria-label="' + esc(g.label) + '">'
           + (g.options || []).map(function (o) {
             var on = String(o.value) === String(cur);
-            return '<button type="button" class="rzq-pd-vopt' + (on ? ' is-selected' : '') + '"'
+            var meta = optionStockMeta(p, o.value);
+            var oos = !!meta.oos;
+            var qtyHint = (meta.qty != null && meta.qty > 0 && meta.qty <= 5)
+              ? (' <span class="rzq-pd-vopt-qty">' + meta.qty + '</span>')
+              : '';
+            return '<button type="button" class="rzq-pd-vopt'
+              + (on ? ' is-selected' : '')
+              + (oos ? ' is-oos' : '') + '"'
               + ' data-vgroup="' + esc(g.key) + '" data-vval="' + esc(o.value) + '"'
+              + (oos ? ' disabled aria-disabled="true" title="' + (fr ? 'Rupture' : 'غير متوفر') + '"' : '')
               + ' aria-pressed="' + (on ? 'true' : 'false') + '"'
-              + ' onclick="RizqStoreCommerce.selectVariant(' + JSON.stringify(String(g.key)) + ',' + JSON.stringify(String(o.value)) + ')">'
-              + esc(o.label) + '</button>';
+              + (oos ? '' : (' onclick="RizqStoreCommerce.selectVariant(' + JSON.stringify(String(g.key)) + ',' + JSON.stringify(String(o.value)) + ')"'))
+              + '>'
+              + '<span class="rzq-pd-vopt-lab">' + esc(o.label) + '</span>'
+              + qtyHint
+              + '</button>';
           }).join('')
           + '</div></div>';
       }).join('');
@@ -829,7 +863,7 @@
       + '<div><div class="rzq-pd-price">' + esc(priceTxt)
       + (oldTxt ? '<span class="rzq-pd-price-old">' + esc(oldTxt) + '</span>' : '')
       + '</div><div class="rzq-pd-period">' + esc(pricePeriod) + '</div></div>'
-      + stockBadge(p, fr)
+      + stockBadge(p, fr, selected)
       + '</div>'
       + variantsHtml
       + (showCart
@@ -860,7 +894,12 @@
       + '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">📂</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Catégorie' : 'الفئة') + '</div><div class="rzq-pd-spec-val">' + esc(cat) + '</div></div></div>'
       + '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">💰</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Prix' : 'السعر') + '</div><div class="rzq-pd-spec-val">' + esc(priceTxt) + '</div></div></div>'
       + '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">🏪</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Magasin' : 'المحل') + '</div><div class="rzq-pd-spec-val">' + esc(storeName) + '</div></div></div>'
-      + '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">📦</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Disponibilité' : 'التوفر') + '</div><div class="rzq-pd-spec-val">' + esc((global.RizqStock && RizqStock.buyerLabel) ? (RizqStock.buyerLabel(p.stock, fr) || {}).text || (fr ? 'En stock' : 'متوفر') : (fr ? 'En stock' : 'متوفر')) + '</div></div></div>'
+      + '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">📦</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Disponibilité' : 'التوفر') + '</div><div class="rzq-pd-spec-val" id="rzq-pd-stock-spec">' + esc((function () {
+        var info = (global.RizqStock && RizqStock.buyerLabelForSelection)
+          ? RizqStock.buyerLabelForSelection(p, selected, fr)
+          : (global.RizqStock && RizqStock.buyerLabel ? RizqStock.buyerLabel(p.stock, fr) : null);
+        return (info && info.text) || (fr ? 'En stock' : 'متوفر');
+      })()) + '</div></div></div>'
       + (p.unit ? '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">⚖</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Unité' : 'الوحدة') + '</div><div class="rzq-pd-spec-val">' + esc(p.unit) + '</div></div></div>' : '')
       + (variantSelectionLabel(groups, selected, fr)
         ? '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">📏</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Choix' : 'اختيارك') + '</div><div class="rzq-pd-spec-val">' + esc(variantSelectionLabel(groups, selected, fr)) + '</div></div></div>'
@@ -914,10 +953,23 @@
       if (g0) _pdState.selected[g0.key] = String(opts.selectedVariant);
     }
     _pdState.variantGroups.forEach(function (g) {
-      if (!_pdState.selected[g.key] && g.options && g.options[0]) {
-        _pdState.selected[g.key] = String(g.options[0].value);
+      if (_pdState.selected[g.key]) {
+        /* إن كان الاختيار المحفوظ نافذاً اتركه؛ وإلا اختر أول متوفر */
+        var metaSel = optionStockMeta(p, _pdState.selected[g.key]);
+        if (!metaSel.oos) return;
       }
+      var pick = null;
+      (g.options || []).forEach(function (o) {
+        if (pick) return;
+        var meta = optionStockMeta(p, o.value);
+        if (!meta.oos) pick = String(o.value);
+      });
+      if (pick) _pdState.selected[g.key] = pick;
+      else if (g.options && g.options[0]) _pdState.selected[g.key] = String(g.options[0].value);
     });
+    /* حد الكمية حسب مخزون القياس المختار */
+    var maxQ = selectedSizeMaxQty(p, _pdState.selected);
+    if (maxQ != null) _pdState.qty = Math.max(1, Math.min(_pdState.qty, Math.max(1, maxQ) || 1));
     _pdState.similar = catalog.filter(function (x) {
       return String(x.id) !== String(p.id) && (!p.cat || x.cat === p.cat);
     });
@@ -933,10 +985,58 @@
     return true;
   }
 
+  function selectedSizeMaxQty(p, selected) {
+    if (!p || !global.RizqStock || !RizqStock.hasSizeStock(p)) {
+      var total = global.RizqStock ? RizqStock.parse(p && p.stock) : null;
+      return total;
+    }
+    var sizeVal = selected && (selected.size || selected.weight || selected.volume
+      || selected.storage || selected.option || selected[Object.keys(selected || {})[0]]);
+    var q = RizqStock.sizeQty(p, sizeVal);
+    return q;
+  }
+
+  function refreshStockUi() {
+    var p = _pdState.product;
+    var opts = _pdState.opts || {};
+    var fr = !!opts.fr;
+    if (!p) return;
+    var info = (global.RizqStock && RizqStock.buyerLabelForSelection)
+      ? RizqStock.buyerLabelForSelection(p, _pdState.selected || {}, fr)
+      : null;
+    var badge = document.getElementById('rzq-pd-stock-badge');
+    if (badge && info) {
+      badge.className = 'rzq-pd-badge ' + (info.level || 'in');
+      badge.textContent = info.text;
+    }
+    var spec = document.getElementById('rzq-pd-stock-spec');
+    if (spec && info) spec.textContent = info.text;
+    var maxQ = selectedSizeMaxQty(p, _pdState.selected);
+    if (maxQ != null && maxQ >= 0 && (_pdState.qty || 1) > maxQ) {
+      _pdState.qty = Math.max(1, maxQ || 1);
+      var qEl = document.getElementById('rzq-pd-qty');
+      if (qEl) qEl.textContent = _pdState.qty;
+      var t = document.getElementById('rzq-pd-total');
+      if (t) {
+        var pn = parsePriceNum(p.price);
+        t.textContent = pn > 0 ? ((pn * _pdState.qty).toLocaleString('en-US') + ' MRU') : '—';
+      }
+    }
+  }
+
   function selectVariant(groupKey, value) {
     if (!_pdState.selected) _pdState.selected = {};
     groupKey = String(groupKey);
     value = String(value);
+    var p = _pdState.product;
+    var meta = optionStockMeta(p, value);
+    if (meta.oos) {
+      var fr = !!( _pdState.opts && _pdState.opts.fr);
+      if (typeof global.showToast === 'function') {
+        global.showToast(fr ? '❌ Cette taille est épuisée' : '❌ هذا القياس غير متوفر');
+      }
+      return;
+    }
     _pdState.selected[groupKey] = value;
     var root = document.getElementById('rzq-pd-root');
     if (!root) return;
@@ -952,6 +1052,7 @@
       var opt = g && (g.options || []).find(function (o) { return String(o.value) === value; });
       lab.textContent = opt ? opt.label : value;
     }
+    refreshStockUi();
   }
 
   function closeProductDetail() {
@@ -1081,7 +1182,14 @@
   }
 
   function changeQty(delta) {
-    _pdState.qty = Math.max(1, Math.min(99, (_pdState.qty || 1) + delta));
+    var max = 99;
+    var sizeMax = selectedSizeMaxQty(_pdState.product, _pdState.selected);
+    if (sizeMax != null) max = Math.max(0, Math.min(99, sizeMax));
+    if (max <= 0) {
+      _pdState.qty = 1;
+    } else {
+      _pdState.qty = Math.max(1, Math.min(max, (_pdState.qty || 1) + delta));
+    }
     var q = document.getElementById('rzq-pd-qty');
     var t = document.getElementById('rzq-pd-total');
     if (q) q.textContent = _pdState.qty;
@@ -1103,6 +1211,25 @@
         if (typeof global.showToast === 'function') global.showToast('❌ ' + msg);
         return;
       }
+      var meta = optionStockMeta(p, selected[groups[i].key]);
+      if (meta.oos) {
+        if (typeof global.showToast === 'function') {
+          global.showToast(opts.fr ? '❌ Cette option est épuisée' : '❌ هذا الخيار غير متوفر');
+        }
+        return;
+      }
+    }
+    var sizeMax = selectedSizeMaxQty(p, selected);
+    var qty = _pdState.qty || 1;
+    if (sizeMax != null && sizeMax <= 0) {
+      if (typeof global.showToast === 'function') {
+        global.showToast(opts.fr ? '❌ Rupture de stock' : '❌ نفذ من المخزون');
+      }
+      return;
+    }
+    if (sizeMax != null && qty > sizeMax) {
+      qty = sizeMax;
+      _pdState.qty = qty;
     }
     var selection = {
       selected: selected,
@@ -1111,7 +1238,7 @@
       groups: groups
     };
     if (typeof opts.onAdd === 'function') {
-      opts.onAdd(p, _pdState.qty || 1, selection);
+      opts.onAdd(p, qty, selection);
     }
     closeProductDetail();
   }
