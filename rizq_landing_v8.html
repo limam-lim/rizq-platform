@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-rizq-strip="22.1">
+<html lang="ar" dir="rtl" data-rizq-strip="22.6">
 <head>
   <meta charset="UTF-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -1457,8 +1457,8 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
 
 /* ── الموضع الثاني: شريط بطاقات بعرض شبكة «أبرز العروض» (1200px) ── */
 .rizq-vid-strip{
-  width:min(1200px,calc(100vw - 32px))!important;
-  max-width:min(1200px,calc(100vw - 32px))!important;
+  width:min(1280px,calc(100vw - 24px))!important;
+  max-width:min(1280px,calc(100vw - 24px))!important;
   margin:10px auto 8px;padding:8px 0 4px;
   background:transparent;border:none;border-radius:0;
   box-shadow:none;position:relative;z-index:20;
@@ -1507,22 +1507,22 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   font-family:'Cairo','Segoe UI',sans-serif;
 }
 .rizq-vid-strip-track{
-  display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;
+  display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;
   scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
   padding:2px 0 8px;scrollbar-width:thin;
 }
 .rizq-vid-strip-track::-webkit-scrollbar{height:6px}
 .rizq-vid-strip-track::-webkit-scrollbar-thumb{background:rgba(27,58,107,.25);border-radius:6px}
-/* 7 بطاقات أكبر ظاهرة بعرض listings (1200px) */
+/* 6 بطاقات أكبر ظاهرة بعرض الشريط (1280px) — فجوات 5×10px */
 .rizq-vcard{
-  flex:0 0 calc((100% - 72px) / 7);scroll-snap-align:start;min-width:0;
-  display:flex;flex-direction:column;gap:7px;cursor:pointer;
+  flex:0 0 calc((100% - 50px) / 6);scroll-snap-align:start;min-width:0;
+  display:flex;flex-direction:column;gap:6px;cursor:pointer;
 }
 .rizq-vcard-thumb{
-  position:relative;aspect-ratio:9/16;border-radius:14px;overflow:hidden;
+  position:relative;aspect-ratio:9/16;border-radius:16px;overflow:hidden;
   background:linear-gradient(160deg,#1B3A6B,#0D1B2A);
   border:1px solid rgba(13,27,42,.12);
-  box-shadow:0 8px 18px rgba(13,27,42,.12);
+  box-shadow:0 10px 22px rgba(13,27,42,.14);
 }
 .rizq-vcard-thumb video{
   width:100%;height:100%;object-fit:cover;display:block;background:#0a1525;
@@ -1540,9 +1540,9 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
 }
 .rizq-vcard-play{
   position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;
-  width:40px;height:40px;border-radius:50%;border:none;pointer-events:none;
-  background:#e11d48;color:#fff;font-size:14px;
-  display:grid;place-items:center;box-shadow:0 6px 16px rgba(185,28,28,.4);
+  width:48px;height:48px;border-radius:50%;border:none;pointer-events:none;
+  background:#e11d48;color:#fff;font-size:16px;
+  display:grid;place-items:center;box-shadow:0 8px 18px rgba(185,28,28,.42);
   transition:opacity .2s,transform .2s;
 }
 .rizq-vcard.is-playing .rizq-vcard-play{opacity:0;transform:translate(-50%,-50%) scale(.8);pointer-events:none}
@@ -1578,14 +1578,58 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   background:rgba(201,168,76,.82);border-color:rgba(255,255,255,.5);color:#0f2347;font-size:13px;
 }
 .rizq-vcard-act--fs:hover .rizq-vcard-act-ico{filter:brightness(1.08);background:rgba(201,168,76,.95)}
-.rizq-vcard-act--contact .rizq-vcard-act-ico{
-  background:#2563eb;border-color:rgba(255,255,255,.4);font-size:12px;
-}
-.rizq-vcard-act--contact:hover .rizq-vcard-act-ico{filter:brightness(1.08);background:#1d4ed8}
 .rizq-vcard-act-lbl{
   font-size:8px;font-weight:800;line-height:1;text-align:center;
   text-shadow:0 1px 3px rgba(0,0,0,.65);max-width:44px;
 }
+/* جهات اتصال فوق الفيديو — تحت الوسط، بهدوء فوق الإعلان */
+.rizq-vcard-thumb .rizq-vcard-contacts,
+.rizq-vcard-thumb .rzq-adx-actions{
+  position:absolute;left:50%;top:58%;
+  transform:translate(-50%,0);
+  z-index:5;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:auto;max-width:calc(100% - 52px);
+  margin:0;padding:6px 10px;
+  border-radius:999px;
+  background:rgba(8,16,28,.42);
+  border:1px solid rgba(255,255,255,.18);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 8px 20px rgba(0,0,0,.28);
+  pointer-events:auto;
+}
+.rizq-vcard-thumb .rizq-vcard-tel,
+.rizq-vcard-thumb .rizq-vcard-wa,
+.rizq-vcard-thumb .rzq-adx-tel,
+.rizq-vcard-thumb .rzq-adx-wa{
+  width:30px;height:30px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;padding:0;flex-shrink:0;text-decoration:none;
+  transition:transform .2s,background .2s,border-color .2s,box-shadow .2s,filter .2s;
+  font-size:12px;line-height:1;
+}
+.rizq-vcard-thumb .rizq-vcard-tel,
+.rizq-vcard-thumb .rzq-adx-tel{
+  background:rgba(18,36,63,.92);border:1px solid rgba(201,168,76,.7);
+  color:#E8C96A;box-shadow:0 3px 10px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.1);
+}
+.rizq-vcard-thumb .rizq-vcard-tel:hover,
+.rizq-vcard-thumb .rzq-adx-tel:hover{
+  background:rgba(201,168,76,.28);border-color:#E8C96A;transform:scale(1.07);
+}
+.rizq-vcard-thumb .rizq-vcard-wa,
+.rizq-vcard-thumb .rzq-adx-wa{
+  background:linear-gradient(145deg,#25D366,#128C7E);
+  border:1px solid rgba(255,255,255,.28);color:#fff;
+  box-shadow:0 3px 10px rgba(18,140,126,.4);
+}
+.rizq-vcard-thumb .rizq-vcard-wa:hover,
+.rizq-vcard-thumb .rzq-adx-wa:hover{transform:scale(1.07);filter:brightness(1.08)}
+.rizq-vcard-thumb .rizq-vcard-contacts svg,
+.rizq-vcard-thumb .rzq-adx-actions svg{width:13px;height:13px;display:block;flex-shrink:0}
+.rizq-vcard-contact-lbl{display:none}
+/* أبعد عنوان الفيديو قليلاً حتى لا يتراكب مع جهات الاتصال */
+.rizq-vcard-thumb .rizq-vcard-cap{bottom:8px;max-width:calc(100% - 24px);opacity:.92}
 /* تكبير البطاقة — نافذة كبيرة فوق الصفحة */
 .rizq-vstrip-lb{
   position:fixed;inset:0;z-index:10050;display:none;
@@ -1650,7 +1694,13 @@ body.rizq-vstrip-lb-on{overflow:hidden}
   }
   .rizq-vid-strip{margin:6px auto 0;padding:6px 0 2px;border-radius:0;background:transparent;box-shadow:none;border:none}
   .rizq-vid-strip-hint{display:none}
-  .rizq-vcard{flex-basis:min(168px,52vw)}
+  .rizq-vcard{flex-basis:min(210px,58vw)}
+  .rizq-vcard-thumb .rizq-vcard-contacts,
+  .rizq-vcard-thumb .rzq-adx-actions{top:56%;bottom:auto;padding:5px 8px;gap:8px}
+  .rizq-vcard-thumb .rizq-vcard-tel,
+  .rizq-vcard-thumb .rizq-vcard-wa,
+  .rizq-vcard-thumb .rzq-adx-tel,
+  .rizq-vcard-thumb .rzq-adx-wa{width:28px;height:28px}
   .rizq-vid-strip-btn{padding:6px 10px;font-size:11.5px}
 }
 
@@ -4149,23 +4199,24 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   margin:0 0 6px;min-width:0
 }
 .rizq-style-brand-row .rzq-brand-logo-name.is-stack{
-  display:inline-flex;flex-direction:column;align-items:center;gap:4px;min-width:0
+  /* صف أفقي داخل البطاقة — يقلّل فراغ المعلومات لصالح الصورة */
+  display:inline-flex;flex-direction:row;align-items:center;gap:6px;min-width:0;max-width:100%
 }
 .rizq-style-brand-row .rzq-brand-logo-name.is-inline{
-  display:inline-flex;flex-direction:row;align-items:center;gap:8px;min-width:0;max-width:100%
+  display:inline-flex;flex-direction:row;align-items:center;gap:6px;min-width:0;max-width:100%
 }
 .rizq-style-brand-row .rzq-brand-logo-name-img{
-  width:36px;height:36px;border-radius:10px;flex-shrink:0;display:block;
+  width:28px;height:28px;border-radius:8px;flex-shrink:0;display:block;
   background:#fff;border:1px solid rgba(15,35,71,.1);
   box-shadow:0 1px 4px rgba(15,35,71,.08);object-fit:contain
 }
 .rizq-style-brand-row .rzq-brand-logo-name-main{
-  font-size:12px;font-weight:800;letter-spacing:0;text-transform:none;
-  color:#111;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;
-  padding-bottom:1px
+  font-size:11px;font-weight:800;letter-spacing:0;text-transform:none;
+  color:#111;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;
+  padding-bottom:0
 }
 .rizq-style-brand-row .rzq-brand-logo-name-sub{
-  font-size:10.5px;font-weight:600;color:#5b6b85;line-height:1.35;
+  font-size:9.5px;font-weight:600;color:#5b6b85;line-height:1.2;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap
 }
 
@@ -4211,12 +4262,11 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   color:#5b6b85;font-size:13.5px;line-height:1.7;
   background:rgba(27,58,107,.04);border:1.5px dashed rgba(27,58,107,.18);border-radius:14px
 }
-/* بطاقات أنماط الأزياء + أنماط المعارض — أصغر + حواف ذهبية + جسم أبيض ناصع */
+/* بطاقات أنماط الأزياء + أنماط المعارض — صورة أكبر + معلومات مضغوطة */
 .rizq-style-card{
   display:flex;flex-direction:column;
-  width:220px;min-width:220px;max-width:220px;
-  flex:0 0 220px;
-  /* ارتفاع يكفي للماركة + عنوان سطرين + وصف واضح بدون قصّ الحروف */
+  width:232px;min-width:232px;max-width:232px;
+  flex:0 0 232px;
   min-height:348px;
   height:348px;
   background:#ffffff!important;
@@ -4230,12 +4280,12 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   transition:transform .32s cubic-bezier(.23,1,.32,1),box-shadow .32s,border-color .32s;
   cursor:default;
 }
-.rizq-style-card .rizq-style-body{flex:1 1 auto;min-height:0;overflow:visible}
+.rizq-style-card .rizq-style-body{flex:0 0 auto;min-height:0;overflow:visible}
 .rizq-style-card .rizq-style-brand-row{
-  min-height:48px;height:48px;margin:0 0 6px;overflow:visible;
+  min-height:0;height:auto;margin:0 0 2px;overflow:visible;
   display:flex;align-items:center;justify-content:flex-start;flex-shrink:0
 }
-.rizq-style-card .rizq-style-cta{margin-top:auto;flex-shrink:0}
+.rizq-style-card .rizq-style-cta{margin-top:4px;flex-shrink:0}
 .rizq-style-card::after{
   content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;
   background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.35) 48%,transparent 62%);
@@ -4253,7 +4303,9 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   grid-template-columns:1.35fr 1fr;
   grid-template-rows:1fr 1fr;
   gap:2px;
-  height:132px;
+  flex:1 1 auto;
+  min-height:228px;
+  height:auto;
   background:
     radial-gradient(circle at 25% 20%,rgba(201,168,76,.2),transparent 45%),
     linear-gradient(160deg,#102038,#0a1628);
@@ -4310,42 +4362,41 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   .rizq-style-tile{animation:none}
 }
 .rizq-style-body{
-  padding:10px 12px 12px;display:flex;flex-direction:column;gap:5px;flex:1;
+  padding:5px 9px 7px;display:flex;flex-direction:column;gap:1px;flex:0 0 auto;
   background:#ffffff!important;
   min-height:0;
 }
 .rizq-style-badge{
   display:inline-flex;align-self:flex-start;flex-shrink:0;
-  font-size:10px;font-weight:800;letter-spacing:.2px;
+  font-size:9px;font-weight:800;letter-spacing:.2px;
   color:var(--royal,#1B3A6B);background:#ffffff;
-  border:1px solid rgba(27,58,107,.16);border-radius:10px;padding:3px 8px;margin-bottom:0;
-  line-height:1.35
+  border:1px solid rgba(27,58,107,.16);border-radius:8px;padding:1px 6px;margin-bottom:0;
+  line-height:1.25
 }
 .rizq-style-card[data-sty-gender="women"] .rizq-style-badge{
   color:#6b2d4a;background:#ffffff;border-color:rgba(107,45,74,.28)
 }
 .rizq-style-name{
-  font-size:13.5px;font-weight:800;color:var(--royal,#1B3A6B);
-  /* خط عربي أوضح — يمنع قصّ الحروف السفلية */
-  line-height:1.5;
-  max-height:calc(1.5em * 2);
+  font-size:12.5px;font-weight:800;color:var(--royal,#1B3A6B);
+  line-height:1.3;
+  max-height:calc(1.3em * 2);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   word-break:break-word;overflow-wrap:anywhere;
-  padding-bottom:1px
+  padding-bottom:0
 }
 .rizq-style-meta{
-  font-size:11.5px;color:#3d4f66;line-height:1.5;
-  max-height:calc(1.5em * 2);
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  font-size:10.5px;color:#3d4f66;line-height:1.25;
+  max-height:1.25em;
+  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;
   word-break:break-word;overflow-wrap:anywhere;
-  padding-bottom:1px
+  padding-bottom:0
 }
 .rizq-style-cta{
-  margin-top:auto;padding-top:8px;
-  font-size:12px;font-weight:700;color:var(--gold-dk,#8a6f2a);
+  margin-top:2px;padding-top:2px;
+  font-size:11px;font-weight:700;color:var(--gold-dk,#8a6f2a);
   display:inline-flex;align-items:center;gap:3px;
   text-decoration:none;cursor:pointer;align-self:flex-start;
-  position:relative;z-index:1;line-height:1.4;
+  position:relative;z-index:1;line-height:1.25;
 }
 .rizq-style-cta:hover{color:var(--gold,#C9A84C);text-decoration:none}
 .rizq-style-cta:focus-visible{outline:2px solid rgba(201,168,76,.75);outline-offset:2px;border-radius:4px}
@@ -4388,21 +4439,22 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   }
   .rizq-styles-empty{font-size:12px;padding:18px 12px}
   .rizq-style-card{
-    width:168px!important;min-width:168px!important;max-width:168px!important;
-    flex:0 0 168px!important;
+    width:176px!important;min-width:176px!important;max-width:176px!important;
+    flex:0 0 176px!important;
     min-height:300px!important;height:300px!important;
     border-radius:10px;
     box-shadow:0 4px 14px rgba(13,27,42,.08);
   }
   .rizq-style-card:hover{transform:none;box-shadow:0 4px 14px rgba(13,27,42,.08)}
-  .rizq-style-mosaic{height:100px;gap:2px}
+  .rizq-style-mosaic{min-height:188px;height:auto;flex:1 1 auto;gap:2px}
   .rizq-style-tile{font-size:18px}
   .rizq-style-tile:first-child{font-size:26px}
-  .rizq-style-body{padding:8px 9px 10px;gap:4px}
-  .rizq-style-badge{font-size:9px;padding:2px 6px;margin-bottom:0}
-  .rizq-style-name{font-size:12px;font-weight:800;line-height:1.45;-webkit-line-clamp:2}
-  .rizq-style-meta{font-size:10.5px;line-height:1.45;-webkit-line-clamp:2;display:-webkit-box}
-  .rizq-style-cta{font-size:11px;padding-top:6px}
+  .rizq-style-body{padding:5px 8px 7px;gap:2px;flex:0 0 auto}
+  .rizq-style-badge{font-size:8.5px;padding:1px 5px;margin-bottom:0}
+  .rizq-style-name{font-size:11.5px;font-weight:800;line-height:1.3;-webkit-line-clamp:2}
+  .rizq-style-meta{font-size:10px;line-height:1.2;-webkit-line-clamp:1;display:-webkit-box}
+  .rizq-style-cta{font-size:10.5px;padding-top:2px;margin-top:2px}
+  .rizq-style-brand-row .rzq-brand-logo-name-img{width:24px;height:24px;border-radius:7px}
 }
 
 /* ── شريط "قريباً" — اهتمام حقيقي بالأقسام المغلقة (طلب Limam 03/08/2026) ── */
@@ -4465,8 +4517,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   window.addEventListener('load', unlockRizqPage);
 })();
 </script>
+    <script src="rizq_marquee_kit.js?v=1.0"></script>
     <script src="rizq_announcements.js"></script>
-    <script src="rizq_civic_ticker.js"></script>
+    <script src="rizq_civic_ticker.js?v=1.2"></script>
 <script src="rizq_backend_config.js"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
@@ -6473,7 +6526,8 @@ function _rzqMarqueeTick(now){
       var state = _rzqMarquees[i];
       if(!state || !state.el || !state.el.isConnected) continue;
       if(state.paused || state.offscreen || state.half <= 1) continue;
-      state.pos += state.pxPerSec * dt;
+      var spd = Number(state.pxPerSec) || 0;
+      state.pos += spd * dt;
       if(state.pos >= state.half) state.pos -= state.half;
       if(state.pos < 0) state.pos += state.half;
       state.apply();
@@ -6535,8 +6589,8 @@ function _rzqBindMarqueePointerBoost(state){
     decayTimer = setTimeout(resetBoost, 900);
   }
   function onPointerSample(ev){
-    /* لا نمنع التسريع عند offscreen — إذا حرّك المستخدم المؤشر فوق الشريط فهو ظاهر له */
-    if(state.paused) return;
+    /* إيقاف عند المرور: لا تسريع تلقائي بالمؤشر — الأزرار/العجلة فقط */
+    if(state.paused || state.hoverPaused || state.userPaused) return;
     var t = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     if(lastX != null){
       var dx = ev.clientX - lastX;
@@ -6653,6 +6707,11 @@ function bindRafMarquee(el, opts){
   _rzqBindMarqueePointerBoost(state);
   state.remeasure();
   _rzqEnsureMarqueeLoop();
+  try{
+    if(window.RizqMarqueeKit && typeof RizqMarqueeKit.enhanceRafState === 'function'){
+      RizqMarqueeKit.enhanceRafState(state);
+    }
+  }catch(eKit){}
   return state;
 }
 function syncMarqueeShift(el){
@@ -6660,6 +6719,9 @@ function syncMarqueeShift(el){
   bindRafMarquee(el);
   if(el._rzqMarquee) el._rzqMarquee.remeasure();
   _rzqEnsureMarqueeLoop();
+  try{
+    if(window.RizqMarqueeKit && el._rzqMarquee) RizqMarqueeKit.enhanceRafState(el._rzqMarquee);
+  }catch(eKit2){}
 }
 function syncAllMarquees(){
   [
@@ -6674,6 +6736,7 @@ function syncAllMarquees(){
     if(cfg.el._rzqMarquee) cfg.el._rzqMarquee.remeasure();
   });
   _rzqEnsureMarqueeLoop();
+  try{ if(window.RizqMarqueeKit) RizqMarqueeKit.enhanceAllRaf(); }catch(eKit3){}
 }
 function liveListingsLabelHtml(fr){
   return fr
@@ -14420,7 +14483,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_packages_ui.js?v=23.0"></script>
 <script src="rizq_merchant_activities.js?v=23.0"></script>
 <script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo14"></script>
+<script src="rizq_video_ads.js?v=promo17"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=24.1"></script>
 <script src="rizq_disclaimer.js"></script>
@@ -14835,10 +14898,23 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       var pos = 0;
       var basePx = 42; /* بكسل/ثانية — يتحرك حتى لو بطاقة واحدة */
       var boostPx = 0;
+      var dir = 1;
+      var userPaused = false;
+      var hoverPaused = false;
       var decayTimer = 0;
       var lastX = null;
       var lastT = 0;
       var lastTs = 0;
+      var ctl = {
+        get boostPx(){ return boostPx; },
+        set boostPx(v){ boostPx = v; },
+        get dir(){ return dir; },
+        set dir(v){ dir = v < 0 ? -1 : 1; },
+        get userPaused(){ return userPaused; },
+        set userPaused(v){ userPaused = !!v; },
+        get hoverPaused(){ return hoverPaused; },
+        set hoverPaused(v){ hoverPaused = !!v; }
+      };
       function isRtl(){ return document.documentElement.getAttribute('dir') !== 'ltr'; }
       function loopSpan(){
         var n = parseInt(track.getAttribute('data-loop-copies') || '2', 10) || 2;
@@ -14866,6 +14942,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
           var dx = clientX - lastX;
           var dt = Math.max(8, t - lastT);
           applyBoost(Math.abs(dx) / dt * 1000 * 0.42);
+          if(dx) dir = dx < 0 ? -1 : 1;
           if(drag){
             /* سحب يدوي يزيح الشريط فوراً */
             pos += isRtl() ? dx : -dx;
@@ -14900,8 +14977,9 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       strip.addEventListener('wheel', function(ev){
         var dx = Math.abs(ev.deltaX) > Math.abs(ev.deltaY) ? ev.deltaX : ev.deltaY;
         if(!dx) return;
+        dir = dx > 0 ? 1 : -1;
         applyBoost(Math.min(220, Math.abs(dx) * 2.4));
-        pos += isRtl() ? -dx * 0.35 : dx * 0.35;
+        pos += (isRtl() ? -dx : dx) * 0.35;
         apply();
       }, {passive:true});
       function step(ts){
@@ -14909,9 +14987,11 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         var dt = Math.min(48, ts - lastTs);
         lastTs = ts;
         var span = loopSpan();
-        if(!dragging && span > 1){
-          pos += (basePx + boostPx) * (dt / 1000);
+        var paused = !!(userPaused || hoverPaused);
+        if(!dragging && !paused && span > 1){
+          pos += (basePx + boostPx) * (dt / 1000) * (dir < 0 ? -1 : 1);
           if(pos >= span) pos -= span;
+          if(pos < 0) pos += span;
           apply();
         }
         requestAnimationFrame(step);
@@ -14920,6 +15000,11 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         pos = 0;
         apply();
       } catch (e0) {}
+      try{
+        if(window.RizqMarqueeKit && typeof RizqMarqueeKit.enhanceDiscStrip === 'function'){
+          RizqMarqueeKit.enhanceDiscStrip(strip, ctl);
+        }
+      }catch(eKitD){}
       requestAnimationFrame(step);
     }
 
