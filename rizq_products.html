@@ -36,38 +36,118 @@
   --radius:14px;--shadow:0 6px 24px rgba(0,0,0,.35);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gradient(180deg,#e8eef6 0%,#f4f6fb 40%,#eef2f8 100%);color:#1a2a3a}
-
-/* شريط هوية المحل الفاخر */
-.store-lux-strip{
-  position:relative;overflow:hidden;
+body{
+  font-family:'Cairo',system-ui,-apple-system,sans-serif;color:#1a2a3a;
   background:
-    radial-gradient(ellipse 900px 420px at 70% -20%,rgba(201,168,76,.22),transparent 55%),
-    linear-gradient(135deg,#06111C 0%,#0F2347 45%,#1B3A6B 100%);
-  border-bottom:1px solid rgba(201,168,76,.35);
-  color:#fff;
+    radial-gradient(ellipse 900px 420px at 100% 0%,rgba(201,168,76,.07),transparent 55%),
+    radial-gradient(ellipse 800px 380px at 0% 18%,rgba(27,58,107,.06),transparent 50%),
+    linear-gradient(180deg,#e6ecf5 0%,#f3f6fb 42%,#eef2f8 100%);
+}
+
+/* هيرو كتالوج المحل — كامل العرض، غلاف، علامة تجارية أولاً */
+.store-lux-strip{
+  position:relative;overflow:hidden;color:#fff;
+  min-height:clamp(220px,34vh,320px);
+  display:flex;align-items:flex-end;
+  background:
+    radial-gradient(ellipse 1100px 520px at 78% -8%,rgba(201,168,76,.28),transparent 58%),
+    radial-gradient(ellipse 900px 480px at 12% 110%,rgba(27,58,107,.55),transparent 55%),
+    linear-gradient(145deg,#040a12 0%,#0a1626 42%,#132a4a 100%);
+  border-bottom:1px solid rgba(201,168,76,.28);
+}
+.store-lux-strip .hero-photo{
+  position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;
+  background:#06111C center/cover no-repeat;
+}
+.store-lux-strip .hero-photo img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  transform:scale(1.06);animation:rzProdHeroKen 26s ease-in-out infinite alternate;
+}
+@keyframes rzProdHeroKen{
+  from{transform:scale(1.04) translate3d(0,0,0)}
+  to{transform:scale(1.12) translate3d(-1.4%,-1%,0)}
+}
+@media (prefers-reduced-motion:reduce){
+  .store-lux-strip .hero-photo img{animation:none;transform:none}
+  .store-lux-shine,.store-lux-inner{animation:none!important}
+}
+.store-lux-strip .hero-photo::after{
+  content:'';position:absolute;inset:0;
+  background:
+    linear-gradient(105deg,rgba(4,10,18,.88) 0%,rgba(6,17,28,.55) 46%,rgba(4,10,18,.78) 100%),
+    linear-gradient(180deg,rgba(4,10,18,.15) 0%,rgba(4,10,18,.72) 100%);
+}
+.store-lux-strip.has-hero-photo{background:#06111C}
+.store-lux-veil{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:
+    radial-gradient(circle at 18% 30%,rgba(232,201,106,.12),transparent 42%),
+    radial-gradient(circle at 88% 70%,rgba(201,168,76,.1),transparent 38%);
+}
+.store-lux-shine{
+  position:absolute;inset:-20% -40%;z-index:1;pointer-events:none;
+  background:linear-gradient(115deg,transparent 40%,rgba(232,201,106,.14) 50%,transparent 60%);
+  animation:rzProdHeroShine 7.5s ease-in-out infinite;
+}
+@keyframes rzProdHeroShine{
+  0%,100%{transform:translateX(8%) rotate(8deg);opacity:.35}
+  50%{transform:translateX(-12%) rotate(8deg);opacity:.7}
 }
 .store-lux-inner{
-  max-width:1360px;margin:0 auto;padding:14px 18px 12px;
-  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  position:relative;z-index:2;
+  max-width:1360px;width:100%;margin:0 auto;
+  padding:clamp(36px,5.5vh,64px) 22px clamp(28px,4vh,44px);
+  display:flex;flex-direction:column;align-items:flex-start;gap:10px;
+  animation:rzProdHeroIn .7s ease both;
 }
-.store-lux-logo{
-  width:64px;height:64px;border-radius:16px;flex-shrink:0;
-  background:radial-gradient(circle at 35% 30%,rgba(232,201,106,.45),rgba(27,58,107,.7));
-  border:2px solid rgba(201,168,76,.7);
-  box-shadow:0 0 0 4px rgba(201,168,76,.12),0 8px 20px rgba(0,0,0,.3);
-  display:flex;align-items:center;justify-content:center;font-size:28px;overflow:hidden;
+@keyframes rzProdHeroIn{
+  from{opacity:0;transform:translateY(18px)}
+  to{opacity:1;transform:none}
 }
-.store-lux-logo img{width:100%;height:100%;object-fit:cover;display:block}
-.store-lux-name{font-size:clamp(18px,2.4vw,24px);font-weight:900;letter-spacing:.2px;line-height:1.15;margin:0 0 4px}
-.store-lux-name span{background:linear-gradient(90deg,#E8C96A,#C9A84C);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.store-lux-tag{font-size:12.5px;color:rgba(255,255,255,.72);line-height:1.45;max-width:48ch}
-.store-lux-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.store-lux-chip{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:5px 11px;border-radius:999px;font-size:11.5px;font-weight:800;
-  background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.35);color:#E8C96A;
+.store-lux-kicker{
+  margin:0;font-size:11px;font-weight:700;letter-spacing:.18em;
+  text-transform:uppercase;color:rgba(232,201,106,.78);
 }
+.store-lux-name{
+  font-size:clamp(32px,5.4vw,52px);font-weight:900;letter-spacing:.01em;
+  line-height:1.08;margin:0;max-width:16ch;
+  text-shadow:0 2px 28px rgba(0,0,0,.35);
+}
+.store-lux-name span{
+  background:linear-gradient(105deg,#F3E0A6 0%,#E8C96A 38%,#C9A84C 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.store-lux-tag{
+  margin:0;font-size:clamp(14px,1.7vw,16px);font-weight:500;
+  color:rgba(255,255,255,.82);line-height:1.55;max-width:42ch;
+}
+.store-lux-actions{
+  display:flex;flex-wrap:wrap;align-items:center;gap:14px 18px;margin-top:10px;
+}
+.store-lux-cta{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:44px;padding:10px 20px;
+  border-radius:12px;text-decoration:none;font-family:inherit;
+  font-size:14px;font-weight:800;color:#0D1B2A;
+  background:linear-gradient(135deg,#E8C96A,#C9A84C);
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 10px 28px rgba(201,168,76,.28);
+  transition:transform .2s ease, box-shadow .2s ease;
+}
+.store-lux-cta:hover{
+  transform:translateY(-1px);
+  box-shadow:0 14px 32px rgba(201,168,76,.38);
+  color:#0D1B2A;
+}
+.store-lux-count{
+  font-size:13px;font-weight:700;color:rgba(255,255,255,.7);
+  letter-spacing:.02em;
+}
+/* توافق قديم: لا نعرض شريحة الشعار كبطاقة داخل الهيرو */
+.store-lux-logo{display:none!important}
+.store-lux-chip{display:none}
+#lux-count-chip.store-lux-count,
+.store-lux-count#lux-count-chip{display:inline}
 /* الفيديو التعريفي يظهر مرة واحدة فقط في واجهة المحل الرسمية — لا تكرار هنا */
 
 /* NAV */
@@ -337,10 +417,12 @@ footer{background:linear-gradient(135deg,var(--dark2),var(--navy2));padding:22px
   .product-body{padding:8px}
   .product-name{font-size:12px}
   .product-price{font-size:13px}
-  .store-lux-inner{padding:10px 12px;gap:10px}
-  .store-lux-logo{width:48px;height:48px;font-size:22px;border-radius:12px}
-  .store-lux-name{font-size:17px}
-  .store-lux-tag{font-size:11.5px;max-width:none}
+  .store-lux-strip{min-height:clamp(200px,32vh,260px)}
+  .store-lux-inner{padding:28px 16px 22px;gap:8px}
+  .store-lux-name{font-size:clamp(28px,8vw,36px);max-width:12ch}
+  .store-lux-tag{font-size:13.5px;max-width:none}
+  .store-lux-cta{min-height:42px;padding:9px 16px;font-size:13.5px}
+  .store-lux-kicker{font-size:10px;letter-spacing:.14em}
   .products-grid.list-view .product-card{flex-direction:column}
   .products-grid.list-view .product-img{width:100%;height:140px}
 }
@@ -565,18 +647,20 @@ main, .page-content.active, .main-content, .results-area,
   </div>
 </div>
 
-<!-- هوية المحل — الكتالوج الكامل (الفيديو فقط في الواجهة الرسمية) -->
+<!-- هيرو كتالوج المحل — كامل العرض (الفيديو فقط في الواجهة الرسمية) -->
 <section class="store-lux-strip" id="store-lux-strip" aria-label="هوية المحل">
+  <div class="hero-photo" data-hero-photo aria-hidden="true"></div>
+  <div class="store-lux-veil" aria-hidden="true"></div>
+  <div class="store-lux-shine" aria-hidden="true"></div>
   <div class="store-lux-inner">
-    <div class="store-lux-logo" id="lux-store-logo">🏪</div>
-    <div style="flex:1;min-width:200px">
-      <div class="store-lux-name"><span id="lux-store-name">متجر النور</span></div>
-      <p class="store-lux-tag" id="lux-store-tag">كتالوج كامل — بحث وفلترة وترقيم · الفيديو التعريفي في واجهة المحل</p>
-      <div class="store-lux-meta" id="lux-store-meta">
-        <span class="store-lux-chip" id="lux-count-chip">0 منتج</span>
-        <a class="store-lux-chip" id="lux-back-store" href="rizq_store.html" style="text-decoration:none">↩ واجهة المحل + الفيديو</a>
-      </div>
+    <p class="store-lux-kicker" id="lux-store-kicker">رزق · كتالوج المحل</p>
+    <h1 class="store-lux-name"><span id="lux-store-name">متجر النور</span></h1>
+    <p class="store-lux-tag" id="lux-store-tag">تصفّح المجموعة كاملة — بحث وفلترة بلمسة واحدة</p>
+    <div class="store-lux-actions" id="lux-store-meta">
+      <a class="store-lux-cta" id="lux-back-store" href="rizq_store.html">واجهة المحل</a>
+      <span class="store-lux-count" id="lux-count-chip">0 منتج</span>
     </div>
+    <div class="store-lux-logo" id="lux-store-logo" hidden aria-hidden="true">🏪</div>
   </div>
 </section>
 
@@ -1184,24 +1268,35 @@ function _demoCatalog(fr){
 function applyStoreBrand(acc, storeId, fr){
   window._rizqProductsStoreId = storeId || '';
   var name = (acc && acc.name) || (fr ? 'Boutique Al-Nour' : 'متجر النور');
-  var tag = fr
-    ? 'Catalogue complet — recherche, filtres, pagination · la vidéo est sur la vitrine'
-    : 'كتالوج كامل — بحث وفلترة وترقيم · الفيديو التعريفي في واجهة المحل';
+  var tag = (acc && (fr ? (acc.taglineFr || acc.tagline) : (acc.tagline || acc.taglineFr)))
+    || (fr
+      ? 'Parcourez toute la collection — recherche et filtres en un geste'
+      : 'تصفّح المجموعة كاملة — بحث وفلترة بلمسة واحدة');
   var luxName = document.getElementById('lux-store-name');
   var luxTag = document.getElementById('lux-store-tag');
+  var luxKicker = document.getElementById('lux-store-kicker');
   var luxLogo = document.getElementById('lux-store-logo');
+  var luxStrip = document.getElementById('store-lux-strip');
   var bcLink = document.getElementById('bc-store-link');
   var back = document.getElementById('lux-back-store');
   if(luxName) luxName.textContent = name;
   if(luxTag) luxTag.textContent = tag;
-  if(window.RizqStoreCommerce) RizqStoreCommerce.setLogo(luxLogo, acc && acc.thumb, '🏪');
+  if(luxKicker) luxKicker.textContent = fr ? 'Rizq · Catalogue boutique' : 'رزق · كتالوج المحل';
+  if(window.RizqStoreCommerce){
+    RizqStoreCommerce.setLogo(luxLogo, acc && (acc.thumb || acc.logo || acc.cover), '🏪');
+    var cover = (acc && (acc.cover || acc.thumb || acc.hero || acc.image)) || '';
+    if(!cover && (storeId === 'demo_store' || !storeId)){
+      cover = 'rizq-assets/demo-heroes/store-boutique-promo.jpg';
+    }
+    RizqStoreCommerce.setHeroPhoto(luxStrip, cover);
+  }
   if(bcLink){
     bcLink.textContent = name;
     bcLink.href = storeId ? ('rizq_store.html?id='+encodeURIComponent(storeId)) : 'rizq_landing_v8.html#rzq-disc-store';
   }
   if(back){
     back.href = storeId ? ('rizq_store.html?id='+encodeURIComponent(storeId)) : 'rizq_store.html';
-    back.textContent = fr ? '↩ Vitrine + vidéo' : '↩ واجهة المحل + الفيديو';
+    back.textContent = fr ? 'Vitrine du magasin' : 'واجهة المحل';
   }
   if(name) document.title = name + (fr ? ' — Produits — Rizq' : ' — المنتجات — رزق');
   if(typeof RizqSub !== 'undefined' && storeId){
@@ -1258,7 +1353,11 @@ async function loadRealStoreProducts(){
     });
     commitCatalog(demoMapped, {
       id: 'demo_store', name: fr ? 'Boutique Al-Nour' : 'متجر النور',
-      tagline: fr ? 'Espace marchand démo' : 'واجهة محل تجريبية',
+      tagline: fr
+        ? 'Parcourez toute la collection — recherche et filtres en un geste'
+        : 'تصفّح المجموعة كاملة — بحث وفلترة بلمسة واحدة',
+      cover: 'rizq-assets/demo-heroes/store-boutique-promo.jpg',
+      thumb: 'rizq-assets/demo-heroes/store-boutique-promo.jpg',
       promo_video: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4',
       status: 'approved', type: 'store', storeTopics: demoTopics
     }, 'demo_store', fr);
