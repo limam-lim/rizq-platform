@@ -785,7 +785,7 @@
 
     function scrollByCard(dir) {
       var card = track.querySelector('.rizq-vcard');
-      var step = card ? card.getBoundingClientRect().width + 12 : 160;
+      var step = card ? card.getBoundingClientRect().width + 10 : 170;
       var rtl = document.documentElement.getAttribute('dir') === 'rtl';
       var delta = step * dir * (rtl ? -1 : 1);
       track.scrollBy({ left: delta, behavior: 'smooth' });
