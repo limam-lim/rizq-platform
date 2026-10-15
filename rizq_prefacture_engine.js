@@ -311,13 +311,13 @@
     } else {
       /* توافق قديم: قائمة وسائل دون قناة محددة */
       body = methods.map(function (m) {
-        return '<div style="padding:10px 12px;border:1px solid rgba(201,168,76,.28);border-radius:10px;background:linear-gradient(135deg,rgba(15,35,71,.03),rgba(201,168,76,.06));margin-bottom:8px">'
-          + '<div style="font-size:11px;font-weight:800;color:#C9A84C;margin-bottom:3px">' + _esc(_payTypeLabel(m.type)) + '</div>'
-          + (m.bank ? '<div style="font-size:13px;font-weight:800;color:#0F2347">' + _esc(m.bank) + '</div>' : '')
-          + (m.code ? '<div style="font-family:ui-monospace,monospace;font-size:14px;font-weight:800;color:#0F2347;margin-top:4px;direction:ltr">' + _esc(m.code) + '</div>' : '')
-          + (m.phone ? '<div style="font-family:ui-monospace,monospace;font-size:14px;font-weight:800;color:#0F2347;margin-top:4px;direction:ltr">' + _esc(m.phone) + '</div>' : '')
-          + (m.account ? '<div style="font-family:ui-monospace,monospace;font-size:14px;font-weight:800;color:#0F2347;margin-top:4px;direction:ltr">' + _esc(m.account) + '</div>' : '')
-          + (m.note ? '<div style="font-size:11px;color:#6b7280;margin-top:4px">' + _esc(m.note) + '</div>' : '')
+        return '<div class="rizq-prf-method">'
+          + '<div class="rizq-prf-method-type">' + _esc(_payTypeLabel(m.type)) + '</div>'
+          + (m.bank ? '<div class="rizq-prf-method-bank">' + _esc(m.bank) + '</div>' : '')
+          + (m.code ? '<div class="rizq-prf-method-val" dir="ltr">' + _esc(m.code) + '</div>' : '')
+          + (m.phone ? '<div class="rizq-prf-method-val" dir="ltr">' + _esc(m.phone) + '</div>' : '')
+          + (m.account ? '<div class="rizq-prf-method-val" dir="ltr">' + _esc(m.account) + '</div>' : '')
+          + (m.note ? '<div class="rizq-prf-method-note">' + _esc(m.note) + '</div>' : '')
           + '</div>';
       }).join('');
     }
@@ -635,11 +635,23 @@
 
   /* ── Modal UI ── */
   function _ensureCss() {
-    if (document.getElementById('rizq-prefacture-css')) return;
+    if (!document.getElementById('rizq-prefacture-font') && !document.querySelector('link[href*="fonts.googleapis.com"][href*="Cairo"]')) {
+      var font = document.createElement('link');
+      font.id = 'rizq-prefacture-font';
+      font.rel = 'stylesheet';
+      font.href = 'https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&display=swap';
+      document.head.appendChild(font);
+    }
+    var existing = document.getElementById('rizq-prefacture-css');
+    var href = 'rizq_prefacture.css?v=28.5';
+    if (existing) {
+      if (existing.getAttribute('href') !== href) existing.setAttribute('href', href);
+      return;
+    }
     var link = document.createElement('link');
     link.id = 'rizq-prefacture-css';
     link.rel = 'stylesheet';
-    link.href = 'rizq_prefacture.css?v=28.4';
+    link.href = href;
     document.head.appendChild(link);
   }
 
@@ -726,30 +738,41 @@
       + '<div class="rizq-prf-head">'
       + '<div class="rizq-prf-brand">' + BRAND + '</div>'
       + '<h2>' + _esc(_t('فاتورة قبل', 'Préfacture')) + '</h2>'
-      + '<div class="rizq-prf-num">' + _esc(doc.number) + '</div>'
+      + '<div class="rizq-prf-num">' + _esc(_t('الرقم', 'N°') + ' · ' + doc.number) + '</div>'
+      + '<div class="rizq-prf-meta">' + _esc(_fmtDate(doc.createdAt)) + '</div>'
       + '<span class="rizq-prf-status" style="--prf-st:' + st[1] + '">' + _esc(st[0]) + '</span>'
       + '</div>'
       + '<div class="rizq-prf-scroll">'
       + '<p class="rizq-prf-lead">' + _esc(_t(
-        'راجع البنود ثم ادفع عبر القناة المختارة أدناه.',
-        'Vérifiez les lignes puis payez via le canal choisi ci-dessous.'
+        'راجع البنود ثم ادفع عبر القناة المختارة أدناه. هذه فاتورة قبل رسمية من منصة رزق.',
+        'Vérifiez les lignes puis payez via le canal choisi. Préfacture officielle Rizq.'
       )) + '</p>'
+      + '<div class="rizq-prf-sec">' + _esc(_t('الأطراف', 'Parties')) + '</div>'
       + '<div class="rizq-prf-parties">'
-      + '<div><span>' + _esc(_t('البائع', 'Vendeur')) + '</span><strong>' + _esc(doc.sellerName || '—') + '</strong></div>'
-      + '<div><span>' + _esc(_t('الزبون', 'Client')) + '</span><strong>' + _esc(doc.buyerName || _t('أنت', 'Vous')) + '</strong></div>'
+      + '<div><span>' + _esc(_t('البائع / مقدّم الخدمة', 'Vendeur / Prestataire')) + '</span>'
+      + '<strong>' + _esc(doc.sellerName || '—') + '</strong>'
+      + (doc.sellerPhone ? '<span class="rizq-prf-phone">' + _esc(doc.sellerPhone) + '</span>' : '')
       + '</div>'
+      + '<div><span>' + _esc(_t('الزبون', 'Client')) + '</span>'
+      + '<strong>' + _esc(doc.buyerName || _t('أنت', 'Vous')) + '</strong>'
+      + (doc.buyerPhone ? '<span class="rizq-prf-phone">' + _esc(doc.buyerPhone) + '</span>' : '')
+      + '</div>'
+      + '</div>'
+      + (doc.deliveryType ? '<div class="rizq-prf-sec">' + _esc(_t('التنفيذ', 'Exécution')) + '</div>' : '')
       + _renderFulfillmentBlock(doc)
+      + '<div class="rizq-prf-sec">' + _esc(_t('البنود', 'Articles')) + '</div>'
       + '<div class="rizq-prf-lines">' + linesHtml + '</div>'
       + totalsMid
-      + '<div class="rizq-prf-total"><span>' + _esc(_t('الإجمالي', 'Total')) + '</span> <strong>' + _esc(_fmtMoney(doc.total)) + '</strong></div>'
+      + '<div class="rizq-prf-total"><span>' + _esc(_t('الإجمالي المستحق', 'Total dû')) + '</span> <strong>' + _esc(_fmtMoney(doc.total)) + '</strong></div>'
+      + '<div class="rizq-prf-sec">' + _esc(_t('طريقة الدفع', 'Paiement')) + '</div>'
       + _renderPaymentBlock(doc, false)
       + stampBlock
       + '</div>'
       + '<div class="rizq-prf-footer">'
       + '<div class="rizq-prf-actions">' + actions + '</div>'
       + '<p class="rizq-prf-disc">' + _esc(_t(
-        'ادفع للمحل مباشرة — رزق وسيط نشر فقط.',
-        'Payez directement le magasin — Rizq est uniquement un intermédiaire.'
+        'ادفع للمحل مباشرة — رزق وسيط نشر إلكتروني فقط ولا تستلم المبالغ.',
+        'Payez directement le magasin — Rizq est un intermédiaire et n’encaisse pas.'
       )) + '</p>'
       + '</div>'
       + '</div>';
