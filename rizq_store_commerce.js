@@ -163,14 +163,26 @@
     };
   }
 
+  /** توحيد تسميات المقاسات الكبيرة: XXXL→3XL، XXXXL→4XL، 3xl→3XL */
+  function normalizeSizeToken(tok) {
+    var t = String(tok == null ? '' : tok).trim();
+    if (!t) return '';
+    var u = t.toUpperCase().replace(/\s+/g, '');
+    if (u === 'XXXL' || u === 'XXLXL' || u === '3X' || u === 'XXX') return '3XL';
+    if (u === 'XXXXL' || u === '4X' || u === 'XXXX') return '4XL';
+    if (u === '2XL') return 'XXL';
+    if (/^\d+XL$/.test(u) || /^(XS|S|M|L|XL|XXL)$/.test(u)) return u;
+    return t;
+  }
+
   /** تقسيم خيارات المقاسات/الأوزان من نص البائع أو مصفوفة */
   function splitVariantTokens(raw) {
     if (Array.isArray(raw)) {
-      return raw.map(function (x) { return String(x == null ? '' : x).trim(); }).filter(Boolean);
+      return raw.map(function (x) { return normalizeSizeToken(x); }).filter(Boolean);
     }
     var s = String(raw == null ? '' : raw).trim();
     if (!s) return [];
-    return s.split(/[,،|/·•]+/).map(function (x) { return x.trim(); }).filter(Boolean);
+    return s.split(/[,،|/·•]+/).map(function (x) { return normalizeSizeToken(x); }).filter(Boolean);
   }
 
   function inferVariantKind(product) {
@@ -187,12 +199,12 @@
 
   function defaultOptionsForKind(kind) {
     if (kind === 'shoe') {
-      return ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45'].map(function (n) {
+      return ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45', '46', '47', '48', '49', '50'].map(function (n) {
         return { value: n, label: n + ' EU' };
       });
     }
     if (kind === 'apparel') {
-      return ['XS', 'S', 'M', 'L', 'XL', 'XXL'].map(function (n) {
+      return ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'].map(function (n) {
         return { value: n, label: n };
       });
     }

@@ -1202,7 +1202,7 @@ footer{
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=29.6" defer></script>
+  <script src="rizq_store_commerce.js?v=29.7" defer></script>
   <script src="rizq_map_preview.js?v=1.0" defer></script>
   <script src="rizq_pwa.js" defer></script>
   <script src="rizq_footer_toggle.js?v=23.1" defer></script>
@@ -2344,9 +2344,9 @@ function rizqShare(title, url) {
         thumb: 'rizq-assets/demo-heroes/store-boutique-promo.jpg'
       };
       var products = [
-        { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 47, variants: 'S, M, L, XL, XXL', sizeStock: { S: 8, M: 12, L: 15, XL: 10, XXL: 2 }, unit: 'قطعة', desc: '' },
+        { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 55, variants: 'S, M, L, XL, XXL, 3XL, 4XL', sizeStock: { S: 8, M: 12, L: 15, XL: 10, XXL: 5, '3XL': 3, '4XL': 2 }, unit: 'قطعة', desc: '' },
         { id: 'P2', name: 'عطر شرقي 100مل', nameF: 'Parfum oriental 100ml', price: 18000, cat: 'عطور', emoji: '🧴', stock: 30, variants: '50مل, 100مل, 200مل', unit: 'زجاجة', desc: '' },
-        { id: 'P3', name: 'حذاء رياضي', nameF: 'Baskets sport', price: 22000, cat: 'أحذية', emoji: '👟', stock: 4, variants: 'مقاس: 39, 40, 41, 42, 43, 44', unit: 'زوج', desc: '' },
+        { id: 'P3', name: 'حذاء رياضي', nameF: 'Baskets sport', price: 22000, cat: 'أحذية', emoji: '👟', stock: 18, variants: 'مقاس: 39, 40, 41, 42, 43, 44, 45, 46, 47, 48', sizeStock: { '39': 1, '40': 2, '41': 3, '42': 3, '43': 2, '44': 2, '45': 2, '46': 1, '47': 1, '48': 1 }, unit: 'زوج', desc: '' },
         { id: 'P4', name: 'ساعة كلاسيكية', nameF: 'Montre classique', price: 35000, cat: 'إكسسوارات', emoji: '⌚', stock: 8, desc: '' },
         { id: 'P5', name: 'حقيبة جلدية', nameF: 'Sac en cuir', price: 28000, cat: 'إكسسوارات', emoji: '👜', stock: 6, desc: '' },
         { id: 'P6', name: 'نظارة شمسية', nameF: 'Lunettes de soleil', price: 9000, cat: 'إكسسوارات', emoji: '🕶️', stock: 20, desc: '' },
@@ -2356,12 +2356,12 @@ function rizqShare(title, url) {
         { id: 'P10', name: 'عطر نسائي', nameF: 'Parfum femme', price: 21000, cat: 'عطور', emoji: '🌸', stock: 14, variants: '50مل, 100مل', unit: 'زجاجة', desc: '' },
         { id: 'P11', name: 'سوار ذهب مظهر', nameF: 'Bracelet doré', price: 15000, cat: 'إكسسوارات', emoji: '💍', stock: 9, desc: '' },
         { id: 'P12', name: 'طقم أطفال', nameF: 'Ensemble enfant', price: 11000, cat: 'أطفال', emoji: '🧸', stock: 11, variants: '2-3 سنوات, 4-5 سنوات, 6-7 سنوات', unit: 'طقم', desc: '' },
-        { id: 'P13', name: 'حذاء رسمي', nameF: 'Chaussures formal', price: 32000, cat: 'أحذية', emoji: '👞', stock: 7, variants: 'مقاس: 40, 41, 42, 43, 44, 45', unit: 'زوج', desc: '' },
+        { id: 'P13', name: 'حذاء رسمي', nameF: 'Chaussures formal', price: 32000, cat: 'أحذية', emoji: '👞', stock: 14, variants: 'مقاس: 40, 41, 42, 43, 44, 45, 46, 47', sizeStock: { '40': 2, '41': 2, '42': 3, '43': 2, '44': 2, '45': 1, '46': 1, '47': 1 }, unit: 'زوج', desc: '' },
         { id: 'P14', name: 'معطف خفيف', nameF: 'Manteau léger', price: 40000, cat: 'أزياء', emoji: '🧥', stock: 5, variants: 'M, L, XL, XXL', unit: 'قطعة', desc: '' },
         { id: 'P15', name: 'كريم عناية', nameF: 'Crème soin', price: 7000, cat: 'عطور', emoji: '🧴', stock: 25, variants: '50مل, 100مل, 200مل', unit: 'علبة', desc: '' },
         { id: 'P16', name: 'لعبة تعليمية', nameF: 'Jouet éducatif', price: 6500, cat: 'أطفال', emoji: '🧩', stock: 16, desc: '' },
         { id: 'P17', name: 'قبعة أنيقة', nameF: 'Casquette chic', price: 4500, cat: 'إكسسوارات', emoji: '🧢', stock: 22, desc: '' },
-        { id: 'P18', name: 'تيشيرت قطن', nameF: 'T-shirt coton', price: 5000, cat: 'أزياء', emoji: '👕', stock: 30, variants: 'S, M, L, XL, XXL', sizeStock: { S: 5, M: 10, L: 8, XL: 5, XXL: 2 }, unit: 'قطعة', desc: '' }
+        { id: 'P18', name: 'تيشيرت قطن', nameF: 'T-shirt coton', price: 5000, cat: 'أزياء', emoji: '👕', stock: 36, variants: 'S, M, L, XL, XXL, 3XL, 4XL', sizeStock: { S: 5, M: 10, L: 8, XL: 5, XXL: 4, '3XL': 2, '4XL': 2 }, unit: 'قطعة', desc: '' }
       ];
       var demoTopics = window.RizqStoreTopics ? RizqStoreTopics.seedFromProducts(products) : [];
       var frMap = { 'أزياء':'Mode', 'عطور':'Parfums', 'أحذية':'Chaussures', 'إكسسوارات':'Accessoires', 'أطفال':'Enfants' };

@@ -358,8 +358,8 @@
         sector: 'fashion',
         unitDefault: 'قطعة',
         unitDefaultFr: 'pièce',
-        variantsPhAr: 'مثال: مقاس S/M/L/XL · لون أسود/أبيض',
-        variantsPhFr: 'Ex: taille S/M/L/XL · couleur noir/blanc',
+        variantsPhAr: 'مثال: مقاس S/M/L/XL/XXL/3XL/4XL · لون أسود/أبيض',
+        variantsPhFr: 'Ex: taille S/M/L/XL/XXL/3XL/4XL · couleur noir/blanc',
         skuHintAr: 'رمز SKU للموديل والمقاس',
         skuHintFr: 'SKU modèle + taille',
       };
@@ -403,8 +403,8 @@
       sector: sector || 'general',
       unitDefault: 'قطعة',
       unitDefaultFr: 'pièce',
-      variantsPhAr: 'مثال: S, M, L أو 250غ، 500غ، 1كغ',
-      variantsPhFr: 'Ex: S, M, L ou 250g, 500g, 1kg',
+      variantsPhAr: 'مثال: S, M, L, XL, XXL, 3XL, 4XL أو 250غ، 500غ، 1كغ',
+      variantsPhFr: 'Ex: S, M, L, XL, XXL, 3XL, 4XL ou 250g, 500g, 1kg',
       skuHintAr: 'رمز المنتج (اختياري)',
       skuHintFr: 'Code produit (optionnel)',
     };

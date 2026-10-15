@@ -602,7 +602,13 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
             <div class="form-group"><label class="form-label" data-t="pr-stock-label">الكمية المتوفرة (اختياري — للمنتجات غير الفريدة)</label><input class="form-input" id="pr-stock" type="number" placeholder="مثال: 8" data-ph="pr-stock-ph"/></div>
             <div class="form-group"><label class="form-label" data-t="pr-sold-label">عدد القطع المباعة (اختياري — لإظهار شعبية المنتج)</label><input class="form-input" id="pr-sold" type="number" placeholder="0"/></div>
           </div>
-          <div class="form-group"><label class="form-label" data-t="pr-variants-label">المقاسات / الأوزان / الألوان (اختياري)</label><input class="form-input" id="pr-variants" placeholder="مثال: S, M, L أو 1كغ، 5كغ أو أحمر، أسود" data-ph="pr-variants-ph" oninput="rebuildCorpSizeStockUI()"/></div>
+          <div class="form-group"><label class="form-label" data-t="pr-variants-label">المقاسات / الأوزان / الألوان (اختياري)</label><input class="form-input" id="pr-variants" placeholder="مثال: S, M, L, XL, XXL, 3XL, 4XL أو 1كغ، 5كغ أو أحمر، أسود" data-ph="pr-variants-ph" oninput="rebuildCorpSizeStockUI()"/>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">
+              <button type="button" class="btn btn-outline btn-sm" onclick="fillCorpApparelSizes()" style="border-radius:8px;padding:6px 10px;font-size:11.5px;font-weight:700">📏 S→4XL</button>
+              <button type="button" class="btn btn-outline btn-sm" onclick="fillCorpShoeSizes()" style="border-radius:8px;padding:6px 10px;font-size:11.5px;font-weight:700">👟 36→50</button>
+              <span style="font-size:11px;color:#94a3b8;align-self:center">تعبئة سريعة — ملابس حتى 4XL أو أحذية حتى 50 (يشمل 45–47)</span>
+            </div>
+          </div>
           <div class="form-group" id="pr-size-stock-wrap" style="display:none">
             <label class="form-label" data-t="pr-size-stock-label">كمية كل قياس في الاستوك</label>
             <p style="font-size:11.5px;color:#64748b;margin:0 0 8px;line-height:1.5" data-t="pr-size-stock-hint">حدّد الكمية لكل مقاس. المجموع يحدّث «الكمية المتوفرة». القياس بصفر يظهر مشطوباً للزبون.</p>
@@ -2122,6 +2128,20 @@ function saveProds(p){
   try{localStorage.setItem('rizq_corp_prods_'+(CORP_ACC&&CORP_ACC.id||'demo'), JSON.stringify(p));}catch(e){}
 }
 
+function fillCorpApparelSizes(){
+  var el = document.getElementById('pr-variants');
+  if(!el) return;
+  el.value = 'XS, S, M, L, XL, XXL, 3XL, 4XL';
+  if(typeof rebuildCorpSizeStockUI === 'function') rebuildCorpSizeStockUI({});
+  if(typeof showToast === 'function') showToast(_t2('✅ تم تعبئة المقاسات حتى 4XL','✅ Tailles jusqu\'à 4XL'));
+}
+function fillCorpShoeSizes(){
+  var el = document.getElementById('pr-variants');
+  if(!el) return;
+  el.value = '36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50';
+  if(typeof rebuildCorpSizeStockUI === 'function') rebuildCorpSizeStockUI({});
+  if(typeof showToast === 'function') showToast(_t2('✅ تم تعبئة مقاسات الأحذية حتى 50 (يشمل 45 و46 و47)','✅ Pointures jusqu\'à 50 (incl. 45, 46, 47)'));
+}
 function _parseCorpVariantTokens(raw){
   var s = String(raw == null ? '' : raw).trim();
   if(!s) return [];
