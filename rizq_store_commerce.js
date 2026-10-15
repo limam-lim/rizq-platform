@@ -924,8 +924,14 @@
         return (info && info.text) || (fr ? 'En stock' : 'متوفر');
       })()) + '</div></div></div>'
       + (p.unit ? '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">⚖</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Unité' : 'الوحدة') + '</div><div class="rzq-pd-spec-val">' + esc(p.unit) + '</div></div></div>' : '')
-      + (variantSelectionLabel(groups, selected, fr)
-        ? '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">📏</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Choix' : 'اختيارك') + '</div><div class="rzq-pd-spec-val">' + esc(variantSelectionLabel(groups, selected, fr)) + '</div></div></div>'
+      + (groups.length
+        ? '<div class="rzq-pd-spec" id="rzq-pd-choice-row"'
+          + (variantSelectionLabel(groups, selected, fr) ? '' : ' hidden')
+          + '><span class="rzq-pd-spec-ico">📏</span><div><div class="rzq-pd-spec-label">'
+          + (fr ? 'Choix' : 'اختيارك')
+          + '</div><div class="rzq-pd-spec-val" id="rzq-pd-choice-spec">'
+          + esc(variantSelectionLabel(groups, selected, fr) || '')
+          + '</div></div></div>'
         : '')
       + '</div></div>'
       + '<div class="rzq-pd-block"><div class="rzq-pd-block-title">' + (fr ? '🏷 Étiquettes' : '🏷 الوسوم') + '</div>'
@@ -1034,6 +1040,14 @@
     }
     var spec = document.getElementById('rzq-pd-stock-spec');
     if (spec && info) spec.textContent = info.text;
+    var choiceLab = variantSelectionLabel(_pdState.variantGroups || [], _pdState.selected || {}, fr);
+    var choiceEl = document.getElementById('rzq-pd-choice-spec');
+    var choiceRow = document.getElementById('rzq-pd-choice-row');
+    if (choiceEl) choiceEl.textContent = choiceLab || '';
+    if (choiceRow) {
+      if (choiceLab) choiceRow.removeAttribute('hidden');
+      else choiceRow.setAttribute('hidden', '');
+    }
     var maxQ = selectedSizeMaxQty(p, _pdState.selected);
     if (maxQ != null && maxQ >= 0 && (_pdState.qty || 1) > maxQ) {
       _pdState.qty = Math.max(1, maxQ || 1);
