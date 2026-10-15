@@ -713,7 +713,19 @@
     root.setAttribute('aria-modal', 'true');
     root.innerHTML = '<div class="rzq-pd-sheet" id="rzq-pd-sheet"></div>';
     root.addEventListener('click', function (e) {
-      if (e.target === root) closeProductDetail();
+      if (e.target === root) {
+        closeProductDetail();
+        return;
+      }
+      /* تفويض النقر — تجنّب onclick بـ JSON.stringify داخل صفات "…" التي تكسر القياسات */
+      var btn = e.target && e.target.closest ? e.target.closest('button.rzq-pd-vopt') : null;
+      if (!btn || !root.contains(btn)) return;
+      if (btn.disabled || btn.getAttribute('aria-disabled') === 'true' || btn.classList.contains('is-oos')) return;
+      var gk = btn.getAttribute('data-vgroup');
+      var vv = btn.getAttribute('data-vval');
+      if (gk == null || vv == null) return;
+      e.preventDefault();
+      selectVariant(gk, vv);
     });
     document.body.appendChild(root);
     ensureLightboxHost();
@@ -790,7 +802,6 @@
               + ' data-vgroup="' + esc(g.key) + '" data-vval="' + esc(o.value) + '"'
               + (oos ? ' disabled aria-disabled="true" title="' + (fr ? 'Rupture' : 'غير متوفر') + '"' : '')
               + ' aria-pressed="' + (on ? 'true' : 'false') + '"'
-              + (oos ? '' : (' onclick="RizqStoreCommerce.selectVariant(' + JSON.stringify(String(g.key)) + ',' + JSON.stringify(String(o.value)) + ')"'))
               + '>'
               + '<span class="rzq-pd-vopt-lab">' + esc(o.label) + '</span>'
               + qtyHint

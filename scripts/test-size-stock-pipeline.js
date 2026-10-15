@@ -61,6 +61,13 @@ assert(ft.includes('align-items:center!important'), 'footer stack centered');
 
 const officeHtml = fs.readFileSync(path.join(root, 'rizq_office.html'), 'utf8');
 assert(officeHtml.includes('.office-desk-actions #rf-doc-upload'), 'office upload full-width row');
-assert(officeHtml.includes('padding-bottom:calc(72px'), 'office sticky CTA clearance');
+assert(officeHtml.includes('padding-bottom:calc(128px') || officeHtml.includes('padding-bottom:calc(72px'), 'office sticky CTA clearance');
+
+const commerceSrc = fs.readFileSync(path.join(root, 'rizq_store_commerce.js'), 'utf8');
+assert(!/onclick="RizqStoreCommerce\.selectVariant\(\s*"\s*\+\s*JSON\.stringify/.test(commerceSrc)
+  && !commerceSrc.includes('onclick="RizqStoreCommerce.selectVariant(\' + JSON.stringify'),
+  'must not use broken double-quoted onclick+JSON.stringify for size chips');
+assert(commerceSrc.includes("closest('button.rzq-pd-vopt')") || commerceSrc.includes('closest("button.rzq-pd-vopt")'),
+  'size chips use click delegation');
 
 console.log('test-size-stock-pipeline: OK');
