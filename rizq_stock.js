@@ -104,8 +104,8 @@
               : (sizeVal + ' — نفذ');
           } else if (lab && lab.level === 'in') {
             lab.text = fr
-              ? ('Taille ' + sizeVal + ' : en stock')
-              : (sizeVal + ' — موجود في الاستوك');
+              ? ('Taille ' + sizeVal + ' : ' + q + ' en stock')
+              : (sizeVal + ' — موجود ' + q);
           }
           return lab;
         }

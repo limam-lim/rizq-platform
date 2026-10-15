@@ -22,7 +22,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_header.css?v=27.1"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
-<link rel="stylesheet" href="rizq_product_detail.css?v=28.6"/>
+<link rel="stylesheet" href="rizq_product_detail.css?v=28.7"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=28.9"/>
 <link rel="preload" href="rizq_header.js?v=27.0" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
@@ -1192,20 +1192,20 @@ footer{
   <script src="rizq_reviews_engine.js" defer></script>
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين (RizqSub.getBadges) -->
   <script src="rizq_subscription_engine.js" defer></script>
-  <script src="rizq_stock.js?v=1.1" defer></script>
+  <script src="rizq_stock.js?v=1.3" defer></script>
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_contact_gate.js" defer></script>
   <script src="rizq_mr_payment_catalog.js?v=1.1" defer></script>
   <script src="rizq_account_payments.js?v=28.3" defer></script>
-  <script src="rizq_service_desk.js?v=1.3" defer></script>
+  <script src="rizq_service_desk.js?v=1.4" defer></script>
   <script src="rizq_terms_gate.js?v=23.0" defer></script>
   <script src="rizq_ux_polish.js?v=23.0" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=29.7" defer></script>
+  <script src="rizq_store_commerce.js?v=29.10" defer></script>
   <script src="rizq_map_preview.js?v=1.0" defer></script>
   <script src="rizq_pwa.js" defer></script>
-  <script src="rizq_footer_toggle.js?v=23.1" defer></script>
+  <script src="rizq_footer_toggle.js?v=23.2" defer></script>
   <script src="rizq_auth_gate.js?v=23.0" defer></script>
 </head>
 <body data-t-ns="store">
@@ -1755,6 +1755,7 @@ function openQuickView(id, name, price, emoji, cat){
         id: k, name: f.name || '', nameF: f.nameF || f.name || '', price: f.price || 0,
         emoji: f.emoji || '📦', cat: f.cat || '',
         variants: f.variants || ex.variants || '', unit: f.unit || ex.unit || '',
+        sizeStock: f.sizeStock || ex.sizeStock || null,
         images: ex.images || [], imgDataArr: ex.images || [],
         desc: ex.desc || '', descF: ex.descFr || '', stock: ex.stock
       });
@@ -1770,6 +1771,7 @@ function openQuickView(id, name, price, emoji, cat){
     cat: cat || feat.cat || '',
     variants: feat.variants || extra.variants || '',
     unit: feat.unit || extra.unit || '',
+    sizeStock: feat.sizeStock || extra.sizeStock || null,
     images: images, imgDataArr: images,
     desc: extra.desc || '', descF: extra.descFr || '',
     stock: extra.stock
@@ -2500,11 +2502,13 @@ function rizqShare(title, url) {
         featured[pid] = {
           name: p.name, nameF: p.nameF || p.name, price: Number(p.price)||0,
           emoji: p.emoji || '📦', cat: p.cat || '', topicId: p.topicId || '',
-          variants: p.variants || '', unit: p.unit || '', sku: p.sku || ''
+          variants: p.variants || '', unit: p.unit || '', sku: p.sku || '',
+          sizeStock: (p.sizeStock && typeof p.sizeStock === 'object') ? p.sizeStock : null
         };
         window._qvProductsMap[pid] = {
-          images: imgs.slice(), desc: p.desc || '', descFr: p.descFr || '', stock: p.stock,
-          variants: p.variants || '', unit: p.unit || '', sku: p.sku || ''
+          images: imgs.slice(), desc: p.desc || '', descFr: p.descFr || p.descF || '', stock: p.stock,
+          variants: p.variants || '', unit: p.unit || '', sku: p.sku || '',
+          sizeStock: (p.sizeStock && typeof p.sizeStock === 'object') ? p.sizeStock : null
         };
         var topic = null;
         if(window.RizqStoreTopics) topic = RizqStoreTopics.resolveProductTopic(storeTopics, p);
@@ -2851,8 +2855,11 @@ function rizqShare(title, url) {
             items.forEach(function(p){
               if(names[p.name]) return;
               merged.push({
-                id: 'B'+p.id, name: p.name, nameF: p.name, price: Number(p.price)||0,
-                cat: p.cat||'', topicId: p.topicId||'', emoji: p.emoji||'📦', desc: p.desc||'', stock: p.stock,
+                id: 'B'+p.id, name: p.name, nameF: p.nameFr || p.nameF || p.name, price: Number(p.price)||0,
+                cat: p.cat||'', topicId: p.topicId||'', emoji: p.emoji||'📦', desc: p.desc||'',
+                descFr: p.descFr || '', stock: p.stock,
+                variants: p.variants || '', unit: p.unit || '', sku: p.sku || '',
+                sizeStock: (p.sizeStock && typeof p.sizeStock === 'object') ? p.sizeStock : null,
                 imgDataArr: (Array.isArray(p.images)&&p.images.length)?p.images:(p.image?[p.image]:[])
               });
             });
@@ -2966,7 +2973,7 @@ footer.rizq-footer .footer-links{list-style:none!important;display:flex!importan
 footer.rizq-footer .footer-links li{padding:0!important;line-height:1.6!important}
 footer.rizq-footer .footer-links li a{font-size:13px!important;color:#e0e0e0!important;text-decoration:none!important;transition:color .3s!important}
 footer.rizq-footer .footer-links li a:hover{color:#C9A84C!important}
-footer.rizq-footer .footer-bottom{border-top:1px solid rgba(255,255,255,.05)!important;padding:22px 0!important;max-width:1200px!important;margin:0 auto!important;display:flex!important;justify-content:space-between!important;align-items:center!important;flex-wrap:wrap!important;gap:10px!important}
+footer.rizq-footer .footer-bottom{border-top:1px solid rgba(255,255,255,.05)!important;padding:22px 0!important;max-width:1200px!important;margin:0 auto!important;display:flex!important;justify-content:space-between!important;align-items:center!important;flex-wrap:wrap!important;gap:10px!important}@media(max-width:600px){footer.rizq-footer .footer-bottom{flex-direction:column!important;align-items:center!important;justify-content:center!important;text-align:center!important;gap:12px!important}footer.rizq-footer .footer-copy{width:100%!important;text-align:center!important;justify-content:center!important}footer.rizq-footer .adminia-ft,footer.rizq-footer .rzq-ft-adminia-stack{margin-left:auto!important;margin-right:auto!important}}
 footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,.82)!important}
 .telecom-tag{display:inline-block!important;background:rgba(201,168,76,.14)!important;border:1px solid rgba(201,168,76,.4)!important;color:rgba(201,168,76,.95)!important;font-size:10px!important;padding:4px 12px!important;border-radius:10px!important;font-weight:700!important;letter-spacing:.3px!important}
 @media(max-width:900px){footer.rizq-footer .footer-grid{grid-template-columns:1fr 1fr 1fr!important}}

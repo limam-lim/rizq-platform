@@ -713,7 +713,19 @@
     root.setAttribute('aria-modal', 'true');
     root.innerHTML = '<div class="rzq-pd-sheet" id="rzq-pd-sheet"></div>';
     root.addEventListener('click', function (e) {
-      if (e.target === root) closeProductDetail();
+      if (e.target === root) {
+        closeProductDetail();
+        return;
+      }
+      /* تفويض النقر — تجنّب onclick بـ JSON.stringify داخل صفات "…" التي تكسر القياسات */
+      var btn = e.target && e.target.closest ? e.target.closest('button.rzq-pd-vopt') : null;
+      if (!btn || !root.contains(btn)) return;
+      if (btn.disabled || btn.getAttribute('aria-disabled') === 'true' || btn.classList.contains('is-oos')) return;
+      var gk = btn.getAttribute('data-vgroup');
+      var vv = btn.getAttribute('data-vval');
+      if (gk == null || vv == null) return;
+      e.preventDefault();
+      selectVariant(gk, vv);
     });
     document.body.appendChild(root);
     ensureLightboxHost();
@@ -790,7 +802,6 @@
               + ' data-vgroup="' + esc(g.key) + '" data-vval="' + esc(o.value) + '"'
               + (oos ? ' disabled aria-disabled="true" title="' + (fr ? 'Rupture' : 'غير متوفر') + '"' : '')
               + ' aria-pressed="' + (on ? 'true' : 'false') + '"'
-              + (oos ? '' : (' onclick="RizqStoreCommerce.selectVariant(' + JSON.stringify(String(g.key)) + ',' + JSON.stringify(String(o.value)) + ')"'))
               + '>'
               + '<span class="rzq-pd-vopt-lab">' + esc(o.label) + '</span>'
               + qtyHint
@@ -913,8 +924,14 @@
         return (info && info.text) || (fr ? 'En stock' : 'متوفر');
       })()) + '</div></div></div>'
       + (p.unit ? '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">⚖</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Unité' : 'الوحدة') + '</div><div class="rzq-pd-spec-val">' + esc(p.unit) + '</div></div></div>' : '')
-      + (variantSelectionLabel(groups, selected, fr)
-        ? '<div class="rzq-pd-spec"><span class="rzq-pd-spec-ico">📏</span><div><div class="rzq-pd-spec-label">' + (fr ? 'Choix' : 'اختيارك') + '</div><div class="rzq-pd-spec-val">' + esc(variantSelectionLabel(groups, selected, fr)) + '</div></div></div>'
+      + (groups.length
+        ? '<div class="rzq-pd-spec" id="rzq-pd-choice-row"'
+          + (variantSelectionLabel(groups, selected, fr) ? '' : ' hidden')
+          + '><span class="rzq-pd-spec-ico">📏</span><div><div class="rzq-pd-spec-label">'
+          + (fr ? 'Choix' : 'اختيارك')
+          + '</div><div class="rzq-pd-spec-val" id="rzq-pd-choice-spec">'
+          + esc(variantSelectionLabel(groups, selected, fr) || '')
+          + '</div></div></div>'
         : '')
       + '</div></div>'
       + '<div class="rzq-pd-block"><div class="rzq-pd-block-title">' + (fr ? '🏷 Étiquettes' : '🏷 الوسوم') + '</div>'
@@ -1023,6 +1040,14 @@
     }
     var spec = document.getElementById('rzq-pd-stock-spec');
     if (spec && info) spec.textContent = info.text;
+    var choiceLab = variantSelectionLabel(_pdState.variantGroups || [], _pdState.selected || {}, fr);
+    var choiceEl = document.getElementById('rzq-pd-choice-spec');
+    var choiceRow = document.getElementById('rzq-pd-choice-row');
+    if (choiceEl) choiceEl.textContent = choiceLab || '';
+    if (choiceRow) {
+      if (choiceLab) choiceRow.removeAttribute('hidden');
+      else choiceRow.setAttribute('hidden', '');
+    }
     var maxQ = selectedSizeMaxQty(p, _pdState.selected);
     if (maxQ != null && maxQ >= 0 && (_pdState.qty || 1) > maxQ) {
       _pdState.qty = Math.max(1, maxQ || 1);

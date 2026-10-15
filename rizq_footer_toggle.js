@@ -79,7 +79,22 @@
       + '@media (max-width:900px){footer.rizq-footer .footer-grid{'
       + 'grid-template-columns:1fr 1fr 1fr!important;gap:22px!important}}'
       + '@media (max-width:600px){footer.rizq-footer .footer-grid{'
-      + 'grid-template-columns:1fr!important;gap:20px!important}}'
+      + 'grid-template-columns:1fr!important;gap:20px!important}'
+      /* هاتف: زر إخفاء الروابط + إشعار الشركة في وسط أسفل الصفحة */
+      + 'html body footer.rizq-footer .footer-bottom,'
+      + 'html body footer .footer-bottom{'
+      + 'flex-direction:column!important;align-items:center!important;'
+      + 'justify-content:center!important;text-align:center!important;'
+      + 'gap:12px!important;width:100%!important}'
+      + 'html body footer .footer-copy{width:100%!important;text-align:center!important;'
+      + 'justify-content:center!important}'
+      + 'html body footer .rzq-ft-adminia-stack,'
+      + 'html body footer .adminia-ft,'
+      + 'html body footer .adminia-footer-logo{'
+      + 'margin-left:auto!important;margin-right:auto!important;'
+      + 'align-self:center!important}'
+      + 'html body footer .rzq-ft-toggle-row{width:100%!important;justify-content:center!important}'
+      + '}'
     var style = document.getElementById('rzq-ft-toggle-css');
     if (!style) {
       style = document.createElement('style');
