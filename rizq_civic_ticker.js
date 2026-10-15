@@ -20,8 +20,8 @@
       id: 'civic_fb_emergency',
       textAr: 'أرقام الطوارئ: إطفاء ١٨ · إسعاف ١٧ · شرطة ١٧',
       textFr: 'Urgences: Pompiers 18 · SAMU 17 · Police 17',
-      color: '#C9A84C',
-      priority: 'normal',
+      color: '#ef4444',
+      priority: 'urgent',
       link: '',
       active: true,
       order: 0
@@ -203,6 +203,11 @@
     wrap.classList.add('is-empty', 'civic-ticker-wrap');
     wrap.classList.remove('ticker-has-urgent');
     try { document.documentElement.style.setProperty('--rizq-ticker-h', '0px'); } catch (e) {}
+    try {
+      if (global.RizqMarqueeKit && typeof RizqMarqueeKit.setEmergency === 'function') {
+        global.RizqMarqueeKit.setEmergency([]);
+      }
+    } catch (eEm) {}
   }
 
   function render(list) {
@@ -236,17 +241,42 @@
       : 'إعلانات خدمة عامة');
 
     // علامة عاجل للنص فقط — لا نعيد تلوين خلفية الشريط
-    wrap.classList.toggle('ticker-has-urgent', active.some(isUrgent));
+    var urgentItems = active.filter(isUrgent);
+    wrap.classList.toggle('ticker-has-urgent', urgentItems.length > 0);
+
+    /* شريط طوارئ رقيق منفصل — يظهر فقط عند بنود عاجلة */
+    try {
+      if (global.RizqMarqueeKit && typeof RizqMarqueeKit.setEmergency === 'function') {
+        global.RizqMarqueeKit.setEmergency(urgentItems);
+      }
+    } catch (eEm) {}
 
     try {
-      var th = Math.max(36, Math.round(wrap.getBoundingClientRect().height || 42));
+      /* شريط الخدمة العامة يبقى رقيقاً عند العاجل */
+      var baseH = urgentItems.length ? 32 : 42;
+      var th = Math.max(urgentItems.length ? 28 : 36, Math.round(wrap.getBoundingClientRect().height || baseH));
+      if (urgentItems.length) th = Math.min(th, 34);
       document.documentElement.style.setProperty('--rizq-ticker-h', th + 'px');
+      if (urgentItems.length) {
+        wrap.style.paddingTop = '6px';
+        wrap.style.paddingBottom = '6px';
+      } else {
+        wrap.style.paddingTop = '';
+        wrap.style.paddingBottom = '';
+      }
     } catch (e) {}
 
     if (typeof global.syncMarqueeShift === 'function' && typeof global.requestAnimationFrame === 'function') {
       global.requestAnimationFrame(function () {
         global.syncMarqueeShift(inner);
-        global.requestAnimationFrame(function () { global.syncMarqueeShift(inner); });
+        global.requestAnimationFrame(function () {
+          global.syncMarqueeShift(inner);
+          try {
+            if (global.RizqMarqueeKit && inner._rzqMarquee) {
+              global.RizqMarqueeKit.enhanceRafState(inner._rzqMarquee);
+            }
+          } catch (eKit) {}
+        });
       });
     }
   }
