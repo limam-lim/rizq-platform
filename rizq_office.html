@@ -202,10 +202,10 @@ a{text-decoration:none;color:inherit}
   display:none;position:absolute;z-index:4;inset:0;pointer-events:none
 }
 .office-hero.has-hero-videos .hero-videos{display:block}
-.office-hero.has-hero-videos .hero-cover{padding:56px 24px 132px}
+.office-hero.has-hero-videos .hero-cover{padding:56px 24px 148px}
 .office-hero.has-hero-videos .hero-scroll-cue{bottom:8px;opacity:.4}
 .office-hero .hero-video-card{
-  position:absolute;bottom:12px;width:min(210px,28vw);max-width:230px;min-width:0;
+  position:absolute;bottom:12px;width:min(248px,32vw);max-width:268px;min-width:0;
   background:rgba(6,17,28,.55);border:1px solid rgba(103,232,249,.4);
   border-radius:14px;overflow:hidden;backdrop-filter:blur(8px);
   box-shadow:0 10px 24px rgba(0,0,0,.32);animation:rzOfHeroVidIn .7s ease both;
@@ -243,16 +243,16 @@ a{text-decoration:none;color:inherit}
 }
 @media(max-width:900px){
   .office-hero .hero-cover{padding:40px 16px 64px}
-  .office-hero.has-hero-videos .hero-cover{padding:40px 16px 118px}
-  .office-hero .hero-video-card{width:min(132px,38vw);bottom:8px;border-radius:10px}
+  .office-hero.has-hero-videos .hero-cover{padding:40px 16px 132px}
+  .office-hero .hero-video-card{width:min(156px,42vw);bottom:8px;border-radius:10px}
   .office-hero .hero-video-card--intro{right:8px}
   .office-hero .hero-video-card--extra{left:8px}
 }
 @media(max-width:640px){
   .office-hero{min-height:0!important;height:auto!important}
   .office-hero .hero-cover{padding:18px 14px 14px!important;min-height:0!important}
-  .office-hero.has-hero-videos .hero-cover{padding:18px 14px 100px!important}
-  .office-hero.has-hero-videos .hero-video-card{width:min(118px,36vw);bottom:6px}
+  .office-hero.has-hero-videos .hero-cover{padding:18px 14px 112px!important}
+  .office-hero.has-hero-videos .hero-video-card{width:min(140px,42vw);bottom:6px}
   .office-hero.has-hero-videos .hero-video-card--intro{right:6px}
   .office-hero.has-hero-videos .hero-video-card--extra{left:6px}
   .office-logo{width:56px;height:56px;font-size:26px}
@@ -1693,6 +1693,7 @@ function openMaps(){
 </script>
 
   <script src="rizq_intro_video.js?v=29.9"></script>
+  <script src="rizq_live_showcase.js?v=1.0"></script>
   <script>
   /* فيديو تعريفي + إضافي في ركن الهيرو — نفس موضع المحلات/المعارض */
   window.mountOfficeIntroVideo = function(url, officeId, accHint){
@@ -1719,11 +1720,13 @@ function openMaps(){
         if(hero) hero.classList.remove('has-hero-videos');
         if(introCard) introCard.style.display = 'none';
         if(extraCard) extraCard.style.display = 'none';
+        try{ if(window.RizqLiveShowcase) RizqLiveShowcase.maybeApplyPublic(acc); }catch(eLive0){}
         return;
       }
       var sig = [id, introUrl, extraUrl, fr ? 'fr' : 'ar', 'hero-corners-v2'].join('|');
-      if (window.__rzqOfficeIntroSig === sig && introMount.querySelector('.rzq-iv-wrap')) {
+      if (window.__rzqOfficeIntroSig === sig && introMount.querySelector('.rzq-iv-wrap') && !(extraCard && extraCard.classList.contains('is-live-now'))) {
         if(hero) hero.classList.add('has-hero-videos');
+        try{ if(window.RizqLiveShowcase) RizqLiveShowcase.maybeApplyPublic(acc); }catch(eLive1){}
         return;
       }
       window.__rzqOfficeIntroSig = sig;
@@ -1750,6 +1753,7 @@ function openMaps(){
         if(extraMount) extraMount.innerHTML = '';
       }
       if(hero) hero.classList.toggle('has-hero-videos', !!(okIntro || okExtra));
+      try{ if(window.RizqLiveShowcase) RizqLiveShowcase.maybeApplyPublic(acc); }catch(eLive2){}
     }catch(e){}
   };
   window.mountOfficeIntroVideo();

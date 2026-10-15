@@ -98,10 +98,10 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
   display:none;position:absolute;z-index:4;inset:0;pointer-events:none
 }
 .showroom-hero.has-hero-videos .hero-videos{display:block}
-.showroom-hero.has-hero-videos .hero-cover{padding:56px 24px 132px}
+.showroom-hero.has-hero-videos .hero-cover{padding:56px 24px 148px}
 .showroom-hero.has-hero-videos .hero-scroll-cue{bottom:8px;opacity:.4}
 .hero-video-card{
-  position:absolute;bottom:12px;width:min(210px,28vw);max-width:230px;min-width:0;
+  position:absolute;bottom:12px;width:min(248px,32vw);max-width:268px;min-width:0;
   background:rgba(6,17,28,.55);border:1px solid rgba(201,168,76,.4);
   border-radius:14px;overflow:hidden;backdrop-filter:blur(8px);
   box-shadow:0 10px 24px rgba(0,0,0,.32);animation:rzSrHeroVidIn .7s ease both;
@@ -140,8 +140,8 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 @media(max-width:900px){
   .showroom-hero-stage{flex-direction:column;gap:14px}
   .hero-cover{padding:40px 16px 64px}
-  .showroom-hero.has-hero-videos .hero-cover{padding:40px 16px 118px}
-  .hero-video-card{width:min(132px,38vw);bottom:8px;border-radius:10px}
+  .showroom-hero.has-hero-videos .hero-cover{padding:40px 16px 132px}
+  .hero-video-card{width:min(156px,42vw);bottom:8px;border-radius:10px}
   .hero-video-card--intro{right:8px}
   .hero-video-card--extra{left:8px}
 }
@@ -184,8 +184,8 @@ body.rzq-storefront-lb-on{overflow:hidden}
 @media(max-width:640px){
   .showroom-hero{min-height:0!important;height:auto!important}
   .hero-cover{padding:18px 14px 14px!important;min-height:0!important}
-  .showroom-hero.has-hero-videos .hero-cover{padding:18px 14px 100px!important}
-  .showroom-hero.has-hero-videos .hero-video-card{width:min(118px,36vw);bottom:6px}
+  .showroom-hero.has-hero-videos .hero-cover{padding:18px 14px 112px!important}
+  .showroom-hero.has-hero-videos .hero-video-card{width:min(140px,42vw);bottom:6px}
   .showroom-hero.has-hero-videos .hero-video-card--intro{right:6px}
   .showroom-hero.has-hero-videos .hero-video-card--extra{left:6px}
   .showroom-logo{width:56px;height:56px;font-size:26px}
@@ -1480,6 +1480,7 @@ function mountShowroomIntroVideo(){
     if(hero) hero.classList.remove('has-hero-videos');
     if(introCard) introCard.style.display = 'none';
     if(extraCard) extraCard.style.display = 'none';
+    try{ if(window.RizqLiveShowcase && _acc) RizqLiveShowcase.maybeApplyPublic(_acc); }catch(eLive0){}
     return;
   }
 
@@ -1487,8 +1488,9 @@ function mountShowroomIntroVideo(){
   var extra = videos.find(function(v){ return v.kind === 'extra'; });
   if(intro && extra && intro.url === extra.url) extra = null;
   var sig = [_showroomId, (intro && intro.url) || '', (extra && extra.url) || '', fr ? 'fr' : 'ar', 'hero-corners-v2'].join('|');
-  if (window.__rzqShowroomIntroSig === sig && introMount.querySelector('.rzq-iv-wrap')) {
+  if (window.__rzqShowroomIntroSig === sig && introMount.querySelector('.rzq-iv-wrap') && !(extraCard && extraCard.classList.contains('is-live-now'))) {
     if(hero) hero.classList.add('has-hero-videos');
+    try{ if(window.RizqLiveShowcase && _acc) RizqLiveShowcase.maybeApplyPublic(_acc); }catch(eLive1){}
     return;
   }
   window.__rzqShowroomIntroSig = sig;
@@ -1516,6 +1518,7 @@ function mountShowroomIntroVideo(){
     if(extraMount) extraMount.innerHTML = '';
   }
   if(hero) hero.classList.toggle('has-hero-videos', !!(okIntro || okExtra));
+  try{ if(window.RizqLiveShowcase && _acc) RizqLiveShowcase.maybeApplyPublic(_acc); }catch(eLive2){}
 }
 
 /* ── Load Packages — شبكة كاملة العرض بدون تداخل grid ── */
@@ -2083,6 +2086,7 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 </style>
 <script src="rizq_video_ads.js"></script>
 <script src="rizq_intro_video.js?v=29.9"></script>
+<script src="rizq_live_showcase.js?v=1.0"></script>
 <script src="rizq_store_commerce.js?v=29.5"></script>
 <script src="rizq_map_preview.js?v=1.0"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>

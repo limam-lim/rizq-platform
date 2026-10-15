@@ -370,6 +370,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
 <script src="rizq_store_topics.js?v=27.0"></script>
 <script src="rizq_store_commerce.js?v=29.0"></script>
 <script src="rizq_intro_video.js?v=29.9"></script>
+<script src="rizq_live_showcase.js?v=1.0"></script>
 <script src="rizq_mr_payment_catalog.js?v=1.1"></script>
 <script src="rizq_account_payments.js?v=28.3"></script>
 <script src="rizq_service_desk.js?v=1.3"></script>
@@ -824,6 +825,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
             <div style="font-size:11px;color:#94a3b8;margin-top:4px" id="p-promo-video-extra-hint" data-t="p-promo-video-extra-hint">بعض الباقات تشمل فيديو تعريفي + فيديو إضافي (السنوية: إضافي مجاني). يظهران معاً في واجهة المحل كمقطعَين مختلفين.</div>
             <div id="p-promo-video-extra-preview" style="display:none;margin-top:10px;border-radius:12px;overflow:hidden;border:1px solid rgba(27,58,107,.12);background:#0D1B2A"></div>
           </div>
+          <div id="rzq-live-showcase-slot"></div>
           <p class="form-hint" data-t="p-desc-hint">يظهر للزبائن في صفحة محلك — اجعله جذاباً</p>
         </div>
 
@@ -2582,6 +2584,9 @@ function fillProfileForm(){
   var pvEx = document.getElementById('p-promo-video-extra'); if(pvEx) pvEx.value = STORE.promo_video_extra||'';
   try{ _syncPromoVideoExtraUI(STORE); }catch(ePv){}
   try{ previewDashPromoVideo(); previewDashPromoVideoExtra(); }catch(ePrev){}
+  try{
+    if(window.RizqLiveShowcase) RizqLiveShowcase.bindDashboard('#rzq-live-showcase-slot', STORE);
+  }catch(eLive){}
   document.getElementById('p-whatsapp').value = STORE.whatsapp||'';
   document.getElementById('p-facebook').value = STORE.facebook||'';
   var tlEl = document.getElementById('p-tagline'); if(tlEl){ tlEl.value = STORE.tagline||''; updateTaglineCount(); }

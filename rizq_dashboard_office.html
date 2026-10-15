@@ -272,6 +272,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
   <script src="rizq_account_payments.js?v=28.3"></script>
   <script src="rizq_service_desk.js?v=1.3"></script>
   <script src="rizq_intro_video.js?v=29.9"></script>
+  <script src="rizq_live_showcase.js?v=1.0"></script>
   <script src="rizq_invoice_engine.js"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
@@ -584,6 +585,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
             <input class="form-input" id="p-promo-video" dir="ltr" data-ph="pf-video-ph" placeholder="https://youtu.be/... أو رابط Facebook" style="font-family:monospace;font-size:12px" oninput="previewDashPromoVideo()"/>
             <div style="font-size:11px;color:#94a3b8;margin-top:4px" data-t="prof-video-hint">رابط YouTube أو Facebook — يظهر مضمَّناً وواضحاً في صفحة مكتبك. يُفضَّل 15–20 ثانية.</div>
             <div id="p-promo-video-preview" style="display:none;margin-top:10px;border-radius:12px;overflow:hidden;border:1px solid rgba(27,58,107,.12);background:#0D1B2A"></div>
+            <div id="rzq-live-showcase-slot"></div>
           </div>
 
           <!-- ══ بطاقة الظهور في "آخر المكاتب" على الصفحة الرئيسية ══ -->
@@ -1894,6 +1896,7 @@ function fillProfile(){
     for(let o of act.options){ if(o.value===OFFICE.activity || o.textContent.trim()===OFFICE.activity){ o.selected=true; break; } }
   }
   onDashboardActivityChange('office');
+  try{ if(window.RizqLiveShowcase) RizqLiveShowcase.bindDashboard('#rzq-live-showcase-slot', OFFICE); }catch(e){}
 }
 function applySbThumb(){
   if(!window.RizqProfilePhoto) return;

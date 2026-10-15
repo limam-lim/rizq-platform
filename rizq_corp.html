@@ -67,9 +67,9 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
   display:none;position:absolute;z-index:4;inset:0;pointer-events:none
 }
 .corp-hero.has-hero-videos .hero-videos{display:block}
-.corp-hero.has-hero-videos .hero-cover{padding:56px 24px 132px;min-height:360px}
+.corp-hero.has-hero-videos .hero-cover{padding:56px 24px 148px;min-height:360px}
 .corp-hero .hero-video-card{
-  position:absolute;bottom:12px;width:min(210px,28vw);max-width:230px;min-width:0;
+  position:absolute;bottom:12px;width:min(248px,32vw);max-width:268px;min-width:0;
   background:rgba(6,17,28,.55);border:1px solid rgba(201,168,76,.4);
   border-radius:14px;overflow:hidden;backdrop-filter:blur(8px);
   box-shadow:0 10px 24px rgba(0,0,0,.32);animation:rzCorpHeroVidIn .7s ease both;
@@ -107,14 +107,14 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f0f3f8;c
 }
 @media(max-width:900px){
   .corp-hero .hero-cover{padding:40px 16px 72px;min-height:280px}
-  .corp-hero.has-hero-videos .hero-cover{padding:40px 16px 118px;min-height:300px}
-  .corp-hero .hero-video-card{width:min(132px,38vw);bottom:8px;border-radius:10px}
+  .corp-hero.has-hero-videos .hero-cover{padding:40px 16px 132px;min-height:300px}
+  .corp-hero .hero-video-card{width:min(156px,42vw);bottom:8px;border-radius:10px}
   .corp-hero .hero-video-card--intro{right:8px}
   .corp-hero .hero-video-card--extra{left:8px}
 }
 @media(max-width:640px){
-  .corp-hero.has-hero-videos .hero-cover{padding:18px 14px 100px!important;min-height:0!important}
-  .corp-hero .hero-video-card{width:min(118px,36vw);bottom:6px}
+  .corp-hero.has-hero-videos .hero-cover{padding:18px 14px 112px!important;min-height:0!important}
+  .corp-hero .hero-video-card{width:min(140px,42vw);bottom:6px}
   .corp-hero .hero-video-card--intro{right:6px}
   .corp-hero .hero-video-card--extra{left:6px}
 }
@@ -1946,6 +1946,7 @@ window._rizqProfile = (function() {
 })();
 </script>
 <script src="rizq_intro_video.js?v=29.9"></script>
+<script src="rizq_live_showcase.js?v=1.0"></script>
 <script src="rizq_store_commerce.js?v=2"></script>
 <script src="rizq_service_desk.js?v=1.3"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
@@ -1980,11 +1981,13 @@ window.mountCorpIntroVideo = function(url, accHint){
       if(hero) hero.classList.remove('has-hero-videos');
       if(introCard) introCard.style.display = 'none';
       if(extraCard) extraCard.style.display = 'none';
+      try{ if(window.RizqLiveShowcase) RizqLiveShowcase.maybeApplyPublic(acc); }catch(eLive0){}
       return;
     }
     var sig = [corpId, introUrl, extraUrl, fr ? 'fr' : 'ar', 'hero-corners-v2'].join('|');
-    if (window.__rzqCorpIntroSig === sig && introMount.querySelector('.rzq-iv-wrap')) {
+    if (window.__rzqCorpIntroSig === sig && introMount.querySelector('.rzq-iv-wrap') && !(extraCard && extraCard.classList.contains('is-live-now'))) {
       if(hero) hero.classList.add('has-hero-videos');
+      try{ if(window.RizqLiveShowcase) RizqLiveShowcase.maybeApplyPublic(acc); }catch(eLive1){}
       return;
     }
     window.__rzqCorpIntroSig = sig;
@@ -2011,6 +2014,7 @@ window.mountCorpIntroVideo = function(url, accHint){
       if(extraMount) extraMount.innerHTML = '';
     }
     if(hero) hero.classList.toggle('has-hero-videos', !!(okIntro || okExtra));
+    try{ if(window.RizqLiveShowcase) RizqLiveShowcase.maybeApplyPublic(acc); }catch(eLive2){}
   }catch(e){}
 };
 window.mountCorpIntroVideo();
