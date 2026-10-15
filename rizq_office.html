@@ -520,12 +520,19 @@ body.rizq-empty-office .rating-inline{display:none!important}
   .office-desk-actions #rf-doc-upload{grid-column:auto}
   #office-service-desk.office-desk-hz #req-submit-btn,
   #office-service-desk.office-desk-hz #req-prf-btn{width:100%}
-  /* شريط الإجراءات الثابت لا يغطي محتوى أسفل الصفحة */
-  body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+  /* شريط الإجراءات + ويدجت الدردشة لا يغطيان محتوى أسفل الصفحة */
+  body{padding-bottom:calc(128px + env(safe-area-inset-bottom,0px))}
   .office-hero.has-hero-photo .office-profile,
   .office-hero .office-meta,
   .office-hero .office-badges{position:relative;z-index:5}
   .office-hero.has-hero-videos .hero-cover{padding-bottom:124px!important}
+  #rizq-chat-toggle{
+    width:48px!important;height:48px!important;
+    bottom:calc(88px + env(safe-area-inset-bottom,0px))!important;
+    right:10px!important;
+  }
+  .sticky-cta{z-index:400}
+  #about-section,.card.fade-in{position:relative;z-index:1}
 }
 .desk-step{
   display:inline-flex;align-items:center;gap:6px;
