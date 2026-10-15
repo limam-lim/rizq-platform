@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-rizq-strip="22.1">
+<html lang="ar" dir="rtl" data-rizq-strip="22.3">
 <head>
   <meta charset="UTF-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -4149,7 +4149,8 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   margin:0 0 6px;min-width:0
 }
 .rizq-style-brand-row .rzq-brand-logo-name.is-stack{
-  display:inline-flex;flex-direction:column;align-items:center;gap:2px;min-width:0
+  /* صف أفقي داخل البطاقة — يقلّل فراغ المعلومات لصالح الصورة */
+  display:inline-flex;flex-direction:row;align-items:center;gap:6px;min-width:0;max-width:100%
 }
 .rizq-style-brand-row .rzq-brand-logo-name.is-inline{
   display:inline-flex;flex-direction:row;align-items:center;gap:6px;min-width:0;max-width:100%
@@ -4216,8 +4217,8 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   display:flex;flex-direction:column;
   width:232px;min-width:232px;max-width:232px;
   flex:0 0 232px;
-  min-height:336px;
-  height:336px;
+  min-height:348px;
+  height:348px;
   background:#ffffff!important;
   border:1.5px solid rgba(201,168,76,.5);
   border-radius:10px;
@@ -4253,7 +4254,7 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   grid-template-rows:1fr 1fr;
   gap:2px;
   flex:1 1 auto;
-  min-height:208px;
+  min-height:228px;
   height:auto;
   background:
     radial-gradient(circle at 25% 20%,rgba(201,168,76,.2),transparent 45%),
@@ -4311,7 +4312,7 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   .rizq-style-tile{animation:none}
 }
 .rizq-style-body{
-  padding:6px 10px 8px;display:flex;flex-direction:column;gap:2px;flex:0 0 auto;
+  padding:5px 9px 7px;display:flex;flex-direction:column;gap:1px;flex:0 0 auto;
   background:#ffffff!important;
   min-height:0;
 }
@@ -4390,12 +4391,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   .rizq-style-card{
     width:176px!important;min-width:176px!important;max-width:176px!important;
     flex:0 0 176px!important;
-    min-height:292px!important;height:292px!important;
+    min-height:300px!important;height:300px!important;
     border-radius:10px;
     box-shadow:0 4px 14px rgba(13,27,42,.08);
   }
   .rizq-style-card:hover{transform:none;box-shadow:0 4px 14px rgba(13,27,42,.08)}
-  .rizq-style-mosaic{min-height:168px;height:auto;flex:1 1 auto;gap:2px}
+  .rizq-style-mosaic{min-height:188px;height:auto;flex:1 1 auto;gap:2px}
   .rizq-style-tile{font-size:18px}
   .rizq-style-tile:first-child{font-size:26px}
   .rizq-style-body{padding:5px 8px 7px;gap:2px;flex:0 0 auto}
