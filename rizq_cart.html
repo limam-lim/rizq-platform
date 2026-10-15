@@ -1537,7 +1537,7 @@ function issueCartPrefacture(){
   if (!window.RizqPrefacture) {
     showToast(isAr ? '⏳ جاري تحميل PREFACTUR…' : '⏳ Chargement PREFACTUR…');
     var s = document.createElement('script');
-    s.src = 'rizq_prefacture_engine.js?v=28.4';
+    s.src = 'rizq_prefacture_engine.js?v=28.5';
     s.onload = function(){ issueCartPrefacture(); };
     document.head.appendChild(s);
     return;

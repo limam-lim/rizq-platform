@@ -146,11 +146,11 @@
         if (!document.querySelector('link[rel="stylesheet"][href*="rizq_prefacture.css"]')) {
           var prfCss = document.createElement('link');
           prfCss.rel = 'stylesheet';
-          prfCss.href = 'rizq_prefacture.css?v=' + ASSET_V;
+          prfCss.href = 'rizq_prefacture.css?v=28.5' + ASSET_V;
           document.head.appendChild(prfCss);
         }
         if (!document.querySelector('script[src*="rizq_prefacture_engine.js"]')) {
-          appendScript('rizq_prefacture_engine.js?v=' + ASSET_V, { defer: true });
+          appendScript('rizq_prefacture_engine.js?v=28.5' + ASSET_V, { defer: true });
         }
       }
     } catch (ePrf) {}
