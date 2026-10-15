@@ -4064,9 +4064,9 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 }
 .rizq-style-from-view{
   display:inline-flex;align-self:flex-start;
-  font-size:9.5px;font-weight:800;
+  font-size:9px;font-weight:800;line-height:1.2;
   color:var(--royal,#1B3A6B);background:#ffffff;
-  border:1px solid rgba(27,58,107,.16);border-radius:10px;padding:2px 8px;margin-bottom:2px
+  border:1px solid rgba(27,58,107,.16);border-radius:8px;padding:1px 6px;margin:0
 }
 .rizq-styles-gender-tabs{
   display:flex;justify-content:center;gap:8px;margin:0 0 18px;flex-wrap:wrap
@@ -4142,32 +4142,27 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   box-shadow:0 4px 16px rgba(15,35,71,.1),0 0 0 2px rgba(201,168,76,.18);
   transform:translateY(-2px)
 }
-/* على بطاقة الإطلالة: شعار فوق + اختصار تحت */
+/* على بطاقة الإطلالة: شعار بجانب الاسم (صف واحد) لتوفير حيز للصور */
 .rizq-style-mosaic{position:relative}
 .rizq-style-brand-row{
   display:flex;align-items:center;justify-content:flex-start;
-  margin:0 0 6px;min-width:0
+  margin:0;min-width:0
 }
-.rizq-style-brand-row .rzq-brand-logo-name.is-stack{
-  display:inline-flex;flex-direction:column;align-items:center;gap:4px;min-width:0
-}
+.rizq-style-brand-row .rzq-brand-logo-name.is-stack,
 .rizq-style-brand-row .rzq-brand-logo-name.is-inline{
-  display:inline-flex;flex-direction:row;align-items:center;gap:8px;min-width:0;max-width:100%
+  display:inline-flex;flex-direction:row;align-items:center;gap:6px;min-width:0;max-width:100%
 }
 .rizq-style-brand-row .rzq-brand-logo-name-img{
-  width:36px;height:36px;border-radius:10px;flex-shrink:0;display:block;
+  width:26px;height:26px;border-radius:7px;flex-shrink:0;display:block;
   background:#fff;border:1px solid rgba(15,35,71,.1);
-  box-shadow:0 1px 4px rgba(15,35,71,.08);object-fit:contain
+  box-shadow:0 1px 3px rgba(15,35,71,.08);object-fit:contain
 }
 .rizq-style-brand-row .rzq-brand-logo-name-main{
-  font-size:12px;font-weight:800;letter-spacing:0;text-transform:none;
-  color:#111;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;
-  padding-bottom:1px
+  font-size:11.5px;font-weight:800;letter-spacing:0;text-transform:none;
+  color:#111;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;
+  padding-bottom:0
 }
-.rizq-style-brand-row .rzq-brand-logo-name-sub{
-  font-size:10.5px;font-weight:600;color:#5b6b85;line-height:1.35;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap
-}
+.rizq-style-brand-row .rzq-brand-logo-name-sub{display:none}
 
 /* شريط أنماط/نماذج — حركة مثل المباشر + مظهر فاخر */
 .rizq-styles-track-wrap{
@@ -4211,14 +4206,13 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   color:#5b6b85;font-size:13.5px;line-height:1.7;
   background:rgba(27,58,107,.04);border:1.5px dashed rgba(27,58,107,.18);border-radius:14px
 }
-/* بطاقات أنماط الأزياء + أنماط المعارض — أصغر + حواف ذهبية + جسم أبيض ناصع */
+/* بطاقات إطلالات/نماذج — الصور بارزة (~62%) والنصوص مدمجة واضحة */
 .rizq-style-card{
   display:flex;flex-direction:column;
   width:220px;min-width:220px;max-width:220px;
   flex:0 0 220px;
-  /* ارتفاع يكفي للماركة + عنوان سطرين + وصف واضح بدون قصّ الحروف */
-  min-height:348px;
-  height:348px;
+  min-height:360px;
+  height:360px;
   background:#ffffff!important;
   border:1.5px solid rgba(201,168,76,.5);
   border-radius:10px;
@@ -4230,12 +4224,12 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   transition:transform .32s cubic-bezier(.23,1,.32,1),box-shadow .32s,border-color .32s;
   cursor:default;
 }
-.rizq-style-card .rizq-style-body{flex:1 1 auto;min-height:0;overflow:visible}
+.rizq-style-card .rizq-style-body{flex:0 0 auto;min-height:0;overflow:hidden}
 .rizq-style-card .rizq-style-brand-row{
-  min-height:48px;height:48px;margin:0 0 6px;overflow:visible;
+  min-height:0;height:auto;margin:0;overflow:hidden;
   display:flex;align-items:center;justify-content:flex-start;flex-shrink:0
 }
-.rizq-style-card .rizq-style-cta{margin-top:auto;flex-shrink:0}
+.rizq-style-card .rizq-style-cta{margin-top:2px;flex-shrink:0}
 .rizq-style-card::after{
   content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;
   background:linear-gradient(120deg,transparent 35%,rgba(255,255,255,.35) 48%,transparent 62%);
@@ -4253,7 +4247,8 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   grid-template-columns:1.35fr 1fr;
   grid-template-rows:1fr 1fr;
   gap:2px;
-  height:132px;
+  height:224px;
+  flex:0 0 224px;
   background:
     radial-gradient(circle at 25% 20%,rgba(201,168,76,.2),transparent 45%),
     linear-gradient(160deg,#102038,#0a1628);
@@ -4310,42 +4305,41 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   .rizq-style-tile{animation:none}
 }
 .rizq-style-body{
-  padding:10px 12px 12px;display:flex;flex-direction:column;gap:5px;flex:1;
+  padding:6px 10px 8px;display:flex;flex-direction:column;gap:3px;flex:0 0 auto;
   background:#ffffff!important;
   min-height:0;
 }
 .rizq-style-badge{
   display:inline-flex;align-self:flex-start;flex-shrink:0;
-  font-size:10px;font-weight:800;letter-spacing:.2px;
+  font-size:9.5px;font-weight:800;letter-spacing:.15px;
   color:var(--royal,#1B3A6B);background:#ffffff;
-  border:1px solid rgba(27,58,107,.16);border-radius:10px;padding:3px 8px;margin-bottom:0;
-  line-height:1.35
+  border:1px solid rgba(27,58,107,.16);border-radius:8px;padding:1px 7px;margin:0;
+  line-height:1.25
 }
 .rizq-style-card[data-sty-gender="women"] .rizq-style-badge{
   color:#6b2d4a;background:#ffffff;border-color:rgba(107,45,74,.28)
 }
 .rizq-style-name{
-  font-size:13.5px;font-weight:800;color:var(--royal,#1B3A6B);
-  /* خط عربي أوضح — يمنع قصّ الحروف السفلية */
-  line-height:1.5;
-  max-height:calc(1.5em * 2);
+  font-size:12.5px;font-weight:800;color:var(--royal,#1B3A6B);
+  line-height:1.3;
+  max-height:calc(1.3em * 2);
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   word-break:break-word;overflow-wrap:anywhere;
-  padding-bottom:1px
+  padding-bottom:0
 }
 .rizq-style-meta{
-  font-size:11.5px;color:#3d4f66;line-height:1.5;
-  max-height:calc(1.5em * 2);
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  font-size:10.5px;color:#3d4f66;line-height:1.25;
+  max-height:1.25em;
+  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;
   word-break:break-word;overflow-wrap:anywhere;
-  padding-bottom:1px
+  padding-bottom:0;white-space:nowrap;text-overflow:ellipsis
 }
 .rizq-style-cta{
-  margin-top:auto;padding-top:8px;
-  font-size:12px;font-weight:700;color:var(--gold-dk,#8a6f2a);
+  margin-top:2px;padding-top:0;
+  font-size:11px;font-weight:700;color:var(--gold-dk,#8a6f2a);
   display:inline-flex;align-items:center;gap:3px;
   text-decoration:none;cursor:pointer;align-self:flex-start;
-  position:relative;z-index:1;line-height:1.4;
+  position:relative;z-index:1;line-height:1.25;
 }
 .rizq-style-cta:hover{color:var(--gold,#C9A84C);text-decoration:none}
 .rizq-style-cta:focus-visible{outline:2px solid rgba(201,168,76,.75);outline-offset:2px;border-radius:4px}
@@ -4390,19 +4384,21 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   .rizq-style-card{
     width:168px!important;min-width:168px!important;max-width:168px!important;
     flex:0 0 168px!important;
-    min-height:300px!important;height:300px!important;
+    min-height:292px!important;height:292px!important;
     border-radius:10px;
     box-shadow:0 4px 14px rgba(13,27,42,.08);
   }
   .rizq-style-card:hover{transform:none;box-shadow:0 4px 14px rgba(13,27,42,.08)}
-  .rizq-style-mosaic{height:100px;gap:2px}
+  .rizq-style-mosaic{height:178px!important;flex-basis:178px!important;gap:2px}
   .rizq-style-tile{font-size:18px}
   .rizq-style-tile:first-child{font-size:26px}
-  .rizq-style-body{padding:8px 9px 10px;gap:4px}
-  .rizq-style-badge{font-size:9px;padding:2px 6px;margin-bottom:0}
-  .rizq-style-name{font-size:12px;font-weight:800;line-height:1.45;-webkit-line-clamp:2}
-  .rizq-style-meta{font-size:10.5px;line-height:1.45;-webkit-line-clamp:2;display:-webkit-box}
-  .rizq-style-cta{font-size:11px;padding-top:6px}
+  .rizq-style-body{padding:5px 8px 7px;gap:2px}
+  .rizq-style-brand-row .rzq-brand-logo-name-img{width:22px;height:22px;border-radius:6px}
+  .rizq-style-brand-row .rzq-brand-logo-name-main{font-size:10.5px}
+  .rizq-style-badge{font-size:9px;padding:1px 6px;margin:0}
+  .rizq-style-name{font-size:11.5px;font-weight:800;line-height:1.25;-webkit-line-clamp:2;max-height:calc(1.25em * 2)}
+  .rizq-style-meta{font-size:10px;line-height:1.2;-webkit-line-clamp:1;max-height:1.2em;display:-webkit-box}
+  .rizq-style-cta{font-size:10.5px;padding-top:0;margin-top:1px}
 }
 
 /* ── شريط "قريباً" — اهتمام حقيقي بالأقسام المغلقة (طلب Limam 03/08/2026) ── */
@@ -7229,8 +7225,9 @@ function _styBrandLogoNameHtml(ad, fr, opts){
 function _styBrandChipForLook(items, fr, catKey){
   items = Array.isArray(items) ? items : (items ? [items] : []);
   var i, html, ad, brandId;
+  var brandOpts = { inline: true, size: 26 };
   for(i = 0; i < items.length; i++){
-    html = _styBrandLogoNameHtml(items[i], fr);
+    html = _styBrandLogoNameHtml(items[i], fr, brandOpts);
     if(html) return html;
   }
   if(!window.RizqBrands || typeof RizqBrands.forCategory !== 'function') return '';
@@ -7243,9 +7240,9 @@ function _styBrandChipForLook(items, fr, catKey){
   for(i = 0; i < key.length; i++) hash = ((hash << 5) - hash) + key.charCodeAt(i) | 0;
   brandId = brands[Math.abs(hash) % brands.length].id;
   if(typeof RizqBrands.logoNameHtml === 'function'){
-    return RizqBrands.logoNameHtml(brandId, { fr: !!fr, size: 36 });
+    return RizqBrands.logoNameHtml(brandId, { fr: !!fr, size: 26, inline: true });
   }
-  return RizqBrands.chipHtml(brandId, { fr: !!fr, size: 22 });
+  return RizqBrands.chipHtml(brandId, { fr: !!fr, size: 18 });
 }
 /** وصف قصير واضح للبطاقة — بدون قصّ منتصف الكلمات */
 function _styClearMeta(items, fr){
