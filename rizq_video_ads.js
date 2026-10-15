@@ -656,11 +656,12 @@
               '<span class="rizq-vcard-act-ico">⛶</span><span class="rizq-vcard-act-lbl">' + esc(lblFs) + '</span>' +
             '</button>' +
           '</div>' +
+          /* جهات الاتصال فوق الفيديو — تحت الوسط بأسلوب هادئ */
+          contactActionsHtml(ad) +
           '<div class="rizq-vcard-cap">' + esc(title) + '</div>' +
         '</div>' +
         '<div class="rizq-vcard-name">' + esc(title) + '</div>' +
-        (sub ? '<div class="rizq-vcard-sub">' + esc(sub) + '</div>' : '') +
-        contactActionsHtml(ad);
+        (sub ? '<div class="rizq-vcard-sub">' + esc(sub) + '</div>' : '');
 
       var video = card.querySelector('video');
       var btnPlay = card.querySelector('[data-act="play"]');

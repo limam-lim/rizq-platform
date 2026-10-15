@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-rizq-strip="22.5">
+<html lang="ar" dir="rtl" data-rizq-strip="22.6">
 <head>
   <meta charset="UTF-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -1582,42 +1582,54 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   font-size:8px;font-weight:800;line-height:1;text-align:center;
   text-shadow:0 1px 3px rgba(0,0,0,.65);max-width:44px;
 }
-/* جهات اتصال — نفس شكل بطاقات الإعلانات (دوائر اتصال + واتساب) */
-.rizq-vcard-contacts,
-.rizq-vcard .rzq-adx-actions{
-  display:flex;align-items:center;justify-content:center;gap:14px;
-  padding:4px 0 2px;margin-top:2px;width:100%;
+/* جهات اتصال فوق الفيديو — تحت الوسط، بهدوء فوق الإعلان */
+.rizq-vcard-thumb .rizq-vcard-contacts,
+.rizq-vcard-thumb .rzq-adx-actions{
+  position:absolute;left:50%;bottom:18%;
+  transform:translateX(-50%);
+  z-index:5;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:auto;max-width:calc(100% - 52px);
+  margin:0;padding:6px 10px;
+  border-radius:999px;
+  background:rgba(8,16,28,.42);
+  border:1px solid rgba(255,255,255,.18);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 8px 20px rgba(0,0,0,.28);
+  pointer-events:auto;
 }
-.rizq-vcard-contacts .rizq-vcard-tel,
-.rizq-vcard-contacts .rizq-vcard-wa,
-.rizq-vcard .rzq-adx-tel,
-.rizq-vcard .rzq-adx-wa{
-  width:28px;height:28px;border-radius:50%;
+.rizq-vcard-thumb .rizq-vcard-tel,
+.rizq-vcard-thumb .rizq-vcard-wa,
+.rizq-vcard-thumb .rzq-adx-tel,
+.rizq-vcard-thumb .rzq-adx-wa{
+  width:30px;height:30px;border-radius:50%;
   display:inline-flex;align-items:center;justify-content:center;
   cursor:pointer;padding:0;flex-shrink:0;text-decoration:none;
   transition:transform .2s,background .2s,border-color .2s,box-shadow .2s,filter .2s;
   font-size:12px;line-height:1;
 }
-.rizq-vcard-contacts .rizq-vcard-tel,
-.rizq-vcard .rzq-adx-tel{
-  background:#12243f;border:1px solid rgba(201,168,76,.6);
-  color:#E8C96A;box-shadow:0 3px 10px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.08);
+.rizq-vcard-thumb .rizq-vcard-tel,
+.rizq-vcard-thumb .rzq-adx-tel{
+  background:rgba(18,36,63,.92);border:1px solid rgba(201,168,76,.7);
+  color:#E8C96A;box-shadow:0 3px 10px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.1);
 }
-.rizq-vcard-contacts .rizq-vcard-tel:hover,
-.rizq-vcard .rzq-adx-tel:hover{
-  background:rgba(201,168,76,.18);border-color:#C9A84C;transform:scale(1.06);
+.rizq-vcard-thumb .rizq-vcard-tel:hover,
+.rizq-vcard-thumb .rzq-adx-tel:hover{
+  background:rgba(201,168,76,.28);border-color:#E8C96A;transform:scale(1.07);
 }
-.rizq-vcard-contacts .rizq-vcard-wa,
-.rizq-vcard .rzq-adx-wa{
+.rizq-vcard-thumb .rizq-vcard-wa,
+.rizq-vcard-thumb .rzq-adx-wa{
   background:linear-gradient(145deg,#25D366,#128C7E);
-  border:1px solid rgba(255,255,255,.22);color:#fff;
-  box-shadow:0 3px 10px rgba(18,140,126,.35);
+  border:1px solid rgba(255,255,255,.28);color:#fff;
+  box-shadow:0 3px 10px rgba(18,140,126,.4);
 }
-.rizq-vcard-contacts .rizq-vcard-wa:hover,
-.rizq-vcard .rzq-adx-wa:hover{transform:scale(1.06);filter:brightness(1.06)}
-.rizq-vcard-contacts svg,
-.rizq-vcard .rzq-adx-actions svg{width:13px;height:13px;display:block;flex-shrink:0}
+.rizq-vcard-thumb .rizq-vcard-wa:hover,
+.rizq-vcard-thumb .rzq-adx-wa:hover{transform:scale(1.07);filter:brightness(1.08)}
+.rizq-vcard-thumb .rizq-vcard-contacts svg,
+.rizq-vcard-thumb .rzq-adx-actions svg{width:13px;height:13px;display:block;flex-shrink:0}
 .rizq-vcard-contact-lbl{display:none}
+/* أبعد عنوان الفيديو قليلاً حتى لا يتراكب مع جهات الاتصال */
+.rizq-vcard-thumb .rizq-vcard-cap{bottom:8px;max-width:calc(100% - 24px);opacity:.92}
 /* تكبير البطاقة — نافذة كبيرة فوق الصفحة */
 .rizq-vstrip-lb{
   position:fixed;inset:0;z-index:10050;display:none;
@@ -1683,11 +1695,12 @@ body.rizq-vstrip-lb-on{overflow:hidden}
   .rizq-vid-strip{margin:6px auto 0;padding:6px 0 2px;border-radius:0;background:transparent;box-shadow:none;border:none}
   .rizq-vid-strip-hint{display:none}
   .rizq-vcard{flex-basis:min(210px,58vw)}
-  .rizq-vcard-contacts .rizq-vcard-tel,
-  .rizq-vcard-contacts .rizq-vcard-wa,
-  .rizq-vcard .rzq-adx-tel,
-  .rizq-vcard .rzq-adx-wa{width:26px;height:26px}
-  .rizq-vcard-contacts{gap:12px}
+  .rizq-vcard-thumb .rizq-vcard-contacts,
+  .rizq-vcard-thumb .rzq-adx-actions{bottom:16%;padding:5px 8px;gap:8px}
+  .rizq-vcard-thumb .rizq-vcard-tel,
+  .rizq-vcard-thumb .rizq-vcard-wa,
+  .rizq-vcard-thumb .rzq-adx-tel,
+  .rizq-vcard-thumb .rzq-adx-wa{width:28px;height:28px}
   .rizq-vid-strip-btn{padding:6px 10px;font-size:11.5px}
 }
 
@@ -14470,7 +14483,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_packages_ui.js?v=23.0"></script>
 <script src="rizq_merchant_activities.js?v=23.0"></script>
 <script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo16"></script>
+<script src="rizq_video_ads.js?v=promo17"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=24.1"></script>
 <script src="rizq_disclaimer.js"></script>
