@@ -619,15 +619,14 @@
       var waDigits = digitsOnly(wa) || telDigits;
       var telHref = telDigits ? ('tel:+' + telDigits.replace(/^00/, '')) : 'rizq_ads_info.html';
       var waHref = waDigits ? ('https://wa.me/' + waDigits.replace(/^00/, '')) : 'rizq_ads_info.html';
+      /* نفس صفّ جهات الاتصال في بطاقات الإعلانات: دوائر اتصال + واتساب */
       return ''
-        + '<div class="rizq-vcard-contacts" role="group" aria-label="' + esc(isFr ? 'Contact' : 'تواصل') + '">'
-        +   '<a class="rizq-vcard-tel" data-act="tel" href="' + esc(telHref) + '" aria-label="' + esc(lblCall) + '" title="' + esc(lblCall) + '">'
+        + '<div class="rizq-vcard-contacts rzq-adx-actions" role="group" aria-label="' + esc(isFr ? 'Contact' : 'تواصل') + '">'
+        +   '<a class="rizq-vcard-tel rzq-adx-tel" data-act="tel" href="' + esc(telHref) + '" aria-label="' + esc(lblCall) + '" title="' + esc(lblCall) + '">'
         +     STRIP_PHONE_SVG
-        +     '<span class="rizq-vcard-contact-lbl">' + esc(lblCall) + '</span>'
         +   '</a>'
-        +   '<a class="rizq-vcard-wa" data-act="wa" href="' + esc(waHref) + '" target="_blank" rel="noopener" aria-label="' + esc(lblWa) + '" title="' + esc(lblWa) + '">'
+        +   '<a class="rizq-vcard-wa rzq-adx-wa" data-act="wa" href="' + esc(waHref) + '" target="_blank" rel="noopener" aria-label="' + esc(lblWa) + '" title="' + esc(lblWa) + '">'
         +     STRIP_WA_SVG
-        +     '<span class="rizq-vcard-contact-lbl">' + esc(lblWa) + '</span>'
         +   '</a>'
         + '</div>';
     }
@@ -740,7 +739,7 @@
 
       // جوال: لمس البطاقة (خارج الأزرار/جهات الاتصال) يشغّل/يوقف ويعرض الأدوات
       card.addEventListener('click', function (ev) {
-        if (ev.target.closest && ev.target.closest('.rizq-vcard-actions,.rizq-vcard-contacts')) return;
+        if (ev.target.closest && ev.target.closest('.rizq-vcard-actions,.rizq-vcard-contacts,.rzq-adx-actions,.rzq-adx-tel,.rzq-adx-wa')) return;
         if (window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
           return; // سطح المكتب يعتمد على hover
         }

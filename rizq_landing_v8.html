@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-rizq-strip="22.4">
+<html lang="ar" dir="rtl" data-rizq-strip="22.5">
 <head>
   <meta charset="UTF-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -1582,35 +1582,42 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   font-size:8px;font-weight:800;line-height:1;text-align:center;
   text-shadow:0 1px 3px rgba(0,0,0,.65);max-width:44px;
 }
-/* جهات اتصال واضحة مثل بطاقات الإعلانات — اتصال + واتساب */
-.rizq-vcard-contacts{
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  padding:2px 0 0;margin-top:1px;
+/* جهات اتصال — نفس شكل بطاقات الإعلانات (دوائر اتصال + واتساب) */
+.rizq-vcard-contacts,
+.rizq-vcard .rzq-adx-actions{
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  padding:4px 0 2px;margin-top:2px;width:100%;
 }
-.rizq-vcard-tel,
-.rizq-vcard-wa{
-  flex:1 1 0;min-width:0;height:32px;border-radius:10px;
-  display:inline-flex;align-items:center;justify-content:center;gap:5px;
-  cursor:pointer;padding:0 8px;text-decoration:none;
-  font-family:'Cairo','Segoe UI',sans-serif;font-size:11px;font-weight:800;
-  transition:transform .2s,background .2s,border-color .2s,filter .2s,box-shadow .2s;
+.rizq-vcard-contacts .rizq-vcard-tel,
+.rizq-vcard-contacts .rizq-vcard-wa,
+.rizq-vcard .rzq-adx-tel,
+.rizq-vcard .rzq-adx-wa{
+  width:28px;height:28px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;padding:0;flex-shrink:0;text-decoration:none;
+  transition:transform .2s,background .2s,border-color .2s,box-shadow .2s,filter .2s;
+  font-size:12px;line-height:1;
 }
-.rizq-vcard-tel{
-  background:#12243f;border:1px solid rgba(201,168,76,.65);
-  color:#E8C96A;box-shadow:0 3px 10px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.08);
+.rizq-vcard-contacts .rizq-vcard-tel,
+.rizq-vcard .rzq-adx-tel{
+  background:#12243f;border:1px solid rgba(201,168,76,.6);
+  color:#E8C96A;box-shadow:0 3px 10px rgba(0,0,0,.26),inset 0 1px 0 rgba(255,255,255,.08);
 }
-.rizq-vcard-tel:hover{
-  background:rgba(201,168,76,.18);border-color:#C9A84C;transform:scale(1.03);
+.rizq-vcard-contacts .rizq-vcard-tel:hover,
+.rizq-vcard .rzq-adx-tel:hover{
+  background:rgba(201,168,76,.18);border-color:#C9A84C;transform:scale(1.06);
 }
-.rizq-vcard-wa{
+.rizq-vcard-contacts .rizq-vcard-wa,
+.rizq-vcard .rzq-adx-wa{
   background:linear-gradient(145deg,#25D366,#128C7E);
   border:1px solid rgba(255,255,255,.22);color:#fff;
-  box-shadow:0 3px 10px rgba(18,140,126,.32);
+  box-shadow:0 3px 10px rgba(18,140,126,.35);
 }
-.rizq-vcard-wa:hover{transform:scale(1.03);filter:brightness(1.06)}
-.rizq-vcard-tel svg,
-.rizq-vcard-wa svg{width:14px;height:14px;display:block;flex-shrink:0}
-.rizq-vcard-contact-lbl{line-height:1;white-space:nowrap}
+.rizq-vcard-contacts .rizq-vcard-wa:hover,
+.rizq-vcard .rzq-adx-wa:hover{transform:scale(1.06);filter:brightness(1.06)}
+.rizq-vcard-contacts svg,
+.rizq-vcard .rzq-adx-actions svg{width:13px;height:13px;display:block;flex-shrink:0}
+.rizq-vcard-contact-lbl{display:none}
 /* تكبير البطاقة — نافذة كبيرة فوق الصفحة */
 .rizq-vstrip-lb{
   position:fixed;inset:0;z-index:10050;display:none;
@@ -1676,8 +1683,11 @@ body.rizq-vstrip-lb-on{overflow:hidden}
   .rizq-vid-strip{margin:6px auto 0;padding:6px 0 2px;border-radius:0;background:transparent;box-shadow:none;border:none}
   .rizq-vid-strip-hint{display:none}
   .rizq-vcard{flex-basis:min(210px,58vw)}
-  .rizq-vcard-tel,.rizq-vcard-wa{height:30px;font-size:10.5px;padding:0 6px;gap:4px;border-radius:9px}
-  .rizq-vcard-tel svg,.rizq-vcard-wa svg{width:13px;height:13px}
+  .rizq-vcard-contacts .rizq-vcard-tel,
+  .rizq-vcard-contacts .rizq-vcard-wa,
+  .rizq-vcard .rzq-adx-tel,
+  .rizq-vcard .rzq-adx-wa{width:26px;height:26px}
+  .rizq-vcard-contacts{gap:12px}
   .rizq-vid-strip-btn{padding:6px 10px;font-size:11.5px}
 }
 
@@ -14460,7 +14470,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_packages_ui.js?v=23.0"></script>
 <script src="rizq_merchant_activities.js?v=23.0"></script>
 <script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo15"></script>
+<script src="rizq_video_ads.js?v=promo16"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=24.1"></script>
 <script src="rizq_disclaimer.js"></script>
