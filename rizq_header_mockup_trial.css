@@ -28,26 +28,40 @@ body.rizq-mockup-hdr-trial .hero{
   display:block!important;
   padding-top: calc(var(--rizq-mock-hdr-h) + 12px)!important;
 }
+/* وضوح: إيقاف لمعة/طفو تشوّش الشعار أثناء التجربة */
+body.rizq-mockup-hdr-trial .hero-headline::after{
+  display:none!important;content:none!important;animation:none!important;
+}
+body.rizq-mockup-hdr-trial .hero-title-card{
+  overflow:hidden!important;
+  animation:none!important;
+}
+body.rizq-mockup-hdr-trial .hero-subtitle-primary,
+body.rizq-mockup-hdr-trial .hero-subtitle-secondary{
+  text-shadow:none;
+  opacity:1!important;
+}
 #rizq-mock-hdr{
   position:fixed;top:0;left:0;right:0;z-index:10050;
   font-family:'Cairo','Segoe UI',Tahoma,sans-serif;
   background:var(--rmh-navy);
   box-shadow:0 8px 24px rgba(2,6,14,.35);
   direction:rtl;
+  overflow:visible;
 }
 #rizq-mock-hdr *{box-sizing:border-box}
 
 /* شريط تنويه علوي */
 .rmh-util{
   display:flex;align-items:center;justify-content:space-between;gap:14px;
-  padding:4px 22px;
+  padding:5px 22px;
   background:#060d18;
   border-bottom:1px solid rgba(201,168,76,.14);
-  color:rgba(220,230,245,.7);
-  font-size:11px;font-weight:600;line-height:1.35;
+  color:rgba(235,242,255,.92);
+  font-size:12px;font-weight:700;line-height:1.4;
 }
 .rmh-util-emergency{direction:rtl;unicode-bidi:isolate;white-space:nowrap}
-.rmh-util-notice{flex:1;text-align:center;opacity:.88}
+.rmh-util-notice{flex:1;text-align:center;opacity:1}
 
 /* الصف الرئيسي: شعار · بحث · أدوات */
 .rmh-main{
@@ -93,7 +107,7 @@ body.rizq-mockup-hdr-trial .hero{
   flex:1;min-width:0;border:0;outline:0;padding:0 14px;
   font:600 14px 'Cairo',sans-serif;color:#0D1B2A;background:transparent;
 }
-.rmh-search-input::placeholder{color:#8a9bb0}
+.rmh-search-input::placeholder{color:#5a6f88;opacity:1}
 .rmh-search-btn{
   width:48px;flex-shrink:0;border:0;cursor:pointer;
   background:#15325c;color:#fff;
@@ -171,38 +185,45 @@ nav.rmh-nav{
 .rmh-nav a.is-active .rmh-nav-ico,
 .rmh-nav a:hover .rmh-nav-ico{opacity:1;color:var(--rmh-gold)}
 
-/* منسدلة السلة العامة */
+/* منسدلة السلة — تُفتح نحو داخل الشاشة حتى لا تُقصّ على الحافة */
+.rmh-cart-wrap{position:relative;z-index:30}
 .rmh-cart-panel{
-  position:absolute;top:calc(100% + 8px);inset-inline-start:0;
-  width:min(340px,92vw);background:#fff;border-radius:14px;
-  border:1px solid rgba(27,58,107,.12);
-  box-shadow:0 16px 40px rgba(15,35,65,.22);
-  padding:12px;z-index:20;display:none;direction:rtl;text-align:right;
+  position:absolute;top:calc(100% + 10px);
+  left:0;right:auto;
+  inset-inline-start:auto;inset-inline-end:auto;
+  width:min(320px,calc(100vw - 24px));
+  max-height:min(70vh,420px);overflow:auto;
+  background:#fff;border-radius:14px;
+  border:1px solid rgba(27,58,107,.14);
+  box-shadow:0 18px 44px rgba(15,35,65,.28);
+  padding:14px;z-index:40;display:none;
+  direction:rtl;text-align:right;
+  color:#0D1B2A;
 }
-.rmh-cart-wrap{position:relative}
 .rmh-cart-wrap.open .rmh-cart-panel{display:block}
 .rmh-cart-panel h4{
-  margin:0 0 8px;font:800 14px 'Cairo',sans-serif;color:#0D1B2A;
+  margin:0 0 10px;font:800 15px/1.35 'Cairo',sans-serif;color:#0D1B2A;
 }
 .rmh-cart-sec{
-  border:1px solid #e8eef6;border-radius:10px;padding:8px 10px;margin-bottom:8px;
-  background:#f8fafc;
+  border:1px solid #e2eaf3;border-radius:10px;padding:10px 12px;margin-bottom:8px;
+  background:#f7fafc;
 }
 .rmh-cart-sec-title{
   display:flex;justify-content:space-between;align-items:center;
-  font:800 12.5px 'Cairo',sans-serif;color:#1B3A6B;margin-bottom:4px;
+  font:800 13px 'Cairo',sans-serif;color:#12325c;margin-bottom:6px;
 }
 .rmh-cart-sec-count{
-  background:rgba(201,168,76,.2);color:#0D1B2A;border-radius:999px;
-  font-size:11px;font-weight:900;padding:1px 8px;
+  background:rgba(201,168,76,.25);color:#0D1B2A;border-radius:999px;
+  font-size:11px;font-weight:900;padding:2px 8px;
 }
-.rmh-cart-sec ul{margin:0;padding:0 14px 0 0;list-style:disc;color:#4a5d78;font:600 12px 'Cairo',sans-serif}
-.rmh-cart-sec li{margin:2px 0}
-.rmh-cart-empty{color:#8a9bb0;font:600 12.5px 'Cairo',sans-serif;margin:0}
+.rmh-cart-sec ul{margin:0;padding:0 16px 0 0;list-style:disc;color:#2f4060;font:650 13px/1.45 'Cairo',sans-serif}
+.rmh-cart-sec li{margin:3px 0}
+.rmh-cart-empty{color:#6a7d94;font:600 13px 'Cairo',sans-serif;margin:0}
 .rmh-cart-open-full{
-  display:block;text-align:center;margin-top:8px;padding:10px;
+  display:block;text-align:center;margin-top:10px;padding:11px 12px;
   background:linear-gradient(135deg,#1B3A6B,#0D1B2A);color:#fff;
-  border-radius:10px;text-decoration:none;font:800 13px 'Cairo',sans-serif;
+  border-radius:10px;text-decoration:none;font:800 13.5px 'Cairo',sans-serif;
+  white-space:nowrap;
 }
 
 /* تابلت — بدون قائمة الأقسام داخل البحث (كالنموذج) */
@@ -242,5 +263,9 @@ nav.rmh-nav{
   .rmh-post-lbl{display:none}
   .rmh-nav{padding:0 6px!important}
   .rmh-nav a{min-width:60px;font-size:10.5px;padding:7px 6px 9px}
-  .rmh-cart-panel{inset-inline-start:auto;inset-inline-end:0}
+  /* على الهاتف: ثبّت اللوحة داخل العرض */
+  .rmh-cart-panel{
+    left:auto;right:0;
+    width:min(300px,calc(100vw - 16px));
+  }
 }
