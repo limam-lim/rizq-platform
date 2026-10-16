@@ -4468,6 +4468,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <script src="rizq_announcements.js"></script>
     <script src="rizq_civic_ticker.js"></script>
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_phone_utils.js?v=1.0"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
 <script src="rizq_terms_gate.js?v=23.0"></script>
@@ -5920,7 +5921,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
       <input class="m-input" id="st-name" type="text" data-ph-fr="Nom du magasin" placeholder="اسم المحل التجاري"/>
       <input class="m-input" id="st-owner" type="text" data-ph-fr="Nom du propriétaire" placeholder="اسم صاحب المحل"/>
-      <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="st-phone" type="tel" data-ph-fr="Numéro de téléphone (WhatsApp)" placeholder="رقم الهاتف (واتساب)"/>
+      <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="st-phone" type="tel" data-ph-fr="Téléphone WhatsApp — 2X XX XX XX ou +222…" placeholder="هاتف واتساب — 2X XX XX XX أو +222…"/>
+      <p style="font-size:10px;color:var(--text-muted);margin:-6px 0 10px" data-t-fr="Mauritanien (8 chiffres, commence par 2/3/4) ou international (+…)" data-t="st-phone-hint">موريتاني 8 أرقام (يبدأ بـ 2/3/4) أو دولي يبدأ بـ +</p>
       <input class="m-input" id="st-city" type="text" data-ph-fr="Ville" placeholder="المدينة"/>
       <select class="m-input merchant-activity-select" id="st-cat" data-account-type="store">
         <option value="">— اختر نشاط المحل —</option>
@@ -5954,7 +5956,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <input class="m-input" id="of-owner" type="text" data-ph-fr="Nom du responsable" placeholder="اسم المسؤول"/>
       <input class="m-input" id="of-ninea" type="text" data-ph-fr="Numéro NINEA (optionnel)" placeholder="رقم NINEA (اختياري)"/>
       <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="of-nni" type="text" maxlength="20" data-ph-fr="Numéro d'identité nationale du responsable (NNI)" placeholder="الرقم الوطني للمسؤول (NNI)"/>
-      <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="of-phone" type="tel" data-ph-fr="Numéro de téléphone (WhatsApp)" placeholder="رقم الهاتف (واتساب)"/>
+      <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="of-phone" type="tel" data-ph-fr="Téléphone WhatsApp — 2X XX XX XX ou +222…" placeholder="هاتف واتساب — 2X XX XX XX أو +222…"/>
+      <p style="font-size:10px;color:var(--text-muted);margin:-6px 0 10px" data-t-fr="Mauritanien (8 chiffres, commence par 2/3/4) ou international (+…)" data-t="of-phone-hint">موريتاني 8 أرقام (يبدأ بـ 2/3/4) أو دولي يبدأ بـ +</p>
       <input class="m-input" id="of-email" type="email" data-ph-fr="E-mail officiel" placeholder="البريد الإلكتروني الرسمي"/>
       <input class="m-input" id="of-city" type="text" data-ph-fr="Ville" placeholder="المدينة"/>
       <select class="m-input merchant-activity-select" id="of-cat" data-account-type="office">
@@ -5997,7 +6000,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <input class="m-input" id="cr-ninea" type="text" data-ph-fr="Numéro NINEA" placeholder="رقم NINEA"/>
       <input class="m-input" id="cr-manager" type="text" data-ph-fr="Nom du directeur responsable" placeholder="اسم المدير المسؤول"/>
       <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="cr-nni" type="text" maxlength="20" data-ph-fr="Numéro d'identité nationale du directeur (NNI)" placeholder="الرقم الوطني للمدير (NNI)"/>
-      <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="cr-phone" type="tel" data-ph-fr="Numéro de téléphone officiel" placeholder="رقم الهاتف الرسمي"/>
+      <input dir="ltr" style="direction:ltr;text-align:left;" class="m-input" id="cr-phone" type="tel" data-ph-fr="Téléphone officiel — 2X XX XX XX ou +222…" placeholder="الهاتف الرسمي — 2X XX XX XX أو +222…"/>
+      <p style="font-size:10px;color:var(--text-muted);margin:-6px 0 10px" data-t-fr="Mauritanien (8 chiffres, commence par 2/3/4) ou international (+…)" data-t="cr-phone-hint">موريتاني 8 أرقام (يبدأ بـ 2/3/4) أو دولي يبدأ بـ +</p>
       <input class="m-input" id="cr-email" type="email" data-ph-fr="E-mail officiel" placeholder="البريد الإلكتروني الرسمي"/>
       <input class="m-input" id="cr-city" type="text" data-ph-fr="Ville" placeholder="المدينة"/>
       <select class="m-input merchant-activity-select" id="cr-cat" data-account-type="corp">
@@ -12375,12 +12379,14 @@ function ppFinalSubmit(){
 function submitStoreReg(){
   const name=document.getElementById('st-name').value.trim();
   const owner=document.getElementById('st-owner').value.trim();
-  const phone=document.getElementById('st-phone').value.trim();
+  const phoneRaw=document.getElementById('st-phone').value.trim();
   const city=document.getElementById('st-city').value.trim();
   const nni=document.getElementById('st-nni').value.trim();
   const pw=document.getElementById('st-pw').value;
   const pw2=document.getElementById('st-pw2').value;
-  if(!name||!owner||!phone||!city){alert(isAr?'يرجى ملء جميع الحقول الإلزامية':'Veuillez remplir tous les champs obligatoires');return;}
+  if(!name||!owner||!phoneRaw||!city){alert(isAr?'يرجى ملء جميع الحقول الإلزامية':'Veuillez remplir tous les champs obligatoires');return;}
+  const phones = (window.RizqPhone && RizqPhone.resolveMerchantPhone(phoneRaw)) || null;
+  if(!phones){alert((window.RizqPhone&&RizqPhone.phoneErrorMessage(isAr))||(isAr?'رقم هاتف غير صالح':'Numéro invalide'));return;}
   const stEmail=(document.getElementById('st-email')&&document.getElementById('st-email').value.trim().toLowerCase())||'';
   if(!stEmail||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(stEmail)){alert(isAr?'البريد الإلكتروني مطلوب لتسجيل الدخول لاحقاً':'E-mail obligatoire pour vous connecter plus tard');return;}
   if(!NNI_RE.test(nni)){alert(isAr?'يرجى إدخال رقم تعريف وطني (NNI) صالح — أرقام فقط':'Veuillez saisir un numéro d\'identité nationale (NNI) valide — chiffres uniquement');return;}
@@ -12393,7 +12399,7 @@ function submitStoreReg(){
     // لكن محتواه الفعلي لم يكن يُقرأ أو يُرفَق بالحساب أبداً — الصورة تُفقَد
     // بالكامل بمجرد الضغط على "إرسال الطلب"، ولا تُخزَّن حتى محلياً.
     _fileToBase64(stFile).then(function(id_image){
-      _ppPendingData={type:'store',name,owner,phone,city,nni,id_image,email:document.getElementById('st-email').value.trim(),password:pw,trial_ends:new Date(Date.now()+10*86400000).toISOString()};
+      _ppPendingData={type:'store',name,owner,phone:phones.phone||phones.whatsapp,phoneIntl:phones.phoneIntl,whatsapp:phones.whatsapp,city,nni,id_image,email:document.getElementById('st-email').value.trim(),password:pw,trial_ends:new Date(Date.now()+10*86400000).toISOString()};
       _ppBackPanel='p-store-form'; _ppBackDot=2;
       ppShowPanel();
     });
@@ -12403,13 +12409,15 @@ function submitStoreReg(){
 function submitOfficeReg(){
   const name=document.getElementById('of-name').value.trim();
   const owner=document.getElementById('of-owner').value.trim();
-  const phone=document.getElementById('of-phone').value.trim();
+  const phoneRaw=document.getElementById('of-phone').value.trim();
   const email=document.getElementById('of-email').value.trim();
   const city=document.getElementById('of-city').value.trim();
   const nni=document.getElementById('of-nni').value.trim();
   const pw=document.getElementById('of-pw').value;
   const pw2=document.getElementById('of-pw2').value;
-  if(!name||!owner||!phone||!email||!city){alert(isAr?'يرجى ملء جميع الحقول الإلزامية':'Veuillez remplir tous les champs obligatoires');return;}
+  if(!name||!owner||!phoneRaw||!email||!city){alert(isAr?'يرجى ملء جميع الحقول الإلزامية':'Veuillez remplir tous les champs obligatoires');return;}
+  const phones = (window.RizqPhone && RizqPhone.resolveMerchantPhone(phoneRaw)) || null;
+  if(!phones){alert((window.RizqPhone&&RizqPhone.phoneErrorMessage(isAr))||(isAr?'رقم هاتف غير صالح':'Numéro invalide'));return;}
   if(!NNI_RE.test(nni)){alert(isAr?'يرجى إدخال رقم تعريف وطني (NNI) صالح — أرقام فقط':'Veuillez saisir un numéro d\'identité nationale (NNI) valide — chiffres uniquement');return;}
   if(pw.length<8){alert(isAr?'كلمة المرور يجب أن تكون 8 أحرف على الأقل':'Le mot de passe doit contenir au moins 8 caractères');return;}
   if(pw!==pw2){alert(isAr?'كلمة المرور غير متطابقة':'Les mots de passe ne correspondent pas');return;}
@@ -12420,7 +12428,7 @@ function submitOfficeReg(){
     // (license_image) — كلاهما كان يُفقَد تماماً بعد الرفع، لم يُقرآ أبداً.
     Promise.all([_fileToBase64(ofFile2), _fileToBase64(ofFile1)]).then(function(r){
       var id_image=r[0], license_image=r[1];
-      _ppPendingData={type:'office',name,owner,phone,email,city,nni,id_image,license_image,ninea:document.getElementById('of-ninea').value.trim(),password:pw,trial_ends:new Date(Date.now()+10*86400000).toISOString()};
+      _ppPendingData={type:'office',name,owner,phone:phones.phone||phones.whatsapp,phoneIntl:phones.phoneIntl,whatsapp:phones.whatsapp,email,city,nni,id_image,license_image,ninea:document.getElementById('of-ninea').value.trim(),password:pw,trial_ends:new Date(Date.now()+10*86400000).toISOString()};
       _ppBackPanel='p-office-form'; _ppBackDot=2;
       ppShowPanel();
     });
@@ -12431,13 +12439,15 @@ function submitCorpReg(){
   const name=document.getElementById('cr-name').value.trim();
   const ninea=document.getElementById('cr-ninea').value.trim();
   const manager=document.getElementById('cr-manager').value.trim();
-  const phone=document.getElementById('cr-phone').value.trim();
+  const phoneRaw=document.getElementById('cr-phone').value.trim();
   const email=document.getElementById('cr-email').value.trim();
   const city=document.getElementById('cr-city').value.trim();
   const nni=document.getElementById('cr-nni').value.trim();
   const pw=document.getElementById('cr-pw').value;
   const pw2=document.getElementById('cr-pw2').value;
-  if(!name||!ninea||!manager||!phone||!email||!city){alert(isAr?'يرجى ملء جميع الحقول الإلزامية':'Veuillez remplir tous les champs obligatoires');return;}
+  if(!name||!ninea||!manager||!phoneRaw||!email||!city){alert(isAr?'يرجى ملء جميع الحقول الإلزامية':'Veuillez remplir tous les champs obligatoires');return;}
+  const phones = (window.RizqPhone && RizqPhone.resolveMerchantPhone(phoneRaw)) || null;
+  if(!phones){alert((window.RizqPhone&&RizqPhone.phoneErrorMessage(isAr))||(isAr?'رقم هاتف غير صالح':'Numéro invalide'));return;}
   if(!NNI_RE.test(nni)){alert(isAr?'يرجى إدخال رقم تعريف وطني (NNI) صالح — أرقام فقط':'Veuillez saisir un numéro d\'identité nationale (NNI) valide — chiffres uniquement');return;}
   if(pw.length<8){alert(isAr?'كلمة المرور يجب أن تكون 8 أحرف على الأقل':'Le mot de passe doit contenir au moins 8 caractères');return;}
   if(pw!==pw2){alert(isAr?'كلمة المرور غير متطابقة':'Les mots de passe ne correspondent pas');return;}
@@ -12446,7 +12456,7 @@ function submitCorpReg(){
     if(!ok) return;
     Promise.all([_fileToBase64(crFile3), _fileToBase64(crFile1), _fileToBase64(crFile2)]).then(function(r){
       var id_image=r[0], license_image=r[1], activity_image2=r[2];
-      _ppPendingData={type:'corp',name,ninea,manager,phone,email,city,nni,id_image,license_image,activity_image2,password:pw,trial_ends:new Date(Date.now()+10*86400000).toISOString()};
+      _ppPendingData={type:'corp',name,ninea,manager,phone:phones.phone||phones.whatsapp,phoneIntl:phones.phoneIntl,whatsapp:phones.whatsapp,email,city,nni,id_image,license_image,activity_image2,password:pw,trial_ends:new Date(Date.now()+10*86400000).toISOString()};
       _ppBackPanel='p-corp-form'; _ppBackDot=2;
       ppShowPanel();
     });
@@ -14214,6 +14224,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeRizqPro
 <!-- إصلاح: عنوان الخادم أصبح مضبوطاً من ملف مشترك واحد (rizq_backend_config.js)
      بدل تكراره داخل كل صفحة على حدة — راجع تعليقات ذلك الملف للتفاصيل. -->
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_phone_utils.js?v=1.0"></script>
 <script src="rizq_verification_policy.js"></script>
 <script src="rizq_contact_gate.js"></script>
 <script>

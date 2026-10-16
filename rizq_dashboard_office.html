@@ -264,6 +264,7 @@ html.rizq-dash-embed .topbar{padding:8px 14px!important}
 html.rizq-dash-embed .content{padding:10px 12px!important}
 </style>
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_phone_utils.js?v=1.0"></script>
 <script src="rizq_packages_config.js?v=16.3"></script>
 <script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_disclaimer.js"></script>
@@ -1908,9 +1909,22 @@ function saveProfile(){
   const accs=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
   const idx=accs.findIndex(a=>a.id===SESSION_ID);
   if(idx===-1&&!IS_DEMO){showToast(_t2('خطأ','Erreur'),'error');return;}
-  const fields=['name','phone','email','city','category','ninea','address','desc','whatsapp','facebook','promo_video'];
+  const phoneRaw=(document.getElementById('p-phone')||{}).value||'';
+  const phones=(window.RizqPhone&&RizqPhone.resolveMerchantPhone(phoneRaw.trim()))||null;
+  if(!phones){showToast(_t2('رقم هاتف غير صالح — موريتاني 8 أرقام (2/3/4) أو دولي +…','Numéro invalide — MR 8 chiffres (2/3/4) ou international +…'),'error');return;}
+  const fields=['name','email','city','category','ninea','address','desc','facebook','promo_video'];
   fields.forEach(k=>{const el=document.getElementById('p-'+k);if(el&&idx!==-1)accs[idx][k]=el.value.trim();});
   if(idx!==-1){
+    accs[idx].phone = phones.phone || phones.whatsapp;
+    accs[idx].phoneIntl = phones.phoneIntl || '';
+    var waManual = ((document.getElementById('p-whatsapp')||{}).value||'').trim();
+    if(waManual && /^https?:\/\/(wa\.me|api\.whatsapp\.com)/i.test(waManual)){
+      accs[idx].whatsapp = waManual.slice(0, 60);
+    } else if(waManual && window.RizqPhone && RizqPhone.normalizeIntlPhone(waManual)){
+      accs[idx].whatsapp = RizqPhone.normalizeIntlPhone(waManual);
+    } else {
+      accs[idx].whatsapp = phones.whatsapp;
+    }
     const act=document.getElementById('p-activity');
     if(act && act.value){
       accs[idx].activityId = act.value;
@@ -1937,7 +1951,7 @@ function _syncProfileToBackend(acc){
     method: 'PATCH',
     headers: { 'Content-Type':'application/json', 'x-account-token': (window.REAL_ACCESS_TOKEN || SESSION_TOKEN) },
     body: JSON.stringify({
-      name: acc.name||'', phone: acc.phone||'', email: acc.email||'', city: acc.city||'',
+      name: acc.name||'', phone: acc.phone||'', phoneIntl: acc.phoneIntl||'', email: acc.email||'', city: acc.city||'',
       category: acc.category||'', activityId: acc.activityId||'', activity: acc.activity||'',
       address: acc.address||'', desc: acc.desc||'',
       promo_video: acc.promo_video||'', whatsapp: acc.whatsapp||'', facebook: acc.facebook||'',

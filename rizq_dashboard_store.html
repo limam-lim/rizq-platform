@@ -360,6 +360,7 @@ html.rizq-dash-embed .topbar{padding:8px 14px!important}
 html.rizq-dash-embed .content{padding:10px 12px!important}
 </style>
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_phone_utils.js?v=1.0"></script>
 <script src="rizq_packages_config.js?v=16.3"></script>
 <script src="rizq_merchant_activities.js?v=2.1"></script>
 <script src="rizq_brands_catalog.js?v=5"></script>
@@ -2826,7 +2827,11 @@ function saveProfile(){
   const idx = accs.findIndex(a=>a.id===SESSION_ID);
   if(idx===-1){showToast(_t2('خطأ في حفظ البيانات','Erreur lors de l\'enregistrement des données'),'error');return;}
   accs[idx].name = document.getElementById('p-store-name').value.trim();
-  accs[idx].phone = document.getElementById('p-phone').value.trim();
+  var phoneRaw = document.getElementById('p-phone').value.trim();
+  var phones = (window.RizqPhone && RizqPhone.resolveMerchantPhone(phoneRaw)) || null;
+  if(!phones){showToast(_t2('رقم هاتف غير صالح — موريتاني 8 أرقام (2/3/4) أو دولي +…','Numéro invalide — MR 8 chiffres (2/3/4) ou international +…'),'error');return;}
+  accs[idx].phone = phones.phone || phones.whatsapp;
+  accs[idx].phoneIntl = phones.phoneIntl || '';
   accs[idx].email = document.getElementById('p-email').value.trim();
   accs[idx].city = document.getElementById('p-city').value.trim();
   var _pCatEl = document.getElementById('p-cat');
@@ -2841,7 +2846,14 @@ function saveProfile(){
   accs[idx].promo_video_extra = (document.getElementById('p-promo-video-extra')||{}).value?.trim()||'';
   STORE.promo_video = accs[idx].promo_video;
   STORE.promo_video_extra = accs[idx].promo_video_extra;
-  accs[idx].whatsapp = document.getElementById('p-whatsapp').value.trim();
+  var waManual = document.getElementById('p-whatsapp').value.trim();
+  if(waManual && /^https?:\/\/(wa\.me|api\.whatsapp\.com)/i.test(waManual)){
+    accs[idx].whatsapp = waManual.slice(0, 60);
+  } else if(waManual && window.RizqPhone && RizqPhone.normalizeIntlPhone(waManual)){
+    accs[idx].whatsapp = RizqPhone.normalizeIntlPhone(waManual);
+  } else {
+    accs[idx].whatsapp = phones.whatsapp;
+  }
   accs[idx].facebook = document.getElementById('p-facebook').value.trim();
   accs[idx].tagline = (document.getElementById('p-tagline')||{}).value?.trim().slice(0,50) || '';
   if(window._pThumbData) accs[idx].thumb = window._pThumbData;
@@ -2864,7 +2876,7 @@ function _syncProfileToBackend(acc){
     method: 'PATCH',
     headers: { 'Content-Type':'application/json', 'x-account-token': (window.REAL_ACCESS_TOKEN || SESSION_TOKEN) },
     body: JSON.stringify({
-      name: acc.name||'', phone: acc.phone||'', email: acc.email||'', city: acc.city||'',
+      name: acc.name||'', phone: acc.phone||'', phoneIntl: acc.phoneIntl||'', email: acc.email||'', city: acc.city||'',
       category: acc.category||'', activityId: acc.activityId||'', activity: acc.activity||'',
       address: acc.address||'', desc: acc.desc||'',
       promo_video: acc.promo_video||'', promo_video_extra: acc.promo_video_extra||'', whatsapp: acc.whatsapp||'', facebook: acc.facebook||'',
