@@ -28,10 +28,6 @@ body.rizq-mockup-hdr-trial .hero{
   display:block!important;
   padding-top: calc(var(--rizq-mock-hdr-h) + 12px)!important;
 }
-body.rizq-mockup-hdr-trial .rmh-demo-stores{
-  padding-top: 18px!important;
-}
-
 #rizq-mock-hdr{
   position:fixed;top:0;left:0;right:0;z-index:10050;
   font-family:'Cairo','Segoe UI',Tahoma,sans-serif;
@@ -247,29 +243,4 @@ nav.rmh-nav{
   .rmh-nav{padding:0 6px!important}
   .rmh-nav a{min-width:60px;font-size:10.5px;padding:7px 6px 9px}
   .rmh-cart-panel{inset-inline-start:auto;inset-inline-end:0}
-}
-
-/* معاينة محتوى المحلات تحت الهيدر (كالنموذج) */
-.rmh-demo-stores{
-  max-width:1180px;margin:0 auto;padding:18px 18px 10px;
-}
-.rmh-demo-stores h2{
-  margin:0 0 14px;font:800 22px 'Cairo',sans-serif;color:#0D1B2A;text-align:right;
-}
-.rmh-demo-grid{
-  display:grid;grid-template-columns:repeat(6,1fr);gap:14px;
-}
-.rmh-demo-card{
-  background:#fff;border-radius:12px;min-height:118px;
-  border:1px solid rgba(15,35,65,.06);
-  box-shadow:0 1px 4px rgba(15,35,65,.04);
-}
-@media(max-width:1024px){
-  .rmh-demo-grid{grid-template-columns:repeat(6,1fr);gap:10px}
-  .rmh-demo-card{min-height:100px}
-}
-@media(max-width:768px){
-  .rmh-demo-grid{grid-template-columns:repeat(2,1fr);gap:12px}
-  .rmh-demo-card{min-height:120px;border-radius:14px}
-  .rmh-demo-stores h2{font-size:20px}
 }
