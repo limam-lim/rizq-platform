@@ -14,9 +14,8 @@ body.rizq-mockup-hdr-trial #nav,
 body.rizq-mockup-hdr-trial #rizq-search-theater,
 body.rizq-mockup-hdr-trial #rizq-search-pill,
 body.rizq-mockup-hdr-trial .nav-sticky-tools,
-body.rizq-mockup-hdr-trial .hero,
 body.rizq-mockup-hdr-trial .hero-browse-panel,
-body.rizq-mockup-hdr-trial .hero-stage-intent .hero-tagline,
+body.rizq-mockup-hdr-trial .hero-stage-intent,
 body.rizq-mockup-hdr-trial .mobile-bottom-nav,
 body.rizq-mockup-hdr-trial #section-jump-bar,
 body.rizq-mockup-hdr-trial .ticker-wrap,
@@ -24,8 +23,13 @@ body.rizq-mockup-hdr-trial #rizq-announce-ticker,
 body.rizq-mockup-hdr-trial .rizq-splash{
   display:none!important;
 }
+/* إعادة هوية المنصة تحت الهيدر الجديد: رزق + السوق + الشعار + بيع/اشتر/تميّز */
+body.rizq-mockup-hdr-trial .hero{
+  display:block!important;
+  padding-top: calc(var(--rizq-mock-hdr-h) + 12px)!important;
+}
 body.rizq-mockup-hdr-trial .rmh-demo-stores{
-  padding-top: calc(var(--rizq-mock-hdr-h) + 18px)!important;
+  padding-top: 18px!important;
 }
 
 #rizq-mock-hdr{
