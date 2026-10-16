@@ -9,17 +9,21 @@ body.rizq-mockup-hdr-trial #nav,
 body.rizq-mockup-hdr-trial #rizq-search-theater,
 body.rizq-mockup-hdr-trial #rizq-search-pill,
 body.rizq-mockup-hdr-trial .nav-sticky-tools,
+body.rizq-mockup-hdr-trial .hero,
 body.rizq-mockup-hdr-trial .hero-browse-panel,
 body.rizq-mockup-hdr-trial .hero-stage-intent .hero-tagline,
 body.rizq-mockup-hdr-trial .mobile-bottom-nav,
-body.rizq-mockup-hdr-trial #section-jump-bar{
+body.rizq-mockup-hdr-trial #section-jump-bar,
+body.rizq-mockup-hdr-trial .ticker-wrap,
+body.rizq-mockup-hdr-trial #rizq-announce-ticker,
+body.rizq-mockup-hdr-trial .rizq-splash{
   display:none!important;
 }
-body.rizq-mockup-hdr-trial .hero{
-  padding-top: calc(var(--rizq-mock-hdr-h) + 12px)!important;
+body.rizq-mockup-hdr-trial{
+  background:#f2f4f7;
 }
-body.rizq-mockup-hdr-trial .ticker-wrap{
-  top: var(--rizq-mock-hdr-h)!important;
+body.rizq-mockup-hdr-trial .rmh-demo-stores{
+  padding-top: calc(var(--rizq-mock-hdr-h) + 16px)!important;
 }
 
 #rizq-mock-hdr{
@@ -188,25 +192,33 @@ nav.rmh-nav{
   .rmh-nav a{min-width:64px;padding:7px 8px 9px;font-size:11px}
 }
 
-/* هاتف */
+/* هاتف — يطابق النموذج: تنويه + شعار/أدوات ثم بحث بعرض كامل */
 @media(max-width:768px){
-  body.rizq-mockup-hdr-trial{--rizq-mock-hdr-h: 188px}
-  .rmh-util{display:none}
+  body.rizq-mockup-hdr-trial{--rizq-mock-hdr-h: 210px}
+  .rmh-util{
+    display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;
+    padding:4px 10px;font-size:9.5px;text-align:center;
+  }
+  .rmh-util-emergency{white-space:normal}
+  .rmh-util-notice{flex:1 1 100%;opacity:.85}
   .rmh-main{
     display:grid;
     grid-template-columns:1fr auto;
     grid-template-areas:
       "brand tools"
       "search search";
-    gap:8px;padding:10px 12px 8px;
+    gap:8px;padding:8px 12px 8px;
   }
   .rmh-brand{grid-area:brand}
-  .rmh-tools{grid-area:tools;justify-self:start}
+  .rmh-tools{grid-area:tools;justify-self:start;gap:6px}
   .rmh-search{grid-area:search;min-height:44px;width:100%}
   .rmh-brand-ar{font-size:20px}
   .rmh-brand img{width:36px;height:36px}
   .rmh-search-cat{min-width:88px;max-width:110px;font-size:12px;padding:0 8px}
   .rmh-search-input{font-size:13px}
+  .rmh-ico{width:36px;height:36px}
+  .rmh-post{width:36px;height:36px;padding:0;justify-content:center}
+  .rmh-post-lbl{display:none}
   .rmh-nav{padding:0 6px}
   .rmh-nav a{min-width:58px;font-size:10.5px}
   .rmh-cart-panel{inset-inline-start:auto;inset-inline-end:0}
