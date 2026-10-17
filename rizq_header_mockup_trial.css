@@ -200,14 +200,20 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
 }
 .rmh-cart-badge[hidden],
 .rmh-cart-badge.is-empty{display:none!important}
-.rmh-post{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:0 14px;height:40px;border-radius:10px;border:0;cursor:pointer;
-  background:linear-gradient(135deg,var(--rmh-gold),var(--rmh-gold-2));color:#0D1B2A;
-  font:800 13px 'Cairo',sans-serif;text-decoration:none;white-space:nowrap;
+.rmh-post,
+.rmh-nav a.rmh-post-nav{
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;
+  align-self:center;
+  padding:0 12px;height:34px;min-width:auto;border-radius:10px;border:0;cursor:pointer;
+  background:linear-gradient(135deg,var(--rmh-gold),var(--rmh-gold-2));color:#0D1B2A!important;
+  font:800 12.5px 'Cairo',sans-serif;text-decoration:none;white-space:nowrap;
   box-shadow:0 3px 12px rgba(201,168,76,.32);
+  border-bottom:0!important;margin:0 4px;
 }
-.rmh-post:hover{filter:brightness(1.05)}
+.rmh-post:hover,
+.rmh-nav a.rmh-post-nav:hover{
+  filter:brightness(1.05);color:#0D1B2A!important;border-bottom-color:transparent!important;
+}
 .rmh-post-lbl{display:inline}
 
 /* شريط الأقسام الثانوي — إعادة ضبط ضد قاعدة nav العامة في الصفحة */
