@@ -789,7 +789,7 @@
     });
   }
 
-  /** هاتف: الرئيسية/إعلانات/محلات أسفل قرب الإبهام؛ نشر بين استثمارات↔مناقصات أعلى */
+  /** هاتف: تبديل مواقع النصفين فقط + نشر بين الاستثمارات والمناقصات */
   function syncPhoneNavSplit() {
     var hdr = document.getElementById('rizq-mock-hdr');
     if (!hdr) return;
