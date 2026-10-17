@@ -24,13 +24,17 @@ body.rizq-mockup-hdr-trial .rizq-splash{
   display:none!important;
 }
 /* كبسولة رزق تحت الهيدر — specificity أعلى من html.rizq-app-nav .hero */
+/* يتفوّق على html.rizq-app-nav:has(#ticker-wrap…) .hero (padding 54px) */
+html.rizq-app-nav:has(#ticker-wrap) body.rizq-mockup-hdr-trial .hero,
+html.rizq-app-nav:has(#nav) body.rizq-mockup-hdr-trial .hero,
 html.rizq-app-nav body.rizq-mockup-hdr-trial .hero,
 body.rizq-mockup-hdr-trial .hero{
   display:flex!important;
   flex-direction:column!important;
   align-items:center!important;
   justify-content:flex-start!important;
-  padding-top:6px!important;
+  padding-top:8px!important;
+  padding-bottom:16px!important;
   margin-top:0!important;
   min-height:0!important;
   height:auto!important;
