@@ -323,34 +323,18 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
 }
 #rizq-mock-hdr .rmh-brand .logo-mark-img,
 #rizq-mock-hdr .rmh-brand img.rmh-mark{
+  /* إطار 44px كما قبل الجلسة — والحشوة تصغّر حرف R داخل المربع */
   width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;
   flex-shrink:0!important;display:block!important;visibility:visible!important;opacity:1!important;
+  box-sizing:border-box!important;
   object-fit:contain!important;object-position:center!important;
-  border:none!important;border-radius:12px!important;padding:0!important;margin:0!important;
+  border:none!important;border-radius:12px!important;
+  padding:6px!important;margin:0!important;
   overflow:hidden!important;position:relative!important;z-index:1!important;
-  background:
-    radial-gradient(circle at 30% 25%,rgba(240,215,138,.22),transparent 55%),
-    linear-gradient(160deg,#1f3558,#0a1324)!important;
-  box-shadow:
-    0 0 0 1.5px rgba(240,215,138,.62),
-    0 0 0 4px rgba(201,168,76,.1),
-    0 0 22px rgba(201,168,76,.34),
-    0 8px 16px rgba(0,0,0,.38),
-    inset 0 1px 0 rgba(255,255,255,.22)!important;
-  filter:saturate(1.06) contrast(1.04)!important;
-  transition:box-shadow .25s ease,filter .25s ease,transform .25s ease!important;
+  background:linear-gradient(160deg,#1a2d4d,#0a1324)!important;
+  box-shadow:0 0 0 1.5px rgba(240,215,138,.55),0 0 18px rgba(201,168,76,.28),0 6px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.18)!important;
+  filter:none!important;transform:none!important;
   content:normal!important;-webkit-mask:none!important;mask:none!important;
-}
-#rizq-mock-hdr .rmh-brand:hover .logo-mark-img,
-#rizq-mock-hdr .rmh-brand:hover img.rmh-mark{
-  filter:saturate(1.12) contrast(1.06) brightness(1.04)!important;
-  box-shadow:
-    0 0 0 1.5px rgba(243,226,168,.75),
-    0 0 0 5px rgba(201,168,76,.14),
-    0 0 28px rgba(201,168,76,.42),
-    0 10px 20px rgba(0,0,0,.4),
-    inset 0 1px 0 rgba(255,255,255,.28)!important;
-  transform:translateY(-1px)!important;
 }
 #rizq-mock-hdr .rmh-brand .logo-text,
 #rizq-mock-hdr .rmh-brand-text{
@@ -738,7 +722,7 @@ body.rizq-mockup-hdr-trial #virtual-offices{
   #rizq-mock-hdr .rmh-brand .logo-mark-img,
   #rizq-mock-hdr .rmh-brand img.rmh-mark{
     width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;
-    border-radius:10px!important;
+    border-radius:10px!important;padding:4px!important;
   }
   .rmh-search-input{font-size:13px;padding:0 12px}
   .rmh-search-btn{width:44px}
