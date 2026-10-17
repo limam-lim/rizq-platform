@@ -5702,7 +5702,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <!-- الأزرار تحت شريط العقارات / النماذج — بدون زر «افتح النموذج الفاخر» -->
     <div class="rzq-disc-wrap fade-in" style="margin-top:22px">
       <div class="rizq-dual-cta">
-        <a class="landing-ads-browse-full" href="rizq_estate_agencies.html" data-t="browse-estate">عرض كل الوكالات العقارية ←</a>
+        <a class="landing-ads-browse-full" id="browse-estate" href="rizq_estate_agencies.html" data-t="browse-estate">عرض كل الوكالات العقارية ←</a>
         <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency" onclick="openRegisterAs('company','office','of_realestate_agency');return false"
            class="rizq-dual-cta-own" data-t="ve-btn1">امتلك واجهتك العقارية على رزق</a>
       </div>
@@ -8711,8 +8711,8 @@ function buildEstateModels(reshuffle){
   if(!list.length){
     rail.classList.add('is-empty');
     rail.innerHTML = '<div class="rizq-styles-empty">'+(fr
-      ? 'Aucun modèle pour ce filtre — voir toutes les agences immobilières.'
-      : 'لا نماذج لهذا التصفية — اعرض كل الوكالات العقارية.')+'</div>';
+      ? 'Aucun modèle pour ce filtre — <a href="rizq_estate_agencies.html">voir toutes les agences immobilières</a>.'
+      : 'لا نماذج لهذا التصفية — <a href="rizq_estate_agencies.html">اعرض كل الوكالات العقارية</a>.')+'</div>';
     return;
   }
   var href = 'rizq_estate.html?demo=1';
