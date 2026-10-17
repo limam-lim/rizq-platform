@@ -69,8 +69,8 @@ html.rizq-app-nav:has(#rizq-desk-nav) .dir-hero{padding-top:16px}
 
 /* بوابات مضغوطة أفقياً — أيقونة + اسم */
 .dir-type-gate{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;
-  max-width:920px;margin:0 auto 10px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;
+  max-width:1080px;margin:0 auto 10px;
 }
 .dir-gate{
   position:relative;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;
@@ -394,17 +394,35 @@ var TYPE_META = {
   corp: {
     page: 'rizq_showroom.html',
     icon: '🏬',
-    ar: 'المعارض', fr: 'Showrooms',
+    ar: 'المعارض والمصانع', fr: 'Showrooms & usines',
     hintAr: 'عرض يلفت الأنظار', hintFr: 'Une vitrine qui attire',
-    titleAr: 'دليل <span>المعارض</span>', titleFr: 'Annuaire des <span>showrooms</span>',
-    subAr: 'معارض البيع الكبرى — سيارات، أثاث، إلكترونيات ومعدات. مختلف عن محلات التجزئة.',
-    subFr: 'Grands showrooms — auto, meubles, électronique & équipements. Distinct des boutiques.',
+    titleAr: 'دليل <span>المعارض والمصانع</span>', titleFr: 'Annuaire des <span>showrooms & usines</span>',
+    subAr: 'معارض البيع الكبرى والمصانع — سيارات، أثاث، إلكترونيات ومعدات. مختلف عن محلات التجزئة.',
+    subFr: 'Grands showrooms et usines — auto, meubles, électronique & équipements. Distinct des boutiques.',
     emptyAr: 'لا معارض مطابقة للفلتر حالياً.',
     emptyFr: 'Aucun showroom ne correspond aux filtres.',
     ctaAr: 'زيارة المعرض ←', ctaFr: 'Voir le showroom →',
     reg: 'rizq_register.html?mode=seller&preBiz=corp',
     regCtaAr: '🚀 سجّل معرضك الآن', regCtaFr: '🚀 Inscrivez votre showroom',
     ownAr: '✨ امتلك واجهة معرضك على رزق', ownFr: '✨ Possédez la vitrine de votre showroom'
+  },
+  /* بعد المعارض والمصانع مباشرة — دليل الوكالات العقارية المنفصل */
+  agencies: {
+    href: 'rizq_estate_agencies.html',
+    page: 'rizq_estate_agencies.html',
+    icon: '🏠',
+    ar: 'كل الوكالات', fr: 'Agences',
+    hintAr: 'وكالات عقارية فقط', hintFr: 'Agences immobilières',
+    titleAr: 'دليل <span>الوكالات العقارية</span>', titleFr: 'Annuaire des <span>agences immobilières</span>',
+    subAr: 'كل الوكالات العقارية على رزق — صفحة مستقلة عن المكاتب والمحلات والمعارض.',
+    subFr: 'Toutes les agences immobilières sur Rizq — page distincte des bureaux, boutiques et showrooms.',
+    emptyAr: 'لا وكالات مطابقة حالياً.',
+    emptyFr: 'Aucune agence ne correspond.',
+    ctaAr: 'فتح صفحة الوكالة ←', ctaFr: 'Ouvrir l\'agence →',
+    reg: './?openRegister=1&regPage=1&preType=company&preBiz=office&preActivity=of_realestate_agency',
+    regCtaAr: '🚀 افتح وكالتك العقارية', regCtaFr: '🚀 Ouvrez votre agence',
+    ownAr: '✨ امتلك واجهة وكالتك العقارية على رزق', ownFr: '✨ Possédez la vitrine de votre agence',
+    external: true
   },
   office: {
     page: 'rizq_office.html',
@@ -535,13 +553,19 @@ var _params = new URLSearchParams(location.search);
 var _typeRaw = (_params.get('type') || 'corp').toLowerCase();
 if (_typeRaw === 'tender') _typeRaw = 'tenders';
 if (_typeRaw === 'investment' || _typeRaw === 'invest') _typeRaw = 'investments';
-var _type = TYPE_META[_typeRaw] ? _typeRaw : 'corp';
+if (_typeRaw === 'agency' || _typeRaw === 'estate' || _typeRaw === 'agences') _typeRaw = 'agencies';
+/* بوابة الوكالات صفحة مستقلة — لا تُعرض كقائمة داخل الدليل الموحّد */
+if (TYPE_META[_typeRaw] && TYPE_META[_typeRaw].external && TYPE_META[_typeRaw].href) {
+  location.replace(TYPE_META[_typeRaw].href);
+}
+var _type = (TYPE_META[_typeRaw] && !TYPE_META[_typeRaw].external) ? _typeRaw : 'corp';
 var _catRaw = _params.get('cat') || '';
 var _catFilter = '';
 var _accounts = [];
 var _loaded = false;
 var _feedCats = [];
-var BUSINESS_TYPES = ['store', 'corp', 'office'];
+/* ترتيب الشريط: محلات → معارض ومصانع → كل الوكالات → مكاتب → … */
+var BUSINESS_TYPES = ['store', 'corp', 'agencies', 'office'];
 var FEED_TYPES = ['tenders', 'investments'];
 /** نفس أسلوب صفحة الإعلانات: دفعة 24 + تحميل المزيد / تمرير */
 var DIR_PAGE_SIZE = 24;
@@ -568,6 +592,8 @@ function _setCatFilterFromParam(){
 }
 
 function typeHref(type, cat){
+  var m = TYPE_META[type];
+  if(m && m.href) return m.href;
   var q = 'type=' + encodeURIComponent(type);
   if(cat) q += '&cat=' + encodeURIComponent(cat);
   return 'rizq_directory.html?' + q;
@@ -577,12 +603,14 @@ function renderTypeTabs(){
   var fr = _rizqLang()==='fr';
   var wrap = document.getElementById('dir-type-tabs');
   var tabs = BUSINESS_TYPES.concat(FEED_TYPES);
+  var onAgencies = /rizq_estate_agencies\.html/i.test(location.pathname || '');
   wrap.innerHTML = tabs.map(function(t){
     var m = TYPE_META[t];
-    var active = _type===t ? ' active' : '';
+    var isActive = m.external ? onAgencies : (_type === t);
+    var active = isActive ? ' active' : '';
     var label = fr ? m.fr : m.ar;
     var hint = fr ? m.hintFr : m.hintAr;
-    return '<a class="dir-gate'+active+'" href="'+typeHref(t)+'" aria-label="'+escapeHtml(label+' — '+hint)+'" aria-current="'+(_type===t?'page':'false')+'">'
+    return '<a class="dir-gate'+active+'" href="'+typeHref(t)+'" aria-label="'+escapeHtml(label+' — '+hint)+'" aria-current="'+(isActive?'page':'false')+'">'
       + '<span class="dir-gate-ico" aria-hidden="true">'+m.icon+'</span>'
       + '<span class="dir-gate-label">'+escapeHtml(label)+'</span>'
       + '<span class="dir-gate-hint">'+escapeHtml(hint)+'</span>'
