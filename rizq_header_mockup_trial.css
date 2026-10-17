@@ -38,11 +38,13 @@ body.rizq-mockup-hdr-trial .hero-headline::after{
 body.rizq-mockup-hdr-trial .hero-title-card{
   overflow:visible!important;
   animation:none!important;
-  padding-top:26px!important;
+  padding-top:34px!important;
+  padding-bottom:18px!important;
 }
 body.rizq-mockup-hdr-trial .hero-headline{
-  line-height:1.15!important;
-  padding-top:4px!important;
+  line-height:1.2!important;
+  padding-top:8px!important;
+  margin-top:4px!important;
 }
 body.rizq-mockup-hdr-trial .hero-subtitle-primary,
 body.rizq-mockup-hdr-trial .hero-subtitle-secondary{
