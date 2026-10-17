@@ -236,30 +236,47 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
   padding:10px 20px;
   background:linear-gradient(180deg,#0e1c32 0%,#0a1628 100%);
 }
-.rmh-brand{
-  display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;
-  cursor:pointer;justify-self:start;direction:ltr;
+/* شعار رزق — مطابق لهيكل #nav الأصلي: علامة + رزق + RIZQ PLATFORM */
+#rizq-mock-hdr .rmh-brand.logo,
+#rizq-mock-hdr .rmh-brand{
+  display:inline-flex!important;align-items:center!important;gap:12px!important;
+  text-decoration:none!important;color:inherit!important;flex-shrink:0;cursor:pointer;
+  justify-self:start;direction:ltr!important;height:auto!important;max-height:70px!important;
+  filter:none!important;border:0!important;outline:0!important;background:transparent!important;
+  padding:0!important;margin:0!important;box-shadow:none!important;
 }
-.rmh-mark{
-  width:44px;height:44px;flex-shrink:0;display:block;object-fit:contain;
-  border:none;border-radius:12px;padding:0;overflow:hidden;
-  background:linear-gradient(160deg,#1a2d4d,#0a1324);
-  box-shadow:0 0 0 1.5px rgba(240,215,138,.55),0 0 18px rgba(201,168,76,.28),0 6px 14px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.18);
+#rizq-mock-hdr .rmh-brand .logo-mark-img,
+#rizq-mock-hdr .rmh-brand img.rmh-mark{
+  width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;
+  flex-shrink:0!important;display:block!important;visibility:visible!important;opacity:1!important;
+  object-fit:contain!important;object-position:center!important;
+  border:none!important;border-radius:14px!important;padding:0!important;margin:0!important;
+  overflow:hidden!important;position:relative!important;z-index:1!important;
+  background:linear-gradient(160deg,#1a2d4d,#0a1324)!important;
+  box-shadow:0 0 0 1.5px rgba(240,215,138,.55),0 0 22px rgba(201,168,76,.28),0 8px 18px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.18)!important;
+  content:normal!important;-webkit-mask:none!important;mask:none!important;
 }
-.rmh-brand-text{
-  display:flex;flex-direction:column;justify-content:center;align-items:flex-end;
-  text-align:right;line-height:1.05;gap:3px;
+#rizq-mock-hdr .rmh-brand .logo-text,
+#rizq-mock-hdr .rmh-brand-text{
+  display:flex!important;flex-direction:column!important;justify-content:center!important;
+  align-items:flex-end!important;text-align:right!important;direction:ltr!important;
+  line-height:1.05!important;gap:4px!important;margin:0!important;padding:0!important;
 }
-.rmh-brand-ar{
-  font-family:'Cairo','Segoe UI',Tahoma,sans-serif;font-weight:900;font-size:24px;
-  color:var(--rmh-gold);-webkit-text-fill-color:var(--rmh-gold);
-  direction:rtl;unicode-bidi:isolate;line-height:1;
-  text-shadow:0 0 12px rgba(201,168,76,.28);
+#rizq-mock-hdr .rmh-brand .logo-ar,
+#rizq-mock-hdr .rmh-brand-ar{
+  font-family:'Cairo','Segoe UI',Tahoma,sans-serif!important;font-weight:900!important;
+  font-size:22px!important;color:#C9A84C!important;-webkit-text-fill-color:#C9A84C!important;
+  line-height:1!important;display:block!important;white-space:nowrap!important;
+  text-shadow:0 0 16px rgba(201,168,76,.4)!important;
+  direction:rtl!important;unicode-bidi:isolate!important;text-decoration:none!important;
 }
-.rmh-brand-sub{
-  font-size:8px;color:rgba(201,168,76,.82);letter-spacing:2px;text-transform:uppercase;
-  font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;
-  direction:ltr;unicode-bidi:isolate;white-space:nowrap;
+#rizq-mock-hdr .rmh-brand .logo-sub,
+#rizq-mock-hdr .rmh-brand-sub{
+  display:block!important;font-size:8px!important;color:rgba(201,168,76,.65)!important;
+  letter-spacing:2px!important;text-transform:uppercase!important;
+  font-family:Georgia,'Times New Roman',serif!important;font-style:italic!important;
+  font-weight:700!important;margin-top:0!important;padding:0!important;
+  direction:ltr!important;unicode-bidi:isolate!important;white-space:nowrap!important;
 }
 .rmh-tools{justify-self:end}
 
@@ -608,9 +625,15 @@ nav.rmh-nav{
     justify-self:stretch;min-height:42px;width:100%;max-width:none;
   }
   .rmh-search-cat{display:none}
-  .rmh-brand-ar{font-size:20px}
-  .rmh-brand-sub{font-size:7px;letter-spacing:1.6px}
-  .rmh-mark{width:34px;height:34px;border-radius:10px}
+  #rizq-mock-hdr .rmh-brand .logo-ar,
+  #rizq-mock-hdr .rmh-brand-ar{font-size:20px!important}
+  #rizq-mock-hdr .rmh-brand .logo-sub,
+  #rizq-mock-hdr .rmh-brand-sub{font-size:7px!important;letter-spacing:1.6px!important}
+  #rizq-mock-hdr .rmh-brand .logo-mark-img,
+  #rizq-mock-hdr .rmh-brand img.rmh-mark{
+    width:38px!important;height:38px!important;min-width:38px!important;min-height:38px!important;
+    border-radius:12px!important;
+  }
   .rmh-search-input{font-size:13px;padding:0 12px}
   .rmh-search-btn{width:44px}
   .rmh-lang{display:none}
