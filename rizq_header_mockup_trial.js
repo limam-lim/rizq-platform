@@ -330,12 +330,15 @@
   function placeCartPanel() {
     var btn = document.getElementById('rmh-cart-btn');
     var panel = document.getElementById('rmh-cart-panel');
+    var hdr = document.getElementById('rizq-mock-hdr');
     if (!btn || !panel) return;
     var br = btn.getBoundingClientRect();
+    var hdrBottom = hdr ? hdr.getBoundingClientRect().bottom : br.bottom;
     var pw = Math.min(240, Math.max(200, Math.round(panel.offsetWidth || 220)));
+    /* محاذاة تحت زر السلة، لكن تحت شريط الأقسام حتى لا تُغطّى «المزيد» */
     var left = Math.round(br.left + br.width / 2 - pw / 2);
     left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
-    var top = Math.round(br.bottom + 8);
+    var top = Math.round(Math.max(br.bottom, hdrBottom) + 8);
     panel.classList.add('is-positioned');
     panel.style.setProperty('position', 'fixed', 'important');
     panel.style.setProperty('left', left + 'px', 'important');
