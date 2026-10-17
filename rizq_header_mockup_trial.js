@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.42';
+    link.href = 'rizq_header_mockup_trial.css?v=5.45';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -46,7 +46,8 @@
       ads: L ? '#listings' : 'rizq_browse.html',
       stores: L ? '#virtual-stores' : 'rizq_landing_v8.html#virtual-stores',
       showrooms: L ? '#virtual-showrooms' : 'rizq_landing_v8.html#virtual-showrooms',
-      estate: L ? '#virtual-estate' : 'rizq_landing_v8.html#virtual-estate',
+      /* زر العقارات → نموذج وكالة، وليس قسم «كل العقارات» على الرئيسية */
+      estate: 'rizq_estate.html?demo=1',
       post: 'rizq_post.html',
       offices: L ? '#virtual-offices' : 'rizq_landing_v8.html#virtual-offices',
       tenders: 'rizq_tenders_directory.html',
