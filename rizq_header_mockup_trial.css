@@ -26,15 +26,23 @@ body.rizq-mockup-hdr-trial .rizq-splash{
 /* إعادة هوية المنصة تحت الهيدر الجديد: رزق + السوق + الشعار + بيع/اشتر/تميّز */
 body.rizq-mockup-hdr-trial .hero{
   display:block!important;
-  padding-top: calc(var(--rizq-mock-hdr-h) + 12px)!important;
+  padding-top: calc(var(--rizq-mock-hdr-h) + 28px)!important;
+}
+body.rizq-mockup-hdr-trial .hero-brand-row{
+  margin-top: 10px!important;
 }
 /* وضوح: إيقاف لمعة/طفو تشوّش الشعار أثناء التجربة */
 body.rizq-mockup-hdr-trial .hero-headline::after{
   display:none!important;content:none!important;animation:none!important;
 }
 body.rizq-mockup-hdr-trial .hero-title-card{
-  overflow:hidden!important;
+  overflow:visible!important;
   animation:none!important;
+  padding-top:26px!important;
+}
+body.rizq-mockup-hdr-trial .hero-headline{
+  line-height:1.15!important;
+  padding-top:4px!important;
 }
 body.rizq-mockup-hdr-trial .hero-subtitle-primary,
 body.rizq-mockup-hdr-trial .hero-subtitle-secondary{
