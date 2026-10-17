@@ -254,17 +254,28 @@ nav.rmh-nav{
   color:rgba(255,255,255,.78);font:700 12px 'Cairo',sans-serif;
   border-bottom:3px solid transparent;
   transition:color .15s,border-color .15s;
+  cursor:pointer!important;
+  user-select:none;
+  -webkit-user-select:none;
 }
 .rmh-nav a .rmh-nav-ico{
   display:inline-flex;align-items:center;justify-content:center;
   width:22px;height:22px;line-height:1;opacity:.92;
+  pointer-events:none; /* المؤشر يد على الرابط كله لا تحديد نص */
 }
-.rmh-nav a .rmh-nav-ico svg{display:block}
-.rmh-nav a.is-active,
-.rmh-nav a:hover{
+.rmh-nav a .rmh-nav-ico svg{display:block;pointer-events:none}
+/* نشط افتراضياً — وعند المرور على قسم آخر يبقى الذهبي للماوس فقط */
+.rmh-nav a.is-active{
   color:var(--rmh-gold);border-bottom-color:var(--rmh-gold);
 }
-.rmh-nav a.is-active .rmh-nav-ico,
+.rmh-nav a.is-active .rmh-nav-ico{opacity:1;color:var(--rmh-gold)}
+.rmh-nav:hover a.is-active:not(:hover){
+  color:rgba(255,255,255,.78);border-bottom-color:transparent;
+}
+.rmh-nav:hover a.is-active:not(:hover) .rmh-nav-ico{color:inherit;opacity:.92}
+.rmh-nav a:hover{
+  color:var(--rmh-gold)!important;border-bottom-color:var(--rmh-gold)!important;
+}
 .rmh-nav a:hover .rmh-nav-ico{opacity:1;color:var(--rmh-gold)}
 
 /* منسدلة السلة — تُفتح نحو داخل الشاشة حتى لا تُقصّ على الحافة */
