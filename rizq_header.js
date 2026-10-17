@@ -382,13 +382,17 @@
         '</div>' +
       '</div>';
   }
+  function isMockHelpWrap(wrap) {
+    return !!(wrap && (wrap.id === 'rmh-help-wrap' || wrap.classList.contains('rmh-help-dd') || wrap.closest('#rizq-mock-hdr')));
+  }
   function closeHelpDropdowns() {
     document.querySelectorAll('.rizq-help-dd').forEach(function (wrap) {
+      /* هيدر التجربة يدير قائمته بنفسه — لا تُغلق هنا */
+      if (isMockHelpWrap(wrap)) return;
       wrap.classList.remove('open');
       var btn = wrap.querySelector('.rizq-help-dd-btn');
       var menu = wrap.querySelector('.rizq-help-dd-menu') ||
-        (wrap.id ? document.getElementById(String(wrap.id).replace(/-wrap$/, '-menu')) : null) ||
-        document.querySelector('body > .rizq-help-dd-menu');
+        (wrap.id ? document.getElementById(String(wrap.id).replace(/-wrap$/, '-menu')) : null);
       if (btn) btn.setAttribute('aria-expanded', 'false');
       if (menu) {
         menu.hidden = true;
@@ -1824,12 +1828,12 @@
       if (!document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) {
         var l = document.createElement('link');
         l.rel = 'stylesheet';
-        l.href = 'rizq_header_mockup_trial.css?v=5.34';
+        l.href = 'rizq_header_mockup_trial.css?v=5.35';
         (document.head || document.documentElement).appendChild(l);
       }
       if (!document.querySelector('script[src*="rizq_header_mockup_trial.js"]')) {
         var s = document.createElement('script');
-        s.src = 'rizq_header_mockup_trial.js?v=5.34';
+        s.src = 'rizq_header_mockup_trial.js?v=5.35';
         s.defer = true;
         (document.head || document.documentElement).appendChild(s);
       }
