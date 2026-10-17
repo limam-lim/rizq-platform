@@ -736,6 +736,27 @@ body.rizq-mockup-hdr-trial #virtual-offices{
 body > .rmh-more-menu{
   z-index:10080!important;
   pointer-events:auto!important;
+  cursor:default!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+}
+.rmh-cart-panel,
+.rmh-cart-panel.is-positioned,
+body > .rmh-cart-panel{
+  cursor:default!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+}
+.rmh-cart-panel h4,
+.rmh-cart-sec,
+.rmh-cart-sec-title,
+.rmh-cart-sec-count,
+.rmh-cart-sec ul,
+.rmh-cart-sec li,
+.rmh-cart-empty{
+  cursor:default!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
 }
 .rmh-cart-panel h4{
   margin:0 0 8px;font:800 13.5px/1.35 'Cairo',sans-serif;color:#0D1B2A;
@@ -755,11 +776,36 @@ body > .rmh-more-menu{
 .rmh-cart-sec ul{margin:0;padding:0 16px 0 0;list-style:disc;color:#2f4060;font:650 13px/1.45 'Cairo',sans-serif}
 .rmh-cart-sec li{margin:3px 0}
 .rmh-cart-empty{color:#6a7d94;font:600 13px 'Cairo',sans-serif;margin:0}
-.rmh-cart-open-full{
+.rmh-cart-open-full,
+a.rmh-cart-open-full{
   display:block;text-align:center;margin-top:8px;padding:9px 10px;
   background:linear-gradient(135deg,#1B3A6B,#0D1B2A);color:#fff;
   border-radius:9px;text-decoration:none;font:800 12.5px 'Cairo',sans-serif;
   white-space:normal;
+  cursor:pointer!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+}
+.rmh-cart-open-full:hover,
+a.rmh-cart-open-full:hover{
+  cursor:pointer!important;
+  filter:brightness(1.06);
+}
+/* عناصر تفاعلية في الهيدر — يد دائماً لا مؤشر النص */
+#rizq-mock-hdr .rmh-ico,
+#rizq-mock-hdr .rmh-lang,
+#rizq-mock-hdr .rmh-more-btn,
+#rizq-mock-hdr .rmh-brand,
+#rizq-mock-hdr .rmh-search-btn,
+#rizq-mock-hdr .rmh-nav a,
+#rizq-mock-hdr button,
+body > .rmh-more-menu .rmh-more-item,
+body > .rizq-help-dd-menu a,
+.rmh-help-dd-menu a,
+.rizq-help-dd-item{
+  cursor:pointer!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
 }
 
 /* تابلت — بدون قائمة الأقسام داخل البحث (كالنموذج) */
