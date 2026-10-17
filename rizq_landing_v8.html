@@ -8337,7 +8337,7 @@ var RIZQ_EST_MODELS = [
     ]}
 ];
 var _rizqEstCat = 'all';
-var _rizqEstGalleryTimer = null;
+var _rizqEstGalleryTimer = null; try{ window._rizqEstGalleryTimer = null; }catch(e){}
 
 function setEstateModelCat(cat){
   var ok = {all:1, apartment:1, villa:1, land:1, shop:1};
@@ -8381,7 +8381,7 @@ function _rizqEstApplyGallery(card, imgs, heroIdx){
 }
 
 function _rizqEstStartGalleries(rail){
-  if(_rizqEstGalleryTimer){ clearInterval(_rizqEstGalleryTimer); _rizqEstGalleryTimer = null; }
+  if(_rizqEstGalleryTimer){ clearInterval(_rizqEstGalleryTimer); _rizqEstGalleryTimer = null; } try{ window._rizqEstGalleryTimer = _rizqEstGalleryTimer; }catch(e){}
   if(!rail) return;
   if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   _rizqEstGalleryTimer = setInterval(function(){
@@ -8393,6 +8393,7 @@ function _rizqEstStartGalleries(rail){
       _rizqEstApplyGallery(card, imgs, cur + 1);
     });
   }, 3200);
+  try{ window._rizqEstGalleryTimer = _rizqEstGalleryTimer; }catch(e){}
 }
 
 function buildEstateModels(reshuffle){
