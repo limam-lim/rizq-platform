@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.43';
+    link.href = 'rizq_header_mockup_trial.css?v=5.44';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -120,8 +120,19 @@
       '</div></div></nav></header>';
   }
 
+  function findAccountBtn() {
+    var byId = document.getElementById('rmh-account-btn');
+    if (byId) return byId;
+    var hdr = document.getElementById('rizq-mock-hdr');
+    if (!hdr) return null;
+    var btn = hdr.querySelector('.rmh-tools .rmh-ico[aria-label="حسابي"], .rmh-tools .rmh-ico[aria-label="Mon compte"], .rmh-tools .rmh-ico[onclick*="goToAccount"]');
+    if (btn && !btn.id) btn.id = 'rmh-account-btn';
+    return btn;
+  }
+
   function ensureMockHeader() {
     if (document.getElementById('rizq-mock-hdr')) {
+      findAccountBtn();
       applyNavHrefs();
       markActiveFromPage();
       return;
@@ -539,8 +550,9 @@
   }
 
   function wireAccount() {
-    var btn = document.getElementById('rmh-account-btn');
+    var btn = findAccountBtn();
     if (!btn || btn.getAttribute('data-rmh-account-wired') === '1') return;
+    btn.removeAttribute('onclick');
     btn.setAttribute('data-rmh-account-wired', '1');
     btn.addEventListener('click', openAccountFromMock);
   }
