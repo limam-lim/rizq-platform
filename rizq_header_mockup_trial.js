@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.39';
+    link.href = 'rizq_header_mockup_trial.css?v=5.40';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -158,6 +158,7 @@
       rizq_corp: 'showrooms',
       rizq_estate: 'estate',
       rizq_estate_directory: 'estate',
+      rizq_estate_agencies: 'estate',
       rizq_office: 'offices',
       rizq_tenders: 'tenders',
       rizq_tenders_directory: 'tenders',

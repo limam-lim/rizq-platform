@@ -419,7 +419,11 @@ var TYPE_META = {
     ctaAr: 'زيارة المكتب ←', ctaFr: 'Voir le bureau →',
     reg: 'rizq_register.html?mode=seller&preBiz=office',
     regCtaAr: '🚀 أنشئ مكتبك الآن', regCtaFr: '🚀 Créez votre bureau',
-    ownAr: '✨ امتلك واجهتك المهنية على رزق', ownFr: '✨ Possédez votre vitrine professionnelle'
+    ownAr: '✨ امتلك واجهتك المهنية على رزق', ownFr: '✨ Possédez votre vitrine professionnelle',
+    /* عند فلتر العقارات: مسار وكالة عقارية واضح */
+    regEstate: './?openRegister=1&regPage=1&preType=company&preBiz=office&preActivity=of_realestate_agency',
+    regEstateCtaAr: '🚀 افتح وكالتك العقارية', regEstateCtaFr: '🚀 Ouvrez votre agence immobilière',
+    ownEstateAr: '✨ امتلك واجهة وكالتك العقارية على رزق', ownEstateFr: '✨ Possédez la vitrine de votre agence'
   },
   tenders: {
     page: 'rizq_tender_detail.html',
@@ -614,8 +618,11 @@ function renderHero(){
   document.title = fr ? (m.fr + ' — Rizq') : (m.ar + ' — رزق');
   var own = document.getElementById('dir-own-btn');
   if(own){
-    own.href = m.reg;
-    own.textContent = fr ? m.ownFr : m.ownAr;
+    var estateMode = (_type === 'office' && (_catFilter === 'realestate' || _catRaw === 'realestate'));
+    own.href = (estateMode && m.regEstate) ? m.regEstate : m.reg;
+    own.textContent = estateMode
+      ? (fr ? (m.ownEstateFr || m.ownFr) : (m.ownEstateAr || m.ownAr))
+      : (fr ? m.ownFr : m.ownAr);
   }
   var flabel = document.getElementById('dir-filter-label');
   if(flabel){

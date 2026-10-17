@@ -1831,12 +1831,12 @@
       if (!document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) {
         var l = document.createElement('link');
         l.rel = 'stylesheet';
-        l.href = 'rizq_header_mockup_trial.css?v=5.39';
+        l.href = 'rizq_header_mockup_trial.css?v=5.40';
         (document.head || document.documentElement).appendChild(l);
       }
       if (!document.querySelector('script[src*="rizq_header_mockup_trial.js"]')) {
         var s = document.createElement('script');
-        s.src = 'rizq_header_mockup_trial.js?v=5.39';
+        s.src = 'rizq_header_mockup_trial.js?v=5.40';
         s.defer = true;
         (document.head || document.documentElement).appendChild(s);
       }

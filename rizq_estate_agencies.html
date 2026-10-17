@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link rel="stylesheet" href="rizq-theme.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet"/>
+<title>وكالات العقارات | Agences immobilières — رزق</title>
+<style>
+:root{
+  --navy:#0B1C33;--ink:#060d18;--gold:#C9A84C;--gold2:#E8C96A;--gold3:#F3E2A8;
+  --text:#E8EDF5;--muted:rgba(232,237,245,.72);--line:rgba(201,168,76,.28);
+  --display:'Amiri','Noto Naskh Arabic',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body,
+body.rizq-mockup-hdr-trial{
+  font-family:'Cairo',system-ui,sans-serif;color:var(--text);min-height:100vh;
+  background-color:#060d18!important;
+  background-image:
+    radial-gradient(1100px 480px at 88% -8%,rgba(201,168,76,.14),transparent 55%),
+    radial-gradient(800px 380px at 8% 18%,rgba(27,58,107,.4),transparent 52%),
+    linear-gradient(180deg,#060d18 0%,#0a1424 42%,#07111f 100%)!important;
+  background-attachment:fixed!important;
+}
+button,a,[role="button"]{cursor:pointer}
+img{display:block;max-width:100%}
+button{font:inherit;border:0;background:none;color:inherit}
+
+.ag-top{
+  position:sticky;top:0;z-index:40;
+  background:linear-gradient(180deg,rgba(6,13,24,.98),rgba(6,13,24,.88));
+  backdrop-filter:blur(14px);border-bottom:1px solid rgba(201,168,76,.22);
+}
+.ag-top-inner{
+  max-width:1180px;margin:0 auto;padding:12px 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.ag-brand{display:flex;align-items:center;gap:10px;text-decoration:none;direction:ltr}
+.ag-brand img{width:34px;height:34px;border-radius:10px;object-fit:contain;
+  background:linear-gradient(160deg,#1a2d4d,#0a1324);
+  box-shadow:0 0 0 1.5px rgba(240,215,138,.5)}
+.ag-brand-ar{font-weight:900;font-size:18px;color:var(--gold);line-height:1;display:block}
+.ag-brand-sub{font-size:7.5px;letter-spacing:1.4px;color:rgba(201,168,76,.75);font-style:italic;text-transform:uppercase}
+.ag-nav{display:flex;flex-wrap:wrap;gap:6px}
+.ag-nav a{
+  color:rgba(232,237,245,.8);text-decoration:none;font:800 12.5px Cairo,sans-serif;
+  padding:8px 12px;border-radius:999px;border:1px solid transparent;transition:.2s;
+}
+.ag-nav a:hover,.ag-nav a.is-on{color:var(--gold2);border-color:rgba(201,168,76,.35);background:rgba(201,168,76,.08)}
+.ag-actions{display:flex;gap:8px;flex-wrap:wrap}
+.ag-chip{
+  border:1px solid var(--line);background:rgba(201,168,76,.08);color:var(--gold2);
+  border-radius:999px;padding:8px 14px;font:700 12px/1 Cairo,sans-serif;text-decoration:none;
+}
+.ag-chip.solid{
+  background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0B1C33;border-color:transparent;
+  box-shadow:0 8px 20px rgba(201,168,76,.28);
+}
+
+.ag-hero{
+  max-width:1180px;margin:0 auto;padding:36px 20px 18px;text-align:center;
+}
+.ag-kicker{
+  display:inline-flex;align-items:center;gap:8px;margin-bottom:12px;
+  border:1px solid rgba(201,168,76,.45);background:rgba(11,28,51,.55);
+  color:var(--gold2);border-radius:999px;padding:8px 14px;font:800 12px Cairo,sans-serif;
+}
+.ag-kicker i{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(201,168,76,.22)}
+.ag-hero h1{
+  font-family:var(--display);font-size:clamp(28px,4.5vw,48px);font-weight:700;line-height:1.2;
+  margin-bottom:10px;color:#fff;
+}
+.ag-hero h1 em{
+  font-style:normal;
+  background:linear-gradient(135deg,#F3E2A8,#C9A84C 55%,#E8C96A);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.ag-hero p{color:var(--muted);font-size:15px;line-height:1.7;max-width:48ch;margin:0 auto 18px}
+.ag-hero-cta{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:8px}
+.ag-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border-radius:14px;padding:13px 20px;font:800 14px Cairo,sans-serif;text-decoration:none;
+  transition:transform .2s,box-shadow .2s;
+}
+.ag-btn:hover{transform:translateY(-2px)}
+.ag-btn-gold{
+  background:linear-gradient(135deg,#F3E2A8,#C9A84C 45%,#E8C96A);color:#0B1C33;
+  box-shadow:0 12px 28px rgba(201,168,76,.32);
+}
+.ag-btn-ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.16)}
+.ag-path{
+  max-width:720px;margin:14px auto 0;padding:12px 16px;border-radius:14px;
+  border:1px solid rgba(201,168,76,.28);background:rgba(201,168,76,.08);
+  font:700 13px/1.55 Cairo,sans-serif;color:rgba(232,237,245,.9);
+}
+.ag-path strong{color:var(--gold3)}
+
+.ag-wrap{max-width:1180px;margin:0 auto;padding:10px 20px 48px}
+.ag-toolbar{
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;
+  margin:8px 0 16px;
+}
+.ag-search{
+  flex:1 1 240px;min-width:0;border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05);color:#fff;border-radius:12px;padding:12px 14px;
+  font:700 13px Cairo,sans-serif;outline:none;
+}
+.ag-search:focus{border-color:rgba(201,168,76,.55)}
+.ag-count{font:800 13px Cairo,sans-serif;color:var(--muted)}
+
+.ag-grid{
+  display:grid;grid-template-columns:repeat(12,1fr);gap:16px;
+}
+.ag-card{
+  grid-column:span 4;border-radius:20px;overflow:hidden;
+  background:linear-gradient(160deg,#121f33,#0a1628);
+  border:1px solid rgba(201,168,76,.24);
+  box-shadow:0 16px 36px rgba(0,0,0,.28);
+  display:flex;flex-direction:column;min-height:100%;
+  transition:transform .25s,border-color .25s,box-shadow .25s;
+}
+.ag-card:hover{transform:translateY(-4px);border-color:rgba(201,168,76,.5);box-shadow:0 22px 48px rgba(0,0,0,.38)}
+.ag-card-cover{position:relative;aspect-ratio:16/10;background:#0a1424;overflow:hidden}
+.ag-card-cover img{width:100%;height:100%;object-fit:cover}
+.ag-card-cover::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 40%,rgba(6,13,24,.88) 100%);
+}
+.ag-card-logo{
+  position:absolute;bottom:12px;right:12px;z-index:2;width:54px;height:54px;border-radius:14px;
+  object-fit:cover;border:2px solid rgba(240,215,138,.7);
+  background:linear-gradient(145deg,#1a2d4d,#0a1324);box-shadow:0 8px 18px rgba(0,0,0,.35);
+}
+.ag-card-badge{
+  position:absolute;top:12px;left:12px;z-index:2;
+  background:rgba(6,13,24,.75);border:1px solid rgba(201,168,76,.45);
+  color:var(--gold2);border-radius:999px;padding:5px 10px;font:800 11px Cairo,sans-serif;
+}
+.ag-card-body{padding:16px 16px 18px;display:flex;flex-direction:column;gap:8px;flex:1}
+.ag-card-body h3{font-size:17px;font-weight:900;color:#fff;line-height:1.35}
+.ag-card-act{font:700 12.5px Cairo,sans-serif;color:var(--gold2)}
+.ag-card-city{font-size:13px;color:var(--muted)}
+.ag-card-tag{font-size:12.5px;color:rgba(232,237,245,.78);line-height:1.55;flex:1}
+.ag-card-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.ag-card-actions a{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border-radius:12px;padding:11px 10px;font:800 12.5px Cairo,sans-serif;text-decoration:none;
+}
+.ag-call{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347}
+.ag-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
+.ag-open{
+  display:inline-flex;align-items:center;justify-content:center;margin-top:8px;
+  width:100%;border-radius:12px;padding:11px 12px;font:800 13px Cairo,sans-serif;
+  text-decoration:none;color:#fff;border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.05);
+}
+.ag-open:hover{border-color:rgba(201,168,76,.45);color:var(--gold2)}
+
+.ag-empty{
+  grid-column:1/-1;text-align:center;padding:40px 18px;border-radius:18px;
+  border:1px dashed rgba(201,168,76,.3);background:rgba(255,255,255,.02);color:var(--muted);
+}
+
+.ag-own{
+  margin-top:36px;border-radius:24px;overflow:hidden;
+  border:1px solid rgba(201,168,76,.3);
+  background:
+    radial-gradient(700px 240px at 80% 0%,rgba(201,168,76,.16),transparent 55%),
+    linear-gradient(145deg,#121f33,#0B1C33 55%,#0a1628);
+  padding:28px 24px;text-align:center;
+}
+.ag-own h2{font-family:var(--display);font-size:clamp(22px,3vw,32px);margin-bottom:8px;color:#fff}
+.ag-own p{color:var(--muted);max-width:46ch;margin:0 auto 16px;line-height:1.7}
+.ag-own-steps{
+  display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 16px;
+}
+.ag-own-steps span{
+  border:1px solid rgba(201,168,76,.28);background:rgba(201,168,76,.08);
+  color:rgba(232,237,245,.9);border-radius:999px;padding:7px 12px;font:800 12px Cairo,sans-serif;
+}
+
+.ag-foot{
+  border-top:1px solid rgba(201,168,76,.18);text-align:center;
+  padding:18px 20px 28px;color:rgba(232,237,245,.45);font-size:12px;
+}
+.ag-foot a{color:var(--gold2);text-decoration:none;font-weight:800}
+
+@media(max-width:980px){.ag-card{grid-column:span 6}.ag-nav{display:none}}
+@media(max-width:640px){.ag-card{grid-column:span 12}.ag-card-actions{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="rizq-page-dark">
+
+<header class="ag-top">
+  <div class="ag-top-inner">
+    <a class="ag-brand" href="rizq_landing_v8.html" aria-label="رزق">
+      <img src="rizq-mark-inset.png?v=1" width="34" height="34" alt=""/>
+      <span>
+        <span class="ag-brand-ar">رزق</span>
+        <span class="ag-brand-sub">ESTATE AGENCIES</span>
+      </span>
+    </a>
+    <nav class="ag-nav" aria-label="تنقل وكالات العقارات">
+      <a href="#ag-list" class="is-on">الوكالات</a>
+      <a href="rizq_estate.html?demo=1">معروضات العقارات</a>
+      <a href="rizq_landing_v8.html#virtual-estate">بوابة رزق</a>
+    </nav>
+    <div class="ag-actions">
+      <a class="ag-chip" href="rizq_estate.html?demo=1">تصفّح العقارات</a>
+      <a class="ag-chip solid" id="ag-reg-top" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">افتح وكالتك</a>
+    </div>
+  </div>
+</header>
+
+<section class="ag-hero" aria-label="دليل الوكالات العقارية">
+  <div class="ag-kicker"><i></i> مسار مستقل · وكالات العقارات فقط</div>
+  <h1>كل <em>الوكالات العقارية</em> في مكان واحد</h1>
+  <p>صفحة منعزلة مباشرة للوصول إلى وكالات العقار على رزق — هوية واضحة، معروضات، وتواصل فوري مع الوكالة.</p>
+  <div class="ag-hero-cta">
+    <a class="ag-btn ag-btn-gold" href="#ag-list">تصفّح الوكالات</a>
+    <a class="ag-btn ag-btn-ghost" id="ag-reg-hero" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">سجّل وكالتك العقارية</a>
+  </div>
+  <div class="ag-path">
+    مسار الحساب في التسجيل: <strong>شركة → مكتب → وساطة عقارية</strong>
+    <span dir="ltr" style="opacity:.75"> (preBiz=office · preActivity=of_realestate_agency)</span>
+  </div>
+</section>
+
+<main class="ag-wrap">
+  <div class="ag-toolbar">
+    <input class="ag-search" id="ag-search" type="search" placeholder="ابحث باسم الوكالة أو المدينة…" autocomplete="off"/>
+    <div class="ag-count" id="ag-count" aria-live="polite"></div>
+  </div>
+  <div class="ag-grid" id="ag-list" role="list" aria-label="قائمة الوكالات العقارية"></div>
+
+  <section class="ag-own" aria-label="امتلك وكالتك العقارية">
+    <h2>امتلك واجهتك العقارية على رزق</h2>
+    <p>حساب وكالة عقارية مستقل عن المحلات والمعارض — صفحة باسمك، معروضات، وأزرار اتصال وواتساب مباشرة.</p>
+    <div class="ag-own-steps">
+      <span>1) سجّل كشركة</span>
+      <span>2) اختر نوع «مكتب»</span>
+      <span>3) نشاط «وساطة عقارية»</span>
+    </div>
+    <a class="ag-btn ag-btn-gold" id="ag-reg-own" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">افتح حساب وكالة عقارية</a>
+  </section>
+</main>
+
+<footer class="ag-foot">
+  © 2026 رزق — دليل الوكالات العقارية ·
+  <a href="rizq_estate.html?demo=1">بوابة العقارات</a> ·
+  <a href="rizq_directory.html?type=office&amp;cat=realestate">دليل المكاتب (عقارات)</a>
+</footer>
+
+<script>
+(function(){
+  var DEMO = [
+    {
+      id: 'demo_estate_atwar',
+      name: 'أطوار للعقارات',
+      activity: 'وساطة عقارية',
+      city: 'نواكشوط',
+      tagline: 'فلل وشقق وأراضي — تواصل مباشر مع الوكالة',
+      phone: '+222 42 00 01 11',
+      whatsapp: '22242000111',
+      cover: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80',
+      logo: 'rizq-mark-inset.png?v=1',
+      badge: 'نموذج',
+      href: 'rizq_office.html?demo=1&activity=of_realestate_agency&name=' + encodeURIComponent('أطوار للعقارات')
+    },
+    {
+      id: 'demo_estate_saknia',
+      name: 'سكنية العقارية',
+      activity: 'بيع وإيجار',
+      city: 'تفرغ زينة',
+      tagline: 'شقق عائلية ومحلات على الشوارع الرئيسية',
+      phone: '+222 45 10 20 30',
+      whatsapp: '22245102030',
+      cover: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
+      logo: 'rizq-mark-inset.png?v=1',
+      badge: 'نموذج',
+      href: 'rizq_office.html?demo=1&activity=of_realestate_agency&name=' + encodeURIComponent('سكنية العقارية')
+    },
+    {
+      id: 'demo_estate_horizon',
+      name: 'هورايزن للإسكان',
+      activity: 'تطوير ووساطة',
+      city: 'نواذيبو',
+      tagline: 'أراضي سكنية وفلل جاهزة للسكن',
+      phone: '+222 46 22 33 44',
+      whatsapp: '22246223344',
+      cover: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80',
+      logo: 'rizq-mark-inset.png?v=1',
+      badge: 'نموذج',
+      href: 'rizq_office.html?demo=1&activity=of_realestate_agency&name=' + encodeURIComponent('هورايزن للإسكان')
+    },
+    {
+      id: 'demo_estate_dar',
+      name: 'دار الأمين العقارية',
+      activity: 'إدارة عقارات',
+      city: 'لكصر',
+      tagline: 'إدارة كراء وبيع بثقة وصور واضحة',
+      phone: '+222 36 70 80 90',
+      whatsapp: '22236708090',
+      cover: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80',
+      logo: 'rizq-mark-inset.png?v=1',
+      badge: 'نموذج',
+      href: 'rizq_office.html?demo=1&activity=of_realestate_agency&name=' + encodeURIComponent('دار الأمين العقارية')
+    }
+  ];
+
+  var agencies = DEMO.slice();
+  var grid = document.getElementById('ag-list');
+  var countEl = document.getElementById('ag-count');
+  var searchEl = document.getElementById('ag-search');
+
+  function esc(s){
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  }
+  function telHref(p){ return 'tel:' + String(p||'').replace(/\s+/g,''); }
+  function waHref(w){ return 'https://wa.me/' + String(w||'').replace(/\D/g,''); }
+
+  function cardHTML(a){
+    var phone = a.phone || '';
+    var wa = a.whatsapp || '';
+    var href = a.href || ('rizq_office.html?id=' + encodeURIComponent(a.id||''));
+    return '<article class="ag-card" role="listitem">'
+      + '<div class="ag-card-cover">'
+      +   (a.cover ? '<img src="'+esc(a.cover)+'" alt="'+esc(a.name)+'" loading="lazy"/>' : '')
+      +   (a.badge ? '<span class="ag-card-badge">'+esc(a.badge)+'</span>' : '')
+      +   (a.logo ? '<img class="ag-card-logo" src="'+esc(a.logo)+'" alt=""/>' : '')
+      + '</div>'
+      + '<div class="ag-card-body">'
+      +   '<h3>'+esc(a.name)+'</h3>'
+      +   '<div class="ag-card-act">🏠 '+esc(a.activity||'وكالة عقارية')+'</div>'
+      +   (a.city ? '<div class="ag-card-city">📍 '+esc(a.city)+'</div>' : '')
+      +   (a.tagline ? '<div class="ag-card-tag">'+esc(a.tagline)+'</div>' : '')
+      +   '<div class="ag-card-actions">'
+      +     (phone
+          ? '<a class="ag-call" href="'+esc(telHref(phone))+'" dir="ltr">📞 اتصل بالوكالة</a>'
+          : '<a class="ag-call" href="'+esc(href)+'">📞 اتصل بالوكالة</a>')
+      +     (wa
+          ? '<a class="ag-wa" href="'+esc(waHref(wa))+'" target="_blank" rel="noopener">💬 واتساب</a>'
+          : '<a class="ag-wa" href="'+esc(href)+'" target="_blank" rel="noopener">💬 واتساب</a>')
+      +   '</div>'
+      +   '<a class="ag-open" href="'+esc(href)+'">افتح صفحة الوكالة ←</a>'
+      + '</div></article>';
+  }
+
+  function filtered(){
+    var q = (searchEl.value||'').trim().toLowerCase();
+    if(!q) return agencies;
+    return agencies.filter(function(a){
+      return ((a.name||'')+' '+(a.city||'')+' '+(a.activity||'')+' '+(a.tagline||'')).toLowerCase().indexOf(q) >= 0;
+    });
+  }
+
+  function render(){
+    var list = filtered();
+    countEl.textContent = list.length
+      ? ('عرض '+list.length+' وكالة')
+      : 'لا وكالات مطابقة';
+    grid.innerHTML = list.length
+      ? list.map(cardHTML).join('')
+      : '<div class="ag-empty">لا وكالات مطابقة حالياً — جرّب بحثاً أوسع أو سجّل وكالتك.</div>';
+  }
+
+  function isEstateAgency(a){
+    if(!a || a.type !== 'office') return false;
+    var act = String(a.activityId || a.activity || a.category || a.sector || '').toLowerCase();
+    if(/realestate|of_realestate|عقار|immobilier|estate/.test(act)) return true;
+    if(window.RizqMerchantActivities && typeof RizqMerchantActivities.accountMatchesDirectoryFilter === 'function'){
+      try { return !!RizqMerchantActivities.accountMatchesDirectoryFilter(a, 'office', 'realestate'); } catch(e){}
+    }
+    return false;
+  }
+
+  function mapAccount(a){
+    return {
+      id: a.id,
+      name: a.name || 'وكالة عقارية',
+      activity: a.activity || a.sector || 'وساطة عقارية',
+      city: a.city || a.wilaya || a.location || '',
+      tagline: a.tagline || a.bio || '',
+      phone: a.phone || a.tel || '',
+      whatsapp: a.whatsapp || a.wa || a.phone || '',
+      cover: a.cover || a.thumb || a.photo || '',
+      logo: a.logo || a.avatar || 'rizq-mark-inset.png?v=1',
+      badge: a.verified ? 'موثّق' : '',
+      href: 'rizq_office.html?id=' + encodeURIComponent(a.id||'')
+    };
+  }
+
+  function backendBase(){
+    return (typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE) || 'http://localhost:3000';
+  }
+
+  function loadLive(){
+    fetch(backendBase() + '/api/accounts/public', { credentials: 'omit' })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(rows){
+        var list = Array.isArray(rows) ? rows : (rows && rows.accounts) || [];
+        var live = list.filter(isEstateAgency).map(mapAccount);
+        if(live.length){
+          agencies = live.concat(DEMO);
+          render();
+        }
+      })
+      .catch(function(){});
+  }
+
+  function bindReg(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('click', function(e){
+      if(typeof window.openRegisterAs === 'function'){
+        e.preventDefault();
+        window.openRegisterAs('company','office','of_realestate_agency');
+      }
+    });
+  }
+
+  searchEl.addEventListener('input', render);
+  bindReg('ag-reg-top');
+  bindReg('ag-reg-hero');
+  bindReg('ag-reg-own');
+  render();
+  loadLive();
+})();
+</script>
+<link rel="stylesheet" href="rizq_header.css?v=31.6"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.40"/>
+<script>document.documentElement.classList.add('rizq-app-nav')</script>
+<script src="rizq_header.js?v=31.0" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.40" defer></script>
+<script src="rizq_merchant_activities.js" defer></script>
+<script src="rizq_pwa.js" defer></script>
+</body>
+</html>
