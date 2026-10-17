@@ -439,6 +439,30 @@
     document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
   }
 
+  function ensureHeroTagline() {
+    var el = document.getElementById('hero-tagline');
+    if (!el) return;
+    var fr = document.documentElement.lang === 'fr' || document.body.classList.contains('rizq-lang-fr');
+    var ar = 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي — كل شيء في مكان واحد';
+    var frTxt = 'Boutique virtuelle · Bureau pro · Pub institutionnelle — tout en un seul endroit';
+    var txt = (el.textContent || '').replace(/\s+/g, ' ').trim();
+    if (!txt || txt.length < 12) {
+      el.innerHTML =
+        '<span class="hero-tagline-lead" data-t="hero-tagline-lead">' +
+        (fr ? 'Boutique virtuelle · Bureau pro · Pub institutionnelle' : 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي') +
+        '</span><span class="hero-tagline-place" data-t="hero-one-place">' +
+        (fr ? ' — tout en un seul endroit' : ' — كل شيء في مكان واحد') +
+        '</span>';
+    }
+    el.hidden = false;
+    el.removeAttribute('hidden');
+    el.style.setProperty('display', 'block', 'important');
+    el.style.setProperty('visibility', 'visible', 'important');
+    el.style.setProperty('opacity', '1', 'important');
+    el.style.setProperty('color', '#0a1628', 'important');
+    el.style.setProperty('-webkit-text-fill-color', '#0a1628', 'important');
+  }
+
   function boot() {
     fillCategories();
     refreshBadge();
@@ -448,9 +472,11 @@
     wireHelp();
     wireMore();
     wireNavActive();
+    ensureHeroTagline();
     syncMockHdrHeight();
     setTimeout(function () {
       fillCategories();
+      ensureHeroTagline();
       syncMockHdrHeight();
     }, 1200);
     window.addEventListener('resize', syncMockHdrHeight);

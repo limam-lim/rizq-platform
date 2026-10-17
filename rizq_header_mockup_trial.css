@@ -206,33 +206,52 @@ body.rizq-mockup-hdr-trial .hero-pill:hover{
   transform:none!important;
   box-shadow:none!important;
 }
-/* جملة متجرك الافتراضي — مع كبسولة بيع/اشتر */
+/* جملة متجرك الافتراضي — ظاهرة بوضوح تحت كبسولة بيع/اشتر */
+body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline,
+body.rizq-mockup-hdr-trial #hero-tagline,
+body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline .hero-tagline-lead,
+body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline .hero-tagline-place,
+body.rizq-mockup-hdr-trial #hero-tagline .hero-tagline-lead,
+body.rizq-mockup-hdr-trial #hero-tagline .hero-tagline-place{
+  display:inline!important;
+  visibility:visible!important;
+  opacity:1!important;
+  color:#0a1628!important;
+  -webkit-text-fill-color:#0a1628!important;
+  background:transparent!important;
+  -webkit-background-clip:border-box!important;
+  background-clip:border-box!important;
+  text-shadow:none!important;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+}
 body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline,
 body.rizq-mockup-hdr-trial #hero-tagline{
   display:block!important;
-  visibility:visible!important;
-  opacity:1!important;
   width:100%!important;
   max-width:100%!important;
-  margin:2px auto 0!important;
-  padding:0 4px!important;
+  margin:8px auto 0!important;
+  padding:8px 10px!important;
+  box-sizing:border-box!important;
   font-family:'Cairo','Segoe UI',Tahoma,sans-serif!important;
-  font-size:clamp(12px,1.35vw,14.5px)!important;
-  font-weight:700!important;
-  color:#0F2347!important;
-  -webkit-text-fill-color:#0F2347!important;
+  font-size:clamp(13px,1.45vw,15.5px)!important;
+  font-weight:800!important;
   letter-spacing:0!important;
-  line-height:1.35!important;
+  line-height:1.45!important;
   text-align:center!important;
-  white-space:nowrap!important;
+  white-space:normal!important;
   overflow:visible!important;
   text-overflow:clip!important;
-  background:transparent!important;
   border:0!important;
   box-shadow:none!important;
+  position:relative!important;
+  z-index:3!important;
+  min-height:1.45em!important;
 }
-body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline-place{
+body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline-place,
+body.rizq-mockup-hdr-trial #hero-tagline .hero-tagline-place{
   display:inline!important;
+  font-weight:800!important;
 }
 @media(max-width:768px){
   html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-lead-row,
@@ -251,12 +270,9 @@ body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline-place{
   body.rizq-mockup-hdr-trial .hero-pill-sep{height:16px!important}
   body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline,
   body.rizq-mockup-hdr-trial #hero-tagline{
-    font-size:clamp(10px,2.6vw,12px)!important;
-    white-space:normal!important;
-    line-height:1.4!important;
-  }
-  body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline-place{
-    display:inline!important;
+    font-size:clamp(11.5px,2.8vw,13.5px)!important;
+    padding:6px 6px!important;
+    margin-top:6px!important;
   }
 }
 /* body padding تحت الهيدر الثابت — يتفوّق على html.rizq-app-nav:has(#nav) body (specificity ID) */
