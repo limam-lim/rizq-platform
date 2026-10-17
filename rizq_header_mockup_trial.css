@@ -135,13 +135,21 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
 }
 .rmh-search-cat{
   border:0;background:#f7f9fc;padding:0 12px;min-width:118px;max-width:148px;
-  font:700 13px 'Cairo',sans-serif;color:#0D1B2A;cursor:pointer;
+  font:700 13px 'Cairo',sans-serif;color:#0D1B2A;
   border-inline-start:1px solid #e4ebf3;
   appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%230D1B2A' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
   background-repeat:no-repeat;
   background-position:left 10px center;
   padding-inline-start:22px;
+  cursor:pointer!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+}
+#rizq-mock-hdr .rmh-search-cat,
+#rizq-mock-hdr .rmh-search-cat option,
+#rizq-mock-hdr select.rmh-search-cat{
+  cursor:pointer!important;
 }
 .rmh-search-input{
   flex:1;min-width:0;border:0;outline:0;padding:0 14px;
