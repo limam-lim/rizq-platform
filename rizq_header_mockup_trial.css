@@ -859,12 +859,15 @@ body > .rizq-help-dd-menu a,
   html.rizq-app-nav:has(#rizq-desk-nav) body.rizq-mockup-hdr-trial{
     padding-top:var(--rizq-mock-hdr-h,212px)!important;
   }
+  /* أعمدة متساوية يمين/يسار حتى يقع البحث في منتصف الشاشة هندسياً */
   #rizq-mock-hdr .rmh-main{
-    grid-template-columns:minmax(128px,auto) minmax(0,300px) minmax(148px,1fr);
-    gap:12px 22px;
-    padding:9px 18px;
+    grid-template-columns:minmax(0,1fr) minmax(0,290px) minmax(0,1fr);
+    gap:10px 14px;
+    padding:9px 16px;
     align-items:center;
   }
+  #rizq-mock-hdr .rmh-brand{justify-self:start!important;min-width:0}
+  #rizq-mock-hdr .rmh-tools{justify-self:end!important;min-width:0}
   /* البحث: أصغر وفي الوسط تماماً بين الشعار والأدوات */
   #rizq-mock-hdr .rmh-search{
     max-width:290px!important;
