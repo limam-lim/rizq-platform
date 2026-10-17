@@ -34,16 +34,30 @@ body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap:not(.is-empty){
   z-index:1!important;
   margin:0!important;
   border-radius:0!important;
-  padding:4px 0!important;
+  padding:2px 0!important;
   min-height:0!important;
-  font-size:12px!important;
-  line-height:1.25!important;
+  height:auto!important;
+  font-size:11px!important;
+  line-height:1.15!important;
+  border-top-width:1px!important;
+  border-bottom-width:1px!important;
 }
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap:not(.is-empty) .ticker-inner,
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap:not(.is-empty) #ticker{
-  font-size:12px!important;
-  line-height:1.25!important;
-  padding-block:0!important;
+  font-size:11px!important;
+  line-height:1.15!important;
+  padding:0!important;
+  margin:0!important;
+  align-items:center!important;
+}
+body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap:not(.is-empty) .ticker-item{
+  font-size:11px!important;
+  line-height:1.15!important;
+  padding:0 22px!important;
+  gap:6px!important;
+}
+body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap:not(.is-empty) .ticker-dot{
+  width:4px!important;height:4px!important;
 }
 /* كبسولة رزق تحت الهيدر — specificity أعلى من html.rizq-app-nav .hero */
 /* يتفوّق على قاعدة الـ ticker (ID داخل :has) التي تفرض padding-top:54px */
