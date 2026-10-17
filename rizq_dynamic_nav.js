@@ -17,11 +17,14 @@
   /** زر نشر بين المعارض والمكاتب على الشريط الرئيسي (سطح المكتب/تابلت) */
   var POST_NAV_ORDER = 5;
 
+  /* الباقات أُزيلت من الرئيسية — تبقى في النماذج فقط */
+  var PACKS_HREF = 'rizq_ads_slots_mockup.html';
+
   var DESKTOP_MORE = [
     { href: 'rizq_landing_v8.html#categories', hdr: 'cats', key: 'cats', ico: '📂', landingHref: '#categories' },
     { href: 'rizq_ads_info.html', hdr: 'rizqads', key: 'rizqads', ico: '🎬' },
     { href: 'rizq_post.html', hdr: 'post', key: 'post', ico: '➕' },
-    { href: 'rizq_landing_v8.html#pricing', hdr: 'packs', key: 'packs', ico: '💎', landingHref: '#pricing' },
+    { href: PACKS_HREF, hdr: 'packs', key: 'packs', ico: '💎', skipOnLanding: true },
     { href: 'rizq_legal.html', hdr: 'legal', key: 'legal', ico: '⚖️' },
     { href: 'rizq_platform.html#who', hdr: 'about', key: 'about', ico: 'ℹ️' },
     { href: 'rizq_platform.html#why', hdr: 'why', key: 'why', ico: '❓' }
@@ -32,7 +35,7 @@
     { href: 'rizq_browse.html', hdr: 'ads', ico: '📢', landingHref: '#listings' },
     { href: 'rizq_ads_info.html', hdr: 'rizqads', ico: '🎬' },
     { href: 'rizq_post.html', hdr: 'post', ico: '➕' },
-    { href: 'rizq_landing_v8.html#pricing', hdr: 'packs', ico: '💎', landingHref: '#pricing' },
+    { href: PACKS_HREF, hdr: 'packs', ico: '💎', skipOnLanding: true },
     { href: 'rizq_legal.html', hdr: 'legal', ico: '⚖️' },
     { href: 'rizq_platform.html#who', hdr: 'about', ico: 'ℹ️' },
     { href: 'rizq_platform.html#why', hdr: 'why', ico: '❓' }
@@ -243,7 +246,11 @@
       });
       container.querySelectorAll('.rizq-nav-packs, .nav-phone-packs-li').forEach(function (packs) {
         if (packs.setAttribute) packs.setAttribute('data-nav-order', '9');
-        /* سطح المكتب/تابلت: أخفِ من الشريط — تبقى في قائمة المزيد */
+        /* الرئيسية: احذف من الشريط تماماً. غير ذلك: سطح المكتب يخفي والهاتف يظهر */
+        if (isLanding()) {
+          packs.remove();
+          return;
+        }
         if (!phone) {
           packs.style.setProperty('display', 'none', 'important');
           packs.setAttribute('data-nav-desk-hidden', '1');
@@ -265,6 +272,7 @@
     menu.innerHTML = '';
     var onLanding = isLanding();
     items.forEach(function (item) {
+      if (item.skipOnLanding && onLanding) return;
       if (item.module && !moduleOpen(flags, item.module)) return;
       var href = resolveHref(item, onLanding);
       var a = document.createElement('a');
@@ -291,6 +299,7 @@
     list.innerHTML = '';
     var onLanding = isLanding();
     getMobileMoreItems().forEach(function (item) {
+      if (item.skipOnLanding && onLanding) return;
       if (item.module && !moduleOpen(flags, item.module)) return;
       var href = resolveHref(item, onLanding);
       var li = document.createElement('li');
