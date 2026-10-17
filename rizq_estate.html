@@ -875,17 +875,29 @@ button{font:inherit;border:0;background:none;color:inherit}
     }
   }
 
+  function isFrEstate(){
+    try{
+      var ls = localStorage.getItem('rizq_lang');
+      if(ls === 'fr') return true;
+      if(ls === 'ar') return false;
+    }catch(e){}
+    return document.documentElement.lang === 'fr' || document.body.classList.contains('rizq-lang-fr');
+  }
+
   function paintPayments(methods){
     window._rizqEstatePaymentMethods = Array.isArray(methods) ? methods : [];
     var box = document.getElementById('est-payment-methods');
     if(!box) return;
+    var fr = isFrEstate();
     function draw(){
       if(typeof RizqAccountPayments !== 'undefined' && typeof RizqAccountPayments.renderPublic === 'function'){
-        RizqAccountPayments.renderPublic(box, window._rizqEstatePaymentMethods, { fr: false });
+        RizqAccountPayments.renderPublic(box, window._rizqEstatePaymentMethods, { fr: fr });
         /* صياغة عقارية فوق النص التجاري الموحّد */
         var kids = box.children;
-        if(kids && kids[0]) kids[0].textContent = '💳 طرق الدفع المتاحة';
-        if(kids && kids[1]) kids[1].textContent = 'ادفع مباشرة للوكالة عبر إحدى الوسائل أدناه — نفس نظام المحلات والمكاتب بواجهة عقارية.';
+        if(kids && kids[0]) kids[0].textContent = fr ? '💳 Moyens de paiement' : '💳 طرق الدفع المتاحة';
+        if(kids && kids[1]) kids[1].textContent = fr
+          ? 'Payez directement l\'agence via l\'un des moyens ci-dessous — même système que boutiques et bureaux, design immobilier.'
+          : 'ادفع مباشرة للوكالة عبر إحدى الوسائل أدناه — نفس نظام المحلات والمكاتب بواجهة عقارية.';
         return true;
       }
       return false;
@@ -945,18 +957,19 @@ button{font:inherit;border:0;background:none;color:inherit}
     };
     window._rizqEstateAccountId = AGENCY.id;
     window._rizqEstateProfile = AGENCY;
-    document.title = AGENCY.name + ' | وكالة عقارية — رزق';
+    var frBoot = isFrEstate();
+    document.title = AGENCY.name + (frBoot ? ' | Agence immobilière — Rizq' : ' | وكالة عقارية — رزق');
 
-    setText('est-kicker', 'وكالة عقارية · ' + AGENCY.name);
+    setText('est-kicker', (frBoot ? 'Agence immobilière · ' : 'وكالة عقارية · ') + AGENCY.name);
     var kicker = document.getElementById('est-kicker');
     if(kicker){
       kicker.innerHTML = window._rizqEstateIsDemo
-        ? ('<i></i> واجهة وكالة عقارية واحدة · ' + esc(AGENCY.name))
-        : ('<i></i> وكالة عقارية · ' + esc(AGENCY.name));
+        ? ('<i></i> ' + (frBoot ? 'Vitrine agence unique · ' : 'واجهة وكالة عقارية واحدة · ') + esc(AGENCY.name))
+        : ('<i></i> ' + (frBoot ? 'Agence immobilière · ' : 'وكالة عقارية · ') + esc(AGENCY.name));
     }
     setText('est-hero-lead', AGENCY.desc);
     setText('est-bar-name', AGENCY.name);
-    setText('est-bar-sub', (AGENCY.activity || 'وكالة عقارية') + ' على رزق · ' + (AGENCY.city || ''));
+    setText('est-bar-sub', (AGENCY.activity || (frBoot ? 'Agence immobilière' : 'وكالة عقارية')) + (frBoot ? ' sur Rizq · ' : ' على رزق · ') + (AGENCY.city || ''));
     setText('est-about-name', AGENCY.name);
     setText('est-about-desc', AGENCY.desc);
 
@@ -1043,8 +1056,9 @@ button{font:inherit;border:0;background:none;color:inherit}
   }
 
   function cardHTML(item){
+    var fr = isFrEstate();
     return '<div class="est-card'+(item.featured?' featured':'')+'" data-id="'+esc(item.id)+'">'
-      + '<button type="button" class="est-card-open" data-id="'+esc(item.id)+'" aria-label="معاينة: '+esc(item.title)+'" style="display:block;width:100%;text-align:inherit;background:transparent;border:0;padding:0;color:inherit;cursor:pointer">'
+      + '<button type="button" class="est-card-open" data-id="'+esc(item.id)+'" aria-label="'+(fr?'Aperçu: ':'معاينة: ')+esc(item.title)+'" style="display:block;width:100%;text-align:inherit;background:transparent;border:0;padding:0;color:inherit;cursor:pointer">'
       + '<div class="est-card-media">'
       +   '<img src="'+esc(item.img)+'" alt="'+esc(item.title)+'" loading="lazy"/>'
       +   '<span class="est-badge">'+esc(item.badge)+'</span>'
@@ -1060,20 +1074,23 @@ button{font:inherit;border:0;background:none;color:inherit}
       +   '</div>'
       + '</div></button>'
       + '<div class="est-card-contact" style="padding:0 16px 14px">'
-      +   '<a class="est-call" href="'+esc(telHref(AGENCY.phone))+'" dir="ltr" onclick="event.stopPropagation()">📞 اتصل</a>'
-      +   '<a class="est-wa" href="'+esc(waHref(AGENCY.whatsapp))+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">💬 واتساب</a>'
+      +   '<a class="est-call" href="'+esc(telHref(AGENCY.phone))+'" dir="ltr" onclick="event.stopPropagation()">'+(fr?'📞 Appeler':'📞 اتصل')+'</a>'
+      +   '<a class="est-wa" href="'+esc(waHref(AGENCY.whatsapp))+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+(fr?'💬 WhatsApp':'💬 واتساب')+'</a>'
       + '</div>'
       + '</div>';
   }
 
   function renderGrid(){
     var list = filtered();
+    var fr = isFrEstate();
     countEl.textContent = list.length
-      ? ('عرض '+list.length+' من أصل '+LISTINGS.length+' عقاراً')
-      : 'لا نتائج لهذه التصفية — جرّب بحثاً أوسع';
+      ? (fr
+        ? (list.length + ' sur ' + LISTINGS.length + ' biens')
+        : ('عرض '+list.length+' من أصل '+LISTINGS.length+' عقاراً'))
+      : (fr ? 'Aucun résultat — élargissez la recherche' : 'لا نتائج لهذه التصفية — جرّب بحثاً أوسع');
     grid.innerHTML = list.length
       ? list.map(cardHTML).join('')
-      : '<div class="est-empty">لا عقارات مطابقة حالياً. عدّل البحث أو التصفية.</div>';
+      : '<div class="est-empty">'+(fr?'Aucun bien correspondant. Modifiez la recherche ou les filtres.':'لا عقارات مطابقة حالياً. عدّل البحث أو التصفية.')+'</div>';
   }
 
   function renderRail(){
@@ -1173,40 +1190,265 @@ button{font:inherit;border:0;background:none;color:inherit}
   bindReg('est-reg-top');
   bindReg('est-reg-agency');
 
+  var __estLangBusy = false;
+  function applyEstateLang(){
+    if(__estLangBusy) return;
+    __estLangBusy = true;
+    try{
+    var fr = isFrEstate();
+    var wantLang = fr ? 'fr' : 'ar';
+    var wantDir = fr ? 'ltr' : 'rtl';
+    if(document.documentElement.lang !== wantLang) document.documentElement.lang = wantLang;
+    if(document.documentElement.getAttribute('dir') !== wantDir) document.documentElement.setAttribute('dir', wantDir);
+    function tx(sel, ar, frTxt){
+      var el = typeof sel === 'string' ? document.querySelector(sel) : sel;
+      if(el) el.textContent = fr ? frTxt : ar;
+    }
+    function ph(id, ar, frTxt){
+      var el = document.getElementById(id);
+      if(el) el.placeholder = fr ? frTxt : ar;
+    }
+    var navMap = [
+      ['a[href="#est-listings"]', 'معروضات الوكالة', 'Biens de l\'agence'],
+      ['a[href="#est-services"]', 'الدفع والاستفسار', 'Paiement & demande'],
+      ['a[href="#est-gallery"]', 'معرض الصور', 'Galerie photos'],
+      ['a[href="#est-agency"]', 'عن الوكالة', 'À propos'],
+      ['nav.est-nav a[href="rizq_estate_agencies.html"]', 'كل الوكالات', 'Toutes les agences']
+    ];
+    navMap.forEach(function(row){ tx(row[0], row[1], row[2]); });
+    tx('#est-reg-top', 'افتح وكالتك', 'Ouvrez votre agence');
+    tx('.est-top-actions .est-chip.nav-hide-sm', 'دليل الوكالات', 'Annuaire des agences');
+    tx('#est-top-call', '📞 اتصل', '📞 Appeler');
+    tx('.est-hero-cta .est-btn-gold', 'استكشف معروضات الوكالة', 'Explorer les biens');
+    tx('#est-hero-wa', '💬 واتساب الوكالة', '💬 WhatsApp agence');
+    var heroH1 = document.querySelector('.est-hero-copy h1');
+    if(heroH1) heroH1.innerHTML = fr
+      ? 'Des espaces à votre mesure — <em>sur Rizq</em>'
+      : 'مساحات تليق بك — <em>على رزق</em>';
+    var stats = document.querySelectorAll('.est-stat span');
+    if(stats[0]) stats[0].textContent = fr ? 'Biens' : 'عرض عقاري';
+    if(stats[1]) stats[1].textContent = fr ? 'Wilayas couvertes' : 'ولايات مغطاة';
+    if(stats[2]) stats[2].textContent = fr ? 'Contact agence' : 'تواصل مع الوكالة';
+    var labs = document.querySelectorAll('.est-search label > span');
+    if(labs[0]) labs[0].textContent = fr ? 'Mot-clé ou quartier' : 'الكلمة أو الحي';
+    if(labs[1]) labs[1].textContent = fr ? 'Wilaya / ville' : 'الولاية / المدينة';
+    if(labs[2]) labs[2].textContent = fr ? 'Type d\'offre' : 'نوع العرض';
+    ph('est-q', 'مثال: تفرغ زينة، فيلا، محل…', 'Ex. : Tevragh Zeina, villa, local…');
+    var locSel = document.querySelector('.est-search select[name="loc"], #est-loc, .est-search label:nth-child(2) select');
+    if(!locSel){
+      var sels = document.querySelectorAll('.est-search select');
+      if(sels[0]) locSel = sels[0];
+    }
+    if(locSel && locSel.options && locSel.options[0] && !locSel.options[0].value){
+      locSel.options[0].textContent = fr ? 'Tous les lieux' : 'كل المواقع';
+    }
+    var dealSel = document.querySelectorAll('.est-search select');
+    var typeSel = dealSel.length > 1 ? dealSel[1] : null;
+    if(typeSel && typeSel.options){
+      Array.prototype.forEach.call(typeSel.options, function(opt){
+        if(opt.value === 'all') opt.textContent = fr ? 'Tous' : 'الكل';
+        if(opt.value === 'sale') opt.textContent = fr ? 'À vendre' : 'للبيع';
+        if(opt.value === 'rent') opt.textContent = fr ? 'À louer' : 'للكراء';
+      });
+    }
+    tx('.est-search-go', '🔎 ابحث الآن', '🔎 Rechercher');
+    tx('#est-bar-call', '📞 اتصل بالوكالة', '📞 Appeler l\'agence');
+    tx('#est-bar-wa', '💬 واتساب', '💬 WhatsApp');
+    tx('a.est-pay', '💳 طرق الدفع', '💳 Paiement');
+    tx('a.est-desk', '📩 استفسار', '📩 Demande');
+    tx('.est-agency-bar-acts .est-page', 'كل الوكالات', 'Toutes les agences');
+    tx('#est-pay-card > h3', '💳 طرق الدفع', '💳 Moyens de paiement');
+    tx('#est-pay-card > .est-svc-sub',
+      'نفس نظام المحلات والمكاتب والمعارض — ادفع مباشرة للوكالة عبر الوسائل التي تفعّلها.',
+      'Même système que boutiques, bureaux et showrooms — payez directement l\'agence.');
+    tx('#est-desk-submit', 'إرسال الاستفسار', 'Envoyer la demande');
+    tx('#est-desk-wa', '💬 واتساب الوكالة', '💬 WhatsApp agence');
+    ph('est-rf-name', 'الاسم الكامل *', 'Nom complet *');
+    ph('est-rf-phone', 'رقم الهاتف / واتساب *', 'Téléphone / WhatsApp *');
+    ph('est-rf-msg', 'صف العقار أو الحي أو ميزانيتك…', 'Décrivez le bien, le quartier ou votre budget…');
+    var interest = document.getElementById('est-rf-interest');
+    if(interest && interest.options.length >= 4){
+      interest.options[0].textContent = fr ? 'Demande de visite' : 'طلب معاينة عقار';
+      interest.options[1].textContent = fr ? 'Demande d\'achat' : 'استفسار شراء';
+      interest.options[2].textContent = fr ? 'Demande de location' : 'استفسار كراء';
+      interest.options[3].textContent = fr ? 'Autre demande' : 'طلب آخر';
+    }
+    var listHead = document.querySelector('#est-listings.est-section-head, .est-section-head#est-listings');
+    if(!listHead) listHead = document.querySelector('.est-section-head');
+    if(listHead){
+      var tag = listHead.querySelector('.tag');
+      var h2 = listHead.querySelector('h2');
+      var p = listHead.querySelector('p');
+      if(tag) tag.textContent = fr ? 'Sélection de l\'agence' : 'مجموعة مختارة من الوكالة';
+      if(h2) h2.textContent = fr ? 'Des biens qui racontent une histoire' : 'عقارات بصور تروي القصة';
+      if(p) p.textContent = fr
+        ? 'Grandes cartes, prix clairs et contact direct avec l\'agence.'
+        : 'بطاقات كبيرة، أسعار واضحة، وتواصل مباشر مع الوكالة — اضغط أي عقار لفتح المعاينة الكاملة.';
+    }
+    var tabs = [
+      ['all', 'الكل', 'Tous'],
+      ['apartment', 'شقق', 'Appartements'],
+      ['villa', 'فلل ومنازل', 'Villas & maisons'],
+      ['land', 'أراضي', 'Terrains'],
+      ['shop', 'محلات', 'Locaux']
+    ];
+    tabs.forEach(function(t){
+      var b = document.querySelector('.est-tab[data-cat="'+t[0]+'"]');
+      if(b) b.textContent = fr ? t[2] : t[1];
+    });
+    document.querySelectorAll('.est-deal button').forEach(function(b){
+      var d = b.getAttribute('data-deal');
+      if(d === 'all') b.textContent = fr ? 'Tous' : 'الكل';
+      if(d === 'sale') b.textContent = fr ? 'À vendre' : 'للبيع';
+      if(d === 'rent') b.textContent = fr ? 'À louer' : 'للكراء';
+    });
+    var tabsEl = document.querySelector('.est-tabs');
+    if(tabsEl) tabsEl.setAttribute('aria-label', fr ? 'Type de bien' : 'نوع العقار');
+    var dealEl = document.querySelector('.est-deal');
+    if(dealEl) dealEl.setAttribute('aria-label', fr ? 'Type d\'opération' : 'نوع الصفقة');
+
+    var trust = document.querySelectorAll('#est-trust article');
+    if(trust[0]){
+      var t0h = trust[0].querySelector('h3'); var t0p = trust[0].querySelector('p');
+      if(t0h) t0h.textContent = fr ? 'Photos convaincantes dès le premier regard' : 'صور تُقنع من أول نظرة';
+      if(t0p) t0p.textContent = fr ? 'Surface, prix et emplacement clairs — l\'acheteur comprend avant de vous écrire.' : 'مساحة وسعر وموقع واضح — المشتري يفهم العرض قبل أن يراسلك.';
+    }
+    if(trust[1]){
+      var t1h = trust[1].querySelector('h3'); var t1p = trust[1].querySelector('p');
+      if(t1h) t1h.textContent = fr ? 'Atteignez les chercheurs sérieux' : 'وصول لمن يبحث بجدية';
+      if(t1p) t1p.textContent = fr ? 'Locataires et acheteurs arrivent via la recherche immobilière sur Rizq.' : 'طلبة كراء ومشترون يصلون عبر بحث العقارات على منصة رزق.';
+    }
+    if(trust[2]){
+      var t2h = trust[2].querySelector('h3'); var t2p = trust[2].querySelector('p');
+      if(t2h) t2h.textContent = fr ? 'Contact direct en confiance' : 'تواصل مباشر بثقة';
+      if(t2p) t2p.textContent = fr ? 'Confidentialité et badges pour instaurer la confiance.' : 'خصوصية محمية وشارات تساعد على بناء الثقة مع الجدّيين.';
+    }
+
+    var galH = document.querySelector('.est-gallery-head h2');
+    var galP = document.querySelector('.est-gallery-head p');
+    if(galH) galH.textContent = fr ? 'Galerie photos' : 'معرض الصور';
+    if(galP) galP.textContent = fr
+      ? 'Vues larges — lumière et finitions ; cliquez pour agrandir.'
+      : 'لقطات واسعة تُظهر الإضاءة والتشطيب — اضغط للتكبير.';
+    var railEl = document.getElementById('est-rail');
+    if(railEl) railEl.setAttribute('aria-label', fr ? 'Galerie photos' : 'معرض صور العقارات');
+
+    var aboutTag = document.querySelector('#est-agency .tag');
+    if(aboutTag) aboutTag.textContent = fr ? 'Cette agence sur Rizq' : 'هذه الوكالة على رزق';
+    var points = document.querySelectorAll('#est-agency-points li');
+    if(points[0]) points[0].textContent = fr ? '✓ Un compte → une page agence (`?id=`)' : '✓ حساب واحد → صفحة وكالة واحدة (`?id=`)';
+    if(points[1]) points[1].textContent = fr ? '✓ Contact, paiement et demande unifiés (tél. + WhatsApp + paiements)' : '✓ تواصل ودفع واستفسار موحّد (هاتف + واتساب + طرق دفع)';
+    if(points[2]) points[2].textContent = fr ? '✓ Inscription : société → bureau → courtage immobilier' : '✓ مسار التسجيل: شركة → مكتب → وساطة عقارية';
+    if(points[3]) points[3].textContent = fr ? '✓ Visibilité dans l\'annuaire des agences' : '✓ الظهور في دليل الوكالات المنفصل';
+
+    tx('#est-reg-agency', 'امتلك واجهتك العقارية', 'Possédez votre vitrine immobilière');
+    tx('#est-about-call', '📞 اتصل بالوكالة', '📞 Appeler l\'agence');
+    tx('#est-about-wa', '💬 واتساب الوكالة', '💬 WhatsApp agence');
+    var aboutGhost = document.querySelector('#est-agency .est-btn-ghost[href="rizq_estate_agencies.html"]');
+    if(aboutGhost) aboutGhost.textContent = fr ? 'Toutes les agences' : 'كل الوكالات العقارية';
+
+    tx('#est-modal-call', '📞 اتصل بالوكالة', '📞 Appeler l\'agence');
+    tx('#est-modal-wa', '💬 واتساب', '💬 WhatsApp');
+    tx('#est-modal-browse', 'صفحة الوكالة', 'Page de l\'agence');
+    var modalClose = document.getElementById('est-modal-close');
+    if(modalClose) modalClose.setAttribute('aria-label', fr ? 'Fermer' : 'إغلاق');
+    var lbClose = document.getElementById('est-lb-close');
+    if(lbClose) lbClose.setAttribute('aria-label', fr ? 'Fermer' : 'إغلاق');
+    var lb = document.getElementById('est-lightbox');
+    if(lb) lb.setAttribute('aria-label', fr ? 'Image agrandie' : 'صورة مكبرة');
+
+    tx('#est-foot-blurb',
+      'نموذج بوابة عقارية فاخرة على رزق — عرض بصري كامل للوكالات والبائعين في موريتانيا.',
+      'Vitrine immobilière premium sur Rizq — agences et vendeurs en Mauritanie.');
+    var footCols = document.querySelectorAll('.est-foot-inner > div');
+    if(footCols[1]){
+      var h4a = footCols[1].querySelector('h4');
+      if(h4a) h4a.textContent = fr ? 'Explorer' : 'استكشف';
+      var fa = footCols[1].querySelectorAll('a');
+      if(fa[0]) fa[0].textContent = fr ? 'Biens de l\'agence' : 'معروضات الوكالة';
+      if(fa[1]) fa[1].textContent = fr ? 'Galerie photos' : 'معرض الصور';
+      if(fa[2]) fa[2].textContent = fr ? 'Toutes les agences' : 'كل الوكالات العقارية';
+      if(fa[3]) fa[3].textContent = fr ? 'Toutes les annonces' : 'كل الإعلانات';
+    }
+    if(footCols[2]){
+      var h4b = footCols[2].querySelector('h4');
+      if(h4b) h4b.textContent = fr ? 'Pour les agences' : 'للوكالات';
+      var fb = footCols[2].querySelectorAll('a');
+      if(fb[0]) fb[0].textContent = fr ? 'Ouvrir une agence' : 'افتح وكالة عقارية';
+      if(fb[1]) fb[1].textContent = fr ? 'Annuaire des agences' : 'دليل الوكالات';
+      if(fb[2]) fb[2].textContent = fr ? 'Portail immobilier' : 'بوابة العقارات';
+    }
+    if(footCols[3]){
+      var h4c = footCols[3].querySelector('h4');
+      if(h4c) h4c.textContent = 'Rizq';
+      var fc = footCols[3].querySelectorAll('a');
+      if(fc[0]) fc[0].textContent = fr ? 'Accueil' : 'الرئيسية';
+      if(fc[1]) fc[1].textContent = fr ? 'Boutiques' : 'المحلات';
+      if(fc[2]) fc[2].textContent = fr ? 'Showrooms & usines' : 'المعارض و المصانع';
+      if(fc[3]) fc[3].textContent = fr ? 'Bureaux' : 'المكاتب';
+    }
+    tx('#est-foot-bar',
+      '© 2026 رزق | Rizq — نموذج بوابة العقارات · RIZQ ESTATE',
+      '© 2026 Rizq — Portail immobilier · RIZQ ESTATE');
+
+    if(window._rizqEstateProfile){
+      paintPayments(window._rizqEstatePaymentMethods || window._rizqEstateProfile.paymentMethods);
+      paintDesk(window._rizqEstateServiceDesk || window._rizqEstateProfile.serviceDesk, window._rizqEstateProfile.name);
+      /* أعد صياغة الشريط الفرعي حسب اللغة دون مسح اسم الوكالة */
+      var act = window._rizqEstateProfile.activity || (fr ? 'Agence immobilière' : 'وكالة عقارية');
+      var city = window._rizqEstateProfile.city || '';
+      setText('est-bar-sub', act + (fr ? ' sur Rizq · ' : ' على رزق · ') + city);
+      var kick = document.getElementById('est-kicker');
+      if(kick){
+        kick.innerHTML = window._rizqEstateIsDemo
+          ? ('<i></i> ' + (fr ? 'Vitrine agence unique · ' : 'واجهة وكالة عقارية واحدة · ') + esc(window._rizqEstateProfile.name || ''))
+          : ('<i></i> ' + (fr ? 'Agence immobilière · ' : 'وكالة عقارية · ') + esc(window._rizqEstateProfile.name || ''));
+      }
+    }
+    renderGrid();
+    } finally { __estLangBusy = false; }
+  }
+
   var deskForm = document.getElementById('est-req-form');
   if(deskForm){
     deskForm.addEventListener('submit', function(e){
       e.preventDefault();
+      var fr = isFrEstate();
       var name = (document.getElementById('est-rf-name').value || '').trim();
       var phone = (document.getElementById('est-rf-phone').value || '').trim();
       var interest = document.getElementById('est-rf-interest').value || 'visit';
       var msg = (document.getElementById('est-rf-msg').value || '').trim();
       if(!name || !phone){
-        alert('يرجى إدخال الاسم ورقم الهاتف');
+        alert(fr ? 'Veuillez saisir le nom et le téléphone' : 'يرجى إدخال الاسم ورقم الهاتف');
         return;
       }
-      var interestAr = {
-        visit: 'طلب معاينة',
-        buy: 'استفسار شراء',
-        rent: 'استفسار كراء',
-        other: 'طلب آخر'
-      }[interest] || 'استفسار';
-      var text = 'استفسار عقاري عبر رزق%0A'
-        + 'الوكالة: ' + encodeURIComponent(AGENCY.name || '') + '%0A'
-        + 'الاسم: ' + encodeURIComponent(name) + '%0A'
-        + 'الهاتف: ' + encodeURIComponent(phone) + '%0A'
-        + 'النوع: ' + encodeURIComponent(interestAr)
-        + (msg ? ('%0Aالتفاصيل: ' + encodeURIComponent(msg)) : '');
+      var interestLbl = ({
+        visit: fr ? 'Demande de visite' : 'طلب معاينة',
+        buy: fr ? 'Demande d\'achat' : 'استفسار شراء',
+        rent: fr ? 'Demande de location' : 'استفسار كراء',
+        other: fr ? 'Autre' : 'طلب آخر'
+      })[interest] || (fr ? 'Demande' : 'استفسار');
+      var text = (fr ? 'Demande immobilière via Rizq' : 'استفسار عقاري عبر رزق') + '%0A'
+        + (fr ? 'Agence: ' : 'الوكالة: ') + encodeURIComponent(AGENCY.name || '') + '%0A'
+        + (fr ? 'Nom: ' : 'الاسم: ') + encodeURIComponent(name) + '%0A'
+        + (fr ? 'Tél: ' : 'الهاتف: ') + encodeURIComponent(phone) + '%0A'
+        + (fr ? 'Type: ' : 'النوع: ') + encodeURIComponent(interestLbl)
+        + (msg ? ('%0A' + (fr ? 'Détails: ' : 'التفاصيل: ') + encodeURIComponent(msg)) : '');
       var wa = String(AGENCY.whatsapp || '').replace(/\D/g,'');
       if(wa){
         window.open('https://wa.me/' + wa + '?text=' + text, '_blank', 'noopener');
       } else {
-        alert('تم تسجيل استفسارك — تواصل مع الوكالة عبر أزرار الاتصال.');
+        alert(fr
+          ? 'Demande enregistrée — contactez l\'agence via les boutons d\'appel.'
+          : 'تم تسجيل استفسارك — تواصل مع الوكالة عبر أزرار الاتصال.');
       }
     });
   }
 
+  document.addEventListener('rizq:langchange', applyEstateLang);
+
   bootAgency();
+  applyEstateLang();
   rail.addEventListener('click', function(e){
     var shot = e.target.closest('.est-shot');
     if(!shot) return;
@@ -1251,10 +1493,10 @@ button{font:inherit;border:0;background:none;color:inherit}
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.40"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.41"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <script src="rizq_header.js?v=31.0" defer></script>
-<script src="rizq_header_mockup_trial.js?v=5.40" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.41" defer></script>
 <script src="rizq_pwa.js" defer></script>
 </body>
 </html>

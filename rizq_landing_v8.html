@@ -4863,8 +4863,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <script src="rizq_announcements.js"></script>
     <script src="rizq_civic_ticker.js"></script>
 <script src="rizq_backend_config.js"></script>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.40"/>
-<script src="rizq_header_mockup_trial.js?v=5.40" defer></script>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.41"/>
+<script src="rizq_header_mockup_trial.js?v=5.41" defer></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
@@ -10658,7 +10658,7 @@ function applyLandingLang(toAr) {
   if (jumpBar) {
     var jumpMap = isAr
       ? {'#listings':'الإعلانات','#rzq-disc-store':'المحلات','#rzq-disc-corp':'المعارض و المصانع','post':'+ نشر','#rzq-disc-office':'المكاتب','rizq_tenders_directory.html':'المناقصات','rizq_investments_directory.html':'الاستثمارات'}
-      : {'#listings':'Annonces','#rzq-disc-store':'Boutiques','#rzq-disc-corp':'Showrooms','post':'+ Publier','#rzq-disc-office':'Bureaux','rizq_tenders_directory.html':'A-doffres','rizq_investments_directory.html':'Investissements'};
+      : {'#listings':'Annonces','#rzq-disc-store':'Boutiques','#rzq-disc-corp':'Showrooms & usines','post':'+ Publier','#rzq-disc-office':'Bureaux','rizq_tenders_directory.html':'A-doffres','rizq_investments_directory.html':'Investissements'};
     jumpBar.querySelectorAll('a[data-jump]').forEach(function(a){
       var k = a.getAttribute('data-jump');
       if (jumpMap[k]) a.textContent = jumpMap[k];

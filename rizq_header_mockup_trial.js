@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.40';
+    link.href = 'rizq_header_mockup_trial.css?v=5.41';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -387,6 +387,137 @@
     }, true);
   }
 
+  function currentMockLang() {
+    try {
+      var ls = localStorage.getItem('rizq_lang');
+      if (ls === 'fr' || ls === 'ar') return ls;
+    } catch (e) {}
+    if (document.documentElement.lang === 'fr') return 'fr';
+    if (document.body && document.body.classList.contains('rizq-lang-fr')) return 'fr';
+    return 'ar';
+  }
+
+  function tMock(ar, fr) {
+    return currentMockLang() === 'fr' ? fr : ar;
+  }
+
+  /** يمنع تسرب العربية في الهيدر عند اختيار الفرنسية */
+  var __rmhLangBusy = false;
+  function applyMockLang() {
+    if (__rmhLangBusy) return;
+    var hdr = document.getElementById('rizq-mock-hdr');
+    if (!hdr) return;
+    __rmhLangBusy = true;
+    try {
+    var fr = currentMockLang() === 'fr';
+    var wantLang = fr ? 'fr' : 'ar';
+    var wantDir = fr ? 'ltr' : 'rtl';
+    if (document.documentElement.lang !== wantLang) document.documentElement.lang = wantLang;
+    if (document.documentElement.getAttribute('dir') !== wantDir) document.documentElement.setAttribute('dir', wantDir);
+    document.body.classList.toggle('rizq-lang-fr', fr);
+
+    var nav = {
+      home: ['الرئيسية', 'Accueil'],
+      ads: ['الإعلانات', 'Annonces'],
+      stores: ['المحلات', 'Boutiques'],
+      showrooms: ['المعارض و المصانع', 'Showrooms & usines'],
+      estate: ['العقارات', 'Immobilier'],
+      offices: ['المكاتب', 'Bureaux'],
+      tenders: ['المناقصات', 'Appels d\'offres'],
+      investments: ['الاستثمارات', 'Investissements']
+    };
+    Object.keys(nav).forEach(function (key) {
+      var a = hdr.querySelector('.rmh-nav a[data-rmh="' + key + '"]');
+      if (!a) return;
+      var ico = a.querySelector('.rmh-nav-ico');
+      var label = tMock(nav[key][0], nav[key][1]);
+      a.setAttribute('aria-label', label);
+      var textNode = null;
+      for (var i = 0; i < a.childNodes.length; i++) {
+        if (a.childNodes[i].nodeType === 3) {
+          textNode = a.childNodes[i];
+          break;
+        }
+      }
+      if (textNode) textNode.textContent = label;
+      else if (ico) ico.insertAdjacentText('afterend', label);
+      else a.appendChild(document.createTextNode(label));
+    });
+
+    var postLbl = hdr.querySelector('.rmh-post-lbl');
+    if (postLbl) postLbl.textContent = tMock('انشر إعلان', 'Publier');
+    var postA = hdr.querySelector('a[data-rmh="post"]');
+    if (postA) postA.setAttribute('aria-label', tMock('انشر إعلان', 'Publier une annonce'));
+
+    var moreLbl = hdr.querySelector('.rmh-more-lbl');
+    if (moreLbl) moreLbl.textContent = tMock('المزيد', 'Plus');
+    var moreBtn = document.getElementById('rmh-more-btn');
+    if (moreBtn) moreBtn.setAttribute('aria-label', tMock('المزيد', 'Plus'));
+
+    var moreItems = [
+      ['الأقسام', 'Catégories'],
+      ['Rizq ADS', 'Rizq ADS'],
+      ['المواد القانونية', 'Mentions légales'],
+      ['من نحن', 'À propos'],
+      ['لماذا رزق', 'Pourquoi Rizq'],
+      ['الشركة المالكة', 'Société propriétaire']
+    ];
+    hdr.querySelectorAll('.rmh-more-item strong').forEach(function (el, idx) {
+      if (moreItems[idx]) el.textContent = tMock(moreItems[idx][0], moreItems[idx][1]);
+    });
+
+    var helpItems = hdr.querySelectorAll('.rizq-help-dd-item-lbl');
+    if (helpItems[0]) helpItems[0].textContent = tMock('اتصل بنا', 'Nous contacter');
+    if (helpItems[1]) helpItems[1].textContent = tMock('مركز المساعدة', 'Centre d\'aide');
+    var helpBtn = document.getElementById('rmh-help-btn');
+    if (helpBtn) {
+      var ht = tMock('المساعدة والدعم', 'Aide & support');
+      helpBtn.setAttribute('aria-label', ht);
+      helpBtn.setAttribute('title', ht);
+    }
+
+    var cat = document.getElementById('rmh-search-cat');
+    if (cat) {
+      cat.setAttribute('aria-label', tMock('كل الأقسام', 'Toutes les catégories'));
+      if (cat.options && cat.options[0] && !cat.options[0].value) {
+        cat.options[0].textContent = tMock('كل الأقسام', 'Toutes les catégories');
+      }
+    }
+    var q = document.getElementById('rmh-search-q');
+    if (q) {
+      q.placeholder = fr
+        ? (q.getAttribute('data-ph-fr') || 'Cherchez une voiture, un appartement, un magasin, un bureau...')
+        : 'ابحث عن سيارة، شقة، محل، مكتب...';
+    }
+    var searchBtn = hdr.querySelector('.rmh-search-btn');
+    if (searchBtn) searchBtn.setAttribute('aria-label', tMock('بحث', 'Rechercher'));
+
+    var accountBtn = hdr.querySelector('.rmh-tools .rmh-ico[onclick*="goToAccount"]');
+    if (accountBtn) accountBtn.setAttribute('aria-label', tMock('حسابي', 'Mon compte'));
+    var fav = hdr.querySelector('.rmh-tools a.rmh-ico[href*="fav"]');
+    if (fav) fav.setAttribute('aria-label', tMock('المفضلة', 'Favoris'));
+    var cartBtn = document.getElementById('rmh-cart-btn');
+    if (cartBtn) cartBtn.setAttribute('aria-label', tMock('السلة', 'Panier'));
+    var cartPanel = document.getElementById('rmh-cart-panel');
+    if (cartPanel) cartPanel.setAttribute('aria-label', tMock('ملخص السلة', 'Résumé du panier'));
+    var cartH = cartPanel && cartPanel.querySelector('h4');
+    if (cartH) cartH.textContent = tMock('سلتك — لم تُكمَل بعد', 'Votre panier — non finalisé');
+    var cartFull = hdr.querySelector('.rmh-cart-open-full');
+    if (cartFull) cartFull.textContent = tMock('فتح السلة بالتفاصيل', 'Ouvrir le panier détaillé');
+    var cartEmpty = hdr.querySelector('#rmh-cart-body .rmh-cart-empty');
+    if (cartEmpty) cartEmpty.textContent = tMock('السلة فارغة', 'Panier vide');
+
+    hdr.setAttribute('aria-label', tMock('شريط رزق', 'Barre Rizq'));
+    var navEl = hdr.querySelector('nav.rmh-nav');
+    if (navEl) navEl.setAttribute('aria-label', tMock('أقسام رزق', 'Rubriques Rizq'));
+    var topNav = document.getElementById('rmh-nav-top');
+    if (topNav) topNav.setAttribute('aria-label', tMock('أقسام رزق — أعلى', 'Rubriques Rizq — haut'));
+
+    try { renderCartPanel(); } catch (eCart) {}
+    try { ensureHeroTagline(); } catch (eHero) {}
+    } finally { __rmhLangBusy = false; }
+  }
+
   function wireLang() {
     var btn = document.getElementById('rmh-lang-btn');
     var navLang = document.getElementById('nav-lang-btn');
@@ -395,6 +526,17 @@
       if (navLang) navLang.click();
       else if (typeof toggleLang === 'function') toggleLang();
       else if (typeof toggleLangPage === 'function') toggleLangPage();
+      else {
+        var next = currentMockLang() === 'ar' ? 'fr' : 'ar';
+        try { localStorage.setItem('rizq_lang', next); } catch (e) {}
+        document.documentElement.lang = next;
+        document.dispatchEvent(new CustomEvent('rizq:langchange', { bubbles: true, detail: { lang: next } }));
+      }
+      setTimeout(applyMockLang, 30);
+      setTimeout(applyMockLang, 200);
+    });
+    document.addEventListener('rizq:langchange', function () {
+      applyMockLang();
     });
   }
 
@@ -898,6 +1040,7 @@
     renderCartPanel();
     wireCart();
     wireLang();
+    applyMockLang();
     wireHelp();
     wireMore();
     wireNavActive();
@@ -905,6 +1048,7 @@
     syncMockHdrHeight();
     setTimeout(function () {
       fillCategories();
+      applyMockLang();
       ensureHeroTagline();
       syncMockHdrHeight();
       markActiveFromPage();

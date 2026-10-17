@@ -350,29 +350,36 @@ button{font:inherit;border:0;background:none;color:inherit}
   }
 
   function cardHTML(a){
+    var fr = isFrAg();
     var phone = a.phone || '';
     var wa = a.whatsapp || '';
     var href = a.href || ('rizq_estate.html?id=' + encodeURIComponent(a.id||''));
+    var act = a.activity || (fr ? 'Agence immobilière' : 'وكالة عقارية');
+    var callLbl = fr ? '📞 Appeler l\'agence' : '📞 اتصل بالوكالة';
+    var waLbl = fr ? '💬 WhatsApp' : '💬 واتساب';
+    var openLbl = fr ? 'Ouvrir la page agence →' : 'افتح صفحة الوكالة ←';
+    var badge = a.badge;
+    if(fr && badge === 'نموذج') badge = 'Modèle';
     return '<article class="ag-card" role="listitem">'
       + '<div class="ag-card-cover">'
       +   (a.cover ? '<img src="'+esc(a.cover)+'" alt="'+esc(a.name)+'" loading="lazy"/>' : '')
-      +   (a.badge ? '<span class="ag-card-badge">'+esc(a.badge)+'</span>' : '')
+      +   (badge ? '<span class="ag-card-badge">'+esc(badge)+'</span>' : '')
       +   (a.logo ? '<img class="ag-card-logo" src="'+esc(a.logo)+'" alt=""/>' : '')
       + '</div>'
       + '<div class="ag-card-body">'
       +   '<h3>'+esc(a.name)+'</h3>'
-      +   '<div class="ag-card-act">🏠 '+esc(a.activity||'وكالة عقارية')+'</div>'
+      +   '<div class="ag-card-act">🏠 '+esc(act)+'</div>'
       +   (a.city ? '<div class="ag-card-city">📍 '+esc(a.city)+'</div>' : '')
       +   (a.tagline ? '<div class="ag-card-tag">'+esc(a.tagline)+'</div>' : '')
       +   '<div class="ag-card-actions">'
       +     (phone
-          ? '<a class="ag-call" href="'+esc(telHref(phone))+'" dir="ltr">📞 اتصل بالوكالة</a>'
-          : '<a class="ag-call" href="'+esc(href)+'">📞 اتصل بالوكالة</a>')
+          ? '<a class="ag-call" href="'+esc(telHref(phone))+'" dir="ltr">'+callLbl+'</a>'
+          : '<a class="ag-call" href="'+esc(href)+'">'+callLbl+'</a>')
       +     (wa
-          ? '<a class="ag-wa" href="'+esc(waHref(wa))+'" target="_blank" rel="noopener">💬 واتساب</a>'
-          : '<a class="ag-wa" href="'+esc(href)+'" target="_blank" rel="noopener">💬 واتساب</a>')
+          ? '<a class="ag-wa" href="'+esc(waHref(wa))+'" target="_blank" rel="noopener">'+waLbl+'</a>'
+          : '<a class="ag-wa" href="'+esc(href)+'" target="_blank" rel="noopener">'+waLbl+'</a>')
       +   '</div>'
-      +   '<a class="ag-open" href="'+esc(href)+'">افتح صفحة الوكالة ←</a>'
+      +   '<a class="ag-open" href="'+esc(href)+'">'+openLbl+'</a>'
       + '</div></article>';
   }
 
@@ -386,12 +393,15 @@ button{font:inherit;border:0;background:none;color:inherit}
 
   function render(){
     var list = filtered();
+    var fr = isFrAg();
     countEl.textContent = list.length
-      ? ('عرض '+list.length+' وكالة')
-      : 'لا وكالات مطابقة';
+      ? (fr ? (list.length + ' agence' + (list.length > 1 ? 's' : '')) : ('عرض '+list.length+' وكالة'))
+      : (fr ? 'Aucune agence correspondante' : 'لا وكالات مطابقة');
     grid.innerHTML = list.length
       ? list.map(cardHTML).join('')
-      : '<div class="ag-empty">لا وكالات مطابقة حالياً — جرّب بحثاً أوسع'+(hasLiveAgencies?'': ' أو سجّل وكالتك')+'.</div>';
+      : '<div class="ag-empty">'+(fr
+        ? ('Aucune agence pour l\'instant — élargissez la recherche'+(hasLiveAgencies?'': ' ou inscrivez votre agence')+'.')
+        : ('لا وكالات مطابقة حالياً — جرّب بحثاً أوسع'+(hasLiveAgencies?'': ' أو سجّل وكالتك')+'.'))+'</div>';
   }
 
   function isEstateAgency(a){
@@ -464,6 +474,69 @@ button{font:inherit;border:0;background:none;color:inherit}
     });
   }
 
+  function isFrAg(){
+    try{
+      var ls = localStorage.getItem('rizq_lang');
+      if(ls === 'fr') return true;
+      if(ls === 'ar') return false;
+    }catch(e){}
+    return document.documentElement.lang === 'fr';
+  }
+
+  var __agLangBusy = false;
+  function applyAgenciesLang(){
+    if(__agLangBusy) return;
+    __agLangBusy = true;
+    try{
+      var fr = isFrAg();
+      var wantLang = fr ? 'fr' : 'ar';
+      var wantDir = fr ? 'ltr' : 'rtl';
+      if(document.documentElement.lang !== wantLang) document.documentElement.lang = wantLang;
+      if(document.documentElement.getAttribute('dir') !== wantDir) document.documentElement.setAttribute('dir', wantDir);
+      function tx(sel, ar, frTxt){
+        var el = document.querySelector(sel);
+        if(el) el.textContent = fr ? frTxt : ar;
+      }
+      tx('.ag-nav a[href="#ag-list"]', 'الوكالات', 'Agences');
+      tx('.ag-nav a[href="rizq_estate.html?demo=1"]', 'معروضات العقارات', 'Biens immobiliers');
+      tx('.ag-nav a[href="rizq_landing_v8.html#virtual-estate"]', 'بوابة رزق', 'Portail Rizq');
+      tx('#ag-reg-top', 'افتح وكالتك', 'Ouvrez votre agence');
+      tx('.ag-actions .ag-chip:not(.solid)', 'تصفّح العقارات', 'Parcourir les biens');
+      var kick = document.querySelector('.ag-kicker');
+      if(kick) kick.innerHTML = fr
+        ? '<i></i> Parcours dédié · agences immobilières'
+        : '<i></i> مسار مستقل · وكالات العقارات فقط';
+      var h1 = document.querySelector('.ag-hero h1');
+      if(h1) h1.innerHTML = fr
+        ? 'Toutes les <em>agences immobilières</em> au même endroit'
+        : 'كل <em>الوكالات العقارية</em> في مكان واحد';
+      tx('.ag-hero > p',
+        'صفحة منعزلة مباشرة للوصول إلى وكالات العقار على رزق — هوية واضحة، معروضات، وتواصل فوري مع الوكالة.',
+        'Page dédiée pour joindre les agences immobilières sur Rizq — identité claire, biens et contact direct.');
+      tx('.ag-hero-cta .ag-btn-gold', 'تصفّح الوكالات', 'Parcourir les agences');
+      tx('#ag-reg-hero', 'سجّل وكالتك العقارية', 'Inscrivez votre agence');
+      tx('#ag-path',
+        'مسار الحساب في التسجيل: شركة → مكتب → وساطة عقارية (preBiz=office · preActivity=of_realestate_agency)',
+        'Parcours d\'inscription : société → bureau → courtage immobilier (preBiz=office · preActivity=of_realestate_agency)');
+      tx('#ag-own h2', 'امتلك واجهتك العقارية على رزق', 'Possédez votre vitrine immobilière sur Rizq');
+      tx('#ag-own > p',
+        'حساب وكالة عقارية مستقل عن المحلات والمعارض — صفحة باسمك، معروضات، وأزرار اتصال وواتساب مباشرة.',
+        'Compte agence distinct des boutiques et showrooms — page à votre nom, biens, appel et WhatsApp.');
+      var steps = document.querySelectorAll('.ag-own-steps span');
+      if(steps[0]) steps[0].textContent = fr ? '1) Inscrivez-vous en société' : '1) سجّل كشركة';
+      if(steps[1]) steps[1].textContent = fr ? '2) Choisissez « Bureau »' : '2) اختر نوع «مكتب»';
+      if(steps[2]) steps[2].textContent = fr ? '3) Activité « Courtage immobilier »' : '3) نشاط «وساطة عقارية»';
+      tx('#ag-reg-own', 'افتح حساب وكالة عقارية', 'Ouvrir un compte agence');
+      tx('#ag-demo-link', 'نموذج وكالة', 'Agence modèle');
+      var footOffice = document.querySelector('.ag-foot a[href*="directory"]');
+      if(footOffice) footOffice.textContent = fr ? 'Annuaire des bureaux (immobilier)' : 'دليل المكاتب (عقارات)';
+      searchEl.placeholder = fr ? 'Rechercher une agence ou une ville…' : 'ابحث باسم الوكالة أو المدينة…';
+      var listLabel = document.getElementById('ag-list');
+      if(listLabel) listLabel.setAttribute('aria-label', fr ? 'Liste des agences immobilières' : 'قائمة الوكالات العقارية');
+      render();
+    } finally { __agLangBusy = false; }
+  }
+
   searchEl.addEventListener('input', render);
   bindReg('ag-reg-top');
   bindReg('ag-reg-hero');
@@ -472,15 +545,17 @@ button{font:inherit;border:0;background:none;color:inherit}
     agencies = [];
   }
   hidePromoExplain();
+  applyAgenciesLang();
+  document.addEventListener('rizq:langchange', applyAgenciesLang);
   render();
   loadLive();
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.40"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.41"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <script src="rizq_header.js?v=31.0" defer></script>
-<script src="rizq_header_mockup_trial.js?v=5.40" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.41" defer></script>
 <script src="rizq_merchant_activities.js" defer></script>
 <script src="rizq_pwa.js" defer></script>
 </body>
