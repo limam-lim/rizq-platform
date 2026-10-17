@@ -20,9 +20,7 @@ body.rizq-mockup-hdr-trial .mobile-bottom-nav,
 body.rizq-mockup-hdr-trial #section-jump-bar,
 body.rizq-mockup-hdr-trial #rizq-announce-ticker,
 body.rizq-mockup-hdr-trial .rizq-splash,
-body.rizq-mockup-hdr-trial .rmh-util,
-body.rizq-mockup-hdr-trial #pricing,
-body.rizq-mockup-hdr-trial .pricing-section{
+body.rizq-mockup-hdr-trial .rmh-util{
   display:none!important;
 }
 /* شريط الخدمة العامة (طوارئ من الأدمن) — يظهر ويتحرك داخل الهيدر */

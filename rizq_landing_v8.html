@@ -4468,8 +4468,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <script src="rizq_announcements.js"></script>
     <script src="rizq_civic_ticker.js"></script>
 <script src="rizq_backend_config.js"></script>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=4.5"/>
-<script src="rizq_header_mockup_trial.js?v=4.5" defer></script>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=4.6"/>
+<script src="rizq_header_mockup_trial.js?v=4.6" defer></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
 <script src="rizq_terms_gate.js?v=23.0"></script>
@@ -4569,7 +4569,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
   <div class="rmh-main">
     <a class="rmh-brand" href="rizq_landing_v8.html">
-      <span class="rmh-mark" aria-hidden="true"></span>
+      <img class="rmh-mark" src="rizq-mark-512.png" width="44" height="44" alt="" decoding="async"/>
       <span class="rmh-brand-text">
         <span class="rmh-brand-ar">رزق</span>
         <span class="rmh-brand-sub">PLATFORM</span>
@@ -5459,90 +5459,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
 <!-- ══ RIZQ ADS ══ -->
 
-<!-- ══ PRICING — مخفي على الرئيسية أثناء تجربة الهيدر؛ الباقات تبقى في النماذج فقط ══ -->
-<section class="pricing-section" id="pricing" hidden aria-hidden="true">
-  <div class="section-header fade-in">
-    <p class="section-tag" data-t="s-price-tag">خطط الأسعار</p>
-    <h2 class="section-title" data-t="s-price-title">خطط <span>شفافة وبسيطة</span></h2>
-    <p class="section-desc" data-t="s-price-desc">ابدأ مجاناً وطوّر تجربتك متى شئت</p>
-  </div>
-  <div id="diamond-pitch" style="max-width:760px;width:100%;margin:0 auto 28px;padding:16px 18px;border-radius:16px;background:linear-gradient(135deg,#0a1628,#1B3A6B);border:1px solid rgba(201,168,76,.45);color:#f5f0e6;text-align:center;box-sizing:border-box">
-    <div id="diamond-pitch-head" data-t-fr="💎 Le plus choisi par les entreprises" style="font-size:11px;font-weight:900;letter-spacing:.4px;color:#e8c96a;margin-bottom:8px">💎 النائب الذكي — باقتان ماسيتان للشركات</div>
-    <div class="diamond-pitch-grid">
-      <div style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.28)">
-        <div id="diamond-pitch-std-name" data-t-fr="Diamant Standard 💎" style="font-size:15px;font-weight:900;margin-bottom:4px;color:#f3de9c">الماسية الأساسية 💎</div>
-        <div id="diamond-pitch-std-desc" data-t-fr="Réceptionniste automatique 24h/24 — 5 000 MRU/mois" style="font-size:12px;line-height:1.65;color:rgba(255,255,255,.85)">موظف استقبال واستفسارات آلي 24/7 — 5,000 MRU/شهر</div>
-      </div>
-      <div style="padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.4)">
-        <div id="diamond-pitch-pro-name" data-t-fr="Diamant Pro 💎" style="font-size:15px;font-weight:900;margin-bottom:4px;color:#f3de9c">الماسية Pro 💎</div>
-        <div id="diamond-pitch-pro-desc" data-t-fr="Système de vente et service client — texte + appels vocaux · 10 000 MRU/mois" style="font-size:12px;line-height:1.65;color:#fde68a">منظومة مبيعات وخدمة عملاء — نص + مكالمات صوتية · 10,000 MRU/شهر</div>
-      </div>
-    </div>
-    <div id="diamond-pitch-foot" data-t-fr="Le principal avantage de Pro : les appels vocaux interactifs en plus du texte." style="margin-top:12px;font-size:12.5px;line-height:1.65;color:rgba(255,255,255,.88)">الفرق الرئيسي: الماسية Pro تضيف المكالمات الصوتية التفاعلية فوق كل مزايا الماسية الأساسية.</div>
-  </div>
-
-  <div class="pricing-container">
-  <!-- Tabs -->
-  <div class="pricing-tabs">
-    <button class="ptab-card" data-ptab="individual" onclick="switchPriceTab('individual',this)">
-      <span class="ptab-icon">👤</span>
-      <span class="ptab-lbl" data-t-fr="Particuliers">الأفراد</span>
-    </button>
-    <button class="ptab-card" data-ptab="stores" onclick="switchPriceTab('stores',this)">
-      <span class="ptab-icon">🏪</span>
-      <span class="ptab-lbl" data-t-fr="Boutiques">المحلات التجارية</span>
-    </button>
-    <button class="ptab-card active" data-ptab="offices" onclick="switchPriceTab('offices',this)">
-      <span class="ptab-icon">🏢</span>
-      <span class="ptab-lbl" data-t-fr="Bureaux virtuels">المكاتب الافتراضية</span>
-    </button>
-    <button class="ptab-card" data-ptab="corp" onclick="switchPriceTab('corp',this)">
-      <span class="ptab-icon">🏛️</span>
-      <span class="ptab-lbl" data-t-fr="Entreprises &amp; showrooms">الشركات والمعارض</span>
-    </button>
-    <button class="ptab-card" data-ptab="tender" onclick="switchPriceTab('tender',this)">
-      <span class="ptab-icon">📑</span>
-      <span class="ptab-lbl" data-t-fr="Appels d'offres">غرفة المناقصة</span>
-    </button>
-    <button class="ptab-card" data-ptab="investment" onclick="switchPriceTab('investment',this)">
-      <span class="ptab-icon">📈</span>
-      <span class="ptab-lbl" data-t-fr="Investissements">غرفة الاستثمارات</span>
-    </button>
-    <button class="ptab-card" data-ptab="ads" onclick="switchPriceTab('ads',this)">
-      <span class="ptab-icon">🎬</span>
-      <span class="ptab-lbl" data-t-fr="Annonces">الإعلانات</span>
-    </button>
-  </div>
-
-  <!-- Individual -->
-  <div class="price-pane" id="pane-individual">
-    <div class="pricing-grid" id="grid-individual" data-rizq-pkg-skel="1"></div>
-  </div>
-  <!-- Stores -->
-  <div class="price-pane" id="pane-stores">
-    <div class="pricing-grid" id="grid-stores" data-rizq-pkg-skel="1"></div>
-  </div>
-  <!-- Offices -->
-  <div class="price-pane active" id="pane-offices">
-    <div class="pricing-grid" id="grid-offices" data-rizq-pkg-skel="1"></div>
-  </div>
-  <!-- Corp -->
-  <div class="price-pane" id="pane-corp">
-    <div class="pricing-grid" id="grid-corp" data-rizq-pkg-skel="1"></div>
-  </div>
-  <div class="price-pane" id="pane-tender">
-    <div class="pricing-grid" id="grid-tender" data-rizq-pkg-skel="1"></div>
-  </div>
-  <div class="price-pane" id="pane-investment">
-    <div class="pricing-grid" id="grid-investment" data-rizq-pkg-skel="1"></div>
-  </div>
-  <div class="price-pane" id="pane-ads">
-    <div class="pricing-grid" id="grid-ads" data-rizq-pkg-skel="1"></div>
-  </div>
-
-  </div><!-- /.pricing-container -->
-
-</section>
+<!-- ══ الباقات — أُزيلت من الرئيسية لتخفيف الطول؛ تبقى في النماذج (مثل rizq_ads_slots_mockup.html) ══ -->
 
 <!-- ══ CTA ══ -->
 <section class="cta-section">
