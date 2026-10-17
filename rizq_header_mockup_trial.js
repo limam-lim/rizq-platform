@@ -169,12 +169,13 @@
 
   /* مفاتيح التبويب التي تتبع التمرير داخل الصفحة */
   var SPY_KEYS = ['home', 'ads', 'stores', 'showrooms', 'estate', 'offices'];
+  var spyLockKey = '';
   var spyLockUntil = 0;
 
   function headerOffset() {
     var hdr = document.getElementById('rizq-mock-hdr');
     var h = hdr ? hdr.getBoundingClientRect().height : 0;
-    return Math.ceil(h || 188) + 10;
+    return Math.ceil(h || 188) + 8;
   }
 
   function spySections() {
@@ -205,25 +206,30 @@
   function resolveSpyKey() {
     var sections = spySections();
     if (!sections.length) return 'home';
-    if (window.scrollY < 48) return 'home';
-    var y = window.scrollY + headerOffset();
+    if (window.scrollY < 60) return 'home';
+    /* خط التركيز مباشرة تحت الهيدر الثابت */
+    var focusY = headerOffset() + 28;
     var current = sections[0].key;
     for (var i = 0; i < sections.length; i++) {
-      var top = sections[i].el.getBoundingClientRect().top + window.scrollY;
-      if (top <= y + 8) current = sections[i].key;
+      var top = sections[i].el.getBoundingClientRect().top;
+      if (top <= focusY) current = sections[i].key;
     }
     return current;
   }
 
   function updateSpy() {
-    if (Date.now() < spyLockUntil) return;
+    if (Date.now() < spyLockUntil && spyLockKey) {
+      setSpyActive(spyLockKey);
+      return;
+    }
+    spyLockKey = '';
     setSpyActive(resolveSpyKey());
   }
 
   function scrollToSpyTarget(el) {
     if (!el) return;
-    var top = el.getBoundingClientRect().top + window.scrollY - headerOffset();
-    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    var top = el.getBoundingClientRect().top + window.pageYOffset - headerOffset();
+    window.scrollTo(0, Math.max(0, Math.round(top)));
   }
 
   function wireNavActive() {
@@ -238,12 +244,16 @@
         var target =
           (id && document.getElementById(id)) ||
           (key === 'home' ? document.getElementById('hero') || document.querySelector('.hero') : null);
+        spyLockKey = key;
+        spyLockUntil = Date.now() + 1200;
         setSpyActive(key);
-        spyLockUntil = Date.now() + 900;
         scrollToSpyTarget(target);
         try {
           if (id) history.replaceState(null, '', '#' + id);
         } catch (err) { /* ignore */ }
+        requestAnimationFrame(updateSpy);
+        setTimeout(updateSpy, 100);
+        setTimeout(updateSpy, 400);
       });
     });
 
@@ -258,8 +268,10 @@
     }
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', updateSpy);
+    document.addEventListener('visibilitychange', updateSpy);
     updateSpy();
-    setTimeout(updateSpy, 400);
+    setTimeout(updateSpy, 300);
+    setTimeout(updateSpy, 1200);
   }
 
   function wireMore() {
