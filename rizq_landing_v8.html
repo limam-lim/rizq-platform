@@ -1721,13 +1721,13 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   font-size:8px;font-weight:800;line-height:1;text-align:center;
   text-shadow:0 1px 3px rgba(0,0,0,.65);max-width:44px;
 }
-/* اتصال + واتساب أسفل الفيديو — تظهر مع .is-armed فقط، وتختفي عند التشغيل أو مغادرة الماوس */
+/* اتصال + واتساب أسفل الفيديو — ظاهرة دائماً على البطاقة المتوقفة، وتختفي أثناء التشغيل فقط */
 .rizq-vcard-thumb .rizq-vcard-contacts,
 .rizq-vcard-thumb .rzq-adx-actions{
   position:absolute;left:50%;top:auto;bottom:12px;
-  transform:translate(-50%,6px);
+  transform:translate(-50%,0);
   z-index:5;
-  display:flex;align-items:center;justify-content:center;gap:10px;
+  display:flex!important;align-items:center;justify-content:center;gap:10px;
   width:auto;max-width:calc(100% - 52px);
   margin:0;padding:6px 10px;
   border-radius:999px;
@@ -1735,12 +1735,8 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   border:1px solid rgba(255,255,255,.18);
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   box-shadow:0 8px 20px rgba(0,0,0,.28);
-  opacity:0;pointer-events:none;
+  opacity:1;pointer-events:auto;
   transition:opacity .2s ease,transform .2s ease;
-}
-.rizq-vcard.is-armed:not(.is-playing) .rizq-vcard-thumb .rizq-vcard-contacts,
-.rizq-vcard.is-armed:not(.is-playing) .rizq-vcard-thumb .rzq-adx-actions{
-  opacity:1;pointer-events:auto;transform:translate(-50%,0);
 }
 .rizq-vcard.is-playing .rizq-vcard-thumb .rizq-vcard-contacts,
 .rizq-vcard.is-playing .rizq-vcard-thumb .rzq-adx-actions{
@@ -5458,7 +5454,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         </div>
       </div>
     </div>
-    <p class="rizq-vid-strip-hint" data-t="vstrip-hint">مرّر للاتصال ثم التشغيل</p>
+    <p class="rizq-vid-strip-hint" data-t="vstrip-hint">مرّر الماوس للتشغيل</p>
     <div class="rizq-vid-strip-track" id="rizq-vid-strip-track" tabindex="0"></div>
   </section>
 
@@ -10192,7 +10188,7 @@ const LANG = {
     'hbiz-cta': 'احجز مساحتك الإعلانية الآن — إعلانك حيث يبدأ الجميع',
     'vstrip-title': 'اكتشف العروض الجديدة بالفيديو',
     'vstrip-tier': 'شريط الفيديو',
-    'vstrip-hint': 'مرّر للاتصال ثم التشغيل',
+    'vstrip-hint': 'مرّر الماوس للتشغيل',
     'stat-ads': 'إعلان نشط', 'stat-cats': 'قسماً رئيسياً', 'stat-subs': 'فرعاً متخصصاً', 'stat-wilayas': 'ولاية موريتانية', 'stat-free': 'النشر الأساسي',
     's-cats-title': 'كل ما تحتاجه في <span>مكان واحد</span>',
     's-cats-desc': 'من الدراعة إلى السيارة — كل ما يبحث عنه الموريتاني في مكان واحد',
@@ -10356,7 +10352,7 @@ const LANG = {
     'hbiz-cta': 'Réservez votre espace pub maintenant — votre annonce là où tout commence',
     'vstrip-title': 'Découvrez les nouvelles offres en vidéo',
     'vstrip-tier': 'Bandeau vidéo',
-    'vstrip-hint': 'Survolez pour contacter, puis lecture',
+    'vstrip-hint': 'Survolez pour lire',
     'stat-ads': 'annonces actives', 'stat-cats': 'catégories', 'stat-subs': 'sous-catégories', 'stat-wilayas': 'wilayas', 'stat-free': 'Publication de base',
     's-cats-title': 'Tout ce dont vous avez besoin en <span>un seul endroit</span>',
     's-cats-desc': 'De la daraa à la voiture — tout ce que cherche le Mauritanien, au même endroit',
@@ -15179,7 +15175,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_packages_ui.js?v=23.0"></script>
 <script src="rizq_merchant_activities.js?v=23.0"></script>
 <script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo17"></script>
+<script src="rizq_video_ads.js?v=promo18"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=24.1"></script>
 <script src="rizq_disclaimer.js"></script>
