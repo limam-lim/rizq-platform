@@ -948,10 +948,19 @@ body > .rizq-help-dd-menu a,
     gap:8px;padding:10px 12px 10px;
   }
   .rmh-brand{grid-area:brand;justify-self:start}
-  .rmh-tools{grid-area:tools;justify-self:start;gap:5px}
-  .rmh-search{
-    grid-area:search;grid-column:auto;
-    justify-self:stretch;min-height:42px;width:100%;max-width:none;
+  .rmh-tools{grid-area:tools;justify-self:end;gap:5px}
+  /* صف البحث بعرض كامل تحت الشعار/الأدوات */
+  .rmh-search,
+  #rizq-mock-hdr .rmh-search{
+    grid-area:search;
+    grid-column:1 / -1!important;
+    justify-self:stretch!important;
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    min-height:42px;
+    margin-inline:0!important;
+    transform:none!important;
   }
   .rmh-search-cat{display:none}
   #rizq-mock-hdr .rmh-brand .logo-ar,
