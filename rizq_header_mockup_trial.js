@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.33';
+    link.href = 'rizq_header_mockup_trial.css?v=5.34';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -719,40 +719,23 @@
     wrap.setAttribute('data-rmh-help-bound', '1');
     if (!__rmhHelpHome) __rmhHelpHome = menu.parentNode;
 
-    function scheduleClose() {
-      clearTimeout(__rmhHelpLeave);
-      __rmhHelpLeave = setTimeout(function () {
-        try {
-          if (wrap.matches(':hover') || menu.matches(':hover')) return;
-        } catch (err) { /* ignore */ }
-        closeHelp();
-      }, 160);
-    }
-
+    /*
+     * فتح/إغلاق بالنقر فقط — القائمة تُنقل إلى body فلا يعمل hover
+     * (مغادرة الزر تُغلق قبل الوصول للروابط وتبدو «جامدة»).
+     */
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
-      __rmhHelpIgnoreDoc = Date.now() + 400;
+      __rmhHelpIgnoreDoc = Date.now() + 450;
       if (wrap.classList.contains('open') && !menu.hidden) closeHelp();
       else openHelp();
     });
-    wrap.addEventListener('mouseenter', function () {
-      try { if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return; } catch (err) { return; }
-      clearTimeout(__rmhHelpLeave);
-      openHelp();
-    });
-    wrap.addEventListener('mouseleave', function () {
-      try { if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return; } catch (err) { return; }
-      scheduleClose();
-    });
-    menu.addEventListener('mouseenter', function () { clearTimeout(__rmhHelpLeave); });
-    menu.addEventListener('mouseleave', scheduleClose);
-    /* الروابط تعمل وتُغلق القائمة بعد النقر */
     menu.addEventListener('click', function (e) {
       var a = e.target && e.target.closest ? e.target.closest('a') : null;
       if (!a) return;
-      __rmhHelpIgnoreDoc = Date.now() + 400;
-      setTimeout(closeHelp, 0);
+      __rmhHelpIgnoreDoc = Date.now() + 450;
+      /* اترك التنقل يحدث ثم أغلق */
+      setTimeout(closeHelp, 10);
     });
     document.addEventListener('click', function (e) {
       if (Date.now() < __rmhHelpIgnoreDoc) return;
