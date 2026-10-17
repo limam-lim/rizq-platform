@@ -200,9 +200,9 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
 }
 .rmh-cart-badge[hidden],
 .rmh-cart-badge.is-empty{display:none!important}
-/* نشر — نفس شكل الأقسام، بدون خلفية صفراء، بلون ذهبي مميّز */
+/* نشر — نص أبيض + علامة + صفراء بحجم أيقونات الأقسام */
 .rmh-nav a.rmh-post-nav{
-  color:#E8C96A!important;
+  color:rgba(255,255,255,.92)!important;
   background:transparent!important;
   box-shadow:none!important;
   border-radius:0;
@@ -215,14 +215,22 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
   flex-direction:column;
   gap:4px;
 }
-.rmh-nav a.rmh-post-nav .rmh-nav-ico{
+.rmh-nav a.rmh-post-nav .rmh-nav-ico,
+.rmh-nav a.rmh-post-nav .rmh-post-plus{
   font-size:18px;line-height:1;opacity:1;
+  color:#E8C96A!important;
+  font-weight:900;
+  width:22px;height:22px;
+  display:inline-flex;align-items:center;justify-content:center;
 }
 .rmh-nav a.rmh-post-nav:hover,
 .rmh-nav a.rmh-post-nav.is-active{
-  color:#F5D76E!important;
+  color:#fff!important;
   border-bottom-color:#E8C96A!important;
   filter:none;
+}
+.rmh-nav a.rmh-post-nav:hover .rmh-post-plus{
+  color:#F5D76E!important;
 }
 .rmh-post-lbl{display:inline;color:inherit}
 
@@ -307,8 +315,7 @@ nav.rmh-nav{
   .rmh-main{padding:9px 14px;gap:10px}
   .rmh-search{flex-basis:380px;max-width:380px}
   .rmh-search-cat{display:none}
-  .rmh-nav a.rmh-post-nav .rmh-post-lbl{display:none}
-  .rmh-nav a.rmh-post-nav{width:34px;padding:0;font-size:18px;min-width:34px}
+  .rmh-nav a.rmh-post-nav{min-width:68px;padding:8px 8px 10px;font-size:11px}
   .rmh-nav a{min-width:68px;padding:8px 8px 10px;font-size:11px}
 }
 
@@ -334,8 +341,7 @@ nav.rmh-nav{
   .rmh-search-btn{width:44px}
   .rmh-lang{display:none}
   .rmh-ico{width:34px;height:34px;border-radius:9px}
-  .rmh-nav a.rmh-post-nav{width:32px;height:32px;min-width:32px;padding:0;font-size:17px}
-  .rmh-nav a.rmh-post-nav .rmh-post-lbl{display:none}
+  .rmh-nav a.rmh-post-nav{min-width:60px;font-size:10.5px;padding:7px 6px 9px}
   .rmh-nav{padding:0 6px!important}
   .rmh-nav a{min-width:60px;font-size:10.5px;padding:7px 6px 9px}
   /* على الهاتف: ثبّت اللوحة داخل العرض */
