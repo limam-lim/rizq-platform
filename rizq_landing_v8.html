@@ -5355,15 +5355,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
 </section>
 
-<!-- ══ نماذج العقارات — أحدث عقارات + شريط نماذج ══ -->
-<section id="rizq-estate-models" class="rizq-styles-section" aria-labelledby="rizq-est-title">
+<!-- ══ نماذج العقارات — تبويبات + شريط + أزرار (بدون بطاقة أحدث عقارات / عدّاد النماذج) ══ -->
+<section id="rizq-estate-models" class="rizq-styles-section" aria-label="نماذج العقارات">
   <div class="rizq-styles-inner">
-    <div class="section-header fade-in">
-      <p class="section-tag">عقارات <span>رزق</span></p>
-      <h2 id="rizq-est-title" class="section-title" data-t="est-title">أحدث عقارات على <span>رزق</span></h2>
-      <p class="section-desc" data-t="est-desc">شقق وفلل وأراضي ومحلات — اعرض عقارك حيث يبحث الجادّون في موريتانيا بصور واسعة تليق ببوابة عقارية فخمة</p>
-    </div>
-    <p class="rizq-srm-tick" id="rizq-est-tick" aria-live="polite" style="text-align:center;margin:0 0 12px"></p>
     <div class="rizq-styles-gender-tabs" role="tablist" aria-label="أنواع نماذج العقارات" id="rizq-est-tabs">
       <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-est-cat="all" id="est-tab-all" onclick="setEstateModelCat('all')">🏠 <span data-t="est-all">الكل</span></button>
       <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-est-cat="apartment" id="est-tab-apartment" onclick="setEstateModelCat('apartment')">🏢 <span data-t="est-apt">شقق</span></button>
@@ -5372,7 +5366,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-est-cat="shop" id="est-tab-shop" onclick="setEstateModelCat('shop')">🏪 <span data-t="est-shop">محلات</span></button>
     </div>
     <div class="rizq-styles-track-wrap fade-in">
-      <div class="rizq-styles-rail" id="rizq-est-rail" role="list" aria-labelledby="rizq-est-title"></div>
+      <div class="rizq-styles-rail" id="rizq-est-rail" role="list" aria-labelledby="rizq-est-tabs"></div>
     </div>
     <!-- الأزرار تحت شريط العقارات / النماذج — بدون زر «افتح النموذج الفاخر» -->
     <div class="rzq-disc-wrap fade-in" style="margin-top:22px">
