@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.32';
+    link.href = 'rizq_header_mockup_trial.css?v=5.33';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -708,11 +708,15 @@
     requestAnimationFrame(placeHelpMenu);
   }
 
+  var __rmhHelpIgnoreDoc = 0;
+
   function wireHelp() {
     var wrap = document.getElementById('rmh-help-wrap');
     var btn = document.getElementById('rmh-help-btn');
     var menu = document.getElementById('rmh-help-menu');
     if (!wrap || !btn || !menu) return;
+    if (wrap.getAttribute('data-rmh-help-bound') === '1') return;
+    wrap.setAttribute('data-rmh-help-bound', '1');
     if (!__rmhHelpHome) __rmhHelpHome = menu.parentNode;
 
     function scheduleClose() {
@@ -728,6 +732,7 @@
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
+      __rmhHelpIgnoreDoc = Date.now() + 400;
       if (wrap.classList.contains('open') && !menu.hidden) closeHelp();
       else openHelp();
     });
@@ -746,9 +751,11 @@
     menu.addEventListener('click', function (e) {
       var a = e.target && e.target.closest ? e.target.closest('a') : null;
       if (!a) return;
+      __rmhHelpIgnoreDoc = Date.now() + 400;
       setTimeout(closeHelp, 0);
     });
     document.addEventListener('click', function (e) {
+      if (Date.now() < __rmhHelpIgnoreDoc) return;
       if (menu.hidden && !wrap.classList.contains('open')) return;
       if (wrap.contains(e.target) || menu.contains(e.target)) return;
       closeHelp();
