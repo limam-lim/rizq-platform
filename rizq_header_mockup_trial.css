@@ -715,22 +715,28 @@ body.rizq-mockup-hdr-trial #virtual-offices{
 }
 .rmh-nav a:hover .rmh-nav-ico{opacity:1;color:var(--rmh-gold)}
 
-/* منسدلة السلة — تُفتح نحو داخل الشاشة حتى لا تُقصّ على الحافة */
+/* منسدلة السلة — fixed عبر JS حتى لا تتداخل مع قائمة المزيد ولا تُقصّ */
 .rmh-cart-wrap{position:relative;z-index:30}
 .rmh-cart-panel{
-  position:absolute;top:calc(100% + 10px);
-  left:0;right:auto;
-  inset-inline-start:auto;inset-inline-end:auto;
+  position:fixed;top:0;left:0;
   width:min(240px,calc(100vw - 24px));
   max-height:min(70vh,420px);overflow:auto;
   background:#fff;border-radius:12px;
   border:1px solid rgba(27,58,107,.14);
   box-shadow:0 18px 44px rgba(15,35,65,.28);
-  padding:10px;z-index:40;display:none;
+  padding:10px;z-index:10060;display:none;
   direction:rtl;text-align:right;
   color:#0D1B2A;
+  pointer-events:auto;
 }
-.rmh-cart-wrap.open .rmh-cart-panel{display:block}
+.rmh-cart-wrap.open .rmh-cart-panel,
+.rmh-cart-panel.is-positioned{display:block}
+/* لا تبقَ السلة والمزيد مفتوحين معاً — الطبقة الأعلى للمزيد دائماً */
+.rmh-more-menu.is-positioned,
+body > .rmh-more-menu{
+  z-index:10080!important;
+  pointer-events:auto!important;
+}
 .rmh-cart-panel h4{
   margin:0 0 8px;font:800 13.5px/1.35 'Cairo',sans-serif;color:#0D1B2A;
 }
@@ -843,11 +849,11 @@ body.rizq-mockup-hdr-trial #virtual-offices{
   .rmh-nav a{min-width:58px;font-size:10px;padding:6px 5px 8px}
   .rmh-nav a[data-rmh="showrooms"]{min-width:84px;font-size:9.5px}
   .rmh-cart-panel{
-    left:auto;right:0;
     width:min(220px,calc(100vw - 16px));
   }
   /* قائمة المزيد تفتح للأعلى فوق الشريط السفلي */
-  .rmh-more-menu{
+  .rmh-more-menu,
+  body > .rmh-more-menu{
     max-height:min(55vh,320px);
   }
 }
