@@ -183,16 +183,52 @@
     var btn = document.getElementById('rmh-more-btn');
     var menu = document.getElementById('rmh-more-menu');
     if (!wrap || !btn || !menu) return;
+    var leaveTimer = null;
+
+    function placeMenu() {
+      var br = btn.getBoundingClientRect();
+      var menuW = Math.max(176, Math.round(menu.offsetWidth || 176));
+      /* في RTL الزر على اليسار غالباً — ثبّت القائمة تحت الزر دون قصّ */
+      var left = Math.round(br.left + br.width / 2 - menuW / 2);
+      left = Math.max(8, Math.min(left, window.innerWidth - menuW - 8));
+      var top = Math.round(br.bottom + 6);
+      menu.classList.add('is-positioned');
+      menu.style.setProperty('position', 'fixed', 'important');
+      menu.style.setProperty('left', left + 'px', 'important');
+      menu.style.setProperty('right', 'auto', 'important');
+      menu.style.setProperty('top', top + 'px', 'important');
+      menu.style.setProperty('transform', 'none', 'important');
+      menu.style.setProperty('z-index', '10080', 'important');
+      menu.style.setProperty('display', 'flex', 'important');
+    }
 
     function closeMore() {
+      clearTimeout(leaveTimer);
       wrap.classList.remove('open');
       btn.setAttribute('aria-expanded', 'false');
       menu.hidden = true;
+      menu.classList.remove('is-positioned');
+      menu.style.removeProperty('display');
     }
+
     function openMore() {
       wrap.classList.add('open');
       btn.setAttribute('aria-expanded', 'true');
       menu.hidden = false;
+      placeMenu();
+      requestAnimationFrame(placeMenu);
+    }
+
+    function scheduleClose() {
+      clearTimeout(leaveTimer);
+      leaveTimer = setTimeout(function () {
+        if (wrap.matches(':hover') || menu.matches(':hover')) return;
+        closeMore();
+      }, 160);
+    }
+
+    function fineHover() {
+      try { return window.matchMedia('(hover:hover) and (pointer:fine)').matches; } catch (err) { return false; }
     }
 
     btn.addEventListener('click', function (e) {
@@ -202,19 +238,28 @@
       else openMore();
     });
     wrap.addEventListener('mouseenter', function () {
-      try { if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return; } catch (err) { return; }
+      if (!fineHover()) return;
+      clearTimeout(leaveTimer);
       openMore();
     });
     wrap.addEventListener('mouseleave', function () {
-      try { if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return; } catch (err) { return; }
-      closeMore();
+      if (!fineHover()) return;
+      scheduleClose();
     });
+    menu.addEventListener('mouseenter', function () { clearTimeout(leaveTimer); });
+    menu.addEventListener('mouseleave', scheduleClose);
     document.addEventListener('click', function (e) {
-      if (!wrap.contains(e.target)) closeMore();
+      if (!wrap.contains(e.target) && !menu.contains(e.target)) closeMore();
     });
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') closeMore();
     });
+    window.addEventListener('resize', function () {
+      if (wrap.classList.contains('open')) placeMenu();
+    });
+    window.addEventListener('scroll', function () {
+      if (wrap.classList.contains('open')) placeMenu();
+    }, true);
   }
 
   function wireHelp() {
