@@ -3,7 +3,7 @@
  * يُفعَّل بـ body.rizq-mockup-hdr-trial — سهل الإلغاء بحذف الكلاس أو الملف.
  */
 body.rizq-mockup-hdr-trial{
-  --rizq-mock-hdr-h: 152px;
+  --rizq-mock-hdr-h: 168px;
   --rmh-navy: #0a1628;
   --rmh-navy-2: #0d1a2e;
   --rmh-gold: #C9A84C;
@@ -23,33 +23,60 @@ body.rizq-mockup-hdr-trial #rizq-announce-ticker,
 body.rizq-mockup-hdr-trial .rizq-splash{
   display:none!important;
 }
-/* إعادة هوية المنصة تحت الهيدر الجديد: رزق + السوق + الشعار + بيع/اشتر/تميّز */
+/* كبسولة رزق تحت الهيدر — specificity أعلى من html.rizq-app-nav .hero */
+html.rizq-app-nav body.rizq-mockup-hdr-trial .hero,
 body.rizq-mockup-hdr-trial .hero{
-  display:block!important;
-  padding-top: calc(var(--rizq-mock-hdr-h) + 40px)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  padding-top:24px!important;
+  margin-top:0!important;
+  min-height:0!important;
+  height:auto!important;
+  overflow:visible!important;
 }
+html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-content,
+body.rizq-mockup-hdr-trial .hero-content{
+  padding-top:12px!important;
+  margin-top:0!important;
+  overflow:visible!important;
+}
+html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-brand-row,
 body.rizq-mockup-hdr-trial .hero-brand-row{
-  margin-top: 18px!important;
+  margin-top:12px!important;
+  position:relative;
+  z-index:2;
 }
 /* وضوح: إيقاف لمعة/طفو تشوّش الشعار أثناء التجربة */
 body.rizq-mockup-hdr-trial .hero-headline::after{
   display:none!important;content:none!important;animation:none!important;
 }
+html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-title-card,
 body.rizq-mockup-hdr-trial .hero-title-card{
   overflow:visible!important;
   animation:none!important;
-  padding-top:34px!important;
-  padding-bottom:18px!important;
+  padding-top:28px!important;
+  padding-bottom:20px!important;
+  margin-top:0!important;
 }
 body.rizq-mockup-hdr-trial .hero-headline{
   line-height:1.2!important;
-  padding-top:8px!important;
-  margin-top:4px!important;
+  padding-top:6px!important;
+  margin:0!important;
+}
+html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-brand-row .hero-eyebrow,
+body.rizq-mockup-hdr-trial .hero-brand-row .hero-eyebrow{
+  margin-top:10px!important;
 }
 body.rizq-mockup-hdr-trial .hero-subtitle-primary,
 body.rizq-mockup-hdr-trial .hero-subtitle-secondary{
   text-shadow:none;
   opacity:1!important;
+}
+/* body padding تحت الهيدر الثابت للتجربة */
+html.rizq-app-nav body.rizq-mockup-hdr-trial{
+  padding-top:var(--rizq-mock-hdr-h)!important;
 }
 #rizq-mock-hdr{
   position:fixed;top:0;left:0;right:0;z-index:10050;
