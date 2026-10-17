@@ -1817,6 +1817,25 @@
     }
   }
 
+  /** هيدر النموذج الموحّد — يُحمَّل أيضاً من هنا إن غاب PWA */
+  function ensureMockHeaderAssets() {
+    try {
+      if (isDashShell()) return;
+      if (!document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) {
+        var l = document.createElement('link');
+        l.rel = 'stylesheet';
+        l.href = 'rizq_header_mockup_trial.css?v=5.21';
+        (document.head || document.documentElement).appendChild(l);
+      }
+      if (!document.querySelector('script[src*="rizq_header_mockup_trial.js"]')) {
+        var s = document.createElement('script');
+        s.src = 'rizq_header_mockup_trial.js?v=5.21';
+        s.defer = true;
+        (document.head || document.documentElement).appendChild(s);
+      }
+    } catch (eMock) { /* ignore */ }
+  }
+
   function inject() {
     if (isDashShell()) {
       removeHeader();
@@ -1829,6 +1848,7 @@
     document.documentElement.classList.add('rizq-app-nav');
     ensureActiveNavListeners();
     injectUnifiedStrip();
+    ensureMockHeaderAssets();
   }
 
   window.RizqHeader = {

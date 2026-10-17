@@ -23,7 +23,9 @@ body.rizq-mockup-hdr-trial .mobile-bottom-nav,
 body.rizq-mockup-hdr-trial #section-jump-bar,
 body.rizq-mockup-hdr-trial #rizq-announce-ticker,
 body.rizq-mockup-hdr-trial .rizq-splash,
-body.rizq-mockup-hdr-trial .rmh-util{
+body.rizq-mockup-hdr-trial .rmh-util,
+body.rizq-mockup-hdr-trial .est-top,
+body.rizq-mockup-hdr-trial > nav:not(#rizq-desk-nav):not(#rizq-thumb-dock):not(.rmh-nav):not(.rizq-thumb-dock){
   display:none!important;
 }
 /* شريط الخدمة العامة (طوارئ من الأدمن) — يظهر ويتحرك داخل الهيدر */

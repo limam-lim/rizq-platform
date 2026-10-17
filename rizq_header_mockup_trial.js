@@ -29,14 +29,15 @@
     else document.addEventListener('DOMContentLoaded', fn);
   }
 
-  if (isDashShell()) return;
+  function ensureMockCss() {
+    if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
+    var link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = 'rizq_header_mockup_trial.css?v=5.21';
+    (document.head || document.documentElement).appendChild(link);
+  }
 
-  waitBody(function () {
-    document.body.classList.add('rizq-mockup-hdr-trial');
-    document.documentElement.classList.add('rizq-app-nav');
-    ensureMockHeader();
-    bootMockHeader();
-  });
+  if (isDashShell()) return;
 
   function navHrefs() {
     var L = isLanding();
@@ -187,7 +188,7 @@
       if (Array.isArray(c) && c.length) return c;
     } catch (e) { /* ignore */ }
     // معاينة النموذج فقط — لا تُكتب في localStorage
-    return DEMO_CART.slice();
+    return (DEMO_CART || []).slice();
   }
 
   function moduleOf(item) {
@@ -658,6 +659,7 @@
   function bootMockHeader() {
     if (__rmhBooted) return;
     __rmhBooted = true;
+    ensureMockCss();
     applyNavHrefs();
     markActiveFromPage();
     fillCategories();
@@ -684,4 +686,13 @@
       }
     });
   }
+
+  /* التشغيل في النهاية — بعد تهيئة DEMO_CART وكل الدوال */
+  waitBody(function () {
+    document.body.classList.add('rizq-mockup-hdr-trial');
+    document.documentElement.classList.add('rizq-app-nav');
+    ensureMockCss();
+    ensureMockHeader();
+    bootMockHeader();
+  });
 })();
