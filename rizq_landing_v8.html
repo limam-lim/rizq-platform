@@ -1684,11 +1684,14 @@ body.rizq-vstrip-lb-on{overflow:hidden}
 .hero-biz-label-top{display:none} /* استُبدل بـ .hero-spaces-head */
 .hero-biz-nav{
   display:grid!important;
-  grid-template-columns:repeat(5,minmax(0,1fr));
+  grid-template-columns:repeat(6,minmax(0,1fr));
   gap:11px;width:100%;max-width:100%;margin:0 auto;
   animation:heroSpacesIn .7s .22s ease both;z-index:61;position:relative;
   padding:2px;box-sizing:border-box;
   flex-direction:unset!important;flex-wrap:unset!important;
+}
+@media(max-width:1200px){
+  .hero-biz-nav{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 html[dir="ltr"] .hero-biz-nav,
 html[lang="fr"] .hero-biz-nav,
@@ -1774,6 +1777,7 @@ body.rizq-lang-fr .hero-biz-nav{
 .hero-biz-gold,
 .hero-biz-royal,
 .hero-biz-diamond,
+.hero-biz-estate,
 .hero-biz-tender,
 .hero-biz-invest{
   background:
@@ -1785,6 +1789,7 @@ body.rizq-lang-fr .hero-biz-nav{
 .hero-biz-gold .hero-biz-ico-wrap,
 .hero-biz-royal .hero-biz-ico-wrap,
 .hero-biz-diamond .hero-biz-ico-wrap,
+.hero-biz-estate .hero-biz-ico-wrap,
 .hero-biz-tender .hero-biz-ico-wrap,
 .hero-biz-invest .hero-biz-ico-wrap{
   background:linear-gradient(145deg,#F0D78A,#C9A84C,#b89840);
@@ -1793,17 +1798,20 @@ body.rizq-lang-fr .hero-biz-nav{
 .hero-biz-gold .hero-biz-hint,
 .hero-biz-royal .hero-biz-hint,
 .hero-biz-diamond .hero-biz-hint,
+.hero-biz-estate .hero-biz-hint,
 .hero-biz-tender .hero-biz-hint,
 .hero-biz-invest .hero-biz-hint{color:#FFE7A0}
 .hero-biz-gold:hover,
 .hero-biz-royal:hover,
 .hero-biz-diamond:hover,
+.hero-biz-estate:hover,
 .hero-biz-tender:hover,
 .hero-biz-invest:hover{
   border-color:#E8C96A;
   box-shadow:0 16px 34px rgba(15,35,65,.34),0 0 18px rgba(201,168,76,.22),inset 0 1px 0 rgba(255,255,255,.22),inset 0 -10px 18px rgba(8,15,30,.18);
 }
 /* لمسة تمييز خفيفة دون كسر العائلة */
+.hero-biz-estate .hero-biz-ico-wrap{box-shadow:0 4px 12px rgba(0,0,0,.28),inset 0 0 0 1.5px rgba(96,165,250,.5),inset 0 1px 0 rgba(255,255,255,.5)}
 .hero-biz-tender .hero-biz-ico-wrap{box-shadow:0 4px 12px rgba(0,0,0,.28),inset 0 0 0 1.5px rgba(52,211,153,.45),inset 0 1px 0 rgba(255,255,255,.5)}
 .hero-biz-invest .hero-biz-ico-wrap{box-shadow:0 4px 12px rgba(0,0,0,.28),inset 0 0 0 1.5px rgba(232,201,106,.65),inset 0 1px 0 rgba(255,255,255,.5)}
 .hero-biz-btn:hover{transform:translateY(-5px);filter:brightness(1.04)}
@@ -2893,8 +2901,9 @@ html[dir="ltr"] .listings-section .section-desc{
   .cats-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px!important}
   .footer-grid{grid-template-columns:2fr 1fr 1fr 1fr 1.2fr!important;gap:22px!important}
   .hero-biz-nav{grid-template-columns:repeat(3,minmax(0,1fr));max-width:100%;gap:12px}
-  .hero-biz-nav .hero-biz-btn:nth-child(4){grid-column:1 / 2}
-  .hero-biz-nav .hero-biz-btn:nth-child(5){grid-column:2 / 4;max-width:none}
+  .hero-biz-nav .hero-biz-btn:nth-child(4),
+  .hero-biz-nav .hero-biz-btn:nth-child(5),
+  .hero-biz-nav .hero-biz-btn:nth-child(6){grid-column:auto;max-width:none}
   .hero-stage{padding:18px 14px 8px}
   .vo-specialty-portals{
     grid-template-columns:repeat(3,minmax(0,1fr))!important;
@@ -5035,6 +5044,14 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
             <span class="hero-biz-text">
               <span class="hero-biz-label" data-t="hbiz-showrooms">المعارض</span>
               <span class="hero-biz-hint" data-t="hbiz-showrooms-hint">عرض يلفت الأنظار</span>
+            </span>
+          </a>
+          <a href="rizq_estate.html?demo=1" class="hero-biz-btn hero-biz-estate" data-space-portal="estate" data-rizq-module="estate" aria-label="نموذج وكالة عقارات">
+            <span class="hero-biz-badge" data-t="hbiz-estate-badge">جديد</span>
+            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏠</span></span>
+            <span class="hero-biz-text">
+              <span class="hero-biz-label" data-t="hbiz-estate">وكالات العقارات</span>
+              <span class="hero-biz-hint" data-t="hbiz-estate-hint">عقارك يصل للجادّين</span>
             </span>
           </a>
           <a href="rizq_office.html?demo=1" class="hero-biz-btn hero-biz-royal" data-space-portal="office" data-rizq-module="office" aria-label="نموذج مكتب">
@@ -9827,6 +9844,7 @@ const LANG = {
     'hbiz-stores': 'المحلات',
     'hbiz-offices': 'المكاتب',
     'hbiz-showrooms': 'المعارض',
+    'hbiz-estate': 'وكالات العقارات',
     'hbiz-tenders': 'المناقصات',
     'hbiz-investments': 'الاستثمارات',
     'hbiz-pick': 'شاهد النماذج على رزق',
@@ -9842,10 +9860,12 @@ const LANG = {
     'hbiz-stores-hint': 'بيع أقوى كل يوم',
     'hbiz-offices-hint': 'عملاء يبحثون عنك',
     'hbiz-showrooms-hint': 'عرض يلفت الأنظار',
+    'hbiz-estate-hint': 'عقارك يصل للجادّين',
     'hbiz-tenders-hint': 'فرص أعمال حقيقية',
     'hbiz-investments-hint': 'شراكات تنمو معك',
     'hbiz-inv-badge': 'جديد',
     'hbiz-tender-badge': 'جديد',
+    'hbiz-estate-badge': 'جديد',
     'hbiz-new': 'جديد',
     'hbiz-cta': 'ثم ابدأ مجاناً — انشر إعلانك أو افتح محلك خلال دقائق',
     'vstrip-title': 'اكتشف العروض الجديدة بالفيديو',
@@ -9988,6 +10008,7 @@ const LANG = {
     'hbiz-stores': 'Boutiques',
     'hbiz-offices': 'Bureaux',
     'hbiz-showrooms': 'Showrooms',
+    'hbiz-estate': 'Agences immobilières',
     'hbiz-tenders': 'Appels d\'offres',
     'hbiz-investments': 'Investissements',
     'hbiz-pick': 'Découvrez les modèles sur Rizq',
@@ -10003,10 +10024,12 @@ const LANG = {
     'hbiz-stores-hint': 'Vendez plus fort chaque jour',
     'hbiz-offices-hint': 'Des clients vous cherchent',
     'hbiz-showrooms-hint': 'Une vitrine qui attire',
+    'hbiz-estate-hint': 'Votre bien atteint les acheteurs sérieux',
     'hbiz-tenders-hint': 'De vraies opportunités',
     'hbiz-investments-hint': 'Des partenariats qui grandissent',
     'hbiz-inv-badge': 'Nouveau',
     'hbiz-tender-badge': 'Nouveau',
+    'hbiz-estate-badge': 'Nouveau',
     'hbiz-new': 'Nouveau',
     'hbiz-cta': 'Puis commencez gratuitement — publiez une annonce ou ouvrez votre boutique en quelques minutes',
     'vstrip-title': 'Découvrez les nouvelles offres en vidéo',
