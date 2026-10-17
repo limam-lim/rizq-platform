@@ -167,15 +167,99 @@
     });
   }
 
+  /* مفاتيح التبويب التي تتبع التمرير داخل الصفحة */
+  var SPY_KEYS = ['home', 'ads', 'stores', 'showrooms', 'estate', 'offices'];
+  var spyLockUntil = 0;
+
+  function headerOffset() {
+    var hdr = document.getElementById('rizq-mock-hdr');
+    var h = hdr ? hdr.getBoundingClientRect().height : 0;
+    return Math.ceil(h || 188) + 10;
+  }
+
+  function spySections() {
+    return [
+      { key: 'home', el: document.getElementById('hero') || document.querySelector('.hero') },
+      { key: 'ads', el: document.getElementById('listings') },
+      { key: 'stores', el: document.getElementById('virtual-stores') },
+      { key: 'showrooms', el: document.getElementById('virtual-showrooms') },
+      { key: 'estate', el: document.getElementById('rzq-disc-estate') },
+      { key: 'offices', el: document.getElementById('virtual-offices') },
+    ].filter(function (s) {
+      return s.el;
+    });
+  }
+
+  function setSpyActive(key) {
+    if (SPY_KEYS.indexOf(key) === -1) return;
+    document.querySelectorAll('.rmh-nav a[data-rmh]').forEach(function (a) {
+      var k = a.getAttribute('data-rmh');
+      if (SPY_KEYS.indexOf(k) === -1) return;
+      var on = k === key;
+      a.classList.toggle('is-active', on);
+      if (on) a.setAttribute('aria-current', 'true');
+      else a.removeAttribute('aria-current');
+    });
+  }
+
+  function resolveSpyKey() {
+    var sections = spySections();
+    if (!sections.length) return 'home';
+    if (window.scrollY < 48) return 'home';
+    var y = window.scrollY + headerOffset();
+    var current = sections[0].key;
+    for (var i = 0; i < sections.length; i++) {
+      var top = sections[i].el.getBoundingClientRect().top + window.scrollY;
+      if (top <= y + 8) current = sections[i].key;
+    }
+    return current;
+  }
+
+  function updateSpy() {
+    if (Date.now() < spyLockUntil) return;
+    setSpyActive(resolveSpyKey());
+  }
+
+  function scrollToSpyTarget(el) {
+    if (!el) return;
+    var top = el.getBoundingClientRect().top + window.scrollY - headerOffset();
+    window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+  }
+
   function wireNavActive() {
     document.querySelectorAll('.rmh-nav a[data-rmh]').forEach(function (a) {
-      a.addEventListener('click', function () {
-        document.querySelectorAll('.rmh-nav a[data-rmh]').forEach(function (x) {
-          x.classList.remove('is-active');
-        });
-        a.classList.add('is-active');
+      a.addEventListener('click', function (e) {
+        var key = a.getAttribute('data-rmh');
+        var href = a.getAttribute('href') || '';
+        if (SPY_KEYS.indexOf(key) === -1) return;
+        if (href.charAt(0) !== '#') return;
+        e.preventDefault();
+        var id = href.slice(1);
+        var target =
+          (id && document.getElementById(id)) ||
+          (key === 'home' ? document.getElementById('hero') || document.querySelector('.hero') : null);
+        setSpyActive(key);
+        spyLockUntil = Date.now() + 900;
+        scrollToSpyTarget(target);
+        try {
+          if (id) history.replaceState(null, '', '#' + id);
+        } catch (err) { /* ignore */ }
       });
     });
+
+    var ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(function () {
+        ticking = false;
+        updateSpy();
+      });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', updateSpy);
+    updateSpy();
+    setTimeout(updateSpy, 400);
   }
 
   function wireMore() {

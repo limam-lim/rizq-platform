@@ -518,12 +518,21 @@ nav.rmh-nav{
   direction:rtl;
 }
 .rmh-nav::-webkit-scrollbar{display:none}
+/* أقسام الصفحة — هامش تمرير تحت الهيدر الثابت */
+body.rizq-mockup-hdr-trial #hero,
+body.rizq-mockup-hdr-trial #listings,
+body.rizq-mockup-hdr-trial #virtual-stores,
+body.rizq-mockup-hdr-trial #virtual-showrooms,
+body.rizq-mockup-hdr-trial #rzq-disc-estate,
+body.rizq-mockup-hdr-trial #virtual-offices{
+  scroll-margin-top:calc(var(--rizq-mock-hdr-h,188px) + 12px);
+}
 .rmh-nav a{
   flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:4px;min-width:78px;padding:9px 12px 11px;text-decoration:none;
   color:rgba(255,255,255,.78);font:700 12px 'Cairo',sans-serif;
   border-bottom:3px solid transparent;
-  transition:color .15s,border-color .15s;
+  transition:color .2s ease,border-bottom-color .2s ease,opacity .2s ease;
   cursor:pointer!important;
   user-select:none;
   -webkit-user-select:none;
