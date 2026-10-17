@@ -12191,7 +12191,15 @@ document.getElementById('modal').addEventListener('click',function(e){
             if(typeof goFromType==='function') goFromType();
             if(preBiz) setTimeout(function(){
               if(typeof selectBizType==='function') selectBizType(preBiz);
-              if(window._rizqPreActivity && typeof applyPreActivitySelect==='function'){
+              /* سوق العقارات وغيره: تجاوز خطوة نوع المؤسسة تلقائياً عند وجود نشاط مسبق */
+              if(window._rizqPreActivity){
+                setTimeout(function(){
+                  if(typeof goFromBizType==='function') goFromBizType();
+                  setTimeout(function(){
+                    if(typeof applyPreActivitySelect==='function') applyPreActivitySelect(preBiz);
+                  }, 80);
+                }, 120);
+              } else if(typeof applyPreActivitySelect==='function'){
                 setTimeout(function(){ applyPreActivitySelect(preBiz); }, 120);
               }
             }, 250);

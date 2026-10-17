@@ -9,8 +9,24 @@
     individual: 'rizq_dashboard.html',
     store: 'rizq_dashboard_store.html',
     office: 'rizq_dashboard_office.html',
-    corp: 'rizq_dashboard_corp.html'
+    corp: 'rizq_dashboard_corp.html',
+    estate: 'rizq_dashboard_estate.html'
   };
+
+  /** وكالة عقارية = مكتب بنشاط عقاري — داشبورد وواجهة سوق العقارات */
+  function isRealEstateAgency(acc) {
+    if (!acc) return false;
+    var type = String(acc.type || '');
+    if (type && type !== 'office' && type !== 'estate') return false;
+    var act = String(acc.activityId || acc.activity || acc.sector || acc.category || '').toLowerCase();
+    if (/of_realestate|realestate|عقار|immobilier|estate|وساط|agence/.test(act)) return true;
+    try {
+      if (window.RizqMerchantActivities && typeof RizqMerchantActivities.accountMatchesDirectoryFilter === 'function') {
+        return !!RizqMerchantActivities.accountMatchesDirectoryFilter(acc, 'realestate');
+      }
+    } catch (eAct) {}
+    return false;
+  }
 
   var SESSION_KEYS = [
     'rizq_active_session',
@@ -104,7 +120,9 @@
     }) || null;
   }
 
-  function dashFileName(type) {
+  function dashFileName(type, acc) {
+    if (acc && isRealEstateAgency(acc)) return DASHBOARD_FILES.estate;
+    if (type === 'estate') return DASHBOARD_FILES.estate;
     return DASHBOARD_FILES[type] || DASHBOARD_FILES.individual;
   }
 
@@ -127,7 +145,7 @@
     if (!acc || !acc.id || !acc.token) return '';
     storeDashToken(acc.id, acc.token);
     var type = acc.type || 'individual';
-    var path = htmlDashPath(dashFileName(type));
+    var path = htmlDashPath(dashFileName(type, acc));
     return path + '?id=' + encodeURIComponent(acc.id);
   }
 
@@ -238,7 +256,9 @@
   function publicPageForAccount(accOrType, id) {
     var type = 'individual';
     var accId = '';
+    var accObj = null;
     if (accOrType && typeof accOrType === 'object') {
+      accObj = accOrType;
       type = accOrType.type || 'individual';
       accId = accOrType.id || '';
     } else {
@@ -249,9 +269,11 @@
       store: 'rizq_store.html',
       office: 'rizq_office.html',
       corp: 'rizq_corp.html',
+      estate: 'rizq_estate.html',
       individual: 'rizq_profile.html'
     };
     var page = map[type] || 'rizq_profile.html';
+    if (accObj && isRealEstateAgency(accObj)) page = 'rizq_estate.html';
     return accId ? page + '?id=' + encodeURIComponent(accId) : page;
   }
 
@@ -551,10 +573,22 @@
         return a && a.id === id && a.token === token && a.status === 'approved';
       });
       var typeFromUrl = accFromUrl && accFromUrl.type ? accFromUrl.type : (expectedType || '');
-      if (expectedType && typeFromUrl && typeFromUrl !== expectedType) return null;
+      if (expectedType === 'estate') {
+        if (accFromUrl && !isRealEstateAgency(accFromUrl)) return null;
+      } else if (expectedType && typeFromUrl && typeFromUrl !== expectedType) {
+        return null;
+      }
       try {
-        var pathOnly = htmlDashPath(dashFileName(typeFromUrl || expectedType || 'individual'));
-        history.replaceState(null, '', pathOnly + '?id=' + encodeURIComponent(id));
+        var pathOnly = htmlDashPath(dashFileName(typeFromUrl || expectedType || 'individual', accFromUrl));
+        var destUrl = pathOnly + '?id=' + encodeURIComponent(id);
+        var curFile = (location.pathname || '').split('/').pop() || '';
+        var destFile = String(pathOnly || '').split('/').pop() || '';
+        /* وكالة عقارية على داشبورد المكتب → انتقال حقيقي لداشبورد سوق العقارات */
+        if (normalizeDashName(curFile) !== normalizeDashName(destFile)) {
+          location.replace(destUrl);
+          return null;
+        }
+        history.replaceState(null, '', destUrl);
       } catch (eHist) {}
       return { id: id, token: token, account: accFromUrl || null, fromUrl: true };
     }
@@ -564,11 +598,22 @@
     var acc = findApprovedAccount(sess);
     if (!acc) return null;
     var type = acc.type || 'individual';
-    if (expectedType && type !== expectedType) return null;
+    if (expectedType === 'estate') {
+      if (!isRealEstateAgency(acc)) return null;
+    } else if (expectedType && type !== expectedType) {
+      return null;
+    }
     storeDashToken(acc.id, acc.token);
     try {
-      var path = htmlDashPath(dashFileName(type));
-      history.replaceState(null, '', path + '?id=' + encodeURIComponent(acc.id));
+      var path = htmlDashPath(dashFileName(type, acc));
+      var destUrl2 = path + '?id=' + encodeURIComponent(acc.id);
+      var curFile2 = (location.pathname || '').split('/').pop() || '';
+      var destFile2 = String(path || '').split('/').pop() || '';
+      if (normalizeDashName(curFile2) !== normalizeDashName(destFile2)) {
+        location.replace(destUrl2);
+        return null;
+      }
+      history.replaceState(null, '', destUrl2);
     } catch (eHist2) {}
     return { id: acc.id, token: acc.token, account: acc, fromUrl: false };
   }
@@ -598,6 +643,7 @@
 
   window.RizqAccount = {
     open: openAccount,
+    isRealEstateAgency: isRealEstateAgency,
     publicPageForAccount: publicPageForAccount,
     resolveDashboardUrl: resolveDashboardUrl,
     buildDashboardUrl: buildDashboardUrl,
