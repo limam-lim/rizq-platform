@@ -669,7 +669,7 @@ button{font:inherit;border:0;background:none;color:inherit}
       <h4>رزق</h4>
       <a href="rizq_landing_v8.html">الرئيسية</a>
       <a href="rizq_landing_v8.html#virtual-stores">المحلات</a>
-      <a href="rizq_landing_v8.html#virtual-showrooms">المعارض</a>
+      <a href="rizq_landing_v8.html#virtual-showrooms">المعارض و المصانع</a>
       <a href="rizq_landing_v8.html#virtual-offices">المكاتب</a>
     </div>
   </div>
@@ -882,6 +882,10 @@ button{font:inherit;border:0;background:none;color:inherit}
     function draw(){
       if(typeof RizqAccountPayments !== 'undefined' && typeof RizqAccountPayments.renderPublic === 'function'){
         RizqAccountPayments.renderPublic(box, window._rizqEstatePaymentMethods, { fr: false });
+        /* صياغة عقارية فوق النص التجاري الموحّد */
+        var kids = box.children;
+        if(kids && kids[0]) kids[0].textContent = '💳 طرق الدفع المتاحة';
+        if(kids && kids[1]) kids[1].textContent = 'ادفع مباشرة للوكالة عبر إحدى الوسائل أدناه — نفس نظام المحلات والمكاتب بواجهة عقارية.';
         return true;
       }
       return false;

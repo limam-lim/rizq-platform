@@ -633,7 +633,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
         <span id="msg-btn-lbl">محادثة</span>
       </button>
       <button class="action-btn btn-share" onclick="shareShowroom()" id="share-btn-lbl">📤 مشاركة</button>
-      <a class="action-btn btn-browse" id="showroom-browse-cta" href="rizq_landing_v8.html#rzq-disc-corp">🏬 تصفّح المعارض</a>
+      <a class="action-btn btn-browse" id="showroom-browse-cta" href="rizq_landing_v8.html#rzq-disc-corp">🏬 تصفّح المعارض و المصانع</a>
     </div>
     <div class="showroom-rating">
       <div class="stars">★★★★★</div>
@@ -1177,7 +1177,7 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
   var fr = false;
   try { fr = (localStorage.getItem('rizq_lang') || 'ar') === 'fr'; } catch (e) {}
   var c = document.getElementById('showroom-browse-cta');
-  if(c) c.textContent = fr ? '🏬 Parcourir les showrooms' : '🏬 تصفّح المعارض';
+  if(c) c.textContent = fr ? '🏬 Parcourir showrooms & usines' : '🏬 تصفّح المعارض و المصانع';
 })();
 
 /* ── Data ── */
