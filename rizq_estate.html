@@ -75,6 +75,64 @@ button{font:inherit;border:0;background:none;color:inherit}
 .est-agency-bar-acts .est-call{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347}
 .est-agency-bar-acts .est-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
 .est-agency-bar-acts .est-page{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.14)}
+.est-agency-bar-acts .est-pay{background:rgba(201,168,76,.12);color:var(--gold2);border:1px solid rgba(201,168,76,.35)}
+.est-agency-bar-acts .est-desk{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.14)}
+
+/* خدمات موحّدة (دفع + غرفة استفسار) بتصميم عقاري */
+.est-services{
+  display:grid;grid-template-columns:1fr 1.15fr;gap:14px;margin:0 0 22px;
+}
+.est-svc-card{
+  border-radius:18px;padding:18px 16px;
+  background:linear-gradient(160deg,rgba(16,28,46,.96),rgba(11,28,51,.88));
+  border:1px solid rgba(201,168,76,.28);
+  box-shadow:0 12px 32px rgba(0,0,0,.28);
+}
+.est-svc-card h3{
+  font:900 14px Cairo,sans-serif;color:var(--gold2);margin:0 0 6px;
+  letter-spacing:.2px;
+}
+.est-svc-card .est-svc-sub{font-size:12.5px;color:var(--muted);line-height:1.6;margin:0 0 12px}
+#est-payment-methods{min-height:0}
+#est-payment-methods > div:first-child{color:var(--gold2)!important}
+#est-payment-methods > div:nth-child(2){color:var(--muted)!important}
+#est-payment-methods > div[style*="background:#fff"],
+#est-payment-methods > div[style*="background: #fff"]{
+  background:rgba(255,255,255,.05)!important;
+  border-color:rgba(201,168,76,.22)!important;
+}
+#est-payment-methods [style*="color:#1B3A6B"],
+#est-payment-methods [style*="color: #1B3A6B"]{color:#E8EDF5!important}
+#est-payment-methods [style*="color:#0f2347"],
+#est-payment-methods [style*="color: #0f2347"]{color:var(--gold3)!important}
+#est-payment-methods [style*="background:#e8f0fe"],
+#est-payment-methods [style*="background: #e8f0fe"]{
+  background:rgba(201,168,76,.14)!important;color:var(--gold3)!important;
+}
+#est-payment-methods .rzq-pay-logo{border-color:rgba(201,168,76,.35)!important;background:#0a1324!important}
+.est-desk-fields{display:grid;gap:8px}
+.est-desk-fields input,
+.est-desk-fields select,
+.est-desk-fields textarea{
+  width:100%;border-radius:12px;padding:11px 12px;font:600 13px Cairo,sans-serif;
+  color:#E8EDF5;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.12);outline:none;
+}
+.est-desk-fields input:focus,
+.est-desk-fields select:focus,
+.est-desk-fields textarea:focus{border-color:rgba(201,168,76,.55)}
+.est-desk-fields textarea{min-height:78px;resize:vertical}
+.est-desk-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.est-desk-actions button,
+.est-desk-actions a{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border-radius:12px;padding:11px 14px;font:800 12.5px Cairo,sans-serif;
+  text-decoration:none;border:0;cursor:pointer;
+}
+.est-desk-go{background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0f2347}
+.est-desk-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
+.est-meta-row{display:flex;flex-wrap:wrap;gap:10px 16px;margin:0 0 10px;font-size:12.5px;color:var(--muted)}
+.est-meta-row strong{color:#fff;font-weight:800}
 .est-card-contact{
   display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;
 }
@@ -365,6 +423,7 @@ button{font:inherit;border:0;background:none;color:inherit}
   .est-search-go{grid-column:1/-1}
   .est-card,.est-card.featured{grid-column:span 6}
   .est-trust{grid-template-columns:1fr}
+  .est-services{grid-template-columns:1fr}
   .est-agency{grid-template-columns:1fr}
   .est-agency-photo{min-height:220px}
   .est-agency-photo::after{background:linear-gradient(180deg,transparent,rgba(11,28,51,.35))}
@@ -396,6 +455,7 @@ button{font:inherit;border:0;background:none;color:inherit}
     </a>
     <nav class="est-nav" aria-label="أقسام واجهة الوكالة العقارية">
       <a href="#est-listings" class="is-on">معروضات الوكالة</a>
+      <a href="#est-services">الدفع والاستفسار</a>
       <a href="#est-gallery">معرض الصور</a>
       <a href="#est-agency">عن الوكالة</a>
       <a href="rizq_estate_agencies.html">كل الوكالات</a>
@@ -468,9 +528,42 @@ button{font:inherit;border:0;background:none;color:inherit}
     <div class="est-agency-bar-acts">
       <a class="est-call" id="est-bar-call" href="tel:+22242000111" dir="ltr">📞 اتصل بالوكالة</a>
       <a class="est-wa" id="est-bar-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب</a>
+      <a class="est-pay" href="#est-services">💳 طرق الدفع</a>
+      <a class="est-desk" href="#est-desk">📩 استفسار</a>
       <a class="est-page" href="rizq_estate_agencies.html">كل الوكالات</a>
     </div>
   </div>
+
+  <section class="est-services" id="est-services" aria-label="طرق الدفع وغرفة الاستفسار">
+    <div class="est-svc-card" id="est-pay-card">
+      <h3>💳 طرق الدفع</h3>
+      <p class="est-svc-sub">نفس نظام المحلات والمكاتب والمعارض — ادفع مباشرة للوكالة عبر الوسائل التي تفعّلها.</p>
+      <div class="est-meta-row" id="est-contact-meta" hidden>
+        <span>📍 <strong id="est-addr-lbl">—</strong></span>
+        <span>✉️ <strong id="est-email-lbl">—</strong></span>
+      </div>
+      <div id="est-payment-methods" style="display:none"></div>
+    </div>
+    <div class="est-svc-card" id="est-desk" aria-label="غرفة استفسار عقاري">
+      <h3 id="est-desk-title" data-desk="title">📩 استفسار عقاري</h3>
+      <p class="est-svc-sub" id="est-desk-hint" data-desk="hint">أدخل بياناتك وسنتواصل معك بخصوص العرض أو الزيارة — مثل غرفة الطلبات في المحل والمكتب، بواجهة عقارية.</p>
+      <form class="est-desk-fields" id="est-req-form" novalidate>
+        <input id="est-rf-name" name="name" type="text" autocomplete="name" placeholder="الاسم الكامل *" required/>
+        <input id="est-rf-phone" name="phone" type="tel" autocomplete="tel" dir="ltr" placeholder="رقم الهاتف / واتساب *" required/>
+        <select id="est-rf-interest" name="interest" aria-label="نوع الطلب">
+          <option value="visit">طلب معاينة عقار</option>
+          <option value="buy">استفسار شراء</option>
+          <option value="rent">استفسار كراء</option>
+          <option value="other">طلب آخر</option>
+        </select>
+        <textarea id="est-rf-msg" name="message" placeholder="صف العقار أو الحي أو ميزانيتك…"></textarea>
+        <div class="est-desk-actions">
+          <button type="submit" class="est-desk-go" id="est-desk-submit">إرسال الاستفسار</button>
+          <a class="est-desk-wa" id="est-desk-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب الوكالة</a>
+        </div>
+      </form>
+    </div>
+  </section>
 
   <div class="est-section-head" id="est-listings">
     <div class="tag">مجموعة مختارة من الوكالة</div>
@@ -530,7 +623,7 @@ button{font:inherit;border:0;background:none;color:inherit}
       <p id="est-about-desc">صفحة وكالة واحدة (مثل صفحة محل أو مكتب أو معرض) بتصميم عقاري مستقل — معروضات، هوية، وجهات اتصال واحدة للوكالة.</p>
       <ul class="est-agency-points" id="est-agency-points" data-rizq-estate-promo="1">
         <li>✓ حساب واحد → صفحة وكالة واحدة (`?id=`)</li>
-        <li>✓ جهات اتصال الوكالة فقط (هاتف + واتساب)</li>
+        <li>✓ تواصل ودفع واستفسار موحّد (هاتف + واتساب + طرق دفع)</li>
         <li>✓ مسار التسجيل: شركة → مكتب → وساطة عقارية</li>
         <li>✓ الظهور في دليل الوكالات المنفصل</li>
       </ul>
@@ -610,6 +703,10 @@ button{font:inherit;border:0;background:none;color:inherit}
   <img class="est-lb-img" id="est-lb-img" alt=""/>
 </div>
 
+<script src="rizq_backend_config.js"></script>
+<script src="rizq_mr_payment_catalog.js?v=1.1"></script>
+<script src="rizq_account_payments.js?v=28.3"></script>
+<script src="rizq_service_desk.js?v=1.3"></script>
 <script>
 (function(){
   var LISTINGS = [
@@ -674,34 +771,67 @@ button{font:inherit;border:0;background:none;color:inherit}
   }
 
   /* وكالة واحدة لكل صفحة — مثل rizq_store / rizq_office / rizq_showroom */
+  var DEMO_PAY = [
+    { type: 'bankily', bank: 'Bankily', code: '42000111', phone: '+22242000111', note: 'اذكر اسمك ورقم العرض بعد التحويل' },
+    { type: 'sedad', bank: 'Sedad', code: '420011', phone: '+22242000111' },
+    { type: 'bank', bank: 'BCI', account: 'MR13 0001 4200 0111 0000 0000 000', note: 'تحويل — عربون / أتعاب وساطة' }
+  ];
+  var DEMO_DESK = {
+    enabled: true,
+    formTitle: 'استفسار عقاري',
+    formHint: 'بياناتك تصل للوكالة مباشرة. يمكنك المتابعة عبر واتساب بعد الإرسال — مثل غرفة الطلبات في المحل والمكتب.',
+    docsChannel: 'whatsapp'
+  };
+
   var DEMO_AGENCIES = {
     demo_estate_atwar: {
       id: 'demo_estate_atwar', name: 'أطوار للعقارات', city: 'نواكشوط',
       activity: 'وساطة عقارية', phone: '+222 42 00 01 11', whatsapp: '22242000111',
+      email: 'atwar@estate-demo.mr', address: 'تفرغ زينة — نواكشوط',
       logo: 'rizq-mark-inset.png?v=1',
       cover: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1800&q=80',
-      desc: 'وكالة عقارية نموذجية على رزق — صفحة واحدة بجهات اتصال واحدة وتصميم عقاري مستقل.'
+      desc: 'وكالة عقارية نموذجية على رزق — صفحة واحدة بجهات اتصال ودفع واستفسار بتصميم عقاري مستقل.',
+      paymentMethods: DEMO_PAY,
+      serviceDesk: Object.assign({}, DEMO_DESK, { formTitle: 'استفسار — أطوار للعقارات' })
     },
     demo_estate_saknia: {
       id: 'demo_estate_saknia', name: 'سكنية العقارية', city: 'تفرغ زينة',
       activity: 'بيع وإيجار', phone: '+222 45 10 20 30', whatsapp: '22245102030',
+      email: 'saknia@estate-demo.mr', address: 'تفرغ زينة',
       logo: 'rizq-mark-inset.png?v=1',
       cover: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1800&q=80',
-      desc: 'وكالة واحدة للشقق العائلية والمحلات — تواصل مباشر مع الوكالة فقط.'
+      desc: 'وكالة واحدة للشقق العائلية والمحلات — تواصل ودفع مباشر مع الوكالة.',
+      paymentMethods: [
+        { type: 'bankily', bank: 'Bankily', code: '45102030', phone: '+22245102030' },
+        { type: 'cash', bank: 'دفع عند توقيع العقد', note: 'عربون في مكتب الوكالة' }
+      ],
+      serviceDesk: Object.assign({}, DEMO_DESK, { formTitle: 'استفسار — سكنية العقارية' })
     },
     demo_estate_horizon: {
       id: 'demo_estate_horizon', name: 'هورايزن للإسكان', city: 'نواذيبو',
       activity: 'تطوير ووساطة', phone: '+222 46 22 33 44', whatsapp: '22246223344',
+      email: 'horizon@estate-demo.mr', address: 'نواذيبو',
       logo: 'rizq-mark-inset.png?v=1',
       cover: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1800&q=80',
-      desc: 'وكالة واحدة للأراضي والفلل — رقم وواتساب الوكالة على كل بطاقة.'
+      desc: 'وكالة واحدة للأراضي والفلل — رقم وواتساب وطرق دفع الوكالة على الصفحة.',
+      paymentMethods: [
+        { type: 'sedad', bank: 'Sedad', code: '462233', phone: '+22246223344' },
+        { type: 'bank', bank: 'GBM', account: 'MR13 0002 4600 2233 0000 0000 000' }
+      ],
+      serviceDesk: Object.assign({}, DEMO_DESK, { formTitle: 'استفسار — هورايزن للإسكان' })
     },
     demo_estate_dar: {
       id: 'demo_estate_dar', name: 'دار الأمين العقارية', city: 'لكصر',
       activity: 'إدارة عقارات', phone: '+222 36 70 80 90', whatsapp: '22236708090',
+      email: 'dar@estate-demo.mr', address: 'لكصر — نواكشوط',
       logo: 'rizq-mark-inset.png?v=1',
       cover: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1800&q=80',
-      desc: 'وكالة واحدة لإدارة الكراء والبيع — واجهة مستقلة بهوية رزق العقارية.'
+      desc: 'وكالة واحدة لإدارة الكراء والبيع — واجهة مستقلة بهوية رزق العقارية.',
+      paymentMethods: [
+        { type: 'bankily', bank: 'Bankily', code: '36708090', phone: '+22236708090' },
+        { type: 'bimbam', bank: 'BimBank', code: '367080', phone: '+22236708090' }
+      ],
+      serviceDesk: Object.assign({}, DEMO_DESK, { formTitle: 'استفسار — دار الأمين العقارية' })
     }
   };
 
@@ -745,6 +875,53 @@ button{font:inherit;border:0;background:none;color:inherit}
     }
   }
 
+  function paintPayments(methods){
+    window._rizqEstatePaymentMethods = Array.isArray(methods) ? methods : [];
+    var box = document.getElementById('est-payment-methods');
+    if(!box) return;
+    function draw(){
+      if(typeof RizqAccountPayments !== 'undefined' && typeof RizqAccountPayments.renderPublic === 'function'){
+        RizqAccountPayments.renderPublic(box, window._rizqEstatePaymentMethods, { fr: false });
+        return true;
+      }
+      return false;
+    }
+    if(draw()) return;
+    if(!window._rizqEstatePaymentMethods.length){
+      box.style.display = 'none';
+      box.innerHTML = '';
+      return;
+    }
+    var tries = 0;
+    var t = setInterval(function(){
+      tries += 1;
+      if(draw() || tries > 20) clearInterval(t);
+    }, 100);
+  }
+
+  function paintDesk(desk, name){
+    window._rizqEstateServiceDesk = desk || {};
+    var root = document.getElementById('est-desk');
+    if(window.RizqServiceDesk && typeof RizqServiceDesk.applyPublicLabels === 'function'){
+      RizqServiceDesk.applyPublicLabels(root, window._rizqEstateServiceDesk, name || AGENCY.name);
+    } else {
+      var title = (desk && desk.formTitle) || ('استفسار عقاري — ' + (name || AGENCY.name || ''));
+      var hint = (desk && desk.formHint) || 'أدخل بياناتك وسنتواصل معك بخصوص العرض أو الزيارة.';
+      setText('est-desk-title', '📩 ' + title);
+      setText('est-desk-hint', hint);
+    }
+  }
+
+  function paintContactMeta(acc){
+    var addr = acc.address || acc.city || '';
+    var email = acc.email || '';
+    var meta = document.getElementById('est-contact-meta');
+    var has = !!(addr || email);
+    if(meta) meta.hidden = !has;
+    if(addr) setText('est-addr-lbl', addr);
+    if(email) setText('est-email-lbl', email);
+  }
+
   function applyAgency(acc){
     if(!acc) return;
     AGENCY = {
@@ -754,11 +931,16 @@ button{font:inherit;border:0;background:none;color:inherit}
       activity: acc.activity || acc.sector || AGENCY.activity,
       phone: acc.phone || acc.tel || AGENCY.phone,
       whatsapp: String(acc.whatsapp || acc.wa || acc.phone || AGENCY.whatsapp).replace(/\D/g,''),
+      email: acc.email || AGENCY.email || '',
+      address: acc.address || acc.city || AGENCY.address || '',
       logo: acc.logo || acc.thumb || acc.avatar || AGENCY.logo,
       cover: acc.cover || acc.thumb || AGENCY.cover,
-      desc: acc.desc || acc.tagline || acc.bio || AGENCY.desc
+      desc: acc.desc || acc.tagline || acc.bio || AGENCY.desc,
+      paymentMethods: Array.isArray(acc.paymentMethods) ? acc.paymentMethods : (AGENCY.paymentMethods || []),
+      serviceDesk: acc.serviceDesk || AGENCY.serviceDesk || {}
     };
     window._rizqEstateAccountId = AGENCY.id;
+    window._rizqEstateProfile = AGENCY;
     document.title = AGENCY.name + ' | وكالة عقارية — رزق';
 
     setText('est-kicker', 'وكالة عقارية · ' + AGENCY.name);
@@ -789,6 +971,10 @@ button{font:inherit;border:0;background:none;color:inherit}
     setHref('est-about-wa', wa);
     setHref('est-modal-call', call);
     setHref('est-modal-wa', wa);
+    setHref('est-desk-wa', wa);
+    paintContactMeta(AGENCY);
+    paintPayments(AGENCY.paymentMethods);
+    paintDesk(AGENCY.serviceDesk, AGENCY.name);
     hidePlatformUpsellOnBoundEstate();
     renderGrid();
   }
@@ -982,6 +1168,40 @@ button{font:inherit;border:0;background:none;color:inherit}
   }
   bindReg('est-reg-top');
   bindReg('est-reg-agency');
+
+  var deskForm = document.getElementById('est-req-form');
+  if(deskForm){
+    deskForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      var name = (document.getElementById('est-rf-name').value || '').trim();
+      var phone = (document.getElementById('est-rf-phone').value || '').trim();
+      var interest = document.getElementById('est-rf-interest').value || 'visit';
+      var msg = (document.getElementById('est-rf-msg').value || '').trim();
+      if(!name || !phone){
+        alert('يرجى إدخال الاسم ورقم الهاتف');
+        return;
+      }
+      var interestAr = {
+        visit: 'طلب معاينة',
+        buy: 'استفسار شراء',
+        rent: 'استفسار كراء',
+        other: 'طلب آخر'
+      }[interest] || 'استفسار';
+      var text = 'استفسار عقاري عبر رزق%0A'
+        + 'الوكالة: ' + encodeURIComponent(AGENCY.name || '') + '%0A'
+        + 'الاسم: ' + encodeURIComponent(name) + '%0A'
+        + 'الهاتف: ' + encodeURIComponent(phone) + '%0A'
+        + 'النوع: ' + encodeURIComponent(interestAr)
+        + (msg ? ('%0Aالتفاصيل: ' + encodeURIComponent(msg)) : '');
+      var wa = String(AGENCY.whatsapp || '').replace(/\D/g,'');
+      if(wa){
+        window.open('https://wa.me/' + wa + '?text=' + text, '_blank', 'noopener');
+      } else {
+        alert('تم تسجيل استفسارك — تواصل مع الوكالة عبر أزرار الاتصال.');
+      }
+    });
+  }
+
   bootAgency();
   rail.addEventListener('click', function(e){
     var shot = e.target.closest('.est-shot');
