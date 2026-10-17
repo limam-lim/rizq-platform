@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.31';
+    link.href = 'rizq_header_mockup_trial.css?v=5.32';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -642,6 +642,16 @@
     }, true);
   }
 
+  function clearHelpMenuInline() {
+    var menu = document.getElementById('rmh-help-menu');
+    if (!menu) return;
+    menu.classList.remove('is-positioned');
+    /* يجب إزالة display وإلا يبقى flex!important مضمّناً ويمنع [hidden] */
+    ['position', 'left', 'right', 'top', 'transform', 'z-index', 'display', 'flex-direction', 'pointer-events'].forEach(function (p) {
+      menu.style.removeProperty(p);
+    });
+  }
+
   function closeHelp() {
     var wrap = document.getElementById('rmh-help-wrap');
     var btn = document.getElementById('rmh-help-btn');
@@ -652,13 +662,8 @@
     if (btn) btn.setAttribute('aria-expanded', 'false');
     if (!menu) return;
     menu.hidden = true;
-    menu.classList.remove('is-positioned');
-    menu.style.removeProperty('position');
-    menu.style.removeProperty('left');
-    menu.style.removeProperty('right');
-    menu.style.removeProperty('top');
-    menu.style.removeProperty('transform');
-    menu.style.removeProperty('z-index');
+    menu.setAttribute('hidden', '');
+    clearHelpMenuInline();
     if (__rmhHelpHome && menu.parentNode !== __rmhHelpHome) {
       __rmhHelpHome.appendChild(menu);
     }
@@ -667,7 +672,7 @@
   function placeHelpMenu() {
     var btn = document.getElementById('rmh-help-btn');
     var menu = document.getElementById('rmh-help-menu');
-    if (!btn || !menu) return;
+    if (!btn || !menu || menu.hidden) return;
     if (menu.parentNode !== document.body) {
       if (!__rmhHelpHome) __rmhHelpHome = menu.parentNode;
       document.body.appendChild(menu);
@@ -684,8 +689,8 @@
     menu.style.setProperty('top', top + 'px', 'important');
     menu.style.setProperty('transform', 'none', 'important');
     menu.style.setProperty('z-index', '10070', 'important');
-    menu.style.setProperty('display', 'flex', 'important');
-    menu.style.setProperty('flex-direction', 'column', 'important');
+    menu.style.setProperty('pointer-events', 'auto', 'important');
+    /* لا تفرض display مضمّناً — CSS :not([hidden]) يتولى الإظهار/الإخفاء */
   }
 
   function openHelp() {
@@ -698,6 +703,7 @@
     wrap.classList.add('open');
     btn.setAttribute('aria-expanded', 'true');
     menu.hidden = false;
+    menu.removeAttribute('hidden');
     placeHelpMenu();
     requestAnimationFrame(placeHelpMenu);
   }
@@ -712,15 +718,17 @@
     function scheduleClose() {
       clearTimeout(__rmhHelpLeave);
       __rmhHelpLeave = setTimeout(function () {
-        if (wrap.matches(':hover') || menu.matches(':hover')) return;
+        try {
+          if (wrap.matches(':hover') || menu.matches(':hover')) return;
+        } catch (err) { /* ignore */ }
         closeHelp();
-      }, 140);
+      }, 160);
     }
 
     btn.addEventListener('click', function (e) {
       e.preventDefault();
       e.stopPropagation();
-      if (wrap.classList.contains('open')) closeHelp();
+      if (wrap.classList.contains('open') && !menu.hidden) closeHelp();
       else openHelp();
     });
     wrap.addEventListener('mouseenter', function () {
@@ -734,8 +742,14 @@
     });
     menu.addEventListener('mouseenter', function () { clearTimeout(__rmhHelpLeave); });
     menu.addEventListener('mouseleave', scheduleClose);
+    /* الروابط تعمل وتُغلق القائمة بعد النقر */
+    menu.addEventListener('click', function (e) {
+      var a = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (!a) return;
+      setTimeout(closeHelp, 0);
+    });
     document.addEventListener('click', function (e) {
-      if (!wrap.classList.contains('open')) return;
+      if (menu.hidden && !wrap.classList.contains('open')) return;
       if (wrap.contains(e.target) || menu.contains(e.target)) return;
       closeHelp();
     });

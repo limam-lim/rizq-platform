@@ -4125,10 +4125,10 @@ body > .rizq-help-dd-menu{
   box-shadow:0 10px 28px rgba(15,23,42,.16),0 2px 6px rgba(15,23,42,.06);
   z-index:10060;
   direction:rtl;
-  display:flex!important;
   flex-direction:column!important;
   align-items:stretch!important;
   gap:2px;
+  pointer-events:auto!important;
 }
 .rizq-help-dd-menu.is-positioned,
 body > .rizq-help-dd-menu.is-positioned{
@@ -4139,8 +4139,16 @@ body > .rizq-help-dd-menu.is-positioned{
 html[dir="ltr"] .rizq-help-dd-menu,
 html[dir="ltr"] body > .rizq-help-dd-menu{direction:ltr}
 .rizq-help-dd-menu[hidden],
-body > .rizq-help-dd-menu[hidden]{display:none!important}
-.rizq-help-dd.open .rizq-help-dd-menu{display:flex!important;flex-direction:column!important}
+body > .rizq-help-dd-menu[hidden]{
+  display:none!important;
+  pointer-events:none!important;
+  visibility:hidden!important;
+}
+.rizq-help-dd.open .rizq-help-dd-menu:not([hidden]),
+body > .rizq-help-dd-menu:not([hidden]){
+  display:flex!important;
+  flex-direction:column!important;
+}
 .rizq-help-dd-menu::before{
   content:'';
   position:absolute;
