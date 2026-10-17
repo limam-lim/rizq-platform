@@ -1594,10 +1594,10 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   .hero-vid-cta-link{font-size:11px;padding:8px 14px}
 }
 
-/* ── الموضع الثاني: شريط بطاقات بعرض شبكة «أبرز العروض» (1200px) ── */
+/* ── الموضع الثاني: شريط بطاقات بعرض أوسع لـ 6 بطاقات أكبر ── */
 .rizq-vid-strip{
-  width:min(1200px,calc(100vw - 32px))!important;
-  max-width:min(1200px,calc(100vw - 32px))!important;
+  width:min(1280px,calc(100vw - 24px))!important;
+  max-width:min(1280px,calc(100vw - 24px))!important;
   margin:10px auto 8px;padding:8px 0 4px;
   background:transparent;border:none;border-radius:0;
   box-shadow:none;position:relative;z-index:20;
@@ -1646,22 +1646,22 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   font-family:'Cairo','Segoe UI',sans-serif;
 }
 .rizq-vid-strip-track{
-  display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;
+  display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;
   scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
   padding:2px 0 8px;scrollbar-width:thin;
 }
 .rizq-vid-strip-track::-webkit-scrollbar{height:6px}
 .rizq-vid-strip-track::-webkit-scrollbar-thumb{background:rgba(27,58,107,.25);border-radius:6px}
-/* 7 بطاقات أكبر ظاهرة بعرض listings (1200px) */
+/* 6 بطاقات أكبر ظاهرة بعرض الشريط (1280px) — فجوات 5×10px */
 .rizq-vcard{
-  flex:0 0 calc((100% - 72px) / 7);scroll-snap-align:start;min-width:0;
-  display:flex;flex-direction:column;gap:7px;cursor:pointer;
+  flex:0 0 calc((100% - 50px) / 6);scroll-snap-align:start;min-width:0;
+  display:flex;flex-direction:column;gap:6px;cursor:pointer;
 }
 .rizq-vcard-thumb{
-  position:relative;aspect-ratio:9/16;border-radius:14px;overflow:hidden;
+  position:relative;aspect-ratio:9/16;border-radius:16px;overflow:hidden;
   background:linear-gradient(160deg,#1B3A6B,#0D1B2A);
   border:1px solid rgba(13,27,42,.12);
-  box-shadow:0 8px 18px rgba(13,27,42,.12);
+  box-shadow:0 10px 22px rgba(13,27,42,.14);
 }
 .rizq-vcard-thumb video{
   width:100%;height:100%;object-fit:cover;display:block;background:#0a1525;
@@ -1679,13 +1679,13 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
 }
 .rizq-vcard-play{
   position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;
-  width:40px;height:40px;border-radius:50%;border:none;pointer-events:none;
-  background:#e11d48;color:#fff;font-size:14px;
-  display:grid;place-items:center;box-shadow:0 6px 16px rgba(185,28,28,.4);
+  width:48px;height:48px;border-radius:50%;border:none;pointer-events:none;
+  background:#e11d48;color:#fff;font-size:16px;
+  display:grid;place-items:center;box-shadow:0 8px 18px rgba(185,28,28,.42);
   transition:opacity .2s,transform .2s;
 }
 .rizq-vcard.is-playing .rizq-vcard-play{opacity:0;transform:translate(-50%,-50%) scale(.8);pointer-events:none}
-/* أزرار الاختصار على الفيديو — يمين سفلي: تشغيل · كتم · تكبير · تواصل */
+/* أزرار الاختصار على الفيديو — يمين سفلي: تشغيل · كتم · تكبير */
 .rizq-vcard-actions{
   position:absolute;right:4px;bottom:6px;top:auto;z-index:4;
   display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;
@@ -1717,14 +1717,57 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   background:rgba(201,168,76,.82);border-color:rgba(255,255,255,.5);color:#0f2347;font-size:13px;
 }
 .rizq-vcard-act--fs:hover .rizq-vcard-act-ico{filter:brightness(1.08);background:rgba(201,168,76,.95)}
-.rizq-vcard-act--contact .rizq-vcard-act-ico{
-  background:#2563eb;border-color:rgba(255,255,255,.4);font-size:12px;
-}
-.rizq-vcard-act--contact:hover .rizq-vcard-act-ico{filter:brightness(1.08);background:#1d4ed8}
 .rizq-vcard-act-lbl{
   font-size:8px;font-weight:800;line-height:1;text-align:center;
   text-shadow:0 1px 3px rgba(0,0,0,.65);max-width:44px;
 }
+/* اتصال + واتساب فوق الفيديو — تحت زر التشغيل */
+.rizq-vcard-thumb .rizq-vcard-contacts,
+.rizq-vcard-thumb .rzq-adx-actions{
+  position:absolute;left:50%;top:58%;
+  transform:translate(-50%,0);
+  z-index:5;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  width:auto;max-width:calc(100% - 52px);
+  margin:0;padding:6px 10px;
+  border-radius:999px;
+  background:rgba(8,16,28,.42);
+  border:1px solid rgba(255,255,255,.18);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 8px 20px rgba(0,0,0,.28);
+  pointer-events:auto;
+}
+.rizq-vcard-thumb .rizq-vcard-tel,
+.rizq-vcard-thumb .rizq-vcard-wa,
+.rizq-vcard-thumb .rzq-adx-tel,
+.rizq-vcard-thumb .rzq-adx-wa{
+  width:30px;height:30px;border-radius:50%;
+  display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;padding:0;flex-shrink:0;text-decoration:none;
+  transition:transform .2s,background .2s,border-color .2s,box-shadow .2s,filter .2s;
+  font-size:12px;line-height:1;
+}
+.rizq-vcard-thumb .rizq-vcard-tel,
+.rizq-vcard-thumb .rzq-adx-tel{
+  background:rgba(18,36,63,.92);border:1px solid rgba(201,168,76,.7);
+  color:#E8C96A;box-shadow:0 3px 10px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.1);
+}
+.rizq-vcard-thumb .rizq-vcard-tel:hover,
+.rizq-vcard-thumb .rzq-adx-tel:hover{
+  background:rgba(201,168,76,.28);border-color:#E8C96A;transform:scale(1.07);
+}
+.rizq-vcard-thumb .rizq-vcard-wa,
+.rizq-vcard-thumb .rzq-adx-wa{
+  background:linear-gradient(145deg,#25D366,#128C7E);
+  border:1px solid rgba(255,255,255,.28);color:#fff;
+  box-shadow:0 3px 10px rgba(18,140,126,.4);
+}
+.rizq-vcard-thumb .rizq-vcard-wa:hover,
+.rizq-vcard-thumb .rzq-adx-wa:hover{transform:scale(1.07);filter:brightness(1.08)}
+.rizq-vcard-thumb .rizq-vcard-contacts svg,
+.rizq-vcard-thumb .rzq-adx-actions svg{width:13px;height:13px;display:block;flex-shrink:0}
+.rizq-vcard-contact-lbl{display:none}
+.rizq-vcard-thumb .rizq-vcard-cap{bottom:8px;max-width:calc(100% - 24px);opacity:.92}
 /* تكبير البطاقة — نافذة كبيرة فوق الصفحة */
 .rizq-vstrip-lb{
   position:fixed;inset:0;z-index:10050;display:none;
@@ -1789,8 +1832,25 @@ body.rizq-vstrip-lb-on{overflow:hidden}
   }
   .rizq-vid-strip{margin:6px auto 0;padding:6px 0 2px;border-radius:0;background:transparent;box-shadow:none;border:none}
   .rizq-vid-strip-hint{display:none}
-  .rizq-vcard{flex-basis:min(168px,52vw)}
+  .rizq-vcard{flex-basis:min(210px,58vw)}
+  .rizq-vcard-thumb .rizq-vcard-contacts,
+  .rizq-vcard-thumb .rzq-adx-actions{top:56%;bottom:auto;padding:5px 8px;gap:8px}
+  .rizq-vcard-thumb .rizq-vcard-tel,
+  .rizq-vcard-thumb .rizq-vcard-wa,
+  .rizq-vcard-thumb .rzq-adx-tel,
+  .rizq-vcard-thumb .rzq-adx-wa{width:28px;height:28px}
   .rizq-vid-strip-btn{padding:6px 10px;font-size:11.5px}
+}
+/* تابلت: نفس 6 بطاقات أكبر */
+@media(min-width:700px) and (max-width:1100px){
+  .rizq-vid-strip{
+    width:min(100%,calc(100vw - 20px))!important;
+    max-width:min(100%,calc(100vw - 20px))!important;
+  }
+  .rizq-vcard{flex:0 0 calc((100% - 50px) / 6);gap:5px}
+  .rizq-vcard-play{width:42px;height:42px;font-size:14px}
+  .rizq-vcard-thumb .rizq-vcard-contacts,
+  .rizq-vcard-thumb .rzq-adx-actions{top:57%;padding:5px 9px;gap:9px}
 }
 
 /* ── SEARCH BAR (Amazon style) ── */
@@ -15115,7 +15175,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_packages_ui.js?v=23.0"></script>
 <script src="rizq_merchant_activities.js?v=23.0"></script>
 <script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo14"></script>
+<script src="rizq_video_ads.js?v=promo15"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=24.1"></script>
 <script src="rizq_disclaimer.js"></script>

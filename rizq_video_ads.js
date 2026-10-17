@@ -348,7 +348,10 @@
   // ════════════════════════════════════════
   //  ② STRIP — بطاقات فيديو عمودية (بديل الموضع الثاني)
   // ════════════════════════════════════════
-  var STRIP_TARGET = 7;
+  var STRIP_TARGET = 6;
+  var STRIP_DEMO_PHONE = '+22244882212';
+  var STRIP_PHONE_SVG = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.8 21 3 13.2 3 3.7c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z" fill="currentColor"/></svg>';
+  var STRIP_WA_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.5 2 2 6.3 2 11.6c0 2 .6 3.9 1.7 5.5L2 22l5.1-1.6c1.5.8 3.2 1.2 4.9 1.2 5.5 0 10-4.3 10-9.6S17.5 2 12 2zm0 17.5c-1.5 0-3-.4-4.3-1.2l-.3-.2-3.2 1 1-3.1-.2-.3c-.9-1.4-1.4-3-1.4-4.6 0-4.3 3.7-7.8 8.4-7.8s8.4 3.5 8.4 7.8-3.7 7.8-8.4 7.8zm4.6-5.8c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.2.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.8-.7-1.4-1.6-1.6-1.9-.2-.3 0-.4.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.2.7 3 .6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.2-.3-.2-.6-.3z"/></svg>';
 
   /** مسار نسبي حتى يعمل على GitHub Pages (/rizq-platform/) وليس فقط على الجذر */
   function resolvePromoUrl(url) {
@@ -364,22 +367,47 @@
     }
   }
 
+  function digitsOnly(v) {
+    return String(v == null ? '' : v).replace(/\D/g, '');
+  }
+
+  function stripContactPhone(ad) {
+    if (!ad) return '';
+    return String(
+      ad.phone
+      || (ad.sellerContact && (ad.sellerContact.phone || ad.sellerContact.tel))
+      || ad.tel
+      || ''
+    ).trim();
+  }
+
+  function stripContactWa(ad) {
+    if (!ad) return '';
+    return String(
+      ad.whatsapp
+      || (ad.sellerContact && (ad.sellerContact.whatsapp || ad.sellerContact.phone))
+      || ad.phone
+      || ad.tel
+      || ''
+    ).trim();
+  }
+
   function demoStripAds() {
-    /* 7 بطاقات أكبر — 6 ملفات mp4 شغّالة (+ واحدة بإعادة استخدام) */
+    /* 6 بطاقات ظاهرة أكبر — ملف mp4 لكل بطاقة بلا تكرار */
+    var demoPhone = STRIP_DEMO_PHONE;
     return [
-      { advertiser: 'محلات رزق', title: 'واجهة محلك', loc: 'نوّاكشوط', url: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4', active: true, demo: true },
-      { advertiser: 'مكاتب رزق', title: 'مكتب أعمالك', loc: 'موريتانيا', url: 'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4', active: true, demo: true },
-      { advertiser: 'معارض رزق', title: 'معرضك الافتراضي', loc: 'كل الولايات', url: 'rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4', active: true, demo: true },
-      { advertiser: 'رزق', title: 'واجهات المنصة', loc: 'Rizq ADS', url: 'rizq-assets/promo/rizq-public-interfaces-promo-light.mp4', active: true, demo: true },
-      { advertiser: 'رزق', title: 'منصة رزق', loc: 'موريتانيا', url: 'rizq-assets/promo/rizq-platform-promo-light.mp4', active: true, demo: true },
-      { advertiser: 'رزق', title: 'وحدات المنصة', loc: 'شرح عملي', url: 'rizq-assets/promo/rizq-modules-promo-demo-light.mp4', active: true, demo: true },
-      { advertiser: 'محلات رزق', title: 'متجرك بالفيديو', loc: 'عروض حيّة', url: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4', active: true, demo: true }
+      { advertiser: 'محلات رزق', title: 'واجهة محلك', loc: 'نوّاكشوط', url: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4', phone: demoPhone, whatsapp: demoPhone, active: true, demo: true },
+      { advertiser: 'مكاتب رزق', title: 'مكتب أعمالك', loc: 'موريتانيا', url: 'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4', phone: demoPhone, whatsapp: demoPhone, active: true, demo: true },
+      { advertiser: 'معارض رزق', title: 'معرضك الافتراضي', loc: 'كل الولايات', url: 'rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4', phone: demoPhone, whatsapp: demoPhone, active: true, demo: true },
+      { advertiser: 'رزق', title: 'واجهات المنصة', loc: 'Rizq ADS', url: 'rizq-assets/promo/rizq-public-interfaces-promo-light.mp4', phone: demoPhone, whatsapp: demoPhone, active: true, demo: true },
+      { advertiser: 'رزق', title: 'منصة رزق', loc: 'موريتانيا', url: 'rizq-assets/promo/rizq-platform-promo-light.mp4', phone: demoPhone, whatsapp: demoPhone, active: true, demo: true },
+      { advertiser: 'رزق', title: 'وحدات المنصة', loc: 'شرح عملي', url: 'rizq-assets/promo/rizq-modules-promo-demo-light.mp4', phone: demoPhone, whatsapp: demoPhone, active: true, demo: true }
     ].map(function (a) {
       return Object.assign({}, a, { url: resolvePromoUrl(a.url) });
     });
   }
 
-  /** دائماً املأ الشريط إلى 7 بطاقات — لا تترك إعلاناً واحداً من الإعدادات يستبدل كل الأمثلة */
+  /** دائماً املأ الشريط إلى 6 بطاقات — لا تترك إعلاناً واحداً من الإعدادات يستبدل كل الأمثلة */
   function buildStripPlaylist() {
     var live = (stripAds || []).filter(function (a) {
       return a && a.url && isDirectVideo(a.url);
@@ -568,7 +596,7 @@
     var nextBtn = document.getElementById('rizq-vid-strip-next');
     if (!root || !track) return false;
 
-    // دائماً 7 بطاقات ظاهرة أكبر: إعلانات حيّة أولاً ثم أمثلة شغّالة تملأ الباقي
+    // دائماً 6 بطاقات ظاهرة أكبر: إعلانات حيّة أولاً ثم أمثلة شغّالة تملأ الباقي
     var ads = buildStripPlaylist();
 
     var isFr = (document.documentElement.lang || '').toLowerCase().indexOf('fr') === 0
@@ -578,19 +606,28 @@
     var lblPlay = isFr ? 'Lire' : 'تشغيل';
     var lblMute = isFr ? 'Couper' : 'كتم';
     var lblFs = isFr ? 'Agrandir' : 'تكبير';
-    var lblContact = isFr ? 'Contacter' : 'تواصل';
+    var lblCall = isFr ? 'Appeler' : 'اتصال';
+    var lblWa = 'WhatsApp';
     var countTpl = isFr
       ? function (n) { return n + ' vidéo' + (n > 1 ? 's' : '') + ' disponible' + (n > 1 ? 's' : ''); }
       : function (n) { return n === 1 ? 'فيديو واحد متاح' : (n + ' فيديوهات متاحة'); };
 
-    function contactHref(ad) {
-      if (ad.whatsapp) {
-        var wa = String(ad.whatsapp).replace(/\D/g, '');
-        return 'https://wa.me/' + wa;
-      }
-      if (ad.contact) return ad.contact;
-      if (ad.link) return ad.link;
-      return 'rizq_ads_info.html';
+    function contactActionsHtml(ad) {
+      var phone = stripContactPhone(ad) || STRIP_DEMO_PHONE;
+      var wa = stripContactWa(ad) || phone || STRIP_DEMO_PHONE;
+      var telDigits = digitsOnly(phone);
+      var waDigits = digitsOnly(wa) || telDigits;
+      var telHref = telDigits ? ('tel:+' + telDigits.replace(/^00/, '')) : 'rizq_ads_info.html';
+      var waHref = waDigits ? ('https://wa.me/' + waDigits.replace(/^00/, '')) : 'rizq_ads_info.html';
+      return ''
+        + '<div class="rizq-vcard-contacts rzq-adx-actions" role="group" aria-label="' + esc(isFr ? 'Contact' : 'تواصل') + '">'
+        +   '<a class="rizq-vcard-tel rzq-adx-tel" data-act="tel" href="' + esc(telHref) + '" aria-label="' + esc(lblCall) + '" title="' + esc(lblCall) + '">'
+        +     STRIP_PHONE_SVG
+        +   '</a>'
+        +   '<a class="rizq-vcard-wa rzq-adx-wa" data-act="wa" href="' + esc(waHref) + '" target="_blank" rel="noopener" aria-label="' + esc(lblWa) + '" title="' + esc(lblWa) + '">'
+        +     STRIP_WA_SVG
+        +   '</a>'
+        + '</div>';
     }
 
     track.innerHTML = '';
@@ -617,12 +654,9 @@
             '<button type="button" class="rizq-vcard-act rizq-vcard-act--fs" data-act="fs" aria-label="' + esc(lblFs) + '" title="' + esc(lblFs) + '">' +
               '<span class="rizq-vcard-act-ico">⛶</span><span class="rizq-vcard-act-lbl">' + esc(lblFs) + '</span>' +
             '</button>' +
-            '<a class="rizq-vcard-act rizq-vcard-act--contact" data-act="contact" href="' + esc(contactHref(ad)) + '"' +
-              (contactHref(ad).indexOf('http') === 0 ? ' target="_blank" rel="noopener"' : '') +
-              ' aria-label="' + esc(lblContact) + '">' +
-              '<span class="rizq-vcard-act-ico">✉</span><span class="rizq-vcard-act-lbl">' + esc(lblContact) + '</span>' +
-            '</a>' +
           '</div>' +
+          /* اتصال + واتساب فوق مساحة الفيديو — تحت زر التشغيل */
+          contactActionsHtml(ad) +
           '<div class="rizq-vcard-cap">' + esc(title) + '</div>' +
         '</div>' +
         '<div class="rizq-vcard-name">' + esc(title) + '</div>' +
@@ -632,7 +666,8 @@
       var btnPlay = card.querySelector('[data-act="play"]');
       var btnMute = card.querySelector('[data-act="mute"]');
       var btnFs = card.querySelector('[data-act="fs"]');
-      var btnContact = card.querySelector('[data-act="contact"]');
+      var btnTel = card.querySelector('[data-act="tel"]');
+      var btnWa = card.querySelector('[data-act="wa"]');
 
       function syncActionUi() {
         if (!video) return;
@@ -689,16 +724,22 @@
           openStripLightbox(card, ad, isFr);
         });
       }
-      if (btnContact) {
-        btnContact.addEventListener('click', function (ev) {
+      if (btnTel) {
+        btnTel.addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          if (ad.accountId) trackEvent(ad.accountId, 'click');
+        });
+      }
+      if (btnWa) {
+        btnWa.addEventListener('click', function (ev) {
           ev.stopPropagation();
           if (ad.accountId) trackEvent(ad.accountId, 'click');
         });
       }
 
-      // جوال: لمس البطاقة (خارج الأزرار) يشغّل/يوقف ويعرض الأدوات
+      // جوال: لمس البطاقة (خارج الأزرار/جهات الاتصال) يشغّل/يوقف ويعرض الأدوات
       card.addEventListener('click', function (ev) {
-        if (ev.target.closest && ev.target.closest('.rizq-vcard-actions')) return;
+        if (ev.target.closest && ev.target.closest('.rizq-vcard-actions,.rizq-vcard-contacts,.rzq-adx-actions,.rzq-adx-tel,.rzq-adx-wa')) return;
         if (window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
           return; // سطح المكتب يعتمد على hover
         }
@@ -743,7 +784,7 @@
 
     function scrollByCard(dir) {
       var card = track.querySelector('.rizq-vcard');
-      var step = card ? card.getBoundingClientRect().width + 12 : 160;
+      var step = card ? card.getBoundingClientRect().width + 10 : 180;
       var rtl = document.documentElement.getAttribute('dir') === 'rtl';
       var delta = step * dir * (rtl ? -1 : 1);
       track.scrollBy({ left: delta, behavior: 'smooth' });
