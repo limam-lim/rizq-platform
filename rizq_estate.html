@@ -650,7 +650,7 @@ button{font:inherit;border:0;background:none;color:inherit}
           <span class="est-brand-sub">RIZQ ESTATE</span>
         </span>
       </a>
-      <p id="est-foot-blurb">نموذج بوابة عقارية فاخرة على رزق — عرض بصري كامل للوكالات والبائعين في موريتانيا.</p>
+      <p id="est-foot-blurb">سوق العقارات على رزق — وكالات ومعروضات وتواصل مباشر في موريتانيا.</p>
     </div>
     <div>
       <h4>استكشف</h4>
@@ -673,7 +673,7 @@ button{font:inherit;border:0;background:none;color:inherit}
       <a href="rizq_landing_v8.html#virtual-offices">المكاتب</a>
     </div>
   </div>
-  <div class="est-foot-bar" id="est-foot-bar">© 2026 رزق | Rizq — نموذج بوابة العقارات · RIZQ ESTATE</div>
+  <div class="est-foot-bar" id="est-foot-bar">© 2026 رزق | Rizq — سوق العقارات · RIZQ ESTATE</div>
 </footer>
 
 <!-- معاينة عقار -->
@@ -915,13 +915,13 @@ button{font:inherit;border:0;background:none;color:inherit}
     var footBlurb = document.getElementById('est-foot-blurb');
     if(footBlurb){
       footBlurb.textContent = isDemo
-        ? 'نموذج بوابة عقارية فاخرة على رزق — عرض بصري كامل للوكالات والبائعين في موريتانيا.'
+        ? 'سوق العقارات على رزق — وكالات ومعروضات وتواصل مباشر في موريتانيا.'
         : 'وكالات عقارية على رزق — معروضات واضحة وتواصل مباشر مع الوكالة.';
     }
     var footBar = document.getElementById('est-foot-bar');
     if(footBar){
       footBar.textContent = isDemo
-        ? '© 2026 رزق | Rizq — نموذج بوابة العقارات · RIZQ ESTATE'
+        ? '© 2026 رزق | Rizq — سوق العقارات · RIZQ ESTATE'
         : '© 2026 رزق | Rizq — سوق العقارات · RIZQ ESTATE';
     }
   }
@@ -1442,8 +1442,8 @@ button{font:inherit;border:0;background:none;color:inherit}
     if(lb) lb.setAttribute('aria-label', fr ? 'Image agrandie' : 'صورة مكبرة');
 
     tx('#est-foot-blurb',
-      'نموذج بوابة عقارية فاخرة على رزق — عرض بصري كامل للوكالات والبائعين في موريتانيا.',
-      'Vitrine immobilière premium sur Rizq — agences et vendeurs en Mauritanie.');
+      'سوق العقارات على رزق — وكالات ومعروضات وتواصل مباشر في موريتانيا.',
+      'Marché immobilier sur Rizq — agences, biens et contact direct en Mauritanie.');
     var footCols = document.querySelectorAll('.est-foot-inner > div');
     if(footCols[1]){
       var h4a = footCols[1].querySelector('h4');
@@ -1472,8 +1472,8 @@ button{font:inherit;border:0;background:none;color:inherit}
       if(fc[3]) fc[3].textContent = fr ? 'Bureaux' : 'المكاتب';
     }
     tx('#est-foot-bar',
-      '© 2026 رزق | Rizq — نموذج بوابة العقارات · RIZQ ESTATE',
-      '© 2026 Rizq — Portail immobilier · RIZQ ESTATE');
+      '© 2026 رزق | Rizq — سوق العقارات · RIZQ ESTATE',
+      '© 2026 Rizq — Marché immobilier · RIZQ ESTATE');
 
     if(window._rizqEstateProfile){
       paintPayments(window._rizqEstatePaymentMethods || window._rizqEstateProfile.paymentMethods);
