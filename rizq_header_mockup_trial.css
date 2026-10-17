@@ -26,10 +26,10 @@ body.rizq-mockup-hdr-trial .rizq-splash{
 /* إعادة هوية المنصة تحت الهيدر الجديد: رزق + السوق + الشعار + بيع/اشتر/تميّز */
 body.rizq-mockup-hdr-trial .hero{
   display:block!important;
-  padding-top: calc(var(--rizq-mock-hdr-h) + 28px)!important;
+  padding-top: calc(var(--rizq-mock-hdr-h) + 40px)!important;
 }
 body.rizq-mockup-hdr-trial .hero-brand-row{
-  margin-top: 10px!important;
+  margin-top: 18px!important;
 }
 /* وضوح: إيقاف لمعة/طفو تشوّش الشعار أثناء التجربة */
 body.rizq-mockup-hdr-trial .hero-headline::after{
