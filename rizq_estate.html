@@ -19,15 +19,19 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{
+body,
+body.rizq-mockup-hdr-trial{
   font-family:'Cairo',system-ui,sans-serif;background:var(--ink);color:var(--text);
   min-height:100vh;
   background-image:
     radial-gradient(1200px 500px at 90% -10%,rgba(201,168,76,.12),transparent 55%),
     radial-gradient(900px 420px at 10% 20%,rgba(27,58,107,.35),transparent 50%),
-    linear-gradient(180deg,#060d18 0%,#0a1424 40%,#07111f 100%);
-  background-attachment:fixed;
+    linear-gradient(180deg,#060d18 0%,#0a1424 40%,#07111f 100%)!important;
+  background-attachment:fixed!important;
+  background-color:#060d18!important;
 }
+.est-section-head h2{color:#fff!important}
+.est-section-head p{color:var(--muted)!important}
 button,a,[role="button"]{cursor:pointer}
 img{display:block;max-width:100%}
 button{font:inherit;border:0;background:none;color:inherit}
@@ -346,7 +350,7 @@ button{font:inherit;border:0;background:none;color:inherit}
 }
 </style>
 </head>
-<body>
+<body class="rizq-page-dark">
 
 <header class="est-top">
   <div class="est-top-inner">
@@ -770,10 +774,10 @@ button{font:inherit;border:0;background:none;color:inherit}
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.38"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.39"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <script src="rizq_header.js?v=31.0" defer></script>
-<script src="rizq_header_mockup_trial.js?v=5.38" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.39" defer></script>
 <script src="rizq_pwa.js" defer></script>
 </body>
 </html>
