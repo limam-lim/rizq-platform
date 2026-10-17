@@ -21,7 +21,7 @@
 html{scroll-behavior:smooth}
 body{
   font-family:'Cairo',system-ui,sans-serif;background:var(--ink);color:var(--text);
-  min-height:100vh;cursor:auto;
+  min-height:100vh;
   background-image:
     radial-gradient(1200px 500px at 90% -10%,rgba(201,168,76,.12),transparent 55%),
     radial-gradient(900px 420px at 10% 20%,rgba(27,58,107,.35),transparent 50%),
@@ -30,30 +30,40 @@ body{
 }
 button,a,[role="button"]{cursor:pointer}
 img{display:block;max-width:100%}
+button{font:inherit;border:0;background:none;color:inherit}
 
-/* شريط علوي */
+/* ── Header ── */
 .est-top{
-  position:sticky;top:0;z-index:40;
-  background:linear-gradient(180deg,rgba(6,13,24,.97),rgba(6,13,24,.88));
+  position:sticky;top:0;z-index:50;
+  background:linear-gradient(180deg,rgba(6,13,24,.98),rgba(6,13,24,.9));
   backdrop-filter:blur(16px) saturate(1.2);
   border-bottom:1px solid rgba(201,168,76,.22);
 }
 .est-top-inner{
   max-width:1180px;margin:0 auto;padding:12px 20px;
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-  direction:ltr;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
 }
-.est-brand{display:flex;align-items:center;gap:10px;text-decoration:none;direction:ltr}
-.est-brand img{width:40px;height:40px;border-radius:12px;object-fit:contain;
+.est-brand{display:flex;align-items:center;gap:10px;text-decoration:none;direction:ltr;flex-shrink:0}
+.est-brand img{width:36px;height:36px;border-radius:11px;object-fit:contain;
   background:linear-gradient(160deg,#1a2d4d,#0a1324);
-  box-shadow:0 0 0 1.5px rgba(240,215,138,.5),0 0 18px rgba(201,168,76,.25)}
-.est-brand-ar{font-weight:900;font-size:20px;color:var(--gold);line-height:1}
-.est-brand-sub{font-size:8px;letter-spacing:1.8px;color:rgba(201,168,76,.75);font-style:italic;text-transform:uppercase}
-.est-top-actions{display:flex;gap:8px;align-items:center}
+  box-shadow:0 0 0 1.5px rgba(240,215,138,.55),0 0 16px rgba(201,168,76,.22)}
+.est-brand-ar{font-weight:900;font-size:19px;color:var(--gold);line-height:1;display:block}
+.est-brand-sub{font-size:7.5px;letter-spacing:1.6px;color:rgba(201,168,76,.75);font-style:italic;text-transform:uppercase}
+.est-nav{
+  display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:center;
+}
+.est-nav a{
+  color:rgba(232,237,245,.78);text-decoration:none;font:800 12.5px Cairo,sans-serif;
+  padding:8px 12px;border-radius:999px;border:1px solid transparent;transition:.2s;
+}
+.est-nav a:hover,.est-nav a.is-on{
+  color:var(--gold2);border-color:rgba(201,168,76,.35);background:rgba(201,168,76,.08);
+}
+.est-top-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
 .est-chip{
   border:1px solid var(--line);background:rgba(201,168,76,.08);color:var(--gold2);
   border-radius:999px;padding:8px 14px;font:700 12px/1 Cairo,sans-serif;text-decoration:none;
-  transition:background .2s,transform .2s,box-shadow .2s;
+  transition:background .2s,transform .2s;
 }
 .est-chip:hover{background:rgba(201,168,76,.18);transform:translateY(-1px)}
 .est-chip.solid{
@@ -61,11 +71,8 @@ img{display:block;max-width:100%}
   box-shadow:0 8px 22px rgba(201,168,76,.28);
 }
 
-/* بطل عقاري سينمائي */
-.est-hero{
-  position:relative;min-height:min(86vh,780px);overflow:hidden;
-  display:flex;align-items:flex-end;
-}
+/* ── Hero ── */
+.est-hero{position:relative;min-height:min(84vh,760px);overflow:hidden;display:flex;align-items:flex-end}
 .est-hero-media{position:absolute;inset:0}
 .est-hero-media img{
   width:100%;height:100%;object-fit:cover;
@@ -80,224 +87,262 @@ img{display:block;max-width:100%}
     linear-gradient(180deg,rgba(6,13,24,.2) 0%,rgba(6,13,24,.08) 28%,rgba(6,13,24,.55) 68%,rgba(6,13,24,.96) 100%),
     linear-gradient(90deg,rgba(6,13,24,.72) 0%,rgba(6,13,24,.25) 42%,transparent 68%);
 }
-.est-hero-media::after{
-  content:'';position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.35;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.45'/%3E%3C/svg%3E");
-  mix-blend-mode:overlay;
-}
 .est-hero-copy{
   position:relative;z-index:2;width:100%;max-width:1180px;margin:0 auto;
-  padding:56px 20px 64px;
-  animation:estRise .9s ease both;
+  padding:48px 20px 40px;animation:estRise .9s ease both;
 }
 @keyframes estRise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .est-kicker{
   display:inline-flex;align-items:center;gap:8px;
   border:1px solid rgba(201,168,76,.45);background:rgba(11,28,51,.55);
   color:var(--gold2);border-radius:999px;padding:9px 16px;font:800 12px Cairo,sans-serif;
-  margin-bottom:18px;backdrop-filter:blur(10px);
-  box-shadow:0 0 0 4px rgba(201,168,76,.06);
+  margin-bottom:16px;backdrop-filter:blur(10px);
 }
-.est-kicker i{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(201,168,76,.22);animation:estPulse 2.4s ease infinite}
-@keyframes estPulse{0%,100%{box-shadow:0 0 0 4px rgba(201,168,76,.18)}50%{box-shadow:0 0 0 7px rgba(201,168,76,.08)}}
+.est-kicker i{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(201,168,76,.22)}
 .est-hero h1{
-  font-family:var(--display);font-size:clamp(38px,6.5vw,72px);font-weight:700;line-height:1.12;max-width:15ch;
-  letter-spacing:0;margin-bottom:14px;
-  text-shadow:0 12px 48px rgba(0,0,0,.55);
+  font-family:var(--display);font-size:clamp(36px,6.2vw,68px);font-weight:700;line-height:1.12;max-width:15ch;
+  margin-bottom:12px;text-shadow:0 12px 48px rgba(0,0,0,.55);
 }
 .est-hero h1 em{
   font-style:normal;
   background:linear-gradient(135deg,#F3E2A8,#C9A84C 55%,#E8C96A);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.est-hero-lead{
-  max-width:40ch;font-size:clamp(15px,2vw,18px);line-height:1.75;color:var(--muted);margin-bottom:24px;
-}
-.est-hero-stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}
+.est-hero-lead{max-width:42ch;font-size:clamp(15px,2vw,17px);line-height:1.75;color:var(--muted);margin-bottom:20px}
+.est-hero-stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
 .est-stat{
-  min-width:118px;padding:14px 16px;border-radius:16px;
-  background:rgba(14,26,44,.7);border:1px solid rgba(201,168,76,.2);
-  backdrop-filter:blur(12px);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.06);
-  transition:border-color .25s,transform .25s;
+  min-width:110px;padding:12px 14px;border-radius:14px;
+  background:rgba(14,26,44,.72);border:1px solid rgba(201,168,76,.2);backdrop-filter:blur(12px);
 }
-.est-stat:hover{border-color:rgba(201,168,76,.45);transform:translateY(-2px)}
-.est-stat b{display:block;font-size:22px;color:var(--gold2);font-weight:900}
+.est-stat b{display:block;font-size:20px;color:var(--gold2);font-weight:900}
 .est-stat span{font-size:12px;color:var(--muted)}
-.est-hero-cta{display:flex;flex-wrap:wrap;gap:10px}
+.est-hero-cta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px}
 .est-btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  border-radius:14px;padding:14px 22px;font:800 14px Cairo,sans-serif;text-decoration:none;border:0;
+  border-radius:14px;padding:13px 20px;font:800 14px Cairo,sans-serif;text-decoration:none;border:0;
   transition:transform .2s,box-shadow .2s,filter .2s;
 }
 .est-btn:hover{transform:translateY(-2px)}
 .est-btn-gold{
-  background:linear-gradient(135deg,#F3E2A8,#C9A84C 45%,#E8C96A);
-  color:#0B1C33;box-shadow:0 12px 28px rgba(201,168,76,.32);
+  background:linear-gradient(135deg,#F3E2A8,#C9A84C 45%,#E8C96A);color:#0B1C33;
+  box-shadow:0 12px 28px rgba(201,168,76,.32);
 }
-.est-btn-gold:hover{filter:brightness(1.05);box-shadow:0 16px 34px rgba(201,168,76,.4)}
 .est-btn-ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.16)}
 .est-btn-ghost:hover{background:rgba(255,255,255,.12)}
 
-/* محتوى */
-.est-wrap{max-width:1180px;margin:0 auto;padding:36px 20px 72px;position:relative}
-.est-wrap::before{
-  content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);
-  width:min(180px,40%);height:2px;
-  background:linear-gradient(90deg,transparent,var(--gold),transparent);
-  opacity:.7;
+/* بحث البطل */
+.est-search{
+  display:grid;grid-template-columns:1.2fr 1fr 1fr auto;gap:8px;
+  padding:12px;border-radius:18px;
+  background:rgba(10,20,36,.78);border:1px solid rgba(201,168,76,.3);
+  backdrop-filter:blur(14px);box-shadow:0 18px 40px rgba(0,0,0,.35);
 }
-.est-section-head{margin:8px 0 20px;text-align:center}
-.est-section-head .tag{
-  color:var(--gold2);font:800 12px Cairo,sans-serif;letter-spacing:.6px;margin-bottom:8px;
-  display:inline-block;
+.est-search label{display:flex;flex-direction:column;gap:4px;min-width:0}
+.est-search span{font:800 10px Cairo,sans-serif;color:var(--gold2);letter-spacing:.3px}
+.est-search input,.est-search select{
+  width:100%;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);
+  color:#fff;border-radius:12px;padding:11px 12px;font:700 13px Cairo,sans-serif;outline:none;
 }
-.est-section-head h2{font-family:var(--display);font-size:clamp(28px,3.8vw,42px);font-weight:700;margin-bottom:8px}
-.est-section-head p{color:var(--muted);font-size:15px;line-height:1.65;max-width:42ch;margin:0 auto}
-.est-tabs{
-  display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 0 26px;
+.est-search input:focus,.est-search select:focus{border-color:rgba(201,168,76,.55)}
+.est-search select option{background:#0B1C33;color:#fff}
+.est-search-go{
+  align-self:end;padding:12px 18px;border-radius:12px;font:900 13px Cairo,sans-serif;
+  background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0B1C33;white-space:nowrap;
+  box-shadow:0 8px 18px rgba(201,168,76,.28);
 }
+
+/* ── Content ── */
+.est-wrap{max-width:1180px;margin:0 auto;padding:36px 20px 40px;position:relative}
+.est-section-head{margin:8px 0 18px;text-align:center}
+.est-section-head .tag{color:var(--gold2);font:800 12px Cairo,sans-serif;letter-spacing:.5px;margin-bottom:8px;display:inline-block}
+.est-section-head h2{font-family:var(--display);font-size:clamp(26px,3.6vw,40px);font-weight:700;margin-bottom:8px}
+.est-section-head p{color:var(--muted);font-size:15px;line-height:1.65;max-width:44ch;margin:0 auto}
+
+.est-toolbar{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;
+  margin:0 0 18px;
+}
+.est-tabs{display:flex;flex-wrap:wrap;gap:8px}
 .est-tab{
   border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);
-  color:rgba(255,255,255,.82);border-radius:999px;padding:10px 16px;
-  font:800 13px Cairo,sans-serif;transition:all .2s;
+  color:rgba(255,255,255,.82);border-radius:999px;padding:9px 15px;font:800 13px Cairo,sans-serif;
+  transition:all .2s;
 }
 .est-tab:hover{border-color:rgba(201,168,76,.4);color:var(--gold2)}
 .est-tab.is-active{
   background:linear-gradient(135deg,rgba(201,168,76,.28),rgba(201,168,76,.1));
   border-color:rgba(201,168,76,.6);color:var(--gold3);
-  box-shadow:0 0 0 3px rgba(201,168,76,.08),0 8px 20px rgba(0,0,0,.2);
+  box-shadow:0 0 0 3px rgba(201,168,76,.08);
 }
+.est-deal{display:flex;gap:6px;flex-wrap:wrap}
+.est-deal button{
+  border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:8px 12px;
+  font:800 12px Cairo,sans-serif;color:rgba(255,255,255,.75);background:rgba(255,255,255,.03);
+}
+.est-deal button.is-on{border-color:rgba(201,168,76,.5);color:var(--gold2);background:rgba(201,168,76,.1)}
+.est-count{font:800 13px Cairo,sans-serif;color:var(--muted);min-height:1.2em}
 
-/* شبكة عقارات */
-.est-grid{
-  display:grid;grid-template-columns:repeat(12,1fr);gap:18px;
-}
+.est-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;min-height:120px}
 .est-card{
-  position:relative;grid-column:span 4;border-radius:24px;overflow:hidden;
+  position:relative;grid-column:span 4;border-radius:22px;overflow:hidden;
   background:var(--card);border:1px solid rgba(255,255,255,.07);
-  box-shadow:0 20px 44px rgba(0,0,0,.32);text-decoration:none;color:inherit;
-  transition:transform .3s ease, box-shadow .3s ease, border-color .3s ease;
-  min-height:340px;display:flex;flex-direction:column;
-  animation:estCardIn .55s ease both;
+  box-shadow:0 18px 40px rgba(0,0,0,.3);text-decoration:none;color:inherit;
+  transition:transform .28s,box-shadow .28s,border-color .28s;
+  min-height:340px;display:flex;flex-direction:column;cursor:pointer;text-align:right;
 }
-.est-card:nth-child(1){animation-delay:.02s}
-.est-card:nth-child(2){animation-delay:.08s}
-.est-card:nth-child(3){animation-delay:.14s}
-.est-card:nth-child(4){animation-delay:.2s}
-.est-card:nth-child(5){animation-delay:.26s}
-.est-card:nth-child(6){animation-delay:.32s}
-.est-card:nth-child(7){animation-delay:.38s}
-@keyframes estCardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-.est-card:hover{
-  transform:translateY(-6px);
-  border-color:rgba(201,168,76,.48);
-  box-shadow:0 28px 56px rgba(0,0,0,.42),0 0 0 1px rgba(201,168,76,.18);
-}
-.est-card.featured{grid-column:span 8;min-height:460px}
-.est-card-media{position:relative;flex:1;min-height:220px;overflow:hidden}
-.est-card.featured .est-card-media{min-height:300px}
-.est-card-media img{width:100%;height:100%;object-fit:cover;transition:transform .65s ease}
-.est-card:hover .est-card-media img{transform:scale(1.08)}
+.est-card:hover{transform:translateY(-5px);border-color:rgba(201,168,76,.48);box-shadow:0 26px 52px rgba(0,0,0,.4)}
+.est-card.featured{grid-column:span 8;min-height:440px}
+.est-card-media{position:relative;flex:1;min-height:210px;overflow:hidden}
+.est-card.featured .est-card-media{min-height:280px}
+.est-card-media img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.est-card:hover .est-card-media img{transform:scale(1.07)}
 .est-card-media::after{
   content:'';position:absolute;inset:0;
-  background:
-    linear-gradient(180deg,transparent 35%,rgba(6,13,24,.92) 100%),
-    linear-gradient(90deg,rgba(201,168,76,.08),transparent 40%);
+  background:linear-gradient(180deg,transparent 35%,rgba(6,13,24,.92) 100%);
 }
 .est-badge{
   position:absolute;top:14px;right:14px;z-index:2;
   background:rgba(6,13,24,.75);border:1px solid rgba(201,168,76,.5);
-  color:var(--gold2);border-radius:999px;padding:7px 12px;font:800 11px Cairo,sans-serif;
-  backdrop-filter:blur(10px);
+  color:var(--gold2);border-radius:999px;padding:6px 11px;font:800 11px Cairo,sans-serif;
+  backdrop-filter:blur(8px);
 }
 .est-price{
   position:absolute;bottom:14px;left:14px;z-index:2;
   background:linear-gradient(135deg,#F3E2A8,#C9A84C 50%,#E8C96A);color:#0B1C33;
-  border-radius:12px;padding:9px 13px;font:900 14px Cairo,sans-serif;
-  box-shadow:0 8px 18px rgba(0,0,0,.28);
+  border-radius:12px;padding:8px 12px;font:900 14px Cairo,sans-serif;
+  box-shadow:0 8px 16px rgba(0,0,0,.28);
 }
-.est-card-body{padding:16px 16px 18px}
-.est-card.featured .est-card-body h3{font-size:22px}
-.est-card-body h3{font-size:17px;font-weight:900;margin-bottom:6px;line-height:1.35}
+.est-card-body{padding:15px 16px 16px}
+.est-card-body h3{font-size:16px;font-weight:900;margin-bottom:6px;line-height:1.35}
+.est-card.featured .est-card-body h3{font-size:21px}
 .est-card-body .loc{color:var(--muted);font-size:13px;margin-bottom:10px}
-.est-meta{display:flex;flex-wrap:wrap;gap:8px}
+.est-meta{display:flex;flex-wrap:wrap;gap:7px}
 .est-meta span{
   font-size:12px;font-weight:700;color:rgba(232,237,245,.88);
   background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
   border-radius:999px;padding:5px 10px;
 }
+.est-empty{
+  grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--muted);
+  border:1px dashed rgba(201,168,76,.3);border-radius:18px;background:rgba(255,255,255,.02);
+}
 
-/* معرض صور */
-.est-gallery-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:52px 0 18px;flex-wrap:wrap}
-.est-gallery-head h2{font-family:var(--display);font-size:clamp(26px,3.4vw,36px);font-weight:700}
+/* ثقة */
+.est-trust{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:42px 0 8px;
+}
+.est-trust article{
+  padding:22px 18px;border-radius:18px;border:1px solid rgba(201,168,76,.2);
+  background:linear-gradient(160deg,rgba(16,28,46,.9),rgba(11,28,51,.7));
+}
+.est-trust h3{font-size:16px;font-weight:900;margin:8px 0 6px;color:var(--gold2)}
+.est-trust p{font-size:13px;line-height:1.65;color:var(--muted)}
+.est-trust .ico{font-size:22px}
+
+/* معرض */
+.est-gallery-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:48px 0 16px;flex-wrap:wrap}
+.est-gallery-head h2{font-family:var(--display);font-size:clamp(24px,3.2vw,34px);font-weight:700}
 .est-gallery-head p{color:var(--muted);font-size:14px}
 .est-rail-wrap{
-  overflow:hidden;border-radius:24px;
-  border:1px solid rgba(201,168,76,.18);
-  background:rgba(14,26,44,.55);
-  box-shadow:0 18px 40px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.04);
+  overflow:hidden;border-radius:22px;border:1px solid rgba(201,168,76,.18);
+  background:rgba(14,26,44,.55);box-shadow:0 18px 40px rgba(0,0,0,.28);
 }
-.est-rail{
-  display:flex;gap:14px;overflow-x:auto;padding:14px;scroll-snap-type:x mandatory;
-  scrollbar-width:thin;scrollbar-color:rgba(201,168,76,.5) transparent;
-}
+.est-rail{display:flex;gap:14px;overflow-x:auto;padding:14px;scroll-snap-type:x mandatory;scrollbar-width:thin}
 .est-shot{
-  flex:0 0 min(360px,78vw);scroll-snap-align:start;position:relative;
-  border-radius:18px;overflow:hidden;aspect-ratio:4/3;background:#0a1424;
-  border:1px solid rgba(255,255,255,.06);
-  transition:transform .25s,border-color .25s;
+  flex:0 0 min(340px,78vw);scroll-snap-align:start;position:relative;
+  border-radius:16px;overflow:hidden;aspect-ratio:4/3;background:#0a1424;
+  border:1px solid rgba(255,255,255,.06);cursor:zoom-in;transition:transform .25s,border-color .25s;
 }
 .est-shot:hover{transform:translateY(-3px);border-color:rgba(201,168,76,.4)}
-.est-shot img{width:100%;height:100%;object-fit:cover;transition:transform .5s}
-.est-shot:hover img{transform:scale(1.05)}
+.est-shot img{width:100%;height:100%;object-fit:cover}
 .est-shot figcaption{
-  position:absolute;inset:auto 0 0 0;padding:16px 14px 14px;
-  background:linear-gradient(180deg,transparent,rgba(6,13,24,.92));
-  font:800 13px Cairo,sans-serif;
+  position:absolute;inset:auto 0 0 0;padding:14px;
+  background:linear-gradient(180deg,transparent,rgba(6,13,24,.92));font:800 13px Cairo,sans-serif;
 }
 
-/* وكالة نموذج */
+/* وكالة */
 .est-agency{
-  margin-top:52px;border-radius:28px;overflow:hidden;
-  border:1px solid rgba(201,168,76,.28);
+  margin-top:48px;border-radius:26px;overflow:hidden;border:1px solid rgba(201,168,76,.28);
   background:
-    radial-gradient(700px 260px at 85% 0%,rgba(201,168,76,.2),transparent 58%),
+    radial-gradient(700px 260px at 85% 0%,rgba(201,168,76,.18),transparent 58%),
     linear-gradient(145deg,#121f33,#0B1C33 55%,#0a1628);
-  display:grid;grid-template-columns:1.1fr .9fr;gap:0;
-  box-shadow:0 24px 60px rgba(0,0,0,.35);
+  display:grid;grid-template-columns:1.1fr .9fr;gap:0;box-shadow:0 24px 60px rgba(0,0,0,.35);
 }
-.est-agency-copy{padding:40px 32px}
-.est-agency-copy h2{font-family:var(--display);font-size:clamp(26px,3.4vw,36px);font-weight:700;margin:10px 0 12px}
-.est-agency-copy p{color:var(--muted);line-height:1.8;margin-bottom:20px;max-width:42ch}
+.est-agency-copy{padding:36px 28px}
+.est-agency-copy h2{font-family:var(--display);font-size:clamp(24px,3.2vw,34px);font-weight:700;margin:8px 0 10px}
+.est-agency-copy p{color:var(--muted);line-height:1.8;margin-bottom:16px;max-width:42ch}
+.est-agency-points{display:grid;gap:8px;margin:0 0 18px}
+.est-agency-points li{
+  list-style:none;font:700 13px Cairo,sans-serif;color:rgba(232,237,245,.88);
+  padding:8px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);
+}
 .est-agency-photo{min-height:300px;position:relative}
 .est-agency-photo img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
-.est-agency-photo::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(90deg,rgba(11,28,51,.55),transparent 45%);
+.est-agency-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,28,51,.5),transparent 45%)}
+
+/* Footer */
+.est-foot{
+  margin-top:28px;border-top:1px solid rgba(201,168,76,.18);
+  background:linear-gradient(180deg,rgba(10,20,36,.4),rgba(6,13,24,.95));
+}
+.est-foot-inner{
+  max-width:1180px;margin:0 auto;padding:36px 20px 24px;
+  display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:24px;
+}
+.est-foot h4{color:var(--gold2);font-size:14px;margin-bottom:12px}
+.est-foot a{display:block;color:rgba(232,237,245,.7);text-decoration:none;font:700 13px Cairo,sans-serif;margin:0 0 8px}
+.est-foot a:hover{color:var(--gold2)}
+.est-foot p{color:var(--muted);font-size:13px;line-height:1.7;max-width:36ch}
+.est-foot-bar{
+  border-top:1px solid rgba(255,255,255,.06);text-align:center;
+  padding:16px 20px 28px;color:rgba(232,237,245,.45);font-size:12px;
 }
 
-.est-foot{
-  text-align:center;padding:28px 20px 56px;color:rgba(232,237,245,.55);font-size:13px;
+/* Modal / lightbox */
+.est-overlay{
+  position:fixed;inset:0;z-index:80;background:rgba(3,8,16,.78);
+  backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:18px;
 }
-.est-foot a{color:var(--gold2);text-decoration:none;font-weight:800}
+.est-overlay.is-open{display:flex}
+.est-modal{
+  width:min(920px,100%);max-height:min(92vh,820px);overflow:auto;border-radius:22px;
+  background:linear-gradient(160deg,#121f33,#0a1628);border:1px solid rgba(201,168,76,.35);
+  box-shadow:0 30px 80px rgba(0,0,0,.55);position:relative;
+}
+.est-modal-close{
+  position:absolute;top:12px;left:12px;z-index:2;width:38px;height:38px;border-radius:999px;
+  background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:20px;
+}
+.est-modal-media{position:relative;aspect-ratio:16/10;background:#07111f}
+.est-modal-media img{width:100%;height:100%;object-fit:cover}
+.est-modal-body{padding:22px 22px 26px}
+.est-modal-body h3{font-family:var(--display);font-size:clamp(22px,3vw,30px);margin:0 0 8px}
+.est-modal-price{display:inline-block;margin:8px 0 14px;padding:8px 12px;border-radius:12px;
+  background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0B1C33;font:900 15px Cairo,sans-serif}
+.est-modal-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.est-lb-img{max-width:min(1100px,96vw);max-height:88vh;border-radius:16px;object-fit:contain;
+  box-shadow:0 24px 60px rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.25)}
 
 @media(max-width:980px){
+  .est-search{grid-template-columns:1fr 1fr}
+  .est-search-go{grid-column:1/-1}
   .est-card,.est-card.featured{grid-column:span 6}
+  .est-trust{grid-template-columns:1fr}
   .est-agency{grid-template-columns:1fr}
-  .est-agency-photo{min-height:220px;position:relative}
+  .est-agency-photo{min-height:220px}
   .est-agency-photo::after{background:linear-gradient(180deg,transparent,rgba(11,28,51,.35))}
+  .est-foot-inner{grid-template-columns:1fr 1fr}
+  .est-nav{display:none}
 }
 @media(max-width:640px){
   .est-card,.est-card.featured{grid-column:span 12}
-  .est-hero{min-height:90vh}
-  .est-top-inner{padding:10px 14px}
+  .est-hero{min-height:88vh}
+  .est-search{grid-template-columns:1fr}
+  .est-foot-inner{grid-template-columns:1fr}
   .est-chip.nav-hide-sm{display:none}
-  .est-agency-copy{padding:28px 20px}
 }
 @media(prefers-reduced-motion:reduce){
-  .est-hero-media img,.est-kicker i,.est-card,.est-hero-copy{animation:none!important}
-  .est-card:hover,.est-shot:hover{transform:none}
+  .est-hero-media img,.est-hero-copy,.est-card{animation:none!important}
 }
 </style>
 </head>
@@ -305,15 +350,21 @@ img{display:block;max-width:100%}
 
 <header class="est-top">
   <div class="est-top-inner">
-    <a class="est-brand" href="rizq_landing_v8.html">
-      <img src="rizq-mark-512.png?v=23.0" width="40" height="40" alt=""/>
+    <a class="est-brand" href="rizq_landing_v8.html" aria-label="رزق">
+      <img src="rizq-mark-inset.png?v=1" width="36" height="36" alt=""/>
       <span>
         <span class="est-brand-ar">رزق</span>
         <span class="est-brand-sub">RIZQ ESTATE</span>
       </span>
     </a>
+    <nav class="est-nav" aria-label="أقسام بوابة العقارات">
+      <a href="#est-listings" class="is-on">العقارات</a>
+      <a href="#est-gallery">معرض الصور</a>
+      <a href="#est-agency">الوكالات</a>
+      <a href="#est-trust">لماذا رزق</a>
+    </nav>
     <div class="est-top-actions">
-      <a class="est-chip nav-hide-sm" href="rizq_landing_v8.html#virtual-estate">بوابة العقارات</a>
+      <a class="est-chip nav-hide-sm" href="rizq_landing_v8.html#virtual-estate">بوابة رزق</a>
       <a class="est-chip" href="rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA">كل الإعلانات</a>
       <a class="est-chip solid" href="rizq_post.html">اعرض عقارك</a>
     </div>
@@ -325,9 +376,9 @@ img{display:block;max-width:100%}
     <img src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1800&q=80" alt="فيلا فاخرة عند الغروب" fetchpriority="high"/>
   </div>
   <div class="est-hero-copy">
-    <div class="est-kicker"><i></i> بوابة العقارات · نموذج فاخر</div>
+    <div class="est-kicker"><i></i> بوابة العقارات · نموذج مكتمل</div>
     <h1>مساحات تليق بك — <em>على رزق</em></h1>
-    <p class="est-hero-lead">واجهة عقارية بصور واسعة وتفاصيل واضحة: شقق، فلل، أراضي ومحلات — حيث يبحث المشترون بجدية في موريتانيا.</p>
+    <p class="est-hero-lead">ابحث، صفّ، واستعرض التفاصيل بصور واسعة — شقق وفلل وأراضي ومحلات حيث يبحث المشترون بجدية في موريتانيا.</p>
     <div class="est-hero-stats" aria-label="أرقام نموذج">
       <div class="est-stat"><b>+120</b><span>عرض عقاري</span></div>
       <div class="est-stat"><b>8</b><span>ولايات مغطاة</span></div>
@@ -337,6 +388,34 @@ img{display:block;max-width:100%}
       <a class="est-btn est-btn-gold" href="#est-listings">استكشف العقارات</a>
       <a class="est-btn est-btn-ghost" href="rizq_landing_v8.html#virtual-estate">العودة لبوابة رزق</a>
     </div>
+    <form class="est-search" id="est-search" role="search" aria-label="بحث العقارات">
+      <label>
+        <span>الكلمة أو الحي</span>
+        <input type="search" id="est-q" name="q" placeholder="مثال: تفرغ زينة، فيلا، محل…" autocomplete="off"/>
+      </label>
+      <label>
+        <span>الولاية / المدينة</span>
+        <select id="est-city" name="city">
+          <option value="">كل المواقع</option>
+          <option>نواكشوط الغربية</option>
+          <option>تفرغ زينة</option>
+          <option>لكصر</option>
+          <option>القطب</option>
+          <option>نواذيبو</option>
+          <option>كيفة</option>
+          <option>سوق العاصمة</option>
+        </select>
+      </label>
+      <label>
+        <span>نوع العرض</span>
+        <select id="est-deal" name="deal">
+          <option value="all">الكل</option>
+          <option value="sale">للبيع</option>
+          <option value="rent">للكراء</option>
+        </select>
+      </label>
+      <button type="submit" class="est-search-go">🔎 ابحث الآن</button>
+    </form>
   </div>
 </section>
 
@@ -344,34 +423,64 @@ img{display:block;max-width:100%}
   <div class="est-section-head" id="est-listings">
     <div class="tag">مجموعة مختارة</div>
     <h2>عقارات بصور تروي القصة</h2>
-    <p>نموذج عرض فاخر — بطاقات كبيرة، أسعار واضحة، وتفاصيل سريعة قبل التواصل.</p>
+    <p>بطاقات كبيرة، أسعار واضحة، وتفاصيل سريعة — اضغط أي عقار لفتح المعاينة الكاملة.</p>
   </div>
 
-  <div class="est-tabs" role="tablist" aria-label="تصفية العقارات">
-    <button type="button" class="est-tab is-active" data-cat="all" role="tab" aria-selected="true">الكل</button>
-    <button type="button" class="est-tab" data-cat="apartment" role="tab" aria-selected="false">شقق</button>
-    <button type="button" class="est-tab" data-cat="villa" role="tab" aria-selected="false">فلل ومنازل</button>
-    <button type="button" class="est-tab" data-cat="land" role="tab" aria-selected="false">أراضي</button>
-    <button type="button" class="est-tab" data-cat="shop" role="tab" aria-selected="false">محلات</button>
+  <div class="est-toolbar">
+    <div class="est-tabs" role="tablist" aria-label="نوع العقار">
+      <button type="button" class="est-tab is-active" data-cat="all" role="tab" aria-selected="true">الكل</button>
+      <button type="button" class="est-tab" data-cat="apartment" role="tab" aria-selected="false">شقق</button>
+      <button type="button" class="est-tab" data-cat="villa" role="tab" aria-selected="false">فلل ومنازل</button>
+      <button type="button" class="est-tab" data-cat="land" role="tab" aria-selected="false">أراضي</button>
+      <button type="button" class="est-tab" data-cat="shop" role="tab" aria-selected="false">محلات</button>
+    </div>
+    <div class="est-deal" role="group" aria-label="نوع الصفقة">
+      <button type="button" class="is-on" data-deal="all">الكل</button>
+      <button type="button" data-deal="sale">للبيع</button>
+      <button type="button" data-deal="rent">للكراء</button>
+    </div>
   </div>
-
+  <p class="est-count" id="est-count" aria-live="polite"></p>
   <div class="est-grid" id="est-grid"></div>
 
-  <div class="est-gallery-head">
+  <section class="est-trust" id="est-trust" aria-label="لماذا العقارات على رزق">
+    <article>
+      <div class="ico" aria-hidden="true">📸</div>
+      <h3>صور تُقنع من أول نظرة</h3>
+      <p>مساحة وسعر وموقع واضح — المشتري يفهم العرض قبل أن يراسلك.</p>
+    </article>
+    <article>
+      <div class="ico" aria-hidden="true">📍</div>
+      <h3>وصول لمن يبحث بجدية</h3>
+      <p>طلبة كراء ومشترون يصلون عبر بحث العقارات على منصة رزق.</p>
+    </article>
+    <article>
+      <div class="ico" aria-hidden="true">✅</div>
+      <h3>تواصل مباشر بثقة</h3>
+      <p>خصوصية محمية وشارات تساعد على بناء الثقة مع الجدّيين.</p>
+    </article>
+  </section>
+
+  <div class="est-gallery-head" id="est-gallery">
     <div>
       <h2>معرض الصور</h2>
-      <p>لقطات واسعة تُظهر الإضاءة، التشطيب، والموقع — أسلوب العقارات الفاخرة.</p>
+      <p>لقطات واسعة تُظهر الإضاءة والتشطيب — اضغط للتكبير.</p>
     </div>
   </div>
   <div class="est-rail-wrap">
     <div class="est-rail" id="est-rail" aria-label="معرض صور العقارات"></div>
   </div>
 
-  <section class="est-agency" aria-label="وكالة نموذج">
+  <section class="est-agency" id="est-agency" aria-label="وكالة نموذج">
     <div class="est-agency-copy">
       <div class="tag" style="color:var(--gold);font:800 12px Cairo,sans-serif">وكالة نموذج على رزق</div>
       <h2>أطوار للعقارات</h2>
-      <p>واجهة وكالة عقارية كاملة: هوية واضحة، معروضات بصور احترافية، وتواصل مباشر مع من يبحث عن شقة أو فيلا أو أرض. هذا النموذج يوضح كيف تبدو بوابتك على رزق.</p>
+      <p>واجهة وكالة عقارية كاملة: هوية واضحة، معروضات بصور احترافية، وتواصل مباشر مع من يبحث عن شقة أو فيلا أو أرض.</p>
+      <ul class="est-agency-points">
+        <li>✓ صفحة وكالة باسمك وشعارك</li>
+        <li>✓ عرض فلل وشقق وأراضي في كتالوج واحد</li>
+        <li>✓ تواصل واتساب وهاتف من البطاقة مباشرة</li>
+      </ul>
       <div class="est-hero-cta">
         <a class="est-btn est-btn-gold" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">امتلك واجهتك العقارية</a>
         <a class="est-btn est-btn-ghost" href="rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA">تصفّح إعلانات العقارات</a>
@@ -384,48 +493,132 @@ img{display:block;max-width:100%}
 </main>
 
 <footer class="est-foot">
-  <a href="rizq_landing_v8.html">← الرئيسية رزق</a>
-  · نموذج بوابة العقارات · RIZQ ESTATE
+  <div class="est-foot-inner">
+    <div>
+      <a class="est-brand" href="rizq_landing_v8.html" style="margin-bottom:12px">
+        <img src="rizq-mark-inset.png?v=1" width="34" height="34" alt=""/>
+        <span>
+          <span class="est-brand-ar">رزق</span>
+          <span class="est-brand-sub">RIZQ ESTATE</span>
+        </span>
+      </a>
+      <p>نموذج بوابة عقارية فاخرة على رزق — عرض بصري كامل للوكالات والبائعين في موريتانيا.</p>
+    </div>
+    <div>
+      <h4>استكشف</h4>
+      <a href="#est-listings">العقارات</a>
+      <a href="#est-gallery">معرض الصور</a>
+      <a href="#est-agency">الوكالات</a>
+      <a href="rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA">كل الإعلانات</a>
+    </div>
+    <div>
+      <h4>للباعة</h4>
+      <a href="rizq_post.html">اعرض عقارك</a>
+      <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">افتح وكالة</a>
+      <a href="rizq_landing_v8.html#virtual-estate">بوابة العقارات</a>
+    </div>
+    <div>
+      <h4>رزق</h4>
+      <a href="rizq_landing_v8.html">الرئيسية</a>
+      <a href="rizq_landing_v8.html#virtual-stores">المحلات</a>
+      <a href="rizq_landing_v8.html#virtual-showrooms">المعارض</a>
+      <a href="rizq_landing_v8.html#virtual-offices">المكاتب</a>
+    </div>
+  </div>
+  <div class="est-foot-bar">© 2026 رزق | Rizq — نموذج بوابة العقارات · RIZQ ESTATE</div>
 </footer>
+
+<!-- معاينة عقار -->
+<div class="est-overlay" id="est-modal" role="dialog" aria-modal="true" aria-labelledby="est-modal-title" hidden>
+  <div class="est-modal">
+    <button type="button" class="est-modal-close" id="est-modal-close" aria-label="إغلاق">×</button>
+    <div class="est-modal-media"><img id="est-modal-img" alt=""/></div>
+    <div class="est-modal-body">
+      <div class="est-badge" id="est-modal-badge" style="position:static;display:inline-flex;margin-bottom:8px"></div>
+      <h3 id="est-modal-title"></h3>
+      <div class="loc" id="est-modal-loc" style="color:var(--muted);margin-bottom:6px"></div>
+      <div class="est-modal-price" id="est-modal-price"></div>
+      <div class="est-meta" id="est-modal-meta"></div>
+      <p id="est-modal-desc" style="color:var(--muted);line-height:1.75;margin-top:14px"></p>
+      <div class="est-modal-actions">
+        <a class="est-btn est-btn-gold" id="est-modal-browse" href="rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA">عرض في الإعلانات</a>
+        <a class="est-btn est-btn-ghost" href="rizq_post.html">انشر عقاراً مشابهاً</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- تكبير صورة المعرض -->
+<div class="est-overlay" id="est-lightbox" role="dialog" aria-modal="true" aria-label="صورة مكبرة" hidden>
+  <button type="button" class="est-modal-close" id="est-lb-close" aria-label="إغلاق" style="position:fixed;top:18px;left:18px">×</button>
+  <img class="est-lb-img" id="est-lb-img" alt=""/>
+</div>
 
 <script>
 (function(){
   var LISTINGS = [
-    {id:'e1', cat:'villa', featured:true, title:'فيلا راقية بإطلالة بانورامية', loc:'نواكشوط الغربية', price:'4.8M MRU', beds:'5', baths:'4', area:'420 م²',
-      img:'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1400&q=80', badge:'مميّز'},
-    {id:'e2', cat:'apartment', title:'شقة فاخرة 3 غرف — تشطيب حديث', loc:'تفرغ زينة', price:'150K / شهر', beds:'3', baths:'2', area:'145 م²',
-      img:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1000&q=80', badge:'للكراء'},
-    {id:'e3', cat:'apartment', title:'شقة مفروشة بإطلالة مدينة', loc:'لكصر', price:'2.1M MRU', beds:'2', baths:'2', area:'110 م²',
-      img:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1000&q=80', badge:'للبيع'},
-    {id:'e4', cat:'land', title:'أرض سكنية 600 م² — موقع استراتيجي', loc:'نواذيبو', price:'2.2M MRU', beds:'—', baths:'—', area:'600 م²',
-      img:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80', badge:'أرض'},
-    {id:'e5', cat:'villa', title:'منزل عائلي بحديقة خاصة', loc:'كيفة', price:'3.4M MRU', beds:'4', baths:'3', area:'280 م²',
-      img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80', badge:'منزل'},
-    {id:'e6', cat:'shop', title:'محل تجاري على شارع رئيسي', loc:'سوق العاصمة', price:'85K / شهر', beds:'—', baths:'—', area:'75 م²',
-      img:'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1000&q=80', badge:'محل'},
-    {id:'e7', cat:'apartment', title:'بنتهاوس بإطلالة غروب', loc:'القطب', price:'6.5M MRU', beds:'4', baths:'3', area:'260 م²',
-      img:'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1000&q=80', badge:'بنتهاوس'}
+    {id:'e1', cat:'villa', deal:'sale', featured:true, title:'فيلا راقية بإطلالة بانورامية', loc:'نواكشوط الغربية', price:'4.8M MRU', beds:'5', baths:'4', area:'420 م²',
+      img:'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1400&q=80', badge:'مميّز',
+      desc:'فيلا فاخرة بحديقة ومسبح وإطلالة واسعة — تشطيب حديث ومساحة مريحة للعائلة.'},
+    {id:'e2', cat:'apartment', deal:'rent', title:'شقة فاخرة 3 غرف — تشطيب حديث', loc:'تفرغ زينة', price:'150K / شهر', beds:'3', baths:'2', area:'145 م²',
+      img:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1000&q=80', badge:'للكراء',
+      desc:'شقة مفروشة جزئياً في موقع هادئ قريب من الخدمات — مثالية للكراء العائلي.'},
+    {id:'e3', cat:'apartment', deal:'sale', title:'شقة مفروشة بإطلالة مدينة', loc:'لكصر', price:'2.1M MRU', beds:'2', baths:'2', area:'110 م²',
+      img:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1000&q=80', badge:'للبيع',
+      desc:'شقة جاهزة للسكن مع إطلالة مدينة وإضاءة طبيعية ممتازة.'},
+    {id:'e4', cat:'land', deal:'sale', title:'أرض سكنية 600 م² — موقع استراتيجي', loc:'نواذيبو', price:'2.2M MRU', beds:'—', baths:'—', area:'600 م²',
+      img:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80', badge:'أرض',
+      desc:'قطعة أرض سكنية بموقع استراتيجي ووثائق واضحة — جاهزة للبناء.'},
+    {id:'e5', cat:'villa', deal:'sale', title:'منزل عائلي بحديقة خاصة', loc:'كيفة', price:'3.4M MRU', beds:'4', baths:'3', area:'280 م²',
+      img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80', badge:'منزل',
+      desc:'منزل عائلي بحديقة خاصة ومساحات معيشة واسعة.'},
+    {id:'e6', cat:'shop', deal:'rent', title:'محل تجاري على شارع رئيسي', loc:'سوق العاصمة', price:'85K / شهر', beds:'—', baths:'—', area:'75 م²',
+      img:'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1000&q=80', badge:'محل',
+      desc:'محل على شارع رئيسي بحركة عالية — مناسب للتجارة اليومية.'},
+    {id:'e7', cat:'apartment', deal:'sale', title:'بنتهاوس بإطلالة غروب', loc:'القطب', price:'6.5M MRU', beds:'4', baths:'3', area:'260 م²',
+      img:'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1000&q=80', badge:'بنتهاوس',
+      desc:'بنتهاوس فاخر بإطلالة غروب وتراس واسع — تشطيب راقٍ.'},
+    {id:'e8', cat:'villa', deal:'rent', title:'فيلا للكراء — حي راقٍ', loc:'تفرغ زينة', price:'280K / شهر', beds:'5', baths:'4', area:'380 م²',
+      img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80', badge:'للكراء',
+      desc:'فيلا مفروشة للكراء في حي راقٍ — مناسبة للعائلات والبعثات.'}
   ];
 
   var GALLERY = [
-    {img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=900&q=80', cap:'صالة استقبال فسيحة'},
-    {img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80', cap:'واجهة فيلا ليلية'},
-    {img:'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=900&q=80', cap:'مطبخ عصري مفتوح'},
-    {img:'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=900&q=80', cap:'غرفة نوم رئيسية'},
-    {img:'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=900&q=80', cap:'تراس بإطلالة مفتوحة'},
-    {img:'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=900&q=80', cap:'حمام بتشطيب فاخر'}
+    {img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80', cap:'صالة استقبال فسيحة'},
+    {img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80', cap:'واجهة فيلا ليلية'},
+    {img:'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=80', cap:'مطبخ عصري مفتوح'},
+    {img:'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1200&q=80', cap:'غرفة نوم رئيسية'},
+    {img:'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80', cap:'تراس بإطلالة مفتوحة'},
+    {img:'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=1200&q=80', cap:'حمام بتشطيب فاخر'}
   ];
 
+  var state = { cat:'all', deal:'all', q:'', city:'' };
   var grid = document.getElementById('est-grid');
   var rail = document.getElementById('est-rail');
-  var active = 'all';
+  var countEl = document.getElementById('est-count');
+  var modal = document.getElementById('est-modal');
+  var lightbox = document.getElementById('est-lightbox');
 
   function esc(s){
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
   }
 
+  function filtered(){
+    var q = (state.q||'').trim().toLowerCase();
+    return LISTINGS.filter(function(x){
+      if(state.cat !== 'all' && x.cat !== state.cat) return false;
+      if(state.deal !== 'all' && x.deal !== state.deal) return false;
+      if(state.city && x.loc !== state.city) return false;
+      if(q){
+        var blob = (x.title+' '+x.loc+' '+x.badge+' '+x.desc).toLowerCase();
+        if(blob.indexOf(q) < 0) return false;
+      }
+      return true;
+    });
+  }
+
   function cardHTML(item){
-    return '<a class="est-card'+(item.featured?' featured':'')+'" href="rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA" data-cat="'+esc(item.cat)+'">'
+    return '<button type="button" class="est-card'+(item.featured?' featured':'')+'" data-id="'+esc(item.id)+'" aria-label="معاينة: '+esc(item.title)+'">'
       + '<div class="est-card-media">'
       +   '<img src="'+esc(item.img)+'" alt="'+esc(item.title)+'" loading="lazy"/>'
       +   '<span class="est-badge">'+esc(item.badge)+'</span>'
@@ -439,23 +632,62 @@ img{display:block;max-width:100%}
       +     '<span>🛁 '+esc(item.baths)+'</span>'
       +     '<span>📐 '+esc(item.area)+'</span>'
       +   '</div>'
-      + '</div></a>';
+      + '</div></button>';
   }
 
   function renderGrid(){
-    var list = LISTINGS.filter(function(x){ return active==='all' || x.cat===active; });
-    grid.innerHTML = list.map(cardHTML).join('');
+    var list = filtered();
+    countEl.textContent = list.length
+      ? ('عرض '+list.length+' من أصل '+LISTINGS.length+' عقاراً')
+      : 'لا نتائج لهذه التصفية — جرّب بحثاً أوسع';
+    grid.innerHTML = list.length
+      ? list.map(cardHTML).join('')
+      : '<div class="est-empty">لا عقارات مطابقة حالياً. عدّل البحث أو التصفية.</div>';
   }
 
   function renderRail(){
-    rail.innerHTML = GALLERY.map(function(g){
-      return '<figure class="est-shot"><img src="'+esc(g.img)+'" alt="'+esc(g.cap)+'" loading="lazy"/><figcaption>'+esc(g.cap)+'</figcaption></figure>';
+    rail.innerHTML = GALLERY.map(function(g, i){
+      return '<figure class="est-shot" data-gi="'+i+'" tabindex="0" role="button" aria-label="تكبير: '+esc(g.cap)+'">'
+        + '<img src="'+esc(g.img)+'" alt="'+esc(g.cap)+'" loading="lazy"/>'
+        + '<figcaption>'+esc(g.cap)+'</figcaption></figure>';
     }).join('');
+  }
+
+  function openModal(item){
+    document.getElementById('est-modal-img').src = item.img;
+    document.getElementById('est-modal-img').alt = item.title;
+    document.getElementById('est-modal-title').textContent = item.title;
+    document.getElementById('est-modal-loc').textContent = '📍 '+item.loc;
+    document.getElementById('est-modal-price').textContent = item.price;
+    document.getElementById('est-modal-badge').textContent = item.badge;
+    document.getElementById('est-modal-desc').textContent = item.desc;
+    document.getElementById('est-modal-meta').innerHTML =
+      '<span>🛏 '+esc(item.beds)+'</span><span>🛁 '+esc(item.baths)+'</span><span>📐 '+esc(item.area)+'</span>';
+    modal.hidden = false;
+    modal.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(){
+    modal.classList.remove('is-open');
+    modal.hidden = true;
+    document.body.style.overflow = '';
+  }
+  function openLb(g){
+    document.getElementById('est-lb-img').src = g.img;
+    document.getElementById('est-lb-img').alt = g.cap;
+    lightbox.hidden = false;
+    lightbox.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLb(){
+    lightbox.classList.remove('is-open');
+    lightbox.hidden = true;
+    document.body.style.overflow = '';
   }
 
   document.querySelectorAll('.est-tab').forEach(function(btn){
     btn.addEventListener('click', function(){
-      active = btn.getAttribute('data-cat') || 'all';
+      state.cat = btn.getAttribute('data-cat') || 'all';
       document.querySelectorAll('.est-tab').forEach(function(b){
         var on = b===btn;
         b.classList.toggle('is-active', on);
@@ -464,11 +696,78 @@ img{display:block;max-width:100%}
       renderGrid();
     });
   });
+  document.querySelectorAll('.est-deal button').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      state.deal = btn.getAttribute('data-deal') || 'all';
+      document.querySelectorAll('.est-deal button').forEach(function(b){
+        b.classList.toggle('is-on', b===btn);
+      });
+      var sel = document.getElementById('est-deal');
+      if(sel) sel.value = state.deal;
+      renderGrid();
+    });
+  });
+
+  document.getElementById('est-search').addEventListener('submit', function(e){
+    e.preventDefault();
+    state.q = document.getElementById('est-q').value || '';
+    state.city = document.getElementById('est-city').value || '';
+    state.deal = document.getElementById('est-deal').value || 'all';
+    document.querySelectorAll('.est-deal button').forEach(function(b){
+      b.classList.toggle('is-on', b.getAttribute('data-deal') === state.deal);
+    });
+    renderGrid();
+    document.getElementById('est-listings').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+
+  grid.addEventListener('click', function(e){
+    var card = e.target.closest('.est-card');
+    if(!card) return;
+    var item = LISTINGS.find(function(x){ return x.id === card.getAttribute('data-id'); });
+    if(item) openModal(item);
+  });
+  rail.addEventListener('click', function(e){
+    var shot = e.target.closest('.est-shot');
+    if(!shot) return;
+    var g = GALLERY[+shot.getAttribute('data-gi')];
+    if(g) openLb(g);
+  });
+  rail.addEventListener('keydown', function(e){
+    if(e.key !== 'Enter' && e.key !== ' ') return;
+    var shot = e.target.closest('.est-shot');
+    if(!shot) return;
+    e.preventDefault();
+    var g = GALLERY[+shot.getAttribute('data-gi')];
+    if(g) openLb(g);
+  });
+
+  document.getElementById('est-modal-close').addEventListener('click', closeModal);
+  document.getElementById('est-lb-close').addEventListener('click', closeLb);
+  modal.addEventListener('click', function(e){ if(e.target === modal) closeModal(); });
+  lightbox.addEventListener('click', function(e){ if(e.target === lightbox) closeLb(); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){ closeModal(); closeLb(); }
+  });
+
+  /* تمييز روابط التنقل حسب القسم الظاهر */
+  var navLinks = Array.prototype.slice.call(document.querySelectorAll('.est-nav a'));
+  var sections = navLinks.map(function(a){
+    return { a:a, el:document.querySelector(a.getAttribute('href')) };
+  }).filter(function(s){ return s.el; });
+  function spy(){
+    var y = window.scrollY + 120;
+    var cur = sections[0];
+    sections.forEach(function(s){
+      if(s.el.offsetTop <= y) cur = s;
+    });
+    navLinks.forEach(function(a){ a.classList.toggle('is-on', a === cur.a); });
+  }
+  window.addEventListener('scroll', spy, {passive:true});
+  spy();
 
   renderGrid();
   renderRail();
 })();
 </script>
-<script src="rizq_header.js?v=27.0" defer></script>
 </body>
 </html>
