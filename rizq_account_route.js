@@ -474,6 +474,15 @@
       window.openModal('login');
       return true;
     }
+    /* صفحات عامة بلا بوابة مصادقة (هيدر النموذج): افتح حسابي على الرئيسية */
+    try {
+      var file = String((location.pathname || '').split('/').pop() || '').toLowerCase();
+      var onLanding = !file || file === 'index.html' || file === 'rizq_landing_v8.html';
+      if (!onLanding) {
+        location.href = 'rizq_landing_v8.html?openAccount=1';
+        return true;
+      }
+    } catch (eLand) {}
     return false;
   }
 
@@ -626,4 +635,9 @@
     refreshStoredSessionFromBackend: refreshStoredSessionFromBackend,
     goAfterRegistration: goAfterRegistration
   };
+
+  /* هيدر النموذج يستدعي goToAccount على كل الصفحات — عرّفه عالمياً إن لم تعرّفه الصفحة */
+  if (typeof window.goToAccount !== 'function') {
+    window.goToAccount = openAccount;
+  }
 })();

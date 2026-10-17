@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.42';
+    link.href = 'rizq_header_mockup_trial.css?v=5.44';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -77,7 +77,7 @@
       '<div class="rmh-tools">' +
       '<button type="button" class="rmh-lang btn-lang btn-lang-primary" id="rmh-lang-btn" dir="ltr" aria-label="FR | AR">' +
       '<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>' +
-      '<button type="button" class="rmh-ico" onclick="typeof goToAccount===\'function\'&&goToAccount()" aria-label="حسابي">' +
+      '<button type="button" class="rmh-ico" id="rmh-account-btn" aria-label="حسابي">' +
       '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19c1.6-3.2 4-4.8 6.5-4.8S16.9 15.8 18.5 19"/></svg></button>' +
       '<div class="rmh-cart-wrap" id="rmh-cart-wrap">' +
       '<button type="button" class="rmh-ico" id="rmh-cart-btn" aria-haspopup="true" aria-expanded="false" aria-controls="rmh-cart-panel" aria-label="السلة">' +
@@ -120,8 +120,19 @@
       '</div></div></nav></header>';
   }
 
+  function findAccountBtn() {
+    var byId = document.getElementById('rmh-account-btn');
+    if (byId) return byId;
+    var hdr = document.getElementById('rizq-mock-hdr');
+    if (!hdr) return null;
+    var btn = hdr.querySelector('.rmh-tools .rmh-ico[aria-label="حسابي"], .rmh-tools .rmh-ico[aria-label="Mon compte"], .rmh-tools .rmh-ico[onclick*="goToAccount"]');
+    if (btn && !btn.id) btn.id = 'rmh-account-btn';
+    return btn;
+  }
+
   function ensureMockHeader() {
     if (document.getElementById('rizq-mock-hdr')) {
+      findAccountBtn();
       applyNavHrefs();
       markActiveFromPage();
       return;
@@ -492,7 +503,7 @@
     var searchBtn = hdr.querySelector('.rmh-search-btn');
     if (searchBtn) searchBtn.setAttribute('aria-label', tMock('بحث', 'Rechercher'));
 
-    var accountBtn = hdr.querySelector('.rmh-tools .rmh-ico[onclick*="goToAccount"]');
+    var accountBtn = document.getElementById('rmh-account-btn') || hdr.querySelector('.rmh-tools .rmh-ico[aria-label="حسابي"], .rmh-tools .rmh-ico[aria-label="Mon compte"]');
     if (accountBtn) accountBtn.setAttribute('aria-label', tMock('حسابي', 'Mon compte'));
     var fav = hdr.querySelector('.rmh-tools a.rmh-ico[href*="fav"]');
     if (fav) fav.setAttribute('aria-label', tMock('المفضلة', 'Favoris'));
@@ -516,6 +527,34 @@
     try { renderCartPanel(); } catch (eCart) {}
     try { ensureHeroTagline(); } catch (eHero) {}
     } finally { __rmhLangBusy = false; }
+  }
+
+  function openAccountFromMock(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (window.RizqAccount && typeof window.RizqAccount.open === 'function') {
+      return window.RizqAccount.open(e);
+    }
+    if (typeof window.goToAccount === 'function') {
+      return window.goToAccount(e);
+    }
+    if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function') {
+      window.RizqAuthGate.openAccountChoice();
+      return false;
+    }
+    if (typeof window.openModal === 'function') {
+      window.openModal('login');
+      return false;
+    }
+    location.href = 'rizq_landing_v8.html?openAccount=1';
+    return false;
+  }
+
+  function wireAccount() {
+    var btn = findAccountBtn();
+    if (!btn || btn.getAttribute('data-rmh-account-wired') === '1') return;
+    btn.removeAttribute('onclick');
+    btn.setAttribute('data-rmh-account-wired', '1');
+    btn.addEventListener('click', openAccountFromMock);
   }
 
   function wireLang() {
@@ -1040,6 +1079,7 @@
     renderCartPanel();
     wireCart();
     wireLang();
+    wireAccount();
     applyMockLang();
     wireHelp();
     wireMore();
