@@ -103,37 +103,54 @@ body.rizq-mockup-hdr-trial .hero-brand-row .hero-eyebrow{
   min-width:0!important;
   align-self:center!important;
 }
+/* خيارك الأول + بيع/اشتر — نفس الطول، أقصر من السابق */
+html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-lead-row,
 body.rizq-mockup-hdr-trial .hero-lead-row{
   margin-top:4px!important;
   gap:10px!important;
+  width:100%!important;
+  max-width:min(640px,78vw)!important;
+  align-items:stretch!important;
 }
 body.rizq-mockup-hdr-trial .hero-subtitle-card{
-  padding-top:12px!important;
-  padding-bottom:10px!important;
+  width:100%!important;
+  max-width:none!important;
+  padding:14px 20px 12px!important;
+  border-radius:12px!important;
+  box-sizing:border-box!important;
+}
+body.rizq-mockup-hdr-trial .hero-subtitle-primary{
+  font-size:clamp(15px,1.7vw,20px)!important;
+  white-space:normal!important;
+}
+body.rizq-mockup-hdr-trial .hero-subtitle-secondary{
+  font-size:clamp(13px,1.4vw,16px)!important;
+  white-space:normal!important;
 }
 body.rizq-mockup-hdr-trial .hero-subtitle-primary,
 body.rizq-mockup-hdr-trial .hero-subtitle-secondary{
   text-shadow:none;
   opacity:1!important;
 }
-/* كبسولات بيع/اشتر/تميّز — أقصر عرضاً وارتفاعاً من بطاقة العنوان */
+/* بيع/اشتر/تميّز — نفس عرض خيارك الأول (كما كانت)، ارتفاع مضغوط */
 html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pills,
 body.rizq-mockup-hdr-trial .hero-pills{
-  width:auto!important;
-  max-width:280px!important;
+  width:100%!important;
+  max-width:none!important;
   min-height:0!important;
   height:auto!important;
-  padding:2px 4px!important;
-  margin:0 auto!important;
+  padding:3px!important;
+  margin:0!important;
   border-radius:8px!important;
   border-width:1px!important;
   box-shadow:0 3px 10px rgba(13,27,42,.08),inset 0 1px 0 rgba(255,255,255,.65)!important;
+  box-sizing:border-box!important;
 }
 html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pill,
 body.rizq-mockup-hdr-trial .hero-pill{
-  flex:0 0 auto!important;
-  padding:3px 14px!important;
-  font-size:12.5px!important;
+  flex:1 1 0!important;
+  padding:4px 10px!important;
+  font-size:13px!important;
   font-weight:800!important;
   border-radius:6px!important;
   letter-spacing:0!important;
@@ -142,23 +159,25 @@ body.rizq-mockup-hdr-trial .hero-pill{
   min-width:0!important;
 }
 body.rizq-mockup-hdr-trial .hero-pill-sep{
-  height:12px!important;
-  margin:0 1px!important;
+  height:14px!important;
+  margin:0 2px!important;
 }
 body.rizq-mockup-hdr-trial .hero-pill:hover{
   transform:none!important;
   box-shadow:none!important;
 }
 @media(max-width:768px){
-  html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pills,
-  body.rizq-mockup-hdr-trial .hero-pills{
-    width:auto!important;max-width:240px!important;padding:2px 3px!important;
+  html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-lead-row,
+  body.rizq-mockup-hdr-trial .hero-lead-row{
+    max-width:min(520px,92vw)!important;
   }
+  html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pills,
+  body.rizq-mockup-hdr-trial .hero-pills{padding:2px!important}
   html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pill,
   body.rizq-mockup-hdr-trial .hero-pill{
-    padding:3px 10px!important;font-size:12px!important;flex:0 0 auto!important;
+    padding:4px 6px!important;font-size:12px!important;flex:1 1 0!important;
   }
-  body.rizq-mockup-hdr-trial .hero-pill-sep{height:11px!important}
+  body.rizq-mockup-hdr-trial .hero-pill-sep{height:12px!important}
 }
 /* body padding تحت الهيدر الثابت — يتفوّق على html.rizq-app-nav:has(#nav) body (specificity ID) */
 html.rizq-app-nav:has(#nav) body.rizq-mockup-hdr-trial,
