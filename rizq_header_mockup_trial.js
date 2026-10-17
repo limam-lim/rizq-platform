@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.41';
+    link.href = 'rizq_header_mockup_trial.css?v=5.42';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -101,7 +101,7 @@
       '<a href="' + h.ads + '" data-rmh="ads"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10v4h2l5 3V7L6 10H4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 7a7 7 0 0 1 0 10"/></svg></span>الإعلانات</a>' +
       '<a href="' + h.stores + '" data-rmh="stores"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10 6 5h12l2 5"/><path d="M4 10v9h16v-9"/><path d="M9 19v-5h6v5"/></svg></span>المحلات</a>' +
       '<a href="' + h.showrooms + '" data-rmh="showrooms"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="7" width="16" height="12" rx="1"/><path d="M8 7V5h8v2M8 11h.01M12 11h.01M16 11h.01M8 15h8"/></svg></span>المعارض و المصانع</a>' +
-      '<a href="' + h.estate + '" data-rmh="estate"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V10l8-6 8 6v10"/><path d="M10 20v-6h4v6"/></svg></span>العقارات</a>' +
+      '<a href="' + h.estate + '" data-rmh="estate"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V10l8-6 8 6v10"/><path d="M10 20v-6h4v6"/></svg></span>سوق العقارات</a>' +
       '<a class="rmh-post-nav" href="' + h.post + '" data-rmh="post"><span class="rmh-nav-ico rmh-post-plus" aria-hidden="true">+</span><span class="rmh-post-lbl">انشر إعلان</span></a>' +
       '<a href="' + h.offices + '" data-rmh="offices"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="16" height="11" rx="1"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M4 13h16"/></svg></span>المكاتب</a>' +
       '<a href="' + h.tenders + '" data-rmh="tenders"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 4h8a2 2 0 0 1 2 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h6"/></svg></span>المناقصات</a>' +
@@ -421,7 +421,7 @@
       ads: ['الإعلانات', 'Annonces'],
       stores: ['المحلات', 'Boutiques'],
       showrooms: ['المعارض و المصانع', 'Showrooms & usines'],
-      estate: ['العقارات', 'Immobilier'],
+      estate: ['سوق العقارات', 'Marché immobilier'],
       offices: ['المكاتب', 'Bureaux'],
       tenders: ['المناقصات', 'Appels d\'offres'],
       investments: ['الاستثمارات', 'Investissements']
@@ -892,7 +892,7 @@
   }
 
   /* هاتف: نفس التقسيم 5/5 — تبديل المواقع فقط
-     أسفل قرب الإبهام: الرئيسية·الإعلانات·المحلات·المعارض·العقارات
+     أسفل قرب الإبهام: الرئيسية·الإعلانات·المحلات·المعارض·سوق العقارات
      أعلى: المكاتب·الاستثمارات·نشر·المناقصات·المزيد */
   var RMH_NAV_BOTTOM_ORDER = ['home', 'ads', 'stores', 'showrooms', 'estate'];
   var RMH_NAV_TOP_ORDER = ['offices', 'investments', 'post', 'tenders', 'more'];

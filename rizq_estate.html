@@ -871,7 +871,7 @@ button{font:inherit;border:0;background:none;color:inherit}
     if(footBar){
       footBar.textContent = isDemo
         ? '© 2026 رزق | Rizq — نموذج بوابة العقارات · RIZQ ESTATE'
-        : '© 2026 رزق | Rizq — العقارات · RIZQ ESTATE';
+        : '© 2026 رزق | Rizq — سوق العقارات · RIZQ ESTATE';
     }
   }
 
@@ -1035,23 +1035,31 @@ button{font:inherit;border:0;background:none;color:inherit}
         window._rizqEstateIsDemo = false;
         window._rizqEstateAccountId = id;
         hidePlatformUpsellOnBoundEstate();
-        setText('est-kicker', 'وكالة غير موجودة');
+        var frMiss = isFrEstate();
+        setText('est-kicker', frMiss ? 'Agence introuvable' : 'وكالة غير موجودة');
         var kickerMiss = document.getElementById('est-kicker');
-        if(kickerMiss) kickerMiss.innerHTML = '<i></i> وكالة غير موجودة';
-        setText('est-hero-lead', 'الوكالة غير موجودة — افتح صفحتك من لوحة التحكم أو من دليل الوكالات.');
-        setText('est-bar-name', 'وكالة غير موجودة');
-        setText('est-bar-sub', 'افتح رابط الوكالة الصحيح من الدليل');
-        setText('est-about-name', 'وكالة غير موجودة');
-        setText('est-about-desc', 'تعذّر العثور على هذه الوكالة. تصفّح دليل الوكالات أو افتح صفحتك من لوحة التحكم.');
-        document.title = 'وكالة غير موجودة — رزق';
+        if(kickerMiss) kickerMiss.innerHTML = '<i></i> ' + (frMiss ? 'Agence introuvable' : 'وكالة غير موجودة');
+        setText('est-hero-lead', frMiss
+          ? 'Agence introuvable — ouvrez votre page depuis le tableau de bord ou l\'annuaire.'
+          : 'الوكالة غير موجودة — افتح صفحتك من لوحة التحكم أو من دليل الوكالات.');
+        setText('est-bar-name', frMiss ? 'Agence introuvable' : 'وكالة غير موجودة');
+        setText('est-bar-sub', frMiss ? 'Ouvrez le bon lien depuis l\'annuaire' : 'افتح رابط الوكالة الصحيح من الدليل');
+        setText('est-about-name', frMiss ? 'Agence introuvable' : 'وكالة غير موجودة');
+        setText('est-about-desc', frMiss
+          ? 'Impossible de trouver cette agence. Parcourez l\'annuaire ou ouvrez votre page depuis le tableau de bord.'
+          : 'تعذّر العثور على هذه الوكالة. تصفّح دليل الوكالات أو افتح صفحتك من لوحة التحكم.');
+        document.title = frMiss ? 'Agence introuvable — Rizq' : 'وكالة غير موجودة — رزق';
       })
       .catch(function(){
         window._rizqEstateIsDemo = false;
         window._rizqEstateAccountId = id;
         hidePlatformUpsellOnBoundEstate();
-        setText('est-hero-lead', 'تعذّر تحميل الوكالة حالياً — حاول لاحقاً أو تصفّح دليل الوكالات.');
-        setText('est-bar-name', 'تعذّر التحميل');
-        setText('est-bar-sub', 'حاول لاحقاً أو تصفّح دليل الوكالات');
+        var frErr = isFrEstate();
+        setText('est-hero-lead', frErr
+          ? 'Chargement impossible pour le moment — réessayez ou parcourez l\'annuaire.'
+          : 'تعذّر تحميل الوكالة حالياً — حاول لاحقاً أو تصفّح دليل الوكالات.');
+        setText('est-bar-name', frErr ? 'Chargement impossible' : 'تعذّر التحميل');
+        setText('est-bar-sub', frErr ? 'Réessayez ou parcourez l\'annuaire' : 'حاول لاحقاً أو تصفّح دليل الوكالات');
       });
   }
 
@@ -1493,10 +1501,10 @@ button{font:inherit;border:0;background:none;color:inherit}
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.41"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.42"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <script src="rizq_header.js?v=31.0" defer></script>
-<script src="rizq_header_mockup_trial.js?v=5.41" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.42" defer></script>
 <script src="rizq_pwa.js" defer></script>
 </body>
 </html>

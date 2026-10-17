@@ -289,7 +289,7 @@ const HUMAN_REVIEW_CODES = {
 ══════════════════════════════════════════════ */
 const AD_CATEGORIES = [
   { id: 'vehicles',       name_ar: 'سيارات ومركبات',              name_fr: 'Véhicules' },
-  { id: 'real_estate',    name_ar: 'عقارات',                      name_fr: 'Immobilier' },
+  { id: 'real_estate',    name_ar: 'سوق العقارات',                name_fr: 'Marché immobilier' },
   { id: 'electronics',    name_ar: 'إلكترونيات وتقنية',           name_fr: 'Électronique' },
   { id: 'fashion',        name_ar: 'ملابس وأزياء',                name_fr: 'Mode et vêtements' },
   { id: 'home',           name_ar: 'أثاث ومنزل',                  name_fr: 'Maison et meubles' },

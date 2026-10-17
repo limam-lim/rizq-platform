@@ -420,7 +420,7 @@
     'أزياء': { ar: '👗 أزياء وملابس', fr: '👗 Mode & vêtements' },
     'أغذية': { ar: '🛒 أغذية وتموين', fr: '🛒 Alimentation' },
     'زراعة': { ar: '🌾 أعلاف ومستلزمات زراعية', fr: '🌾 Aliments & fournitures agricoles' },
-    'عقارات': { ar: '🏠 عقارات', fr: '🏠 Immobilier' },
+    'عقارات': { ar: '🏠 سوق العقارات', fr: '🏠 Marché immobilier' },
     'مهن': { ar: '🧰 مهن متخصصة', fr: '🧰 Métiers spécialisés' },
     'خدمات': { ar: '🏷️ خدمات تجارية', fr: '🏷️ Services commerciaux' },
     'أخرى': { ar: '🏷️ أخرى', fr: '🏷️ Autre' },
