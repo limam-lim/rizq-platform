@@ -159,7 +159,6 @@
       rizq_estate: 'estate',
       rizq_estate_directory: 'estate',
       rizq_estate_agencies: 'estate',
-      rizq_estate_listings: 'estate',
       rizq_office: 'offices',
       rizq_tenders: 'tenders',
       rizq_tenders_directory: 'tenders',
