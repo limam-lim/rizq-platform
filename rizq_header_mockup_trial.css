@@ -172,86 +172,147 @@ body.rizq-mockup-hdr-trial .hero-subtitle-secondary{
   text-shadow:none;
   opacity:1!important;
 }
-/* بيع/اشتر/تميّز — نفس طول خيارك الأول، عرض (سمك) الكبسولة أكبر قليلاً */
+/* بيع/اشتر/تميّز — كبسولة زجاجية كحلي/ذهبي أوضح وأكثر فخامة */
 html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pills,
 body.rizq-mockup-hdr-trial .hero-pills{
   width:100%!important;
   max-width:100%!important;
   min-height:0!important;
   height:auto!important;
-  padding:5px 4px!important;
+  padding:6px 5px!important;
   margin:0 auto!important;
-  border-radius:10px!important;
-  border-width:1px!important;
-  box-shadow:0 3px 10px rgba(13,27,42,.08),inset 0 1px 0 rgba(255,255,255,.65)!important;
+  border-radius:14px!important;
+  border:1.5px solid rgba(201,168,76,.62)!important;
+  background:
+    linear-gradient(165deg,rgba(255,255,255,.72) 0%,rgba(247,241,225,.55) 42%,rgba(232,237,245,.4) 100%),
+    linear-gradient(135deg,rgba(27,58,107,.08),rgba(201,168,76,.14))!important;
+  box-shadow:
+    0 12px 28px rgba(13,27,42,.14),
+    0 0 0 1px rgba(201,168,76,.12),
+    0 0 24px rgba(201,168,76,.12),
+    inset 0 1px 0 rgba(255,255,255,.85),
+    inset 0 -1px 0 rgba(13,27,42,.05)!important;
+  backdrop-filter:blur(14px) saturate(1.2)!important;
+  -webkit-backdrop-filter:blur(14px) saturate(1.2)!important;
   box-sizing:border-box!important;
+  position:relative!important;
+  overflow:hidden!important;
+}
+html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pills::before,
+body.rizq-mockup-hdr-trial .hero-pills::before{
+  content:''!important;
+  position:absolute!important;inset:0!important;
+  background:linear-gradient(105deg,transparent 35%,rgba(243,226,168,.28) 48%,transparent 62%)!important;
+  transform:translateX(-120%)!important;
+  animation:rmhPillSheen 5.5s ease-in-out infinite!important;
+  pointer-events:none!important;
+  z-index:0!important;
+}
+@keyframes rmhPillSheen{
+  0%,55%{transform:translateX(-120%)}
+  75%{transform:translateX(120%)}
+  100%{transform:translateX(120%)}
 }
 html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pill,
 body.rizq-mockup-hdr-trial .hero-pill{
   flex:1 1 0!important;
-  padding:7px 12px!important;
-  font-size:15px!important;
-  font-weight:800!important;
-  border-radius:7px!important;
-  letter-spacing:0!important;
+  padding:9px 14px!important;
+  font-size:15.5px!important;
+  font-weight:900!important;
+  border-radius:10px!important;
+  letter-spacing:.2px!important;
   line-height:1.15!important;
   min-height:0!important;
   min-width:0!important;
+  color:#0F2347!important;
+  -webkit-text-fill-color:#0F2347!important;
+  position:relative!important;
+  z-index:1!important;
+  transition:background .22s ease,color .22s ease,box-shadow .22s ease,transform .22s ease!important;
 }
 body.rizq-mockup-hdr-trial .hero-pill-sep{
-  height:18px!important;
-  margin:0 2px!important;
+  width:1.5px!important;
+  height:22px!important;
+  margin:0 3px!important;
+  flex:0 0 1.5px!important;
+  align-self:center!important;
+  background:linear-gradient(180deg,transparent,rgba(201,168,76,.75),transparent)!important;
+  color:transparent!important;
+  font-size:0!important;
+  position:relative!important;
+  z-index:1!important;
 }
 body.rizq-mockup-hdr-trial .hero-pill:hover{
-  transform:none!important;
-  box-shadow:none!important;
+  background:linear-gradient(145deg,#1B3A6B,#0D1B2A)!important;
+  color:#F3E2A8!important;
+  -webkit-text-fill-color:#F3E2A8!important;
+  transform:translateY(-1px)!important;
+  box-shadow:0 8px 18px rgba(13,27,42,.22),0 0 0 1px rgba(201,168,76,.35)!important;
 }
-/* جملة متجرك الافتراضي — ظاهرة بوضوح تحت كبسولة بيع/اشتر */
-body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline,
-body.rizq-mockup-hdr-trial #hero-tagline,
-body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline .hero-tagline-lead,
-body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline .hero-tagline-place,
-body.rizq-mockup-hdr-trial #hero-tagline .hero-tagline-lead,
-body.rizq-mockup-hdr-trial #hero-tagline .hero-tagline-place{
-  display:inline!important;
-  visibility:visible!important;
-  opacity:1!important;
-  color:#0a1628!important;
-  -webkit-text-fill-color:#0a1628!important;
-  background:transparent!important;
-  -webkit-background-clip:border-box!important;
-  background-clip:border-box!important;
-  text-shadow:none!important;
-  filter:none!important;
-  mix-blend-mode:normal!important;
+body.rizq-mockup-hdr-trial .hero-pill:active{
+  transform:translateY(0)!important;
+  box-shadow:0 3px 10px rgba(13,27,42,.18)!important;
 }
+/* جملة متجرك الافتراضي — شريط أنيق ذهبي تحت الكبسولة */
 body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline,
 body.rizq-mockup-hdr-trial #hero-tagline{
   display:block!important;
+  visibility:visible!important;
+  opacity:1!important;
   width:100%!important;
   max-width:100%!important;
-  margin:8px auto 0!important;
-  padding:8px 10px!important;
+  margin:10px auto 0!important;
+  padding:10px 14px!important;
   box-sizing:border-box!important;
   font-family:'Cairo','Segoe UI',Tahoma,sans-serif!important;
-  font-size:clamp(13px,1.45vw,15.5px)!important;
+  font-size:clamp(12.5px,1.4vw,14.5px)!important;
   font-weight:800!important;
-  letter-spacing:0!important;
-  line-height:1.45!important;
+  letter-spacing:.15px!important;
+  line-height:1.55!important;
   text-align:center!important;
   white-space:normal!important;
   overflow:visible!important;
   text-overflow:clip!important;
-  border:0!important;
-  box-shadow:none!important;
   position:relative!important;
   z-index:3!important;
   min-height:1.45em!important;
+  color:#0F2347!important;
+  -webkit-text-fill-color:#0F2347!important;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.55),rgba(247,241,225,.35))!important;
+  border:1px solid rgba(201,168,76,.38)!important;
+  border-radius:12px!important;
+  box-shadow:
+    0 8px 20px rgba(13,27,42,.08),
+    inset 0 1px 0 rgba(255,255,255,.7)!important;
+  text-shadow:none!important;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+  animation:rmhTagRise .7s .15s ease both!important;
+}
+@keyframes rmhTagRise{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:none}
+}
+body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline .hero-tagline-lead,
+body.rizq-mockup-hdr-trial #hero-tagline .hero-tagline-lead{
+  display:inline!important;
+  visibility:visible!important;
+  opacity:1!important;
+  color:#0F2347!important;
+  -webkit-text-fill-color:#0F2347!important;
+  background:transparent!important;
+  font-weight:800!important;
 }
 body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline-place,
 body.rizq-mockup-hdr-trial #hero-tagline .hero-tagline-place{
   display:inline!important;
-  font-weight:800!important;
+  visibility:visible!important;
+  opacity:1!important;
+  font-weight:900!important;
+  color:#9a7a2e!important;
+  -webkit-text-fill-color:#9a7a2e!important;
+  background:transparent!important;
 }
 @media(max-width:768px){
   html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-lead-row,
@@ -262,18 +323,24 @@ body.rizq-mockup-hdr-trial #hero-tagline .hero-tagline-place{
   body.rizq-mockup-hdr-trial .hero-subtitle-primary{font-size:clamp(14px,3.6vw,17px)!important}
   body.rizq-mockup-hdr-trial .hero-subtitle-secondary{font-size:clamp(12px,3.1vw,14px)!important}
   html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pills,
-  body.rizq-mockup-hdr-trial .hero-pills{max-width:100%!important;padding:4px 3px!important}
+  body.rizq-mockup-hdr-trial .hero-pills{max-width:100%!important;padding:5px 4px!important;border-radius:12px!important}
   html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pill,
   body.rizq-mockup-hdr-trial .hero-pill{
-    padding:6px 8px!important;font-size:13.5px!important;flex:1 1 0!important;
+    padding:8px 8px!important;font-size:13.5px!important;flex:1 1 0!important;
   }
-  body.rizq-mockup-hdr-trial .hero-pill-sep{height:16px!important}
+  body.rizq-mockup-hdr-trial .hero-pill-sep{height:18px!important}
   body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline,
   body.rizq-mockup-hdr-trial #hero-tagline{
-    font-size:clamp(11.5px,2.8vw,13.5px)!important;
-    padding:6px 6px!important;
-    margin-top:6px!important;
+    font-size:clamp(11px,2.7vw,13px)!important;
+    padding:8px 10px!important;
+    margin-top:8px!important;
+    border-radius:10px!important;
   }
+}
+@media(prefers-reduced-motion:reduce){
+  body.rizq-mockup-hdr-trial .hero-pills::before,
+  body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline,
+  body.rizq-mockup-hdr-trial #hero-tagline{animation:none!important}
 }
 /* body padding تحت الهيدر الثابت — يتفوّق على html.rizq-app-nav:has(#nav) body (specificity ID) */
 html.rizq-app-nav:has(#nav) body.rizq-mockup-hdr-trial,
@@ -722,7 +789,7 @@ body.rizq-mockup-hdr-trial #virtual-offices{
   #rizq-mock-hdr .rmh-brand .logo-mark-img,
   #rizq-mock-hdr .rmh-brand img.rmh-mark{
     width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;
-    border-radius:10px!important;padding:6px!important;
+    border-radius:10px!important;padding:0!important;
   }
   .rmh-search-input{font-size:13px;padding:0 12px}
   .rmh-search-btn{width:44px}
