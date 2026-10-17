@@ -312,12 +312,19 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     flex-direction:unset!important;overflow:visible!important;width:100%!important;
   }
   .cats-grid .cat-card{
-    width:100%!important;min-width:0!important;flex:none!important;height:auto!important;
+    width:100%!important;min-width:0!important;flex:none!important;
+    height:auto!important;min-height:0!important;
+    padding:4px 3px 3px!important;gap:1px!important;
   }
+  /* أيقونة عامة — بطاقة القسم لها قاعدة أقصر في الصفحة */
   .cat-icon-box{
     width:48px!important;height:48px!important;border-radius:14px!important;
     background:linear-gradient(135deg,#1B3A6B,#234d8f)!important;
   }
+  .cats-grid .cat-card .cat-icon-box{
+    width:22px!important;height:22px!important;font-size:11px!important;border-radius:6px!important;
+  }
+  .cats-grid .cat-name{font-size:9.5px!important;line-height:1.1!important}
   /* لماذا رزق: شبكة عمودين ثابتة — لا شريط تمرير أفقي ولا عرض 82vw */
   .why-section .why-grid,
   #about .why-grid,
@@ -699,9 +706,11 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
   }
 
   .section,.hero-content,main,.page-wrap{padding-left:12px;padding-right:12px}
-  .cat-card,.listing-card,.ad-card,.product-card,.info-card{padding:12px}
+  .listing-card,.ad-card,.product-card,.info-card{padding:12px}
+  .cats-grid .cat-card{padding:4px 3px 3px!important}
   .cards-track .ad-card{padding:0!important}
-  .cat-name,.l-title,.ad-title,.product-name{font-size:15px!important;line-height:1.4}
+  .l-title,.ad-title,.product-name{font-size:15px!important;line-height:1.4}
+  .cats-grid .cat-name{font-size:9.5px!important;line-height:1.1!important}
   .cards-track .ad-card .ad-title{font-size:11.5px!important;line-height:1.3!important}
   /* عناوين الأقسام (اللافتات الزرقاء) — أصغر على الهاتف */
   .hero-subtitle-primary{font-size:clamp(16px,4.6vw,22px)!important}
