@@ -284,7 +284,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
-<script src="rizq_account_route.js?v=9"></script>
+<script src="rizq_account_route.js?v=10"></script>
 <script src="rizq_dashboard_shared.js?v=1"></script>
 <script src="rizq_seller_onboarding.js"></script>
 <script src="rizq_status_summary.js"></script>
@@ -1249,6 +1249,13 @@ function init(){
 }
 
 function _initWithAccount(acc){
+  /* سوق العقارات: وساطة عقارية لها داشبورد وواجهة مستقلان — لا تبقَ على داشبورد المكتب العام */
+  if(acc && window.RizqAccount && typeof RizqAccount.isRealEstateAgency === 'function' && RizqAccount.isRealEstateAgency(acc)){
+    var estateDest = 'rizq_dashboard_estate.html?id=' + encodeURIComponent(acc.id || SESSION_ID || '');
+    if(IS_DEMO) estateDest += (estateDest.indexOf('?') >= 0 ? '&' : '?') + 'demo=1';
+    location.replace(estateDest);
+    return;
+  }
   OFFICE=loadActivatedPackage(acc);
   // جلسة عامة موحَّدة يقرأها rizq_tenders.html — ميزة المناقصات الجديدة
   if(!IS_DEMO){ try{ localStorage.setItem('rizq_active_session', JSON.stringify({id: acc.id, token: SESSION_TOKEN, type:'office', name: acc.name||''})); }catch(e){} }

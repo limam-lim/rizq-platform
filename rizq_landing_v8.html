@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.4"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
-<link rel="stylesheet" href="rizq_register_wizard.css?v=23.3"/>
+<link rel="stylesheet" href="rizq_register_wizard.css?v=23.4"/>
 <script>
 (function () {
   try {
@@ -4877,7 +4877,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_footer_toggle.js?v=23.1" defer></script>
 <script src="rizq_social_links.js?v=23.5" defer></script>
 <script src="rizq_account_route.js?v=23.0"></script>
-<script src="rizq_auth_gate.js?v=23.0" defer></script>
+<script src="rizq_auth_gate.js?v=23.5" defer></script>
 <script src="rizq_ux_polish.js?v=23.1"></script>
 <script src="rizq_ad_cards.js?v=3.11"></script>
 </head>
@@ -5699,7 +5699,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="rizq-styles-track-wrap fade-in">
       <div class="rizq-styles-rail" id="rizq-est-rail" role="list" aria-labelledby="rizq-est-tabs"></div>
     </div>
-    <!-- الأزرار تحت شريط العقارات / النماذج — بدون زر «افتح النموذج الفاخر» -->
+    <!-- الأزرار تحت شريط العقارات / النماذج -->
     <div class="rzq-disc-wrap fade-in" style="margin-top:22px">
       <div class="rizq-dual-cta">
         <a class="landing-ads-browse-full" href="rizq_estate_agencies.html" data-t="browse-estate">عرض كل الوكالات العقارية ←</a>
@@ -10070,8 +10070,8 @@ const LANG = {
     've-live-sub': 'أحدث العقارات على رزق — عروض تليق بالجادّين',
     'browse-estate': 'عرض كل الوكالات العقارية ←',
     'est-title': 'أحدث عقارات على <span>رزق</span>',
-    'est-desc': 'شقق وفلل وأراضي ومحلات — اعرض عقارك حيث يبحث الجادّون في موريتانيا بصور واسعة تليق ببوابة عقارية فخمة',
-    'est-open-portal': '🏛 افتح النموذج الفاخر',
+    'est-desc': 'شقق وفلل وأراضي ومحلات — اعرض عقارك حيث يبحث الجادّون في موريتانيا، بصور واضحة وتواصل مباشر مع الوكالة',
+    'est-open-portal': '🏛 ادخل سوق العقارات',
     'est-all': 'الكل', 'est-apt': 'شقق', 'est-villa': 'فلل', 'est-land': 'أراضي', 'est-shop': 'محلات',
     's-prices-title': 'نبضة السوق — <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">أسعار اليوم بوضوح</span>',
     's-prices-desc': 'أسعار اليوم في موريتانيا — قرار أوضح قبل أن تشتري أو تبيع',
@@ -10235,7 +10235,7 @@ const LANG = {
     'browse-estate': 'Voir toutes les agences immobilières →',
     'est-title': 'Derniers biens sur <span>Rizq</span>',
     'est-desc': 'Appartements, villas, terrains et locaux — présentez votre bien là où cherchent les acheteurs sérieux, en grandes images',
-    'est-open-portal': '🏛 Ouvrir le modèle premium',
+    'est-open-portal': '🏛 Entrer sur le marché immobilier',
     'est-all': 'Tout', 'est-apt': 'Appartements', 'est-villa': 'Villas', 'est-land': 'Terrains', 'est-shop': 'Locaux',
     's-prices-title': 'Le Pouls du Marché — <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">les prix du jour, clairement</span>',
     's-prices-desc': 'Les prix du jour en Mauritanie — décidez plus clairement avant d\'acheter ou de vendre',
@@ -12191,7 +12191,15 @@ document.getElementById('modal').addEventListener('click',function(e){
             if(typeof goFromType==='function') goFromType();
             if(preBiz) setTimeout(function(){
               if(typeof selectBizType==='function') selectBizType(preBiz);
-              if(window._rizqPreActivity && typeof applyPreActivitySelect==='function'){
+              /* سوق العقارات وغيره: تجاوز خطوة نوع المؤسسة تلقائياً عند وجود نشاط مسبق */
+              if(window._rizqPreActivity){
+                setTimeout(function(){
+                  if(typeof goFromBizType==='function') goFromBizType();
+                  setTimeout(function(){
+                    if(typeof applyPreActivitySelect==='function') applyPreActivitySelect(preBiz);
+                  }, 80);
+                }, 120);
+              } else if(typeof applyPreActivitySelect==='function'){
                 setTimeout(function(){ applyPreActivitySelect(preBiz); }, 120);
               }
             }, 250);
@@ -15229,7 +15237,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         bizType:'corp' },
       estate: { page:'rizq_estate.html', icon:'🏠', badge:{ar:'سوق العقارات',fr:'Marché immobilier'},
         emptyTitle:{ar:'كن أول من يفتح بوابته العقارية هنا',fr:'Soyez le premier à ouvrir votre portail immobilier'},
-        emptyDesc:{ar:'الوكالات والعروض العقارية ستظهر هنا فور نشرها — سجّل الآن وابدأ بصور فخمة.',fr:'Les agences et offres immobilières apparaîtront ici dès publication — inscrivez-vous et commencez avec de belles photos.'},
+        emptyDesc:{ar:'الوكالات والعروض العقارية ستظهر هنا فور نشرها — سجّل وكالتك وابدأ بنشر معروضاتك.',fr:'Les agences et offres immobilières apparaîtront ici dès publication — inscrivez votre agence et publiez vos biens.'},
         emptyCta:{ar:'افتح بوابتك العقارية',fr:'Ouvrez votre portail immobilier'},
         bizType:'estate' },
       tenders: { page:'rizq_tenders.html', icon:'📑', badge:{ar:'مناقصة',fr:'Appel d\'offres'},

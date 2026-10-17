@@ -206,12 +206,11 @@ button{font:inherit;border:0;background:none;color:inherit}
       </span>
     </a>
     <nav class="ag-nav" aria-label="تنقل وكالات العقارات">
-      <a href="#ag-list" class="is-on">الوكالات</a>
-      <a href="rizq_estate.html?demo=1">معروضات العقارات</a>
-      <a href="rizq_landing_v8.html#virtual-estate">بوابة رزق</a>
+      <a href="#ag-list" class="is-on">كل الوكالات</a>
+      <a href="rizq_landing_v8.html#virtual-estate">سوق العقارات</a>
     </nav>
     <div class="ag-actions">
-      <a class="ag-chip" href="rizq_estate.html?demo=1">تصفّح العقارات</a>
+      <a class="ag-chip" href="#ag-list">تصفّح الوكالات</a>
       <a class="ag-chip solid" id="ag-reg-top" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">افتح وكالتك</a>
     </div>
   </div>
@@ -224,10 +223,6 @@ button{font:inherit;border:0;background:none;color:inherit}
   <div class="ag-hero-cta">
     <a class="ag-btn ag-btn-gold" href="#ag-list">تصفّح الوكالات</a>
     <a class="ag-btn ag-btn-ghost" id="ag-reg-hero" data-rizq-estate-promo="1" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">سجّل وكالتك العقارية</a>
-  </div>
-  <div class="ag-path" id="ag-path" data-rizq-estate-promo="1">
-    مسار الحساب في التسجيل: <strong>شركة → مكتب → وساطة عقارية</strong>
-    <span dir="ltr" style="opacity:.75"> (preBiz=office · preActivity=of_realestate_agency)</span>
   </div>
 </section>
 
@@ -242,9 +237,9 @@ button{font:inherit;border:0;background:none;color:inherit}
     <h2>امتلك واجهتك العقارية على رزق</h2>
     <p>حساب وكالة عقارية مستقل عن المحلات والمعارض — صفحة باسمك، معروضات، وأزرار اتصال وواتساب مباشرة.</p>
     <div class="ag-own-steps">
-      <span>1) سجّل كشركة</span>
-      <span>2) اختر نوع «مكتب»</span>
-      <span>3) نشاط «وساطة عقارية»</span>
+      <span>صفحة باسم وكالتك</span>
+      <span>معروضات واضحة</span>
+      <span>اتصال وواتساب مباشر</span>
     </div>
     <a class="ag-btn ag-btn-gold" id="ag-reg-own" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">افتح حساب وكالة عقارية</a>
   </section>
@@ -497,35 +492,31 @@ button{font:inherit;border:0;background:none;color:inherit}
         var el = document.querySelector(sel);
         if(el) el.textContent = fr ? frTxt : ar;
       }
-      tx('.ag-nav a[href="#ag-list"]', 'الوكالات', 'Agences');
-      tx('.ag-nav a[href="rizq_estate.html?demo=1"]', 'معروضات العقارات', 'Biens immobiliers');
-      tx('.ag-nav a[href="rizq_landing_v8.html#virtual-estate"]', 'بوابة رزق', 'Portail Rizq');
+      tx('.ag-nav a[href="#ag-list"]', 'كل الوكالات', 'Toutes les agences');
+      tx('.ag-nav a[href="rizq_landing_v8.html#virtual-estate"]', 'سوق العقارات', 'Marché immobilier');
       tx('#ag-reg-top', 'افتح وكالتك', 'Ouvrez votre agence');
-      tx('.ag-actions .ag-chip:not(.solid)', 'تصفّح العقارات', 'Parcourir les biens');
+      tx('.ag-actions .ag-chip:not(.solid)', 'تصفّح الوكالات', 'Parcourir les agences');
       var kick = document.querySelector('.ag-kicker');
       if(kick) kick.innerHTML = fr
-        ? '<i></i> Parcours dédié · agences immobilières'
-        : '<i></i> مسار مستقل · وكالات العقارات فقط';
+        ? '<i></i> Marché immobilier · agences uniquement'
+        : '<i></i> سوق العقارات · وكالات العقارات فقط';
       var h1 = document.querySelector('.ag-hero h1');
       if(h1) h1.innerHTML = fr
         ? 'Toutes les <em>agences immobilières</em> au même endroit'
         : 'كل <em>الوكالات العقارية</em> في مكان واحد';
       tx('.ag-hero > p',
-        'صفحة منعزلة مباشرة للوصول إلى وكالات العقار على رزق — هوية واضحة، معروضات، وتواصل فوري مع الوكالة.',
+        'صفحة مستقلة للوصول إلى وكالات العقار على رزق — هوية واضحة، معروضات، وتواصل فوري مع الوكالة.',
         'Page dédiée pour joindre les agences immobilières sur Rizq — identité claire, biens et contact direct.');
       tx('.ag-hero-cta .ag-btn-gold', 'تصفّح الوكالات', 'Parcourir les agences');
       tx('#ag-reg-hero', 'سجّل وكالتك العقارية', 'Inscrivez votre agence');
-      tx('#ag-path',
-        'مسار الحساب في التسجيل: شركة → مكتب → وساطة عقارية (preBiz=office · preActivity=of_realestate_agency)',
-        'Parcours d\'inscription : société → bureau → courtage immobilier (preBiz=office · preActivity=of_realestate_agency)');
       tx('#ag-own h2', 'امتلك واجهتك العقارية على رزق', 'Possédez votre vitrine immobilière sur Rizq');
       tx('#ag-own > p',
         'حساب وكالة عقارية مستقل عن المحلات والمعارض — صفحة باسمك، معروضات، وأزرار اتصال وواتساب مباشرة.',
         'Compte agence distinct des boutiques et showrooms — page à votre nom, biens, appel et WhatsApp.');
       var steps = document.querySelectorAll('.ag-own-steps span');
-      if(steps[0]) steps[0].textContent = fr ? '1) Inscrivez-vous en société' : '1) سجّل كشركة';
-      if(steps[1]) steps[1].textContent = fr ? '2) Choisissez « Bureau »' : '2) اختر نوع «مكتب»';
-      if(steps[2]) steps[2].textContent = fr ? '3) Activité « Courtage immobilier »' : '3) نشاط «وساطة عقارية»';
+      if(steps[0]) steps[0].textContent = fr ? 'Page à votre nom' : 'صفحة باسم وكالتك';
+      if(steps[1]) steps[1].textContent = fr ? 'Biens clairement présentés' : 'معروضات واضحة';
+      if(steps[2]) steps[2].textContent = fr ? 'Appel et WhatsApp directs' : 'اتصال وواتساب مباشر';
       tx('#ag-reg-own', 'افتح حساب وكالة عقارية', 'Ouvrir un compte agence');
       tx('#ag-demo-link', 'نموذج وكالة', 'Agence modèle');
       var footOffice = document.querySelector('.ag-foot a[href*="directory"]');
