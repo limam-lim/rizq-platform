@@ -4468,8 +4468,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <script src="rizq_announcements.js"></script>
     <script src="rizq_civic_ticker.js"></script>
 <script src="rizq_backend_config.js"></script>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=3.0"/>
-<script src="rizq_header_mockup_trial.js?v=3.0" defer></script>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=3.1"/>
+<script src="rizq_header_mockup_trial.js?v=3.1" defer></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
 <script src="rizq_terms_gate.js?v=23.0"></script>
@@ -4579,7 +4579,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </button>
     </form>
     <div class="rmh-tools">
-      <button type="button" class="rmh-lang" id="rmh-lang-btn" dir="ltr" aria-label="AR | FR"><span class="lang-ar">AR</span> | <span class="lang-fr">FR</span></button>
+      <button type="button" class="rmh-lang btn-lang btn-lang-primary" id="rmh-lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
       <button type="button" class="rmh-ico" onclick="typeof goToAccount==='function'&&goToAccount()" aria-label="حسابي">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19c1.6-3.2 4-4.8 6.5-4.8S16.9 15.8 18.5 19"/></svg>
       </button>
@@ -4626,7 +4626,21 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <a href="#rzq-disc-office" data-rmh="offices"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="16" height="11" rx="1"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M4 13h16"/></svg></span>المكاتب</a>
     <a href="rizq_tenders_directory.html" data-rmh="tenders"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 4h8a2 2 0 0 1 2 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h6"/></svg></span>المناقصات</a>
     <a href="rizq_investments_directory.html" data-rmh="investments"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 18V6M4 18h16"/><path d="M7 14l4-4 3 3 5-6"/></svg></span>الاستثمارات</a>
-    <a href="#categories" data-rmh="more"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/></svg></span>المزيد</a>
+    <div class="rmh-more-wrap" data-rmh="more">
+      <button type="button" class="rmh-more-btn" id="rmh-more-btn" aria-haspopup="true" aria-expanded="false" aria-controls="rmh-more-menu">
+        <span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/></svg></span>
+        <span class="rmh-more-lbl" data-t="nav-more">المزيد</span>
+      </button>
+      <div class="rmh-more-menu" id="rmh-more-menu" role="menu" hidden>
+        <a href="#categories" class="rmh-more-item" role="menuitem"><span aria-hidden="true">📂</span><strong data-t="dd-cats">الأقسام</strong></a>
+        <a href="rizq_ads_info.html" class="rmh-more-item" role="menuitem"><span aria-hidden="true">🎬</span><strong data-hdr="rizqads">Rizq ADS</strong></a>
+        <a href="#pricing" class="rmh-more-item" role="menuitem"><span aria-hidden="true">💎</span><strong data-t="dd-packs">الباقات</strong></a>
+        <a href="rizq_legal.html" class="rmh-more-item" role="menuitem"><span aria-hidden="true">⚖️</span><strong data-t="dd-legal">المواد القانونية</strong></a>
+        <a href="rizq_platform.html#who" class="rmh-more-item" role="menuitem"><span aria-hidden="true">ℹ️</span><strong data-t="dd-about">من نحن</strong></a>
+        <a href="rizq_platform.html#why" class="rmh-more-item" role="menuitem"><span aria-hidden="true">❓</span><strong data-t="dd-why">لماذا رزق</strong></a>
+        <a href="rizq_about.html" class="rmh-more-item" role="menuitem"><span aria-hidden="true">🏛️</span><strong data-t="dd-company">الشركة المالكة</strong></a>
+      </div>
+    </div>
   </nav>
 </header>
 

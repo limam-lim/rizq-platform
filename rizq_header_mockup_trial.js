@@ -168,13 +168,52 @@
   }
 
   function wireNavActive() {
-    document.querySelectorAll('.rmh-nav a').forEach(function (a) {
+    document.querySelectorAll('.rmh-nav a[data-rmh]').forEach(function (a) {
       a.addEventListener('click', function () {
-        document.querySelectorAll('.rmh-nav a').forEach(function (x) {
+        document.querySelectorAll('.rmh-nav a[data-rmh]').forEach(function (x) {
           x.classList.remove('is-active');
         });
         a.classList.add('is-active');
       });
+    });
+  }
+
+  function wireMore() {
+    var wrap = document.querySelector('.rmh-more-wrap');
+    var btn = document.getElementById('rmh-more-btn');
+    var menu = document.getElementById('rmh-more-menu');
+    if (!wrap || !btn || !menu) return;
+
+    function closeMore() {
+      wrap.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+      menu.hidden = true;
+    }
+    function openMore() {
+      wrap.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+      menu.hidden = false;
+    }
+
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (wrap.classList.contains('open')) closeMore();
+      else openMore();
+    });
+    wrap.addEventListener('mouseenter', function () {
+      try { if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return; } catch (err) { return; }
+      openMore();
+    });
+    wrap.addEventListener('mouseleave', function () {
+      try { if (!window.matchMedia('(hover:hover) and (pointer:fine)').matches) return; } catch (err) { return; }
+      closeMore();
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) closeMore();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeMore();
     });
   }
 
@@ -255,6 +294,7 @@
     wireCart();
     wireLang();
     wireHelp();
+    wireMore();
     wireNavActive();
     setTimeout(fillCategories, 1200);
     window.addEventListener('storage', function (ev) {

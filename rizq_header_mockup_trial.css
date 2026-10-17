@@ -108,6 +108,7 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
 }
 .rmh-brand{
   display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;
+  cursor:pointer;
 }
 .rmh-mark{
   width:40px;height:40px;border-radius:9px;
@@ -147,8 +148,12 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
   font:600 14px 'Cairo',sans-serif;color:#0D1B2A;background:transparent;
 }
 .rmh-search-input::placeholder{color:#5a6f88;opacity:1}
+.rmh-search-cat,
 .rmh-search-btn{
-  width:48px;flex-shrink:0;border:0;cursor:pointer;
+  cursor:pointer;
+}
+.rmh-search-btn{
+  width:48px;flex-shrink:0;border:0;
   background:#15325c;color:#fff;
   display:flex;align-items:center;justify-content:center;
   transition:background .15s;
@@ -178,13 +183,46 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
 #rizq-mock-hdr .rmh-help-dd .rizq-help-dd-menu{
   z-index:10070;
 }
-.rmh-lang{
-  background:transparent;border:0;color:rgba(255,255,255,.88);
-  font:800 12px 'Cairo',sans-serif;cursor:pointer;padding:6px 6px;
-  direction:ltr;letter-spacing:.02em;
+.rmh-lang.btn-lang,
+#rizq-mock-hdr #rmh-lang-btn{
+  background:transparent!important;
+  border:1px solid rgba(255,255,255,.14)!important;
+  color:#fff!important;
+  font:800 12px 'Cairo',sans-serif!important;
+  cursor:pointer!important;
+  padding:6px 10px!important;
+  border-radius:10px!important;
+  direction:ltr!important;
+  letter-spacing:.02em;
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:0!important;
+  min-height:38px;
+  box-shadow:none!important;
 }
-.rmh-lang .lang-ar{color:#fff}
-.rmh-lang .lang-fr{color:rgba(255,255,255,.72)}
+#rizq-mock-hdr #rmh-lang-btn:hover{
+  background:rgba(201,168,76,.18)!important;
+  border-color:rgba(201,168,76,.4)!important;
+}
+#rizq-mock-hdr #rmh-lang-btn .lang-fr,
+#rizq-mock-hdr #rmh-lang-btn .lang-ar{
+  color:rgba(255,255,255,.72)!important;
+  opacity:.85!important;
+  font-weight:800!important;
+}
+#rizq-mock-hdr #rmh-lang-btn .lang-sep{
+  color:rgba(255,255,255,.45)!important;
+  opacity:1!important;
+}
+/* اللغة النشطة ذهبية — كما في الهيدر الأصلي */
+html[lang="ar"] #rizq-mock-hdr #rmh-lang-btn .lang-ar,
+body.rizq-lang-ar #rizq-mock-hdr #rmh-lang-btn .lang-ar{
+  color:#E8C96A!important;opacity:1!important;font-weight:900!important;
+}
+html[lang="fr"] #rizq-mock-hdr #rmh-lang-btn .lang-fr,
+body.rizq-lang-fr #rizq-mock-hdr #rmh-lang-btn .lang-fr{
+  color:#E8C96A!important;opacity:1!important;font-weight:900!important;
+}
 .rmh-ico{
   width:38px;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.14);
   background:transparent;color:#fff;display:inline-flex;align-items:center;justify-content:center;
@@ -264,6 +302,39 @@ nav.rmh-nav{
   pointer-events:none; /* المؤشر يد على الرابط كله لا تحديد نص */
 }
 .rmh-nav a .rmh-nav-ico svg{display:block;pointer-events:none}
+
+/* المزيد — قائمة منسدلة كما السابق */
+.rmh-more-wrap{
+  position:relative;flex:0 0 auto;display:flex;align-items:stretch;
+}
+.rmh-more-btn{
+  appearance:none;background:transparent;border:0;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;min-width:78px;padding:9px 12px 11px;
+  color:rgba(255,255,255,.78);font:700 12px 'Cairo',sans-serif;
+  border-bottom:3px solid transparent;user-select:none;
+}
+.rmh-more-btn .rmh-nav-ico{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;pointer-events:none}
+.rmh-more-btn .rmh-nav-ico svg{display:block}
+.rmh-more-wrap.open .rmh-more-btn,
+.rmh-more-btn:hover{
+  color:var(--rmh-gold);border-bottom-color:var(--rmh-gold);
+}
+.rmh-more-menu{
+  position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);
+  min-width:176px;padding:8px 6px;border-radius:12px;z-index:10070;
+  background:rgba(15,23,42,.97);border:1px solid rgba(201,168,76,.42);
+  box-shadow:0 16px 40px rgba(0,0,0,.55);direction:rtl;text-align:right;
+  display:none;flex-direction:column;gap:2px;
+}
+.rmh-more-wrap.open .rmh-more-menu{display:flex}
+.rmh-more-menu[hidden]{display:none!important}
+.rmh-more-item{
+  display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;
+  text-decoration:none;color:#e8eef8;font:700 13px 'Cairo',sans-serif;
+}
+.rmh-more-item:hover{background:rgba(255,255,255,.08);color:#E8C96A}
+.rmh-more-item strong{font-weight:800}
 /* نشط افتراضياً — وعند المرور على قسم آخر يبقى الذهبي للماوس فقط */
 .rmh-nav a.is-active{
   color:var(--rmh-gold);border-bottom-color:var(--rmh-gold);
