@@ -5269,6 +5269,34 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
 </section>
 
+<!-- ══ نماذج المعارض — اقتراحات رزق (سيارات / أثاث / إلكترونيات…) ══ -->
+<section id="rizq-showroom-models" class="rizq-styles-section" aria-labelledby="rizq-srm-title">
+  <div class="rizq-styles-inner">
+    <div class="section-header fade-in">
+      <p class="section-tag">معارض <span>رزق</span></p>
+      <h2 id="rizq-srm-title" class="section-title" data-t="srm-title">من قلب المعارض على <span>رزق</span></h2>
+      <p class="section-desc" data-t="srm-desc">سيارات، أثاث، إلكترونيات ومعدات — عروض تليق بمعرض يليق بك</p>
+    </div>
+    <div class="rizq-styles-toolbar">
+      <button type="button" class="rizq-styles-reshuffle" id="rizq-srm-reshuffle" onclick="buildShowroomModels(true)" data-t="srm-reshuffle" aria-label="نماذج جديدة">🔀 نماذج جديدة</button>
+      <p class="rizq-srm-tick" id="rizq-srm-tick" aria-live="polite"></p>
+    </div>
+    <div class="rizq-styles-gender-tabs" role="tablist" aria-label="أنواع نماذج المعارض">
+      <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-srm-cat="cars" id="srm-tab-cars" onclick="setShowroomModelCat('cars')">🚗 <span data-t="srm-cars">سيارات</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="electronics" id="srm-tab-electronics" onclick="setShowroomModelCat('electronics')">📱 <span data-t="srm-electronics">إلكترونيات</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="furniture" id="srm-tab-furniture" onclick="setShowroomModelCat('furniture')">🛋️ <span data-t="srm-furniture">أثاث ومفروشات</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="equipment" id="srm-tab-equipment" onclick="setShowroomModelCat('equipment')">⚙️ <span data-t="srm-equipment">معدات ومكائن</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="building" id="srm-tab-building" onclick="setShowroomModelCat('building')">🏗️ <span data-t="srm-building">مواد بناء</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="jewelry" id="srm-tab-jewelry" onclick="setShowroomModelCat('jewelry')">💎 <span data-t="srm-jewelry">مجوهرات</span></button>
+    </div>
+    <!-- شعارات الماركات فوق صور أنماط المعارض (سيارات → تويوتا/مرسيدس، إلكترونيات → آبل/سامسونج…) -->
+    <div class="rzq-landing-brand-strip-wrap fade-in" id="rizq-srm-brand-strip" aria-label="ماركات المعارض"></div>
+    <div class="rizq-styles-track-wrap fade-in">
+      <div class="rizq-styles-rail" id="rizq-srm-rail" role="list" aria-labelledby="srm-tab-cars"></div>
+    </div>
+  </div>
+</section>
+
 <!-- ══ SECTION: VIRTUAL ESTATE / العقارات — نفس أسلوب المحلات والمعارض ══ -->
 <section id="virtual-estate" style="padding:50px 5%;background:var(--bg-section);position:relative;overflow:hidden">
 
@@ -5344,34 +5372,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
     <div class="rizq-styles-track-wrap fade-in">
       <div class="rizq-styles-rail" id="rizq-est-rail" role="list" aria-labelledby="rizq-est-title"></div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ نماذج المعارض — اقتراحات رزق (سيارات / أثاث / إلكترونيات…) ══ -->
-<section id="rizq-showroom-models" class="rizq-styles-section" aria-labelledby="rizq-srm-title">
-  <div class="rizq-styles-inner">
-    <div class="section-header fade-in">
-      <p class="section-tag">معارض <span>رزق</span></p>
-      <h2 id="rizq-srm-title" class="section-title" data-t="srm-title">من قلب المعارض على <span>رزق</span></h2>
-      <p class="section-desc" data-t="srm-desc">سيارات، أثاث، إلكترونيات ومعدات — عروض تليق بمعرض يليق بك</p>
-    </div>
-    <div class="rizq-styles-toolbar">
-      <button type="button" class="rizq-styles-reshuffle" id="rizq-srm-reshuffle" onclick="buildShowroomModels(true)" data-t="srm-reshuffle" aria-label="نماذج جديدة">🔀 نماذج جديدة</button>
-      <p class="rizq-srm-tick" id="rizq-srm-tick" aria-live="polite"></p>
-    </div>
-    <div class="rizq-styles-gender-tabs" role="tablist" aria-label="أنواع نماذج المعارض">
-      <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-srm-cat="cars" id="srm-tab-cars" onclick="setShowroomModelCat('cars')">🚗 <span data-t="srm-cars">سيارات</span></button>
-      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="electronics" id="srm-tab-electronics" onclick="setShowroomModelCat('electronics')">📱 <span data-t="srm-electronics">إلكترونيات</span></button>
-      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="furniture" id="srm-tab-furniture" onclick="setShowroomModelCat('furniture')">🛋️ <span data-t="srm-furniture">أثاث ومفروشات</span></button>
-      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="equipment" id="srm-tab-equipment" onclick="setShowroomModelCat('equipment')">⚙️ <span data-t="srm-equipment">معدات ومكائن</span></button>
-      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="building" id="srm-tab-building" onclick="setShowroomModelCat('building')">🏗️ <span data-t="srm-building">مواد بناء</span></button>
-      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-srm-cat="jewelry" id="srm-tab-jewelry" onclick="setShowroomModelCat('jewelry')">💎 <span data-t="srm-jewelry">مجوهرات</span></button>
-    </div>
-    <!-- شعارات الماركات فوق صور أنماط المعارض (سيارات → تويوتا/مرسيدس، إلكترونيات → آبل/سامسونج…) -->
-    <div class="rzq-landing-brand-strip-wrap fade-in" id="rizq-srm-brand-strip" aria-label="ماركات المعارض"></div>
-    <div class="rizq-styles-track-wrap fade-in">
-      <div class="rizq-styles-rail" id="rizq-srm-rail" role="list" aria-labelledby="srm-tab-cars"></div>
     </div>
   </div>
 </section>
