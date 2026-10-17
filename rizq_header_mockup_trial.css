@@ -220,10 +220,10 @@ nav.rmh-nav{
 .rmh-cart-sec li{margin:3px 0}
 .rmh-cart-empty{color:#6a7d94;font:600 13px 'Cairo',sans-serif;margin:0}
 .rmh-cart-open-full{
-  display:block;text-align:center;margin-top:10px;padding:11px 12px;
+  display:block;text-align:center;margin-top:8px;padding:9px 10px;
   background:linear-gradient(135deg,#1B3A6B,#0D1B2A);color:#fff;
-  border-radius:10px;text-decoration:none;font:800 13.5px 'Cairo',sans-serif;
-  white-space:nowrap;
+  border-radius:9px;text-decoration:none;font:800 12.5px 'Cairo',sans-serif;
+  white-space:normal;
 }
 
 /* تابلت — بدون قائمة الأقسام داخل البحث (كالنموذج) */
