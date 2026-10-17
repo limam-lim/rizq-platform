@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.35';
+    link.href = 'rizq_header_mockup_trial.css?v=5.36';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -748,8 +748,11 @@
     });
   }
 
-  /* ترتيب أقسام الشريط — للنصف العلوي/السفلي على الهاتف */
-  var RMH_NAV_TOP_KEYS = ['home', 'ads', 'stores', 'showrooms', 'estate'];
+  /* هاتف فقط:
+     - أسفل (قرب الإبهام): الرئيسية · الإعلانات · المحلات
+     - أعلى (تحت الشعار): الباقي، مع نشر بين الاستثمارات والمناقصات */
+  var RMH_NAV_BOTTOM_ORDER = ['home', 'ads', 'stores'];
+  var RMH_NAV_TOP_ORDER = ['showrooms', 'estate', 'offices', 'investments', 'post', 'tenders', 'more'];
   var __rmhNavSlots = null;
 
   function captureNavSlots(bottomNav) {
@@ -769,7 +772,24 @@
     return '';
   }
 
-  /** هاتف: نصف الأقسام تحت الشعار، نصف يبقى أسفل الشاشة */
+  function slotByKey(key) {
+    if (!__rmhNavSlots) return null;
+    for (var i = 0; i < __rmhNavSlots.length; i++) {
+      if (__rmhNavSlots[i].key === key) return __rmhNavSlots[i];
+    }
+    return null;
+  }
+
+  function appendOrdered(nav, orderKeys) {
+    if (!nav) return;
+    orderKeys.forEach(function (key) {
+      var slot = slotByKey(key);
+      if (slot && slot.el && slot.el.parentNode !== nav) nav.appendChild(slot.el);
+      else if (slot && slot.el) nav.appendChild(slot.el);
+    });
+  }
+
+  /** هاتف: الرئيسية/إعلانات/محلات أسفل قرب الإبهام؛ نشر بين استثمارات↔مناقصات أعلى */
   function syncPhoneNavSplit() {
     var hdr = document.getElementById('rizq-mock-hdr');
     if (!hdr) return;
@@ -787,6 +807,8 @@
         topNav.parentNode && topNav.parentNode.removeChild(topNav);
       }
       document.body.classList.remove('rmh-phone-nav-split');
+      var deskPostLbl = bottomNav.querySelector('a[data-rmh="post"] .rmh-post-lbl');
+      if (deskPostLbl) deskPostLbl.textContent = 'انشر إعلان';
       return;
     }
 
@@ -802,28 +824,22 @@
       else hdr.insertBefore(topNav, bottomNav);
     }
 
-    var topSet = {};
-    RMH_NAV_TOP_KEYS.forEach(function (k) { topSet[k] = 1; });
+    appendOrdered(topNav, RMH_NAV_TOP_ORDER);
+    appendOrdered(bottomNav, RMH_NAV_BOTTOM_ORDER);
 
+    /* أي عنصر غير معروف يبقى في الشريط العلوي بعد «المزيد» */
     if (__rmhNavSlots) {
       __rmhNavSlots.forEach(function (slot) {
         if (!slot.el) return;
-        if (topSet[slot.key]) {
-          if (slot.el.parentNode !== topNav) topNav.appendChild(slot.el);
-        } else if (slot.el.parentNode !== bottomNav) {
-          bottomNav.appendChild(slot.el);
-        }
-      });
-    } else {
-      Array.prototype.slice.call(hdr.querySelectorAll('nav.rmh-nav [data-rmh], nav.rmh-nav .rmh-more-wrap')).forEach(function (el) {
-        var key = navKeyOf(el);
-        if (topSet[key]) {
-          if (el.parentNode !== topNav) topNav.appendChild(el);
-        } else if (el.parentNode !== bottomNav) {
-          bottomNav.appendChild(el);
-        }
+        if (RMH_NAV_BOTTOM_ORDER.indexOf(slot.key) >= 0) return;
+        if (RMH_NAV_TOP_ORDER.indexOf(slot.key) >= 0) return;
+        if (slot.el.parentNode !== topNav) topNav.appendChild(slot.el);
       });
     }
+
+    /* هاتف: اختصار تسمية النشر في الوسط */
+    var postLbl = topNav.querySelector('a[data-rmh="post"] .rmh-post-lbl');
+    if (postLbl) postLbl.textContent = 'نشر';
   }
 
   function syncMockHdrHeight() {
