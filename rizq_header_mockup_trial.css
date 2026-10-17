@@ -242,10 +242,14 @@ body.rizq-mockup-hdr-trial .hero-pill-sep{
   position:relative!important;
   z-index:1!important;
 }
-body.rizq-mockup-hdr-trial .hero-pill:hover{
+html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pill:hover,
+body.rizq-mockup-hdr-trial .hero-pill:hover,
+html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pill:focus-visible,
+body.rizq-mockup-hdr-trial .hero-pill:focus-visible{
   background:linear-gradient(145deg,#1B3A6B,#0D1B2A)!important;
-  color:#F3E2A8!important;
-  -webkit-text-fill-color:#F3E2A8!important;
+  color:#FFE9A8!important;
+  -webkit-text-fill-color:#FFE9A8!important;
+  text-shadow:0 0 12px rgba(201,168,76,.35)!important;
   transform:translateY(-1px)!important;
   box-shadow:0 8px 18px rgba(13,27,42,.22),0 0 0 1px rgba(201,168,76,.35)!important;
 }
