@@ -4468,8 +4468,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <script src="rizq_announcements.js"></script>
     <script src="rizq_civic_ticker.js"></script>
 <script src="rizq_backend_config.js"></script>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=2.3"/>
-<script src="rizq_header_mockup_trial.js?v=2.3" defer></script>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=2.5"/>
+<script src="rizq_header_mockup_trial.js?v=2.5" defer></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
 <script src="rizq_terms_gate.js?v=23.0"></script>
@@ -4597,9 +4597,24 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <a class="rmh-ico" href="#wishlist-block" aria-label="المفضلة">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 20s-6.5-4.2-8.5-8A4.6 4.6 0 0 1 12 7.2 4.6 4.6 0 0 1 20.5 12c-2 3.8-8.5 8-8.5 8z"/></svg>
       </a>
-      <a class="rmh-ico rmh-help" href="rizq_help.html" aria-label="المساعدة" title="المساعدة">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 0 1 4.8.8c0 1.5-1.5 2.1-2.4 2.7"/><circle cx="12" cy="16.2" r="1" fill="currentColor" stroke="none"/></svg>
-      </a>
+      <div class="rizq-help-dd rmh-help-dd" id="rmh-help-wrap" data-rizq-toolbar="help">
+        <button type="button" class="rizq-help-dd-btn rmh-ico" id="rmh-help-btn" aria-haspopup="true" aria-expanded="false" aria-controls="rmh-help-menu" aria-label="المساعدة والدعم" title="المساعدة والدعم">
+          <span class="rizq-help-dd-chev" aria-hidden="true">▾</span>
+          <span class="rizq-help-dd-ico" aria-hidden="true">
+            <svg class="rizq-help-svg" viewBox="0 0 24 24" width="18" height="18" focusable="false"><path fill="currentColor" d="M12 3a8 8 0 0 0-8 8v2.2a2.2 2.2 0 0 0 2.2 2.2H7.5a1.3 1.3 0 0 0 1.3-1.3V12a1.3 1.3 0 0 0-1.3-1.3H6.1A5.9 5.9 0 0 1 12 5a5.9 5.9 0 0 1 5.9 5.7h-1.4A1.3 1.3 0 0 0 15.2 12v2.1a1.3 1.3 0 0 0 1.3 1.3h1.3A2.2 2.2 0 0 0 20 13.2V11a8 8 0 0 0-8-8zm-1.2 14.6c0-.5.4-.9.9-.9h.6c2.1 0 3.4 1 3.4 2.5v.4c0 .4-.3.7-.7.7h-5c-.7 0-1.2-.5-1.2-1.2v-1.5z"/></svg>
+          </span>
+        </button>
+        <div class="rizq-help-dd-menu" id="rmh-help-menu" role="menu" hidden>
+          <a class="rizq-help-dd-item" role="menuitem" href="rizq_legal.html#s10">
+            <span class="rizq-help-dd-item-ico" aria-hidden="true"><svg class="rizq-help-svg" viewBox="0 0 24 24" width="18" height="18" focusable="false"><path fill="currentColor" d="M12 3c4.7 0 8.5 3.1 8.5 7s-3.8 7-8.5 7c-.7 0-1.4-.1-2.1-.2L6 19.2c-.4.2-.8-.2-.6-.6l1.1-3.1C4.7 14.5 3.5 12.4 3.5 10c0-3.9 3.8-7 8.5-7zm-3.2 6.2a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm3.2 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm3.2 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg></span>
+            <span class="rizq-help-dd-item-lbl" data-rizq-help-lbl="contact">اتصل بنا</span>
+          </a>
+          <a class="rizq-help-dd-item" role="menuitem" href="rizq_help.html">
+            <span class="rizq-help-dd-item-ico" aria-hidden="true"><svg class="rizq-help-svg" viewBox="0 0 24 24" width="18" height="18" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 1 0 .01 20.01A10 10 0 0 0 12 2zm0 4.2a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zM10.8 11h2.4v6.2h-2.4V11z"/></svg></span>
+            <span class="rizq-help-dd-item-lbl" data-rizq-help-lbl="help">مركز المساعدة</span>
+          </a>
+        </div>
+      </div>
       <a class="rmh-post" href="rizq_post.html"><span aria-hidden="true">+</span><span class="rmh-post-lbl">انشر إعلان</span></a>
     </div>
   </div>
