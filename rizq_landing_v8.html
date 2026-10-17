@@ -1721,7 +1721,7 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   font-size:8px;font-weight:800;line-height:1;text-align:center;
   text-shadow:0 1px 3px rgba(0,0,0,.65);max-width:44px;
 }
-/* اتصال + واتساب أسفل الفيديو — تظهر عند المرور فقط، وتختفي عند التشغيل أو مغادرة الماوس */
+/* اتصال + واتساب أسفل الفيديو — تظهر مع .is-armed فقط، وتختفي عند التشغيل أو مغادرة الماوس */
 .rizq-vcard-thumb .rizq-vcard-contacts,
 .rizq-vcard-thumb .rzq-adx-actions{
   position:absolute;left:50%;top:auto;bottom:12px;
@@ -1738,22 +1738,13 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   opacity:0;pointer-events:none;
   transition:opacity .2s ease,transform .2s ease;
 }
-.rizq-vcard:hover:not(.is-playing) .rizq-vcard-thumb .rizq-vcard-contacts,
-.rizq-vcard:hover:not(.is-playing) .rizq-vcard-thumb .rzq-adx-actions,
-.rizq-vcard:focus-within:not(.is-playing) .rizq-vcard-thumb .rizq-vcard-contacts,
-.rizq-vcard:focus-within:not(.is-playing) .rizq-vcard-thumb .rzq-adx-actions{
+.rizq-vcard.is-armed:not(.is-playing) .rizq-vcard-thumb .rizq-vcard-contacts,
+.rizq-vcard.is-armed:not(.is-playing) .rizq-vcard-thumb .rzq-adx-actions{
   opacity:1;pointer-events:auto;transform:translate(-50%,0);
 }
 .rizq-vcard.is-playing .rizq-vcard-thumb .rizq-vcard-contacts,
 .rizq-vcard.is-playing .rizq-vcard-thumb .rzq-adx-actions{
   opacity:0!important;pointer-events:none!important;transform:translate(-50%,6px);
-}
-/* لمس: الأزرار ظاهرة طالما الفيديو متوقف، وتختفي عند التشغيل */
-@media (hover:none){
-  .rizq-vcard:not(.is-playing) .rizq-vcard-thumb .rizq-vcard-contacts,
-  .rizq-vcard:not(.is-playing) .rizq-vcard-thumb .rzq-adx-actions{
-    opacity:1;pointer-events:auto;transform:translate(-50%,0);
-  }
 }
 .rizq-vcard-thumb .rizq-vcard-tel,
 .rizq-vcard-thumb .rizq-vcard-wa,
@@ -15188,7 +15179,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_packages_ui.js?v=23.0"></script>
 <script src="rizq_merchant_activities.js?v=23.0"></script>
 <script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo16"></script>
+<script src="rizq_video_ads.js?v=promo17"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=24.1"></script>
 <script src="rizq_disclaimer.js"></script>

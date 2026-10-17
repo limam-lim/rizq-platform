@@ -695,18 +695,27 @@
         }
       }
 
-      // سطح المكتب: عند المرور تظهر أزرار الاتصال أولاً، ثم تشغيل بعد تأخير قصير
-      // عند التشغيل أو مغادرة الماوس تختفي الأزرار
+      function armContacts() {
+        if (!card.classList.contains('is-playing')) card.classList.add('is-armed');
+      }
+      function disarmContacts() {
+        card.classList.remove('is-armed');
+      }
+
+      // سطح المكتب: مرور = إظهار الاتصال، ثم تشغيل بعد تأخير؛ مغادرة/تشغيل = إخفاء
       card.addEventListener('mouseenter', function () {
+        armContacts();
         clearHoverPlayTimer();
         hoverPlayTimer = setTimeout(function () {
           hoverPlayTimer = null;
+          disarmContacts();
           playStripVideo(card);
           syncActionUi();
         }, 480);
       });
       card.addEventListener('mouseleave', function () {
         clearHoverPlayTimer();
+        disarmContacts();
         if (_stripLightbox && _stripLightbox.classList.contains('is-open')) return;
         stopStripVideo(card);
         syncActionUi();
@@ -715,11 +724,14 @@
       if (btnPlay) {
         btnPlay.addEventListener('click', function (ev) {
           ev.preventDefault(); ev.stopPropagation();
+          clearHoverPlayTimer();
           if (card.classList.contains('is-playing') && video && !video.paused) {
             try { video.pause(); } catch (e) {}
             card.classList.remove('is-playing');
             if (_stripPlaying === card) _stripPlaying = null;
+            armContacts();
           } else {
+            disarmContacts();
             playStripVideo(card);
           }
           syncActionUi();
@@ -755,26 +767,42 @@
         });
       }
 
-      // جوال: لمس البطاقة (خارج الأزرار/جهات الاتصال) يشغّل/يوقف ويعرض الأدوات
+      // جوال: لمس البطاقة (خارج الأزرار/جهات الاتصال) يشغّل/يوقف
+      // متوقف → أظهر الاتصال؛ تشغيل → أخفِ الاتصال
       card.addEventListener('click', function (ev) {
         if (ev.target.closest && ev.target.closest('.rizq-vcard-actions,.rizq-vcard-contacts,.rzq-adx-actions,.rzq-adx-tel,.rzq-adx-wa')) return;
         if (window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
           return; // سطح المكتب يعتمد على hover
         }
         ev.preventDefault();
-        if (card.classList.contains('is-playing')) stopStripVideo(card);
-        else playStripVideo(card);
+        if (card.classList.contains('is-playing')) {
+          stopStripVideo(card);
+          armContacts();
+        } else {
+          disarmContacts();
+          playStripVideo(card);
+        }
         syncActionUi();
         if (ad.accountId) trackEvent(ad.accountId, 'click');
       });
       card.addEventListener('keydown', function (ev) {
         if (ev.key === 'Enter' || ev.key === ' ') {
           ev.preventDefault();
-          if (card.classList.contains('is-playing')) stopStripVideo(card);
-          else playStripVideo(card);
+          if (card.classList.contains('is-playing')) {
+            stopStripVideo(card);
+            armContacts();
+          } else {
+            disarmContacts();
+            playStripVideo(card);
+          }
           syncActionUi();
         }
       });
+
+      // لمس أولي: أظهر أزرار الاتصال إن لم يكن التشغيل جارياً
+      card.addEventListener('touchstart', function () {
+        if (!card.classList.contains('is-playing')) armContacts();
+      }, { passive: true });
 
       if (ad.accountId && !ad.demo) trackEvent(ad.accountId, 'impression');
       track.appendChild(card);
