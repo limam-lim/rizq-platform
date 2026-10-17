@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta http-equiv="X-Content-Type-Options" content="nosniff"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link rel="stylesheet" href="rizq-theme.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet"/>
+<title>معروضات العقارات | Biens immobiliers — رزق</title>
+<style>
+:root{
+  --navy:#0B1C33;--ink:#060d18;--gold:#C9A84C;--gold2:#E8C96A;--gold3:#F3E2A8;
+  --text:#E8EDF5;--muted:rgba(232,237,245,.72);--line:rgba(201,168,76,.28);
+  --display:'Amiri','Noto Naskh Arabic',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body,
+body.rizq-mockup-hdr-trial{
+  font-family:'Cairo',system-ui,sans-serif;color:var(--text);min-height:100vh;
+  background-color:#060d18!important;
+  background-image:
+    radial-gradient(1100px 480px at 88% -8%,rgba(201,168,76,.14),transparent 55%),
+    radial-gradient(800px 380px at 8% 18%,rgba(27,58,107,.4),transparent 52%),
+    linear-gradient(180deg,#060d18 0%,#0a1424 42%,#07111f 100%)!important;
+  background-attachment:fixed!important;
+}
+button,a,[role="button"]{cursor:pointer}
+img{display:block;max-width:100%}
+button{font:inherit;border:0;background:none;color:inherit}
+
+.el-top{
+  position:sticky;top:0;z-index:40;
+  background:linear-gradient(180deg,rgba(6,13,24,.98),rgba(6,13,24,.88));
+  backdrop-filter:blur(14px);border-bottom:1px solid rgba(201,168,76,.22);
+}
+.el-top-inner{
+  max-width:1180px;margin:0 auto;padding:12px 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+}
+.el-brand{display:flex;align-items:center;gap:10px;text-decoration:none;direction:ltr}
+.el-brand img{width:34px;height:34px;border-radius:10px;object-fit:contain;
+  background:linear-gradient(160deg,#1a2d4d,#0a1324);
+  box-shadow:0 0 0 1.5px rgba(240,215,138,.5)}
+.el-brand-ar{font-weight:900;font-size:18px;color:var(--gold);line-height:1;display:block}
+.el-brand-sub{font-size:7.5px;letter-spacing:1.4px;color:rgba(201,168,76,.75);font-style:italic;text-transform:uppercase}
+.el-nav{display:flex;flex-wrap:wrap;gap:6px}
+.el-nav a{
+  color:rgba(232,237,245,.8);text-decoration:none;font:800 12.5px Cairo,sans-serif;
+  padding:8px 12px;border-radius:999px;border:1px solid transparent;transition:.2s;
+}
+.el-nav a:hover,.el-nav a.is-on{color:var(--gold2);border-color:rgba(201,168,76,.35);background:rgba(201,168,76,.08)}
+.el-actions{display:flex;gap:8px;flex-wrap:wrap}
+.el-chip{
+  border:1px solid var(--line);background:rgba(201,168,76,.08);color:var(--gold2);
+  border-radius:999px;padding:8px 14px;font:700 12px/1 Cairo,sans-serif;text-decoration:none;
+}
+.el-chip.solid{
+  background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0B1C33;border-color:transparent;
+  box-shadow:0 8px 20px rgba(201,168,76,.28);
+}
+
+.el-hero{
+  max-width:1180px;margin:0 auto;padding:32px 20px 12px;text-align:center;
+}
+.el-kicker{
+  display:inline-flex;align-items:center;gap:8px;margin-bottom:12px;
+  border:1px solid rgba(201,168,76,.45);background:rgba(11,28,51,.55);
+  color:var(--gold2);border-radius:999px;padding:8px 14px;font:800 12px Cairo,sans-serif;
+}
+.el-kicker i{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(201,168,76,.22)}
+.el-hero h1{
+  font-family:var(--display);font-size:clamp(28px,4.5vw,48px);font-weight:700;line-height:1.2;
+  margin-bottom:10px;color:#fff;
+}
+.el-hero h1 em{
+  font-style:normal;
+  background:linear-gradient(135deg,#F3E2A8,#C9A84C 55%,#E8C96A);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.el-hero p{color:var(--muted);font-size:15px;line-height:1.7;max-width:50ch;margin:0 auto 16px}
+.el-hero-cta{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.el-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border-radius:14px;padding:13px 20px;font:800 14px Cairo,sans-serif;text-decoration:none;
+  transition:transform .2s,box-shadow .2s;
+}
+.el-btn:hover{transform:translateY(-2px)}
+.el-btn-gold{
+  background:linear-gradient(135deg,#F3E2A8,#C9A84C 45%,#E8C96A);color:#0B1C33;
+  box-shadow:0 12px 28px rgba(201,168,76,.32);
+}
+.el-btn-ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.16)}
+
+.el-wrap{max-width:1180px;margin:0 auto;padding:8px 20px 48px}
+
+.el-filters{
+  margin:10px 0 18px;padding:16px;border-radius:18px;
+  border:1px solid rgba(201,168,76,.22);background:rgba(255,255,255,.03);
+  display:grid;grid-template-columns:1.4fr .9fr .9fr auto;gap:10px;align-items:end;
+}
+.el-field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.el-field label{font:800 11px Cairo,sans-serif;color:var(--gold2);letter-spacing:.3px}
+.el-field input,.el-field select{
+  width:100%;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);
+  color:#fff;border-radius:12px;padding:12px 14px;font:700 13px Cairo,sans-serif;outline:none;
+}
+.el-field input:focus,.el-field select:focus{border-color:rgba(201,168,76,.55)}
+.el-field select option{background:#0f1c30;color:#fff}
+.el-go{
+  border:0;border-radius:12px;padding:12px 18px;font:800 13px Cairo,sans-serif;
+  background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0B1C33;white-space:nowrap;
+}
+
+.el-tabs{
+  display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;align-items:center;justify-content:space-between;
+}
+.el-tab-row{display:flex;flex-wrap:wrap;gap:8px}
+.el-tab,.el-deal{
+  border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(232,237,245,.85);
+  border-radius:999px;padding:8px 14px;font:800 12.5px Cairo,sans-serif;transition:.2s;
+}
+.el-tab.is-on,.el-deal.is-on{
+  color:#0B1C33;border-color:transparent;
+  background:linear-gradient(135deg,#F3E2A8,#C9A84C 50%,#E8C96A);
+}
+.el-count{font:800 13px Cairo,sans-serif;color:var(--muted)}
+
+.el-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.el-card{
+  grid-column:span 4;border-radius:20px;overflow:hidden;
+  background:linear-gradient(160deg,#121f33,#0a1628);
+  border:1px solid rgba(201,168,76,.24);
+  box-shadow:0 16px 36px rgba(0,0,0,.28);
+  display:flex;flex-direction:column;min-height:100%;
+  transition:transform .25s,border-color .25s,box-shadow .25s;
+}
+.el-card:hover{transform:translateY(-4px);border-color:rgba(201,168,76,.5);box-shadow:0 22px 48px rgba(0,0,0,.38)}
+.el-card.featured{grid-column:span 8}
+.el-card-media{position:relative;aspect-ratio:16/10;background:#0a1424;overflow:hidden}
+.el-card.featured .el-card-media{aspect-ratio:21/10;min-height:240px}
+.el-card-media img{width:100%;height:100%;object-fit:cover;transition:transform .55s}
+.el-card:hover .el-card-media img{transform:scale(1.06)}
+.el-card-media::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 35%,rgba(6,13,24,.9) 100%);
+}
+.el-badge{
+  position:absolute;top:12px;right:12px;z-index:2;
+  background:rgba(6,13,24,.78);border:1px solid rgba(201,168,76,.45);
+  color:var(--gold2);border-radius:999px;padding:5px 10px;font:800 11px Cairo,sans-serif;
+}
+.el-price{
+  position:absolute;bottom:12px;left:12px;z-index:2;
+  background:linear-gradient(135deg,#F3E2A8,#C9A84C);color:#0B1C33;
+  border-radius:12px;padding:8px 12px;font:900 14px Cairo,sans-serif;
+}
+.el-card-body{padding:15px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.el-card-body h3{font-size:16px;font-weight:900;color:#fff;line-height:1.35}
+.el-card.featured .el-card-body h3{font-size:20px}
+.el-loc{font-size:13px;color:var(--muted)}
+.el-meta{display:flex;flex-wrap:wrap;gap:10px;font:700 12.5px Cairo,sans-serif;color:rgba(232,237,245,.82)}
+.el-agency{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;
+  margin-top:auto;padding-top:8px;border-top:1px solid rgba(255,255,255,.08);
+}
+.el-agency a{
+  color:var(--gold2);font:800 12.5px Cairo,sans-serif;text-decoration:none;
+}
+.el-agency a:hover{text-decoration:underline}
+.el-card-cta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.el-card-cta a{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border-radius:12px;padding:10px 8px;font:800 12.5px Cairo,sans-serif;text-decoration:none;
+}
+.el-call{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347}
+.el-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
+
+.el-empty{
+  grid-column:1/-1;text-align:center;padding:44px 18px;border-radius:18px;
+  border:1px dashed rgba(201,168,76,.3);background:rgba(255,255,255,.02);color:var(--muted);
+}
+
+.el-own{
+  margin-top:36px;border-radius:24px;overflow:hidden;
+  border:1px solid rgba(201,168,76,.3);
+  background:
+    radial-gradient(700px 240px at 80% 0%,rgba(201,168,76,.16),transparent 55%),
+    linear-gradient(145deg,#121f33,#0B1C33 55%,#0a1628);
+  padding:28px 24px;text-align:center;
+}
+.el-own h2{font-family:var(--display);font-size:clamp(22px,3vw,32px);margin-bottom:8px;color:#fff}
+.el-own p{color:var(--muted);max-width:46ch;margin:0 auto 16px;line-height:1.7}
+
+.el-foot{
+  border-top:1px solid rgba(201,168,76,.18);text-align:center;
+  padding:18px 20px 28px;color:rgba(232,237,245,.45);font-size:12px;
+}
+.el-foot a{color:var(--gold2);text-decoration:none;font-weight:800}
+
+@media(max-width:980px){
+  .el-filters{grid-template-columns:1fr 1fr}
+  .el-card,.el-card.featured{grid-column:span 6}
+  .el-nav{display:none}
+}
+@media(max-width:640px){
+  .el-filters{grid-template-columns:1fr}
+  .el-card,.el-card.featured{grid-column:span 12}
+  .el-card-cta{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body class="rizq-page-dark">
+
+<header class="el-top">
+  <div class="el-top-inner">
+    <a class="el-brand" href="rizq_landing_v8.html" aria-label="رزق">
+      <img src="rizq-mark-inset.png?v=1" width="34" height="34" alt=""/>
+      <span>
+        <span class="el-brand-ar">رزق</span>
+        <span class="el-brand-sub">ESTATE LISTINGS</span>
+      </span>
+    </a>
+    <nav class="el-nav" aria-label="تنقل سوق العقارات">
+      <a href="rizq_estate_agencies.html">الوكالات</a>
+      <a href="#el-grid" class="is-on">معروضات العقارات</a>
+      <a href="rizq_landing_v8.html#virtual-estate">بوابة رزق</a>
+    </nav>
+    <div class="el-actions">
+      <a class="el-chip" href="rizq_estate_agencies.html">دليل الوكالات</a>
+      <a class="el-chip solid" id="el-reg-top" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">افتح وكالتك</a>
+    </div>
+  </div>
+</header>
+
+<section class="el-hero" aria-label="سوق العقارات — كل المعروضات">
+  <div class="el-kicker"><i></i> سوق العقارات · كل المعروضات</div>
+  <h1>اعثر على <em>عقارك</em> من كل الوكالات</h1>
+  <p>صفحة مستقلة لمعروضات البيع والكراء على رزق — صوّر، صفّ، وتواصل مباشرة مع الوكالة.</p>
+  <div class="el-hero-cta">
+    <a class="el-btn el-btn-gold" href="#el-grid">تصفّح المعروضات</a>
+    <a class="el-btn el-btn-ghost" href="rizq_estate_agencies.html">تصفّح الوكالات</a>
+  </div>
+</section>
+
+<main class="el-wrap">
+  <form class="el-filters" id="el-filters" role="search" aria-label="تصفية المعروضات">
+    <div class="el-field">
+      <label for="el-q">البحث</label>
+      <input id="el-q" type="search" placeholder="حي، فيلا، شقة، محل…" autocomplete="off"/>
+    </div>
+    <div class="el-field">
+      <label for="el-city">المدينة</label>
+      <select id="el-city"><option value="">كل المواقع</option></select>
+    </div>
+    <div class="el-field">
+      <label for="el-deal">نوع العرض</label>
+      <select id="el-deal">
+        <option value="all">الكل</option>
+        <option value="sale">للبيع</option>
+        <option value="rent">للكراء</option>
+      </select>
+    </div>
+    <button type="submit" class="el-go" id="el-go">🔎 ابحث</button>
+  </form>
+
+  <div class="el-tabs">
+    <div class="el-tab-row" role="tablist" aria-label="نوع العقار">
+      <button type="button" class="el-tab is-on" data-cat="all">الكل</button>
+      <button type="button" class="el-tab" data-cat="apartment">شقق</button>
+      <button type="button" class="el-tab" data-cat="villa">فلل</button>
+      <button type="button" class="el-tab" data-cat="land">أراضي</button>
+      <button type="button" class="el-tab" data-cat="shop">محلات</button>
+    </div>
+    <div class="el-count" id="el-count" aria-live="polite"></div>
+  </div>
+
+  <div class="el-grid" id="el-grid" role="list" aria-label="قائمة المعروضات العقارية"></div>
+
+  <section class="el-own" aria-label="انشر عقارك">
+    <h2>أنشر معروضاتك مع وكالتك على رزق</h2>
+    <p>افتح حساب وكالة عقارية، أضف فللًا وشققًا وأراضي، ويصل إليك الباحثون مباشرة عبر الصفحة والتواصل.</p>
+    <a class="el-btn el-btn-gold" id="el-reg-own" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">سجّل وكالتك العقارية</a>
+  </section>
+</main>
+
+<footer class="el-foot">
+  © 2026 رزق — سوق العقارات ·
+  <a href="rizq_estate_agencies.html">دليل الوكالات</a> ·
+  <a href="rizq_landing_v8.html#virtual-estate">بوابة العقارات</a>
+</footer>
+
+<script>
+(function(){
+  var DEMO_AGENCIES = {
+    demo_estate_atwar: { name:'أطوار للعقارات', phone:'+222 42 00 01 11', whatsapp:'22242000111', city:'نواكشوط' },
+    demo_estate_saknia: { name:'سكنية العقارية', phone:'+222 45 10 20 30', whatsapp:'22245102030', city:'تفرغ زينة' },
+    demo_estate_horizon: { name:'هورايزن للإسكان', phone:'+222 46 22 33 44', whatsapp:'22246223344', city:'نواذيبو' },
+    demo_estate_dar: { name:'دار الأمين العقارية', phone:'+222 36 70 80 90', whatsapp:'22236708090', city:'لكصر' }
+  };
+
+  var DEMO_LISTINGS = [
+    {id:'e1', agencyId:'demo_estate_atwar', cat:'villa', deal:'sale', featured:true, title:'فيلا راقية بإطلالة بانورامية', loc:'نواكشوط الغربية', price:'4.8M MRU', beds:'5', baths:'4', area:'420 م²',
+      img:'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1400&q=80', badge:'مميّز',
+      desc:'فيلا بحديقة ومسبح — تشطيب حديث ومساحة مريحة للعائلة.'},
+    {id:'e2', agencyId:'demo_estate_saknia', cat:'apartment', deal:'rent', title:'شقة 3 غرف — تشطيب حديث', loc:'تفرغ زينة', price:'150K / شهر', beds:'3', baths:'2', area:'145 م²',
+      img:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1000&q=80', badge:'للكراء',
+      desc:'شقة مفروشة جزئياً في موقع هادئ قريب من الخدمات.'},
+    {id:'e3', agencyId:'demo_estate_dar', cat:'apartment', deal:'sale', title:'شقة مفروشة بإطلالة مدينة', loc:'لكصر', price:'2.1M MRU', beds:'2', baths:'2', area:'110 م²',
+      img:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1000&q=80', badge:'للبيع',
+      desc:'شقة جاهزة للسكن مع إضاءة طبيعية ممتازة.'},
+    {id:'e4', agencyId:'demo_estate_horizon', cat:'land', deal:'sale', title:'أرض سكنية 600 م²', loc:'نواذيبو', price:'2.2M MRU', beds:'—', baths:'—', area:'600 م²',
+      img:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80', badge:'أرض',
+      desc:'قطعة أرض بموقع استراتيجي ووثائق واضحة.'},
+    {id:'e5', agencyId:'demo_estate_atwar', cat:'villa', deal:'sale', title:'منزل عائلي بحديقة خاصة', loc:'كيفة', price:'3.4M MRU', beds:'4', baths:'3', area:'280 م²',
+      img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80', badge:'منزل',
+      desc:'منزل عائلي بمساحات معيشة واسعة.'},
+    {id:'e6', agencyId:'demo_estate_saknia', cat:'shop', deal:'rent', title:'محل تجاري على شارع رئيسي', loc:'سوق العاصمة', price:'85K / شهر', beds:'—', baths:'—', area:'75 م²',
+      img:'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1000&q=80', badge:'محل',
+      desc:'محل بحركة عالية — مناسب للتجارة اليومية.'},
+    {id:'e7', agencyId:'demo_estate_horizon', cat:'apartment', deal:'sale', title:'بنتهاوس بإطلالة غروب', loc:'القطب', price:'6.5M MRU', beds:'4', baths:'3', area:'260 م²',
+      img:'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1000&q=80', badge:'بنتهاوس',
+      desc:'بنتهاوس بتراس واسع وتشطيب راقٍ.'},
+    {id:'e8', agencyId:'demo_estate_dar', cat:'villa', deal:'rent', title:'فيلا للكراء — حي هادئ', loc:'تفرغ زينة', price:'280K / شهر', beds:'5', baths:'4', area:'380 م²',
+      img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80', badge:'للكراء',
+      desc:'فيلا مفروشة مناسبة للعائلات.'},
+    {id:'e9', agencyId:'demo_estate_atwar', cat:'apartment', deal:'rent', title:'استوديو مفروش قريب من الخدمات', loc:'لكصر', price:'65K / شهر', beds:'1', baths:'1', area:'48 م²',
+      img:'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1000&q=80', badge:'للكراء',
+      desc:'استوديو جاهز للسكن بإيجار شهري واضح.'},
+    {id:'e10', agencyId:'demo_estate_saknia', cat:'land', deal:'sale', title:'قطعة تجارية على طريق رئيسي', loc:'نواكشوط', price:'3.1M MRU', beds:'—', baths:'—', area:'450 م²',
+      img:'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1000&q=80', badge:'أرض',
+      desc:'مناسبة لمشروع تجاري أو سكني مختلط.'}
+  ];
+
+  var listings = [];
+  var state = { cat:'all', deal:'all', q:'', city:'' };
+  var grid = document.getElementById('el-grid');
+  var countEl = document.getElementById('el-count');
+  var citySel = document.getElementById('el-city');
+  var dealSel = document.getElementById('el-deal');
+  var qInput = document.getElementById('el-q');
+
+  function esc(s){
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  }
+  function isFr(){
+    try{
+      var ls = localStorage.getItem('rizq_lang');
+      if(ls === 'fr') return true;
+      if(ls === 'ar') return false;
+    }catch(e){}
+    return document.documentElement.lang === 'fr';
+  }
+  function demoAllowed(){
+    try{
+      if(window.RIZQ_PUBLIC_CONFIG && window.RIZQ_PUBLIC_CONFIG.production === true) return false;
+    }catch(e0){}
+    try{
+      var h = String(location.hostname||'').toLowerCase();
+      if(h === 'localhost' || h === '127.0.0.1' || h === '0.0.0.0' || h.endsWith('.local')) return true;
+    }catch(e1){}
+    return /[?&]demo=1(?:&|$)/.test(location.search||'');
+  }
+
+  function agencyMeta(id){
+    if(DEMO_AGENCIES[id]) return DEMO_AGENCIES[id];
+    try{
+      var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+      var hit = (Array.isArray(accs)?accs:[]).find(function(a){ return a && a.id === id; });
+      if(hit){
+        return {
+          name: hit.name || (isFr()?'Agence':'وكالة'),
+          phone: hit.phone || hit.tel || '',
+          whatsapp: String(hit.whatsapp||hit.wa||hit.phone||'').replace(/\D/g,''),
+          city: hit.city || hit.wilaya || ''
+        };
+      }
+    }catch(e){}
+    return { name: isFr()?'Agence':'وكالة', phone:'', whatsapp:'', city:'' };
+  }
+
+  function normalizeListing(raw, agencyId){
+    if(!raw || typeof raw !== 'object') return null;
+    var status = String(raw.status||'available').toLowerCase();
+    if(status === 'sold' || status === 'rented') return null;
+    var aid = agencyId || raw.agencyId || '';
+    var meta = agencyMeta(aid);
+    var fr = isFr();
+    var badge = raw.badge || (raw.featured ? (fr?'Vedette':'مميّز') : (raw.deal==='rent'?(fr?'À louer':'للكراء'):(fr?'À vendre':'للبيع')));
+    return {
+      id: String(raw.id || ('el_'+Date.now())),
+      agencyId: aid,
+      agencyName: meta.name,
+      phone: meta.phone,
+      whatsapp: meta.whatsapp,
+      cat: raw.cat || 'apartment',
+      deal: raw.deal === 'rent' ? 'rent' : 'sale',
+      featured: !!raw.featured,
+      title: raw.title || '',
+      loc: raw.loc || raw.city || meta.city || '',
+      price: raw.price || '—',
+      beds: raw.beds != null && raw.beds !== '' ? String(raw.beds) : '—',
+      baths: raw.baths != null && raw.baths !== '' ? String(raw.baths) : '—',
+      area: raw.area || '—',
+      img: raw.img || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1000&q=80',
+      badge: badge,
+      desc: raw.desc || '',
+      href: aid
+        ? ('rizq_estate.html?' + (/^demo_estate/i.test(aid)?'demo=1&':'') + 'id=' + encodeURIComponent(aid))
+        : 'rizq_estate_agencies.html'
+    };
+  }
+
+  function collectFromStorage(){
+    var out = [];
+    var seen = {};
+    function pushAll(arr, agencyId){
+      if(!Array.isArray(arr)) return;
+      arr.forEach(function(row){
+        var n = normalizeListing(row, agencyId || row.agencyId);
+        if(!n) return;
+        var key = n.agencyId + ':' + n.id;
+        if(seen[key]) return;
+        seen[key] = true;
+        out.push(n);
+      });
+    }
+    Object.keys(DEMO_AGENCIES).forEach(function(id){
+      try{
+        var raw = localStorage.getItem('estate_listings_'+id);
+        if(raw) pushAll(JSON.parse(raw), id);
+      }catch(e){}
+    });
+    try{
+      var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+      (Array.isArray(accs)?accs:[]).forEach(function(a){
+        if(!a || !a.id) return;
+        var act = String(a.activityId||a.activity||a.sector||'').toLowerCase();
+        var isRE = a.type==='office' || a.type==='estate'
+          ? /of_realestate|realestate|عقار|immobilier|estate|وساط/.test(act)
+          : false;
+        if(!isRE && a.type !== 'estate') return;
+        try{
+          var raw2 = localStorage.getItem('estate_listings_'+a.id);
+          if(raw2) pushAll(JSON.parse(raw2), a.id);
+        }catch(e2){}
+      });
+    }catch(e3){}
+    return out;
+  }
+
+  function bootListings(){
+    var stored = collectFromStorage();
+    if(stored.length){
+      listings = stored;
+      return;
+    }
+    if(demoAllowed()){
+      listings = DEMO_LISTINGS.map(function(x){ return normalizeListing(x, x.agencyId); }).filter(Boolean);
+    } else {
+      listings = [];
+    }
+  }
+
+  function fillCities(){
+    var cities = [];
+    var map = {};
+    listings.forEach(function(x){
+      var c = (x.loc||'').trim();
+      if(c && !map[c]){ map[c]=true; cities.push(c); }
+    });
+    cities.sort();
+    var fr = isFr();
+    citySel.innerHTML = '<option value="">'+(fr?'Tous les lieux':'كل المواقع')+'</option>'
+      + cities.map(function(c){ return '<option value="'+esc(c)+'">'+esc(c)+'</option>'; }).join('');
+  }
+
+  function filtered(){
+    var q = (state.q||'').trim().toLowerCase();
+    return listings.filter(function(x){
+      if(state.cat !== 'all' && x.cat !== state.cat) return false;
+      if(state.deal !== 'all' && x.deal !== state.deal) return false;
+      if(state.city && x.loc !== state.city) return false;
+      if(q){
+        var blob = (x.title+' '+x.loc+' '+x.badge+' '+x.desc+' '+x.agencyName+' '+x.price).toLowerCase();
+        if(blob.indexOf(q) < 0) return false;
+      }
+      return true;
+    });
+  }
+
+  function cardHTML(item){
+    var fr = isFr();
+    var tel = item.phone ? ('tel:'+String(item.phone).replace(/\s+/g,'')) : item.href;
+    var wa = item.whatsapp ? ('https://wa.me/'+String(item.whatsapp).replace(/\D/g,'')) : item.href;
+    return '<article class="el-card'+(item.featured?' featured':'')+'" role="listitem">'
+      + '<a class="el-card-media" href="'+esc(item.href)+'" aria-label="'+esc(item.title)+'">'
+      +   '<img src="'+esc(item.img)+'" alt="'+esc(item.title)+'" loading="lazy"/>'
+      +   '<span class="el-badge">'+esc(item.badge)+'</span>'
+      +   '<span class="el-price">'+esc(item.price)+'</span>'
+      + '</a>'
+      + '<div class="el-card-body">'
+      +   '<h3>'+esc(item.title)+'</h3>'
+      +   '<div class="el-loc">📍 '+esc(item.loc)+'</div>'
+      +   '<div class="el-meta"><span>🛏 '+esc(item.beds)+'</span><span>🛁 '+esc(item.baths)+'</span><span>📐 '+esc(item.area)+'</span></div>'
+      +   '<div class="el-agency"><a href="'+esc(item.href)+'">🏛 '+esc(item.agencyName)+'</a>'
+      +     '<a href="'+esc(item.href)+'">'+(fr?'Voir l\'agence ←':'صفحة الوكالة ←')+'</a></div>'
+      +   '<div class="el-card-cta">'
+      +     '<a class="el-call" href="'+esc(tel)+'" dir="ltr">'+(fr?'📞 Appeler':'📞 اتصل')+'</a>'
+      +     '<a class="el-wa" href="'+esc(wa)+'" target="_blank" rel="noopener">'+(fr?'💬 WhatsApp':'💬 واتساب')+'</a>'
+      +   '</div>'
+      + '</div></article>';
+  }
+
+  function render(){
+    var list = filtered();
+    var fr = isFr();
+    countEl.textContent = list.length
+      ? (fr ? (list.length + ' bien' + (list.length>1?'s':'') + ' · ' + listings.length + ' au total')
+            : ('عرض '+list.length+' من أصل '+listings.length+' عقاراً'))
+      : (fr ? 'Aucun résultat' : 'لا نتائج لهذه التصفية');
+    grid.innerHTML = list.length
+      ? list.map(cardHTML).join('')
+      : '<div class="el-empty">'+(fr
+        ? 'Aucun bien pour l\'instant — élargissez la recherche ou parcourez les agences.'
+        : 'لا معروضات مطابقة حالياً — وسّع البحث أو تصفّح الوكالات.')+'</div>';
+  }
+
+  function applyLang(){
+    var fr = isFr();
+    document.documentElement.lang = fr ? 'fr' : 'ar';
+    document.documentElement.dir = fr ? 'ltr' : 'rtl';
+    function tx(sel, ar, frTxt){
+      var el = document.querySelector(sel);
+      if(el) el.textContent = fr ? frTxt : ar;
+    }
+    tx('.el-nav a[href="rizq_estate_agencies.html"]', 'الوكالات', 'Agences');
+    tx('.el-nav a.is-on', 'معروضات العقارات', 'Biens immobiliers');
+    tx('.el-nav a[href="rizq_landing_v8.html#virtual-estate"]', 'بوابة رزق', 'Portail Rizq');
+    tx('#el-reg-top', 'افتح وكالتك', 'Ouvrez votre agence');
+    tx('.el-actions .el-chip:not(.solid)', 'دليل الوكالات', 'Annuaire des agences');
+    var kick = document.querySelector('.el-kicker');
+    if(kick) kick.innerHTML = fr
+      ? '<i></i> Marché immobilier · tous les biens'
+      : '<i></i> سوق العقارات · كل المعروضات';
+    var h1 = document.querySelector('.el-hero h1');
+    if(h1) h1.innerHTML = fr
+      ? 'Trouvez <em>votre bien</em> auprès de toutes les agences'
+      : 'اعثر على <em>عقارك</em> من كل الوكالات';
+    tx('.el-hero > p',
+      'صفحة مستقلة لمعروضات البيع والكراء على رزق — صوّر، صفّ، وتواصل مباشرة مع الوكالة.',
+      'Page dédiée aux biens à vendre et à louer sur Rizq — filtrez et contactez l\'agence directement.');
+    tx('.el-hero-cta .el-btn-gold', 'تصفّح المعروضات', 'Parcourir les biens');
+    tx('.el-hero-cta .el-btn-ghost', 'تصفّح الوكالات', 'Parcourir les agences');
+    tx('label[for="el-q"]', 'البحث', 'Recherche');
+    tx('label[for="el-city"]', 'المدينة', 'Ville');
+    tx('label[for="el-deal"]', 'نوع العرض', 'Type d\'offre');
+    tx('#el-go', '🔎 ابحث', '🔎 Rechercher');
+    qInput.placeholder = fr ? 'Quartier, villa, appart…' : 'حي، فيلا، شقة، محل…';
+    dealSel.options[0].textContent = fr ? 'Tous' : 'الكل';
+    dealSel.options[1].textContent = fr ? 'À vendre' : 'للبيع';
+    dealSel.options[2].textContent = fr ? 'À louer' : 'للكراء';
+    var tabs = [
+      ['all','الكل','Tous'],['apartment','شقق','Appart.'],['villa','فلل','Villas'],
+      ['land','أراضي','Terrains'],['shop','محلات','Locaux']
+    ];
+    tabs.forEach(function(t){
+      var b = document.querySelector('.el-tab[data-cat="'+t[0]+'"]');
+      if(b) b.textContent = fr ? t[2] : t[1];
+    });
+    tx('#el-own h2', 'أنشر معروضاتك مع وكالتك على رزق', 'Publiez vos biens avec votre agence sur Rizq');
+    tx('#el-own > p',
+      'افتح حساب وكالة عقارية، أضف فللًا وشققًا وأراضي، ويصل إليك الباحثون مباشرة عبر الصفحة والتواصل.',
+      'Ouvrez un compte agence, publiez villas, appartements et terrains — les chercheurs vous contactent directement.');
+    tx('#el-reg-own', 'سجّل وكالتك العقارية', 'Inscrivez votre agence');
+    fillCities();
+    if(state.city) citySel.value = state.city;
+    render();
+  }
+
+  document.querySelectorAll('.el-tab').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      state.cat = btn.getAttribute('data-cat') || 'all';
+      document.querySelectorAll('.el-tab').forEach(function(b){ b.classList.toggle('is-on', b===btn); });
+      render();
+    });
+  });
+
+  document.getElementById('el-filters').addEventListener('submit', function(e){
+    e.preventDefault();
+    state.q = qInput.value || '';
+    state.city = citySel.value || '';
+    state.deal = dealSel.value || 'all';
+    render();
+  });
+  qInput.addEventListener('input', function(){
+    state.q = qInput.value || '';
+    render();
+  });
+  citySel.addEventListener('change', function(){
+    state.city = citySel.value || '';
+    render();
+  });
+  dealSel.addEventListener('change', function(){
+    state.deal = dealSel.value || 'all';
+    render();
+  });
+
+  function bindReg(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('click', function(e){
+      if(typeof window.openRegisterAs === 'function'){
+        e.preventDefault();
+        window.openRegisterAs('company','office','of_realestate_agency');
+      }
+    });
+  }
+  bindReg('el-reg-top');
+  bindReg('el-reg-own');
+
+  bootListings();
+  applyLang();
+  document.addEventListener('rizq:langchange', applyLang);
+})();
+</script>
+<link rel="stylesheet" href="rizq_header.css?v=31.6"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.42"/>
+<script>document.documentElement.classList.add('rizq-app-nav')</script>
+<script src="rizq_header.js?v=31.0" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.43" defer></script>
+<script src="rizq_merchant_activities.js" defer></script>
+<script src="rizq_pwa.js" defer></script>
+</body>
+</html>
