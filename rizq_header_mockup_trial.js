@@ -228,8 +228,12 @@
 
   function scrollToSpyTarget(el) {
     if (!el) return;
-    var top = el.getBoundingClientRect().top + window.pageYOffset - headerOffset();
-    window.scrollTo(0, Math.max(0, Math.round(top)));
+    var top = Math.max(0, Math.round(el.getBoundingClientRect().top + window.pageYOffset - headerOffset()));
+    try {
+      window.scrollTo({ top: top, left: 0, behavior: 'smooth' });
+    } catch (err) {
+      window.scrollTo(0, top);
+    }
   }
 
   function wireNavActive() {
