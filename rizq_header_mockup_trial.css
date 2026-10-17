@@ -87,11 +87,11 @@ body.rizq-mockup-hdr-trial .hero-subtitle-secondary{
 /* كبسولات بيع/اشتر/تميّز — أقصر عرضاً وارتفاعاً من بطاقة العنوان */
 html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pills,
 body.rizq-mockup-hdr-trial .hero-pills{
-  width:min(420px,92%)!important;
-  max-width:420px!important;
+  width:auto!important;
+  max-width:280px!important;
   min-height:0!important;
   height:auto!important;
-  padding:2px!important;
+  padding:2px 4px!important;
   margin:0 auto!important;
   border-radius:8px!important;
   border-width:1px!important;
@@ -99,13 +99,15 @@ body.rizq-mockup-hdr-trial .hero-pills{
 }
 html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pill,
 body.rizq-mockup-hdr-trial .hero-pill{
-  padding:3px 10px!important;
+  flex:0 0 auto!important;
+  padding:3px 14px!important;
   font-size:12.5px!important;
   font-weight:800!important;
   border-radius:6px!important;
   letter-spacing:0!important;
   line-height:1.15!important;
   min-height:0!important;
+  min-width:0!important;
 }
 body.rizq-mockup-hdr-trial .hero-pill-sep{
   height:12px!important;
