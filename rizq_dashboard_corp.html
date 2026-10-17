@@ -301,6 +301,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
 </style>
 <link rel="stylesheet" href="rizq_dashboard_corp_layout.css">
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_phone_utils.js?v=1.0"></script>
 <script src="rizq_packages_config.js?v=16.3"></script>
 <script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_brands_catalog.js?v=5"></script>
@@ -3601,12 +3602,18 @@ function saveMyPayment(){
   function toggleCorpActivityOther(){ onCorpDashboardActivityChange(); }
   function saveProfile(){
     var acc = CORP_ACC||{};
-    var fields = ['p-name','p-activity','p-phone','p-email','p-city','p-category','p-address','p-desc','p-year','p-website'];
-    var keys   = ['name','activity','phone','email','city','category','address','desc','year','website'];
+    var phoneRaw = ((document.getElementById('p-phone')||{}).value||'').trim();
+    var phones = (window.RizqPhone && RizqPhone.resolveMerchantPhone(phoneRaw)) || null;
+    if(!phones){showToast(_t2('رقم هاتف غير صالح — موريتاني 8 أرقام (2/3/4) أو دولي +…','Numéro invalide — MR 8 chiffres (2/3/4) ou international +…'),'error');return;}
+    var fields = ['p-name','p-activity','p-email','p-city','p-category','p-address','p-desc','p-year','p-website'];
+    var keys   = ['name','activity','email','city','category','address','desc','year','website'];
     fields.forEach(function(id,i){
       var el=document.getElementById(id);
       if(el&&el.value.trim()) acc[keys[i]]=el.value.trim();
     });
+    acc.phone = phones.phone || phones.whatsapp;
+    acc.phoneIntl = phones.phoneIntl || '';
+    acc.whatsapp = phones.whatsapp;
     var actEl=document.getElementById('p-activity');
     if(actEl && actEl.value){
       acc.activityId = actEl.value;
@@ -3618,7 +3625,7 @@ function saveMyPayment(){
     // pending_accounts بلا نشاط/عنوان/وصف/موقع حقيقي مهما عدّله صاحب المعرض)
     var pending=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
     var idx=pending.findIndex(function(a){return a.id===acc.id;});
-    if(idx>-1){ Object.assign(pending[idx],{name:acc.name,phone:acc.phone,email:acc.email,city:acc.city,category:acc.category,activity:acc.activity,activityId:acc.activityId,address:acc.address,desc:acc.desc,year:acc.year,website:acc.website}); localStorage.setItem('rizq_pending_accounts',JSON.stringify(pending)); }
+    if(idx>-1){ Object.assign(pending[idx],{name:acc.name,phone:acc.phone,phoneIntl:acc.phoneIntl,whatsapp:acc.whatsapp,email:acc.email,city:acc.city,category:acc.category,activity:acc.activity,activityId:acc.activityId,address:acc.address,desc:acc.desc,year:acc.year,website:acc.website}); localStorage.setItem('rizq_pending_accounts',JSON.stringify(pending)); }
     // حفظ في rizq_accounts
     var accts=JSON.parse(localStorage.getItem('rizq_accounts')||'{}');
     if(accts[acc.id]) Object.assign(accts[acc.id],acc);
@@ -3652,7 +3659,7 @@ function saveMyPayment(){
       method: 'PATCH',
       headers: { 'Content-Type':'application/json', 'x-account-token': (window.REAL_ACCESS_TOKEN || acc.token) },
       body: JSON.stringify({
-        name: acc.name||'', phone: acc.phone||'', email: acc.email||'', city: acc.city||'',
+        name: acc.name||'', phone: acc.phone||'', phoneIntl: acc.phoneIntl||'', whatsapp: acc.whatsapp||'', email: acc.email||'', city: acc.city||'',
         category: acc.category||'', activityId: acc.activityId||'', activity: acc.activity||'',
         address: acc.address||'', desc: acc.desc||'',
         promo_video: (document.getElementById('p-promo-video')||{}).value||'',

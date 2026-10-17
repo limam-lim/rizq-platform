@@ -5,6 +5,8 @@
  */
 'use strict';
 
+const { resolveAccountPhones } = require('../lib/phoneNormalize');
+
 /**
  * @param {import('express').Application} app
  * @param {object} deps
@@ -29,6 +31,7 @@ function mountAccountsManageRoutes(app, deps) {
     genAccessToken,
     purgeAccountIdDocument,
     REFERRAL_BONUS_DAYS,
+    upsertSubscriberProfileFromAccount,
   } = deps;
 
   const adminView = typeof toAdminAccount === 'function' ? toAdminAccount : stripToken;
@@ -173,8 +176,28 @@ function mountAccountsManageRoutes(app, deps) {
     // نفس منطق verifyAccountOwner (راجع تعريفها أعلاه).
     if (acc.suspended) return res.status(403).json({ error: 'account_suspended' });
 
-    const EDITABLE = ['name', 'phone', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'promo_video_extra', 'whatsapp', 'facebook', 'thumb', 'cover', 'tagline', 'nni', 'idImage', 'licenseImage'];
+    const EDITABLE = ['name', 'phone', 'phoneIntl', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'promo_video_extra', 'whatsapp', 'facebook', 'thumb', 'cover', 'tagline', 'nni', 'idImage', 'licenseImage'];
     const b = req.body || {};
+    // ضبط الهاتف (محل/مكتب/معرض/فرد): تطبيع + رفض أرقام غير صالحة
+    if (b.phone !== undefined || b.phoneIntl !== undefined || b.whatsapp !== undefined) {
+      const waRaw = b.whatsapp !== undefined ? b.whatsapp : acc.whatsapp;
+      const isWaUrl = /^https?:\/\//i.test(String(waRaw || ''));
+      const phoneResolved = resolveAccountPhones({
+        phone: b.phone !== undefined ? b.phone : acc.phone,
+        phoneIntl: b.phoneIntl !== undefined ? b.phoneIntl : acc.phoneIntl,
+        whatsapp: isWaUrl ? '' : waRaw,
+      });
+      if (!phoneResolved.ok) {
+        return res.status(400).json({
+          ok: false,
+          code: phoneResolved.code || 'invalid_phone',
+          error: phoneResolved.error || 'رقم هاتف غير صالح',
+        });
+      }
+      b.phone = phoneResolved.phone;
+      b.phoneIntl = phoneResolved.phoneIntl;
+      b.whatsapp = isWaUrl ? String(waRaw).trim().slice(0, 60) : phoneResolved.whatsapp;
+    }
     if (b.email !== undefined) {
       const nextEmail = String(b.email || '').trim().toLowerCase();
       const cur = String(acc.email || '').trim().toLowerCase();
@@ -268,6 +291,13 @@ function mountAccountsManageRoutes(app, deps) {
     acc.updatedAt = new Date().toISOString();
     list[idx] = acc;
     writeAccounts(list);
+    // مزامنة ملف الوكيل الهاتفي عند تغيير رقم المحل/المكتب/المعرض
+    if (typeof upsertSubscriberProfileFromAccount === 'function'
+      && (b.phone !== undefined || b.phoneIntl !== undefined || b.whatsapp !== undefined || b.name !== undefined)) {
+      try {
+        upsertSubscriberProfileFromAccount(acc, {});
+      } catch (eUpsert) { /* اختياري — لا يفشل الحفظ */ }
+    }
     res.json({ ok: true, account: stripToken(acc) });
   });
 

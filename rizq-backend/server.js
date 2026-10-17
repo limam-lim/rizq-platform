@@ -28,8 +28,9 @@ const { createAdminAuth } = require('./middleware/adminAuth');
 const { isProdEnv, extractAccountToken, extractDashToken, tokenMatchesAccount } = require('./middleware/accountAuth');
 const { timingSafeEqualStr } = require('./lib/secureCompare');
 const { normalizeDisplayName, normalizeEmailSafe, stripBidiControls } = require('./lib/sanitizeText');
+const { resolveAccountPhones, phoneMatchKey } = require('./lib/phoneNormalize');
 const { installAdminPanelGate } = require('./middleware/adminPanelGate');
-const { registerSubscriber, getSubscriberProfile, getAllSubscriberProfiles, getSubscriberProfileByAccountId, upsertSubscriberKnowledgeFromAccount, upsertSubscriberInstructionsFromAccount } = require('../rizq_subscriber_agent');
+const { registerSubscriber, getSubscriberProfile, getAllSubscriberProfiles, getSubscriberProfileByAccountId, upsertSubscriberKnowledgeFromAccount, upsertSubscriberInstructionsFromAccount, upsertSubscriberProfileFromAccount } = require('../rizq_subscriber_agent');
 const { normalizeAccountActivityFields, loadCatalog } = require('./services/merchantActivities');
 const { refreshCurrencyRates, sanitizeCurrencyList, mergeCurrencyConfig } = require('./services/currencyRates');
 const { parseKnowledgeFile, formatDynamicKnowledgeForPrompt } = require('./services/dynamicKnowledge');
@@ -526,8 +527,8 @@ app.post('/api/agent/toggle', (req, res) => {
       } catch (eAi) {
         return res.status(403).json({ ok: false, error: eAi.message || 'unauthorized', code: eAi.code });
       }
-      const want = String(subscriberPhone || '').replace(/\D/g, '').slice(-8);
-      const accPh = String(acc.phone || acc.whatsapp || '').replace(/\D/g, '').slice(-8);
+      const want = phoneMatchKey(subscriberPhone);
+      const accPh = phoneMatchKey(acc.phone || acc.whatsapp || acc.phoneIntl);
       // يجب ربط التبديل برقم الحساب — لا IDOR عند غياب الهاتف
       if (!want || !accPh || want !== accPh) {
         return res.status(403).json({ ok: false, error: 'phone_mismatch', code: 'phone_mismatch' });
@@ -1937,6 +1938,20 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     return res.status(403).json({ error: 'هذا القسم غير مفتوح للتسجيل حالياً' });
   }
 
+  // هاتف إلزامي ومُطبَّع مبكراً (محل/مكتب/معرض/فرد) — قبل النشاط لتفادي رسائل مضلّلة
+  const phoneResolved = resolveAccountPhones({
+    phone: b.phone,
+    phoneIntl: b.phoneIntl || b.phone_intl,
+    whatsapp: b.whatsapp,
+  });
+  if (!phoneResolved.ok) {
+    return res.status(400).json({
+      ok: false,
+      code: phoneResolved.code || 'invalid_phone',
+      error: phoneResolved.error || 'رقم هاتف غير صالح',
+    });
+  }
+
   let activityFields = { ok: true, activityId: null, activity: null, category: String(b.category || '').slice(0, 40) };
   if (['store', 'office', 'corp'].includes(reqType)) {
     activityFields = normalizeAccountActivityFields(b, reqType);
@@ -1958,7 +1973,23 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
   const accessToken = genAccessToken();
   const sellerEmail = String(b.email || '').trim().toLowerCase();
   const sellerPassword = String(b.password || '').slice(0, 128);
-  if (['individual', 'store'].includes(reqType) && sellerPassword) {
+  // محل / مكتب / معرض(شركة): بريد + كلمة مرور إلزاميان لتسجيل الدخول لاحقاً
+  if (['store', 'office', 'corp'].includes(reqType)) {
+    if (!sellerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sellerEmail)) {
+      return res.status(400).json({
+        ok: false,
+        code: 'email_required',
+        error: 'البريد الإلكتروني مطلوب لتسجيل الدخول لاحقاً',
+      });
+    }
+    if (!sellerPassword || sellerPassword.length < 8) {
+      return res.status(400).json({
+        ok: false,
+        code: 'weak_password',
+        error: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
+      });
+    }
+  } else if (reqType === 'individual' && sellerPassword) {
     if (!sellerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sellerEmail)) {
       return res.status(400).json({
         ok: false,
@@ -2016,8 +2047,8 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     accessToken,
     type: reqType,
     name: normalizeDisplayName(b.name, 120),
-    phone: String(b.phone || '').slice(0, 30),
-    phoneIntl: String(b.phoneIntl || b.phone_intl || '').slice(0, 30),
+    phone: phoneResolved.phone.slice(0, 30),
+    phoneIntl: phoneResolved.phoneIntl.slice(0, 30),
     email: normalizeEmailSafe(b.email || ''),
     city: stripBidiControls(String(b.city || '')).normalize('NFC').slice(0, 60),
     category: activityFields.category || String(b.category || '').slice(0, 40),
@@ -2028,7 +2059,7 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     desc: stripBidiControls(String(b.desc || '')).normalize('NFC').slice(0, 1000),
     promo_video: String(b.promo_video || '').slice(0, 500),
     promo_video_extra: String(b.promo_video_extra || '').slice(0, 500),
-    whatsapp: String(b.whatsapp || '').slice(0, 60),
+    whatsapp: phoneResolved.whatsapp.slice(0, 60),
     facebook: String(b.facebook || '').slice(0, 300),
     thumb: (function(){
       const t = String(b.thumb || '').trim();
@@ -2204,6 +2235,7 @@ mountAccountsManageRoutes(app, {
   genAccessToken,
   purgeAccountIdDocument,
   REFERRAL_BONUS_DAYS,
+  upsertSubscriberProfileFromAccount,
 });
 
 // ═══════════════════════════════════════════════════════════════
