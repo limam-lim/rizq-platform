@@ -419,6 +419,7 @@
   }
   function bindHelpDropdown(wrap) {
     if (!wrap || wrap.getAttribute('data-rizq-help-bound') === '1') return;
+    if (isMockHelpWrap(wrap)) return;
     wrap.setAttribute('data-rizq-help-bound', '1');
     var btn = wrap.querySelector('.rizq-help-dd-btn');
     var menu = wrap.querySelector('.rizq-help-dd-menu');
@@ -514,6 +515,8 @@
       window.__rizqHelpDocBound = true;
       document.addEventListener('click', function (e) {
         if (e.target.closest && e.target.closest('.rizq-help-dd')) return;
+        /* قائمة تجربة الهيدر قد تكون على body */
+        if (e.target.closest && e.target.closest('#rmh-help-menu, #rmh-help-wrap, .rmh-help-dd')) return;
         closeHelpDropdowns();
       });
       document.addEventListener('keydown', function (e) {

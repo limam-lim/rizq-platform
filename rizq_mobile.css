@@ -417,15 +417,9 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     margin-top:4px!important;
     padding-top:6px!important;
   }
-  /* بطاقات ترويجية → أصغر على الهاتف (عمودين مدمجين) */
-  .rizq-feat-row,
-  .rizq-feat-row.rizq-feat-row-3,
-  .rizq-trio,
-  #virtual-stores .rizq-trio,
-  #virtual-offices .rizq-feat-row,
-  #virtual-showrooms .rizq-feat-row,
-  #virtual-tenders .rizq-feat-row,
-  #virtual-investments .rizq-feat-row{
+  /* بطاقات ترويجية رباعية → عمودين على الهاتف */
+  .rizq-feat-row:not(.rizq-feat-row-3),
+  #virtual-offices .rizq-feat-row:not(.rizq-feat-row-3){
     display:grid!important;
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
     flex-direction:unset!important;
@@ -434,6 +428,23 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     max-width:100%!important;
     width:100%!important;
     margin-bottom:16px!important;
+  }
+  /* الثلاث ترويجيات → صف أفقي واحد دائماً */
+  .rizq-feat-row.rizq-feat-row-3,
+  .rizq-trio,
+  #virtual-stores .rizq-trio,
+  #virtual-showrooms .rizq-feat-row.rizq-feat-row-3,
+  #virtual-estate .rizq-feat-row.rizq-feat-row-3,
+  #virtual-tenders .rizq-feat-row.rizq-feat-row-3,
+  #virtual-investments .rizq-feat-row.rizq-feat-row-3{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    flex-direction:unset!important;
+    gap:5px!important;
+    padding:0 2px!important;
+    max-width:100%!important;
+    width:100%!important;
+    margin-bottom:14px!important;
   }
   .rizq-feat-row > div,
   .rizq-trio > div,
