@@ -24,7 +24,8 @@ body.rizq-mockup-hdr-trial .rizq-splash{
   display:none!important;
 }
 /* كبسولة رزق تحت الهيدر — specificity أعلى من html.rizq-app-nav .hero */
-/* يتفوّق على html.rizq-app-nav:has(#ticker-wrap…) .hero (padding 54px) */
+/* يتفوّق على قاعدة الـ ticker (ID داخل :has) التي تفرض padding-top:54px */
+html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) body.rizq-mockup-hdr-trial .hero,
 html.rizq-app-nav:has(#ticker-wrap) body.rizq-mockup-hdr-trial .hero,
 html.rizq-app-nav:has(#nav) body.rizq-mockup-hdr-trial .hero,
 html.rizq-app-nav body.rizq-mockup-hdr-trial .hero,
