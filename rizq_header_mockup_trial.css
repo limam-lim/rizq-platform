@@ -920,11 +920,15 @@ body > .rizq-help-dd-menu a,
   }
 }
 
-/* هاتف — نصف فوق (شعار+بحث) ونصف تحت (أقسام ثابتة) */
+/*
+ * هاتف:
+ * صف واحد: شعار (خط أصغر) | كبسولة بحث مصغّرة | مفضلة+مساعدة (أصغر) — بلا زر بحث
+ * شريط الأقسام نصفين: نصف تحت الشعار، نصف ثابت أسفل الشاشة
+ */
 @media(max-width:768px){
   body.rizq-mockup-hdr-trial{
-    --rizq-mock-hdr-h: 118px;
-    --rizq-mock-nav-h: 72px;
+    --rizq-mock-hdr-h: 128px;
+    --rizq-mock-nav-h: 64px;
   }
   html.rizq-app-nav:has(#nav) body.rizq-mockup-hdr-trial,
   html.rizq-app-nav:has(#rizq-desk-nav) body.rizq-mockup-hdr-trial,
@@ -939,46 +943,104 @@ body > .rizq-help-dd-menu a,
     bottom:auto!important;
     box-shadow:0 6px 18px rgba(2,6,14,.28);
   }
+  /* صف واحد: شعار | بحث وسط | أدوات */
   .rmh-main{
     display:grid;
-    grid-template-columns:1fr auto;
-    grid-template-areas:
-      "brand tools"
-      "search search";
-    gap:8px;padding:10px 12px 10px;
+    grid-template-columns:auto minmax(0,1fr) auto;
+    grid-template-areas:"brand search tools";
+    gap:6px 8px;
+    padding:7px 10px 6px;
+    align-items:center;
   }
-  .rmh-brand{grid-area:brand;justify-self:start}
-  .rmh-tools{grid-area:tools;justify-self:end;gap:5px}
-  /* صف البحث بعرض كامل تحت الشعار/الأدوات */
+  .rmh-brand{grid-area:brand;justify-self:start;min-width:0}
+  .rmh-tools{
+    grid-area:tools;justify-self:end;gap:4px;
+    align-items:center;
+  }
   .rmh-search,
   #rizq-mock-hdr .rmh-search{
     grid-area:search;
-    grid-column:1 / -1!important;
+    grid-column:auto!important;
     justify-self:stretch!important;
     width:100%!important;
     max-width:none!important;
     min-width:0!important;
-    min-height:42px;
+    min-height:32px!important;
+    height:32px;
+    border-radius:9px!important;
     margin-inline:0!important;
     transform:none!important;
   }
-  .rmh-search-cat{display:none}
+  .rmh-search-cat{display:none!important}
+  /* امحِ زر البحث — الإرسال بـ Enter */
+  #rizq-mock-hdr .rmh-search-btn,
+  .rmh-search-btn{display:none!important}
+  .rmh-search-input{
+    font-size:11.5px!important;
+    padding:0 10px!important;
+    font-weight:600;
+  }
+  /* شعار — نفس التصميم، خط أصغر فقط */
+  #rizq-mock-hdr .rmh-brand.logo,
+  #rizq-mock-hdr .rmh-brand{gap:7px!important;max-height:44px!important}
   #rizq-mock-hdr .rmh-brand .logo-ar,
-  #rizq-mock-hdr .rmh-brand-ar{font-size:20px!important}
+  #rizq-mock-hdr .rmh-brand-ar{font-size:15px!important;line-height:1.05!important}
   #rizq-mock-hdr .rmh-brand .logo-sub,
-  #rizq-mock-hdr .rmh-brand-sub{font-size:7px!important;letter-spacing:1.6px!important}
+  #rizq-mock-hdr .rmh-brand-sub{
+    font-size:5.5px!important;letter-spacing:1.2px!important;margin-top:0!important;
+  }
   #rizq-mock-hdr .rmh-brand .logo-mark-img,
   #rizq-mock-hdr .rmh-brand img.rmh-mark{
-    width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;
-    border-radius:10px!important;padding:0!important;
+    width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;
+    border-radius:8px!important;padding:0!important;
   }
-  .rmh-search-input{font-size:13px;padding:0 12px}
-  .rmh-search-btn{width:44px}
   .rmh-lang{display:none}
-  .rmh-ico{width:34px;height:34px;border-radius:9px}
-  /* شريط الأقسام — ثابت أسفل الشاشة */
-  #rizq-mock-hdr nav.rmh-nav,
-  nav.rmh-nav{
+  /* أدوات عامة أصغر قليلاً */
+  .rmh-ico{width:30px;height:30px;border-radius:8px}
+  .rmh-ico svg{width:15px;height:15px}
+  /* المفضلة + المساعدة أصغر بوضوح */
+  #rizq-mock-hdr .rmh-tools > a.rmh-ico[aria-label="المفضلة"],
+  #rizq-mock-hdr .rmh-tools > a.rmh-ico[href*="fav"]{
+    width:26px!important;height:26px!important;border-radius:7px!important;
+  }
+  #rizq-mock-hdr .rmh-tools > a.rmh-ico[aria-label="المفضلة"] svg,
+  #rizq-mock-hdr .rmh-tools > a.rmh-ico[href*="fav"] svg{
+    width:13px!important;height:13px!important;
+  }
+  #rizq-mock-hdr .rmh-help-dd .rizq-help-dd-btn.rmh-ico{
+    width:26px!important;min-width:26px!important;height:26px!important;
+    padding:0!important;gap:0!important;border-radius:7px!important;
+  }
+  #rizq-mock-hdr .rmh-help-dd .rizq-help-dd-chev{display:none!important}
+  #rizq-mock-hdr .rmh-help-dd .rizq-help-svg,
+  #rizq-mock-hdr .rmh-help-dd .rizq-help-dd-ico svg{
+    width:13px!important;height:13px!important;
+  }
+  .rmh-cart-badge{
+    min-width:14px;height:14px;padding:0 3px;font:900 8px/14px 'Cairo',sans-serif;
+    top:-4px;inset-inline-end:-4px;
+  }
+
+  /* ——— نصف الأقسام فوق (تحت الشعار/الأزرار) ——— */
+  #rizq-mock-hdr nav.rmh-nav.rmh-nav-top{
+    position:relative!important;
+    top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;
+    z-index:1!important;
+    width:100%!important;max-width:100%!important;
+    margin:0!important;
+    padding:2px 4px 4px!important;
+    border-radius:0!important;
+    border:0!important;
+    border-top:1px solid rgba(201,168,76,.16)!important;
+    background:rgba(8,18,34,.98)!important;
+    box-shadow:none!important;
+    justify-content:space-around!important;
+    overflow-x:auto!important;
+    -webkit-overflow-scrolling:touch;
+  }
+  /* ——— نصف الأقسام يبقى أسفل الشاشة ——— */
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top),
+  nav.rmh-nav:not(.rmh-nav-top){
     position:fixed!important;
     top:auto!important;
     left:0!important;
@@ -988,22 +1050,24 @@ body > .rizq-help-dd-menu a,
     width:100%!important;
     max-width:100%!important;
     margin:0!important;
-    padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px))!important;
-    border-radius:16px 16px 0 0!important;
+    padding:3px 4px calc(3px + env(safe-area-inset-bottom,0px))!important;
+    border-radius:14px 14px 0 0!important;
     border-left:0!important;
     border-right:0!important;
     border-bottom:0!important;
     background:rgba(10,22,40,.98)!important;
     box-shadow:0 -8px 24px rgba(0,0,0,.35)!important;
-    justify-content:flex-start!important;
+    justify-content:space-around!important;
   }
-  .rmh-nav a.rmh-post-nav{min-width:58px;font-size:10px;padding:6px 5px 8px}
-  .rmh-nav a{min-width:58px;font-size:10px;padding:6px 5px 8px}
-  .rmh-nav a[data-rmh="showrooms"]{min-width:84px;font-size:9.5px}
+  .rmh-nav a.rmh-post-nav{min-width:52px;font-size:9.5px;padding:4px 4px 6px}
+  .rmh-nav a{min-width:52px;font-size:9.5px;padding:4px 4px 6px}
+  .rmh-nav a[data-rmh="showrooms"]{min-width:72px;font-size:8.5px}
+  .rmh-nav a .rmh-nav-ico{width:18px;height:18px}
+  .rmh-nav a .rmh-nav-ico svg{width:18px;height:18px}
+  .rmh-more-btn{min-width:52px;padding:4px 4px 6px;font-size:9.5px}
   .rmh-cart-panel{
     width:min(220px,calc(100vw - 16px));
   }
-  /* قائمة المزيد تفتح للأعلى فوق الشريط السفلي */
   .rmh-more-menu,
   body > .rmh-more-menu{
     max-height:min(55vh,320px);

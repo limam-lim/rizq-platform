@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.30';
+    link.href = 'rizq_header_mockup_trial.css?v=5.31';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -744,20 +744,101 @@
     });
   }
 
+  /* ترتيب أقسام الشريط — للنصف العلوي/السفلي على الهاتف */
+  var RMH_NAV_TOP_KEYS = ['home', 'ads', 'stores', 'showrooms', 'estate'];
+  var __rmhNavSlots = null;
+
+  function captureNavSlots(bottomNav) {
+    if (__rmhNavSlots || !bottomNav) return;
+    __rmhNavSlots = Array.prototype.map.call(bottomNav.children, function (el) {
+      var key = el.getAttribute('data-rmh');
+      if (!key && el.classList && el.classList.contains('rmh-more-wrap')) key = 'more';
+      return { key: key || '', el: el };
+    });
+  }
+
+  function navKeyOf(el) {
+    if (!el) return '';
+    var key = el.getAttribute('data-rmh');
+    if (key) return key;
+    if (el.classList && el.classList.contains('rmh-more-wrap')) return 'more';
+    return '';
+  }
+
+  /** هاتف: نصف الأقسام تحت الشعار، نصف يبقى أسفل الشاشة */
+  function syncPhoneNavSplit() {
+    var hdr = document.getElementById('rizq-mock-hdr');
+    if (!hdr) return;
+    var bottomNav = hdr.querySelector('nav.rmh-nav:not(.rmh-nav-top)');
+    if (!bottomNav) return;
+    captureNavSlots(bottomNav);
+
+    var topNav = document.getElementById('rmh-nav-top');
+
+    if (!isPhone()) {
+      if (topNav && __rmhNavSlots) {
+        __rmhNavSlots.forEach(function (slot) {
+          if (slot.el && slot.el.parentNode !== bottomNav) bottomNav.appendChild(slot.el);
+        });
+        topNav.parentNode && topNav.parentNode.removeChild(topNav);
+      }
+      document.body.classList.remove('rmh-phone-nav-split');
+      return;
+    }
+
+    document.body.classList.add('rmh-phone-nav-split');
+    if (!topNav) {
+      topNav = document.createElement('nav');
+      topNav.id = 'rmh-nav-top';
+      topNav.className = 'rmh-nav rmh-nav-top';
+      topNav.setAttribute('aria-label', 'أقسام رزق — أعلى');
+      var main = hdr.querySelector('.rmh-main');
+      if (main && main.nextSibling) hdr.insertBefore(topNav, main.nextSibling);
+      else if (main) main.insertAdjacentElement('afterend', topNav);
+      else hdr.insertBefore(topNav, bottomNav);
+    }
+
+    var topSet = {};
+    RMH_NAV_TOP_KEYS.forEach(function (k) { topSet[k] = 1; });
+
+    if (__rmhNavSlots) {
+      __rmhNavSlots.forEach(function (slot) {
+        if (!slot.el) return;
+        if (topSet[slot.key]) {
+          if (slot.el.parentNode !== topNav) topNav.appendChild(slot.el);
+        } else if (slot.el.parentNode !== bottomNav) {
+          bottomNav.appendChild(slot.el);
+        }
+      });
+    } else {
+      Array.prototype.slice.call(hdr.querySelectorAll('nav.rmh-nav [data-rmh], nav.rmh-nav .rmh-more-wrap')).forEach(function (el) {
+        var key = navKeyOf(el);
+        if (topSet[key]) {
+          if (el.parentNode !== topNav) topNav.appendChild(el);
+        } else if (el.parentNode !== bottomNav) {
+          bottomNav.appendChild(el);
+        }
+      });
+    }
+  }
+
   function syncMockHdrHeight() {
     var hdr = document.getElementById('rizq-mock-hdr');
     if (!hdr) return;
+    syncPhoneNavSplit();
     var main = hdr.querySelector('.rmh-main');
     var ticker = hdr.querySelector('.ticker-wrap:not(.is-empty)');
-    var nav = hdr.querySelector('.rmh-nav');
+    var topNav = document.getElementById('rmh-nav-top');
+    var bottomNav = hdr.querySelector('nav.rmh-nav:not(.rmh-nav-top)');
     var topH;
     if (isPhone() && main) {
-      topH = Math.ceil(main.getBoundingClientRect().height || 100);
+      topH = Math.ceil(main.getBoundingClientRect().height || 44);
       if (ticker) topH += Math.ceil(ticker.getBoundingClientRect().height || 0);
+      if (topNav) topH += Math.ceil(topNav.getBoundingClientRect().height || 48);
       topH = Math.max(topH, 96);
       document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
-      if (nav) {
-        var nh = Math.ceil(nav.getBoundingClientRect().height || 72);
+      if (bottomNav) {
+        var nh = Math.ceil(bottomNav.getBoundingClientRect().height || 64);
         document.body.style.setProperty('--rizq-mock-nav-h', nh + 'px');
       }
       return;
