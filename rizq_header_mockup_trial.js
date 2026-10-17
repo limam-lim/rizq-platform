@@ -184,7 +184,7 @@
       { key: 'ads', el: document.getElementById('listings') },
       { key: 'stores', el: document.getElementById('virtual-stores') },
       { key: 'showrooms', el: document.getElementById('virtual-showrooms') },
-      { key: 'estate', el: document.getElementById('rzq-disc-estate') },
+      { key: 'estate', el: document.getElementById('virtual-estate') },
       { key: 'offices', el: document.getElementById('virtual-offices') },
     ].filter(function (s) {
       return s.el;

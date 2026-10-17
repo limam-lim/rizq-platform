@@ -539,7 +539,8 @@ body.rizq-mockup-hdr-trial #hero,
 body.rizq-mockup-hdr-trial #listings,
 body.rizq-mockup-hdr-trial #virtual-stores,
 body.rizq-mockup-hdr-trial #virtual-showrooms,
-body.rizq-mockup-hdr-trial #rzq-disc-estate,
+body.rizq-mockup-hdr-trial #virtual-estate,
+body.rizq-mockup-hdr-trial #rizq-estate-models,
 body.rizq-mockup-hdr-trial #virtual-offices{
   scroll-margin-top:calc(var(--rizq-mock-hdr-h,188px) + 12px);
 }
