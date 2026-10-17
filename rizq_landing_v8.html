@@ -113,10 +113,10 @@ document.documentElement.classList.add('rizq-app-nav');
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,42px) + 12px)}
 #virtual-stores,#virtual-showrooms,#virtual-estate,#virtual-offices,#virtual-tenders,#virtual-investments,
-#rzq-disc-store,#rzq-disc-corp,#rzq-disc-estate,#rzq-disc-office,#rzq-disc-tenders,#rzq-disc-investments,
+#rzq-disc-store,#rzq-disc-corp,#rzq-disc-office,#rzq-disc-tenders,#rzq-disc-investments,
 #rizq-estate-models,#listings,#categories,#pricing,#about{scroll-margin-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,42px) + 12px)}
 /* ارتفاع أدنى لمراسي الاكتشاف قبل ملء JS حتى لا يفشل تمرير الهاش من صفحات أخرى */
-#rzq-disc-store,#rzq-disc-corp,#rzq-disc-estate,#rzq-disc-office,#rzq-disc-tenders,#rzq-disc-investments{min-height:1px}
+#rzq-disc-store,#rzq-disc-corp,#rzq-disc-office,#rzq-disc-tenders,#rzq-disc-investments{min-height:1px}
 body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:var(--bg-page);color:var(--text-main);cursor:auto;font-weight:600}
 *,*::before,*::after{font-family:'Cairo',system-ui,-apple-system,sans-serif!important;-webkit-font-smoothing:antialiased}
 .logo-mark,.rizq-splash-brand{font-family:Georgia,'Times New Roman',serif!important}
@@ -3970,10 +3970,17 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
   box-shadow:0 10px 28px rgba(7,17,31,.28),inset 0 1px 0 rgba(255,255,255,.12);
   max-width:100%;box-sizing:border-box
 }
-/* شريط مباشر تحت ترويسة العقارات — كبسولة أطول مثل المعارض في الموكب */
-#virtual-estate .rzq-disc-live-head{
-  border-radius:999px;padding:10px 22px 10px 14px;margin:4px auto 0;
-  gap:12px;
+/* العقارات: ترويسة + ميزات ثم النماذج مباشرة — بلا شريط «مباشر/أحدث» وبلا فراغ مزدوج */
+#virtual-estate{
+  padding-top:40px!important;
+  padding-bottom:12px!important;
+}
+#virtual-estate .rizq-feat-row.rizq-feat-row-3{
+  margin-bottom:0!important;
+}
+#rizq-estate-models{
+  padding-top:18px!important;
+  padding-bottom:40px;
 }
 html[dir="ltr"] .rzq-disc-live-head{direction:ltr}
 .rzq-disc-live-head .live-label-sub{
@@ -4421,7 +4428,9 @@ html[dir="ltr"] .rizq-style-cta::after{content:'→'}
 .rizq-style-card:hover .rizq-style-cta::after{transform:translateX(-3px)}
 html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translateX(3px)}
 @media(max-width:640px){
-  #rizq-styles,#rizq-showroom-models,#rizq-estate-models{padding:28px var(--rizq-strip-inset) 32px!important}
+  #rizq-styles,#rizq-showroom-models{padding:28px var(--rizq-strip-inset) 32px!important}
+  #rizq-estate-models{padding:14px var(--rizq-strip-inset) 28px!important}
+  #virtual-estate{padding-top:28px!important;padding-bottom:8px!important}
   #rizq-styles .section-header,#rizq-showroom-models .section-header,#rizq-estate-models .section-header{margin-bottom:16px}
   #rizq-styles .section-title,#rizq-showroom-models .section-title,#rizq-estate-models .section-title{font-size:clamp(11px,3vw,13px)!important;margin:0 0 2px}
   #rizq-styles .section-desc,#rizq-showroom-models .section-desc,#rizq-estate-models .section-desc{font-size:10px;line-height:1.3;max-width:100%}
@@ -5305,11 +5314,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 </section>
 
 <!-- ══ SECTION: VIRTUAL ESTATE / العقارات — نفس أسلوب المعارض (فوق شريط النماذج) ══ -->
-<section id="virtual-estate" style="padding:50px 5%;background:var(--bg-section);position:relative;overflow:hidden">
-
-  <!-- خلفية زخرفية -->
-  <div style="position:absolute;top:-60px;right:-60px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.07),transparent 70%);pointer-events:none"></div>
-  <div style="position:absolute;bottom:-80px;left:-40px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06),transparent 70%);pointer-events:none"></div>
+<section id="virtual-estate" style="padding:40px 5% 12px;background:var(--bg-section);position:relative;overflow:hidden">
 
   <div style="max-width:1100px;margin:0 auto;position:relative;z-index:1">
 
@@ -5341,14 +5346,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <div class="rizq-feat-ico"><div class="cat-icon-box">✅</div></div>
         <div class="rizq-feat-title" data-t="ve-card3-title">ثقة ووضوح في التعامل</div>
         <div class="rizq-feat-desc" data-t="ve-card3-desc">تواصل مباشر عبر المنصة مع خصوصية محمية وشارات تساعد على بناء الثقة.</div>
-      </div>
-    </div>
-
-    <!-- شريط مباشر — بدون أزرار اشتراك وبدون شريط اكتشاف منفصل -->
-    <div class="fade-in" style="text-align:center;margin-top:8px">
-      <div class="rzq-disc-live-head" role="status">
-        <span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt" data-t="ve-live">مباشر</strong></span>
-        <span class="live-label-sub" data-t="ve-live-sub">أحدث العقارات على رزق — عروض بصور واسعة تليق بالجادّين</span>
       </div>
     </div>
 
@@ -9640,8 +9637,6 @@ const LANG = {
     've-card1-title': 'عرض يُقنع من أول نظرة', 've-card1-desc': 'صور ومساحة وسعر وموقع واضح — المشتري يفهم عرضك قبل أن يراسلك.',
     've-card2-title': 'وصول لمن يبحث عن عقار', 've-card2-desc': 'طلبة كراء ومشترون ومستأجرون يصلون إليك عبر بحث العقارات على رزق.',
     've-card3-title': 'ثقة ووضوح في التعامل', 've-card3-desc': 'تواصل مباشر عبر المنصة مع خصوصية محمية وشارات تساعد على بناء الثقة.',
-    've-live': 'مباشر',
-    've-live-sub': 'أحدث العقارات على رزق — عروض بصور واسعة تليق بالجادّين',
     'browse-estate': 'ادخل بوابة العقارات ←',
     'est-title': 'أحدث عقارات على <span>رزق</span>',
     'est-desc': 'شقق وفلل وأراضي ومحلات — اعرض عقارك حيث يبحث الجادّون في موريتانيا بصور واسعة تليق ببوابة عقارية فخمة',
@@ -9801,8 +9796,6 @@ const LANG = {
     've-card1-title': 'Une offre convaincante au premier regard', 've-card1-desc': 'Photos, surface, prix et emplacement clairs — l\'acheteur comprend avant de vous écrire.',
     've-card2-title': 'Atteignez qui cherche un bien', 've-card2-desc': 'Locataires et acheteurs vous rejoignent via la recherche immobilière sur Rizq.',
     've-card3-title': 'Confiance et clarté', 've-card3-desc': 'Contact direct via la plateforme, confidentialité protégée et badges de confiance.',
-    've-live': 'En direct',
-    've-live-sub': 'Dernières offres immobilières sur Rizq — de belles photos pour acheteurs sérieux',
     'browse-estate': 'Entrer dans le portail immobilier →',
     'est-title': 'Derniers biens sur <span>Rizq</span>',
     'est-desc': 'Appartements, villas, terrains et locaux — présentez votre bien là où cherchent les acheteurs sérieux, en grandes images',
