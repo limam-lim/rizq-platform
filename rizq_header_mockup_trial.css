@@ -158,7 +158,7 @@ nav.rmh-nav{
   position:static!important;
   top:auto!important;left:auto!important;right:auto!important;
   height:auto!important;z-index:auto!important;
-  display:flex!important;align-items:stretch;justify-content:flex-start;
+  display:flex!important;align-items:stretch;justify-content:center;
   gap:0;overflow-x:auto;overflow-y:visible;scrollbar-width:none;
   padding:0 14px!important;
   background:var(--rmh-navy)!important;
