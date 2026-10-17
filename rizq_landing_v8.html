@@ -4863,8 +4863,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <script src="rizq_announcements.js"></script>
     <script src="rizq_civic_ticker.js"></script>
 <script src="rizq_backend_config.js"></script>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.42"/>
-<script src="rizq_header_mockup_trial.js?v=5.42" defer></script>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.43"/>
+<script src="rizq_header_mockup_trial.js?v=5.43" defer></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
@@ -4876,7 +4876,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_pwa.js" defer></script>
 <script src="rizq_footer_toggle.js?v=23.1" defer></script>
 <script src="rizq_social_links.js?v=23.5" defer></script>
-<script src="rizq_account_route.js?v=23.0"></script>
+<script src="rizq_account_route.js?v=23.1"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
 <script src="rizq_ux_polish.js?v=23.1"></script>
 <script src="rizq_ad_cards.js?v=3.11"></script>
@@ -12165,6 +12165,7 @@ document.getElementById('modal').addEventListener('click',function(e){
 (function initAuthModalFromUrl(){
   var openedRegister=false;
   var openedLogin=false;
+  var openedAccount=false;
   function tryOpen(){
     try{
       var p=new URLSearchParams(window.location.search);
@@ -12197,6 +12198,17 @@ document.getElementById('modal').addEventListener('click',function(e){
             }, 250);
           }, 220);
         }
+      } else if(p.get('openAccount')==='1' && !openedAccount){
+        openedAccount=true;
+        try{
+          var uAcc=new URL(window.location.href);
+          uAcc.searchParams.delete('openAccount');
+          history.replaceState(null,'',uAcc.pathname+uAcc.search+uAcc.hash);
+        }catch(eAccUrl){}
+        if(typeof goToAccount==='function') goToAccount();
+        else if(window.RizqAccount && typeof window.RizqAccount.open==='function') window.RizqAccount.open();
+        else if(window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice==='function') window.RizqAuthGate.openAccountChoice();
+        else if(typeof openModal==='function') openModal('login');
       } else if(p.get('openLogin')==='1' && !openedLogin && typeof openModal==='function'){
         openedLogin=true;
         openModal('login');
