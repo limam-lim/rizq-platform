@@ -948,7 +948,7 @@
     tesla: 'tesla'
   };
 
-  /** أيقونات Simple Icons (مسارات الماركة الرسمية المبسّطة) عند توفرها */
+  /** أيقونات Simple Icons (CORS-safe عبر jsDelivr) — شعار الماركة لا حرف */
   var SIMPLE_ICON_SLUG = {
     nike: 'nike', adidas: 'adidas', puma: 'puma', zara: 'zara', uniqlo: 'uniqlo',
     dior: 'dior', reebok: 'reebok', 'new-balance': 'newbalance',
@@ -956,7 +956,11 @@
     xiaomi: 'xiaomi', huawei: 'huawei', oppo: 'oppo', vivo: 'vivo',
     honor: 'honor', sony: 'sony', lg: 'lg', lenovo: 'lenovo', hp: 'hp',
     dell: 'dell', asus: 'asus', nokia: 'nokia', ikea: 'ikea', pandora: 'pandora',
-    mercedes: 'mercedes', bmw: 'bmw'
+    mercedes: 'mercedes', bmw: 'bmw', toyota: 'toyota', hyundai: 'hyundai',
+    kia: 'kia', nissan: 'nissan', volkswagen: 'volkswagen', peugeot: 'peugeot',
+    renault: 'renault', ford: 'ford', honda: 'honda', mazda: 'mazda',
+    mitsubishi: 'mitsubishi', suzuki: 'suzuki', audi: 'audi', jeep: 'jeep',
+    volvo: 'volvo', tesla: 'tesla', chevrolet: 'chevrolet', casio: 'casio'
   };
 
   /** نطاق الموقع الرسمي — أيقونة العلامة من الموقع عند غياب مصدر أفضل */
@@ -980,7 +984,15 @@
     tecno: 'tecno-mobile.com', infinix: 'infinixmobility.com', itel: 'itel-mobile.com',
     ikea: 'ikea.com', 'home-centre': 'homecentre.com', 'pan-emirates': 'panemirates.com',
     danube: 'danubeco.com', rolex: 'rolex.com', cartier: 'cartier.com',
-    swatch: 'swatch.com', casio: 'casio.com', tissot: 'tissot.com', pandora: 'pandora.net'
+    swatch: 'swatch.com', casio: 'casio.com', tissot: 'tissot.com', pandora: 'pandora.net',
+    toyota: 'toyota.com', mercedes: 'mercedes-benz.com', bmw: 'bmw.com',
+    hyundai: 'hyundai.com', kia: 'kia.com', nissan: 'nissan.com',
+    volkswagen: 'vw.com', peugeot: 'peugeot.com', renault: 'renault.com',
+    ford: 'ford.com', chevrolet: 'chevrolet.com', honda: 'honda.com',
+    mazda: 'mazda.com', mitsubishi: 'mitsubishi-motors.com', suzuki: 'suzuki.com',
+    audi: 'audi.com', jeep: 'jeep.com', volvo: 'volvo.com', tesla: 'tesla.com',
+    skoda: 'skoda-auto.com', opel: 'opel.com', geely: 'geely.com', chery: 'cheryinternational.com',
+    byd: 'byd.com', dacia: 'dacia.com', 'land-rover': 'landrover.com'
   };
 
   function carlogoUrl(slug) {
@@ -995,16 +1007,41 @@
     return 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(domain) + '&sz=128';
   }
 
-  /** رابط الشعار الحقيقي — بدون رسوم تقريبية مزيّفة */
+  /**
+   * شعار الماركة الحقيقي (لا حرف):
+   * 1) logoUrl مخصّص
+   * 2) Simple Icons عبر jsDelivr (CORS-safe)
+   * 3) أيقونة نطاق الماركة (Google favicons)
+   * 4) carlogos كمحاولة أخيرة (قد يُحجب hotlink)
+   */
   function logoUrl(brand) {
     if (!brand) return '';
     if (brand.logoUrl) return String(brand.logoUrl);
     var id = String(brand.id || '').toLowerCase();
-    if (AUTO_LOGO_SLUG[id]) return carlogoUrl(AUTO_LOGO_SLUG[id]);
     if (SIMPLE_ICON_SLUG[id]) return simpleIconUrl(SIMPLE_ICON_SLUG[id]);
     var domain = brand.domain || BRAND_DOMAIN[id];
     if (domain) return siteIconUrl(domain);
+    if (AUTO_LOGO_SLUG[id]) return carlogoUrl(AUTO_LOGO_SLUG[id]);
     return '';
+  }
+
+  /** سلسلة مصادر احتياطية قبل المونوغرام الحرفي */
+  function logoFallbackChain(brand) {
+    if (!brand) return [];
+    var id = String(brand.id || '').toLowerCase();
+    var out = [];
+    var seen = {};
+    function push(u) {
+      if (!u || seen[u]) return;
+      seen[u] = 1;
+      out.push(u);
+    }
+    if (brand.logoUrl) push(String(brand.logoUrl));
+    if (SIMPLE_ICON_SLUG[id]) push(simpleIconUrl(SIMPLE_ICON_SLUG[id]));
+    var domain = brand.domain || BRAND_DOMAIN[id];
+    if (domain) push(siteIconUrl(domain));
+    if (AUTO_LOGO_SLUG[id]) push(carlogoUrl(AUTO_LOGO_SLUG[id]));
+    return out;
   }
 
   /** مونوغرام نظيف فقط كاحتياطي عند فشل التحميل — ليس تقليداً لشعار */
@@ -1047,19 +1084,21 @@
     }
   }
 
-  /** صورة شعار: رابط حقيقي أولاً، ثم مونوغرام عند فشل التحميل */
+  /** صورة شعار الماركة: سلسلة روابط حقيقية ثم مونوغرام أخيراً فقط */
   function logoImgHtml(brand, size, opts) {
     opts = opts || {};
     var name = displayName(brand, !!opts.fr) || (brand && (brand.nameFr || brand.nameAr)) || 'brand';
-    var fb = logoDataUri(brand, size * 2);
-    var url = logoUrl(brand);
-    var src = url || fb;
+    var mono = logoDataUri(brand, size * 2);
+    var chain = logoFallbackChain(brand);
+    var src = chain[0] || mono;
+    var rest = chain.slice(1);
+    if (mono) rest.push(mono);
     var cls = opts.className ? ' class="' + esc(opts.className) + '"' : '';
     var style = opts.style ? ' style="' + esc(opts.style) + '"' : '';
-    var onerr = url
-      ? ' data-fallback="' + esc(fb) + '" onerror="if(this.dataset.fallback){this.onerror=null;this.src=this.dataset.fallback}"'
+    var onerr = rest.length
+      ? ' data-fallbacks="' + esc(rest.join('|')) + '" onerror="(function(img){var a=(img.dataset.fallbacks||\'\').split(\'|\').filter(Boolean);if(!a.length){img.onerror=null;return;}img.src=a.shift();img.dataset.fallbacks=a.join(\'|\');})(this)"'
       : '';
-    var loading = url ? ' loading="lazy" decoding="async" referrerpolicy="no-referrer"' : '';
+    var loading = chain.length ? ' loading="lazy" decoding="async" referrerpolicy="no-referrer"' : '';
     return '<img' + cls + ' src="' + esc(src) + '" alt="' + esc(name) + '" width="' + size + '" height="' + size + '"' + style + onerr + loading + '/>';
   }
 
@@ -1340,6 +1379,7 @@
     findByAlias: findByAlias,
     brandLetter: brandLetter,
     logoUrl: logoUrl,
+    logoFallbackChain: logoFallbackChain,
     logoSvg: logoSvg,
     logoDataUri: logoDataUri,
     logoImgHtml: logoImgHtml,

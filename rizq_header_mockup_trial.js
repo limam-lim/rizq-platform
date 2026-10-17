@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.26';
+    link.href = 'rizq_header_mockup_trial.css?v=5.28';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -685,6 +685,7 @@
     menu.style.setProperty('transform', 'none', 'important');
     menu.style.setProperty('z-index', '10070', 'important');
     menu.style.setProperty('display', 'flex', 'important');
+    menu.style.setProperty('flex-direction', 'column', 'important');
   }
 
   function openHelp() {

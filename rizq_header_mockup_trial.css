@@ -438,13 +438,22 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
 
 .rmh-search{
   grid-column:2;
-  justify-self:center;
+  justify-self:center!important;
   width:100%;max-width:460px;min-width:0;
   display:flex;align-items:stretch;
   background:#fff;border-radius:12px;overflow:hidden;
   border:1px solid rgba(255,255,255,.12);
   box-shadow:0 2px 10px rgba(0,0,0,.14);
   min-height:44px;
+}
+/* كمبيوتر: بحث وسط بعرض أوضح — لا إزاحة نحو الشعار */
+@media(min-width:1025px){
+  #rizq-mock-hdr .rmh-search{
+    max-width:460px!important;
+    justify-self:center!important;
+    margin-inline:0!important;
+    transform:none!important;
+  }
 }
 .rmh-search-cat{
   border:0;background:#f7f9fc;padding:0 12px;min-width:118px;max-width:148px;
@@ -504,8 +513,19 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
 }
 #rizq-mock-hdr .rmh-help-dd .rizq-help-dd-chev{color:var(--rmh-gold);font-size:10px}
 #rizq-mock-hdr .rmh-help-dd .rizq-help-dd-ico{color:inherit}
-#rizq-mock-hdr .rmh-help-dd .rizq-help-dd-menu{
+#rizq-mock-hdr .rmh-help-dd .rizq-help-dd-menu,
+body > .rizq-help-dd-menu{
   z-index:10070;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+  gap:2px;
+}
+body > .rizq-help-dd-menu[hidden]{display:none!important}
+body > .rizq-help-dd-menu .rizq-help-dd-item{
+  display:flex!important;
+  flex-direction:row!important;
+  width:100%!important;
 }
 .rmh-lang.btn-lang,
 #rizq-mock-hdr #rmh-lang-btn{
@@ -845,14 +865,14 @@ body > .rizq-help-dd-menu a,
     padding:9px 18px;
     align-items:center;
   }
-  /* البحث: أصغر + نحو اليمين (الشعار) مع فراغ عن أزرار اليسار */
+  /* البحث: أصغر وفي الوسط تماماً بين الشعار والأدوات */
   #rizq-mock-hdr .rmh-search{
     max-width:290px!important;
     width:100%!important;
     min-width:0!important;
-    justify-self:start; /* RTL: start = يمين = نحو الشعار */
-    margin-inline-end:6px; /* فراغ إضافي عن الأدوات على اليسار */
-    transform:translateX(10px); /* إزاحة طفيفة يميناً على الشاشة */
+    justify-self:center!important;
+    margin-inline:0!important;
+    transform:none!important;
   }
   /* شعار أصغر خطاً — نفس التصميم */
   #rizq-mock-hdr .rmh-brand .logo-ar,
@@ -887,14 +907,13 @@ body > .rizq-help-dd-menu a,
   body.rizq-mockup-hdr-trial .hero-brand-row .hero-eyebrow{
     margin-top:4px!important;
   }
-  /* الفرنسية LTR: أبقِ نفس الفراغات؛ الإزاحة البصرية للبحث تُعكس */
+  /* الفرنسية LTR: البحث يبقى في الوسط أيضاً */
   html[dir="ltr"] #rizq-mock-hdr .rmh-search,
   html[lang="fr"] #rizq-mock-hdr .rmh-search,
   body.rizq-lang-fr #rizq-mock-hdr .rmh-search{
-    justify-self:end; /* LTR: نحو الشعار على اليسار */
-    margin-inline-end:0;
-    margin-inline-start:6px;
-    transform:translateX(-10px);
+    justify-self:center!important;
+    margin-inline:0!important;
+    transform:none!important;
   }
 }
 
