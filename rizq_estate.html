@@ -402,28 +402,28 @@ button{font:inherit;border:0;background:none;color:inherit}
     </nav>
     <div class="est-top-actions">
       <a class="est-chip nav-hide-sm" href="rizq_estate_agencies.html">دليل الوكالات</a>
-      <a class="est-chip" href="tel:+22242000111" dir="ltr">📞 اتصل</a>
+      <a class="est-chip" id="est-top-call" href="tel:+22242000111" dir="ltr">📞 اتصل</a>
       <a class="est-chip solid" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency" id="est-reg-top">افتح وكالتك</a>
     </div>
   </div>
 </header>
 
-<section class="est-hero" aria-label="واجهة وكالة عقارية">
+<section class="est-hero" aria-label="واجهة وكالة عقارية واحدة">
   <div class="est-hero-media">
-    <img src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1800&q=80" alt="فيلا فاخرة عند الغروب" fetchpriority="high"/>
+    <img id="est-hero-img" src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1800&q=80" alt="فيلا فاخرة عند الغروب" fetchpriority="high"/>
   </div>
   <div class="est-hero-copy">
-    <div class="est-kicker"><i></i> واجهة وكالة عقارية · أطوار للعقارات</div>
+    <div class="est-kicker" id="est-kicker"><i></i> واجهة وكالة عقارية واحدة · مثل المحل والمكتب</div>
     <h1>مساحات تليق بك — <em>على رزق</em></h1>
-    <p class="est-hero-lead">واجهة وكالة عقارية كاملة: معروضات بصور واسعة، أسعار واضحة، وتواصل مباشر مع الوكالة — هاتف وواتساب من كل بطاقة.</p>
+    <p class="est-hero-lead" id="est-hero-lead">صفحة وكالة واحدة: معروضاتها، ورقمها، وواتسابها — تصميم عقاري مستقل عن المحلات والمكاتب والمعارض.</p>
     <div class="est-hero-stats" aria-label="أرقام نموذج">
-      <div class="est-stat"><b>+120</b><span>عرض عقاري</span></div>
+      <div class="est-stat"><b id="est-stat-ads">+120</b><span>عرض عقاري</span></div>
       <div class="est-stat"><b>8</b><span>ولايات مغطاة</span></div>
       <div class="est-stat"><b>24/7</b><span>تواصل مع الوكالة</span></div>
     </div>
     <div class="est-hero-cta">
       <a class="est-btn est-btn-gold" href="#est-listings">استكشف معروضات الوكالة</a>
-      <a class="est-btn est-btn-ghost" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب الوكالة</a>
+      <a class="est-btn est-btn-ghost" id="est-hero-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب الوكالة</a>
     </div>
     <form class="est-search" id="est-search" role="search" aria-label="بحث العقارات">
       <label>
@@ -457,17 +457,17 @@ button{font:inherit;border:0;background:none;color:inherit}
 </section>
 
 <main class="est-wrap">
-  <div class="est-agency-bar" aria-label="تواصل مع الوكالة">
+  <div class="est-agency-bar" aria-label="تواصل مع هذه الوكالة">
     <div class="est-agency-bar-id">
-      <img src="rizq-mark-inset.png?v=1" width="44" height="44" alt=""/>
+      <img id="est-bar-logo" src="rizq-mark-inset.png?v=1" width="44" height="44" alt=""/>
       <div>
-        <strong>أطوار للعقارات</strong>
-        <span>وكالة عقارية على رزق · نواكشوط</span>
+        <strong id="est-bar-name">أطوار للعقارات</strong>
+        <span id="est-bar-sub">وكالة عقارية على رزق · نواكشوط</span>
       </div>
     </div>
     <div class="est-agency-bar-acts">
-      <a class="est-call" href="tel:+22242000111" dir="ltr">📞 اتصل بالوكالة</a>
-      <a class="est-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب</a>
+      <a class="est-call" id="est-bar-call" href="tel:+22242000111" dir="ltr">📞 اتصل بالوكالة</a>
+      <a class="est-wa" id="est-bar-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب</a>
       <a class="est-page" href="rizq_estate_agencies.html">كل الوكالات</a>
     </div>
   </div>
@@ -525,18 +525,18 @@ button{font:inherit;border:0;background:none;color:inherit}
 
   <section class="est-agency" id="est-agency" aria-label="عن الوكالة">
     <div class="est-agency-copy">
-      <div class="tag" style="color:var(--gold);font:800 12px Cairo,sans-serif">وكالة نموذج على رزق</div>
-      <h2>أطوار للعقارات</h2>
-      <p>واجهة وكالة عقارية كاملة: هوية واضحة، معروضات بصور احترافية، وتواصل مباشر مع من يبحث عن شقة أو فيلا أو أرض.</p>
+      <div class="tag" style="color:var(--gold);font:800 12px Cairo,sans-serif">هذه الوكالة على رزق</div>
+      <h2 id="est-about-name">أطوار للعقارات</h2>
+      <p id="est-about-desc">صفحة وكالة واحدة (مثل صفحة محل أو مكتب أو معرض) بتصميم عقاري مستقل — معروضات، هوية، وجهات اتصال واحدة للوكالة.</p>
       <ul class="est-agency-points">
-        <li>✓ مسار حساب مستقل: شركة → مكتب → وساطة عقارية</li>
-        <li>✓ صفحة وكالة باسمك وشعارك على رزق</li>
-        <li>✓ أزرار اتصال وواتساب من البطاقة والمعاينة</li>
-        <li>✓ ظهور في دليل الوكالات العقارية المنفصل</li>
+        <li>✓ حساب واحد → صفحة وكالة واحدة (`?id=`)</li>
+        <li>✓ جهات اتصال الوكالة فقط (هاتف + واتساب)</li>
+        <li>✓ مسار التسجيل: شركة → مكتب → وساطة عقارية</li>
+        <li>✓ الظهور في دليل الوكالات المنفصل</li>
       </ul>
       <div class="est-hero-cta">
-        <a class="est-btn est-btn-gold" href="tel:+22242000111" dir="ltr">📞 اتصل بالوكالة</a>
-        <a class="est-btn est-btn-ghost" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب الوكالة</a>
+        <a class="est-btn est-btn-gold" id="est-about-call" href="tel:+22242000111" dir="ltr">📞 اتصل بالوكالة</a>
+        <a class="est-btn est-btn-ghost" id="est-about-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب الوكالة</a>
         <a class="est-btn est-btn-gold" id="est-reg-agency" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">امتلك واجهتك العقارية</a>
         <a class="est-btn est-btn-ghost" href="rizq_estate_agencies.html">كل الوكالات العقارية</a>
       </div>
@@ -673,12 +673,130 @@ button{font:inherit;border:0;background:none;color:inherit}
     });
   }
 
-  var AGENCY = {
-    name: 'أطوار للعقارات',
-    phone: '+222 42 00 01 11',
-    whatsapp: '22242000111',
-    page: 'rizq_estate_agencies.html'
+  /* وكالة واحدة لكل صفحة — مثل rizq_store / rizq_office / rizq_showroom */
+  var DEMO_AGENCIES = {
+    demo_estate_atwar: {
+      id: 'demo_estate_atwar', name: 'أطوار للعقارات', city: 'نواكشوط',
+      activity: 'وساطة عقارية', phone: '+222 42 00 01 11', whatsapp: '22242000111',
+      logo: 'rizq-mark-inset.png?v=1',
+      cover: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1800&q=80',
+      desc: 'وكالة عقارية نموذجية على رزق — صفحة واحدة بجهات اتصال واحدة وتصميم عقاري مستقل.'
+    },
+    demo_estate_saknia: {
+      id: 'demo_estate_saknia', name: 'سكنية العقارية', city: 'تفرغ زينة',
+      activity: 'بيع وإيجار', phone: '+222 45 10 20 30', whatsapp: '22245102030',
+      logo: 'rizq-mark-inset.png?v=1',
+      cover: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1800&q=80',
+      desc: 'وكالة واحدة للشقق العائلية والمحلات — تواصل مباشر مع الوكالة فقط.'
+    },
+    demo_estate_horizon: {
+      id: 'demo_estate_horizon', name: 'هورايزن للإسكان', city: 'نواذيبو',
+      activity: 'تطوير ووساطة', phone: '+222 46 22 33 44', whatsapp: '22246223344',
+      logo: 'rizq-mark-inset.png?v=1',
+      cover: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1800&q=80',
+      desc: 'وكالة واحدة للأراضي والفلل — رقم وواتساب الوكالة على كل بطاقة.'
+    },
+    demo_estate_dar: {
+      id: 'demo_estate_dar', name: 'دار الأمين العقارية', city: 'لكصر',
+      activity: 'إدارة عقارات', phone: '+222 36 70 80 90', whatsapp: '22236708090',
+      logo: 'rizq-mark-inset.png?v=1',
+      cover: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1800&q=80',
+      desc: 'وكالة واحدة لإدارة الكراء والبيع — واجهة مستقلة بهوية رزق العقارية.'
+    }
   };
+
+  var AGENCY = Object.assign({}, DEMO_AGENCIES.demo_estate_atwar);
+  window._rizqEstateAccountId = AGENCY.id;
+  window._rizqEstateIsDemo = true;
+
+  function telHref(p){ return 'tel:' + String(p||'').replace(/\s+/g,''); }
+  function waHref(w){ return 'https://wa.me/' + String(w||'').replace(/\D/g,''); }
+
+  function setHref(id, href){
+    var el = document.getElementById(id);
+    if(el && href) el.setAttribute('href', href);
+  }
+  function setText(id, text){
+    var el = document.getElementById(id);
+    if(el && text != null) el.textContent = text;
+  }
+
+  function applyAgency(acc){
+    if(!acc) return;
+    AGENCY = {
+      id: acc.id || AGENCY.id,
+      name: acc.name || AGENCY.name,
+      city: acc.city || acc.wilaya || AGENCY.city,
+      activity: acc.activity || acc.sector || AGENCY.activity,
+      phone: acc.phone || acc.tel || AGENCY.phone,
+      whatsapp: String(acc.whatsapp || acc.wa || acc.phone || AGENCY.whatsapp).replace(/\D/g,''),
+      logo: acc.logo || acc.thumb || acc.avatar || AGENCY.logo,
+      cover: acc.cover || acc.thumb || AGENCY.cover,
+      desc: acc.desc || acc.tagline || acc.bio || AGENCY.desc
+    };
+    window._rizqEstateAccountId = AGENCY.id;
+    document.title = AGENCY.name + ' | وكالة عقارية — رزق';
+
+    setText('est-kicker', 'وكالة عقارية واحدة · ' + AGENCY.name);
+    var kicker = document.getElementById('est-kicker');
+    if(kicker) kicker.innerHTML = '<i></i> وكالة عقارية واحدة · ' + esc(AGENCY.name);
+    setText('est-hero-lead', AGENCY.desc);
+    setText('est-bar-name', AGENCY.name);
+    setText('est-bar-sub', (AGENCY.activity || 'وكالة عقارية') + ' على رزق · ' + (AGENCY.city || ''));
+    setText('est-about-name', AGENCY.name);
+    setText('est-about-desc', AGENCY.desc);
+
+    var logo = document.getElementById('est-bar-logo');
+    if(logo && AGENCY.logo){ logo.src = AGENCY.logo; logo.alt = AGENCY.name; }
+    var hero = document.getElementById('est-hero-img');
+    if(hero && AGENCY.cover){ hero.src = AGENCY.cover; hero.alt = AGENCY.name; }
+
+    var call = telHref(AGENCY.phone);
+    var wa = waHref(AGENCY.whatsapp);
+    setHref('est-top-call', call);
+    setHref('est-hero-wa', wa);
+    setHref('est-bar-call', call);
+    setHref('est-bar-wa', wa);
+    setHref('est-about-call', call);
+    setHref('est-about-wa', wa);
+    setHref('est-modal-call', call);
+    setHref('est-modal-wa', wa);
+    renderGrid();
+  }
+
+  function backendBase(){
+    return (typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE) || 'http://localhost:3000';
+  }
+
+  function bootAgency(){
+    var params = new URLSearchParams(location.search);
+    var id = params.get('id') || params.get('agency') || params.get('office') || '';
+    var forceDemo = params.get('demo') === '1' || !id || /^demo_estate/i.test(id) || id === 'demo_estate';
+    if(forceDemo){
+      if(!id || id === 'demo_estate' || !DEMO_AGENCIES[id]) id = 'demo_estate_atwar';
+      window._rizqEstateIsDemo = true;
+      applyAgency(DEMO_AGENCIES[id] || DEMO_AGENCIES.demo_estate_atwar);
+      try{ history.replaceState(null, '', 'rizq_estate.html?demo=1&id=' + encodeURIComponent(id)); }catch(e){}
+      return;
+    }
+    window._rizqEstateIsDemo = false;
+    fetch(backendBase() + '/api/accounts/public', { credentials: 'omit' })
+      .then(function(r){ return r.ok ? r.json() : []; })
+      .then(function(rows){
+        var list = Array.isArray(rows) ? rows : (rows && rows.accounts) || [];
+        var acc = list.find(function(a){ return a && a.id === id; });
+        if(acc){
+          applyAgency(acc);
+        } else {
+          window._rizqEstateIsDemo = true;
+          applyAgency(DEMO_AGENCIES.demo_estate_atwar);
+        }
+      })
+      .catch(function(){
+        window._rizqEstateIsDemo = true;
+        applyAgency(DEMO_AGENCIES.demo_estate_atwar);
+      });
+  }
 
   function cardHTML(item){
     return '<div class="est-card'+(item.featured?' featured':'')+'" data-id="'+esc(item.id)+'">'
@@ -698,8 +816,8 @@ button{font:inherit;border:0;background:none;color:inherit}
       +   '</div>'
       + '</div></button>'
       + '<div class="est-card-contact" style="padding:0 16px 14px">'
-      +   '<a class="est-call" href="tel:'+esc(AGENCY.phone.replace(/\s+/g,''))+'" dir="ltr" onclick="event.stopPropagation()">📞 اتصل</a>'
-      +   '<a class="est-wa" href="https://wa.me/'+esc(AGENCY.whatsapp)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">💬 واتساب</a>'
+      +   '<a class="est-call" href="'+esc(telHref(AGENCY.phone))+'" dir="ltr" onclick="event.stopPropagation()">📞 اتصل</a>'
+      +   '<a class="est-wa" href="'+esc(waHref(AGENCY.whatsapp))+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">💬 واتساب</a>'
       + '</div>'
       + '</div>';
   }
@@ -810,6 +928,7 @@ button{font:inherit;border:0;background:none;color:inherit}
   }
   bindReg('est-reg-top');
   bindReg('est-reg-agency');
+  bootAgency();
   rail.addEventListener('click', function(e){
     var shot = e.target.closest('.est-shot');
     if(!shot) return;

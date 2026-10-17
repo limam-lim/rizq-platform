@@ -252,7 +252,7 @@ button{font:inherit;border:0;background:none;color:inherit}
 
 <footer class="ag-foot">
   © 2026 رزق — دليل الوكالات العقارية ·
-  <a href="rizq_estate.html?demo=1">بوابة العقارات</a> ·
+  <a href="rizq_estate.html?demo=1&amp;id=demo_estate_atwar">نموذج وكالة</a> ·
   <a href="rizq_directory.html?type=office&amp;cat=realestate">دليل المكاتب (عقارات)</a>
 </footer>
 
@@ -270,7 +270,7 @@ button{font:inherit;border:0;background:none;color:inherit}
       cover: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80',
       logo: 'rizq-mark-inset.png?v=1',
       badge: 'نموذج',
-      href: 'rizq_office.html?demo=1&activity=of_realestate_agency&name=' + encodeURIComponent('أطوار للعقارات')
+      href: 'rizq_estate.html?demo=1&id=demo_estate_atwar'
     },
     {
       id: 'demo_estate_saknia',
@@ -283,7 +283,7 @@ button{font:inherit;border:0;background:none;color:inherit}
       cover: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80',
       logo: 'rizq-mark-inset.png?v=1',
       badge: 'نموذج',
-      href: 'rizq_office.html?demo=1&activity=of_realestate_agency&name=' + encodeURIComponent('سكنية العقارية')
+      href: 'rizq_estate.html?demo=1&id=demo_estate_saknia'
     },
     {
       id: 'demo_estate_horizon',
@@ -296,7 +296,7 @@ button{font:inherit;border:0;background:none;color:inherit}
       cover: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1200&q=80',
       logo: 'rizq-mark-inset.png?v=1',
       badge: 'نموذج',
-      href: 'rizq_office.html?demo=1&activity=of_realestate_agency&name=' + encodeURIComponent('هورايزن للإسكان')
+      href: 'rizq_estate.html?demo=1&id=demo_estate_horizon'
     },
     {
       id: 'demo_estate_dar',
@@ -309,7 +309,7 @@ button{font:inherit;border:0;background:none;color:inherit}
       cover: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80',
       logo: 'rizq-mark-inset.png?v=1',
       badge: 'نموذج',
-      href: 'rizq_office.html?demo=1&activity=of_realestate_agency&name=' + encodeURIComponent('دار الأمين العقارية')
+      href: 'rizq_estate.html?demo=1&id=demo_estate_dar'
     }
   ];
 
@@ -391,7 +391,7 @@ button{font:inherit;border:0;background:none;color:inherit}
       cover: a.cover || a.thumb || a.photo || '',
       logo: a.logo || a.avatar || 'rizq-mark-inset.png?v=1',
       badge: a.verified ? 'موثّق' : '',
-      href: 'rizq_office.html?id=' + encodeURIComponent(a.id||'')
+      href: 'rizq_estate.html?id=' + encodeURIComponent(a.id||'')
     };
   }
 
