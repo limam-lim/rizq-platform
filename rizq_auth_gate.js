@@ -1,6 +1,7 @@
 /**
- * rizq_auth_gate.js — بوابة العضو / حساب الأعمال (Guest Gate) v19.5
+ * rizq_auth_gate.js — بوابة العضو / حساب الأعمال (Guest Gate) v19.6
  * اسم + بريد + واتساب + (هاتف MR أو دولي) + OTP بالبريد
+ * v19.6: رأس موحّد فخم فوق شاشة حسابي (مثل باقي الصفحات) + شريط كحلي داخلي
  * v19.5: «سوق العقارات» كمسار منفصل واضح في شاشة حسابي (سوق كبير مستقل)
  * v19.4: زر «سوق العقارات» — مسار وكالة عقارية مستقل في شاشة حسابي
  * v19.3: تسميات أوسع من بائع/مشتري — حساب شخصي · حساب أعمال · دخول رزق
@@ -52,6 +53,9 @@
       titleAccount: 'حسابي',
       titleOtp: 'تأكيد بريدك الإلكتروني',
       titleChoice: 'حسابي على رزق',
+      heroKicker: 'رزق · حسابي',
+      heroTitleHtml: 'حسابي على <span>رزق</span>',
+      heroSub: 'بوابة فخمة للدخول والتسجيل — شخصي، أعمال، أو سوق العقارات',
       subGate: 'سجّل مجاناً بمعلومات صحيحة تُستخدم للتوصيل والفاتورة والخدمات — أقل من دقيقة',
       subAccount: 'حسابك على رزق — للتصفح والشراء والتوصيل والمفضلة',
       subOtp: 'أدخل الرمز المُرسَل إلى بريدك الإلكتروني',
@@ -123,6 +127,9 @@
       titleAccount: 'Mon compte',
       titleOtp: 'Confirmez votre e-mail',
       titleChoice: 'Mon compte Rizq',
+      heroKicker: 'Rizq · Mon compte',
+      heroTitleHtml: 'Mon compte sur <span>Rizq</span>',
+      heroSub: 'Portail premium — personnel, pro, ou marché immobilier',
       subGate: 'Inscrivez-vous avec des infos exactes (livraison, facture, services) — moins d’une minute',
       subAccount: 'Votre compte Rizq — navigation, achats, livraison et favoris',
       subOtp: 'Saisissez le code envoyé à votre e-mail',
@@ -324,20 +331,28 @@
     if (old) old.parentNode.removeChild(old);
     var css = [
       /* شاشة تسجيل المشتري بنفس أسلوب نشر الإعلان / معالج البائع الفاتح */
-      '#rag-overlay.rag-overlay{position:fixed;inset:0;background:#f8faff!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;z-index:1000001!important;display:none;align-items:stretch;justify-content:flex-start;padding:0;opacity:1;pointer-events:none;overflow-y:auto;-webkit-overflow-scrolling:touch}',
+      '#rag-overlay.rag-overlay{position:fixed;top:var(--rizq-header-h,74px);left:0;right:0;bottom:0;background:linear-gradient(180deg,#eef2f8 0%,#f7f9fc 45%,#fff 100%)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;z-index:10040!important;display:none;align-items:stretch;justify-content:flex-start;padding:0;opacity:1;pointer-events:none;overflow-y:auto;-webkit-overflow-scrolling:touch}',
       '#rag-overlay.rag-overlay.open{display:flex!important;pointer-events:auto}',
-      '#rag-overlay .rag-modal{background:#fff!important;border:none!important;border-radius:0!important;max-width:820px;width:100%;margin:0 auto;padding:0 0 40px!important;box-shadow:none!important;transform:none!important;font-family:Cairo,\"Segoe UI\",sans-serif;position:relative;min-height:100%;min-height:100dvh;overflow:visible;color:#1a2535!important;box-sizing:border-box}',
-      '@media (min-width:769px){#rag-overlay.rag-overlay{padding:24px 16px 40px;align-items:flex-start}#rag-overlay .rag-modal{min-height:auto;border-radius:18px!important;border:1px solid #e2e8f0!important;box-shadow:0 10px 30px -10px rgba(0,0,0,.08)!important}}',
-      '#rag-overlay .rag-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid #e2e8f5;background:#fff;position:sticky;top:0;z-index:6}',
+      '#rag-overlay .rag-modal{background:#fff!important;border:none!important;border-radius:0!important;max-width:820px;width:100%;margin:0 auto;padding:0 0 40px!important;box-shadow:none!important;transform:none!important;font-family:Cairo,\"Segoe UI\",sans-serif;position:relative;min-height:100%;min-height:calc(100dvh - var(--rizq-header-h,74px));overflow:visible;color:#1a2535!important;box-sizing:border-box}',
+      '@media (min-width:769px){#rag-overlay.rag-overlay{padding:18px 16px 40px;align-items:flex-start;background:linear-gradient(180deg,#e8eef7 0%,#f4f7fb 40%,#fff 100%)!important}#rag-overlay .rag-modal{min-height:auto;border-radius:18px!important;border:1px solid rgba(27,58,107,.12)!important;box-shadow:0 18px 48px rgba(15,35,65,.14)!important;overflow:hidden}}',
+      '#rag-overlay .rag-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:none;background:transparent;position:absolute;top:0;left:0;right:0;z-index:8}',
       '#rag-overlay .rag-back{display:inline-flex!important;align-items:center;gap:6px;background:#0f2347!important;border:2px solid #c9a84c!important;color:#e8c96a!important;min-height:44px;padding:10px 16px;border-radius:12px;cursor:pointer;font-size:14px;font-weight:800;font-family:inherit;box-shadow:0 4px 12px rgba(15,35,65,.18)}',
       '#rag-overlay .rag-back:hover{background:#1b3a6b!important;border-color:#e8c96a!important;color:#fff!important}',
-      '#rag-overlay .rag-close{background:#fff!important;border:2px solid #94a3b8!important;color:#0f2347!important;width:44px;height:44px;border-radius:12px;cursor:pointer;font-size:22px;font-weight:900;flex-shrink:0;line-height:1;box-shadow:0 2px 8px rgba(15,35,65,.12)!important}',
+      '#rag-overlay .rag-close{background:rgba(255,255,255,.12)!important;border:2px solid rgba(232,201,106,.55)!important;color:#E8C96A!important;width:44px;height:44px;border-radius:12px;cursor:pointer;font-size:22px;font-weight:900;flex-shrink:0;line-height:1;box-shadow:0 2px 8px rgba(15,35,65,.12)!important}',
       '#rag-overlay .rag-close:hover{background:#fef2f2!important;border-color:#ef4444!important;color:#b91c1c!important}',
-      '#rag-overlay .rag-brand{display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 20px 10px;border-bottom:1px solid #e2e8f5}',
-      '#rag-overlay .rag-brand-mark{width:56px;height:56px;border-radius:14px;background:#0f2347;border:1px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center}',
-      '#rag-overlay .rag-brand-mark img{width:44px;height:44px}',
-      '#rag-overlay .rag-brand-name{font-size:16px;font-weight:800;color:#1b3a6b}',
-      '#rag-overlay .rag-brand-back{font-size:12px;font-weight:700;color:#a07820;letter-spacing:.2px}',
+      '#rag-overlay .rag-brand{display:none}',
+      '#rag-overlay .rag-hero{position:relative;overflow:hidden;text-align:center;padding:56px 18px 18px;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(201,168,76,.18),transparent 55%),linear-gradient(165deg,#071020 0%,#0f2347 48%,#1B3A6B 100%);border-bottom:1px solid rgba(201,168,76,.28)}',
+      '#rag-overlay .rag-hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.2;background-image:radial-gradient(rgba(201,168,76,.12) 1px,transparent 1px);background-size:18px 18px}',
+      '#rag-overlay .rag-hero-inner{position:relative;z-index:1}',
+      '#rag-overlay .rag-hero-kicker{display:inline-block;margin:0 0 8px;padding:3px 10px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.6px;color:#E8C96A;border:1px solid rgba(201,168,76,.35);background:rgba(201,168,76,.1)}',
+      '#rag-overlay .rag-hero-mark{width:52px;height:52px;margin:0 auto 8px;border-radius:14px;background:#0f2347;border:1.5px solid rgba(201,168,76,.45);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 16px rgba(0,0,0,.25)}',
+      '#rag-overlay .rag-hero-mark img{width:40px;height:40px}',
+      '#rag-overlay .rag-hero-title{font-family:Amiri,Georgia,serif;font-size:clamp(22px,3vw,28px);font-weight:700;color:#fff;line-height:1.25;margin:0 0 4px;text-shadow:0 2px 14px rgba(0,0,0,.3)}',
+      '#rag-overlay .rag-hero-title span{background:linear-gradient(135deg,#F0D78A,#C9A84C,#E8C96A);-webkit-background-clip:text;background-clip:text;color:transparent}',
+      '#rag-overlay .rag-hero-sub{color:rgba(255,255,255,.78);font-size:12.5px;font-weight:600;max-width:36ch;margin:0 auto;line-height:1.45}',
+      'body.rizq-reg-open #rizq-mock-hdr{z-index:10050!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important;display:block!important}',
+      'html.rizq-app-nav body.rizq-reg-open,html.rizq-app-nav.has-rizq-desk-nav body.rizq-reg-open,html.rizq-reg-page body,html.rizq-app-nav.rizq-reg-page body{padding-top:var(--rizq-header-h,74px)!important}',
+      'html.rizq-app-nav body.rizq-reg-open #rizq-mock-hdr .rmh-nav,html.rizq-app-nav body.rizq-reg-open #rizq-mock-hdr .rmh-row{visibility:visible!important;pointer-events:auto!important}',
       '#rag-overlay .rag-progress{display:none;background:#fff;border-bottom:1px solid #e2e8f5;padding:14px 16px 16px}',
       '#rag-overlay.open .rag-progress{display:block}',
       '#rag-overlay .rag-progress-steps{display:flex;align-items:center;max-width:640px;margin:0 auto}',
@@ -414,7 +429,7 @@
       '#rag-overlay .rag-seller-link{display:block;text-align:center;margin-top:10px;color:#1b3a6b;font-size:13px;font-weight:700;text-decoration:none}',
       '#rag-overlay .rag-step{display:none}',
       '#rag-overlay .rag-step.active{display:block}',
-      'body.rizq-reg-open #rizq-chat-toggle,body.rizq-reg-open .mobile-bottom-nav,body.rizq-reg-open #nav,body.rizq-reg-open .fixed-rizq-logo,body.rizq-reg-open #rizq-rlogo-edge{visibility:hidden!important;pointer-events:none!important}',
+      'body.rizq-reg-open #rizq-chat-toggle,body.rizq-reg-open .mobile-bottom-nav,body.rizq-reg-open #nav:not(#rizq-mock-hdr),body.rizq-reg-open .fixed-rizq-logo,body.rizq-reg-open #rizq-rlogo-edge{visibility:hidden!important;pointer-events:none!important}',
       '#rizq-terms-modal.rizq-terms-overlay{z-index:1000010!important;background:rgba(15,35,65,.45)!important}'
     ].join('');
     var style = document.createElement('style');
@@ -468,7 +483,14 @@
       '      <button class="rag-back" id="rag-nav-back-btn" type="button"></button>',
       '      <button class="rag-close" id="rag-close-btn" type="button" aria-label="إغلاق">✕</button>',
       '    </div>',
-      '    <div class="rag-brand"><div class="rag-brand-mark"><img src="rizq-mark-512.png" width="48" height="48" alt="رزق"/></div><div class="rag-brand-name">رزق | Rizq</div></div>',
+      '    <div class="rag-hero" id="rag-hero" aria-hidden="false">',
+      '      <div class="rag-hero-inner">',
+      '        <div class="rag-hero-kicker" id="rag-hero-kicker">رزق · حسابي</div>',
+      '        <div class="rag-hero-mark"><img src="rizq-mark-512.png" width="40" height="40" alt="رزق"/></div>',
+      '        <div class="rag-hero-title" id="rag-hero-title">حسابي على <span>رزق</span></div>',
+      '        <p class="rag-hero-sub" id="rag-hero-sub">بوابة فخمة للدخول والتسجيل — شخصي، أعمال، أو سوق العقارات</p>',
+      '      </div>',
+      '    </div>',
       '    <div class="rag-progress" id="rag-progress" aria-hidden="false">',
       '      <div class="rag-progress-steps">',
       '        <div class="rag-pstep active" id="rag-pstep-1"><div class="rag-pstep-circle">1</div><div class="rag-pstep-label" id="rag-pstep-1-label">البيانات</div></div>',
@@ -729,7 +751,7 @@
     var ov = document.getElementById('rag-overlay');
     ov.classList.add('open');
     ov.style.display = 'flex';
-    ov.style.zIndex = '1000001';
+    ov.style.zIndex = '10040';
     ov.style.pointerEvents = 'none';
     document.body.classList.add('rizq-reg-open');
     var isPhone = ragIsPhoneViewport();
@@ -1318,6 +1340,12 @@
     var dict = d();
     document.getElementById('rag-title').textContent = dict.titleChoice;
     document.getElementById('rag-sub').textContent = dict.subChoice;
+    var heroKick = document.getElementById('rag-hero-kicker');
+    var heroTitle = document.getElementById('rag-hero-title');
+    var heroSub = document.getElementById('rag-hero-sub');
+    if (heroKick) heroKick.textContent = dict.heroKicker || dict.titleChoice;
+    if (heroTitle) heroTitle.innerHTML = dict.heroTitleHtml || dict.titleChoice;
+    if (heroSub) heroSub.textContent = dict.heroSub || dict.subChoice;
     document.getElementById('rag-choice-buyer-title').textContent = dict.choiceBuyer;
     document.getElementById('rag-choice-buyer-sub').textContent = dict.choiceBuyerSub;
     document.getElementById('rag-choice-seller-title').textContent = dict.choiceSeller;
