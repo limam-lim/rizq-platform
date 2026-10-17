@@ -1721,11 +1721,11 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   font-size:8px;font-weight:800;line-height:1;text-align:center;
   text-shadow:0 1px 3px rgba(0,0,0,.65);max-width:44px;
 }
-/* اتصال + واتساب فوق الفيديو — تحت زر التشغيل */
+/* اتصال + واتساب أسفل الفيديو — تظهر عند المرور فقط، وتختفي عند التشغيل أو مغادرة الماوس */
 .rizq-vcard-thumb .rizq-vcard-contacts,
 .rizq-vcard-thumb .rzq-adx-actions{
-  position:absolute;left:50%;top:58%;
-  transform:translate(-50%,0);
+  position:absolute;left:50%;top:auto;bottom:12px;
+  transform:translate(-50%,6px);
   z-index:5;
   display:flex;align-items:center;justify-content:center;gap:10px;
   width:auto;max-width:calc(100% - 52px);
@@ -1735,7 +1735,25 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   border:1px solid rgba(255,255,255,.18);
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
   box-shadow:0 8px 20px rgba(0,0,0,.28);
-  pointer-events:auto;
+  opacity:0;pointer-events:none;
+  transition:opacity .2s ease,transform .2s ease;
+}
+.rizq-vcard:hover:not(.is-playing) .rizq-vcard-thumb .rizq-vcard-contacts,
+.rizq-vcard:hover:not(.is-playing) .rizq-vcard-thumb .rzq-adx-actions,
+.rizq-vcard:focus-within:not(.is-playing) .rizq-vcard-thumb .rizq-vcard-contacts,
+.rizq-vcard:focus-within:not(.is-playing) .rizq-vcard-thumb .rzq-adx-actions{
+  opacity:1;pointer-events:auto;transform:translate(-50%,0);
+}
+.rizq-vcard.is-playing .rizq-vcard-thumb .rizq-vcard-contacts,
+.rizq-vcard.is-playing .rizq-vcard-thumb .rzq-adx-actions{
+  opacity:0!important;pointer-events:none!important;transform:translate(-50%,6px);
+}
+/* لمس: الأزرار ظاهرة طالما الفيديو متوقف، وتختفي عند التشغيل */
+@media (hover:none){
+  .rizq-vcard:not(.is-playing) .rizq-vcard-thumb .rizq-vcard-contacts,
+  .rizq-vcard:not(.is-playing) .rizq-vcard-thumb .rzq-adx-actions{
+    opacity:1;pointer-events:auto;transform:translate(-50%,0);
+  }
 }
 .rizq-vcard-thumb .rizq-vcard-tel,
 .rizq-vcard-thumb .rizq-vcard-wa,
@@ -1767,7 +1785,8 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
 .rizq-vcard-thumb .rizq-vcard-contacts svg,
 .rizq-vcard-thumb .rzq-adx-actions svg{width:13px;height:13px;display:block;flex-shrink:0}
 .rizq-vcard-contact-lbl{display:none}
-.rizq-vcard-thumb .rizq-vcard-cap{bottom:8px;max-width:calc(100% - 24px);opacity:.92}
+/* العنوان على الفيديو مُلغى — يكفي الاسم تحت البطاقة */
+.rizq-vcard-cap{display:none!important}
 /* تكبير البطاقة — نافذة كبيرة فوق الصفحة */
 .rizq-vstrip-lb{
   position:fixed;inset:0;z-index:10050;display:none;
@@ -1807,13 +1826,7 @@ html[lang="fr"] .hero-vid-fs-btn{right:auto;left:54px}
   text-shadow:0 1px 4px rgba(0,0,0,.55);pointer-events:none;
 }
 body.rizq-vstrip-lb-on{overflow:hidden}
-/* عنوان على الفيديو — ركن أيسر سفلي بعيداً عن أزرار التواصل يمين */
-.rizq-vcard-cap{
-  position:absolute;left:8px;right:auto;bottom:8px;z-index:2;color:#fff;
-  max-width:calc(100% - 56px);text-align:left;
-  font-size:12px;font-weight:800;line-height:1.3;pointer-events:none;
-  text-shadow:0 1px 4px rgba(0,0,0,.5);font-family:'Cairo',sans-serif;
-}
+.rizq-vcard-cap{display:none!important}
 .rizq-vcard-name{
   font-size:13px;font-weight:800;color:#0D1B2A;line-height:1.3;padding-inline:2px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
@@ -1834,7 +1847,7 @@ body.rizq-vstrip-lb-on{overflow:hidden}
   .rizq-vid-strip-hint{display:none}
   .rizq-vcard{flex-basis:min(210px,58vw)}
   .rizq-vcard-thumb .rizq-vcard-contacts,
-  .rizq-vcard-thumb .rzq-adx-actions{top:56%;bottom:auto;padding:5px 8px;gap:8px}
+  .rizq-vcard-thumb .rzq-adx-actions{bottom:10px;padding:5px 8px;gap:8px}
   .rizq-vcard-thumb .rizq-vcard-tel,
   .rizq-vcard-thumb .rizq-vcard-wa,
   .rizq-vcard-thumb .rzq-adx-tel,
@@ -1850,7 +1863,7 @@ body.rizq-vstrip-lb-on{overflow:hidden}
   .rizq-vcard{flex:0 0 calc((100% - 50px) / 6);gap:5px}
   .rizq-vcard-play{width:42px;height:42px;font-size:14px}
   .rizq-vcard-thumb .rizq-vcard-contacts,
-  .rizq-vcard-thumb .rzq-adx-actions{top:57%;padding:5px 9px;gap:9px}
+  .rizq-vcard-thumb .rzq-adx-actions{bottom:10px;padding:5px 9px;gap:9px}
 }
 
 /* ── SEARCH BAR (Amazon style) ── */
@@ -5454,7 +5467,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         </div>
       </div>
     </div>
-    <p class="rizq-vid-strip-hint" data-t="vstrip-hint">مرّر الماوس للتشغيل</p>
+    <p class="rizq-vid-strip-hint" data-t="vstrip-hint">مرّر للاتصال ثم التشغيل</p>
     <div class="rizq-vid-strip-track" id="rizq-vid-strip-track" tabindex="0"></div>
   </section>
 
@@ -10188,7 +10201,7 @@ const LANG = {
     'hbiz-cta': 'احجز مساحتك الإعلانية الآن — إعلانك حيث يبدأ الجميع',
     'vstrip-title': 'اكتشف العروض الجديدة بالفيديو',
     'vstrip-tier': 'شريط الفيديو',
-    'vstrip-hint': 'مرّر الماوس للتشغيل',
+    'vstrip-hint': 'مرّر للاتصال ثم التشغيل',
     'stat-ads': 'إعلان نشط', 'stat-cats': 'قسماً رئيسياً', 'stat-subs': 'فرعاً متخصصاً', 'stat-wilayas': 'ولاية موريتانية', 'stat-free': 'النشر الأساسي',
     's-cats-title': 'كل ما تحتاجه في <span>مكان واحد</span>',
     's-cats-desc': 'من الدراعة إلى السيارة — كل ما يبحث عنه الموريتاني في مكان واحد',
@@ -10352,7 +10365,7 @@ const LANG = {
     'hbiz-cta': 'Réservez votre espace pub maintenant — votre annonce là où tout commence',
     'vstrip-title': 'Découvrez les nouvelles offres en vidéo',
     'vstrip-tier': 'Bandeau vidéo',
-    'vstrip-hint': 'Survolez pour lire',
+    'vstrip-hint': 'Survolez pour contacter, puis lecture',
     'stat-ads': 'annonces actives', 'stat-cats': 'catégories', 'stat-subs': 'sous-catégories', 'stat-wilayas': 'wilayas', 'stat-free': 'Publication de base',
     's-cats-title': 'Tout ce dont vous avez besoin en <span>un seul endroit</span>',
     's-cats-desc': 'De la daraa à la voiture — tout ce que cherche le Mauritanien, au même endroit',
@@ -15175,7 +15188,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_packages_ui.js?v=23.0"></script>
 <script src="rizq_merchant_activities.js?v=23.0"></script>
 <script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo15"></script>
+<script src="rizq_video_ads.js?v=promo16"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=24.1"></script>
 <script src="rizq_disclaimer.js"></script>

@@ -655,9 +655,8 @@
               '<span class="rizq-vcard-act-ico">⛶</span><span class="rizq-vcard-act-lbl">' + esc(lblFs) + '</span>' +
             '</button>' +
           '</div>' +
-          /* اتصال + واتساب فوق مساحة الفيديو — تحت زر التشغيل */
+          /* اتصال + واتساب على الفيديو — أسفل الوسط؛ العنوان تحت البطاقة فقط */
           contactActionsHtml(ad) +
-          '<div class="rizq-vcard-cap">' + esc(title) + '</div>' +
         '</div>' +
         '<div class="rizq-vcard-name">' + esc(title) + '</div>' +
         (sub ? '<div class="rizq-vcard-sub">' + esc(sub) + '</div>' : '');
@@ -668,6 +667,14 @@
       var btnFs = card.querySelector('[data-act="fs"]');
       var btnTel = card.querySelector('[data-act="tel"]');
       var btnWa = card.querySelector('[data-act="wa"]');
+      var hoverPlayTimer = null;
+
+      function clearHoverPlayTimer() {
+        if (hoverPlayTimer) {
+          clearTimeout(hoverPlayTimer);
+          hoverPlayTimer = null;
+        }
+      }
 
       function syncActionUi() {
         if (!video) return;
@@ -688,9 +695,18 @@
         }
       }
 
-      // سطح المكتب: hover = تشغيل صامت | مغادرة = توقف (إلا أثناء التكبير)
-      card.addEventListener('mouseenter', function () { playStripVideo(card); syncActionUi(); });
+      // سطح المكتب: عند المرور تظهر أزرار الاتصال أولاً، ثم تشغيل بعد تأخير قصير
+      // عند التشغيل أو مغادرة الماوس تختفي الأزرار
+      card.addEventListener('mouseenter', function () {
+        clearHoverPlayTimer();
+        hoverPlayTimer = setTimeout(function () {
+          hoverPlayTimer = null;
+          playStripVideo(card);
+          syncActionUi();
+        }, 480);
+      });
       card.addEventListener('mouseleave', function () {
+        clearHoverPlayTimer();
         if (_stripLightbox && _stripLightbox.classList.contains('is-open')) return;
         stopStripVideo(card);
         syncActionUi();
@@ -727,12 +743,14 @@
       if (btnTel) {
         btnTel.addEventListener('click', function (ev) {
           ev.stopPropagation();
+          clearHoverPlayTimer();
           if (ad.accountId) trackEvent(ad.accountId, 'click');
         });
       }
       if (btnWa) {
         btnWa.addEventListener('click', function (ev) {
           ev.stopPropagation();
+          clearHoverPlayTimer();
           if (ad.accountId) trackEvent(ad.accountId, 'click');
         });
       }
