@@ -5,7 +5,8 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '30.9';
+  var ASSET_V = '31.0';
+  var MOCK_HDR_V = '5.20';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -112,12 +113,22 @@
       hdrCss.href = 'rizq_header.css?v=' + ASSET_V;
       document.head.appendChild(hdrCss);
     }
+    /* هيدر النموذج الموحّد — كل الصفحات العامة */
+    if (isPublicShell() && !document.querySelector('link[rel="stylesheet"][href*="rizq_header_mockup_trial.css"]')) {
+      var mockCss = document.createElement('link');
+      mockCss.rel = 'stylesheet';
+      mockCss.href = 'rizq_header_mockup_trial.css?v=' + MOCK_HDR_V;
+      document.head.appendChild(mockCss);
+    }
     if (!document.querySelector('script[src*="rizq_account_route.js"]')) {
       appendScript('rizq_account_route.js?v=' + ASSET_V, { async: false });
     }
     if (!document.querySelector('script[src*="rizq_header.js"]')) {
       appendScript('rizq_header.js?v=' + ASSET_V, { async: false });
       appendScript('rizq_input_bidi.js?v=' + ASSET_V, { defer: true });
+    }
+    if (isPublicShell() && !document.querySelector('script[src*="rizq_header_mockup_trial.js"]')) {
+      appendScript('rizq_header_mockup_trial.js?v=' + MOCK_HDR_V, { defer: true });
     }
     /* فوتر المنصة الموحّد — زوار + داشبوردات المشتركين */
     if (!document.querySelector('script[src*="rizq_site_footer.js"]')) {

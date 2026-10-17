@@ -1,9 +1,179 @@
 /**
- * TRIAL — سلوك هيدر النموذج + سلة عامة (محلات / معارض / مكاتب)
+ * هيدر النموذج الموحّد — يُحقن على كل الصفحات العامة
+ * (شعار + بحث + أدوات فوق / أقسام أسفل على الهاتف)
  */
 (function () {
   'use strict';
-  if (!document.body || !document.body.classList.contains('rizq-mockup-hdr-trial')) return;
+
+  function pathName() {
+    try { return (location.pathname || '').split('/').pop() || ''; }
+    catch (e) { return ''; }
+  }
+  function pageKey() {
+    return pathName().toLowerCase().replace(/\.html$/, '');
+  }
+  function isDashShell() {
+    return /dashboard|admin\.html|chat_widget|cp_panel|register\.html/.test(pathName().toLowerCase());
+  }
+  function isLanding() {
+    var k = pageKey();
+    return !k || k === 'rizq_landing_v8' || k === 'index';
+  }
+  function isPhone() {
+    try { return window.matchMedia('(max-width:768px)').matches; }
+    catch (e) { return false; }
+  }
+
+  function waitBody(fn) {
+    if (document.body) fn();
+    else document.addEventListener('DOMContentLoaded', fn);
+  }
+
+  if (isDashShell()) return;
+
+  waitBody(function () {
+    document.body.classList.add('rizq-mockup-hdr-trial');
+    document.documentElement.classList.add('rizq-app-nav');
+    ensureMockHeader();
+    bootMockHeader();
+  });
+
+  function navHrefs() {
+    var L = isLanding();
+    return {
+      home: L ? '#hero' : 'rizq_landing_v8.html',
+      ads: L ? '#listings' : 'rizq_browse.html',
+      stores: L ? '#virtual-stores' : 'rizq_landing_v8.html#virtual-stores',
+      showrooms: L ? '#virtual-showrooms' : 'rizq_landing_v8.html#virtual-showrooms',
+      estate: L ? '#virtual-estate' : 'rizq_landing_v8.html#virtual-estate',
+      post: 'rizq_post.html',
+      offices: L ? '#virtual-offices' : 'rizq_landing_v8.html#virtual-offices',
+      tenders: 'rizq_tenders_directory.html',
+      investments: 'rizq_investments_directory.html',
+      cats: L ? '#categories' : 'rizq_browse.html'
+    };
+  }
+
+  function mockHeaderHtml() {
+    var h = navHrefs();
+    return '' +
+      '<header id="rizq-mock-hdr" aria-label="شريط رزق">' +
+      '<div class="rmh-util" hidden></div>' +
+      '<div class="ticker-wrap is-empty civic-ticker-wrap rmh-ticker" id="ticker-wrap" role="marquee" aria-label="إعلانات خدمة عامة">' +
+      '<div class="ticker-inner" id="ticker"></div></div>' +
+      '<div class="rmh-main">' +
+      '<a class="rmh-brand logo" href="rizq_landing_v8.html" aria-label="رزق" id="rmh-brand">' +
+      '<img class="logo-mark-img rmh-mark" src="rizq-mark-inset.png?v=1" width="44" height="44" alt="رزق" decoding="async"/>' +
+      '<div class="logo-text rmh-brand-text"><span class="logo-ar rmh-brand-ar">رزق</span>' +
+      '<span class="logo-sub rmh-brand-sub">RIZQ PLATFORM</span></div></a>' +
+      '<form class="rmh-search" id="rmh-search-form" action="rizq_browse.html" method="get" role="search">' +
+      '<select class="rmh-search-cat" id="rmh-search-cat" name="cat" aria-label="كل الأقسام"><option value="">كل الأقسام</option></select>' +
+      '<input class="rmh-search-input" id="rmh-search-q" type="search" name="q" autocomplete="off" ' +
+      'placeholder="ابحث عن سيارة، شقة، محل، مكتب..." data-ph-fr="Cherchez une voiture, un appartement, un magasin, un bureau..."/>' +
+      '<button class="rmh-search-btn" type="submit" aria-label="بحث">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>' +
+      '</button></form>' +
+      '<div class="rmh-tools">' +
+      '<button type="button" class="rmh-lang btn-lang btn-lang-primary" id="rmh-lang-btn" dir="ltr" aria-label="FR | AR">' +
+      '<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>' +
+      '<button type="button" class="rmh-ico" onclick="typeof goToAccount===\'function\'&&goToAccount()" aria-label="حسابي">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19c1.6-3.2 4-4.8 6.5-4.8S16.9 15.8 18.5 19"/></svg></button>' +
+      '<div class="rmh-cart-wrap" id="rmh-cart-wrap">' +
+      '<button type="button" class="rmh-ico" id="rmh-cart-btn" aria-haspopup="true" aria-expanded="false" aria-controls="rmh-cart-panel" aria-label="السلة">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 5h2l1.5 10h11L20 8H7"/><circle cx="9.5" cy="19" r="1.3"/><circle cx="16.5" cy="19" r="1.3"/></svg>' +
+      '<span class="rmh-cart-badge" id="rmh-cart-badge" hidden>0</span></button>' +
+      '<div class="rmh-cart-panel" id="rmh-cart-panel" role="dialog" aria-label="ملخص السلة">' +
+      '<h4>سلتك — لم تُكمَل بعد</h4><div id="rmh-cart-body"><p class="rmh-cart-empty">السلة فارغة</p></div>' +
+      '<a class="rmh-cart-open-full" href="rizq_cart.html">فتح السلة بالتفاصيل</a></div></div>' +
+      '<a class="rmh-ico" href="rizq_browse.html?fav=1" aria-label="المفضلة">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 20s-6.5-4.2-8.5-8A4.6 4.6 0 0 1 12 7.2 4.6 4.6 0 0 1 20.5 12c-2 3.8-8.5 8-8.5 8z"/></svg></a>' +
+      '<div class="rizq-help-dd rmh-help-dd" id="rmh-help-wrap" data-rizq-toolbar="help">' +
+      '<button type="button" class="rizq-help-dd-btn rmh-ico" id="rmh-help-btn" aria-haspopup="true" aria-expanded="false" aria-controls="rmh-help-menu" aria-label="المساعدة والدعم" title="المساعدة والدعم">' +
+      '<span class="rizq-help-dd-chev" aria-hidden="true">▾</span>' +
+      '<span class="rizq-help-dd-ico" aria-hidden="true"><svg class="rizq-help-svg" viewBox="0 0 24 24" width="18" height="18" focusable="false"><path fill="currentColor" d="M12 3a8 8 0 0 0-8 8v2.2a2.2 2.2 0 0 0 2.2 2.2H7.5a1.3 1.3 0 0 0 1.3-1.3V12a1.3 1.3 0 0 0-1.3-1.3H6.1A5.9 5.9 0 0 1 12 5a5.9 5.9 0 0 1 5.9 5.7h-1.4A1.3 1.3 0 0 0 15.2 12v2.1a1.3 1.3 0 0 0 1.3 1.3h1.3A2.2 2.2 0 0 0 20 13.2V11a8 8 0 0 0-8-8zm-1.2 14.6c0-.5.4-.9.9-.9h.6c2.1 0 3.4 1 3.4 2.5v.4c0 .4-.3.7-.7.7h-5c-.7 0-1.2-.5-1.2-1.2v-1.5z"/></svg></span></button>' +
+      '<div class="rizq-help-dd-menu" id="rmh-help-menu" role="menu" hidden>' +
+      '<a class="rizq-help-dd-item" role="menuitem" href="rizq_legal.html#s10"><span class="rizq-help-dd-item-lbl">اتصل بنا</span></a>' +
+      '<a class="rizq-help-dd-item" role="menuitem" href="rizq_help.html"><span class="rizq-help-dd-item-lbl">مركز المساعدة</span></a>' +
+      '</div></div></div></div>' +
+      '<nav class="rmh-nav" aria-label="أقسام رزق">' +
+      '<a href="' + h.home + '" data-rmh="home"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7.2 14.2 12 12 16.8 9.8 12Z"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg></span>الرئيسية</a>' +
+      '<a href="' + h.ads + '" data-rmh="ads"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10v4h2l5 3V7L6 10H4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 7a7 7 0 0 1 0 10"/></svg></span>الإعلانات</a>' +
+      '<a href="' + h.stores + '" data-rmh="stores"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10 6 5h12l2 5"/><path d="M4 10v9h16v-9"/><path d="M9 19v-5h6v5"/></svg></span>المحلات</a>' +
+      '<a href="' + h.showrooms + '" data-rmh="showrooms"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="7" width="16" height="12" rx="1"/><path d="M8 7V5h8v2M8 11h.01M12 11h.01M16 11h.01M8 15h8"/></svg></span>المعارض والمصانع</a>' +
+      '<a href="' + h.estate + '" data-rmh="estate"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V10l8-6 8 6v10"/><path d="M10 20v-6h4v6"/></svg></span>العقارات</a>' +
+      '<a class="rmh-post-nav" href="' + h.post + '" data-rmh="post"><span class="rmh-nav-ico rmh-post-plus" aria-hidden="true">+</span><span class="rmh-post-lbl">انشر إعلان</span></a>' +
+      '<a href="' + h.offices + '" data-rmh="offices"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="16" height="11" rx="1"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M4 13h16"/></svg></span>المكاتب</a>' +
+      '<a href="' + h.tenders + '" data-rmh="tenders"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 4h8a2 2 0 0 1 2 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h6"/></svg></span>المناقصات</a>' +
+      '<a href="' + h.investments + '" data-rmh="investments"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 18V6M4 18h16"/><path d="M7 14l4-4 3 3 5-6"/></svg></span>الاستثمارات</a>' +
+      '<div class="rmh-more-wrap" data-rmh="more">' +
+      '<button type="button" class="rmh-more-btn" id="rmh-more-btn" aria-haspopup="true" aria-expanded="false" aria-controls="rmh-more-menu">' +
+      '<span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/></svg></span>' +
+      '<span class="rmh-more-lbl">المزيد</span></button>' +
+      '<div class="rmh-more-menu" id="rmh-more-menu" role="menu" hidden>' +
+      '<a href="' + h.cats + '" class="rmh-more-item" role="menuitem"><span aria-hidden="true">📂</span><strong>الأقسام</strong></a>' +
+      '<a href="rizq_ads_info.html" class="rmh-more-item" role="menuitem"><span aria-hidden="true">🎬</span><strong>Rizq ADS</strong></a>' +
+      '<a href="rizq_legal.html" class="rmh-more-item" role="menuitem"><span aria-hidden="true">⚖️</span><strong>المواد القانونية</strong></a>' +
+      '<a href="rizq_platform.html#who" class="rmh-more-item" role="menuitem"><span aria-hidden="true">ℹ️</span><strong>من نحن</strong></a>' +
+      '<a href="rizq_platform.html#why" class="rmh-more-item" role="menuitem"><span aria-hidden="true">❓</span><strong>لماذا رزق</strong></a>' +
+      '<a href="rizq_about.html" class="rmh-more-item" role="menuitem"><span aria-hidden="true">🏛️</span><strong>الشركة المالكة</strong></a>' +
+      '</div></div></nav></header>';
+  }
+
+  function ensureMockHeader() {
+    if (document.getElementById('rizq-mock-hdr')) {
+      applyNavHrefs();
+      markActiveFromPage();
+      return;
+    }
+    document.body.insertAdjacentHTML('afterbegin', mockHeaderHtml());
+    markActiveFromPage();
+  }
+
+  function applyNavHrefs() {
+    var h = navHrefs();
+    Object.keys(h).forEach(function (key) {
+      var a = document.querySelector('.rmh-nav a[data-rmh="' + key + '"]');
+      if (a) a.setAttribute('href', h[key]);
+    });
+    var cats = document.querySelector('.rmh-more-menu a.rmh-more-item[href="#categories"], .rmh-more-menu a.rmh-more-item[href*="browse"]');
+    if (cats) cats.setAttribute('href', h.cats);
+  }
+
+  function markActiveFromPage() {
+    var k = pageKey();
+    var map = {
+      rizq_landing_v8: 'home',
+      index: 'home',
+      '': 'home',
+      rizq_browse: 'ads',
+      rizq_listing: 'ads',
+      rizq_post: 'post',
+      rizq_directory: 'stores',
+      rizq_store: 'stores',
+      rizq_products: 'stores',
+      rizq_cart: 'stores',
+      rizq_showroom: 'showrooms',
+      rizq_showroom_directory: 'showrooms',
+      rizq_corp: 'showrooms',
+      rizq_estate: 'estate',
+      rizq_estate_directory: 'estate',
+      rizq_office: 'offices',
+      rizq_tenders: 'tenders',
+      rizq_tenders_directory: 'tenders',
+      rizq_tender_detail: 'tenders',
+      rizq_investments: 'investments',
+      rizq_investments_directory: 'investments',
+      rizq_investment_detail: 'investments'
+    };
+    var active = map[k] || '';
+    if (!active || isLanding()) return;
+    document.querySelectorAll('.rmh-nav a[data-rmh]').forEach(function (a) {
+      var on = a.getAttribute('data-rmh') === active;
+      a.classList.toggle('is-active', on);
+      if (on) a.setAttribute('aria-current', 'true');
+      else a.removeAttribute('aria-current');
+    });
+  }
 
   var DEMO_CART = [
     { id: 'demo-s1', name: 'هاتف ذكي', nameF: 'Smartphone', qty: 1, module: 'store', storeName: 'محل تجريبي' },
@@ -288,10 +458,16 @@
     function placeMenu() {
       var br = btn.getBoundingClientRect();
       var menuW = Math.max(176, Math.round(menu.offsetWidth || 176));
-      /* في RTL الزر على اليسار غالباً — ثبّت القائمة تحت الزر دون قصّ */
       var left = Math.round(br.left + br.width / 2 - menuW / 2);
       left = Math.max(8, Math.min(left, window.innerWidth - menuW - 8));
-      var top = Math.round(br.bottom + 6);
+      var top;
+      if (isPhone()) {
+        /* على الهاتف الشريط أسفل — افتح القائمة للأعلى */
+        var mh = Math.min(menu.offsetHeight || 220, window.innerHeight * 0.55);
+        top = Math.max(8, Math.round(br.top - mh - 8));
+      } else {
+        top = Math.round(br.bottom + 6);
+      }
       menu.classList.add('is-positioned');
       menu.style.setProperty('position', 'fixed', 'important');
       menu.style.setProperty('left', left + 'px', 'important');
@@ -435,6 +611,21 @@
   function syncMockHdrHeight() {
     var hdr = document.getElementById('rizq-mock-hdr');
     if (!hdr) return;
+    var main = hdr.querySelector('.rmh-main');
+    var ticker = hdr.querySelector('.ticker-wrap:not(.is-empty)');
+    var nav = hdr.querySelector('.rmh-nav');
+    var topH;
+    if (isPhone() && main) {
+      topH = Math.ceil(main.getBoundingClientRect().height || 100);
+      if (ticker) topH += Math.ceil(ticker.getBoundingClientRect().height || 0);
+      topH = Math.max(topH, 96);
+      document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
+      if (nav) {
+        var nh = Math.ceil(nav.getBoundingClientRect().height || 72);
+        document.body.style.setProperty('--rizq-mock-nav-h', nh + 'px');
+      }
+      return;
+    }
     var h = Math.ceil(hdr.getBoundingClientRect().height || 188);
     document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
   }
@@ -463,7 +654,12 @@
     el.style.setProperty('-webkit-text-fill-color', '#0a1628', 'important');
   }
 
-  function boot() {
+  var __rmhBooted = false;
+  function bootMockHeader() {
+    if (__rmhBooted) return;
+    __rmhBooted = true;
+    applyNavHrefs();
+    markActiveFromPage();
     fillCategories();
     refreshBadge();
     renderCartPanel();
@@ -478,6 +674,7 @@
       fillCategories();
       ensureHeroTagline();
       syncMockHdrHeight();
+      markActiveFromPage();
     }, 1200);
     window.addEventListener('resize', syncMockHdrHeight);
     window.addEventListener('storage', function (ev) {
@@ -487,7 +684,4 @@
       }
     });
   }
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
 })();

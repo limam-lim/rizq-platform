@@ -13,12 +13,14 @@
  */
 'use strict';
 
-var CACHE_NAME = 'rizq-cache-v22.1';
+var CACHE_NAME = 'rizq-cache-v22.2';
 var CORE_ASSETS = [
   'rizq-theme.css',
   'rizq_header.css',
+  'rizq_header_mockup_trial.css',
   'rizq_account_route.js',
   'rizq_header.js',
+  'rizq_header_mockup_trial.js',
   'rizq_agent.js',
   'rizq_dynamic_nav.js',
   'rizq_manager_agent_config.js',
