@@ -4468,8 +4468,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <script src="rizq_announcements.js"></script>
     <script src="rizq_civic_ticker.js"></script>
 <script src="rizq_backend_config.js"></script>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=4.3"/>
-<script src="rizq_header_mockup_trial.js?v=4.3" defer></script>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=4.4"/>
+<script src="rizq_header_mockup_trial.js?v=4.4" defer></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
 <script src="rizq_terms_gate.js?v=23.0"></script>
@@ -4559,14 +4559,21 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
 <!-- ══ TRIAL: هيدر النموذج (كمبيوتر/تابلت/هاتف) — احذف body.rizq-mockup-hdr-trial للإلغاء ══ -->
 <header id="rizq-mock-hdr" aria-label="تجربة هيدر رزق">
-  <div class="rmh-util">
+  <div class="rmh-util" hidden>
     <span class="rmh-util-emergency">أرقام الطوارئ: إطفاء 18 — شرطة 17</span>
     <span class="rmh-util-notice">تنويه خدمة عامة — تحقق من المصادر الرسمية قبل إعادة النشر</span>
   </div>
+  <!-- شريط الخدمة العامة / الطوارئ — يُدار من الأدمن ويتحرك -->
+  <div class="ticker-wrap is-empty civic-ticker-wrap rmh-ticker" id="ticker-wrap" role="marquee" aria-label="إعلانات خدمة عامة">
+    <div class="ticker-inner" id="ticker"></div>
+  </div>
   <div class="rmh-main">
     <a class="rmh-brand" href="rizq_landing_v8.html">
-      <span class="rmh-mark" aria-hidden="true">R</span>
-      <span class="rmh-brand-ar">رِزْق</span>
+      <span class="rmh-mark" aria-hidden="true"></span>
+      <span class="rmh-brand-text">
+        <span class="rmh-brand-ar">رزق</span>
+        <span class="rmh-brand-sub">PLATFORM</span>
+      </span>
     </a>
     <form class="rmh-search" id="rmh-search-form" action="rizq_browse.html" method="get" role="search">
       <select class="rmh-search-cat" id="rmh-search-cat" name="cat" aria-label="كل الأقسام">
@@ -4621,7 +4628,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <a href="rizq_landing_v8.html" data-rmh="home"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-5v-5H10v5H5a1 1 0 0 1-1-1z"/></svg></span>الرئيسية</a>
     <a href="#listings" data-rmh="ads"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10v4h2l5 3V7L6 10H4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 7a7 7 0 0 1 0 10"/></svg></span>الإعلانات</a>
     <a href="#rzq-disc-store" data-rmh="stores" class="is-active"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10 6 5h12l2 5"/><path d="M4 10v9h16v-9"/><path d="M9 19v-5h6v5"/></svg></span>المحلات</a>
-    <a href="#rzq-disc-corp" data-rmh="showrooms"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="7" width="16" height="12" rx="1"/><path d="M8 7V5h8v2M8 11h.01M12 11h.01M16 11h.01M8 15h8"/></svg></span>المعارض</a>
+    <a href="#rzq-disc-corp" data-rmh="showrooms"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="7" width="16" height="12" rx="1"/><path d="M8 7V5h8v2M8 11h.01M12 11h.01M16 11h.01M8 15h8"/></svg></span>المعارض والمصانع</a>
+    <a href="#rzq-disc-estate" data-rmh="estate"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V10l8-6 8 6v10"/><path d="M10 20v-6h4v6"/></svg></span>العقارات</a>
     <a class="rmh-post-nav" href="rizq_post.html" data-rmh="post"><span class="rmh-nav-ico rmh-post-plus" aria-hidden="true">+</span><span class="rmh-post-lbl">انشر إعلان</span></a>
     <a href="#rzq-disc-office" data-rmh="offices"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="16" height="11" rx="1"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M4 13h16"/></svg></span>المكاتب</a>
     <a href="rizq_tenders_directory.html" data-rmh="tenders"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 4h8a2 2 0 0 1 2 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h6"/></svg></span>المناقصات</a>
@@ -4634,7 +4642,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div class="rmh-more-menu" id="rmh-more-menu" role="menu" hidden>
         <a href="#categories" class="rmh-more-item" role="menuitem"><span aria-hidden="true">📂</span><strong data-t="dd-cats">الأقسام</strong></a>
         <a href="rizq_ads_info.html" class="rmh-more-item" role="menuitem"><span aria-hidden="true">🎬</span><strong data-hdr="rizqads">Rizq ADS</strong></a>
-        <a href="#pricing" class="rmh-more-item" role="menuitem"><span aria-hidden="true">💎</span><strong data-t="dd-packs">الباقات</strong></a>
+        <a href="rizq_ads_slots_mockup.html" class="rmh-more-item" role="menuitem"><span aria-hidden="true">💎</span><strong data-t="dd-packs">الباقات</strong></a>
         <a href="rizq_legal.html" class="rmh-more-item" role="menuitem"><span aria-hidden="true">⚖️</span><strong data-t="dd-legal">المواد القانونية</strong></a>
         <a href="rizq_platform.html#who" class="rmh-more-item" role="menuitem"><span aria-hidden="true">ℹ️</span><strong data-t="dd-about">من نحن</strong></a>
         <a href="rizq_platform.html#why" class="rmh-more-item" role="menuitem"><span aria-hidden="true">❓</span><strong data-t="dd-why">لماذا رزق</strong></a>
@@ -4800,10 +4808,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </svg>
   </div>
 
-  <!-- Civic / public-service ticker (admin-managed). Live ads stay in «مباشر» below. -->
-  <div class="ticker-wrap is-empty civic-ticker-wrap" id="ticker-wrap" role="marquee" aria-label="إعلانات خدمة عامة">
-    <div class="ticker-inner" id="ticker"></div>
-  </div>
+  <!-- Civic ticker moved into #rizq-mock-hdr (admin-managed emergency / public notices). -->
 
   <!-- Hero Content -->
   <div class="hero-content">
@@ -4826,7 +4831,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <span class="hero-pill-sep" aria-hidden="true">·</span>
         <a class="hero-pill" href="rizq_browse.html" data-t="hero-pill-buy" data-pill="buy" aria-label="اشتر — تصفّح الإعلانات">اشتر</a>
         <span class="hero-pill-sep" aria-hidden="true">·</span>
-        <a class="hero-pill" href="#pricing" data-t="hero-pill-feat" data-pill="feat" aria-label="تميّز — باقات التمييز">تميّز</a>
+        <a class="hero-pill" href="rizq_ads_slots_mockup.html" data-t="hero-pill-feat" data-pill="feat" aria-label="تميّز — باقات التمييز">تميّز</a>
       </div>
     </div>
     <!-- ══ دخول خفيف: هوية + نية بحث — ثم شريط الإبهار مباشرة ══ -->
@@ -5207,6 +5212,20 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
 </section>
 
+<!-- ══ عقارات — مرساة للتنقل (صفحة عقارات كاملة لاحقاً كالمعارض والمكاتب) ══ -->
+<section id="rzq-disc-estate" class="rzq-styles-section" aria-label="العقارات" style="scroll-margin-top:calc(var(--rizq-mock-hdr-h,188px) + 12px)">
+  <div class="rzq-styles-inner">
+    <div class="section-header fade-in">
+      <p class="section-tag">عقارات <span>رزق</span></p>
+      <h2 class="section-title">بوابة <span>العقارات</span></h2>
+      <p class="section-desc">قريباً — صفحة عقارات مستقلة بنفس أسلوب المعارض والمكاتب. حالياً يمكنك تصفّح إعلانات العقارات.</p>
+    </div>
+    <div class="rizq-dual-cta" style="justify-content:center;margin-top:8px">
+      <a class="landing-ads-browse-full" href="rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA">تصفّح إعلانات العقارات ←</a>
+    </div>
+  </div>
+</section>
+
 <!-- ══ نماذج المعارض — اقتراحات رزق (سيارات / أثاث / إلكترونيات…) ══ -->
 <section id="rizq-showroom-models" class="rizq-styles-section" aria-labelledby="rizq-srm-title">
   <div class="rizq-styles-inner">
@@ -5440,8 +5459,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
 <!-- ══ RIZQ ADS ══ -->
 
-<!-- ══ PRICING ══ -->
-<section class="pricing-section" id="pricing">
+<!-- ══ PRICING — مخفي على الرئيسية أثناء تجربة الهيدر؛ الباقات تبقى في النماذج فقط ══ -->
+<section class="pricing-section" id="pricing" hidden aria-hidden="true">
   <div class="section-header fade-in">
     <p class="section-tag" data-t="s-price-tag">خطط الأسعار</p>
     <h2 class="section-title" data-t="s-price-title">خطط <span>شفافة وبسيطة</span></h2>

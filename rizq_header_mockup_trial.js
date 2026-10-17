@@ -332,6 +332,13 @@
     });
   }
 
+  function syncMockHdrHeight() {
+    var hdr = document.getElementById('rizq-mock-hdr');
+    if (!hdr) return;
+    var h = Math.ceil(hdr.getBoundingClientRect().height || 188);
+    document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
+  }
+
   function boot() {
     fillCategories();
     refreshBadge();
@@ -341,7 +348,12 @@
     wireHelp();
     wireMore();
     wireNavActive();
-    setTimeout(fillCategories, 1200);
+    syncMockHdrHeight();
+    setTimeout(function () {
+      fillCategories();
+      syncMockHdrHeight();
+    }, 1200);
+    window.addEventListener('resize', syncMockHdrHeight);
     window.addEventListener('storage', function (ev) {
       if (ev.key === 'rizq_cart') {
         refreshBadge();
