@@ -722,11 +722,11 @@ button{font:inherit;border:0;background:none;color:inherit}
   }
 
   /* باقات/شرح/ترويج المنصة تختفي من صفحة الوكالة الحقيقية فقط —
-     نماذج المعاينة (?demo / demo_estate_*): الشرح والترويج يبقيان ظاهرين. */
+     نماذج المعاينة (?demo / demo_estate_*): الشرح والترويج يبقيان ظاهرين.
+     نعتمد علم _rizqEstateIsDemo فقط (مثل المحل/المكتب) حتى لا يُبقي معرّف
+     النموذج الافتراضي الترويج ظاهراً على مسار ?id= الحقيقي. */
   function hidePlatformUpsellOnBoundEstate(){
-    var isDemo = !!(window._rizqEstateIsDemo
-      || /^demo_estate/i.test(String(window._rizqEstateAccountId || ''))
-      || /^acc_promo_/.test(String(window._rizqEstateAccountId || '')));
+    var isDemo = !!window._rizqEstateIsDemo;
     document.body.classList.toggle('rizq-estate-live', !isDemo);
     document.querySelectorAll('[data-rizq-estate-promo]').forEach(function(el){
       el.style.display = isDemo ? '' : 'none';
@@ -816,6 +816,8 @@ button{font:inherit;border:0;background:none;color:inherit}
       return;
     }
     window._rizqEstateIsDemo = false;
+    window._rizqEstateAccountId = id;
+    hidePlatformUpsellOnBoundEstate();
     fetch(backendBase() + '/api/accounts/public', { credentials: 'omit' })
       .then(function(r){ return r.ok ? r.json() : []; })
       .then(function(rows){
@@ -828,7 +830,11 @@ button{font:inherit;border:0;background:none;color:inherit}
         }
         /* حساب غير موجود: لا نسقط إلى نموذج ترويجي على صفحة ?id= حقيقية */
         window._rizqEstateIsDemo = false;
+        window._rizqEstateAccountId = id;
         hidePlatformUpsellOnBoundEstate();
+        setText('est-kicker', 'وكالة غير موجودة');
+        var kickerMiss = document.getElementById('est-kicker');
+        if(kickerMiss) kickerMiss.innerHTML = '<i></i> وكالة غير موجودة';
         setText('est-hero-lead', 'الوكالة غير موجودة — افتح صفحتك من لوحة التحكم أو من دليل الوكالات.');
         setText('est-bar-name', 'وكالة غير موجودة');
         setText('est-bar-sub', 'افتح رابط الوكالة الصحيح من الدليل');
@@ -838,8 +844,11 @@ button{font:inherit;border:0;background:none;color:inherit}
       })
       .catch(function(){
         window._rizqEstateIsDemo = false;
+        window._rizqEstateAccountId = id;
         hidePlatformUpsellOnBoundEstate();
         setText('est-hero-lead', 'تعذّر تحميل الوكالة حالياً — حاول لاحقاً أو تصفّح دليل الوكالات.');
+        setText('est-bar-name', 'تعذّر التحميل');
+        setText('est-bar-sub', 'حاول لاحقاً أو تصفّح دليل الوكالات');
       });
   }
 
