@@ -1,6 +1,8 @@
 /**
- * rizq_auth_gate.js — بوابة العضو / حساب الأعمال (Guest Gate) v19.3
+ * rizq_auth_gate.js — بوابة العضو / حساب الأعمال (Guest Gate) v19.5
  * اسم + بريد + واتساب + (هاتف MR أو دولي) + OTP بالبريد
+ * v19.5: «سوق العقارات» كمسار منفصل واضح في شاشة حسابي (سوق كبير مستقل)
+ * v19.4: زر «سوق العقارات» — مسار وكالة عقارية مستقل في شاشة حسابي
  * v19.3: تسميات أوسع من بائع/مشتري — حساب شخصي · حساب أعمال · دخول رزق
  */
 (function () {
@@ -54,13 +56,16 @@
       subAccount: 'حسابك على رزق — للتصفح والشراء والتوصيل والمفضلة',
       subOtp: 'أدخل الرمز المُرسَل إلى بريدك الإلكتروني',
       subReturning: 'مرحباً بعودتك! أكّد بريدك برمز التحقق',
-      subChoice: 'اختر بوضوح: حساب شخصي، أو حساب أعمال جديد، أو دخول لحساب موجود',
+      subChoice: 'اختر بوضوح: حساب شخصي، دخول، حساب أعمال — أو سوق العقارات كمسار مستقل',
       choiceBuyer: '👤 أتصفّح وأتواصل',
       choiceBuyerSub: 'حساب شخصي — تواصل ومفضلة وتوصيل وفاتورة وخدمات',
       choiceSeller: '🏢 أنشر وأدير — حساب أعمال جديد',
       choiceSellerSub: 'إعلانات · محل · مكتب · معرض · مناقصات · استثمارات',
       choiceSellerLogin: '🔑 لدي حساب على رزق — دخول',
       choiceSellerLoginSub: 'البريد وكلمة المرور للوحة التحكم',
+      choiceEstate: '🏠 سوق العقارات',
+      choiceEstateSub: 'سوق كبير مستقل — وكالة عقارية، معروضات، تواصل ودفع',
+      choiceEstateBadge: 'مسار مستقل',
       nameLabel: 'الاسم الكامل *',
       namePh: 'مثال: محمد أحمد ولد سيدي',
       phoneMrLabel: 'هاتف موريتاني (اختياري)',
@@ -122,13 +127,16 @@
       subAccount: 'Votre compte Rizq — navigation, achats, livraison et favoris',
       subOtp: 'Saisissez le code envoyé à votre e-mail',
       subReturning: 'Bon retour ! Confirmez votre e-mail avec le code',
-      subChoice: 'Choisissez clairement : compte personnel, nouveau compte pro, ou connexion',
+      subChoice: 'Choisissez clairement : personnel, connexion, compte pro — ou le marché immobilier à part',
       choiceBuyer: '👤 Je parcours et je contacte',
       choiceBuyerSub: 'Compte personnel — contact, favoris, livraison et facture',
       choiceSeller: '🏢 Je publie et gère — nouveau compte pro',
       choiceSellerSub: 'Annonces · boutique · bureau · showroom · appels d\'offres · investissements',
       choiceSellerLogin: '🔑 J\'ai un compte Rizq — Connexion',
       choiceSellerLoginSub: 'E-mail et mot de passe du tableau de bord',
+      choiceEstate: '🏠 Marché immobilier',
+      choiceEstateSub: 'Marché majeur et séparé — agence, biens, contact et paiement',
+      choiceEstateBadge: 'Parcours dédié',
       nameLabel: 'Nom complet *',
       namePh: 'Ex : Mohamed Ahmed Ould Sidi',
       phoneMrLabel: 'Tél. mauritanien (optionnel)',
@@ -372,6 +380,12 @@
       '#rag-overlay .rag-choice-card-accent{border-color:rgba(201,168,76,.55)!important;background:linear-gradient(180deg,#fffef8,#fff)!important;box-shadow:0 8px 24px rgba(201,168,76,.12)}',
       '#rag-overlay .rag-choice-icon{width:48px;height:48px;border-radius:13px;background:linear-gradient(135deg,#0f2347,#1b3a6b);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}',
       '#rag-overlay .rag-choice-icon-gold{background:linear-gradient(135deg,#c9a84c,#e8c96a)!important}',
+      '#rag-overlay .rag-choice-sep{display:flex;align-items:center;gap:10px;margin:4px 0 2px;color:#64748b;font-size:11px;font-weight:800;letter-spacing:.3px;text-transform:uppercase}',
+      '#rag-overlay .rag-choice-sep::before,#rag-overlay .rag-choice-sep::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(26,74,110,.35),transparent)}',
+      '#rag-overlay .rag-choice-icon-estate{background:linear-gradient(135deg,#1a4a6e,#0f2a40)!important;box-shadow:0 4px 12px rgba(15,42,64,.25)}',
+      '#rag-overlay .rag-choice-card-estate{border-color:rgba(26,74,110,.55)!important;background:linear-gradient(180deg,#f4f9fd,#fff)!important;box-shadow:0 10px 28px rgba(15,42,64,.12);position:relative}',
+      '#rag-overlay .rag-choice-card-estate:hover{border-color:rgba(26,74,110,.85)!important;background:#eef6fb!important;transform:translateY(-1px)}',
+      '#rag-overlay .rag-choice-estate-badge{display:inline-block;margin-inline-start:6px;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:800;letter-spacing:.2px;color:#0f2a40;background:rgba(201,168,76,.22);border:1px solid rgba(201,168,76,.45);vertical-align:middle}',
       '#rag-overlay .rag-choice-title{font-size:15px;font-weight:800;color:#1b3a6b}',
       '#rag-overlay .rag-choice-sub{font-size:12px;color:#64748b;margin-top:2px;line-height:1.45}',
       '@media (max-width:768px){#rag-overlay .rag-title{font-size:1.35rem!important}#rag-overlay .rag-sub,#rag-overlay .rag-intro{font-size:12.5px!important}#rag-overlay .rag-choice{gap:8px!important}#rag-overlay .rag-choice-card{padding:11px 10px;min-height:58px;border-width:1.5px;box-shadow:0 6px 16px rgba(15,35,65,.06)}#rag-overlay .rag-choice-title{font-size:14.5px}#rag-overlay .rag-choice-sub{font-size:11.5px;color:#475569}#rag-overlay .rag-choice-icon{width:40px;height:40px;font-size:18px}#rag-overlay .rag-legal{padding:10px 10px calc(10px + env(safe-area-inset-bottom,0px))!important;border-radius:0}#rag-overlay .rag-legal-links{flex-direction:row;flex-wrap:wrap;justify-content:center}#rag-overlay .rag-legal-links a{width:auto;min-height:30px;font-size:11px!important;padding:5px 8px!important}#rag-overlay .rag-topbar{padding:10px 12px;gap:8px}#rag-overlay .rag-back{min-height:40px;font-size:13.5px;padding:8px 14px}#rag-overlay .rag-close{width:40px;height:40px;font-size:18px}}',
@@ -409,8 +423,43 @@
     document.head.appendChild(style);
   }
 
+  function ensureEstateChoiceCard() {
+    var choice = document.querySelector('#rag-overlay .rag-choice');
+    if (!choice || document.getElementById('rag-choice-estate')) return;
+    if (!document.getElementById('rag-choice-estate-sep')) {
+      var sep = document.createElement('div');
+      sep.className = 'rag-choice-sep';
+      sep.id = 'rag-choice-estate-sep';
+      sep.setAttribute('aria-hidden', 'true');
+      choice.appendChild(sep);
+    }
+    var card = document.createElement('div');
+    card.className = 'rag-choice-card rag-choice-card-estate';
+    card.id = 'rag-choice-estate';
+    card.setAttribute('role', 'button');
+    card.tabIndex = 0;
+    card.innerHTML = '<div class="rag-choice-icon rag-choice-icon-estate">🏠</div>'
+      + '<div><div class="rag-choice-title"><span id="rag-choice-estate-title"></span> '
+      + '<span class="rag-choice-estate-badge" id="rag-choice-estate-badge"></span></div>'
+      + '<div class="rag-choice-sub" id="rag-choice-estate-sub"></div></div>';
+    choice.appendChild(card);
+    card.addEventListener('click', function () {
+      closeModal();
+      setTimeout(openEstateAgencyRegister, 60);
+    });
+    card.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        card.click();
+      }
+    });
+  }
+
   function ensureModal() {
-    if (document.getElementById('rag-overlay')) return;
+    if (document.getElementById('rag-overlay')) {
+      ensureEstateChoiceCard();
+      return;
+    }
     injectStyle();
     var html = [
       '<div class="rag-overlay" id="rag-overlay">',
@@ -446,6 +495,11 @@
       '        <div class="rag-choice-card" id="rag-choice-seller" role="button" tabindex="0">',
       '          <div class="rag-choice-icon">🏢</div>',
       '          <div><div class="rag-choice-title" id="rag-choice-seller-title"></div><div class="rag-choice-sub" id="rag-choice-seller-sub"></div></div>',
+      '        </div>',
+      '        <div class="rag-choice-sep" id="rag-choice-estate-sep" aria-hidden="true"></div>',
+      '        <div class="rag-choice-card rag-choice-card-estate" id="rag-choice-estate" role="button" tabindex="0">',
+      '          <div class="rag-choice-icon rag-choice-icon-estate">🏠</div>',
+      '          <div><div class="rag-choice-title"><span id="rag-choice-estate-title"></span> <span class="rag-choice-estate-badge" id="rag-choice-estate-badge"></span></div><div class="rag-choice-sub" id="rag-choice-estate-sub"></div></div>',
       '        </div>',
       '      </div>',
       '    </div>',
@@ -610,6 +664,19 @@
         else location.href = '?openRegister=1';
       }, 60);
     });
+    var estateChoice = document.getElementById('rag-choice-estate');
+    if (estateChoice) {
+      estateChoice.addEventListener('click', function () {
+        closeModal();
+        setTimeout(openEstateAgencyRegister, 60);
+      });
+      estateChoice.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          estateChoice.click();
+        }
+      });
+    }
     document.getElementById('rag-seller-link').addEventListener('click', function (e) {
       e.preventDefault();
       closeModal();
@@ -745,6 +812,14 @@
     var loginSub = document.getElementById('rag-choice-seller-login-sub');
     if (loginTitle) loginTitle.textContent = dict.choiceSellerLogin;
     if (loginSub) loginSub.textContent = dict.choiceSellerLoginSub;
+    var estateTitle = document.getElementById('rag-choice-estate-title');
+    var estateSub = document.getElementById('rag-choice-estate-sub');
+    var estateBadge = document.getElementById('rag-choice-estate-badge');
+    var estateSep = document.getElementById('rag-choice-estate-sep');
+    if (estateTitle) estateTitle.textContent = dict.choiceEstate;
+    if (estateSub) estateSub.textContent = dict.choiceEstateSub;
+    if (estateBadge) estateBadge.textContent = dict.choiceEstateBadge || '';
+    if (estateSep) estateSep.textContent = dict.choiceEstateBadge || '';
     document.getElementById('rag-name-label').textContent = dict.nameLabel;
     document.getElementById('rag-name').placeholder = dict.namePh;
     document.getElementById('rag-phone-mr-label').textContent = dict.phoneMrLabel;
@@ -1237,6 +1312,7 @@
     }
     rememberAfterAuthHref();
     openRagShell();
+    ensureEstateChoiceCard();
     _modalMode = 'gate';
     applyTexts('reasonGeneric');
     var dict = d();
@@ -1250,6 +1326,14 @@
     var loginSub = document.getElementById('rag-choice-seller-login-sub');
     if (loginTitle) loginTitle.textContent = dict.choiceSellerLogin;
     if (loginSub) loginSub.textContent = dict.choiceSellerLoginSub;
+    var estateTitle = document.getElementById('rag-choice-estate-title');
+    var estateSub = document.getElementById('rag-choice-estate-sub');
+    var estateBadge = document.getElementById('rag-choice-estate-badge');
+    var estateSep = document.getElementById('rag-choice-estate-sep');
+    if (estateTitle) estateTitle.textContent = dict.choiceEstate;
+    if (estateSub) estateSub.textContent = dict.choiceEstateSub;
+    if (estateBadge) estateBadge.textContent = dict.choiceEstateBadge || '';
+    if (estateSep) estateSep.textContent = dict.choiceEstateBadge || '';
     var closeBtn = document.getElementById('rag-close-btn');
     if (closeBtn) {
       closeBtn.setAttribute('aria-label', t('إغلاق', 'Fermer'));
@@ -1262,6 +1346,25 @@
     if (l2) l2.textContent = t('البيانات', 'Infos');
     if (l3) l3.textContent = t('تم', 'OK');
     showStep('choice');
+  }
+
+  function openEstateAgencyRegister() {
+    var q = 'rizq_landing_v8.html?openRegister=1&regPage=1&preType=company&preBiz=office&preActivity=of_realestate_agency';
+    try {
+      if (typeof window.openRegisterAs === 'function') {
+        window.openRegisterAs('company', 'office', 'of_realestate_agency');
+        return;
+      }
+    } catch (eOpen) {}
+    try {
+      var file = String((location.pathname || '').split('/').pop() || '').toLowerCase();
+      var onLanding = !file || file === 'index.html' || file === 'rizq_landing_v8.html';
+      if (onLanding && typeof window.openModal === 'function') {
+        location.href = './?openRegister=1&regPage=1&preType=company&preBiz=office&preActivity=of_realestate_agency';
+        return;
+      }
+    } catch (eLand) {}
+    location.href = q;
   }
 
   function openAccountModal() {
