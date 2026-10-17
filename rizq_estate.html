@@ -80,7 +80,7 @@ button{font:inherit;border:0;background:none;color:inherit}
 
 /* خدمات موحّدة (دفع + غرفة استفسار) بتصميم عقاري */
 .est-services{
-  display:grid;grid-template-columns:1fr 1.15fr;gap:14px;margin:0 0 22px;
+  display:grid;grid-template-columns:1fr 1.15fr;gap:14px;margin:28px 0 18px;
 }
 .est-svc-card{
   border-radius:18px;padding:18px 16px;
@@ -306,7 +306,11 @@ button{font:inherit;border:0;background:none;color:inherit}
   background:linear-gradient(135deg,#F3E2A8,#C9A84C 50%,#E8C96A);color:#0B1C33;
   border-radius:12px;padding:8px 12px;font:900 14px Cairo,sans-serif;
   box-shadow:0 8px 16px rgba(0,0,0,.28);
+  /* شريط السعر على الصورة: سعر البيت/المنزل فقط */
+  max-width:calc(100% - 28px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  pointer-events:none;letter-spacing:.2px;
 }
+.est-price::before{content:none}
 .est-card-body{padding:15px 16px 16px}
 .est-card-body h3{font-size:16px;font-weight:900;margin-bottom:6px;line-height:1.35}
 .est-card.featured .est-card-body h3{font-size:21px}
@@ -534,6 +538,30 @@ button{font:inherit;border:0;background:none;color:inherit}
     </div>
   </div>
 
+  <div class="est-section-head" id="est-listings">
+    <div class="tag">مجموعة مختارة من الوكالة</div>
+    <h2>عقارات بصور تروي القصة</h2>
+    <p>بطاقات كبيرة، أسعار واضحة، وتواصل مباشر مع الوكالة — اضغط أي عقار لفتح المعاينة الكاملة.</p>
+  </div>
+
+  <div class="est-toolbar">
+    <div class="est-tabs" role="tablist" aria-label="نوع العقار">
+      <button type="button" class="est-tab is-active" data-cat="all" role="tab" aria-selected="true">الكل</button>
+      <button type="button" class="est-tab" data-cat="apartment" role="tab" aria-selected="false">شقق</button>
+      <button type="button" class="est-tab" data-cat="villa" role="tab" aria-selected="false">فلل ومنازل</button>
+      <button type="button" class="est-tab" data-cat="land" role="tab" aria-selected="false">أراضي</button>
+      <button type="button" class="est-tab" data-cat="shop" role="tab" aria-selected="false">محلات</button>
+    </div>
+    <div class="est-deal" role="group" aria-label="نوع الصفقة">
+      <button type="button" class="is-on" data-deal="all">الكل</button>
+      <button type="button" data-deal="sale">للبيع</button>
+      <button type="button" data-deal="rent">للكراء</button>
+    </div>
+  </div>
+  <p class="est-count" id="est-count" aria-live="polite"></p>
+  <div class="est-grid" id="est-grid"></div>
+
+  <!-- الدفع والاستفسار تحت صور المعروضات — ليس فوقها -->
   <section class="est-services" id="est-services" aria-label="طرق الدفع وغرفة الاستفسار">
     <div class="est-svc-card" id="est-pay-card">
       <h3>💳 طرق الدفع</h3>
@@ -565,28 +593,6 @@ button{font:inherit;border:0;background:none;color:inherit}
     </div>
   </section>
 
-  <div class="est-section-head" id="est-listings">
-    <div class="tag">مجموعة مختارة من الوكالة</div>
-    <h2>عقارات بصور تروي القصة</h2>
-    <p>بطاقات كبيرة، أسعار واضحة، وتواصل مباشر مع الوكالة — اضغط أي عقار لفتح المعاينة الكاملة.</p>
-  </div>
-
-  <div class="est-toolbar">
-    <div class="est-tabs" role="tablist" aria-label="نوع العقار">
-      <button type="button" class="est-tab is-active" data-cat="all" role="tab" aria-selected="true">الكل</button>
-      <button type="button" class="est-tab" data-cat="apartment" role="tab" aria-selected="false">شقق</button>
-      <button type="button" class="est-tab" data-cat="villa" role="tab" aria-selected="false">فلل ومنازل</button>
-      <button type="button" class="est-tab" data-cat="land" role="tab" aria-selected="false">أراضي</button>
-      <button type="button" class="est-tab" data-cat="shop" role="tab" aria-selected="false">محلات</button>
-    </div>
-    <div class="est-deal" role="group" aria-label="نوع الصفقة">
-      <button type="button" class="is-on" data-deal="all">الكل</button>
-      <button type="button" data-deal="sale">للبيع</button>
-      <button type="button" data-deal="rent">للكراء</button>
-    </div>
-  </div>
-  <p class="est-count" id="est-count" aria-live="polite"></p>
-  <div class="est-grid" id="est-grid"></div>
 
   <section class="est-trust" id="est-trust" aria-label="لماذا العقارات على رزق" data-rizq-estate-promo="1">
     <article>
@@ -1063,14 +1069,24 @@ button{font:inherit;border:0;background:none;color:inherit}
       });
   }
 
+  /** شريط السعر على صورة العرض = سعر البيت/المنزل فقط (بدون أرقام دفع أو وساطة) */
+  function housePriceOnly(item){
+    var raw = String((item && item.price) || '').trim();
+    if(!raw) return '';
+    /* أزل أي لاحقات وساطة/عربون إن وُجدت بالخطأ */
+    raw = raw.replace(/\s*[·|].*$/, '').replace(/\s*(عربون|أتعاب|وساطة|IBAN|MR\d+).*$/i, '').trim();
+    return raw;
+  }
+
   function cardHTML(item){
     var fr = isFrEstate();
+    var price = housePriceOnly(item);
     return '<div class="est-card'+(item.featured?' featured':'')+'" data-id="'+esc(item.id)+'">'
       + '<button type="button" class="est-card-open" data-id="'+esc(item.id)+'" aria-label="'+(fr?'Aperçu: ':'معاينة: ')+esc(item.title)+'" style="display:block;width:100%;text-align:inherit;background:transparent;border:0;padding:0;color:inherit;cursor:pointer">'
       + '<div class="est-card-media">'
       +   '<img src="'+esc(item.img)+'" alt="'+esc(item.title)+'" loading="lazy"/>'
       +   '<span class="est-badge">'+esc(item.badge)+'</span>'
-      +   '<span class="est-price">'+esc(item.price)+'</span>'
+      +   (price ? '<span class="est-price" aria-label="'+(fr?'Prix du bien':'سعر العقار')+'">'+esc(price)+'</span>' : '')
       + '</div>'
       + '<div class="est-card-body">'
       +   '<h3>'+esc(item.title)+'</h3>'
@@ -1114,7 +1130,7 @@ button{font:inherit;border:0;background:none;color:inherit}
     document.getElementById('est-modal-img').alt = item.title;
     document.getElementById('est-modal-title').textContent = item.title;
     document.getElementById('est-modal-loc').textContent = '📍 '+item.loc;
-    document.getElementById('est-modal-price').textContent = item.price;
+    document.getElementById('est-modal-price').textContent = housePriceOnly(item);
     document.getElementById('est-modal-badge').textContent = item.badge;
     document.getElementById('est-modal-desc').textContent = item.desc;
     document.getElementById('est-modal-meta').innerHTML =
@@ -1501,10 +1517,10 @@ button{font:inherit;border:0;background:none;color:inherit}
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.42"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.45"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <script src="rizq_header.js?v=31.0" defer></script>
-<script src="rizq_header_mockup_trial.js?v=5.42" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.45" defer></script>
 <script src="rizq_pwa.js" defer></script>
 </body>
 </html>
