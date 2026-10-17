@@ -200,21 +200,31 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
 }
 .rmh-cart-badge[hidden],
 .rmh-cart-badge.is-empty{display:none!important}
-.rmh-post,
+/* نشر — نفس شكل الأقسام، بدون خلفية صفراء، بلون ذهبي مميّز */
 .rmh-nav a.rmh-post-nav{
-  display:inline-flex;align-items:center;justify-content:center;gap:5px;
-  align-self:center;
-  padding:0 12px;height:34px;min-width:auto;border-radius:10px;border:0;cursor:pointer;
-  background:linear-gradient(135deg,var(--rmh-gold),var(--rmh-gold-2));color:#0D1B2A!important;
-  font:800 12.5px 'Cairo',sans-serif;text-decoration:none;white-space:nowrap;
-  box-shadow:0 3px 12px rgba(201,168,76,.32);
-  border-bottom:0!important;margin:0 4px;
+  color:#E8C96A!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  border-radius:0;
+  height:auto;
+  min-width:78px;
+  padding:9px 12px 11px;
+  margin:0;
+  border-bottom:3px solid transparent!important;
+  font:700 12px 'Cairo',sans-serif;
+  flex-direction:column;
+  gap:4px;
 }
-.rmh-post:hover,
-.rmh-nav a.rmh-post-nav:hover{
-  filter:brightness(1.05);color:#0D1B2A!important;border-bottom-color:transparent!important;
+.rmh-nav a.rmh-post-nav .rmh-nav-ico{
+  font-size:18px;line-height:1;opacity:1;
 }
-.rmh-post-lbl{display:inline}
+.rmh-nav a.rmh-post-nav:hover,
+.rmh-nav a.rmh-post-nav.is-active{
+  color:#F5D76E!important;
+  border-bottom-color:#E8C96A!important;
+  filter:none;
+}
+.rmh-post-lbl{display:inline;color:inherit}
 
 /* شريط الأقسام الثانوي — إعادة ضبط ضد قاعدة nav العامة في الصفحة */
 #rizq-mock-hdr nav.rmh-nav,
