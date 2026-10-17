@@ -4069,38 +4069,41 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 #rizq-estate-models .rizq-styles-gtab.is-active[data-est-cat="shop"]{background:linear-gradient(135deg,#3a3a58,#1e1e30)}
 /* بطاقات نماذج العقارات — صورة واسعة بأسلوب البوابات الفاخرة */
 .rizq-est-card{
-  flex:0 0 min(300px,78vw);scroll-snap-align:start;position:relative;
-  border-radius:18px;overflow:hidden;background:#0f1c2e;
-  border:1px solid rgba(201,168,76,.22);
-  box-shadow:0 14px 32px rgba(7,17,31,.22);
+  flex:0 0 min(310px,78vw);scroll-snap-align:start;position:relative;
+  border-radius:20px;overflow:hidden;background:#0f1c2e;
+  border:1px solid rgba(201,168,76,.28);
+  box-shadow:0 16px 36px rgba(7,17,31,.24),0 0 0 1px rgba(255,255,255,.03);
   text-decoration:none;color:inherit;display:flex;flex-direction:column;
-  transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease;
+  transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease;
 }
 .rizq-est-card:hover{
-  transform:translateY(-4px);
-  border-color:rgba(201,168,76,.5);
-  box-shadow:0 20px 40px rgba(7,17,31,.32);
+  transform:translateY(-5px);
+  border-color:rgba(201,168,76,.55);
+  box-shadow:0 22px 48px rgba(7,17,31,.36),0 0 0 1px rgba(201,168,76,.2);
 }
 .rizq-est-card-media{position:relative;aspect-ratio:4/3;overflow:hidden;background:#0a1424}
-.rizq-est-card-media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease}
-.rizq-est-card:hover .rizq-est-card-media img{transform:scale(1.06)}
+.rizq-est-card-media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .55s ease}
+.rizq-est-card:hover .rizq-est-card-media img{transform:scale(1.07)}
 .rizq-est-card-media::after{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg,transparent 42%,rgba(7,17,31,.88) 100%);
+  background:
+    linear-gradient(180deg,transparent 40%,rgba(7,17,31,.9) 100%),
+    linear-gradient(90deg,rgba(201,168,76,.1),transparent 45%);
   pointer-events:none;
 }
 .rizq-est-badge{
   position:absolute;top:12px;right:12px;z-index:2;
-  background:rgba(7,17,31,.72);border:1px solid rgba(201,168,76,.45);
-  color:#E8C96A;border-radius:999px;padding:5px 10px;font:800 11px Cairo,sans-serif;
+  background:rgba(7,17,31,.78);border:1px solid rgba(201,168,76,.5);
+  color:#E8C96A;border-radius:999px;padding:6px 11px;font:800 11px Cairo,sans-serif;
   backdrop-filter:blur(8px);
 }
 .rizq-est-price{
   position:absolute;bottom:12px;left:12px;z-index:2;
-  background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0B1C33;
-  border-radius:10px;padding:7px 11px;font:900 13px Cairo,sans-serif;
+  background:linear-gradient(135deg,#F3E2A8,#C9A84C 50%,#E8C96A);color:#0B1C33;
+  border-radius:11px;padding:8px 12px;font:900 13px Cairo,sans-serif;
+  box-shadow:0 6px 14px rgba(0,0,0,.25);
 }
-.rizq-est-card-body{padding:14px 14px 16px;background:#fff}
+.rizq-est-card-body{padding:14px 14px 16px;background:linear-gradient(180deg,#fff,#f7f9fc)}
 .rizq-est-card-body h3{font-size:15px;font-weight:900;color:#0F2347;margin:0 0 6px;line-height:1.35}
 .rizq-est-loc{font-size:12px;font-weight:700;color:#5b6b85;margin-bottom:8px}
 .rizq-est-meta{display:flex;flex-wrap:wrap;gap:6px}
@@ -4109,7 +4112,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   background:rgba(27,58,107,.06);border:1px solid rgba(27,58,107,.1);
   border-radius:999px;padding:4px 9px;
 }
-#rizq-est-rail{display:flex;gap:14px;padding:4px 2px 8px}
+#rizq-est-rail{display:flex;gap:16px;padding:6px 2px 10px}
 #rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="cars"]{background:linear-gradient(135deg,#1a4a6e,#0f2a40)}
 #rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="electronics"]{background:linear-gradient(135deg,#2a3d6b,#152038)}
 #rizq-showroom-models .rizq-styles-gtab.is-active[data-srm-cat="furniture"]{background:linear-gradient(135deg,#4a3a28,#2a2014)}
