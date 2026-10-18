@@ -316,7 +316,7 @@ button{font:inherit;border:0;background:none;color:inherit}
   min-height:340px;display:flex;flex-direction:column;cursor:pointer;text-align:right;
 }
 .est-card:hover{transform:translateY(-4px);border-color:rgba(201,168,76,.38);box-shadow:0 14px 32px rgba(201,168,76,.16),0 8px 18px rgba(27,58,107,.08)}
-.est-card.featured{grid-column:span 8;min-height:440px}
+.est-card.featured{grid-column:span 6;min-height:380px}
 .est-card-media{position:relative;flex:1;min-height:210px;overflow:hidden}
 .est-card.featured .est-card-media{min-height:280px}
 .est-card-media img{width:100%;height:100%;object-fit:cover;transition:transform .6s,opacity .35s}
@@ -442,30 +442,109 @@ button{font:inherit;border:0;background:none;color:inherit}
   padding:16px 20px 28px;color:#B8C4D6;font-size:13px;
 }
 
-/* Modal / lightbox */
+/* Modal / lightbox — لوحة تفاصيل فاخرة */
 .est-overlay{
-  position:fixed;inset:0;z-index:80;background:rgba(3,8,16,.78);
-  backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:18px;
+  position:fixed;inset:0;z-index:80;background:rgba(3,8,16,.82);
+  backdrop-filter:blur(10px);display:none;align-items:flex-start;justify-content:center;
+  padding:18px;overflow:auto;
 }
 .est-overlay.is-open{display:flex}
 .est-modal{
-  width:min(920px,100%);max-height:min(92vh,820px);overflow:auto;border-radius:22px;
+  width:min(1120px,100%);max-height:none;margin:12px auto 40px;overflow:visible;border-radius:22px;
   background:#fff;border:1px solid var(--border);
-  box-shadow:0 30px 80px rgba(15,35,65,.25);position:relative;color:var(--navy);
+  box-shadow:0 30px 80px rgba(15,35,65,.3);position:relative;color:var(--navy);
 }
 .est-modal-close{
-  position:absolute;top:12px;left:12px;z-index:2;width:38px;height:38px;border-radius:999px;
-  background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:20px;
+  position:sticky;top:12px;float:left;margin:12px;z-index:5;width:40px;height:40px;border-radius:999px;
+  background:rgba(6,13,24,.72);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:22px;
+  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
 }
-.est-modal-media{position:relative;aspect-ratio:16/10;background:#07111f}
-.est-modal-media img{width:100%;height:100%;object-fit:cover}
-.est-modal-body{padding:22px 22px 26px}
-.est-modal-body h3{font-family:var(--display);font-size:clamp(22px,3vw,30px);margin:0 0 8px}
-.est-modal-price{display:inline-block;margin:8px 0 14px;padding:8px 12px;border-radius:12px;
-  background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0B1C33;font:900 15px Cairo,sans-serif}
-.est-modal-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.est-pd-gallery{
+  display:grid;grid-template-columns:1.6fr 1fr;grid-template-rows:1fr 1fr;gap:8px;
+  padding:12px 12px 0;min-height:320px;
+}
+.est-pd-gallery .main{
+  grid-row:1/3;border-radius:16px;overflow:hidden;position:relative;background:#0a1424;cursor:zoom-in;
+}
+.est-pd-gallery .main img,.est-pd-gallery .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.est-pd-gallery .thumb{
+  border-radius:14px;overflow:hidden;position:relative;background:#0a1424;cursor:zoom-in;min-height:150px;
+}
+.est-pd-gallery .thumb:nth-child(3){grid-column:2;grid-row:2}
+.est-pd-viewall{
+  position:absolute;inset:auto 12px 12px auto;z-index:2;
+  background:rgba(11,28,51,.88);color:#fff;border:1px solid rgba(201,168,76,.45);
+  border-radius:999px;padding:9px 14px;font:800 12.5px Cairo,sans-serif;cursor:pointer;
+}
+.est-pd-body{padding:20px 22px 28px;clear:both}
+.est-pd-top{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.est-pd-top h3{font-family:var(--display);font-size:clamp(24px,3.2vw,34px);margin:6px 0 8px;line-height:1.25;color:var(--navy)}
+.est-pd-loc{color:#2f3c4d;font-weight:700;font-size:14px}
+.est-pd-price{
+  display:inline-flex;align-items:center;padding:12px 16px;border-radius:14px;
+  background:linear-gradient(135deg,#F3E2A8,#C9A84C 50%,#E8C96A);color:#0B1C33;
+  font:900 18px Cairo,sans-serif;box-shadow:0 8px 20px rgba(201,168,76,.25);
+}
+.est-pd-ribbon{
+  display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px;padding:14px;
+  background:linear-gradient(180deg,#fbfcff,#f4f7fc);border:1px solid var(--border);border-radius:16px;
+}
+.est-pd-ribbon span{
+  display:inline-flex;align-items:center;gap:6px;padding:9px 12px;border-radius:12px;
+  background:#fff;border:1px solid #d8e2f0;font:800 13px Cairo,sans-serif;color:#0f2347;
+}
+.est-pd-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+.est-pd-tabs button{
+  border:1px solid var(--border);background:#fff;color:#2f3c4d;border-radius:999px;
+  padding:8px 14px;font:800 12.5px Cairo,sans-serif;cursor:pointer;
+}
+.est-pd-tabs button.is-on{
+  background:linear-gradient(135deg,rgba(201,168,76,.22),rgba(201,168,76,.08));
+  border-color:rgba(201,168,76,.55);color:var(--navy);
+}
+.est-pd-thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin:0 0 18px}
+.est-pd-thumbs button{
+  border:0;padding:0;border-radius:12px;overflow:hidden;aspect-ratio:4/3;cursor:zoom-in;
+  border:1.5px solid transparent;background:#0a1424;
+}
+.est-pd-thumbs button.is-on{border-color:#C9A84C;box-shadow:0 0 0 2px rgba(201,168,76,.35)}
+.est-pd-thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+.est-pd-desc{color:#1e2a3a;line-height:1.8;font-weight:600;font-size:15px;margin:0 0 16px}
+.est-pd-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+.est-pd-chips span{
+  display:inline-flex;align-items:center;gap:5px;padding:8px 12px;border-radius:999px;
+  background:#f0faf3;border:1px solid rgba(18,140,126,.25);color:#0f7a5c;
+  font:800 12.5px Cairo,sans-serif;
+}
+.est-pd-map{
+  border-radius:16px;border:1px solid var(--border);overflow:hidden;margin:0 0 18px;
+  background:#f4f7fc;min-height:180px;position:relative;
+}
+.est-pd-map .map-placeholder,.est-pd-map .est-map-placeholder{height:180px;min-height:180px;margin:0;border:0;border-radius:0}
+.est-pd-nearby{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px;background:#fff}
+.est-pd-nearby span{
+  font:700 12px Cairo,sans-serif;padding:5px 10px;border-radius:999px;
+  background:#eef3fb;border:1px solid #d5deea;color:var(--navy);
+}
+.est-pd-cta{
+  position:sticky;bottom:0;z-index:4;display:flex;flex-wrap:wrap;gap:10px;
+  padding:14px 0 4px;background:linear-gradient(180deg,rgba(255,255,255,.5),#fff 35%);
+  border-top:1px solid var(--border);margin-top:8px;
+}
+.est-pd-cta .est-btn{flex:1;min-width:140px;justify-content:center}
+.est-pd-cta .est-btn-visit{
+  background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#F3E2A8;border:1px solid rgba(201,168,76,.4);
+}
+.est-pd-cta .est-btn-quote{
+  background:#fff;color:var(--navy);border:1.5px solid rgba(201,168,76,.55);
+}
 .est-lb-img{max-width:min(1100px,96vw);max-height:88vh;border-radius:16px;object-fit:contain;
   box-shadow:0 24px 60px rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.25)}
+@media(max-width:720px){
+  .est-pd-gallery{grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto;min-height:0}
+  .est-pd-gallery .main{grid-row:1;grid-column:1/-1;aspect-ratio:16/10}
+  .est-pd-gallery .thumb{min-height:110px}
+}
 
 @media(max-width:980px){
   .est-search{grid-template-columns:1fr 1fr}
@@ -859,22 +938,38 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   <div class="est-foot-bar" id="est-foot-bar">© 2026 رزق | Rizq — سوق العقارات · RIZQ ESTATE</div>
 </footer>
 
-<!-- معاينة عقار — التواصل عبر الوكالة فقط -->
+<!-- لوحة تفاصيل العقار الفاخرة -->
 <div class="est-overlay" id="est-modal" role="dialog" aria-modal="true" aria-labelledby="est-modal-title" hidden>
-  <div class="est-modal">
+  <div class="est-modal" id="est-pd">
     <button type="button" class="est-modal-close" id="est-modal-close" aria-label="إغلاق">×</button>
-    <div class="est-modal-media"><img id="est-modal-img" alt=""/></div>
-    <div class="est-modal-body">
-      <div class="est-badge" id="est-modal-badge" style="position:static;display:inline-flex;margin-bottom:8px"></div>
-      <h3 id="est-modal-title"></h3>
-      <div class="loc" id="est-modal-loc" style="color:#2f3c4d;font-weight:700;margin-bottom:6px"></div>
-      <div class="est-modal-price" id="est-modal-price"></div>
-      <div class="est-meta" id="est-modal-meta"></div>
-      <p id="est-modal-desc" style="color:#1e2a3a;line-height:1.75;margin-top:14px;font-weight:600;font-size:14.5px"></p>
-      <div class="est-modal-actions">
-        <a class="est-btn est-call" id="est-modal-call" href="tel:+22242000111" dir="ltr">📞 اتصل بالوكالة</a>
-        <a class="est-btn est-wa" id="est-modal-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب الوكالة</a>
-        <a class="est-btn est-btn-ghost" id="est-modal-browse" href="#est-desk">📩 استفسار عن العرض</a>
+    <div class="est-pd-gallery" id="est-pd-gallery" aria-label="معرض صور العقار"></div>
+    <div class="est-pd-body">
+      <div class="est-pd-top">
+        <div>
+          <span class="est-badge" id="est-modal-badge" style="position:static;display:inline-flex"></span>
+          <h3 id="est-modal-title"></h3>
+          <div class="est-pd-loc" id="est-modal-loc"></div>
+        </div>
+        <div class="est-pd-price" id="est-modal-price"></div>
+      </div>
+      <div class="est-pd-ribbon" id="est-pd-ribbon" aria-label="مواصفات العقار"></div>
+      <div class="est-pd-tabs" id="est-pd-tabs" role="tablist" aria-label="تصفية الصور"></div>
+      <div class="est-pd-thumbs" id="est-pd-thumbs"></div>
+      <p class="est-pd-desc" id="est-modal-desc"></p>
+      <div class="est-pd-chips" id="est-pd-chips" aria-label="المزايا"></div>
+      <div class="est-pd-map">
+        <div class="est-map-placeholder map-placeholder" id="est-pd-map" role="button" tabindex="0" aria-label="عرض الموقع على الخريطة">
+          <div class="map-ico">🗺️</div>
+          <div class="map-txt">موقع العقار على الخريطة</div>
+          <div class="map-addr" id="est-pd-map-addr">—</div>
+        </div>
+        <div class="est-pd-nearby" id="est-pd-nearby"></div>
+      </div>
+      <div class="est-pd-cta" id="est-pd-cta">
+        <button type="button" class="est-btn est-btn-visit" id="est-modal-visit">📅 حجز معاينة ميدانية</button>
+        <a class="est-btn est-wa" id="est-modal-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 تواصل واتساب مباشر</a>
+        <button type="button" class="est-btn est-btn-quote" id="est-modal-quote">💬 طلب عرض سعر / تفاوض</button>
+        <a class="est-btn est-call" id="est-modal-call" href="tel:+22242000111" dir="ltr">📞 اتصال</a>
       </div>
     </div>
   </div>
@@ -886,6 +981,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   <img class="est-lb-img" id="est-lb-img" alt=""/>
 </div>
 
+<script src="rizq_estate_data.js?v=1.0"></script>
 <script src="rizq_map_preview.js?v=1.0" defer></script>
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_mr_payment_catalog.js?v=1.1"></script>
@@ -893,58 +989,24 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 <script src="rizq_service_desk.js?v=1.3"></script>
 <script>
 (function(){
-  var LISTINGS = [
-    {id:'e1', cat:'villa', deal:'sale', featured:true, title:'فيلا راقية تمليك — نواكشوط الغربية', loc:'نواكشوط الغربية', price:'4.8M MRU', beds:'5', baths:'4', area:'420 م²',
-      img:'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1400&q=80',
-      imgs:[
-        'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1400&q=80',
-        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1400&q=80',
-        'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1400&q=80'
-      ], badge:'للبيع',
-      desc:'فيلا بحديقة ومسبح وإطلالة واسعة — تشطيب حديث ووثائق جاهزة.'},
-    {id:'e2', cat:'apartment', deal:'sale', title:'شقة فاخرة تمليك — تفرغ زينة', loc:'تفرغ زينة', price:'2.6M MRU', beds:'3', baths:'2', area:'145 م²',
-      img:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1000&q=80',
-      imgs:[
-        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1000&q=80',
-        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1000&q=80',
-        'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1000&q=80'
-      ], badge:'للبيع',
-      desc:'شقة 3 غرف مفروشة جزئياً في موقع هادئ قريب من الخدمات — وثائق تمليك جاهزة.'},
-    {id:'e3', cat:'apartment', deal:'sale', title:'شقة تمليك بإطلالة مدينة — لكصر', loc:'لكصر', price:'2.1M MRU', beds:'2', baths:'2', area:'110 م²',
-      img:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1000&q=80',
-      imgs:[
-        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1000&q=80',
-        'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1000&q=80'
-      ], badge:'للبيع',
-      desc:'شقة جاهزة للسكن مع إطلالة مدينة وإضاءة طبيعية ممتازة.'},
-    {id:'e4', cat:'land', deal:'sale', title:'أرض سكنية 600 م² — القطب', loc:'القطب', price:'2.2M MRU', beds:'—', baths:'—', area:'600 م²',
-      img:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80', badge:'أرض',
-      desc:'قطعة أرض سكنية بموقع واضح ووثائق مستوفاة — جاهزة للبناء.'},
-    {id:'e5', cat:'villa', deal:'sale', title:'منزل عائلي بحديقة — لكصر', loc:'لكصر', price:'3.4M MRU', beds:'4', baths:'3', area:'280 م²',
-      img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80',
-      imgs:[
-        'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80',
-        'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=1000&q=80'
-      ], badge:'للبيع',
-      desc:'منزل عائلي بحديقة خاصة ومساحات معيشة واسعة.'},
-    {id:'e6', cat:'shop', deal:'rent', title:'محل تجاري على شارع رئيسي — سوق العاصمة', loc:'سوق العاصمة', price:'85K / شهر', beds:'—', baths:'—', area:'75 م²',
-      img:'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1000&q=80', badge:'للكراء',
-      desc:'محل على شارع رئيسي بحركة عالية — مناسب للتجارة اليومية.'},
-    {id:'e7', cat:'apartment', deal:'sale', title:'بنتهاوس تمليك — القطب', loc:'القطب', price:'6.5M MRU', beds:'4', baths:'3', area:'260 م²',
-      img:'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1000&q=80',
-      imgs:[
-        'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1000&q=80',
-        'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=80'
-      ], badge:'للبيع',
-      desc:'بنتهاوس بإطلالة غروب وتراس واسع — تشطيب راقٍ.'},
-    {id:'e8', cat:'villa', deal:'rent', title:'فيلا مفروشة للكراء — تفرغ زينة', loc:'تفرغ زينة', price:'280K / شهر', beds:'5', baths:'4', area:'380 م²',
-      img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80',
-      imgs:[
-        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80',
-        'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1000&q=80'
-      ], badge:'للكراء',
-      desc:'فيلا مفروشة في حي راقٍ — مناسبة للعائلات والإقامات الطويلة.'}
-  ];
+  var LISTINGS = (window.RizqEstateData && RizqEstateData.LISTINGS)
+    ? RizqEstateData.LISTINGS.slice()
+    : [];
+  try{
+    if(/[?&]draft=1\b/.test(location.search)){
+      var draft = JSON.parse(localStorage.getItem('rizq_estate_last_draft')||'null');
+      if(draft && draft.title){
+        draft.id = draft.id || ('draft_' + Date.now());
+        draft.featured = true;
+        if(!draft.media) draft.media = {};
+        if(!draft.media.cover && draft.img) draft.media.cover = draft.img;
+        LISTINGS.unshift(draft);
+      }
+    }
+  }catch(eDraft){}
+  var _pdItem = null;
+  var _pdMediaTab = 'all';
+  var _pdMedia = [];
 
   var REVIEWS = [
     { name:'محمد ولد أحمد', stars:5, text:'تعامل واضح ومعاينة في نفس اليوم. ساعدوني في إتمام عقد الكراء بدون تعقيد.', when:'منذ أسبوعين' },
@@ -1345,12 +1407,29 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   }
 
   function listingImgs(item){
+    if(window.RizqEstateData && typeof RizqEstateData.cardImgs === 'function'){
+      return RizqEstateData.cardImgs(item);
+    }
     if(item.imgs && item.imgs.length) return item.imgs.slice();
     return item.img ? [item.img] : [];
   }
 
+  function coverOf(item){
+    if(window.RizqEstateData && typeof RizqEstateData.coverOf === 'function'){
+      return RizqEstateData.coverOf(item);
+    }
+    return item.img || (listingImgs(item)[0] || '');
+  }
+
+  function areaLabel(val, fr){
+    if(val == null || val === '' || val === '—') return fr ? 'Surface: —' : 'المساحة: —';
+    var n = String(val);
+    if(/م²|m²|m2/i.test(n)) return fr ? ('Surface ' + n.replace(/م²/g,'m²')) : ('المساحة ' + n);
+    return fr ? ('Surface ' + n + ' m²') : ('المساحة ' + n + ' م²');
+  }
+
   function specText(kind, val, fr){
-    var empty = !val || val === '—' || val === '-';
+    var empty = val == null || val === '' || val === '—' || val === '-';
     if(kind === 'beds'){
       if(empty) return fr ? 'Chambres: —' : 'غرف: —';
       return fr ? (val + ' chambres') : (val + ' غرف');
@@ -1359,18 +1438,33 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       if(empty) return fr ? 'Salles de bain: —' : 'حمّامات: —';
       return fr ? (val + ' sdb') : (val + ' حمّام');
     }
-    if(kind === 'area'){
-      if(empty) return fr ? 'Surface: —' : 'المساحة: —';
-      var area = String(val);
-      if(/م²|m²|m2/i.test(area)) return fr ? ('Surface ' + area.replace(/م²/g,'m²')) : ('المساحة ' + area);
-      return fr ? ('Surface ' + area) : ('المساحة ' + area);
+    if(kind === 'area') return areaLabel(val, fr);
+    return String(val == null ? '—' : val);
+  }
+
+  function ribbonHTML(item, fr){
+    var bits = [];
+    if(item.cat === 'land'){
+      bits.push('<span>📐 '+esc(areaLabel(item.area, fr))+'</span>');
+      if(item.land && item.land.frontage) bits.push('<span>📏 '+(fr?'Façade ':'واجهة ')+esc(item.land.frontage)+' م</span>');
+      if(item.land && item.land.zoning) bits.push('<span>🏷 '+esc(item.land.zoning)+'</span>');
+      if(item.land && item.land.deed) bits.push('<span>📄 '+esc(item.land.deed)+'</span>');
+      return bits.join('');
     }
-    return String(val || '—');
+    if(item.beds != null) bits.push('<span>🛏 '+esc(specText('beds', item.beds, fr))+'</span>');
+    if(item.living != null) bits.push('<span>🛋 '+(fr ? (item.living+' salons') : (item.living+' صالون'))+'</span>');
+    if(item.baths != null) bits.push('<span>🛁 '+esc(specText('baths', item.baths, fr))+'</span>');
+    bits.push('<span>📐 '+esc(areaLabel(item.area, fr))+'</span>');
+    if(item.builtArea != null) bits.push('<span>🏗 '+(fr?'Bâti ':'مبنية ')+esc(item.builtArea)+' م²</span>');
+    if(item.parking != null) bits.push('<span>🚗 '+(fr?'Parking ':'كراج ')+esc(item.parking)+'</span>');
+    if(item.furnish) bits.push('<span>🛋 '+esc(item.furnish)+'</span>');
+    return bits.join('');
   }
 
   function cardHTML(item){
     var fr = isFrEstate();
     var imgs = listingImgs(item);
+    if(!imgs.length) imgs = [coverOf(item)];
     var media;
     if(imgs.length > 1){
       media = '<div class="est-card-media" data-carousel="1" data-idx="0">'
@@ -1402,11 +1496,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       + '<div class="est-card-body">'
       +   '<h3>'+esc(item.title)+'</h3>'
       +   '<div class="loc">📍 '+(fr?'Quartier: ':'الحي: ')+esc(item.loc)+'</div>'
-      +   '<div class="est-meta">'
-      +     '<span title="'+(fr?'Chambres':'عدد الغرف')+'">🛏 '+esc(specText('beds', item.beds, fr))+'</span>'
-      +     '<span title="'+(fr?'Salles de bain':'عدد الحمّامات')+'">🛁 '+esc(specText('baths', item.baths, fr))+'</span>'
-      +     '<span title="'+(fr?'Surface':'المساحة')+'">📐 '+esc(specText('area', item.area, fr))+'</span>'
-      +   '</div>'
+      +   '<div class="est-meta">'+ribbonHTML(item, fr)+'</div>'
       +   '<span class="est-card-cta">'+(fr?'Voir les détails':'عرض التفاصيل')+'</span>'
       + '</div></button>'
       + '</div>';
@@ -1448,27 +1538,105 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     }).join('');
   }
 
+  function pdMediaList(item, tab){
+    var all = (window.RizqEstateData && RizqEstateData.allMedia)
+      ? RizqEstateData.allMedia(item)
+      : listingImgs(item).map(function(s){ return { src:s, cat:'cover', label:'' }; });
+    if(!tab || tab === 'all') return all;
+    return all.filter(function(x){ return x.cat === tab; });
+  }
+
+  function paintPdGallery(item){
+    var gal = document.getElementById('est-pd-gallery');
+    if(!gal) return;
+    var media = pdMediaList(item, 'all');
+    var cover = coverOf(item);
+    var thumbs = media.filter(function(m){ return m.src !== cover; }).slice(0, 2);
+    while(thumbs.length < 2 && media.length > thumbs.length){
+      thumbs.push(media[thumbs.length]);
+    }
+    var fr = isFrEstate();
+    var html = '<div class="main" data-src="'+esc(cover)+'"><img src="'+esc(cover)+'" alt="'+esc(item.title)+'"/>'
+      + '<button type="button" class="est-pd-viewall" id="est-pd-viewall">'+(fr?'Voir toutes les photos':'مشاهدة جميع الصور')+' ('+media.length+')</button></div>';
+    thumbs.forEach(function(t){
+      html += '<div class="thumb" data-src="'+esc(t.src)+'"><img src="'+esc(t.src)+'" alt="'+esc(t.label||item.title)+'" loading="lazy"/></div>';
+    });
+    gal.innerHTML = html;
+  }
+
+  function paintPdTabs(item){
+    var box = document.getElementById('est-pd-tabs');
+    if(!box) return;
+    var fr = isFrEstate();
+    var tabs = (window.RizqEstateData && RizqEstateData.MEDIA_TABS) || [{id:'all',ar:'الكل',fr:'Tout'}];
+    var all = pdMediaList(item, 'all');
+    box.innerHTML = tabs.map(function(t){
+      var count = t.id === 'all' ? all.length : all.filter(function(m){ return m.cat === t.id; }).length;
+      if(t.id !== 'all' && !count) return '';
+      return '<button type="button" role="tab" data-tab="'+esc(t.id)+'" class="'+(_pdMediaTab===t.id?'is-on':'')+'">'
+        + esc(fr ? t.fr : t.ar) + (count ? ' · '+count : '') + '</button>';
+    }).join('');
+  }
+
+  function paintPdThumbs(item){
+    var box = document.getElementById('est-pd-thumbs');
+    if(!box) return;
+    _pdMedia = pdMediaList(item, _pdMediaTab);
+    box.innerHTML = _pdMedia.length
+      ? _pdMedia.map(function(m, i){
+          return '<button type="button" data-i="'+i+'" data-src="'+esc(m.src)+'" aria-label="'+esc(m.label||item.title)+'">'
+            + '<img src="'+esc(m.src)+'" alt="" loading="lazy"/></button>';
+        }).join('')
+      : '<p style="color:#6a7a8a;font:700 13px Cairo,sans-serif">'+(isFrEstate()?'Aucune photo dans cette section.':'لا صور في هذا القسم.')+'</p>';
+  }
+
+  function paintPdMap(item){
+    var addr = (item.street ? item.street + ' — ' : '') + (item.loc || '');
+    setText('est-pd-map-addr', addr || '—');
+    var near = document.getElementById('est-pd-nearby');
+    if(near){
+      var pts = (item.map && item.map.nearby) || [];
+      near.innerHTML = pts.map(function(p){ return '<span>📍 '+esc(p)+'</span>'; }).join('');
+    }
+    try{
+      if(window.RizqMapPreview && typeof RizqMapPreview.paint === 'function'){
+        var label = (item.map && item.map.lat != null) ? (item.map.lat + ',' + item.map.lon) : addr;
+        RizqMapPreview.paint('#est-pd-map', label);
+      }
+    }catch(e){}
+  }
+
   function openModal(item){
-    document.getElementById('est-modal-img').src = item.img;
-    document.getElementById('est-modal-img').alt = item.title;
-    document.getElementById('est-modal-title').textContent = item.title;
     var frModal = isFrEstate();
-    document.getElementById('est-modal-loc').textContent = '📍 '+(frModal?'Quartier: ':'الحي: ')+item.loc;
+    _pdItem = item;
+    _pdMediaTab = 'all';
+    document.getElementById('est-modal-title').textContent = item.title;
+    document.getElementById('est-modal-loc').textContent = '📍 '+(item.street ? item.street+' · ' : '')+(frModal?'':'')+item.loc;
     document.getElementById('est-modal-price').textContent = item.price;
     document.getElementById('est-modal-badge').textContent = item.badge;
     document.getElementById('est-modal-desc').textContent = item.desc;
-    document.getElementById('est-modal-meta').innerHTML =
-      '<span>🛏 '+esc(specText('beds', item.beds, frModal))+'</span>'
-      + '<span>🛁 '+esc(specText('baths', item.baths, frModal))+'</span>'
-      + '<span>📐 '+esc(specText('area', item.area, frModal))+'</span>';
+    var ribbon = document.getElementById('est-pd-ribbon');
+    if(ribbon) ribbon.innerHTML = ribbonHTML(item, frModal);
+    var chips = document.getElementById('est-pd-chips');
+    if(chips){
+      var feats = item.features || [];
+      chips.innerHTML = feats.map(function(f){ return '<span>✓ '+esc(f)+'</span>'; }).join('');
+      chips.style.display = feats.length ? '' : 'none';
+    }
+    paintPdGallery(item);
+    paintPdTabs(item);
+    paintPdThumbs(item);
+    paintPdMap(item);
     modal.hidden = false;
     modal.classList.add('is-open');
     document.body.style.overflow = 'hidden';
+    try{ modal.scrollTop = 0; }catch(e){}
   }
   function closeModal(){
     modal.classList.remove('is-open');
     modal.hidden = true;
     document.body.style.overflow = '';
+    _pdItem = null;
   }
   function openLb(g){
     document.getElementById('est-lb-img').src = g.img;
@@ -1558,10 +1726,71 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     var item = LISTINGS.find(function(x){ return x.id === id; });
     if(item) openModal(item);
   });
-  var modalBrowse = document.getElementById('est-modal-browse');
-  if(modalBrowse){
-    modalBrowse.addEventListener('click', function(){ closeModal(); });
+  function openPhotoLb(src, alt){
+    if(!src) return;
+    document.getElementById('est-lb-img').src = src;
+    document.getElementById('est-lb-img').alt = alt || '';
+    lightbox.hidden = false;
+    lightbox.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
   }
+
+  function waTextForItem(kind){
+    var fr = isFrEstate();
+    var title = (_pdItem && _pdItem.title) || '';
+    if(kind === 'visit'){
+      return fr
+        ? ('Bonjour, je souhaite réserver une visite pour : ' + title)
+        : ('السلام عليكم، أرغب في حجز معاينة ميدانية لعقار: ' + title);
+    }
+    return fr
+      ? ('Bonjour, je souhaite un devis / négociation pour : ' + title)
+      : ('السلام عليكم، أطلب عرض سعر / تفاوض بخصوص: ' + title);
+  }
+
+  function openAgencyWa(kind){
+    var wa = String((AGENCY && AGENCY.whatsapp) || '').replace(/\D/g,'');
+    if(!wa){ document.getElementById('est-desk').scrollIntoView({behavior:'smooth'}); closeModal(); return; }
+    window.open('https://wa.me/' + wa + '?text=' + encodeURIComponent(waTextForItem(kind)), '_blank', 'noopener');
+  }
+
+  modal.addEventListener('click', function(e){
+    if(e.target === modal){ closeModal(); return; }
+    var tab = e.target.closest('#est-pd-tabs button[data-tab]');
+    if(tab && _pdItem){
+      _pdMediaTab = tab.getAttribute('data-tab') || 'all';
+      paintPdTabs(_pdItem);
+      paintPdThumbs(_pdItem);
+      return;
+    }
+    var viewAll = e.target.closest('#est-pd-viewall');
+    if(viewAll && _pdItem){
+      _pdMediaTab = 'all';
+      paintPdTabs(_pdItem);
+      paintPdThumbs(_pdItem);
+      var thumbs = document.getElementById('est-pd-thumbs');
+      if(thumbs) thumbs.scrollIntoView({behavior:'smooth', block:'nearest'});
+      return;
+    }
+    var shot = e.target.closest('#est-pd-gallery .main, #est-pd-gallery .thumb, #est-pd-thumbs button');
+    if(shot){
+      var src = shot.getAttribute('data-src') || (shot.querySelector('img') && shot.querySelector('img').src);
+      openPhotoLb(src, _pdItem && _pdItem.title);
+      return;
+    }
+    if(e.target.closest('#est-pd-map')){
+      var addr = (_pdItem && (_pdItem.street || _pdItem.loc)) || '';
+      try{
+        if(window.RizqMapPreview && typeof RizqMapPreview.open === 'function'){ RizqMapPreview.open(addr); return; }
+      }catch(err){}
+      window.open('https://www.openstreetmap.org/search?query=' + encodeURIComponent(addr || 'Nouakchott'), '_blank', 'noopener');
+    }
+  });
+
+  var visitBtn = document.getElementById('est-modal-visit');
+  if(visitBtn) visitBtn.addEventListener('click', function(){ openAgencyWa('visit'); });
+  var quoteBtn = document.getElementById('est-modal-quote');
+  if(quoteBtn) quoteBtn.addEventListener('click', function(){ openAgencyWa('quote'); });
 
   var __estLangBusy = false;
   function applyEstateLang(){
@@ -1686,9 +1915,11 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       interest.options[2].textContent = fr ? 'Demande de location' : 'استفسار كراء';
       interest.options[3].textContent = fr ? 'Autre' : 'طلب آخر';
     }
-    tx('#est-modal-call', '📞 اتصال مباشر', '📞 Appeler');
-    tx('#est-modal-wa', '💬 واتساب الوكالة', '💬 WhatsApp');
-    tx('#est-modal-browse', '📩 استفسار عن العرض', '📩 Demande sur ce bien');
+    tx('#est-modal-call', '📞 اتصال', '📞 Appeler');
+    tx('#est-modal-wa', '💬 تواصل واتساب مباشر', '💬 WhatsApp direct');
+    tx('#est-modal-visit', '📅 حجز معاينة ميدانية', '📅 Réserver une visite');
+    tx('#est-modal-quote', '💬 طلب عرض سعر / تفاوض', '💬 Devis / négociation');
+    if(_pdItem){ paintPdTabs(_pdItem); paintPdGallery(_pdItem); }
     tx('#est-foot-blurb', 'وكالة أطوار العقارية — بيع وكراء ومعاينة في نواكشوط.', 'Agence Atwar — vente, location et visites à Nouakchott.');
     if(window._rizqEstateProfile){
       paintPayments(window._rizqEstatePaymentMethods || window._rizqEstateProfile.paymentMethods);
@@ -1805,6 +2036,13 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   renderGrid();
   renderRail();
   renderReviews();
+  try{
+    var openId = new URLSearchParams(location.search).get('open');
+    if(openId){
+      var itOpen = LISTINGS.find(function(x){ return x.id === openId; });
+      if(itOpen) setTimeout(function(){ openModal(itOpen); }, 200);
+    }
+  }catch(eOpen){}
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
