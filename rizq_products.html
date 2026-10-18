@@ -120,12 +120,12 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:linear-gr
 .prod-shop-cluster-label{
   font-size:10px;font-weight:800;letter-spacing:1.4px;color:#8a6a1a;text-transform:uppercase;
 }
-.prod-shop-btns{display:flex;flex-direction:column;gap:8px}
+.prod-shop-btns{display:flex;flex-direction:row;align-items:stretch;gap:8px}
 .sss-btn{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  width:100%;min-height:40px;padding:9px 12px;border-radius:11px;
-  font-family:inherit;font-size:13px;font-weight:800;text-decoration:none;cursor:pointer;
-  border:none;transition:transform .15s,box-shadow .2s,filter .2s;
+  flex:1 1 0;min-width:0;width:auto;min-height:40px;padding:9px 10px;border-radius:11px;
+  font-family:inherit;font-size:12.5px;font-weight:800;text-decoration:none;cursor:pointer;
+  border:none;transition:transform .15s,box-shadow .2s,filter .2s;white-space:nowrap;
 }
 .sss-btn:hover{transform:translateY(-1px)}
 .sss-wish{background:#fff;color:#1B3A6B;border:1.5px solid rgba(27,58,107,.18)}
