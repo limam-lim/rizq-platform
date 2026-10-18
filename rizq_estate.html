@@ -262,10 +262,10 @@ button{font:inherit;border:0;background:none;color:inherit}
 .est-btn-ghost{background:#fff;color:var(--navy);border:1px solid var(--border)}
 .est-btn-ghost:hover{background:rgba(255,255,255,.92)}
 
-/* بحث فوق العروض (نفس منطق المحلات: البحث مع الكتالوج لا داخل الهيرو) */
+/* بحث فوق العروض: ولاية → مدينة → حي */
 .est-search-panel{margin:0 0 16px}
 .est-search{
-  display:grid;grid-template-columns:1.15fr .9fr .9fr .9fr auto;gap:8px;
+  display:grid;grid-template-columns:1.05fr 1.05fr 1.05fr .85fr .85fr auto;gap:8px;
   padding:14px;border-radius:18px;
   background:#fff;border:1px solid var(--border);
   box-shadow:0 8px 24px rgba(15,35,65,.06);
@@ -275,9 +275,19 @@ button{font:inherit;border:0;background:none;color:inherit}
 .est-search input,.est-search select{
   width:100%;border:1px solid #d5deea;background:#f4f7fc;
   color:var(--navy);border-radius:12px;padding:11px 12px;font:700 13px Cairo,sans-serif;outline:none;
+  cursor:pointer;
 }
-.est-search input:focus,.est-search select:focus{border-color:rgba(201,168,76,.65);background:#fff}
-.est-search select option{background:#fff;color:var(--navy)}
+.est-search input[type="search"],.est-search input[type="text"]{cursor:text}
+.est-search select{
+  appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238A6B1F' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:left 12px center;padding-left:28px;
+}
+html[dir="ltr"] .est-search select{background-position:right 12px center;padding-left:12px;padding-right:28px}
+.est-search input:focus,.est-search select:focus{border-color:rgba(201,168,76,.65);background-color:#fff}
+.est-search select:hover,.est-search-go:hover{filter:brightness(1.02)}
+.est-search select option{background:#fff;color:var(--navy);cursor:pointer}
+.est-search select:disabled{opacity:.55;cursor:not-allowed}
 .est-search-go{
   align-self:end;padding:12px 18px;border-radius:12px;font:900 13px Cairo,sans-serif;
   background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0B1C33;white-space:nowrap;
@@ -287,7 +297,7 @@ button{font:inherit;border:0;background:none;color:inherit}
 /* فيديو تعريفي + إضافي على الهيرو (نفس بنية المحلات/المكاتب) */
 .est-hero .hero-videos{display:none;position:absolute;inset:0;z-index:3;pointer-events:none}
 .est-hero.has-hero-videos .hero-videos{display:block}
-.est-hero.has-hero-videos .est-hero-copy{padding-bottom:132px}
+.est-hero.has-hero-videos .est-hero-copy{padding-bottom:112px}
 .est-hero .hero-video-card{
   position:absolute;bottom:12px;width:min(200px,38vw);border-radius:12px;overflow:hidden;
   border:1px solid rgba(201,168,76,.45);box-shadow:0 12px 28px rgba(0,0,0,.35);
@@ -322,6 +332,7 @@ button{font:inherit;border:0;background:none;color:inherit}
   display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;
   margin:0 0 18px;
 }
+.est-tab,.est-deal button,.est-search-go,.est-search select{cursor:pointer}
 .est-tabs{display:flex;flex-wrap:wrap;gap:8px}
 .est-tab{
   border:1px solid var(--border);background:#fff;
@@ -642,6 +653,10 @@ html[dir="ltr"] .est-lb-nav.next{left:auto;right:max(18px, env(safe-area-inset-r
   .est-modal-close{top:10px;left:10px;width:38px;height:38px}
 }
 
+@media(max-width:1100px){
+  .est-search{grid-template-columns:1fr 1fr 1fr}
+  .est-search-go{grid-column:1/-1}
+}
 @media(max-width:980px){
   .est-search{grid-template-columns:1fr 1fr}
   .est-search-go{grid-column:1/-1}
@@ -906,23 +921,26 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       <div class="est-search-panel" id="est-search-panel">
         <form class="est-search" id="est-search" role="search" aria-label="بحث العقارات">
           <label>
-            <span>الكلمة أو الحي</span>
-            <input type="search" id="est-q" name="q" placeholder="مثال: تفرغ زينة، فيلا، شقة تمليك" autocomplete="off"/>
+            <span>الولاية</span>
+            <select id="est-wilaya" name="wilaya" aria-label="الولاية">
+              <option value="">كل الولايات</option>
+            </select>
           </label>
           <label>
-            <span>المنطقة</span>
-            <select id="est-city" name="city">
-              <option value="">كل المناطق</option>
-              <option>تفرغ زينة</option>
-              <option>لكصر</option>
-              <option>نواكشوط الغربية</option>
-              <option>القطب</option>
-              <option>سوق العاصمة</option>
+            <span>المدينة</span>
+            <select id="est-city" name="city" aria-label="المدينة" disabled>
+              <option value="">كل المدن</option>
+            </select>
+          </label>
+          <label>
+            <span>الحي أو المنطقة</span>
+            <select id="est-quartier" name="quartier" aria-label="الحي أو المنطقة" disabled>
+              <option value="">كل الأحياء</option>
             </select>
           </label>
           <label>
             <span>نوع العقار</span>
-            <select id="est-cat" name="cat">
+            <select id="est-cat" name="cat" aria-label="نوع العقار">
               <option value="all">الكل</option>
               <option value="apartment">شقق</option>
               <option value="villa">فلل ومنازل</option>
@@ -932,7 +950,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
           </label>
           <label>
             <span>للبيع أو الكراء</span>
-            <select id="est-deal" name="deal">
+            <select id="est-deal" name="deal" aria-label="للبيع أو الكراء">
               <option value="all">الكل</option>
               <option value="sale">للبيع</option>
               <option value="rent">للكراء</option>
@@ -1099,6 +1117,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   <div class="est-lb-meta" id="est-lb-meta" hidden></div>
 </div>
 
+<script src="rizq_mr_geo.js?v=1.0"></script>
 <script src="rizq_estate_data.js?v=1.0"></script>
 <script src="rizq_map_preview.js?v=1.0" defer></script>
 <script src="rizq_backend_config.js"></script>
@@ -1147,7 +1166,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     {img:'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=1200&q=80', cap:'حمّام بتشطيب حديث'}
   ];
 
-  var state = { cat:'all', deal:'all', q:'', city:'' };
+  var state = { cat:'all', deal:'all', wilaya:'', city:'', quartier:'' };
   var grid = document.getElementById('est-grid');
   var rail = document.getElementById('est-rail');
   var countEl = document.getElementById('est-count');
@@ -1158,18 +1177,102 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
   }
 
+  function listingPlace(item){
+    if(item._geo) return item._geo;
+    var geo = null;
+    try{
+      if(window.RizqMrGeo && RizqMrGeo.findByListingLoc){
+        geo = RizqMrGeo.findByListingLoc(item.loc) || RizqMrGeo.findByListingLoc(item.street) || null;
+      }
+    }catch(e){}
+    item._geo = geo || { wilaya:'', city:'', neighborhood:'' };
+    return item._geo;
+  }
+
+  function placeBlob(item){
+    return ((item.loc||'')+' '+(item.street||'')+' '+(item.title||'')).toLowerCase();
+  }
+
   function filtered(){
-    var q = (state.q||'').trim().toLowerCase();
     return LISTINGS.filter(function(x){
       if(state.cat !== 'all' && x.cat !== state.cat) return false;
       if(state.deal !== 'all' && x.deal !== state.deal) return false;
-      if(state.city && x.loc !== state.city) return false;
-      if(q){
-        var blob = (x.title+' '+x.loc+' '+x.badge+' '+x.desc).toLowerCase();
-        if(blob.indexOf(q) < 0) return false;
+      if(!state.wilaya && !state.city && !state.quartier) return true;
+      if(!window.RizqMrGeo) return true;
+      var g = listingPlace(x);
+      var blob = placeBlob(x);
+      if(state.wilaya){
+        if(g.wilaya !== state.wilaya){
+          var wil = RizqMrGeo.wilayas().find(function(w){ return w.id === state.wilaya; });
+          var cities = RizqMrGeo.citiesOf(state.wilaya);
+          var hitWil = wil && (blob.indexOf(String(wil.ar).toLowerCase()) >= 0 || blob.indexOf(String(wil.fr).toLowerCase()) >= 0);
+          var hitCity = cities.some(function(c){
+            return blob.indexOf(String(c.ar).toLowerCase()) >= 0 || blob.indexOf(String(c.fr).toLowerCase()) >= 0;
+          });
+          if(!hitWil && !hitCity) return false;
+        }
+      }
+      if(state.city){
+        if(g.city !== state.city){
+          var cHit = RizqMrGeo.citiesOf(state.wilaya || g.wilaya).find(function(c){ return c.id === state.city; });
+          if(!cHit) return false;
+          if(blob.indexOf(String(cHit.ar).toLowerCase()) < 0 && blob.indexOf(String(cHit.fr).toLowerCase()) < 0) return false;
+        }
+      }
+      if(state.quartier){
+        if(g.neighborhood !== state.quartier && blob.indexOf(String(state.quartier).toLowerCase()) < 0) return false;
       }
       return true;
     });
+  }
+
+  function fillWilayaSelect(){
+    var sel = document.getElementById('est-wilaya');
+    if(!sel || !window.RizqMrGeo) return;
+    var fr = isFrEstate();
+    var cur = sel.value || state.wilaya || '';
+    var opts = '<option value="">'+(fr?'Toutes les wilayas':'كل الولايات')+'</option>';
+    RizqMrGeo.wilayas().forEach(function(w){
+      opts += '<option value="'+esc(w.id)+'"'+(cur===w.id?' selected':'')+'>'+esc(RizqMrGeo.label(w, fr))+'</option>';
+    });
+    sel.innerHTML = opts;
+  }
+
+  function fillCitySelect(wilayaId){
+    var sel = document.getElementById('est-city');
+    if(!sel) return;
+    var fr = isFrEstate();
+    var cities = (wilayaId && window.RizqMrGeo) ? RizqMrGeo.citiesOf(wilayaId) : [];
+    sel.disabled = !wilayaId;
+    var cur = state.city || '';
+    var opts = '<option value="">'+(fr?'Toutes les villes':'كل المدن')+'</option>';
+    cities.forEach(function(c){
+      opts += '<option value="'+esc(c.id)+'"'+(cur===c.id?' selected':'')+'>'+esc(RizqMrGeo.label(c, fr))+'</option>';
+    });
+    sel.innerHTML = opts;
+    if(!wilayaId){ state.city = ''; state.quartier = ''; }
+  }
+
+  function fillQuartierSelect(wilayaId, cityId){
+    var sel = document.getElementById('est-quartier');
+    if(!sel) return;
+    var fr = isFrEstate();
+    var list = (wilayaId && cityId && window.RizqMrGeo) ? RizqMrGeo.neighborhoodsOf(wilayaId, cityId) : [];
+    sel.disabled = !cityId;
+    var cur = state.quartier || '';
+    var opts = '<option value="">'+(fr?'Tous les quartiers':'كل الأحياء')+'</option>';
+    list.forEach(function(n){
+      var val = n.ar || n.fr || '';
+      opts += '<option value="'+esc(val)+'"'+(cur===val?' selected':'')+'>'+esc(fr ? (n.fr||n.ar) : (n.ar||n.fr))+'</option>';
+    });
+    sel.innerHTML = opts;
+    if(!cityId) state.quartier = '';
+  }
+
+  function syncGeoSelects(){
+    fillWilayaSelect();
+    fillCitySelect(state.wilaya);
+    fillQuartierSelect(state.wilaya, state.city);
   }
 
   /* وكالة واحدة لكل صفحة — مثل rizq_store / rizq_office / rizq_showroom */
@@ -1996,13 +2099,16 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     });
   });
 
-  document.getElementById('est-search').addEventListener('submit', function(e){
-    e.preventDefault();
-    state.q = document.getElementById('est-q').value || '';
-    state.city = document.getElementById('est-city').value || '';
+  function applySearchFormState(){
+    var w = document.getElementById('est-wilaya');
+    var c = document.getElementById('est-city');
+    var q = document.getElementById('est-quartier');
     var catSel = document.getElementById('est-cat');
+    state.wilaya = (w && w.value) || '';
+    state.city = (c && c.value) || '';
+    state.quartier = (q && q.value) || '';
     state.cat = (catSel && catSel.value) ? catSel.value : 'all';
-    state.deal = document.getElementById('est-deal').value || 'all';
+    state.deal = (document.getElementById('est-deal') && document.getElementById('est-deal').value) || 'all';
     document.querySelectorAll('.est-tab').forEach(function(b){
       var on = b.getAttribute('data-cat') === state.cat;
       b.classList.toggle('is-active', on);
@@ -2011,6 +2117,39 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     document.querySelectorAll('.est-deal button').forEach(function(b){
       b.classList.toggle('is-on', b.getAttribute('data-deal') === state.deal);
     });
+  }
+
+  var wilayaSel = document.getElementById('est-wilaya');
+  if(wilayaSel){
+    wilayaSel.addEventListener('change', function(){
+      state.wilaya = wilayaSel.value || '';
+      state.city = '';
+      state.quartier = '';
+      fillCitySelect(state.wilaya);
+      fillQuartierSelect(state.wilaya, '');
+      renderGrid();
+    });
+  }
+  var citySelEl = document.getElementById('est-city');
+  if(citySelEl){
+    citySelEl.addEventListener('change', function(){
+      state.city = citySelEl.value || '';
+      state.quartier = '';
+      fillQuartierSelect(state.wilaya, state.city);
+      renderGrid();
+    });
+  }
+  var quartierSel = document.getElementById('est-quartier');
+  if(quartierSel){
+    quartierSel.addEventListener('change', function(){
+      state.quartier = quartierSel.value || '';
+      renderGrid();
+    });
+  }
+
+  document.getElementById('est-search').addEventListener('submit', function(e){
+    e.preventDefault();
+    applySearchFormState();
     renderGrid();
     document.getElementById('est-listings').scrollIntoView({behavior:'smooth', block:'start'});
   });
@@ -2194,15 +2333,12 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     tx('a.est-pay', '💳 طرق الدفع', '💳 Paiement');
     tx('a.est-desk', '📩 استفسار', '📩 Demande');
     var labs = document.querySelectorAll('.est-search label > span');
-    if(labs[0]) labs[0].textContent = fr ? 'Mot-clé ou quartier' : 'الكلمة أو الحي';
-    if(labs[1]) labs[1].textContent = fr ? 'Zone' : 'المنطقة';
-    if(labs[2]) labs[2].textContent = fr ? 'Type de bien' : 'نوع العقار';
-    if(labs[3]) labs[3].textContent = fr ? 'Vente ou location' : 'للبيع أو الكراء';
-    ph('est-q', 'مثال: تفرغ زينة، فيلا، شقة تمليك', 'Ex. : Tevragh Zeina, villa, appart…');
-    var citySel = document.getElementById('est-city');
-    if(citySel && citySel.options[0] && !citySel.options[0].value){
-      citySel.options[0].textContent = fr ? 'Toutes les zones' : 'كل المناطق';
-    }
+    if(labs[0]) labs[0].textContent = fr ? 'Wilaya' : 'الولاية';
+    if(labs[1]) labs[1].textContent = fr ? 'Ville' : 'المدينة';
+    if(labs[2]) labs[2].textContent = fr ? 'Quartier' : 'الحي أو المنطقة';
+    if(labs[3]) labs[3].textContent = fr ? 'Type de bien' : 'نوع العقار';
+    if(labs[4]) labs[4].textContent = fr ? 'Vente ou location' : 'للبيع أو الكراء';
+    syncGeoSelects();
     var catSelLang = document.getElementById('est-cat');
     if(catSelLang && catSelLang.options){
       Array.prototype.forEach.call(catSelLang.options, function(opt){
