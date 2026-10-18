@@ -1382,7 +1382,12 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       if(!id || id === 'demo_estate' || !DEMO_AGENCIES[id]) id = 'demo_estate_atwar';
       window._rizqEstateIsDemo = true;
       applyAgency(DEMO_AGENCIES[id] || DEMO_AGENCIES.demo_estate_atwar);
-      try{ history.replaceState(null, '', 'rizq_estate.html?demo=1&id=' + encodeURIComponent(id)); }catch(e){}
+      try{
+        var demoQs = 'rizq_estate.html?demo=1&id=' + encodeURIComponent(id);
+        var keepOpen = params.get('open');
+        if(keepOpen) demoQs += '&open=' + encodeURIComponent(keepOpen);
+        history.replaceState(null, '', demoQs);
+      }catch(e){}
       return;
     }
     window._rizqEstateIsDemo = false;
