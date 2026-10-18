@@ -50,7 +50,7 @@ body.rizq-mockup-hdr-trial.rizq-page-light{
   background:#ffffff!important;
   max-width:1180px;margin:0 auto;padding:36px 20px 48px;position:relative;
 }
-.est-main-col,.est-content-grid,.est-side,.est-grid,.est-reviews,.est-toolbar{
+.est-main-col,.est-content-grid,.est-side,.est-grid,.est-reviews{
   background:#ffffff!important;
 }
 .est-section-head h2{color:var(--navy)!important}
@@ -384,30 +384,8 @@ button{font:inherit;border:0;background:none;color:inherit}
 .est-section-head h2{font-family:var(--display);font-size:clamp(26px,3.6vw,40px);font-weight:700;margin-bottom:8px;color:var(--navy)}
 .est-section-head p{color:#1e2a3a;font-size:16px;line-height:1.7;max-width:48ch;margin:0 auto;font-weight:700}
 
-.est-toolbar{
-  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;
-  margin:0 0 18px;
-}
-.est-tab,.est-deal button,.est-search-go,.est-search select{cursor:pointer!important}
-.est-tabs{display:flex;flex-wrap:wrap;gap:8px}
-.est-tab{
-  border:1px solid var(--border);background:#fff;
-  color:#3a4d63;border-radius:999px;padding:9px 15px;font:800 13px Cairo,sans-serif;
-  transition:all .2s;
-}
-.est-tab:hover{border-color:rgba(201,168,76,.45);color:var(--navy)}
-.est-tab.is-active{
-  background:linear-gradient(135deg,rgba(201,168,76,.22),rgba(201,168,76,.08));
-  border-color:rgba(201,168,76,.55);color:var(--navy);
-  box-shadow:0 0 0 3px rgba(201,168,76,.08);
-}
-.est-deal{display:flex;gap:6px;flex-wrap:wrap}
-.est-deal button{
-  border:1px solid var(--border);border-radius:999px;padding:8px 12px;
-  font:800 12px Cairo,sans-serif;color:#3a4d63;background:#fff;
-}
-.est-deal button.is-on{border-color:rgba(201,168,76,.55);color:var(--navy);background:rgba(201,168,76,.12)}
-.est-count{font:800 14px Cairo,sans-serif;color:#2f3c4d;min-height:1.2em}
+.est-search-go,.est-search select{cursor:pointer!important}
+.est-count{font:800 14px Cairo,sans-serif;color:#2f3c4d;min-height:1.2em;margin:0 0 14px}
 
 .est-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;min-height:120px}
 .est-card{
@@ -1022,20 +1000,6 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         </div>
       </div>
 
-      <div class="est-toolbar">
-        <div class="est-tabs" role="tablist" aria-label="نوع العقار">
-          <button type="button" class="est-tab is-active" data-cat="all" role="tab" aria-selected="true">الكل</button>
-          <button type="button" class="est-tab" data-cat="apartment" role="tab" aria-selected="false">شقق</button>
-          <button type="button" class="est-tab" data-cat="villa" role="tab" aria-selected="false">فلل ومنازل</button>
-          <button type="button" class="est-tab" data-cat="land" role="tab" aria-selected="false">أراضي</button>
-          <button type="button" class="est-tab" data-cat="shop" role="tab" aria-selected="false">محلات</button>
-        </div>
-        <div class="est-deal" role="group" aria-label="نوع الصفقة">
-          <button type="button" class="is-on" data-deal="all">الكل</button>
-          <button type="button" data-deal="sale">للبيع</button>
-          <button type="button" data-deal="rent">للكراء</button>
-        </div>
-      </div>
       <p class="est-count" id="est-count" aria-live="polite"></p>
       <div class="est-grid" id="est-grid"></div>
 
@@ -2276,31 +2240,6 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     if(!(modal && modal.classList.contains('is-open'))) document.body.style.overflow = '';
   }
 
-  document.querySelectorAll('.est-tab').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      state.cat = btn.getAttribute('data-cat') || 'all';
-      document.querySelectorAll('.est-tab').forEach(function(b){
-        var on = b===btn;
-        b.classList.toggle('is-active', on);
-        b.setAttribute('aria-selected', on ? 'true' : 'false');
-      });
-      var catBox = document.getElementById('est-cat');
-      if(catBox){ catBox.value = state.cat; syncEstDdFromSelect(catBox); }
-      renderGrid();
-    });
-  });
-  document.querySelectorAll('.est-deal button').forEach(function(btn){
-    btn.addEventListener('click', function(){
-      state.deal = btn.getAttribute('data-deal') || 'all';
-      document.querySelectorAll('.est-deal button').forEach(function(b){
-        b.classList.toggle('is-on', b===btn);
-      });
-      var sel = document.getElementById('est-deal');
-      if(sel){ sel.value = state.deal; syncEstDdFromSelect(sel); }
-      renderGrid();
-    });
-  });
-
   function applySearchFormState(){
     var w = document.getElementById('est-wilaya');
     var c = document.getElementById('est-city');
@@ -2311,14 +2250,6 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     state.quartier = (q && q.value) || '';
     state.cat = (catSel && catSel.value) ? catSel.value : 'all';
     state.deal = (document.getElementById('est-deal') && document.getElementById('est-deal').value) || 'all';
-    document.querySelectorAll('.est-tab').forEach(function(b){
-      var on = b.getAttribute('data-cat') === state.cat;
-      b.classList.toggle('is-active', on);
-      b.setAttribute('aria-selected', on ? 'true' : 'false');
-    });
-    document.querySelectorAll('.est-deal button').forEach(function(b){
-      b.classList.toggle('is-on', b.getAttribute('data-deal') === state.deal);
-    });
   }
 
   enhanceAllEstSearchSelects();
@@ -2360,11 +2291,6 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   if(catSelLive){
     catSelLive.addEventListener('change', function(){
       state.cat = catSelLive.value || 'all';
-      document.querySelectorAll('.est-tab').forEach(function(b){
-        var on = b.getAttribute('data-cat') === state.cat;
-        b.classList.toggle('is-active', on);
-        b.setAttribute('aria-selected', on ? 'true' : 'false');
-      });
       renderGrid();
     });
   }
@@ -2372,9 +2298,6 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   if(dealSelLive){
     dealSelLive.addEventListener('change', function(){
       state.deal = dealSelLive.value || 'all';
-      document.querySelectorAll('.est-deal button').forEach(function(b){
-        b.classList.toggle('is-on', b.getAttribute('data-deal') === state.deal);
-      });
       renderGrid();
     });
   }
@@ -2605,17 +2528,6 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         ? 'Appartements, villas, terrains et locaux — ouvrez « Voir les détails » pour la description et le contact.'
         : 'شقق وفلل وأراضي ومحلات — افتح أي عرض بزر «عرض التفاصيل» للاطلاع على الوصف والتواصل مع الوكالة.';
     }
-    var tabs = [['all','الكل','Tous'],['apartment','شقق','Appartements'],['villa','فلل ومنازل','Villas & maisons'],['land','أراضي','Terrains'],['shop','محلات','Locaux']];
-    tabs.forEach(function(row){
-      var b = document.querySelector('.est-tab[data-cat="'+row[0]+'"]');
-      if(b) b.textContent = fr ? row[2] : row[1];
-    });
-    document.querySelectorAll('.est-deal button').forEach(function(b){
-      var d = b.getAttribute('data-deal');
-      if(d === 'all') b.textContent = fr ? 'Tous' : 'الكل';
-      if(d === 'sale') b.textContent = fr ? 'À vendre' : 'للبيع';
-      if(d === 'rent') b.textContent = fr ? 'À louer' : 'للكراء';
-    });
     tx('#est-about-card .est-info-card-title', '📖 عن الوكالة', '📖 À propos');
     tx('#est-location-card .est-info-card-title', '📍 الموقع والتغطية', '📍 Lieu & couverture');
     tx('#est-hours-card .est-info-card-title', '🕐 ساعات العمل', '🕐 Horaires');
