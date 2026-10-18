@@ -13,7 +13,7 @@
 :root{
   --navy:#0B1C33;--navy2:#152A45;--ink:#ffffff;
   --gold:#C9A84C;--gold2:#B8923A;--gold3:#8A6B1F;
-  --text:#0B1C33;--muted:#526277;
+  --text:#0B1C33;--muted:#3d4a5c;
   --card:#ffffff;--line:rgba(201,168,76,.35);
   --display:'Amiri','Noto Naskh Arabic',serif;
   --soft:#F5F7FA;--border:rgba(27,58,107,.12);
@@ -92,12 +92,12 @@ button{font:inherit;border:0;background:none;color:inherit}
   font:900 14px Cairo,sans-serif;color:var(--navy);margin:0 0 6px;
   letter-spacing:.2px;
 }
-.est-svc-card .est-svc-sub{font-size:12.5px;color:var(--muted);line-height:1.65;margin:0 0 12px}
+.est-svc-card .est-svc-sub{font-size:14px;color:var(--muted);line-height:1.7;margin:0 0 12px}
 #est-payment-methods{min-height:0}
 #est-payment-methods,#est-payment-methods *{color:var(--navy)!important}
 #est-payment-methods strong,#est-payment-methods b,#est-payment-methods [dir="ltr"]{color:var(--navy)!important}
-#est-payment-methods > div:first-child{color:var(--navy)!important;font-weight:900!important}
-#est-payment-methods > div:nth-child(2){color:var(--muted)!important}
+#est-payment-methods > div:first-child{color:var(--navy)!important;font-weight:900!important;font-size:15px!important}
+#est-payment-methods > div:nth-child(2){color:var(--muted)!important;font-size:13.5px!important;line-height:1.65!important}
 #est-payment-methods > div[style*="background:#fff"],
 #est-payment-methods > div[style*="background: #fff"]{
   background:#ffffff!important;
@@ -107,9 +107,18 @@ button{font:inherit;border:0;background:none;color:inherit}
 #est-payment-methods [style*="color: #1B3A6B"]{color:var(--navy)!important}
 #est-payment-methods [style*="color:#0f2347"],
 #est-payment-methods [style*="color: #0f2347"]{color:var(--navy)!important}
+#est-payment-methods [style*="color:#6a7a8a"],
+#est-payment-methods [style*="color: #6a7a8a"],
+#est-payment-methods [style*="color:#4a5568"],
+#est-payment-methods [style*="color: #4a5568"]{color:#3a4d63!important}
+#est-payment-methods [style*="font-size:11px"]{font-size:13px!important;line-height:1.55!important}
+#est-payment-methods [style*="font-size:12px"]{font-size:13.5px!important;line-height:1.6!important}
+#est-payment-methods [style*="font-size:12.5px"]{font-size:15px!important;font-weight:800!important}
+#est-payment-methods [style*="font-size:13px"]{font-size:14.5px!important}
 #est-payment-methods [style*="background:#e8f0fe"],
 #est-payment-methods [style*="background: #e8f0fe"]{
-  background:#f3f6fb!important;color:var(--navy)!important;
+  background:#eef3fb!important;color:var(--navy)!important;
+  padding:5px 10px!important;border-radius:8px!important;
 }
 #est-payment-methods .rzq-pay-logo{border-color:var(--border)!important;background:#fff!important}
 .est-desk-fields{display:grid;gap:8px}
@@ -245,7 +254,7 @@ button{font:inherit;border:0;background:none;color:inherit}
 .est-section-head{margin:8px 0 18px;text-align:center}
 .est-section-head .tag{color:var(--gold2);font:800 12px Cairo,sans-serif;letter-spacing:.5px;margin-bottom:8px;display:inline-block}
 .est-section-head h2{font-family:var(--display);font-size:clamp(26px,3.6vw,40px);font-weight:700;margin-bottom:8px}
-.est-section-head p{color:var(--muted);font-size:15px;line-height:1.65;max-width:44ch;margin:0 auto}
+.est-section-head p{color:var(--muted);font-size:15.5px;line-height:1.7;max-width:48ch;margin:0 auto;font-weight:600}
 
 .est-toolbar{
   display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;
@@ -269,7 +278,7 @@ button{font:inherit;border:0;background:none;color:inherit}
   font:800 12px Cairo,sans-serif;color:#3a4d63;background:#fff;
 }
 .est-deal button.is-on{border-color:rgba(201,168,76,.55);color:var(--navy);background:rgba(201,168,76,.12)}
-.est-count{font:800 13px Cairo,sans-serif;color:var(--muted);min-height:1.2em}
+.est-count{font:800 14px Cairo,sans-serif;color:#2f3c4d;min-height:1.2em}
 
 .est-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;min-height:120px}
 .est-card{
@@ -324,12 +333,12 @@ button{font:inherit;border:0;background:none;color:inherit}
 .est-card-body{padding:15px 16px 16px}
 .est-card-body h3{font-size:16px;font-weight:900;margin-bottom:6px;line-height:1.35;color:var(--navy)}
 .est-card.featured .est-card-body h3{font-size:21px}
-.est-card-body .loc{color:#6a7a8a;font-size:13px;margin-bottom:10px}
+.est-card-body .loc{color:#2f3c4d;font-size:13.5px;font-weight:700;margin-bottom:10px}
 .est-meta{display:flex;flex-wrap:wrap;gap:7px}
 .est-meta span{
-  font-size:12px;font-weight:700;color:#3a4d63;
-  background:#f5f7fa;border:1px solid var(--border);
-  border-radius:999px;padding:5px 10px;
+  font-size:12.5px;font-weight:800;color:#1e2a3a;
+  background:#f0f3f8;border:1px solid #d5deea;
+  border-radius:999px;padding:6px 11px;
 }
 .est-empty{
   grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--muted);
@@ -351,7 +360,8 @@ button{font:inherit;border:0;background:none;color:inherit}
 /* معرض */
 .est-gallery-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:48px 0 16px;flex-wrap:wrap}
 .est-gallery-head h2{font-family:var(--display);font-size:clamp(24px,3.2vw,34px);font-weight:700;color:var(--navy)}
-.est-gallery-head p{color:var(--muted);font-size:14px}
+.est-gallery-head p{color:var(--muted);font-size:14.5px;font-weight:600;line-height:1.65}
+.est-rail figcaption{color:#2f3c4d!important;font-weight:700!important;font-size:13px!important}
 .est-rail-wrap{
   overflow:hidden;border-radius:22px;border:1px solid var(--border);
   background:#fff;box-shadow:0 8px 24px rgba(15,35,65,.06);
@@ -399,10 +409,10 @@ button{font:inherit;border:0;background:none;color:inherit}
 .est-foot h4{color:var(--gold2);font-size:14px;margin-bottom:12px}
 .est-foot a{display:block;color:#D7DEEA;text-decoration:none;font:700 13px Cairo,sans-serif;margin:0 0 8px}
 .est-foot a:hover{color:var(--gold2)}
-.est-foot p{color:var(--muted);font-size:13px;line-height:1.7;max-width:36ch}
+.est-foot p{color:#C8D4E4;font-size:14px;line-height:1.75;max-width:40ch;font-weight:600}
 .est-foot-bar{
   border-top:1px solid rgba(255,255,255,.06);text-align:center;
-  padding:16px 20px 28px;color:#A8B3C7;font-size:12px;
+  padding:16px 20px 28px;color:#B8C4D6;font-size:13px;
 }
 
 /* Modal / lightbox */
@@ -470,19 +480,19 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 }
 .est-info-row{display:flex;gap:10px;align-items:flex-start;margin:0 0 12px}
 .est-info-row .ico{font-size:16px;line-height:1.2;flex-shrink:0}
-.est-info-label{font-size:11px;color:#6a7a8a;margin-bottom:3px}
-.est-info-value{font-size:13px;font-weight:700;color:var(--navy);line-height:1.45}
+.est-info-label{font-size:12.5px;color:#3a4d63;margin-bottom:4px;font-weight:800}
+.est-info-value{font-size:14px;font-weight:700;color:var(--navy);line-height:1.55}
 .est-hours-row{
   display:flex;justify-content:space-between;align-items:center;gap:10px;
-  font-size:13px;padding:7px 0;border-bottom:1px solid rgba(27,58,107,.06);
+  font-size:13.5px;padding:8px 0;border-bottom:1px solid rgba(27,58,107,.1);
 }
 .est-hours-row:last-child{border-bottom:0}
-.est-hours-day{color:#6a7a8a}
-.est-hours-time{font-weight:700;color:var(--navy)}
-.est-hours-closed{font-weight:700;color:#c0392b}
+.est-hours-day{color:#2f3c4d;font-weight:700}
+.est-hours-time{font-weight:800;color:var(--navy)}
+.est-hours-closed{font-weight:800;color:#c0392b}
 .est-open-now{
-  margin-top:12px;padding:8px 12px;background:#f0faf3;border-radius:8px;
-  border:1px solid rgba(37,211,102,.25);color:#128C7E;font:700 12.5px Cairo,sans-serif;
+  margin-top:12px;padding:9px 12px;background:#f0faf3;border-radius:8px;
+  border:1px solid rgba(37,211,102,.25);color:#0f7a5c;font:800 13px Cairo,sans-serif;
 }
 .est-map-placeholder{
   margin-top:8px;height:150px;min-height:150px;border-radius:14px;border:1.5px dashed rgba(27,58,107,.18);
@@ -493,8 +503,8 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 .est-map-placeholder.has-map-preview{border-style:solid;padding:0}
 .est-map-placeholder:hover{border-color:rgba(201,168,76,.5);transform:translateY(-1px);box-shadow:0 8px 18px rgba(27,58,107,.08)}
 .est-map-placeholder .map-ico{font-size:22px}
-.est-map-placeholder .map-txt{font:800 13px Cairo,sans-serif;color:var(--navy)}
-.est-map-placeholder .map-addr{font-size:12px;color:#6a7a8a;max-width:95%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.est-map-placeholder .map-txt{font:800 14px Cairo,sans-serif;color:var(--navy)}
+.est-map-placeholder .map-addr{font-size:13px;color:#2f3c4d;font-weight:700;max-width:95%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(max-width:980px){
   .est-content-grid,html[dir="rtl"] .est-content-grid{grid-template-columns:1fr}
   .est-side{position:static}
@@ -510,40 +520,41 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 }
 .est-hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
 .est-hero-meta span{
-  display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:999px;
-  background:rgba(11,28,51,.55);border:1px solid rgba(255,255,255,.14);
-  color:#F4F7FC;font:700 12px Cairo,sans-serif;backdrop-filter:blur(8px);
+  display:inline-flex;align-items:center;gap:4px;padding:7px 12px;border-radius:999px;
+  background:rgba(11,28,51,.62);border:1px solid rgba(255,255,255,.22);
+  color:#FFFFFF;font:800 13px Cairo,sans-serif;backdrop-filter:blur(8px);
+  text-shadow:0 1px 2px rgba(0,0,0,.35);
 }
 .est-badge-verified{background:rgba(22,163,74,.18)!important;border-color:rgba(22,163,74,.45)!important;color:#bbf7d0!important}
 .est-btn-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:0}
 .est-coverage{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
 .est-coverage span{
-  font:700 11.5px Cairo,sans-serif;padding:5px 10px;border-radius:999px;
-  background:#f3f6fb;border:1px solid var(--border);color:var(--navy);
+  font:800 12.5px Cairo,sans-serif;padding:6px 11px;border-radius:999px;
+  background:#eef3fb;border:1px solid #d5deea;color:var(--navy);
 }
 .est-card-cta{
   margin-top:12px;display:inline-flex;align-items:center;justify-content:center;
-  width:100%;padding:10px 12px;border-radius:10px;
+  width:100%;padding:11px 12px;border-radius:10px;
   background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0B1C33;
-  font:800 12.5px Cairo,sans-serif;border:0;
+  font:800 13.5px Cairo,sans-serif;border:0;
 }
 .est-reviews-summary{
   display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:0 0 14px;
   padding:14px 16px;border-radius:14px;background:#fff;border:1px solid var(--border);
 }
 .est-reviews-score b{font-size:28px;color:var(--navy);margin-inline-end:4px}
-.est-reviews-score span{color:var(--muted);font-size:13px}
+.est-reviews-score span{color:#2f3c4d;font-size:14px;font-weight:700}
 .est-reviews-stars{color:#C9A84C;letter-spacing:2px;font-size:18px}
-.est-reviews-count{color:var(--muted);font:700 13px Cairo,sans-serif}
+.est-reviews-count{color:#2f3c4d;font:800 14px Cairo,sans-serif}
 .est-reviews-list{display:grid;gap:10px}
 .est-review-card{
   background:#fff;border:1px solid var(--border);border-radius:14px;padding:14px 16px;
   box-shadow:0 4px 14px rgba(15,35,65,.04);
 }
-.est-review-card .who{font:800 13.5px Cairo,sans-serif;color:var(--navy)}
-.est-review-card .stars{color:#C9A84C;font-size:13px;margin:4px 0 6px}
-.est-review-card .txt{color:#4a5364;font-size:13px;line-height:1.65}
-.est-review-card .when{color:#8a97a8;font-size:11.5px;margin-top:8px}
+.est-review-card .who{font:800 14.5px Cairo,sans-serif;color:var(--navy)}
+.est-review-card .stars{color:#C9A84C;font-size:14px;margin:4px 0 6px}
+.est-review-card .txt{color:#1e2a3a;font-size:14px;line-height:1.7;font-weight:600}
+.est-review-card .when{color:#3a4d63;font-size:12.5px;font-weight:700;margin-top:8px}
 #est-hero-name{font-family:var(--display);font-size:clamp(32px,5vw,52px);font-weight:700;line-height:1.15;margin:6px 0 8px;color:#fff;text-shadow:0 8px 28px rgba(0,0,0,.45)}
 
 </style>
@@ -599,7 +610,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     <form class="est-search" id="est-search" role="search" aria-label="بحث العقارات">
       <label>
         <span>الكلمة أو الحي</span>
-        <input type="search" id="est-q" name="q" placeholder="مثال: تفرغ زينة، فيلا، شقة تمليك…" autocomplete="off"/>
+        <input type="search" id="est-q" name="q" placeholder="ابحث بالحي أو نوع العقار — مثال: تفرغ زينة، فيلا، شقة تمليك" autocomplete="off"/>
       </label>
       <label>
         <span>المنطقة</span>
@@ -646,7 +657,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     <aside class="est-side" id="est-side" aria-label="معلومات الوكالة">
       <div class="est-info-card" id="est-about-card">
         <div class="est-info-card-title">📖 عن الوكالة</div>
-        <div class="est-info-value" id="est-side-about" style="font-weight:600;color:#4a5364;line-height:1.75">نرافقك في البيع والكراء والمعاينة — فريق محلي يعرف أحياء نواكشوط ووثائق العقار.</div>
+        <div class="est-info-value" id="est-side-about" style="font-weight:700;color:#1e2a3a;line-height:1.75;font-size:14px">نرافقك في البيع والكراء والمعاينة — فريق محلي يعرف أحياء نواكشوط ووثائق العقار.</div>
       </div>
 
       <div class="est-info-card" id="est-location-card">
@@ -699,7 +710,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 
       <div class="est-info-card" id="est-pay-card">
         <div class="est-info-card-title">💳 طرق الدفع والتحويل</div>
-        <p class="est-svc-sub" style="margin:0 0 10px">ادفع مباشرة للوكالة عبر الوسائل التالية:</p>
+        <p class="est-svc-sub" style="margin:0 0 10px">حوّل مباشرة لحساب الوكالة عبر Bankily أو Masrivi أو تحويل بنكي أو نقداً في المكتب:</p>
         <div class="est-meta-row" id="est-contact-meta" hidden>
           <span>📍 <strong id="est-addr-lbl">—</strong></span>
           <span>✉️ <strong id="est-email-lbl">—</strong></span>
@@ -712,7 +723,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       <div class="est-section-head" id="est-listings">
         <div class="tag">معروضات الوكالة</div>
         <h2>عقارات للبيع والكراء</h2>
-        <p>شقق، فلل، أراضي ومحلات — اختر عرضاً لعرض التفاصيل.</p>
+        <p>شقق وفلل وأراضي ومحلات — افتح أي عرض بزر «عرض التفاصيل» للاطلاع على الوصف والتواصل مع الوكالة.</p>
       </div>
 
       <div class="est-toolbar">
@@ -735,7 +746,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       <div class="est-gallery-head" id="est-gallery">
         <div>
           <h2>معرض الصور</h2>
-          <p>صور من معروضات الوكالة ومكتب الاستقبال.</p>
+          <p>صور من عقارات الوكالة ومكتب الاستقبال في تفرغ زينة.</p>
         </div>
       </div>
       <div class="est-rail-wrap">
@@ -746,7 +757,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         <div class="est-section-head" style="text-align:start;margin-top:28px">
           <div class="tag">آراء العملاء</div>
           <h2>التقييمات والآراء</h2>
-          <p>ما يقوله من تعامل مع الوكالة.</p>
+          <p>آراء عملاء تعاملوا مع الوكالة في البيع والكراء والمعاينة.</p>
         </div>
         <div class="est-reviews-summary">
           <div class="est-reviews-score"><b id="est-rev-avg">4.8</b><span>من 5</span></div>
@@ -768,7 +779,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
             <option value="rent">استفسار كراء</option>
             <option value="other">طلب آخر</option>
           </select>
-          <textarea id="est-rf-msg" name="message" placeholder="صف العقار أو الحي أو ميزانيتك…"></textarea>
+          <textarea id="est-rf-msg" name="message" placeholder="اكتب تفاصيل طلبك: الحي، نوع العقار، عدد الغرف، أو ميزانيتك"></textarea>
           <div class="est-desk-actions">
             <button type="submit" class="est-desk-go" id="est-desk-submit">إرسال الاستفسار</button>
             <a class="est-desk-wa" id="est-desk-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب الوكالة</a>
@@ -823,10 +834,10 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     <div class="est-modal-body">
       <div class="est-badge" id="est-modal-badge" style="position:static;display:inline-flex;margin-bottom:8px"></div>
       <h3 id="est-modal-title"></h3>
-      <div class="loc" id="est-modal-loc" style="color:var(--muted);margin-bottom:6px"></div>
+      <div class="loc" id="est-modal-loc" style="color:#2f3c4d;font-weight:700;margin-bottom:6px"></div>
       <div class="est-modal-price" id="est-modal-price"></div>
       <div class="est-meta" id="est-modal-meta"></div>
-      <p id="est-modal-desc" style="color:var(--muted);line-height:1.75;margin-top:14px"></p>
+      <p id="est-modal-desc" style="color:#1e2a3a;line-height:1.75;margin-top:14px;font-weight:600;font-size:14.5px"></p>
       <div class="est-modal-actions">
         <a class="est-btn est-call" id="est-modal-call" href="tel:+22242000111" dir="ltr">📞 اتصل بالوكالة</a>
         <a class="est-btn est-wa" id="est-modal-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب الوكالة</a>
@@ -909,12 +920,12 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   ];
 
   var GALLERY = [
-    {img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80', cap:'صالة استقبال فسيحة'},
-    {img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80', cap:'واجهة فيلا ليلية'},
-    {img:'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=80', cap:'مطبخ عصري مفتوح'},
-    {img:'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1200&q=80', cap:'غرفة نوم رئيسية'},
+    {img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80', cap:'صالة استقبال المكتب — تفرغ زينة'},
+    {img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80', cap:'واجهة فيلا معروضة للبيع'},
+    {img:'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=80', cap:'مطبخ مفتوح داخل شقة تمليك'},
+    {img:'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1200&q=80', cap:'غرفة نوم رئيسية — شقة فاخرة'},
     {img:'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80', cap:'تراس بإطلالة مفتوحة'},
-    {img:'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=1200&q=80', cap:'حمام بتشطيب فاخر'}
+    {img:'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=1200&q=80', cap:'حمّام بتشطيب حديث'}
   ];
 
   var state = { cat:'all', deal:'all', q:'', city:'' };
@@ -944,11 +955,11 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 
   /* وكالة واحدة لكل صفحة — مثل rizq_store / rizq_office / rizq_showroom */
   var DEMO_PAY = [
-    { type: 'bankily', bank: 'Bankily', code: '42000111', phone: '+22242000111', note: 'اذكر اسمك ورقم العرض بعد التحويل' },
-    { type: 'masrivi', bank: 'Masrivi', code: '42000111', phone: '+22242000111', note: 'تحويل مباشر باسم الوكالة' },
-    { type: 'sedad', bank: 'Sedad', code: '420011', phone: '+22242000111' },
-    { type: 'bank', bank: 'BCI', account: 'MR13 0001 4200 0111 0000 0000 000', note: 'تحويل بنكي — عربون أو أتعاب' },
-    { type: 'cash', bank: 'نقداً في المكتب', note: 'الدفع عند توقيع العقد في مقر الوكالة' }
+    { type: 'bankily', bank: 'Bankily', code: '42000111', phone: '+22242000111', note: 'بعد التحويل أرسل اسمك ورقم العرض على واتساب الوكالة' },
+    { type: 'masrivi', bank: 'Masrivi', code: '42000111', phone: '+22242000111', note: 'حوّل باسم وكالة أطوار العقارية ثم أكّد عبر واتساب' },
+    { type: 'sedad', bank: 'Sedad', code: '420011', phone: '+22242000111', note: 'رمز Sedad للوكالة — أكّد الدفع برسالة' },
+    { type: 'bank', bank: 'BCI', account: 'MR13 0001 4200 0111 0000 0000 000', note: 'تحويل بنكي لعربون أو أتعاب الوكالة' },
+    { type: 'cash', bank: 'نقداً في المكتب', note: 'الدفع نقداً عند توقيع العقد في مقر الوكالة بتفرغ زينة' }
   ];
   var DEMO_DESK = {
     enabled: true,
@@ -1063,8 +1074,8 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         var kids = box.children;
         if(kids && kids[0]) kids[0].textContent = fr ? '💳 Moyens de paiement' : '💳 طرق الدفع المتاحة';
         if(kids && kids[1]) kids[1].textContent = fr
-          ? 'Payez directement l\'agence via Bankily, Masrivi, virement ou espèces.'
-          : 'ادفع مباشرة للوكالة عبر Bankily أو Masrivi أو تحويل بنكي أو نقداً.';
+          ? 'Payez l\'agence via Bankily, Masrivi, virement bancaire ou espèces au bureau.'
+          : 'حوّل لحساب الوكالة عبر Bankily أو Masrivi أو تحويل بنكي، أو ادفع نقداً في المكتب.';
         return true;
       }
       return false;
@@ -1309,6 +1320,25 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     return item.img ? [item.img] : [];
   }
 
+  function specText(kind, val, fr){
+    var empty = !val || val === '—' || val === '-';
+    if(kind === 'beds'){
+      if(empty) return fr ? 'Chambres: —' : 'غرف: —';
+      return fr ? (val + ' chambres') : (val + ' غرف');
+    }
+    if(kind === 'baths'){
+      if(empty) return fr ? 'Salles de bain: —' : 'حمّامات: —';
+      return fr ? (val + ' sdb') : (val + ' حمّام');
+    }
+    if(kind === 'area'){
+      if(empty) return fr ? 'Surface: —' : 'المساحة: —';
+      var area = String(val);
+      if(/م²|m²|m2/i.test(area)) return fr ? ('Surface ' + area.replace(/م²/g,'m²')) : ('المساحة ' + area);
+      return fr ? ('Surface ' + area) : ('المساحة ' + area);
+    }
+    return String(val || '—');
+  }
+
   function cardHTML(item){
     var fr = isFrEstate();
     var imgs = listingImgs(item);
@@ -1342,11 +1372,11 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       + '<button type="button" class="est-card-open" data-id="'+esc(item.id)+'" aria-label="'+(fr?'Détails: ':'التفاصيل: ')+esc(item.title)+'" style="display:block;width:100%;text-align:inherit;background:transparent;border:0;padding:0;color:inherit;cursor:pointer">'
       + '<div class="est-card-body">'
       +   '<h3>'+esc(item.title)+'</h3>'
-      +   '<div class="loc">📍 '+esc(item.loc)+'</div>'
+      +   '<div class="loc">📍 '+(fr?'Quartier: ':'الحي: ')+esc(item.loc)+'</div>'
       +   '<div class="est-meta">'
-      +     '<span>🛏 '+esc(item.beds)+'</span>'
-      +     '<span>🛁 '+esc(item.baths)+'</span>'
-      +     '<span>📐 '+esc(item.area)+'</span>'
+      +     '<span title="'+(fr?'Chambres':'عدد الغرف')+'">🛏 '+esc(specText('beds', item.beds, fr))+'</span>'
+      +     '<span title="'+(fr?'Salles de bain':'عدد الحمّامات')+'">🛁 '+esc(specText('baths', item.baths, fr))+'</span>'
+      +     '<span title="'+(fr?'Surface':'المساحة')+'">📐 '+esc(specText('area', item.area, fr))+'</span>'
       +   '</div>'
       +   '<span class="est-card-cta">'+(fr?'Voir les détails':'عرض التفاصيل')+'</span>'
       + '</div></button>'
@@ -1393,12 +1423,15 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     document.getElementById('est-modal-img').src = item.img;
     document.getElementById('est-modal-img').alt = item.title;
     document.getElementById('est-modal-title').textContent = item.title;
-    document.getElementById('est-modal-loc').textContent = '📍 '+item.loc;
+    var frModal = isFrEstate();
+    document.getElementById('est-modal-loc').textContent = '📍 '+(frModal?'Quartier: ':'الحي: ')+item.loc;
     document.getElementById('est-modal-price').textContent = item.price;
     document.getElementById('est-modal-badge').textContent = item.badge;
     document.getElementById('est-modal-desc').textContent = item.desc;
     document.getElementById('est-modal-meta').innerHTML =
-      '<span>🛏 '+esc(item.beds)+'</span><span>🛁 '+esc(item.baths)+'</span><span>📐 '+esc(item.area)+'</span>';
+      '<span>🛏 '+esc(specText('beds', item.beds, frModal))+'</span>'
+      + '<span>🛁 '+esc(specText('baths', item.baths, frModal))+'</span>'
+      + '<span>📐 '+esc(specText('area', item.area, frModal))+'</span>';
     modal.hidden = false;
     modal.classList.add('is-open');
     document.body.style.overflow = 'hidden';
@@ -1533,7 +1566,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     if(labs[0]) labs[0].textContent = fr ? 'Mot-clé ou quartier' : 'الكلمة أو الحي';
     if(labs[1]) labs[1].textContent = fr ? 'Zone' : 'المنطقة';
     if(labs[2]) labs[2].textContent = fr ? 'Type d\'offre' : 'نوع العرض';
-    ph('est-q', 'مثال: تفرغ زينة، فيلا، شقة تمليك…', 'Ex. : Tevragh Zeina, villa, appart…');
+    ph('est-q', 'ابحث بالحي أو نوع العقار — مثال: تفرغ زينة، فيلا، شقة تمليك', 'Cherchez un quartier ou un type — ex. : Tevragh Zeina, villa…');
     var sels = document.querySelectorAll('.est-search select');
     if(sels[0] && sels[0].options[0] && !sels[0].options[0].value) sels[0].options[0].textContent = fr ? 'Toutes les zones' : 'كل المناطق';
     if(sels[1] && sels[1].options){
@@ -1551,7 +1584,9 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       var p = listHead.querySelector('p');
       if(tag) tag.textContent = fr ? 'Annonces de l\'agence' : 'معروضات الوكالة';
       if(h2) h2.textContent = fr ? 'Biens à vendre et à louer' : 'عقارات للبيع والكراء';
-      if(p) p.textContent = fr ? 'Appartements, villas, terrains et locaux — ouvrez les détails.' : 'شقق، فلل، أراضي ومحلات — اختر عرضاً لعرض التفاصيل.';
+      if(p) p.textContent = fr
+        ? 'Appartements, villas, terrains et locaux — ouvrez « Voir les détails » pour la description et le contact.'
+        : 'شقق وفلل وأراضي ومحلات — افتح أي عرض بزر «عرض التفاصيل» للاطلاع على الوصف والتواصل مع الوكالة.';
     }
     var tabs = [['all','الكل','Tous'],['apartment','شقق','Appartements'],['villa','فلل ومنازل','Villas & maisons'],['land','أراضي','Terrains'],['shop','محلات','Locaux']];
     tabs.forEach(function(row){
@@ -1571,19 +1606,27 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     var galH = document.querySelector('.est-gallery-head h2');
     var galP = document.querySelector('.est-gallery-head p');
     if(galH) galH.textContent = fr ? 'Galerie photos' : 'معرض الصور';
-    if(galP) galP.textContent = fr ? 'Photos des biens et de l\'agence.' : 'صور من معروضات الوكالة ومكتب الاستقبال.';
+    if(galP) galP.textContent = fr
+      ? 'Photos des biens et du bureau d\'accueil à Tevragh Zeina.'
+      : 'صور من عقارات الوكالة ومكتب الاستقبال في تفرغ زينة.';
     var revHead = document.querySelector('#est-reviews .est-section-head');
     if(revHead){
       var rt = revHead.querySelector('.tag'); var rh = revHead.querySelector('h2'); var rp = revHead.querySelector('p');
       if(rt) rt.textContent = fr ? 'Avis clients' : 'آراء العملاء';
       if(rh) rh.textContent = fr ? 'Notes et commentaires' : 'التقييمات والآراء';
-      if(rp) rp.textContent = fr ? 'Ce que disent les clients de l\'agence.' : 'ما يقوله من تعامل مع الوكالة.';
+      if(rp) rp.textContent = fr
+        ? 'Avis de clients ayant traité avec l\'agence (vente, location, visite).'
+        : 'آراء عملاء تعاملوا مع الوكالة في البيع والكراء والمعاينة.';
     }
+    var paySub = document.querySelector('#est-pay-card > .est-svc-sub');
+    if(paySub) paySub.textContent = fr
+      ? 'Payez l\'agence via Bankily, Masrivi, virement bancaire ou espèces au bureau :'
+      : 'حوّل مباشرة لحساب الوكالة عبر Bankily أو Masrivi أو تحويل بنكي أو نقداً في المكتب:';
     tx('#est-desk-submit', 'إرسال الاستفسار', 'Envoyer la demande');
     tx('#est-desk-wa', '💬 واتساب الوكالة', '💬 WhatsApp agence');
     ph('est-rf-name', 'الاسم الكامل *', 'Nom complet *');
     ph('est-rf-phone', 'رقم الهاتف / واتساب *', 'Téléphone / WhatsApp *');
-    ph('est-rf-msg', 'صف العقار أو الحي أو ميزانيتك…', 'Décrivez le bien, le quartier ou votre budget…');
+    ph('est-rf-msg', 'اكتب تفاصيل طلبك: الحي، نوع العقار، عدد الغرف، أو ميزانيتك', 'Détails : quartier, type de bien, chambres ou budget');
     var interest = document.getElementById('est-rf-interest');
     if(interest && interest.options.length >= 4){
       interest.options[0].textContent = fr ? 'Demande de visite' : 'طلب معاينة';
