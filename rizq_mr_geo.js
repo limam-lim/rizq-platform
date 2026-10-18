@@ -1,8 +1,8 @@
 /**
  * rizq_mr_geo.js — التقسيم الإداري لموريتانيا للبحث العقاري
- * الولاية → المدينة (مقاطعة) → الحي/المنطقة (بلدية + أحياء معروفة)
- * المصدر: openadmindata.org (15 ولاية / 63 مقاطعة / 238 بلدية) + تسميات عربية
- * وأحياء المدن الرئيسية من مصادر محلية / خرائط (مثل ازويرات وأطار).
+ * الولاية → المدينة (مقاطعة) → الحي/المنطقة
+ * المصدر: openadmindata.org + أحياء حضرية معروفة
+ * + أحياء/مواقع مخصصة من داشبورد سوق العقارات (localStorage).
  */
 (function (global) {
   'use strict';
@@ -43,7 +43,7 @@
           "neighborhoods": [
             {
               "ar": "السبخة",
-              "fr": "السبخة"
+              "fr": "Sebkha"
             },
             {
               "ar": "حي السبخة",
@@ -51,11 +51,39 @@
             },
             {
               "ar": "حي الميناء الغربي",
-              "fr": "Port ouest"
+              "fr": "حي الميناء الغربي"
+            },
+            {
+              "ar": "لبتار",
+              "fr": "لبتار"
+            },
+            {
+              "ar": "حي الرياض الغربي",
+              "fr": "حي الرياض الغربي"
             },
             {
               "ar": "حي لبتار",
               "fr": "Lebtar"
+            },
+            {
+              "ar": "السبخة المركز",
+              "fr": "Sebkha Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -66,7 +94,7 @@
           "neighborhoods": [
             {
               "ar": "لكصر",
-              "fr": "لكصر"
+              "fr": "Ksar"
             },
             {
               "ar": "لكصر المركزي",
@@ -83,6 +111,34 @@
             {
               "ar": "سوق لكصر",
               "fr": "سوق لكصر"
+            },
+            {
+              "ar": "حي السلام",
+              "fr": "حي السلام"
+            },
+            {
+              "ar": "حي السعادة",
+              "fr": "حي السعادة"
+            },
+            {
+              "ar": "لكصر المركز",
+              "fr": "Ksar Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -97,27 +153,55 @@
             },
             {
               "ar": "حي الدبلوماسيين",
-              "fr": "Quartier des Diplomates"
+              "fr": "حي الدبلوماسيين"
             },
             {
               "ar": "حي المرابطين",
-              "fr": "Al Mourabitine"
+              "fr": "حي المرابطين"
             },
             {
               "ar": "حي السعادة",
-              "fr": "Assaada"
+              "fr": "حي السعادة"
             },
             {
               "ar": "قرب دوار تفرغ زينة",
-              "fr": "Près du rond-point Tevragh Zeina"
+              "fr": "قرب دوار تفرغ زينة"
             },
             {
               "ar": "حي راقٍ — تفرغ زينة",
-              "fr": "Quartier résidentiel Tevragh Zeina"
+              "fr": "حي راقٍ — تفرغ زينة"
             },
             {
               "ar": "القطب",
-              "fr": "El Koutb"
+              "fr": "القطب"
+            },
+            {
+              "ar": "سكال",
+              "fr": "سكال"
+            },
+            {
+              "ar": "حي النصر",
+              "fr": "حي النصر"
+            },
+            {
+              "ar": "تفرغ زينة المركز",
+              "fr": "Tevragh Zeina Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         }
@@ -134,16 +218,48 @@
           "fr": "Toujounine",
           "neighborhoods": [
             {
-              "ar": "تيارت",
-              "fr": "Teyaret"
-            },
-            {
               "ar": "توجنين",
-              "fr": "توجنين"
+              "fr": "Toujounine"
             },
             {
               "ar": "حي توجنين",
               "fr": "حي توجنين"
+            },
+            {
+              "ar": "حي السلام",
+              "fr": "حي السلام"
+            },
+            {
+              "ar": "حي الازدهار",
+              "fr": "حي الازدهار"
+            },
+            {
+              "ar": "حي النور",
+              "fr": "حي النور"
+            },
+            {
+              "ar": "تيارت",
+              "fr": "Teyaret"
+            },
+            {
+              "ar": "توجنين المركز",
+              "fr": "Toujounine Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -154,15 +270,43 @@
           "neighborhoods": [
             {
               "ar": "دار النعيم",
-              "fr": "Dar Naim"
-            },
-            {
-              "ar": "دار النعيم",
-              "fr": "دار النعيم"
+              "fr": "Dar Naïm"
             },
             {
               "ar": "حي دار النعيم",
               "fr": "حي دار النعيم"
+            },
+            {
+              "ar": "حي الصداقة",
+              "fr": "حي الصداقة"
+            },
+            {
+              "ar": "حي الكويت",
+              "fr": "حي الكويت"
+            },
+            {
+              "ar": "حي النصر",
+              "fr": "حي النصر"
+            },
+            {
+              "ar": "دار النعيم المركز",
+              "fr": "Dar Naïm Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -172,16 +316,44 @@
           "fr": "Teyarett",
           "neighborhoods": [
             {
-              "ar": "توجنين",
-              "fr": "توجنين"
-            },
-            {
               "ar": "تيارت",
-              "fr": "تيارت"
+              "fr": "Teyarett"
             },
             {
               "ar": "حي تيارت",
               "fr": "حي تيارت"
+            },
+            {
+              "ar": "حي المطار",
+              "fr": "حي المطار"
+            },
+            {
+              "ar": "حي الصناعة",
+              "fr": "حي الصناعة"
+            },
+            {
+              "ar": "توجنين",
+              "fr": "توجنين"
+            },
+            {
+              "ar": "تيارت المركز",
+              "fr": "Teyarett Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         }
@@ -199,7 +371,7 @@
           "neighborhoods": [
             {
               "ar": "عرفات",
-              "fr": "عرفات"
+              "fr": "Arafat"
             },
             {
               "ar": "حي عرفات",
@@ -207,11 +379,35 @@
             },
             {
               "ar": "حي الصداقة",
-              "fr": "Hay Sadaqa"
+              "fr": "حي الصداقة"
             },
             {
               "ar": "حي الكويت",
-              "fr": "Hay Kuwait"
+              "fr": "حي الكويت"
+            },
+            {
+              "ar": "حي 5 كيلومتر",
+              "fr": "حي 5 كيلومتر"
+            },
+            {
+              "ar": "عرفات المركز",
+              "fr": "Arafat Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -222,15 +418,43 @@
           "neighborhoods": [
             {
               "ar": "الميناء",
-              "fr": "الميناء"
+              "fr": "El Mina"
             },
             {
               "ar": "سوق العاصمة",
               "fr": "سوق العاصمة"
             },
             {
+              "ar": "حي الميناء",
+              "fr": "حي الميناء"
+            },
+            {
               "ar": "حي الصيادين",
-              "fr": "Quartier des pêcheurs"
+              "fr": "حي الصيادين"
+            },
+            {
+              "ar": "الكورنيش",
+              "fr": "الكورنيش"
+            },
+            {
+              "ar": "الميناء المركز",
+              "fr": "El Mina Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -241,7 +465,43 @@
           "neighborhoods": [
             {
               "ar": "الرياض",
-              "fr": "الرياض"
+              "fr": "Riad"
+            },
+            {
+              "ar": "حي الرياض",
+              "fr": "حي الرياض"
+            },
+            {
+              "ar": "الرياض الشمالي",
+              "fr": "الرياض الشمالي"
+            },
+            {
+              "ar": "الرياض الجنوبي",
+              "fr": "الرياض الجنوبي"
+            },
+            {
+              "ar": "حي السلام",
+              "fr": "حي السلام"
+            },
+            {
+              "ar": "الرياض المركز",
+              "fr": "Riad Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         }
@@ -259,15 +519,55 @@
           "neighborhoods": [
             {
               "ar": "نواذيبو",
-              "fr": "نواذيبو"
+              "fr": "Nouadhibou"
+            },
+            {
+              "ar": "الميناء",
+              "fr": "الميناء"
+            },
+            {
+              "ar": "حي المطار",
+              "fr": "حي المطار"
+            },
+            {
+              "ar": "كراع النصراني",
+              "fr": "كراع النصراني"
+            },
+            {
+              "ar": "حي الصيادين",
+              "fr": "حي الصيادين"
+            },
+            {
+              "ar": "حي العمال",
+              "fr": "حي العمال"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "الحي الإداري"
             },
             {
               "ar": "بولنوار",
-              "fr": "Boulenouar"
+              "fr": "بولنوار"
             },
             {
               "ar": "إينال",
-              "fr": "Inal"
+              "fr": "إينال"
+            },
+            {
+              "ar": "نواذيبو المركز",
+              "fr": "Nouadhibou Centre"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -278,15 +578,39 @@
           "neighborhoods": [
             {
               "ar": "الشامي",
-              "fr": "الشامي"
+              "fr": "Chami"
             },
             {
               "ar": "تميميشات",
-              "fr": "Tmeimichat"
+              "fr": "تميميشات"
             },
             {
               "ar": "انوامغار",
-              "fr": "Nouamghar"
+              "fr": "انوامغار"
+            },
+            {
+              "ar": "المركز",
+              "fr": "المركز"
+            },
+            {
+              "ar": "الشامي المركز",
+              "fr": "Chami Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         }
@@ -321,6 +645,26 @@
             {
               "ar": "لكصبة 2",
               "fr": "Lexelbe 2"
+            },
+            {
+              "ar": "تكانه المركز",
+              "fr": "Tekane Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -331,7 +675,7 @@
           "neighborhoods": [
             {
               "ar": "بوتلميت",
-              "fr": "بوتلميت"
+              "fr": "Boutilimit"
             },
             {
               "ar": "الب ادريس",
@@ -356,6 +700,26 @@
             {
               "ar": "الميسر",
               "fr": "El Mouyessar"
+            },
+            {
+              "ar": "بوتلميت المركز",
+              "fr": "Boutilimit Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -369,16 +733,32 @@
               "fr": "Keur Macen"
             },
             {
-              "ar": "كرمسين",
-              "fr": "Keurmacen"
-            },
-            {
               "ar": "انذياگو",
               "fr": "N'Diago"
             },
             {
               "ar": "امبلال",
               "fr": "M'Balal"
+            },
+            {
+              "ar": "كرمسين المركز",
+              "fr": "Keur Macen Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -389,7 +769,7 @@
           "neighborhoods": [
             {
               "ar": "واد الناقة",
-              "fr": "واد الناقة"
+              "fr": "Ouad Naga"
             },
             {
               "ar": "أولييگات",
@@ -398,6 +778,26 @@
             {
               "ar": "العارية",
               "fr": "El Ariye"
+            },
+            {
+              "ar": "واد الناقة المركز",
+              "fr": "Ouad Naga Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -425,6 +825,26 @@
             {
               "ar": "تيگنت (الجديد)",
               "fr": "Tiguent (El Jedide)"
+            },
+            {
+              "ar": "المذرذرة المركز",
+              "fr": "Mederdra Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -435,7 +855,11 @@
           "neighborhoods": [
             {
               "ar": "الركيز",
-              "fr": "الركيز"
+              "fr": "R'Kiz"
+            },
+            {
+              "ar": "اركيز",
+              "fr": "R'Kiz"
             },
             {
               "ar": "بوطلحية",
@@ -444,6 +868,26 @@
             {
               "ar": "بارين",
               "fr": "Bareine"
+            },
+            {
+              "ar": "الركيز المركز",
+              "fr": "R'Kiz Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -454,23 +898,39 @@
           "neighborhoods": [
             {
               "ar": "روصو",
-              "fr": "روصو"
+              "fr": "Rosso"
+            },
+            {
+              "ar": "روصو المركز",
+              "fr": "روصو المركز"
             },
             {
               "ar": "جدل الموقن",
-              "fr": "Jedrel Mouhguen"
-            },
-            {
-              "ar": "جدل الموقن",
-              "fr": "Jedrel Mouhguen"
+              "fr": "جدل الموقن"
             },
             {
               "ar": "حي السوق",
-              "fr": "Quartier du marché"
+              "fr": "حي السوق"
             },
             {
               "ar": "حي الكورنيش",
-              "fr": "Corniche"
+              "fr": "حي الكورنيش"
+            },
+            {
+              "ar": "حي الإدارة",
+              "fr": "حي الإدارة"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         }
@@ -501,6 +961,26 @@
             {
               "ar": "واد عمور",
               "fr": "Ouad Emmour"
+            },
+            {
+              "ar": "مقطع لحجار المركز",
+              "fr": "Magtalahjar Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -520,6 +1000,26 @@
             {
               "ar": "آيريه امبار",
               "fr": "Aéré M'Bar"
+            },
+            {
+              "ar": "بابابي المركز",
+              "fr": "Bababé Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -547,6 +1047,26 @@
             {
               "ar": "جلوار",
               "fr": "Djelwar"
+            },
+            {
+              "ar": "مال المركز",
+              "fr": "Maal Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -557,7 +1077,7 @@
           "neighborhoods": [
             {
               "ar": "امباني",
-              "fr": "امباني"
+              "fr": "M'Bagne"
             },
             {
               "ar": "نيابينا",
@@ -570,6 +1090,26 @@
             {
               "ar": "باگودين",
               "fr": "Bagodine"
+            },
+            {
+              "ar": "امباني المركز",
+              "fr": "M'Bagne Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -580,7 +1120,11 @@
           "neighborhoods": [
             {
               "ar": "ألاك",
-              "fr": "ألاك"
+              "fr": "Aleg"
+            },
+            {
+              "ar": "آلاك",
+              "fr": "Aleg"
             },
             {
               "ar": "شگار",
@@ -593,6 +1137,26 @@
             {
               "ar": "اغشورگيت",
               "fr": "Aghchourguit"
+            },
+            {
+              "ar": "ألاك المركز",
+              "fr": "Aleg Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -616,6 +1180,26 @@
             {
               "ar": "ولد بيرام",
               "fr": "Ould Biram"
+            },
+            {
+              "ar": "بوغي المركز",
+              "fr": "Boghé Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         }
@@ -636,6 +1220,22 @@
               "fr": "Kaedi"
             },
             {
+              "ar": "كيهيدي المركز",
+              "fr": "كيهيدي المركز"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "حي السوق"
+            },
+            {
+              "ar": "حي النهر",
+              "fr": "حي النهر"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "الحي الإداري"
+            },
+            {
               "ar": "نيري والو",
               "fr": "Néré Walo"
             },
@@ -650,6 +1250,14 @@
             {
               "ar": "تيفوندي سيفي",
               "fr": "Tifondé Civé"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -661,10 +1269,6 @@
             {
               "ar": "امبود",
               "fr": "M'Bout"
-            },
-            {
-              "ar": "امبود",
-              "fr": "M'Boud"
             },
             {
               "ar": "تيكوبرا",
@@ -697,6 +1301,26 @@
             {
               "ar": "سوف",
               "fr": "Souve"
+            },
+            {
+              "ar": "امبود المركز",
+              "fr": "M'Bout Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -724,6 +1348,26 @@
             {
               "ar": "گانكي",
               "fr": "Ganki"
+            },
+            {
+              "ar": "لكصيبة المركز",
+              "fr": "Lexeibe 1 Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -734,7 +1378,11 @@
           "neighborhoods": [
             {
               "ar": "مقامة",
-              "fr": "مقامة"
+              "fr": "Maghama"
+            },
+            {
+              "ar": "مغامة",
+              "fr": "Maghama"
             },
             {
               "ar": "دو",
@@ -763,6 +1411,26 @@
             {
               "ar": "والي جانتانگ",
               "fr": "Wali Djantang"
+            },
+            {
+              "ar": "مقامة المركز",
+              "fr": "Maghama Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -790,6 +1458,26 @@
             {
               "ar": "ازگيلم طياب",
               "fr": "Azgueilem Tiyab"
+            },
+            {
+              "ar": "مونكل المركز",
+              "fr": "Mounguel Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         }
@@ -807,7 +1495,7 @@
           "neighborhoods": [
             {
               "ar": "كرو",
-              "fr": "كرو"
+              "fr": "Guerou"
             },
             {
               "ar": "اوديي جريد",
@@ -820,6 +1508,26 @@
             {
               "ar": "كامور",
               "fr": "Kamour"
+            },
+            {
+              "ar": "كرو المركز",
+              "fr": "Guerou Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -830,7 +1538,23 @@
           "neighborhoods": [
             {
               "ar": "كيفة",
-              "fr": "كيفة"
+              "fr": "Kiffa"
+            },
+            {
+              "ar": "كيفة المركز",
+              "fr": "كيفة المركز"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "حي السوق"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "الحي الإداري"
+            },
+            {
+              "ar": "حي السلام",
+              "fr": "حي السلام"
             },
             {
               "ar": "انواملين",
@@ -851,6 +1575,14 @@
             {
               "ar": "لگران",
               "fr": "Legrane"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -861,7 +1593,7 @@
           "neighborhoods": [
             {
               "ar": "بومديد",
-              "fr": "بومديد"
+              "fr": "Boumdeid"
             },
             {
               "ar": "حسي تين",
@@ -870,6 +1602,26 @@
             {
               "ar": "لفتح",
               "fr": "Lavtah"
+            },
+            {
+              "ar": "بومديد المركز",
+              "fr": "Boumdeid Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -897,6 +1649,26 @@
             {
               "ar": "حامد",
               "fr": "Hamed"
+            },
+            {
+              "ar": "كنكوصة المركز",
+              "fr": "Kankoussa Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -908,10 +1680,6 @@
             {
               "ar": "باركيول",
               "fr": "Barkéol"
-            },
-            {
-              "ar": "باركيول",
-              "fr": "Barkeiwel"
             },
             {
               "ar": "گللر",
@@ -940,6 +1708,26 @@
             {
               "ar": "بو لأهراث",
               "fr": "Bou Lahrath"
+            },
+            {
+              "ar": "باركيول المركز",
+              "fr": "Barkéol Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         }
@@ -982,6 +1770,26 @@
             {
               "ar": "قصر البركة",
               "fr": "Kasr El Barke"
+            },
+            {
+              "ar": "جكني المركز",
+              "fr": "Djiguenni Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -992,7 +1800,7 @@
           "neighborhoods": [
             {
               "ar": "عدل بگرو",
-              "fr": "عدل بگرو"
+              "fr": "Adel Bagrou"
             },
             {
               "ar": "المسگول",
@@ -1001,6 +1809,26 @@
             {
               "ar": "سيفان",
               "fr": "Sivane"
+            },
+            {
+              "ar": "عدل بگرو المركز",
+              "fr": "Adel Bagrou Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1011,11 +1839,7 @@
           "neighborhoods": [
             {
               "ar": "ولاتة",
-              "fr": "ولاتة"
-            },
-            {
-              "ar": "الباطن",
-              "fr": "Elbatene"
+              "fr": "Oualata"
             },
             {
               "ar": "الباطن",
@@ -1024,6 +1848,22 @@
             {
               "ar": "الحي القديم",
               "fr": "Vieille ville"
+            },
+            {
+              "ar": "ولاتة المركز",
+              "fr": "Oualata Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
             }
           ]
         },
@@ -1034,15 +1874,31 @@
           "neighborhoods": [
             {
               "ar": "انبيكت لحواش",
-              "fr": "Nbeikett Lehwache"
-            },
-            {
-              "ar": "انبيكت لحواش",
-              "fr": "Nbeikett Lehwache"
+              "fr": "N'Beiket Lehwach"
             },
             {
               "ar": "المركز",
               "fr": "Centre"
+            },
+            {
+              "ar": "انبيكت لحواش المركز",
+              "fr": "N'Beiket Lehwach Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1054,10 +1910,6 @@
             {
               "ar": "تمبدغة",
               "fr": "Timbédra"
-            },
-            {
-              "ar": "تمبدغة",
-              "fr": "Tembedgha"
             },
             {
               "ar": "اطويل 1",
@@ -1074,6 +1926,26 @@
             {
               "ar": "حاسي امهدي",
               "fr": "Hassi M'Hadi"
+            },
+            {
+              "ar": "تمبدغة المركز",
+              "fr": "Timbédra Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1087,8 +1959,8 @@
               "fr": "Bassiknou"
             },
             {
-              "ar": "باسكنو",
-              "fr": "Basseknou"
+              "ar": "الظهر",
+              "fr": "Dhar"
             },
             {
               "ar": "المگفة",
@@ -1099,8 +1971,24 @@
               "fr": "Vessale"
             },
             {
-              "ar": "الظهر",
-              "fr": "Dhar"
+              "ar": "باسكنو المركز",
+              "fr": "Bassiknou Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1112,6 +2000,22 @@
             {
               "ar": "النعمة",
               "fr": "Néma"
+            },
+            {
+              "ar": "النعمة المركز",
+              "fr": "النعمة المركز"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "حي السوق"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "الحي الإداري"
+            },
+            {
+              "ar": "حي السلام",
+              "fr": "حي السلام"
             },
             {
               "ar": "اشميم",
@@ -1148,6 +2052,14 @@
             {
               "ar": "اگوينيت",
               "fr": "Agoueinit"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1158,7 +2070,7 @@
           "neighborhoods": [
             {
               "ar": "آمرج",
-              "fr": "آمرج"
+              "fr": "Amourj"
             },
             {
               "ar": "ام اشيش",
@@ -1175,6 +2087,26 @@
             {
               "ar": "لگدور",
               "fr": "Legdour"
+            },
+            {
+              "ar": "آمرج المركز",
+              "fr": "Amourj Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         }
@@ -1192,7 +2124,7 @@
           "neighborhoods": [
             {
               "ar": "تامشكط",
-              "fr": "تامشكط"
+              "fr": "Tamchekett"
             },
             {
               "ar": "المبروك 3",
@@ -1209,6 +2141,26 @@
             {
               "ar": "سافا",
               "fr": "Sava"
+            },
+            {
+              "ar": "تامشكط المركز",
+              "fr": "Tamchekett Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1248,6 +2200,26 @@
             {
               "ar": "ام لحيض",
               "fr": "Oum Lahyadh"
+            },
+            {
+              "ar": "العيون المركز",
+              "fr": "Aïoun Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1258,7 +2230,7 @@
           "neighborhoods": [
             {
               "ar": "كوبني",
-              "fr": "كوبني"
+              "fr": "Kobeni"
             },
             {
               "ar": "حاسي أهل أحمد بشنه",
@@ -1283,6 +2255,26 @@
             {
               "ar": "فولانية",
               "fr": "Voullaniya"
+            },
+            {
+              "ar": "كوبني المركز",
+              "fr": "Kobeni Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1310,6 +2302,26 @@
             {
               "ar": "لحريجات",
               "fr": "Lehreijat"
+            },
+            {
+              "ar": "اطويل المركز",
+              "fr": "Touil Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1320,7 +2332,7 @@
           "neighborhoods": [
             {
               "ar": "الطينطان",
-              "fr": "Tintan"
+              "fr": "Tintane"
             },
             {
               "ar": "حاسي عبد الله",
@@ -1341,6 +2353,26 @@
             {
               "ar": "ديف ا",
               "fr": "Dev-a"
+            },
+            {
+              "ar": "الطينطان المركز",
+              "fr": "Tintane Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         }
@@ -1358,7 +2390,7 @@
           "neighborhoods": [
             {
               "ar": "وادان",
-              "fr": "وادان"
+              "fr": "Ouadane"
             },
             {
               "ar": "الحي القديم",
@@ -1367,6 +2399,22 @@
             {
               "ar": "حي القصر",
               "fr": "Quartier du Ksar"
+            },
+            {
+              "ar": "وادان المركز",
+              "fr": "Ouadane Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
             }
           ]
         },
@@ -1377,7 +2425,71 @@
           "neighborhoods": [
             {
               "ar": "أطار",
-              "fr": "أطار"
+              "fr": "Atar"
+            },
+            {
+              "ar": "أطار المركز",
+              "fr": "أطار المركز"
+            },
+            {
+              "ar": "أغنمريت",
+              "fr": "أغنمريت"
+            },
+            {
+              "ar": "كنوال",
+              "fr": "كنوال"
+            },
+            {
+              "ar": "كرن الكصبة",
+              "fr": "كرن الكصبة"
+            },
+            {
+              "ar": "تينيري",
+              "fr": "تينيري"
+            },
+            {
+              "ar": "أتويرسات",
+              "fr": "أتويرسات"
+            },
+            {
+              "ar": "أكويكه",
+              "fr": "أكويكه"
+            },
+            {
+              "ar": "أمباركه",
+              "fr": "أمباركه"
+            },
+            {
+              "ar": "أتويفنده",
+              "fr": "أتويفنده"
+            },
+            {
+              "ar": "الظُلعة",
+              "fr": "الظُلعة"
+            },
+            {
+              "ar": "لحسينية",
+              "fr": "لحسينية"
+            },
+            {
+              "ar": "الصنكة",
+              "fr": "الصنكة"
+            },
+            {
+              "ar": "افريقيا",
+              "fr": "افريقيا"
+            },
+            {
+              "ar": "الدايرة",
+              "fr": "الدايرة"
+            },
+            {
+              "ar": "الحي العسكري",
+              "fr": "الحي العسكري"
+            },
+            {
+              "ar": "كومبرا",
+              "fr": "كومبرا"
             },
             {
               "ar": "عين أهل تاية",
@@ -1392,64 +2504,20 @@
               "fr": "Choum"
             },
             {
-              "ar": "أغنمريت",
-              "fr": "Aghnomrit"
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
             },
             {
-              "ar": "كنوال",
-              "fr": "Kenewal"
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
             },
             {
-              "ar": "كرن الكصبة",
-              "fr": "Garn El Gasba"
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
             },
             {
-              "ar": "تينيري",
-              "fr": "Tineré"
-            },
-            {
-              "ar": "أتويرسات",
-              "fr": "Toueyrisat"
-            },
-            {
-              "ar": "أكويكه",
-              "fr": "Akwik"
-            },
-            {
-              "ar": "أمباركه",
-              "fr": "M’Barka"
-            },
-            {
-              "ar": "أتويفنده",
-              "fr": "Toueyvindé"
-            },
-            {
-              "ar": "الظُلعة",
-              "fr": "Ed-Dhal’a"
-            },
-            {
-              "ar": "لحسينية",
-              "fr": "Lahsainiya"
-            },
-            {
-              "ar": "الصنكة",
-              "fr": "Es-Sanka"
-            },
-            {
-              "ar": "افريقيا",
-              "fr": "Afrique"
-            },
-            {
-              "ar": "الدايرة",
-              "fr": "Ed-Daira"
-            },
-            {
-              "ar": "الحي العسكري",
-              "fr": "Quartier militaire"
-            },
-            {
-              "ar": "كومبرا",
-              "fr": "Koumbra"
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1460,7 +2528,7 @@
           "neighborhoods": [
             {
               "ar": "أوجفت",
-              "fr": "أوجفت"
+              "fr": "Aoujeft"
             },
             {
               "ar": "معدن",
@@ -1481,6 +2549,18 @@
             {
               "ar": "الحي السكني",
               "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "أوجفت المركز",
+              "fr": "Aoujeft Centre"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1510,8 +2590,20 @@
               "fr": "Quartier des bibliothèques"
             },
             {
-              "ar": "عين سفرة",
-              "fr": "Aïn Savra"
+              "ar": "شنقيط المركز",
+              "fr": "Chinguitti Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
             }
           ]
         }
@@ -1550,6 +2642,22 @@
             {
               "ar": "حي النخيل",
               "fr": "Palmeraie"
+            },
+            {
+              "ar": "المجرية المركز",
+              "fr": "Moudjeria Centre"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1567,16 +2675,24 @@
               "fr": "Lekhcheb"
             },
             {
-              "ar": "تيشيت",
-              "fr": "Tichit"
-            },
-            {
-              "ar": "الخشب",
-              "fr": "Lekhcheb"
-            },
-            {
               "ar": "الحي القديم",
               "fr": "Vieille ville"
+            },
+            {
+              "ar": "تيشيت المركز",
+              "fr": "Tichit Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
             }
           ]
         },
@@ -1588,10 +2704,6 @@
             {
               "ar": "تجكجة",
               "fr": "Tidjikja"
-            },
-            {
-              "ar": "تجكجة",
-              "fr": "Tidjikdja"
             },
             {
               "ar": "الواحات",
@@ -1620,6 +2732,22 @@
             {
               "ar": "الحي السكني",
               "fr": "Résidentiel"
+            },
+            {
+              "ar": "تجكجة المركز",
+              "fr": "Tidjikja Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         }
@@ -1637,23 +2765,31 @@
           "neighborhoods": [
             {
               "ar": "بير أم اكرين",
-              "fr": "Birmoughrein"
+              "fr": "Bir Moughrein"
             },
             {
               "ar": "بير أم اكرين المركز",
-              "fr": "Bir Moghrein Centre"
+              "fr": "بير أم اكرين المركز"
             },
             {
               "ar": "الحي الإداري",
-              "fr": "Quartier administratif"
+              "fr": "الحي الإداري"
             },
             {
               "ar": "حي المطار",
-              "fr": "Quartier de l’aéroport"
+              "fr": "حي المطار"
             },
             {
               "ar": "الحي السكني",
-              "fr": "Quartier résidentiel"
+              "fr": "الحي السكني"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1668,43 +2804,55 @@
             },
             {
               "ar": "ازويرات المركز",
-              "fr": "Zouérat Centre"
+              "fr": "ازويرات المركز"
             },
             {
               "ar": "الهييت",
-              "fr": "El Heit"
+              "fr": "الهييت"
             },
             {
               "ar": "الهاي الشمالي",
-              "fr": "Hait Nord"
+              "fr": "الهاي الشمالي"
             },
             {
               "ar": "حي 600 وحدة سكنية",
-              "fr": "Cité 600 logements"
+              "fr": "حي 600 وحدة سكنية"
             },
             {
               "ar": "حي الترحيل",
-              "fr": "Hay Et-Tarhil"
+              "fr": "حي الترحيل"
             },
             {
               "ar": "باكر ما سالا",
-              "fr": "Bakar Ma Sala"
+              "fr": "باكر ما سالا"
             },
             {
               "ar": "حي اسنيم",
-              "fr": "Cité SNIM"
+              "fr": "حي اسنيم"
             },
             {
               "ar": "الحي القديم",
-              "fr": "Ancien quartier"
+              "fr": "الحي القديم"
             },
             {
               "ar": "حي العمال",
-              "fr": "Quartier des travailleurs"
+              "fr": "حي العمال"
             },
             {
               "ar": "حي المطار",
-              "fr": "Quartier de l’aéroport"
+              "fr": "حي المطار"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
             }
           ]
         },
@@ -1719,23 +2867,39 @@
             },
             {
               "ar": "افديرك المركز",
-              "fr": "F’Dérik Centre"
+              "fr": "افديرك المركز"
             },
             {
               "ar": "الحي العتيق",
-              "fr": "Quartier antique"
+              "fr": "الحي العتيق"
             },
             {
               "ar": "حي التعدين",
-              "fr": "Quartier minier"
+              "fr": "حي التعدين"
             },
             {
               "ar": "حي المحطة",
-              "fr": "Quartier de la gare"
+              "fr": "حي المحطة"
             },
             {
               "ar": "حي السكن",
+              "fr": "حي السكن"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
               "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         }
@@ -1760,12 +2924,24 @@
               "fr": "Mheijrat"
             },
             {
-              "ar": "بنشاب",
-              "fr": "Bennechab"
+              "ar": "بنشاب المركز",
+              "fr": "Bennechab Centre"
             },
             {
-              "ar": "محيجرات",
-              "fr": "Mheijrat"
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1776,19 +2952,31 @@
           "neighborhoods": [
             {
               "ar": "أكجوجت",
-              "fr": "أكجوجت"
+              "fr": "Akjoujt"
+            },
+            {
+              "ar": "أكجوجت المركز",
+              "fr": "أكجوجت المركز"
             },
             {
               "ar": "الحي الإداري",
-              "fr": "Quartier administratif"
+              "fr": "الحي الإداري"
             },
             {
               "ar": "حي التعدين",
-              "fr": "Quartier minier"
+              "fr": "حي التعدين"
             },
             {
               "ar": "الحي السكني",
-              "fr": "Quartier résidentiel"
+              "fr": "الحي السكني"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         }
@@ -1806,7 +2994,7 @@
           "neighborhoods": [
             {
               "ar": "ومبو",
-              "fr": "ومبو"
+              "fr": "Wompou"
             },
             {
               "ar": "اگوينيت",
@@ -1823,6 +3011,26 @@
             {
               "ar": "آر",
               "fr": "Arr"
+            },
+            {
+              "ar": "ومبو المركز",
+              "fr": "Wompou Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1833,7 +3041,7 @@
           "neighborhoods": [
             {
               "ar": "سيليبابي",
-              "fr": "Sélibabi"
+              "fr": "Sélibaby"
             },
             {
               "ar": "ولد امبوني",
@@ -1846,6 +3054,26 @@
             {
               "ar": "حاسي شگار",
               "fr": "Hassi Chegar"
+            },
+            {
+              "ar": "سيليبابي المركز",
+              "fr": "Sélibaby Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1856,7 +3084,7 @@
           "neighborhoods": [
             {
               "ar": "غابو",
-              "fr": "غابو"
+              "fr": "Ghabou"
             },
             {
               "ar": "شليخة",
@@ -1877,6 +3105,26 @@
             {
               "ar": "صوفي",
               "fr": "Soufi"
+            },
+            {
+              "ar": "غابو المركز",
+              "fr": "Ghabou Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         },
@@ -1912,6 +3160,26 @@
             {
               "ar": "لعوينات",
               "fr": "Leaweinat"
+            },
+            {
+              "ar": "ولد ينج المركز",
+              "fr": "Ould Yengé Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
             }
           ]
         }
@@ -1919,6 +3187,7 @@
     }
   ]
 };
+  var CUSTOM_KEY = 'rizq_estate_custom_quartiers';
 
   function wilayas() { return GEO.wilayas.slice(); }
 
@@ -1927,16 +3196,81 @@
     return w ? w.cities.slice() : [];
   }
 
+  function readCustoms() {
+    try {
+      var raw = (typeof localStorage !== 'undefined' && localStorage.getItem(CUSTOM_KEY)) || '[]';
+      var list = JSON.parse(raw);
+      return Array.isArray(list) ? list : [];
+    } catch (e) { return []; }
+  }
+
+  function writeCustoms(list) {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(CUSTOM_KEY, JSON.stringify(list.slice(0, 500)));
+      }
+    } catch (e) {}
+  }
+
   function neighborhoodsOf(wilayaId, cityId) {
     var cities = citiesOf(wilayaId);
     var c = cities.find(function (x) { return x.id === cityId || x.ar === cityId || x.fr === cityId; });
-    return c ? c.neighborhoods.slice() : [];
+    var base = c ? c.neighborhoods.slice() : [];
+    var customs = readCustoms().filter(function (q) {
+      return q && q.wilayaId === wilayaId && q.cityId === cityId && q.ar;
+    }).map(function (q) { return { ar: q.ar, fr: q.fr || q.ar, custom: true }; });
+    var seen = {};
+    var outList = [];
+    base.concat(customs).forEach(function (n) {
+      var k = String(n.ar || '').trim();
+      if (!k || seen[k]) return;
+      seen[k] = 1;
+      outList.push(n);
+    });
+    return outList;
+  }
+
+  function addCustomNeighborhood(entry) {
+    var wilayaId = entry && entry.wilayaId;
+    var cityId = entry && entry.cityId;
+    var ar = String((entry && entry.ar) || '').trim();
+    var fr = String((entry && entry.fr) || ar).trim();
+    if (!wilayaId || !cityId || !ar) return { ok: false, error: 'missing' };
+    var list = readCustoms();
+    var exists = list.some(function (q) {
+      return q.wilayaId === wilayaId && q.cityId === cityId && q.ar === ar;
+    });
+    if (!exists) {
+      list.unshift({
+        id: 'cq_' + Date.now(),
+        wilayaId: wilayaId,
+        cityId: cityId,
+        ar: ar,
+        fr: fr,
+        createdAt: new Date().toISOString()
+      });
+      writeCustoms(list);
+    }
+    return { ok: true, list: list.filter(function (q) { return q.wilayaId === wilayaId && q.cityId === cityId; }) };
+  }
+
+  function listCustomNeighborhoods(wilayaId, cityId) {
+    return readCustoms().filter(function (q) {
+      if (wilayaId && q.wilayaId !== wilayaId) return false;
+      if (cityId && q.cityId !== cityId) return false;
+      return true;
+    });
+  }
+
+  function removeCustomNeighborhood(id) {
+    writeCustoms(readCustoms().filter(function (q) { return q.id !== id; }));
+    return { ok: true };
   }
 
   function findByListingLoc(loc) {
     var q = String(loc || '').trim();
     if (!q) return null;
-    var i, j, k, w, c, n;
+    var i, j, k, w, c, n, customs, ci;
     for (i = 0; i < GEO.wilayas.length; i++) {
       w = GEO.wilayas[i];
       if (w.ar === q || w.fr === q) return { wilaya: w.id, city: '', neighborhood: '' };
@@ -1951,6 +3285,13 @@
         }
       }
     }
+    customs = readCustoms();
+    for (ci = 0; ci < customs.length; ci++) {
+      n = customs[ci];
+      if (n.ar === q || (n.fr && n.fr === q) || q.indexOf(n.ar) >= 0) {
+        return { wilaya: n.wilayaId, city: n.cityId, neighborhood: n.ar };
+      }
+    }
     return null;
   }
 
@@ -1961,9 +3302,13 @@
 
   global.RizqMrGeo = {
     GEO: GEO,
+    CUSTOM_KEY: CUSTOM_KEY,
     wilayas: wilayas,
     citiesOf: citiesOf,
     neighborhoodsOf: neighborhoodsOf,
+    addCustomNeighborhood: addCustomNeighborhood,
+    listCustomNeighborhoods: listCustomNeighborhoods,
+    removeCustomNeighborhood: removeCustomNeighborhood,
     findByListingLoc: findByListingLoc,
     label: label
   };
