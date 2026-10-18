@@ -83,32 +83,32 @@
           "fr": "Tevragh Zeina",
           "neighborhoods": [
             {
-              "ar": "Tefragh Zeina",
-              "fr": "Tefragh Zeina"
+              "ar": "تفرغ زينة",
+              "fr": "Tevragh Zeina"
             },
             {
               "ar": "حي الدبلوماسيين",
-              "fr": "حي الدبلوماسيين"
+              "fr": "Quartier des Diplomates"
             },
             {
               "ar": "حي المرابطين",
-              "fr": "حي المرابطين"
+              "fr": "Al Mourabitine"
             },
             {
               "ar": "حي السعادة",
-              "fr": "حي السعادة"
-            },
-            {
-              "ar": "الطينطان (تفرغ زينة)",
-              "fr": "الطينطان (تفرغ زينة)"
+              "fr": "Assaada"
             },
             {
               "ar": "قرب دوار تفرغ زينة",
-              "fr": "قرب دوار تفرغ زينة"
+              "fr": "Près du rond-point Tevragh Zeina"
+            },
+            {
+              "ar": "حي راقٍ — تفرغ زينة",
+              "fr": "Quartier résidentiel Tevragh Zeina"
             },
             {
               "ar": "القطب",
-              "fr": "القطب"
+              "fr": "El Koutb"
             }
           ]
         }

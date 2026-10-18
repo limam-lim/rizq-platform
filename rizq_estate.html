@@ -1242,7 +1242,15 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         }
       }
       if(state.quartier){
-        if(g.neighborhood !== state.quartier && blob.indexOf(String(state.quartier).toLowerCase()) < 0) return false;
+        var qn = String(state.quartier).toLowerCase().trim();
+        var qHit = (g.neighborhood && String(g.neighborhood).toLowerCase() === qn)
+          || blob.indexOf(qn) >= 0;
+        if(!qHit){
+          /* تطابق جزئي: كلمات الحي داخل العنوان/الشارع */
+          var parts = qn.split(/[\s,،\-—]+/).filter(function(p){ return p.length >= 3; });
+          qHit = parts.length > 0 && parts.every(function(p){ return blob.indexOf(p) >= 0; });
+        }
+        if(!qHit) return false;
       }
       return true;
     });
