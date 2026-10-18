@@ -442,41 +442,55 @@ button{font:inherit;border:0;background:none;color:inherit}
   padding:16px 20px 28px;color:#B8C4D6;font-size:13px;
 }
 
-/* Modal / lightbox — لوحة تفاصيل فاخرة */
+/* Modal / lightbox — فوق شريط رزق الثابت (z-index 10050) حتى لا تُقطع التفاصيل */
 .est-overlay{
-  position:fixed;inset:0;z-index:80;background:rgba(3,8,16,.82);
+  position:fixed;inset:0;z-index:12000;background:rgba(3,8,16,.82);
   backdrop-filter:blur(10px);display:none;align-items:flex-start;justify-content:center;
-  padding:18px;overflow:auto;
+  padding:max(16px, env(safe-area-inset-top, 0px)) 16px 28px;overflow:auto;
+  -webkit-overflow-scrolling:touch;
 }
 .est-overlay.is-open{display:flex}
 .est-modal{
-  width:min(1120px,100%);max-height:none;margin:12px auto 40px;overflow:visible;border-radius:22px;
+  width:min(1120px,100%);max-height:none;margin:8px auto 48px;overflow:visible;border-radius:22px;
   background:#fff;border:1px solid var(--border);
   box-shadow:0 30px 80px rgba(15,35,65,.3);position:relative;color:var(--navy);
 }
 .est-modal-close{
-  position:sticky;top:12px;float:left;margin:12px;z-index:5;width:40px;height:40px;border-radius:999px;
-  background:rgba(6,13,24,.72);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:22px;
+  position:absolute;top:14px;left:14px;z-index:6;width:42px;height:42px;border-radius:999px;
+  background:rgba(6,13,24,.78);border:1px solid rgba(255,255,255,.28);color:#fff;font-size:22px;
   display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,0,0,.28);
 }
+html[dir="ltr"] .est-modal-close{left:auto;right:14px}
 .est-pd-gallery{
-  display:grid;grid-template-columns:1.6fr 1fr;grid-template-rows:1fr 1fr;gap:8px;
-  padding:12px 12px 0;min-height:320px;
+  display:grid;grid-template-columns:1.65fr 1fr;grid-template-rows:minmax(160px,1fr) minmax(160px,1fr);
+  gap:8px;padding:14px 14px 0;height:min(52vh, 460px);min-height:300px;
 }
 .est-pd-gallery .main{
-  grid-row:1/3;border-radius:16px;overflow:hidden;position:relative;background:#0a1424;cursor:zoom-in;
+  grid-row:1/3;border-radius:16px;overflow:hidden;position:relative;background:#0a1424;cursor:zoom-in;min-height:0;
 }
 .est-pd-gallery .main img,.est-pd-gallery .thumb img{width:100%;height:100%;object-fit:cover;display:block}
 .est-pd-gallery .thumb{
-  border-radius:14px;overflow:hidden;position:relative;background:#0a1424;cursor:zoom-in;min-height:150px;
+  border-radius:14px;overflow:hidden;position:relative;background:#0a1424;cursor:zoom-in;min-height:0;
 }
 .est-pd-gallery .thumb:nth-child(3){grid-column:2;grid-row:2}
+.est-pd-gallery .thumb .est-pd-cap{
+  position:absolute;inset:auto 0 0 0;z-index:1;padding:8px 10px;
+  background:linear-gradient(180deg,transparent,rgba(6,13,24,.82));
+  color:#fff;font:800 11.5px Cairo,sans-serif;pointer-events:none;
+}
 .est-pd-viewall{
   position:absolute;inset:auto 12px 12px auto;z-index:2;
-  background:rgba(11,28,51,.88);color:#fff;border:1px solid rgba(201,168,76,.45);
+  background:rgba(11,28,51,.9);color:#fff;border:1px solid rgba(201,168,76,.5);
   border-radius:999px;padding:9px 14px;font:800 12.5px Cairo,sans-serif;cursor:pointer;
+  box-shadow:0 6px 16px rgba(0,0,0,.25);
 }
-.est-pd-body{padding:20px 22px 28px;clear:both}
+.est-pd-count{
+  position:absolute;top:12px;right:12px;z-index:2;
+  background:rgba(11,28,51,.82);color:#F3E2A8;border:1px solid rgba(201,168,76,.4);
+  border-radius:999px;padding:6px 11px;font:800 12px Cairo,sans-serif;pointer-events:none;
+}
+.est-pd-body{padding:20px 22px 28px}
 .est-pd-top{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
 .est-pd-top h3{font-family:var(--display);font-size:clamp(24px,3.2vw,34px);margin:6px 0 8px;line-height:1.25;color:var(--navy)}
 .est-pd-loc{color:#2f3c4d;font-weight:700;font-size:14px}
@@ -541,9 +555,15 @@ button{font:inherit;border:0;background:none;color:inherit}
 .est-lb-img{max-width:min(1100px,96vw);max-height:88vh;border-radius:16px;object-fit:contain;
   box-shadow:0 24px 60px rgba(0,0,0,.5);border:1px solid rgba(201,168,76,.25)}
 @media(max-width:720px){
-  .est-pd-gallery{grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto;min-height:0}
-  .est-pd-gallery .main{grid-row:1;grid-column:1/-1;aspect-ratio:16/10}
-  .est-pd-gallery .thumb{min-height:110px}
+  .est-overlay{padding:10px 10px 24px}
+  .est-modal{margin:4px auto 32px;border-radius:18px}
+  .est-pd-gallery{
+    grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto;
+    height:auto;min-height:0;
+  }
+  .est-pd-gallery .main{grid-row:1;grid-column:1/-1;aspect-ratio:16/10;min-height:200px}
+  .est-pd-gallery .thumb{min-height:110px;aspect-ratio:4/3}
+  .est-modal-close{top:10px;left:10px;width:38px;height:38px}
 }
 
 @media(max-width:980px){
@@ -1550,16 +1570,33 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     var gal = document.getElementById('est-pd-gallery');
     if(!gal) return;
     var media = pdMediaList(item, 'all');
-    var cover = coverOf(item);
+    if(!media.length){
+      var fallback = coverOf(item);
+      if(fallback) media = [{ src:fallback, cat:'cover', label:isFrEstate()?'Principale':'الرئيسية' }];
+    }
+    var cover = (media[0] && media[0].src) || coverOf(item);
     var thumbs = media.filter(function(m){ return m.src !== cover; }).slice(0, 2);
-    while(thumbs.length < 2 && media.length > thumbs.length){
-      thumbs.push(media[thumbs.length]);
+    while(thumbs.length < 2 && media.length > thumbs.length + 1){
+      var next = media[thumbs.length + 1];
+      if(next) thumbs.push(next); else break;
+    }
+    if(thumbs.length < 2){
+      media.forEach(function(m){
+        if(thumbs.length >= 2) return;
+        if(m.src === cover) return;
+        if(thumbs.some(function(t){ return t.src === m.src; })) return;
+        thumbs.push(m);
+      });
     }
     var fr = isFrEstate();
     var html = '<div class="main" data-src="'+esc(cover)+'"><img src="'+esc(cover)+'" alt="'+esc(item.title)+'"/>'
+      + '<span class="est-pd-count">'+(fr ? (media.length+' photos') : (media.length+' صور'))+'</span>'
       + '<button type="button" class="est-pd-viewall" id="est-pd-viewall">'+(fr?'Voir toutes les photos':'مشاهدة جميع الصور')+' ('+media.length+')</button></div>';
     thumbs.forEach(function(t){
-      html += '<div class="thumb" data-src="'+esc(t.src)+'"><img src="'+esc(t.src)+'" alt="'+esc(t.label||item.title)+'" loading="lazy"/></div>';
+      html += '<div class="thumb" data-src="'+esc(t.src)+'">'
+        + '<img src="'+esc(t.src)+'" alt="'+esc(t.label||item.title)+'" loading="lazy"/>'
+        + (t.label ? '<span class="est-pd-cap">'+esc(t.label)+'</span>' : '')
+        + '</div>';
     });
     gal.innerHTML = html;
   }
@@ -1919,7 +1956,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     tx('#est-modal-wa', '💬 تواصل واتساب مباشر', '💬 WhatsApp direct');
     tx('#est-modal-visit', '📅 حجز معاينة ميدانية', '📅 Réserver une visite');
     tx('#est-modal-quote', '💬 طلب عرض سعر / تفاوض', '💬 Devis / négociation');
-    if(_pdItem){ paintPdTabs(_pdItem); paintPdGallery(_pdItem); }
+    if(_pdItem){ paintPdTabs(_pdItem); paintPdGallery(_pdItem); paintPdThumbs(_pdItem); }
     tx('#est-foot-blurb', 'وكالة أطوار العقارية — بيع وكراء ومعاينة في نواكشوط.', 'Agence Atwar — vente, location et visites à Nouakchott.');
     if(window._rizqEstateProfile){
       paintPayments(window._rizqEstatePaymentMethods || window._rizqEstateProfile.paymentMethods);
