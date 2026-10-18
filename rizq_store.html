@@ -1192,6 +1192,7 @@ footer{
   <script src="rizq_reviews_engine.js" defer></script>
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين (RizqSub.getBadges) -->
   <script src="rizq_subscription_engine.js" defer></script>
+  <script src="rizq_subscription_permissions.js" defer></script>
   <script src="rizq_stock.js?v=1.1" defer></script>
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_contact_gate.js" defer></script>
@@ -2178,10 +2179,24 @@ function rizqShare(title, url) {
       var email = acc.email || '';
       var wa = acc.whatsapp || '';
       var fr = isFr();
+      /* isContactVisible = isPaid || isTrialActive || isDemoPage */
+      try{
+        if(typeof useSubscriptionPermissions === 'function'){
+          var perms = useSubscriptionPermissions(accountId, {
+            isDemo: !!(window._rizqStoreIsDemo || accountId === 'demo_store')
+          });
+          locked = !perms.isContactVisible;
+          acc.isContactVisible = perms.isContactVisible;
+        }
+      }catch(ePerm){}
       function maskClick(e){
         e.preventDefault();
         if(window.RizqContactGate && accountId){
           RizqContactGate.onMaskedContactClick(accountId, 'store', { lang: fr ? 'fr' : 'ar' });
+        } else {
+          alert(fr
+            ? 'Numéro de contact indisponible pour le moment'
+            : 'رقم التواصل غير متاح حالياً');
         }
       }
       window._rizqStoreAccountId = accountId || '';
@@ -2198,19 +2213,29 @@ function rizqShare(title, url) {
       }
       if(window._rizqStoreIsDemo || accountId === 'demo_store'){
         locked = false;
+        if(acc) acc.isContactVisible = true;
         phone = acc.phone || phone || '+222 44 55 66 77';
         email = acc.email || email || 'store-demo@rizq.mr';
         wa = acc.whatsapp || wa || '22244556677';
       }
       renderStorePaymentMethods(acc);
       if(locked || (!phone && !email && !wa)){
+        var lockedLbl = fr ? 'Numéro de contact indisponible pour le moment' : 'رقم التواصل غير متاح حالياً';
         var phoneEl = document.getElementById('info-value-phone-el');
-        if(phoneEl){ phoneEl.textContent = '••• ••• •••'; phoneEl.classList.add('rzq-contact-masked'); phoneEl.onclick = maskClick; }
+        if(phoneEl){ phoneEl.textContent = lockedLbl; phoneEl.classList.add('rzq-contact-masked'); phoneEl.onclick = maskClick; }
         var emailEl = document.getElementById('info-value-email-el');
         if(emailEl){ emailEl.textContent = '•••@•••.•••'; emailEl.classList.add('rzq-contact-masked'); emailEl.onclick = maskClick; }
         ['store-wa-top','store-call-top','store-email-top','hub-wa-top','hub-call-top','hub-email-top'].forEach(function(btnId){
           var el = document.getElementById(btnId);
-          if(el){ el.removeAttribute('href'); el.style.cursor = 'pointer'; el.onclick = maskClick; }
+          if(el){
+            el.removeAttribute('href');
+            el.style.cursor = 'pointer';
+            el.onclick = maskClick;
+            if(btnId === 'store-call-top' || btnId === 'hub-call-top'){
+              var span = el.querySelector('[data-t="btn-call"]') || el.querySelector('span:last-child');
+              if(span) span.textContent = fr ? 'Contact verrouillé' : 'التواصل مقفل';
+            }
+          }
         });
         return;
       }
@@ -2256,7 +2281,13 @@ function rizqShare(title, url) {
         return;
       }
       if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE){
-        applyGatedStoreContacts(accountId, { contactsLocked: true });
+        var offlineLocked = true;
+        try{
+          if(typeof useSubscriptionPermissions === 'function'){
+            offlineLocked = !useSubscriptionPermissions(accountId).isContactVisible;
+          }
+        }catch(eOff){}
+        applyGatedStoreContacts(accountId, { contactsLocked: offlineLocked });
         return;
       }
       var headers = window.RizqContactGate ? RizqContactGate.authHeaders() : {};

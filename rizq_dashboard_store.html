@@ -368,6 +368,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
 <script src="rizq_dashboard_agent_knowledge.js"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
+<script src="rizq_subscription_permissions.js"></script>
 <script src="rizq_store_topics.js?v=27.0"></script>
 <script src="rizq_stock.js?v=1.1"></script>
 <script src="rizq_store_commerce.js?v=29.7"></script>
@@ -1333,16 +1334,18 @@ function initSubscriptionLifecycle(accId, accType) {
 
     onExpired: function(sub) {
       _applyFeatureGates(sub);
-      var rem  = (sub.monthlyAdsRemaining !== undefined) ? sub.monthlyAdsRemaining : 0;
-      var limit = sub.freeAdsLimit || 3;
+      window._rizqDashReadOnly = true;
+      var upgradeAr = 'انتهت الفترة المجانية. يرجى الاشتراك في إحدى الباقات لتتمكن من إضافة إعلانات جديدة وتفعيل زر الاتصال للزبائن';
+      var upgradeFr = 'La période d’essai est terminée. Veuillez souscrire à une offre pour publier de nouvelles annonces et activer le bouton d’appel pour vos clients.';
       _showSubBanner({
         icon:'🔒', color:'#dc2626',
-        title:_t2('انتهت باقتك — '+sub.pkg,'Votre forfait a expiré — '+sub.pkg),
-        msg:_t2('حسابك على الخطة المجانية — <strong>'+rem+'/'+limit+'</strong> إعلانات متبقية هذا الشهر · شارة موثق ✅ محفوظة · إعلاناتك القديمة ظاهرة','Compte gratuit — <strong>'+rem+'/'+limit+'</strong> annonces restantes ce mois · Badge vérifié ✅ conservé · Vos anciennes annonces restent visibles'),
-        cta:_t2('♻️ جدّد الاشتراك','♻️ Renouveler l\'abonnement'), ctaFn:'_openRenewalPanel()',
+        title:_t2('انتهت الفترة المجانية / الاشتراك','Essai ou abonnement terminé'),
+        msg:_t2(upgradeAr, upgradeFr),
+        cta:_t2('♻️ اشترك الآن','♻️ Souscrire maintenant'), ctaFn:'_openRenewalPanel()',
         persistent: true
       });
       _showExpiredOverlay(sub);
+      _applyDashboardReadOnly();
     },
 
     onNoSubscription: function(sub) {
@@ -1388,18 +1391,37 @@ function _showSubBanner(opts) {
 }
 
 function _showExpiredOverlay(sub) {
-  // overlay خفيف على الأقسام المدفوعة
-  var paidSections = ['panel-video','panel-auto-reply','panel-vip','panel-analytics-adv','panel-products'];
+  var upgradeAr = 'انتهت الفترة المجانية. يرجى الاشتراك في إحدى الباقات لتتمكن من إضافة إعلانات جديدة وتفعيل زر الاتصال للزبائن';
+  var upgradeFr = 'La période d’essai est terminée. Veuillez souscrire à une offre pour publier de nouvelles annonces et activer le bouton d’appel pour vos clients.';
+  var paidSections = ['panel-video','panel-auto-reply','panel-vip','panel-analytics-adv','panel-products','add-product-form'];
   paidSections.forEach(function(id){
     var el = document.getElementById(id);
     if(!el) return;
     if(el.querySelector('.rizq-expired-lock')) return;
     var lock = document.createElement('div');
     lock.className = 'rizq-expired-lock';
-    lock.style.cssText = 'position:absolute;inset:0;background:rgba(255,255,255,.85);backdrop-filter:blur(3px);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:inherit;gap:8px';
-    lock.innerHTML = '<div style="font-size:36px">🔒</div><div style="font-size:14px;font-weight:700;color:#1B3A6B">'+_t2('هذه الميزة تتطلب اشتراكاً','Cette fonctionnalité nécessite un abonnement')+'</div><button onclick="_openRenewalPanel()" style="margin-top:4px;padding:8px 20px;background:#1B3A6B;color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">♻️ '+_t2('جدّد الاشتراك','Renouveler l\'abonnement')+'</button>';
+    lock.style.cssText = 'position:absolute;inset:0;background:rgba(255,255,255,.9);backdrop-filter:blur(3px);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:inherit;gap:10px;padding:18px;text-align:center';
+    lock.innerHTML = '<div style="font-size:36px">🔒</div><div style="font-size:14px;font-weight:800;color:#1B3A6B;max-width:36ch;line-height:1.65">'+_t2(upgradeAr, upgradeFr)+'</div><button type="button" onclick="_openRenewalPanel()" style="margin-top:4px;padding:10px 20px;background:#1B3A6B;color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">♻️ '+_t2('اشترك الآن','Souscrire maintenant')+'</button>';
     el.style.position = 'relative';
     el.appendChild(lock);
+  });
+}
+
+function _applyDashboardReadOnly() {
+  window._rizqDashReadOnly = true;
+  var form = document.getElementById('add-product-form') || document.getElementById('add-product-body');
+  if (window.RizqSubscriptionPermissions && form) {
+    var perms = useSubscriptionPermissions(typeof SESSION_ID !== 'undefined' ? SESSION_ID : '', { isDemo: !!window.IS_DEMO });
+    if (!perms.isDashboardWritable) {
+      RizqSubscriptionPermissions.disableFormsAndShowUpgradeBanner(form, perms);
+    }
+  }
+  document.querySelectorAll('[data-t="qa-add-product"], #btn-toggle-add-product, [data-t="add-product-title"]').forEach(function(el){
+    var btn = el.closest('button,a,.qa-card') || el;
+    btn.style.opacity = '0.55';
+    btn.style.pointerEvents = 'none';
+    btn.setAttribute('aria-disabled', 'true');
+    btn.title = _t2('انتهت الفترة المجانية — اشترك للإضافة','Essai terminé — souscrivez pour ajouter');
   });
 }
 
@@ -2211,6 +2233,11 @@ function toggleAddForm(){
   btn.textContent = _formOpen ? _t2('تصغير ↑','Réduire ↑') : _t2('إضافة منتج ↓','Ajouter un produit ↓');
 }
 function openAddProduct(){
+  if(window._rizqDashReadOnly){
+    alert(_t2('انتهت الفترة المجانية. يرجى الاشتراك في إحدى الباقات لتتمكن من إضافة إعلانات جديدة وتفعيل زر الاتصال للزبائن','La période d’essai est terminée. Veuillez souscrire à une offre pour publier de nouvelles annonces et activer le bouton d’appel pour vos clients.'));
+    if(typeof _openRenewalPanel==='function') _openRenewalPanel();
+    return;
+  }
   var sb = document.querySelector('.sb-item[onclick*="products"]');
   showPanel('products', sb);
   _formOpen = true;
@@ -2472,6 +2499,11 @@ function fillProductTopicSelect(selectedId){
 }
 
 function saveProduct(){
+  if(window._rizqDashReadOnly){
+    alert(_t2('انتهت الفترة المجانية. يرجى الاشتراك في إحدى الباقات لتتمكن من إضافة إعلانات جديدة وتفعيل زر الاتصال للزبائن','La période d’essai est terminée. Veuillez souscrire pour publier de nouvelles annonces.'));
+    if(typeof _openRenewalPanel==='function') _openRenewalPanel();
+    return;
+  }
   // ── فحص حد المنتجات: الحد الشهري المجاني (منتهي) + الحد العددي الدقيق
   // لمستوى الباقة النشطة (50 شهرية / 200 ربعية / غير محدود سنوية-ماسية)
   // — تصحيح 25/07/2026: كان يُستخدم canPostNewAd() وحدها فتُمنح "غير محدود"
@@ -2540,7 +2572,10 @@ function saveProduct(){
       sku: document.getElementById('prod-sku') ? document.getElementById('prod-sku').value.trim().slice(0,64) : '',
       unit: document.getElementById('prod-unit') ? document.getElementById('prod-unit').value.trim().slice(0,40) : '',
       sold: document.getElementById('prod-sold') ? (parseInt(document.getElementById('prod-sold').value)||0) : 0,
-      status: data._status || (document.getElementById('prod-status') ? document.getElementById('prod-status').value : 'active'),
+      /* بدون باقة نشطة: لا نشر للسوق العام — يبقى قيد المراجعة / مسودة */
+      status: (window._rizqDashReadOnly
+        ? 'pending_review'
+        : (data._status || (document.getElementById('prod-status') ? document.getElementById('prod-status').value : 'active'))),
       brandId: (document.getElementById('prod-brand')||{}).value || '',
       modelId: (document.getElementById('prod-model')||{}).value || '',
       brandName: '',

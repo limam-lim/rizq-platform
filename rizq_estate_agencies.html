@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 <link rel="stylesheet" href="rizq-theme.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet"/>
-<title>وكالات العقارات | Agences immobilières — رزق</title>
+<title>سوق العقارات | Marché immobilier — رزق</title>
 <style>
 :root{
   --navy:#0B1C33;--ink:#060d18;--gold:#C9A84C;--gold2:#E8C96A;--gold3:#F3E2A8;
@@ -202,10 +202,10 @@ button{font:inherit;border:0;background:none;color:inherit}
       <img src="rizq-mark-inset.png?v=1" width="34" height="34" alt=""/>
       <span>
         <span class="ag-brand-ar">رزق</span>
-        <span class="ag-brand-sub">ESTATE AGENCIES</span>
+        <span class="ag-brand-sub">REAL ESTATE MARKET</span>
       </span>
     </a>
-    <nav class="ag-nav" aria-label="تنقل وكالات العقارات">
+    <nav class="ag-nav" aria-label="تنقل سوق العقارات">
       <a href="#ag-list" class="is-on">الوكالات</a>
       <a href="rizq_estate.html?demo=1">معروضات العقارات</a>
       <a href="rizq_landing_v8.html#virtual-estate">بوابة رزق</a>
@@ -218,8 +218,8 @@ button{font:inherit;border:0;background:none;color:inherit}
 </header>
 
 <section class="ag-hero" aria-label="دليل الوكالات العقارية">
-  <div class="ag-kicker"><i></i> مسار مستقل · وكالات العقارات فقط</div>
-  <h1>كل <em>الوكالات العقارية</em> في مكان واحد</h1>
+  <div class="ag-kicker"><i></i> مسار مستقل · سوق العقارات على رزق</div>
+  <h1>كل <em>سوق العقارات</em> في مكان واحد</h1>
   <p>صفحة منعزلة مباشرة للوصول إلى وكالات العقار على رزق — هوية واضحة، معروضات، وتواصل فوري مع الوكالة.</p>
   <div class="ag-hero-cta">
     <a class="ag-btn ag-btn-gold" href="#ag-list">تصفّح الوكالات</a>
@@ -504,12 +504,12 @@ button{font:inherit;border:0;background:none;color:inherit}
       tx('.ag-actions .ag-chip:not(.solid)', 'تصفّح العقارات', 'Parcourir les biens');
       var kick = document.querySelector('.ag-kicker');
       if(kick) kick.innerHTML = fr
-        ? '<i></i> Parcours dédié · agences immobilières'
-        : '<i></i> مسار مستقل · وكالات العقارات فقط';
+        ? '<i></i> Parcours dédié · marché immobilier Rizq'
+        : '<i></i> مسار مستقل · سوق العقارات على رزق';
       var h1 = document.querySelector('.ag-hero h1');
       if(h1) h1.innerHTML = fr
-        ? 'Toutes les <em>agences immobilières</em> au même endroit'
-        : 'كل <em>الوكالات العقارية</em> في مكان واحد';
+        ? 'Tout le <em>marché immobilier</em> au même endroit'
+        : 'كل <em>سوق العقارات</em> في مكان واحد';
       tx('.ag-hero > p',
         'صفحة منعزلة مباشرة للوصول إلى وكالات العقار على رزق — هوية واضحة، معروضات، وتواصل فوري مع الوكالة.',
         'Page dédiée pour joindre les agences immobilières sur Rizq — identité claire, biens et contact direct.');

@@ -25,7 +25,8 @@ function normalizeModule(moduleOrType) {
   const m = String(moduleOrType || 'individual').toLowerCase();
   if (m === 'tender' || m === 'tenders') return 'tender';
   if (m === 'shop') return 'store';
-  if (['store', 'office', 'corp', 'individual'].includes(m)) return m;
+  if (m === 'agency' || m === 'estate' || m === 'real_estate' || m === 'immobilier') return 'estate';
+  if (['store', 'office', 'corp', 'individual', 'estate'].includes(m)) return m;
   return 'individual';
 }
 
@@ -43,11 +44,21 @@ function getSellerContactEligibility(targetAccountId, accountTypeHint) {
   if (status === 'expired' || status === 'suspended') {
     return { canExpose: false, reason: status, isTrial: false, isExpired: true, subscriptionStatus: status };
   }
-  if (ent.isTrial || status === 'no_subscription' || status === 'pending') {
+  if (status === 'no_subscription' || status === 'pending') {
     return {
       canExpose: false,
-      reason: ent.isTrial ? 'trial' : status,
-      isTrial: !!ent.isTrial,
+      reason: status,
+      isTrial: false,
+      isExpired: false,
+      subscriptionStatus: status,
+    };
+  }
+  /* التجربة النشطة: إظهار رقم التواصل للزوار (حسب قاعدة المنصة) */
+  if (ent.isTrial && ACTIVE_STATUSES.includes(status)) {
+    return {
+      canExpose: true,
+      reason: 'trial_active',
+      isTrial: true,
       isExpired: false,
       subscriptionStatus: status,
     };
@@ -107,7 +118,8 @@ function resolveContactGate(viewerAccountId, targetAccountId, module, accountTyp
   if (mod === 'tender') {
     contactsUnlocked = !!viewer.canUnlock;
   } else {
-    contactsUnlocked = !!(seller.canExpose && viewer.canUnlock);
+    /* واجهة المحل/الوكالة العامة: ظهور الهاتف يعتمد على اشتراك البائع (مدفوع أو تجربة نشطة) */
+    contactsUnlocked = !!seller.canExpose;
   }
 
   const contactsLocked = !contactsUnlocked;

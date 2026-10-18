@@ -1169,6 +1169,11 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 <script src="rizq_estate_data.js?v=1.0"></script>
 <script src="rizq_map_preview.js?v=1.0" defer></script>
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_subscription_engine.js" defer></script>
+<script src="rizq_subscription_permissions.js" defer></script>
+<script src="rizq_auth_gate.js" defer></script>
+<script src="rizq_contact_gate.js" defer></script>
+<script src="rizq_messenger.js" defer></script>
 <script src="rizq_mr_payment_catalog.js?v=1.1"></script>
 <script src="rizq_account_payments.js?v=28.3"></script>
 <script src="rizq_service_desk.js?v=1.3"></script>
@@ -1684,6 +1689,11 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     };
     window._rizqEstateAccountId = AGENCY.id;
     window._rizqEstateProfile = AGENCY;
+    window._pageAccountId = AGENCY.id;
+    window._pageSellerName = AGENCY.name;
+    window._pageTitle = AGENCY.name;
+    window._pageEmoji = '🏠';
+    window._pageCategory = 'estate';
     var frBoot = isFrEstate();
     document.title = AGENCY.name + (frBoot ? ' | Agence immobilière — Rizq' : ' | وكالة عقارية — رزق');
 
@@ -1722,6 +1732,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       if(call){ barCall.href = call; barCall.hidden = false; }
       else { barCall.hidden = true; }
     }
+    applyEstateContactVisibility(AGENCY);
     paintContactMeta(AGENCY);
     paintSideInfo(AGENCY);
     paintPayments(AGENCY.paymentMethods);
@@ -1729,6 +1740,41 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     hidePlatformUpsellOnBoundEstate();
     renderGrid();
     try{ mountEstateIntroVideo(); }catch(eVid){}
+  }
+
+  function applyEstateContactVisibility(acc){
+    var perms = null;
+    try{
+      if(typeof useSubscriptionPermissions === 'function'){
+        perms = useSubscriptionPermissions(acc && acc.id, { isDemo: !!window._rizqEstateIsDemo });
+      }
+    }catch(e){}
+    var visible = !perms || perms.isContactVisible || !!window._rizqEstateIsDemo;
+    var fr = isFrEstate();
+    var lockedLbl = fr ? 'Numéro de contact indisponible pour le moment' : 'رقم التواصل غير متاح حالياً';
+    function lockEl(el, isCall){
+      if(!el) return;
+      el.removeAttribute('href');
+      el.style.opacity = '0.72';
+      el.style.cursor = 'pointer';
+      el.setAttribute('aria-disabled', 'true');
+      el.onclick = function(e){
+        e.preventDefault();
+        alert(lockedLbl + '\n' + (fr
+          ? 'Le propriétaire doit activer un forfait pour afficher le contact.'
+          : 'يجب على صاحب الوكالة تفعيل باقة لإظهار رقم التواصل.'));
+      };
+      if(isCall) el.textContent = fr ? '🔒 Contact verrouillé' : '🔒 ' + lockedLbl;
+    }
+    if(visible) return;
+    lockEl(document.getElementById('est-bar-call'), true);
+    lockEl(document.getElementById('est-bar-wa'), false);
+    lockEl(document.getElementById('est-top-call'), true);
+    lockEl(document.getElementById('est-top-wa'), false);
+    lockEl(document.getElementById('est-modal-call'), true);
+    lockEl(document.getElementById('est-modal-wa'), false);
+    var sidePhone = document.getElementById('est-side-phone');
+    if(sidePhone) sidePhone.textContent = lockedLbl;
   }
 
   function mountEstateIntroVideo(){
@@ -2665,12 +2711,19 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   var chatBtn = document.getElementById('est-bar-chat');
   if(chatBtn){
     chatBtn.addEventListener('click', function(e){
-      if(typeof window.openChat === 'function'){
-        e.preventDefault();
-        try{ window.openChat(null); }catch(err){}
-        return;
+      e.preventDefault();
+      function launch(){
+        if(typeof window.openChat === 'function'){
+          try{ window.openChat(null); return; }catch(err){}
+        }
+        var desk = document.getElementById('est-desk');
+        if(desk) desk.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-      /* بدون محادثة منصة: انتقل لنموذج الاستفسار */
+      if(typeof window.rizqRequireAuth === 'function'){
+        window.rizqRequireAuth(launch, 'reasonMsg');
+      } else {
+        launch();
+      }
     });
   }
   bootAgency();

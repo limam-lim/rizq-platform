@@ -692,7 +692,8 @@
       features            : features,
       isTrial             : isTrial,
       isExpired           : status === 'expired',
-      contactsLocked      : status === 'expired' || status === 'pending' || status === 'no_subscription' || isTrial,
+      /* ظاهر للزوار أثناء التجربة النشطة أو الاشتراك المدفوع؛ يُقفل عند الانتهاء/الانتظار */
+      contactsLocked      : status === 'expired' || status === 'pending' || status === 'no_subscription',
       trialCountdownLabel : getTrialCountdownLabel({ status: status, daysLeft: Math.max(0, daysLeft), isTrial: isTrial, endsAt: endsAt }),
       acc                 : acc,
       monthlyAdsUsed      : monthlyAdsUsed,
