@@ -238,13 +238,13 @@ button{font:inherit;border:0;background:none;color:inherit}
 .est-hero-media::before{
   content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
   background:
-    radial-gradient(ellipse 80% 55% at 70% 40%,transparent 30%,rgba(6,13,24,.35) 100%),
-    linear-gradient(180deg,rgba(6,13,24,.28) 0%,rgba(6,13,24,.12) 32%,rgba(6,13,24,.58) 72%,rgba(6,13,24,.96) 100%),
-    linear-gradient(90deg,rgba(6,13,24,.72) 0%,rgba(6,13,24,.25) 42%,transparent 68%);
+    radial-gradient(ellipse 70% 60% at 50% 45%,transparent 25%,rgba(6,13,24,.4) 100%),
+    linear-gradient(180deg,rgba(6,13,24,.22) 0%,rgba(6,13,24,.1) 28%,rgba(6,13,24,.62) 68%,rgba(6,13,24,.96) 100%);
 }
 .est-hero-copy{
   position:relative;z-index:2;width:100%;max-width:1180px;margin:0 auto;
   padding:18px 20px 16px;animation:estRise .9s ease both;
+  text-align:center;
 }
 @keyframes estRise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .est-kicker{
@@ -264,7 +264,7 @@ button{font:inherit;border:0;background:none;color:inherit}
   background:linear-gradient(135deg,#F3E2A8,#C9A84C 55%,#E8C96A);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.est-hero-lead{max-width:46ch;font-size:clamp(14px,1.8vw,16px);line-height:1.65;color:#F4F7FC;margin-bottom:12px;text-shadow:0 2px 14px rgba(0,0,0,.55)}
+.est-hero-lead{max-width:46ch;font-size:clamp(14px,1.8vw,16px);line-height:1.65;color:#F4F7FC;margin:0 auto 12px;text-shadow:0 2px 14px rgba(0,0,0,.55)}
 .est-hero-stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
 .est-stat{
   min-width:110px;padding:12px 14px;border-radius:14px;
@@ -779,9 +779,9 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 
 
 .est-hero-profile{padding-bottom:8px}
-.est-hero-brand-row{display:flex;gap:16px;align-items:flex-start;margin-bottom:10px}
+.est-hero-brand-row{display:flex;gap:16px;align-items:flex-start;justify-content:center;margin-bottom:10px}
 .est-hero-logo{display:none!important}
-.est-hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0}
+.est-hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0;justify-content:center}
 .est-hero-meta span{
   display:inline-flex;align-items:center;gap:4px;padding:7px 12px;border-radius:999px;
   background:rgba(11,28,51,.62);border:1px solid rgba(255,255,255,.22);
