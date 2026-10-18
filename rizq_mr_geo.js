@@ -1,7 +1,8 @@
 /**
  * rizq_mr_geo.js — التقسيم الإداري لموريتانيا للبحث العقاري
  * الولاية → المدينة (مقاطعة) → الحي/المنطقة (بلدية + أحياء معروفة)
- * المصدر: openadmindata.org (15 ولاية / 63 مقاطعة / 238 بلدية) + تسميات عربية رسمية.
+ * المصدر: openadmindata.org (15 ولاية / 63 مقاطعة / 238 بلدية) + تسميات عربية
+ * وأحياء المدن الرئيسية من مصادر محلية / خرائط (مثل ازويرات وأطار).
  */
 (function (global) {
   'use strict';
@@ -47,6 +48,14 @@
             {
               "ar": "حي السبخة",
               "fr": "حي السبخة"
+            },
+            {
+              "ar": "حي الميناء الغربي",
+              "fr": "Port ouest"
+            },
+            {
+              "ar": "حي لبتار",
+              "fr": "Lebtar"
             }
           ]
         },
@@ -125,7 +134,7 @@
           "fr": "Toujounine",
           "neighborhoods": [
             {
-              "ar": "Teyaret",
+              "ar": "تيارت",
               "fr": "Teyaret"
             },
             {
@@ -144,7 +153,7 @@
           "fr": "Dar Naïm",
           "neighborhoods": [
             {
-              "ar": "Dar Naim",
+              "ar": "دار النعيم",
               "fr": "Dar Naim"
             },
             {
@@ -195,6 +204,14 @@
             {
               "ar": "حي عرفات",
               "fr": "حي عرفات"
+            },
+            {
+              "ar": "حي الصداقة",
+              "fr": "Hay Sadaqa"
+            },
+            {
+              "ar": "حي الكويت",
+              "fr": "Hay Kuwait"
             }
           ]
         },
@@ -210,12 +227,16 @@
             {
               "ar": "سوق العاصمة",
               "fr": "سوق العاصمة"
+            },
+            {
+              "ar": "حي الصيادين",
+              "fr": "Quartier des pêcheurs"
             }
           ]
         },
         {
           "id": "MR153",
-          "ar": "Riad",
+          "ar": "الرياض",
           "fr": "Riad",
           "neighborhoods": [
             {
@@ -241,11 +262,11 @@
               "fr": "نواذيبو"
             },
             {
-              "ar": "Boulenouar",
+              "ar": "بولنوار",
               "fr": "Boulenouar"
             },
             {
-              "ar": "Inal",
+              "ar": "إينال",
               "fr": "Inal"
             }
           ]
@@ -260,11 +281,11 @@
               "fr": "الشامي"
             },
             {
-              "ar": "Tmeimichat",
+              "ar": "تميميشات",
               "fr": "Tmeimichat"
             },
             {
-              "ar": "Nouamghar",
+              "ar": "انوامغار",
               "fr": "Nouamghar"
             }
           ]
@@ -278,23 +299,27 @@
       "cities": [
         {
           "id": "MR067",
-          "ar": "Tekane",
+          "ar": "تكانه",
           "fr": "Tekane",
           "neighborhoods": [
             {
-              "ar": "Teikane",
+              "ar": "تكانه",
+              "fr": "Tekane"
+            },
+            {
+              "ar": "تيكان",
               "fr": "Teikane"
             },
             {
-              "ar": "Chemame",
+              "ar": "شمام",
               "fr": "Chemame"
             },
             {
-              "ar": "Teichteyat",
+              "ar": "تيشتيات",
               "fr": "Teichteyat"
             },
             {
-              "ar": "Lexelbe 2",
+              "ar": "لكصبة 2",
               "fr": "Lexelbe 2"
             }
           ]
@@ -309,46 +334,50 @@
               "fr": "بوتلميت"
             },
             {
-              "ar": "Elb Adress",
+              "ar": "الب ادريس",
               "fr": "Elb Adress"
             },
             {
-              "ar": "Ajoueir",
+              "ar": "اجوير",
               "fr": "Ajoueir"
             },
             {
-              "ar": "N'Teichet",
+              "ar": "انتيشيت",
               "fr": "N'Teichet"
             },
             {
-              "ar": "Nebaghiye",
+              "ar": "النباغية",
               "fr": "Nebaghiye"
             },
             {
-              "ar": "Tenghadej",
+              "ar": "تنغادج",
               "fr": "Tenghadej"
             },
             {
-              "ar": "El Mouyessar",
+              "ar": "الميسر",
               "fr": "El Mouyessar"
             }
           ]
         },
         {
           "id": "MR062",
-          "ar": "Keur Macen",
+          "ar": "كرمسين",
           "fr": "Keur Macen",
           "neighborhoods": [
             {
-              "ar": "Keurmacen",
+              "ar": "كرمسين",
+              "fr": "Keur Macen"
+            },
+            {
+              "ar": "كرمسين",
               "fr": "Keurmacen"
             },
             {
-              "ar": "N'Diago",
+              "ar": "انذياگو",
               "fr": "N'Diago"
             },
             {
-              "ar": "M'Balal",
+              "ar": "امبلال",
               "fr": "M'Balal"
             }
           ]
@@ -363,38 +392,38 @@
               "fr": "واد الناقة"
             },
             {
-              "ar": "Aouleiygat",
+              "ar": "أولييگات",
               "fr": "Aouleiygat"
             },
             {
-              "ar": "El Ariye",
+              "ar": "العارية",
               "fr": "El Ariye"
             }
           ]
         },
         {
           "id": "MR063",
-          "ar": "Mederdra",
+          "ar": "المذرذرة",
           "fr": "Mederdra",
           "neighborhoods": [
             {
-              "ar": "Mederdra",
+              "ar": "المذرذرة",
               "fr": "Mederdra"
             },
             {
-              "ar": "Beir Taouress",
+              "ar": "بير تاورص",
               "fr": "Beir Taouress"
             },
             {
-              "ar": "Taguilalet",
+              "ar": "تاگيلالت",
               "fr": "Taguilalet"
             },
             {
-              "ar": "El Khat",
+              "ar": "الخط",
               "fr": "El Khat"
             },
             {
-              "ar": "Tiguent (El Jedide)",
+              "ar": "تيگنت (الجديد)",
               "fr": "Tiguent (El Jedide)"
             }
           ]
@@ -409,11 +438,11 @@
               "fr": "الركيز"
             },
             {
-              "ar": "Boutalhaye",
+              "ar": "بوطلحية",
               "fr": "Boutalhaye"
             },
             {
-              "ar": "Bareine",
+              "ar": "بارين",
               "fr": "Bareine"
             }
           ]
@@ -428,8 +457,20 @@
               "fr": "روصو"
             },
             {
-              "ar": "Jedrel Mouhguen",
+              "ar": "جدل الموقن",
               "fr": "Jedrel Mouhguen"
+            },
+            {
+              "ar": "جدل الموقن",
+              "fr": "Jedrel Mouhguen"
+            },
+            {
+              "ar": "حي السوق",
+              "fr": "Quartier du marché"
+            },
+            {
+              "ar": "حي الكورنيش",
+              "fr": "Corniche"
             }
           ]
         }
@@ -442,23 +483,23 @@
       "cities": [
         {
           "id": "MR054",
-          "ar": "Magtalahjar",
+          "ar": "مقطع لحجار",
           "fr": "Magtalahjar",
           "neighborhoods": [
             {
-              "ar": "Magtalahjar",
+              "ar": "مقطع لحجار",
               "fr": "Magtalahjar"
             },
             {
-              "ar": "Sangrave",
+              "ar": "صنگراوه",
               "fr": "Sangrave"
             },
             {
-              "ar": "Djonabe",
+              "ar": "جونابه",
               "fr": "Djonabe"
             },
             {
-              "ar": "Ouad Emmour",
+              "ar": "واد عمور",
               "fr": "Ouad Emmour"
             }
           ]
@@ -469,42 +510,42 @@
           "fr": "Bababé",
           "neighborhoods": [
             {
-              "ar": "Bababé",
+              "ar": "بابابي",
               "fr": "Bababé"
             },
             {
-              "ar": "El Verae",
+              "ar": "الفريع",
               "fr": "El Verae"
             },
             {
-              "ar": "Aéré M'Bar",
+              "ar": "آيريه امبار",
               "fr": "Aéré M'Bar"
             }
           ]
         },
         {
           "id": "MR056",
-          "ar": "Maal",
+          "ar": "مال",
           "fr": "Maal",
           "neighborhoods": [
             {
-              "ar": "Maal",
+              "ar": "مال",
               "fr": "Maal"
             },
             {
-              "ar": "Roumed",
+              "ar": "رومد",
               "fr": "Roumed"
             },
             {
-              "ar": "Elwad Lebiadh",
+              "ar": "الواد لبيض",
               "fr": "Elwad Lebiadh"
             },
             {
-              "ar": "Bourat",
+              "ar": "بورات",
               "fr": "Bourat"
             },
             {
-              "ar": "Djelwar",
+              "ar": "جلوار",
               "fr": "Djelwar"
             }
           ]
@@ -519,15 +560,15 @@
               "fr": "امباني"
             },
             {
-              "ar": "Niabina",
+              "ar": "نيابينا",
               "fr": "Niabina"
             },
             {
-              "ar": "Edebaye El Hejjaj",
+              "ar": "ادباي الحجاج",
               "fr": "Edebaye El Hejjaj"
             },
             {
-              "ar": "Bagodine",
+              "ar": "باگودين",
               "fr": "Bagodine"
             }
           ]
@@ -542,38 +583,38 @@
               "fr": "ألاك"
             },
             {
-              "ar": "Chegar",
+              "ar": "شگار",
               "fr": "Chegar"
             },
             {
-              "ar": "Bouhdida",
+              "ar": "بوهديـدة",
               "fr": "Bouhdida"
             },
             {
-              "ar": "Aghchourguit",
+              "ar": "اغشورگيت",
               "fr": "Aghchourguit"
             }
           ]
         },
         {
           "id": "MR053",
-          "ar": "Boghé",
+          "ar": "بوغي",
           "fr": "Boghé",
           "neighborhoods": [
             {
-              "ar": "Boghé",
+              "ar": "بوغي",
               "fr": "Boghé"
             },
             {
-              "ar": "Dar El Aviye",
+              "ar": "دار العافية",
               "fr": "Dar El Aviye"
             },
             {
-              "ar": "Dar El Barke",
+              "ar": "دار البركة",
               "fr": "Dar El Barke"
             },
             {
-              "ar": "Ould Biram",
+              "ar": "ولد بيرام",
               "fr": "Ould Biram"
             }
           ]
@@ -587,27 +628,27 @@
       "cities": [
         {
           "id": "MR041",
-          "ar": "Kaedi",
+          "ar": "كيهيدي",
           "fr": "Kaedi",
           "neighborhoods": [
             {
-              "ar": "Kaedi",
+              "ar": "كيهيدي",
               "fr": "Kaedi"
             },
             {
-              "ar": "Néré Walo",
+              "ar": "نيري والو",
               "fr": "Néré Walo"
             },
             {
-              "ar": "Djewol",
+              "ar": "جيهول",
               "fr": "Djewol"
             },
             {
-              "ar": "Toghomadi",
+              "ar": "تغمادي",
               "fr": "Toghomadi"
             },
             {
-              "ar": "Tifondé Civé",
+              "ar": "تيفوندي سيفي",
               "fr": "Tifondé Civé"
             }
           ]
@@ -618,62 +659,70 @@
           "fr": "M'Bout",
           "neighborhoods": [
             {
-              "ar": "M'Boud",
+              "ar": "امبود",
+              "fr": "M'Bout"
+            },
+            {
+              "ar": "امبود",
               "fr": "M'Boud"
             },
             {
-              "ar": "Tikobra",
+              "ar": "تيكوبرا",
               "fr": "Tikobra"
             },
             {
-              "ar": "Terenguel Ehel Moulaye Ely",
+              "ar": "ترنگل أهل مولاي علي",
               "fr": "Terenguel Ehel Moulaye Ely"
             },
             {
-              "ar": "N'Djadjbenni Gandéga",
+              "ar": "انجاجبني گندگا",
               "fr": "N'Djadjbenni Gandéga"
             },
             {
-              "ar": "Edebaye Ehel Guelaye",
+              "ar": "ادباي أهل گلاّي",
               "fr": "Edebaye Ehel Guelaye"
             },
             {
-              "ar": "Voum Legleite",
+              "ar": "فوم لگليته",
               "fr": "Voum Legleite"
             },
             {
-              "ar": "Chelkhet Tiyab",
+              "ar": "شلخت طياب",
               "fr": "Chelkhet Tiyab"
             },
             {
-              "ar": "Lahrach",
+              "ar": "لحراش",
               "fr": "Lahrach"
             },
             {
-              "ar": "Souve",
+              "ar": "سوف",
               "fr": "Souve"
             }
           ]
         },
         {
           "id": "MR045",
-          "ar": "Lexeibe 1",
+          "ar": "لكصيبة",
           "fr": "Lexeibe 1",
           "neighborhoods": [
             {
-              "ar": "Lexeiba 1",
+              "ar": "لكصيبة",
+              "fr": "Lexeibe 1"
+            },
+            {
+              "ar": "لكصيبة 1",
               "fr": "Lexeiba 1"
             },
             {
-              "ar": "Betengal",
+              "ar": "بتنگال",
               "fr": "Betengal"
             },
             {
-              "ar": "Talhaye",
+              "ar": "طلحاية",
               "fr": "Talhaye"
             },
             {
-              "ar": "Ganki",
+              "ar": "گانكي",
               "fr": "Ganki"
             }
           ]
@@ -688,58 +737,58 @@
               "fr": "مقامة"
             },
             {
-              "ar": "Doo",
+              "ar": "دو",
               "fr": "Doo"
             },
             {
-              "ar": "Dolol Civé",
+              "ar": "دولول سيفي",
               "fr": "Dolol Civé"
             },
             {
-              "ar": "Beilouguet Litame",
+              "ar": "بيلوگت لتام",
               "fr": "Beilouguet Litame"
             },
             {
-              "ar": "Vrea Litame",
+              "ar": "فريا لتام",
               "fr": "Vrea Litame"
             },
             {
-              "ar": "Toulel",
+              "ar": "تولل",
               "fr": "Toulel"
             },
             {
-              "ar": "Sagné",
+              "ar": "ساگني",
               "fr": "Sagné"
             },
             {
-              "ar": "Wali Djantang",
+              "ar": "والي جانتانگ",
               "fr": "Wali Djantang"
             }
           ]
         },
         {
           "id": "MR044",
-          "ar": "Mounguel",
+          "ar": "مونكل",
           "fr": "Mounguel",
           "neighborhoods": [
             {
-              "ar": "Mounguel",
+              "ar": "مونكل",
               "fr": "Mounguel"
             },
             {
-              "ar": "Bathet Moït",
+              "ar": "باثت مويت",
               "fr": "Bathet Moït"
             },
             {
-              "ar": "Bokhol",
+              "ar": "بوخل",
               "fr": "Bokhol"
             },
             {
-              "ar": "Melzem Teichet",
+              "ar": "ملزم تيشت",
               "fr": "Melzem Teichet"
             },
             {
-              "ar": "Azgueilem Tiyab",
+              "ar": "ازگيلم طياب",
               "fr": "Azgueilem Tiyab"
             }
           ]
@@ -761,15 +810,15 @@
               "fr": "كرو"
             },
             {
-              "ar": "Oudeiy Jrid",
+              "ar": "اوديي جريد",
               "fr": "Oudeiy Jrid"
             },
             {
-              "ar": "El Ghaira",
+              "ar": "الغيرة",
               "fr": "El Ghaira"
             },
             {
-              "ar": "Kamour",
+              "ar": "كامور",
               "fr": "Kamour"
             }
           ]
@@ -784,23 +833,23 @@
               "fr": "كيفة"
             },
             {
-              "ar": "Nouamlein",
+              "ar": "انواملين",
               "fr": "Nouamlein"
             },
             {
-              "ar": "Aghorat",
+              "ar": "اغورات",
               "fr": "Aghorat"
             },
             {
-              "ar": "El Melgue",
+              "ar": "الملگه",
               "fr": "El Melgue"
             },
             {
-              "ar": "Kouroudjel",
+              "ar": "كوروجل",
               "fr": "Kouroudjel"
             },
             {
-              "ar": "Legrane",
+              "ar": "لگران",
               "fr": "Legrane"
             }
           ]
@@ -815,38 +864,38 @@
               "fr": "بومديد"
             },
             {
-              "ar": "Hseiy Tin",
+              "ar": "حسي تين",
               "fr": "Hseiy Tin"
             },
             {
-              "ar": "Lavtah",
+              "ar": "لفتح",
               "fr": "Lavtah"
             }
           ]
         },
         {
           "id": "MR034",
-          "ar": "Kankoussa",
+          "ar": "كنكوصة",
           "fr": "Kankoussa",
           "neighborhoods": [
             {
-              "ar": "Kankoussa",
+              "ar": "كنكوصة",
               "fr": "Kankoussa"
             },
             {
-              "ar": "Sani",
+              "ar": "ساني",
               "fr": "Sani"
             },
             {
-              "ar": "Blajmil",
+              "ar": "بلجميل",
               "fr": "Blajmil"
             },
             {
-              "ar": "Tenaha",
+              "ar": "تناها",
               "fr": "Tenaha"
             },
             {
-              "ar": "Hamed",
+              "ar": "حامد",
               "fr": "Hamed"
             }
           ]
@@ -857,35 +906,39 @@
           "fr": "Barkéol",
           "neighborhoods": [
             {
-              "ar": "Barkeiwel",
+              "ar": "باركيول",
+              "fr": "Barkéol"
+            },
+            {
+              "ar": "باركيول",
               "fr": "Barkeiwel"
             },
             {
-              "ar": "Gueller",
+              "ar": "گللر",
               "fr": "Gueller"
             },
             {
-              "ar": "Lebheir",
+              "ar": "لبحير",
               "fr": "Lebheir"
             },
             {
-              "ar": "Laweissi",
+              "ar": "لعيسي",
               "fr": "Laweissi"
             },
             {
-              "ar": "Daghveg",
+              "ar": "داغفگ",
               "fr": "Daghveg"
             },
             {
-              "ar": "El Ghabra",
+              "ar": "الغبراء",
               "fr": "El Ghabra"
             },
             {
-              "ar": "R'Dheidhie",
+              "ar": "ارظيظية",
               "fr": "R'Dheidhie"
             },
             {
-              "ar": "Bou Lahrath",
+              "ar": "بو لأهراث",
               "fr": "Bou Lahrath"
             }
           ]
@@ -899,35 +952,35 @@
       "cities": [
         {
           "id": "MR013",
-          "ar": "Djiguenni",
+          "ar": "جكني",
           "fr": "Djiguenni",
           "neighborhoods": [
             {
-              "ar": "Djiguenni",
+              "ar": "جكني",
               "fr": "Djiguenni"
             },
             {
-              "ar": "El Mabrouk 1",
+              "ar": "المبروك 1",
               "fr": "El Mabrouk 1"
             },
             {
-              "ar": "Feirenni",
+              "ar": "فيرني",
               "fr": "Feirenni"
             },
             {
-              "ar": "Beneamane",
+              "ar": "بنعمان",
               "fr": "Beneamane"
             },
             {
-              "ar": "Aoueinat Ez Bel",
+              "ar": "عوينة ازبل",
               "fr": "Aoueinat Ez Bel"
             },
             {
-              "ar": "Ghlig Ehel Beye",
+              "ar": "غليگ أهل بي",
               "fr": "Ghlig Ehel Beye"
             },
             {
-              "ar": "Kasr El Barke",
+              "ar": "قصر البركة",
               "fr": "Kasr El Barke"
             }
           ]
@@ -942,11 +995,11 @@
               "fr": "عدل بگرو"
             },
             {
-              "ar": "Elmessgoul",
+              "ar": "المسگول",
               "fr": "Elmessgoul"
             },
             {
-              "ar": "Sivane",
+              "ar": "سيفان",
               "fr": "Sivane"
             }
           ]
@@ -961,8 +1014,16 @@
               "fr": "ولاتة"
             },
             {
-              "ar": "Elbatene",
+              "ar": "الباطن",
               "fr": "Elbatene"
+            },
+            {
+              "ar": "الباطن",
+              "fr": "Elbatene"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Vieille ville"
             }
           ]
         },
@@ -972,8 +1033,16 @@
           "fr": "N'Beiket Lehwach",
           "neighborhoods": [
             {
-              "ar": "Nbeikett Lehwache",
+              "ar": "انبيكت لحواش",
               "fr": "Nbeikett Lehwache"
+            },
+            {
+              "ar": "انبيكت لحواش",
+              "fr": "Nbeikett Lehwache"
+            },
+            {
+              "ar": "المركز",
+              "fr": "Centre"
             }
           ]
         },
@@ -983,23 +1052,27 @@
           "fr": "Timbédra",
           "neighborhoods": [
             {
-              "ar": "Tembedgha",
+              "ar": "تمبدغة",
+              "fr": "Timbédra"
+            },
+            {
+              "ar": "تمبدغة",
               "fr": "Tembedgha"
             },
             {
-              "ar": "Touil 1",
+              "ar": "اطويل 1",
               "fr": "Touil 1"
             },
             {
-              "ar": "Koumbi Saleh",
+              "ar": "كمبي صالح",
               "fr": "Koumbi Saleh"
             },
             {
-              "ar": "Bousteile",
+              "ar": "بوستيل",
               "fr": "Bousteile"
             },
             {
-              "ar": "Hassi M'Hadi",
+              "ar": "حاسي امهدي",
               "fr": "Hassi M'Hadi"
             }
           ]
@@ -1010,19 +1083,23 @@
           "fr": "Bassiknou",
           "neighborhoods": [
             {
-              "ar": "Basseknou",
+              "ar": "باسكنو",
+              "fr": "Bassiknou"
+            },
+            {
+              "ar": "باسكنو",
               "fr": "Basseknou"
             },
             {
-              "ar": "El Megve",
+              "ar": "المگفة",
               "fr": "El Megve"
             },
             {
-              "ar": "Vessale",
+              "ar": "فسال",
               "fr": "Vessale"
             },
             {
-              "ar": "Dhar",
+              "ar": "الظهر",
               "fr": "Dhar"
             }
           ]
@@ -1033,43 +1110,43 @@
           "fr": "Néma",
           "neighborhoods": [
             {
-              "ar": "Néma",
+              "ar": "النعمة",
               "fr": "Néma"
             },
             {
-              "ar": "Achemime",
+              "ar": "اشميم",
               "fr": "Achemime"
             },
             {
-              "ar": "Jreif",
+              "ar": "جريف",
               "fr": "Jreif"
             },
             {
-              "ar": "Bangou",
+              "ar": "بانگو",
               "fr": "Bangou"
             },
             {
-              "ar": "Hassi Etile",
+              "ar": "حاسي اتيل",
               "fr": "Hassi Etile"
             },
             {
-              "ar": "Oum Avnadech",
+              "ar": "ام افنادش",
               "fr": "Oum Avnadech"
             },
             {
-              "ar": "El Mabrouk 2",
+              "ar": "المبروك 2",
               "fr": "El Mabrouk 2"
             },
             {
-              "ar": "Beribavat",
+              "ar": "بريبافات",
               "fr": "Beribavat"
             },
             {
-              "ar": "Noual",
+              "ar": "نوال",
               "fr": "Noual"
             },
             {
-              "ar": "Agoueinit",
+              "ar": "اگوينيت",
               "fr": "Agoueinit"
             }
           ]
@@ -1084,19 +1161,19 @@
               "fr": "آمرج"
             },
             {
-              "ar": "Oum Echeich",
+              "ar": "ام اشيش",
               "fr": "Oum Echeich"
             },
             {
-              "ar": "Bougadoum",
+              "ar": "بوگادوم",
               "fr": "Bougadoum"
             },
             {
-              "ar": "Djigui",
+              "ar": "جيگي",
               "fr": "Djigui"
             },
             {
-              "ar": "Legdour",
+              "ar": "لگدور",
               "fr": "Legdour"
             }
           ]
@@ -1118,19 +1195,19 @@
               "fr": "تامشكط"
             },
             {
-              "ar": "El Mabrouk 3",
+              "ar": "المبروك 3",
               "fr": "El Mabrouk 3"
             },
             {
-              "ar": "Radhi",
+              "ar": "راضي",
               "fr": "Radhi"
             },
             {
-              "ar": "Guetae-Teidoume",
+              "ar": "گطاع تيدوم",
               "fr": "Guetae-Teidoume"
             },
             {
-              "ar": "Sava",
+              "ar": "سافا",
               "fr": "Sava"
             }
           ]
@@ -1141,38 +1218,42 @@
           "fr": "Aïoun",
           "neighborhoods": [
             {
-              "ar": "Aïoun El Atrouss",
+              "ar": "العيون",
+              "fr": "Aïoun"
+            },
+            {
+              "ar": "عيون العتروس",
               "fr": "Aïoun El Atrouss"
             },
             {
-              "ar": "N'Savenni",
+              "ar": "انسافني",
               "fr": "N'Savenni"
             },
             {
-              "ar": "Doueirare",
+              "ar": "دويرار",
               "fr": "Doueirare"
             },
             {
-              "ar": "Ten Hamadi",
+              "ar": "تن حمادي",
               "fr": "Ten Hamadi"
             },
             {
-              "ar": "Beneamane",
+              "ar": "بنعمان",
               "fr": "Beneamane"
             },
             {
-              "ar": "Egjert",
+              "ar": "اجرت",
               "fr": "Egjert"
             },
             {
-              "ar": "Oum Lahyadh",
+              "ar": "ام لحيض",
               "fr": "Oum Lahyadh"
             }
           ]
         },
         {
           "id": "MR022",
-          "ar": "Kobeni",
+          "ar": "كوبني",
           "fr": "Kobeni",
           "neighborhoods": [
             {
@@ -1180,27 +1261,27 @@
               "fr": "كوبني"
             },
             {
-              "ar": "Hassi Ehel Ahmed Bechne",
+              "ar": "حاسي أهل أحمد بشنه",
               "fr": "Hassi Ehel Ahmed Bechne"
             },
             {
-              "ar": "Timzine",
+              "ar": "تمزين",
               "fr": "Timzine"
             },
             {
-              "ar": "Leghlig",
+              "ar": "لغليگ",
               "fr": "Leghlig"
             },
             {
-              "ar": "Gougui Zemmal",
+              "ar": "گوگي زمال",
               "fr": "Gougui Zemmal"
             },
             {
-              "ar": "Modibougou",
+              "ar": "موديبوغو",
               "fr": "Modibougou"
             },
             {
-              "ar": "Voullaniya",
+              "ar": "فولانية",
               "fr": "Voullaniya"
             }
           ]
@@ -1211,19 +1292,23 @@
           "fr": "Touil",
           "neighborhoods": [
             {
-              "ar": "Touil 2",
+              "ar": "اطويل",
+              "fr": "Touil"
+            },
+            {
+              "ar": "اطويل 2",
               "fr": "Touil 2"
             },
             {
-              "ar": "Baghdad",
+              "ar": "بغداد",
               "fr": "Baghdad"
             },
             {
-              "ar": "Sett",
+              "ar": "ست",
               "fr": "Sett"
             },
             {
-              "ar": "Lehreijat",
+              "ar": "لحريجات",
               "fr": "Lehreijat"
             }
           ]
@@ -1234,27 +1319,27 @@
           "fr": "Tintane",
           "neighborhoods": [
             {
-              "ar": "Tintan",
+              "ar": "الطينطان",
               "fr": "Tintan"
             },
             {
-              "ar": "Hassi Abdallah",
+              "ar": "حاسي عبد الله",
               "fr": "Hassi Abdallah"
             },
             {
-              "ar": "Aweinat Thalle",
+              "ar": "عوينة ثل",
               "fr": "Aweinat Thalle"
             },
             {
-              "ar": "Aïn Varbe",
+              "ar": "عين فارب",
               "fr": "Aïn Varbe"
             },
             {
-              "ar": "Egharghar",
+              "ar": "اغرغر",
               "fr": "Egharghar"
             },
             {
-              "ar": "Dev-a",
+              "ar": "ديف ا",
               "fr": "Dev-a"
             }
           ]
@@ -1274,6 +1359,14 @@
             {
               "ar": "وادان",
               "fr": "وادان"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Vieille ville"
+            },
+            {
+              "ar": "حي القصر",
+              "fr": "Quartier du Ksar"
             }
           ]
         },
@@ -1287,16 +1380,76 @@
               "fr": "أطار"
             },
             {
-              "ar": "Aïn Ehel Taya",
+              "ar": "عين أهل تاية",
               "fr": "Aïn Ehel Taya"
             },
             {
-              "ar": "Tawaz",
+              "ar": "طواز",
               "fr": "Tawaz"
             },
             {
-              "ar": "Choum",
+              "ar": "شوم",
               "fr": "Choum"
+            },
+            {
+              "ar": "أغنمريت",
+              "fr": "Aghnomrit"
+            },
+            {
+              "ar": "كنوال",
+              "fr": "Kenewal"
+            },
+            {
+              "ar": "كرن الكصبة",
+              "fr": "Garn El Gasba"
+            },
+            {
+              "ar": "تينيري",
+              "fr": "Tineré"
+            },
+            {
+              "ar": "أتويرسات",
+              "fr": "Toueyrisat"
+            },
+            {
+              "ar": "أكويكه",
+              "fr": "Akwik"
+            },
+            {
+              "ar": "أمباركه",
+              "fr": "M’Barka"
+            },
+            {
+              "ar": "أتويفنده",
+              "fr": "Toueyvindé"
+            },
+            {
+              "ar": "الظُلعة",
+              "fr": "Ed-Dhal’a"
+            },
+            {
+              "ar": "لحسينية",
+              "fr": "Lahsainiya"
+            },
+            {
+              "ar": "الصنكة",
+              "fr": "Es-Sanka"
+            },
+            {
+              "ar": "افريقيا",
+              "fr": "Afrique"
+            },
+            {
+              "ar": "الدايرة",
+              "fr": "Ed-Daira"
+            },
+            {
+              "ar": "الحي العسكري",
+              "fr": "Quartier militaire"
+            },
+            {
+              "ar": "كومبرا",
+              "fr": "Koumbra"
             }
           ]
         },
@@ -1310,30 +1463,54 @@
               "fr": "أوجفت"
             },
             {
-              "ar": "Maeden",
+              "ar": "معدن",
               "fr": "Maeden"
             },
             {
-              "ar": "N'Teirguent",
+              "ar": "انتيرگنت",
               "fr": "N'Teirguent"
             },
             {
-              "ar": "El Medah",
+              "ar": "المداح",
               "fr": "El Medah"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
             }
           ]
         },
         {
           "id": "MR073",
-          "ar": "Chinguitti",
+          "ar": "شنقيط",
           "fr": "Chinguitti",
           "neighborhoods": [
             {
-              "ar": "Chinguitti",
+              "ar": "شنقيط",
               "fr": "Chinguitti"
             },
             {
-              "ar": "Aïn Savra",
+              "ar": "عين سفرة",
+              "fr": "Aïn Savra"
+            },
+            {
+              "ar": "شنقيط المدينة",
+              "fr": "Chinguetti ville"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Vieille ville"
+            },
+            {
+              "ar": "حي المكتبات",
+              "fr": "Quartier des bibliothèques"
+            },
+            {
+              "ar": "عين سفرة",
               "fr": "Aïn Savra"
             }
           ]
@@ -1347,35 +1524,59 @@
       "cities": [
         {
           "id": "MR091",
-          "ar": "Moudjeria",
+          "ar": "المجرية",
           "fr": "Moudjeria",
           "neighborhoods": [
             {
-              "ar": "Moudjeria",
+              "ar": "المجرية",
               "fr": "Moudjeria"
             },
             {
-              "ar": "N'Beike",
+              "ar": "انبيكه",
               "fr": "N'Beike"
             },
             {
-              "ar": "Soudoud",
+              "ar": "سودود",
               "fr": "Soudoud"
+            },
+            {
+              "ar": "تجكجة المركز",
+              "fr": "Tidjikja Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Administratif"
+            },
+            {
+              "ar": "حي النخيل",
+              "fr": "Palmeraie"
             }
           ]
         },
         {
           "id": "MR092",
-          "ar": "Tichit",
+          "ar": "تيشيت",
           "fr": "Tichit",
           "neighborhoods": [
             {
-              "ar": "Tichit",
+              "ar": "تيشيت",
               "fr": "Tichit"
             },
             {
-              "ar": "Lekhcheb",
+              "ar": "الخشب",
               "fr": "Lekhcheb"
+            },
+            {
+              "ar": "تيشيت",
+              "fr": "Tichit"
+            },
+            {
+              "ar": "الخشب",
+              "fr": "Lekhcheb"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Vieille ville"
             }
           ]
         },
@@ -1385,24 +1586,40 @@
           "fr": "Tidjikja",
           "neighborhoods": [
             {
-              "ar": "Tidjikdja",
+              "ar": "تجكجة",
+              "fr": "Tidjikja"
+            },
+            {
+              "ar": "تجكجة",
               "fr": "Tidjikdja"
             },
             {
-              "ar": "El Wahat",
+              "ar": "الواحات",
               "fr": "El Wahat"
             },
             {
-              "ar": "Tensigh",
+              "ar": "تنصيگ",
               "fr": "Tensigh"
             },
             {
-              "ar": "Boubacar Ben Amer",
+              "ar": "بوبكر بن عامر",
               "fr": "Boubacar Ben Amer"
             },
             {
-              "ar": "Lehsira",
+              "ar": "لحسيرة",
               "fr": "Lehsira"
+            },
+            {
+              "ar": "المجرية",
+              "fr": "Moudjeria"
+            },
+            {
+              "ar": "المركز",
+              "fr": "Centre"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Résidentiel"
             }
           ]
         }
@@ -1415,34 +1632,110 @@
       "cities": [
         {
           "id": "MR111",
-          "ar": "Bir Moughrein",
+          "ar": "بير أم اكرين",
           "fr": "Bir Moughrein",
           "neighborhoods": [
             {
-              "ar": "Birmoughrein",
+              "ar": "بير أم اكرين",
               "fr": "Birmoughrein"
+            },
+            {
+              "ar": "بير أم اكرين المركز",
+              "fr": "Bir Moghrein Centre"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي المطار",
+              "fr": "Quartier de l’aéroport"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
             }
           ]
         },
         {
           "id": "MR113",
-          "ar": "Zoueirat",
+          "ar": "ازويرات",
           "fr": "Zoueirat",
           "neighborhoods": [
             {
-              "ar": "Zoueirat",
+              "ar": "ازويرات",
               "fr": "Zoueirat"
+            },
+            {
+              "ar": "ازويرات المركز",
+              "fr": "Zouérat Centre"
+            },
+            {
+              "ar": "الهييت",
+              "fr": "El Heit"
+            },
+            {
+              "ar": "الهاي الشمالي",
+              "fr": "Hait Nord"
+            },
+            {
+              "ar": "حي 600 وحدة سكنية",
+              "fr": "Cité 600 logements"
+            },
+            {
+              "ar": "حي الترحيل",
+              "fr": "Hay Et-Tarhil"
+            },
+            {
+              "ar": "باكر ما سالا",
+              "fr": "Bakar Ma Sala"
+            },
+            {
+              "ar": "حي اسنيم",
+              "fr": "Cité SNIM"
+            },
+            {
+              "ar": "الحي القديم",
+              "fr": "Ancien quartier"
+            },
+            {
+              "ar": "حي العمال",
+              "fr": "Quartier des travailleurs"
+            },
+            {
+              "ar": "حي المطار",
+              "fr": "Quartier de l’aéroport"
             }
           ]
         },
         {
           "id": "MR112",
-          "ar": "F'Deirick",
+          "ar": "افديرك",
           "fr": "F'Deirick",
           "neighborhoods": [
             {
-              "ar": "F'Deirick",
+              "ar": "افديرك",
               "fr": "F'Deirick"
+            },
+            {
+              "ar": "افديرك المركز",
+              "fr": "F’Dérik Centre"
+            },
+            {
+              "ar": "الحي العتيق",
+              "fr": "Quartier antique"
+            },
+            {
+              "ar": "حي التعدين",
+              "fr": "Quartier minier"
+            },
+            {
+              "ar": "حي المحطة",
+              "fr": "Quartier de la gare"
+            },
+            {
+              "ar": "حي السكن",
+              "fr": "Quartier résidentiel"
             }
           ]
         }
@@ -1455,15 +1748,23 @@
       "cities": [
         {
           "id": "MR122",
-          "ar": "Bennechab",
+          "ar": "بنشاب",
           "fr": "Bennechab",
           "neighborhoods": [
             {
-              "ar": "Bennechab",
+              "ar": "بنشاب",
               "fr": "Bennechab"
             },
             {
-              "ar": "Mheijrat",
+              "ar": "محيجرات",
+              "fr": "Mheijrat"
+            },
+            {
+              "ar": "بنشاب",
+              "fr": "Bennechab"
+            },
+            {
+              "ar": "محيجرات",
               "fr": "Mheijrat"
             }
           ]
@@ -1476,6 +1777,18 @@
             {
               "ar": "أكجوجت",
               "fr": "أكجوجت"
+            },
+            {
+              "ar": "الحي الإداري",
+              "fr": "Quartier administratif"
+            },
+            {
+              "ar": "حي التعدين",
+              "fr": "Quartier minier"
+            },
+            {
+              "ar": "الحي السكني",
+              "fr": "Quartier résidentiel"
             }
           ]
         }
@@ -1496,19 +1809,19 @@
               "fr": "ومبو"
             },
             {
-              "ar": "Agoueinitt",
+              "ar": "اگوينيت",
               "fr": "Agoueinitt"
             },
             {
-              "ar": "Ejar",
+              "ar": "ايجار",
               "fr": "Ejar"
             },
             {
-              "ar": "Sagne Dieri",
+              "ar": "ساگني ديري",
               "fr": "Sagne Dieri"
             },
             {
-              "ar": "Arr",
+              "ar": "آر",
               "fr": "Arr"
             }
           ]
@@ -1519,19 +1832,19 @@
           "fr": "Sélibaby",
           "neighborhoods": [
             {
-              "ar": "Sélibabi",
+              "ar": "سيليبابي",
               "fr": "Sélibabi"
             },
             {
-              "ar": "Ould M'Bonny",
+              "ar": "ولد امبوني",
               "fr": "Ould M'Bonny"
             },
             {
-              "ar": "Tachout",
+              "ar": "تاشوط",
               "fr": "Tachout"
             },
             {
-              "ar": "Hassi Chegar",
+              "ar": "حاسي شگار",
               "fr": "Hassi Chegar"
             }
           ]
@@ -1546,23 +1859,23 @@
               "fr": "غابو"
             },
             {
-              "ar": "Chleikha",
+              "ar": "شليخة",
               "fr": "Chleikha"
             },
             {
-              "ar": "Diogountou",
+              "ar": "ديوگونتو",
               "fr": "Diogountou"
             },
             {
-              "ar": "Bayediam",
+              "ar": "بايديام",
               "fr": "Bayediam"
             },
             {
-              "ar": "Gouraye",
+              "ar": "گوراي",
               "fr": "Gouraye"
             },
             {
-              "ar": "Soufi",
+              "ar": "صوفي",
               "fr": "Soufi"
             }
           ]
@@ -1573,31 +1886,31 @@
           "fr": "Ould Yengé",
           "neighborhoods": [
             {
-              "ar": "Ould Yengé",
+              "ar": "ولد ينج",
               "fr": "Ould Yengé"
             },
             {
-              "ar": "Leebelli",
+              "ar": "ليبللي",
               "fr": "Leebelli"
             },
             {
-              "ar": "Tektake",
+              "ar": "تكتاك",
               "fr": "Tektake"
             },
             {
-              "ar": "Davoue",
+              "ar": "دافوه",
               "fr": "Davoue"
             },
             {
-              "ar": "Bouanz",
+              "ar": "بوانز",
               "fr": "Bouanz"
             },
             {
-              "ar": "Lehraj",
+              "ar": "لهراج",
               "fr": "Lehraj"
             },
             {
-              "ar": "Leaweinat",
+              "ar": "لعوينات",
               "fr": "Leaweinat"
             }
           ]
