@@ -17,12 +17,14 @@
 
   function isDemoPage(opts) {
     opts = opts || {};
+    if (opts.forceDemo || opts.isDemo) return true;
     try {
-      var q = new URLSearchParams(location.search || '');
-      if (q.get('demo') === '1') return true;
+      var search = (global.location && global.location.search) || (typeof location !== 'undefined' && location.search) || '';
+      var path = (global.location && global.location.pathname) || (typeof location !== 'undefined' && location.pathname) || '';
+      if (/[?&]demo=1(?:&|$)/.test(String(search))) return true;
+      if (/\/demo(?:\/|$)/i.test(String(path))) return true;
     } catch (e) {}
-    if (opts.forceDemo) return true;
-    if (global._rizqStoreIsDemo || global._rizqOfficeIsDemo || global._rizqEstateIsDemo || global._rizqCorpIsDemo) return true;
+    if (global._rizqStoreIsDemo || global._rizqOfficeIsDemo || global._rizqEstateIsDemo || global._rizqCorpIsDemo || global._rizqShowroomIsDemo) return true;
     var id = String(opts.accountId || global._rizqStoreAccountId || global._rizqOfficeAccountId || global._rizqEstateAccountId || '');
     if (/^demo[_-]/i.test(id) || /^acc_promo_/i.test(id)) return true;
     return false;
