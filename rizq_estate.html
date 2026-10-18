@@ -20,16 +20,32 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
+html,html.rizq-app-nav,
 body,
-body.rizq-mockup-hdr-trial{
-  font-family:'Cairo',system-ui,sans-serif;background:#ffffff;color:var(--text);
-  min-height:100vh;
+body.rizq-page-light,
+body.rizq-mockup-hdr-trial,
+body.rizq-mockup-hdr-trial.rizq-page-light,
+html.rizq-app-nav body.rizq-mockup-hdr-trial.rizq-page-light{
+  background:#ffffff!important;
   background-image:none!important;
   background-attachment:scroll!important;
   background-color:#ffffff!important;
 }
+body,
+body.rizq-page-light,
+body.rizq-mockup-hdr-trial,
+body.rizq-mockup-hdr-trial.rizq-page-light{
+  font-family:'Cairo',system-ui,sans-serif;color:var(--text);
+  min-height:100vh;
+}
+.est-wrap,.est-main-col,.est-content-grid,.est-side,.est-agency-bar,.est-grid,.est-reviews{
+  background:#ffffff!important;
+}
 .est-section-head h2{color:var(--navy)!important}
-.est-section-head p{color:var(--muted)!important}
+.est-section-head .tag{color:#8A6B1F!important;font-weight:900!important;font-size:13px!important}
+.est-section-head p{color:#1e2a3a!important;font-weight:700!important}
+.est-gallery-head h2{color:var(--navy)!important}
+.est-gallery-head p{color:#1e2a3a!important;font-weight:700!important}
 button,a,[role="button"]{cursor:pointer}
 img{display:block;max-width:100%}
 button{font:inherit;border:0;background:none;color:inherit}
@@ -230,13 +246,13 @@ button{font:inherit;border:0;background:none;color:inherit}
 
 /* بحث البطل */
 .est-search{
-  display:grid;grid-template-columns:1.2fr 1fr 1fr auto;gap:8px;
+  display:grid;grid-template-columns:1.15fr .9fr .9fr .9fr auto;gap:8px;
   padding:12px;border-radius:18px;
   background:rgba(10,20,36,.78);border:1px solid rgba(201,168,76,.3);
   backdrop-filter:blur(14px);box-shadow:0 18px 40px rgba(0,0,0,.35);
 }
 .est-search label{display:flex;flex-direction:column;gap:4px;min-width:0}
-.est-search span{font:800 10px Cairo,sans-serif;color:var(--gold2);letter-spacing:.3px}
+.est-search span{font:800 11px Cairo,sans-serif;color:#F3E2A8;letter-spacing:.2px}
 .est-search input,.est-search select{
   width:100%;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);
   color:#fff;border-radius:12px;padding:11px 12px;font:700 13px Cairo,sans-serif;outline:none;
@@ -252,9 +268,9 @@ button{font:inherit;border:0;background:none;color:inherit}
 /* ── Content ── */
 .est-wrap{max-width:1180px;margin:0 auto;padding:36px 20px 40px;position:relative}
 .est-section-head{margin:8px 0 18px;text-align:center}
-.est-section-head .tag{color:var(--gold2);font:800 12px Cairo,sans-serif;letter-spacing:.5px;margin-bottom:8px;display:inline-block}
-.est-section-head h2{font-family:var(--display);font-size:clamp(26px,3.6vw,40px);font-weight:700;margin-bottom:8px}
-.est-section-head p{color:var(--muted);font-size:15.5px;line-height:1.7;max-width:48ch;margin:0 auto;font-weight:600}
+.est-section-head .tag{color:#8A6B1F;font:900 13px Cairo,sans-serif;letter-spacing:.4px;margin-bottom:8px;display:inline-block}
+.est-section-head h2{font-family:var(--display);font-size:clamp(26px,3.6vw,40px);font-weight:700;margin-bottom:8px;color:var(--navy)}
+.est-section-head p{color:#1e2a3a;font-size:16px;line-height:1.7;max-width:48ch;margin:0 auto;font-weight:700}
 
 .est-toolbar{
   display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;
@@ -513,11 +529,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 
 .est-hero-profile{padding-bottom:28px}
 .est-hero-brand-row{display:flex;gap:16px;align-items:flex-start;margin-bottom:14px}
-.est-hero-logo{
-  width:72px;height:72px;border-radius:18px;object-fit:cover;flex-shrink:0;
-  border:2px solid rgba(240,215,138,.7);background:#0a1324;
-  box-shadow:0 8px 24px rgba(0,0,0,.35);
-}
+.est-hero-logo{display:none!important}
 .est-hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
 .est-hero-meta span{
   display:inline-flex;align-items:center;gap:4px;padding:7px 12px;border-radius:999px;
@@ -590,7 +602,6 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   </div>
   <div class="est-hero-copy est-hero-profile">
     <div class="est-hero-brand-row">
-      <img id="est-hero-logo" class="est-hero-logo" src="rizq-mark-inset.png?v=1" width="72" height="72" alt="شعار الوكالة"/>
       <div>
         <div class="est-kicker" id="est-kicker"><i></i> وكالة عقارية معتمدة ✅</div>
         <h1 id="est-hero-name">وكالة أطوار العقارية</h1>
@@ -610,7 +621,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     <form class="est-search" id="est-search" role="search" aria-label="بحث العقارات">
       <label>
         <span>الكلمة أو الحي</span>
-        <input type="search" id="est-q" name="q" placeholder="ابحث بالحي أو نوع العقار — مثال: تفرغ زينة، فيلا، شقة تمليك" autocomplete="off"/>
+        <input type="search" id="est-q" name="q" placeholder="مثال: تفرغ زينة، فيلا، شقة تمليك" autocomplete="off"/>
       </label>
       <label>
         <span>المنطقة</span>
@@ -624,7 +635,17 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         </select>
       </label>
       <label>
-        <span>نوع العرض</span>
+        <span>نوع العقار</span>
+        <select id="est-cat" name="cat">
+          <option value="all">الكل</option>
+          <option value="apartment">شقق</option>
+          <option value="villa">فلل ومنازل</option>
+          <option value="land">أراضي</option>
+          <option value="shop">محلات</option>
+        </select>
+      </label>
+      <label>
+        <span>للبيع أو الكراء</span>
         <select id="est-deal" name="deal">
           <option value="all">الكل</option>
           <option value="sale">للبيع</option>
@@ -639,7 +660,6 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 <main class="est-wrap">
   <div class="est-agency-bar" aria-label="تواصل مع الوكالة">
     <div class="est-agency-bar-id">
-      <img id="est-bar-logo" src="rizq-mark-inset.png?v=1" width="44" height="44" alt=""/>
       <div>
         <strong id="est-bar-name">وكالة أطوار العقارية</strong>
         <span id="est-bar-sub">وساطة عقارية · تفرغ زينة — نواكشوط</span>
@@ -1226,10 +1246,6 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     setText('est-bar-name', AGENCY.name);
     setText('est-bar-sub', (AGENCY.activity || (frBoot ? 'Courtage immobilier' : 'وساطة عقارية')) + ' · ' + (AGENCY.address || AGENCY.city || ''));
 
-    var logo = document.getElementById('est-bar-logo');
-    if(logo && AGENCY.logo){ logo.src = AGENCY.logo; logo.alt = AGENCY.name; }
-    var heroLogo = document.getElementById('est-hero-logo');
-    if(heroLogo && AGENCY.logo){ heroLogo.src = AGENCY.logo; heroLogo.alt = AGENCY.name; }
     var hero = document.getElementById('est-hero-img');
     if(hero && AGENCY.cover){ hero.src = AGENCY.cover; hero.alt = AGENCY.name; }
 
@@ -1462,6 +1478,8 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         b.classList.toggle('is-active', on);
         b.setAttribute('aria-selected', on ? 'true' : 'false');
       });
+      var catBox = document.getElementById('est-cat');
+      if(catBox) catBox.value = state.cat;
       renderGrid();
     });
   });
@@ -1481,7 +1499,14 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     e.preventDefault();
     state.q = document.getElementById('est-q').value || '';
     state.city = document.getElementById('est-city').value || '';
+    var catSel = document.getElementById('est-cat');
+    state.cat = (catSel && catSel.value) ? catSel.value : 'all';
     state.deal = document.getElementById('est-deal').value || 'all';
+    document.querySelectorAll('.est-tab').forEach(function(b){
+      var on = b.getAttribute('data-cat') === state.cat;
+      b.classList.toggle('is-active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
     document.querySelectorAll('.est-deal button').forEach(function(b){
       b.classList.toggle('is-on', b.getAttribute('data-deal') === state.deal);
     });
@@ -1565,12 +1590,26 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     var labs = document.querySelectorAll('.est-search label > span');
     if(labs[0]) labs[0].textContent = fr ? 'Mot-clé ou quartier' : 'الكلمة أو الحي';
     if(labs[1]) labs[1].textContent = fr ? 'Zone' : 'المنطقة';
-    if(labs[2]) labs[2].textContent = fr ? 'Type d\'offre' : 'نوع العرض';
-    ph('est-q', 'ابحث بالحي أو نوع العقار — مثال: تفرغ زينة، فيلا، شقة تمليك', 'Cherchez un quartier ou un type — ex. : Tevragh Zeina, villa…');
-    var sels = document.querySelectorAll('.est-search select');
-    if(sels[0] && sels[0].options[0] && !sels[0].options[0].value) sels[0].options[0].textContent = fr ? 'Toutes les zones' : 'كل المناطق';
-    if(sels[1] && sels[1].options){
-      Array.prototype.forEach.call(sels[1].options, function(opt){
+    if(labs[2]) labs[2].textContent = fr ? 'Type de bien' : 'نوع العقار';
+    if(labs[3]) labs[3].textContent = fr ? 'Vente ou location' : 'للبيع أو الكراء';
+    ph('est-q', 'مثال: تفرغ زينة، فيلا، شقة تمليك', 'Ex. : Tevragh Zeina, villa, appart…');
+    var citySel = document.getElementById('est-city');
+    if(citySel && citySel.options[0] && !citySel.options[0].value){
+      citySel.options[0].textContent = fr ? 'Toutes les zones' : 'كل المناطق';
+    }
+    var catSelLang = document.getElementById('est-cat');
+    if(catSelLang && catSelLang.options){
+      Array.prototype.forEach.call(catSelLang.options, function(opt){
+        if(opt.value === 'all') opt.textContent = fr ? 'Tous' : 'الكل';
+        if(opt.value === 'apartment') opt.textContent = fr ? 'Appartements' : 'شقق';
+        if(opt.value === 'villa') opt.textContent = fr ? 'Villas & maisons' : 'فلل ومنازل';
+        if(opt.value === 'land') opt.textContent = fr ? 'Terrains' : 'أراضي';
+        if(opt.value === 'shop') opt.textContent = fr ? 'Locaux' : 'محلات';
+      });
+    }
+    var dealSel = document.getElementById('est-deal');
+    if(dealSel && dealSel.options){
+      Array.prototype.forEach.call(dealSel.options, function(opt){
         if(opt.value === 'all') opt.textContent = fr ? 'Tous' : 'الكل';
         if(opt.value === 'sale') opt.textContent = fr ? 'À vendre' : 'للبيع';
         if(opt.value === 'rent') opt.textContent = fr ? 'À louer' : 'للكراء';
@@ -1756,10 +1795,10 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.42"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.43"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <script src="rizq_header.js?v=31.0" defer></script>
-<script src="rizq_header_mockup_trial.js?v=5.42" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.43" defer></script>
 <script src="rizq_pwa.js" defer></script>
 </body>
 </html>

@@ -10,8 +10,8 @@ body.rizq-mockup-hdr-trial{
   --rmh-gold-2: #E8C96A;
   background:#eef1f5;
 }
-/* صفحة العقارات (هوية داكنة) — لا تُستبدل الخلفية بـ eef1f5 فيختفي العنوان الأبيض */
-body.rizq-mockup-hdr-trial:has(.est-wrap),
+/* صفحة العقارات الداكنة فقط — صفحة الوكالة الفاتحة (rizq-page-light) تبقى بيضاء كالـمحلات */
+body.rizq-mockup-hdr-trial:has(.est-wrap):not(.rizq-page-light),
 body.rizq-mockup-hdr-trial.rizq-page-dark{
   background:
     radial-gradient(1200px 500px at 90% -10%,rgba(201,168,76,.12),transparent 55%),
@@ -20,19 +20,39 @@ body.rizq-mockup-hdr-trial.rizq-page-dark{
   background-attachment:fixed!important;
   color:#E8EDF5;
 }
-body.rizq-mockup-hdr-trial:has(.est-wrap) .est-section-head h2,
+body.rizq-mockup-hdr-trial.rizq-page-light:has(.est-wrap),
+body.rizq-mockup-hdr-trial.rizq-page-light{
+  background:#ffffff!important;
+  background-image:none!important;
+  background-attachment:scroll!important;
+  color:#0B1C33!important;
+}
+body.rizq-mockup-hdr-trial:has(.est-wrap):not(.rizq-page-light) .est-section-head h2,
 body.rizq-mockup-hdr-trial.rizq-page-dark .est-section-head h2{
   color:#fff!important;
 }
-body.rizq-mockup-hdr-trial:has(.est-wrap) .est-section-head p,
+body.rizq-mockup-hdr-trial:has(.est-wrap):not(.rizq-page-light) .est-section-head p,
 body.rizq-mockup-hdr-trial.rizq-page-dark .est-section-head p{
   color:rgba(232,237,245,.78)!important;
 }
-body.rizq-mockup-hdr-trial:has(.est-wrap) .est-tab:not(.is-active),
+body.rizq-mockup-hdr-trial.rizq-page-light .est-section-head h2{
+  color:#0B1C33!important;
+}
+body.rizq-mockup-hdr-trial.rizq-page-light .est-section-head p,
+body.rizq-mockup-hdr-trial.rizq-page-light .est-section-head .tag,
+body.rizq-mockup-hdr-trial.rizq-page-light .est-gallery-head p,
+body.rizq-mockup-hdr-trial.rizq-page-light .est-count{
+  color:#1e2a3a!important;
+}
+body.rizq-mockup-hdr-trial:has(.est-wrap):not(.rizq-page-light) .est-tab:not(.is-active),
 body.rizq-mockup-hdr-trial.rizq-page-dark .est-tab:not(.is-active),
-body.rizq-mockup-hdr-trial:has(.est-wrap) .est-deal button:not(.is-on),
+body.rizq-mockup-hdr-trial:has(.est-wrap):not(.rizq-page-light) .est-deal button:not(.is-on),
 body.rizq-mockup-hdr-trial.rizq-page-dark .est-deal button:not(.is-on){
   color:rgba(255,255,255,.82)!important;
+}
+body.rizq-mockup-hdr-trial.rizq-page-light .est-tab:not(.is-active),
+body.rizq-mockup-hdr-trial.rizq-page-light .est-deal button:not(.is-on){
+  color:#2f3c4d!important;
 }
 body.rizq-mockup-hdr-trial #nav,
 body.rizq-mockup-hdr-trial #rizq-desk-nav,
