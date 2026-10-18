@@ -1458,11 +1458,11 @@
     var run = typeof actionFn === 'function'
       ? actionFn
       : function () {
-          if (typeof global.openChat === 'function') global.openChat(null);
-          else if (typeof window.openChat === 'function') window.openChat(null);
+          if (typeof window.openChat === 'function') window.openChat(null);
+          else if (typeof window.openShowroomChat === 'function') window.openShowroomChat();
         };
     if (isPromoDemoContext()) {
-      run();
+      try { run(); } catch (eChat) {}
       return true;
     }
     return requireAuth(run, reasonKey || 'reasonMsg');
