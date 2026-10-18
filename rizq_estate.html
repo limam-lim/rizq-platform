@@ -198,7 +198,7 @@ button{font:inherit;border:0;background:none;color:inherit}
 }
 
 /* ── Hero (أقصر قليلاً — أقل عرضاً بصرياً) ── */
-.est-hero{position:relative;min-height:min(52vh,460px);max-height:560px;overflow:hidden;display:flex;align-items:flex-end}
+.est-hero{position:relative;min-height:min(42vh,380px);max-height:440px;overflow:hidden;display:flex;align-items:flex-end}
 .est-hero-media{position:absolute;inset:0}
 .est-hero-media img{
   width:100%;height:100%;object-fit:cover;
@@ -215,7 +215,7 @@ button{font:inherit;border:0;background:none;color:inherit}
 }
 .est-hero-copy{
   position:relative;z-index:2;width:100%;max-width:1180px;margin:0 auto;
-  padding:28px 20px 22px;animation:estRise .9s ease both;
+  padding:18px 20px 16px;animation:estRise .9s ease both;
 }
 @keyframes estRise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .est-kicker{
@@ -226,8 +226,9 @@ button{font:inherit;border:0;background:none;color:inherit}
 }
 .est-kicker i{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(201,168,76,.22)}
 .est-hero h1{
-  font-family:var(--display);font-size:clamp(28px,4.6vw,48px);font-weight:700;line-height:1.15;max-width:16ch;
+  font-family:var(--display);font-size:clamp(22px,3.6vw,38px);font-weight:700;line-height:1.2;max-width:none;
   margin-bottom:8px;text-shadow:0 12px 48px rgba(0,0,0,.55);
+  white-space:nowrap;
 }
 .est-hero h1 em{
   font-style:normal;
@@ -655,7 +656,8 @@ html[dir="ltr"] .est-lb-nav.next{left:auto;right:max(18px, env(safe-area-inset-r
 }
 @media(max-width:640px){
   .est-card,.est-card.featured{grid-column:span 12}
-  .est-hero{min-height:min(48vh,420px);max-height:480px}
+  .est-hero{min-height:min(40vh,360px);max-height:400px}
+  .est-hero h1,#est-hero-name{white-space:normal;font-size:clamp(20px,5.2vw,30px)}
   .est-search{grid-template-columns:1fr}
   .est-foot-inner{grid-template-columns:1fr}
   .est-chip.nav-hide-sm{display:none}
@@ -752,7 +754,11 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 .est-review-card .stars{color:#C9A84C;font-size:14px;margin:4px 0 6px}
 .est-review-card .txt{color:#1e2a3a;font-size:14px;line-height:1.7;font-weight:600}
 .est-review-card .when{color:#3a4d63;font-size:12.5px;font-weight:700;margin-top:8px}
-#est-hero-name{font-family:var(--display);font-size:clamp(26px,4.2vw,44px);font-weight:700;line-height:1.15;margin:4px 0 6px;color:#fff;text-shadow:0 8px 28px rgba(0,0,0,.45)}
+#est-hero-name{
+  font-family:var(--display);font-size:clamp(22px,3.6vw,38px);font-weight:700;line-height:1.2;
+  margin:4px 0 6px;color:#fff;text-shadow:0 8px 28px rgba(0,0,0,.45);
+  max-width:none;white-space:nowrap;
+}
 
 </style>
 </head>
