@@ -4,8 +4,10 @@
  *
  * قاعدة المنصة:
  *   - صفحات النماذج / الديمو: كل شيء مفتوح (اتصال، واتساب، محادثة، أزرار).
- *   - حساب حقيقي: isContactVisible = isPaid || isTrialActive
- *   - داشبورد حقيقي بعد انتهاء التجربة: قراءة فقط حتى الاشتراك.
+ *   - داشبورد التاجر: isDashboardWritable = isPaid || isTrialActive
+ *   - ظهور جهات الاتصال للزائر:
+ *       isContactVisible = (isPaid || isTrialActive) && viewerLoggedIn
+ *     أي: باقة/تجربة للتاجر + حساب مسجّل للزائر.
  */
 (function (global) {
   'use strict';
@@ -39,6 +41,33 @@
     return isDemoAccountId(id);
   }
 
+  /** هل الزائر مسجّل دخوله بحساب على المنصة؟ */
+  function isViewerLoggedIn() {
+    try {
+      if (global.RizqAuthGate && typeof global.RizqAuthGate.isLoggedIn === 'function') {
+        return !!global.RizqAuthGate.isLoggedIn();
+      }
+    } catch (e0) {}
+    try {
+      if (global.RizqContactGate && typeof global.RizqContactGate.getViewerCredentials === 'function') {
+        if (global.RizqContactGate.getViewerCredentials()) return true;
+      }
+    } catch (e1) {}
+    try {
+      var s = JSON.parse(localStorage.getItem('rizq_session') || 'null');
+      if (s && (s.accountId || s.id) && (s.accessToken || s.token)) return true;
+    } catch (e2) {}
+    try {
+      var ind = JSON.parse(localStorage.getItem('rizq_individual_session') || 'null');
+      if (ind && (ind.accountId || ind.id || ind.phone)) return true;
+    } catch (e3) {}
+    try {
+      var dash = JSON.parse(localStorage.getItem('rizq_dashboard_session') || 'null');
+      if (dash && dash.id && dash.accessToken) return true;
+    } catch (e4) {}
+    return false;
+  }
+
   function useSubscriptionPermissions(accId, opts) {
     opts = opts || {};
     /* النماذج: دائماً مفتوحة — لا قفل اتصال ولا وضع قراءة فقط */
@@ -51,6 +80,8 @@
         isPaid: false,
         isTrialActive: false,
         isExpired: false,
+        viewerLoggedIn: true,
+        sellerCanExpose: true,
         isContactVisible: true,
         contactsLocked: false,
         isDashboardWritable: true,
@@ -58,6 +89,8 @@
         upgradeMessageFr: 'La période d’essai est terminée. Veuillez souscrire à une offre pour publier de nouvelles annonces et activer le bouton d’appel pour vos clients.',
         lockedContactLabelAr: 'رقم التواصل غير متاح حالياً',
         lockedContactLabelFr: 'Numéro de contact indisponible pour le moment',
+        loginRequiredLabelAr: 'سجّل دخولك بحساب على رزق لعرض بيانات التواصل مع التاجر',
+        loginRequiredLabelFr: 'Connectez-vous avec un compte Rizq pour voir les coordonnées du commerçant',
         sub: { status: 'demo', isDemo: true }
       };
     }
@@ -66,7 +99,10 @@
     var isTrialActive = status === 'trial' || status === 'trial_expiring' || (!!sub.isTrial && !sub.isExpired && status !== 'expired');
     var isPaid = status === 'active' || status === 'expiring_soon';
     var isExpired = status === 'expired' || status === 'no_subscription' || status === 'pending' || status === 'suspended';
-    var isContactVisible = !!(isPaid || isTrialActive);
+    var sellerCanExpose = !!(isPaid || isTrialActive);
+    var viewerLoggedIn = isViewerLoggedIn();
+    /* ظهور الرقم للزبون: باقة/تجربة التاجر + حساب الزائر */
+    var isContactVisible = !!(sellerCanExpose && viewerLoggedIn);
     var isDashboardWritable = !!(isPaid || isTrialActive);
     return {
       accountId: accId || '',
@@ -75,6 +111,8 @@
       isPaid: isPaid,
       isTrialActive: isTrialActive,
       isExpired: isExpired,
+      viewerLoggedIn: viewerLoggedIn,
+      sellerCanExpose: sellerCanExpose,
       isContactVisible: isContactVisible,
       contactsLocked: !isContactVisible,
       isDashboardWritable: isDashboardWritable,
@@ -82,6 +120,8 @@
       upgradeMessageFr: 'La période d’essai est terminée. Veuillez souscrire à une offre pour publier de nouvelles annonces et activer le bouton d’appel pour vos clients.',
       lockedContactLabelAr: 'رقم التواصل غير متاح حالياً',
       lockedContactLabelFr: 'Numéro de contact indisponible pour le moment',
+      loginRequiredLabelAr: 'سجّل دخولك بحساب على رزق لعرض بيانات التواصل مع التاجر',
+      loginRequiredLabelFr: 'Connectez-vous avec un compte Rizq pour voir les coordonnées du commerçant',
       sub: sub
     };
   }
@@ -116,6 +156,7 @@
   global.RizqSubscriptionPermissions = {
     useSubscriptionPermissions: useSubscriptionPermissions,
     isDemoPage: isDemoPage,
+    isViewerLoggedIn: isViewerLoggedIn,
     disableFormsAndShowUpgradeBanner: disableFormsAndShowUpgradeBanner
   };
   global.useSubscriptionPermissions = useSubscriptionPermissions;

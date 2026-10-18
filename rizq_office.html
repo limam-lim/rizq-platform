@@ -1959,14 +1959,15 @@ function openMaps(){
       var email = acc.email || '';
       var wa = acc.whatsapp || '';
       var fr = isFr();
-      /* النماذج: كل شيء مفتوح */
+      /* ظهور الرقم: باقة/تجربة التاجر + زائر مسجّل — النماذج مفتوحة */
+      var _perms = null;
       try{
         if(typeof useSubscriptionPermissions === 'function'){
-          var perms = useSubscriptionPermissions(accountId, {
+          _perms = useSubscriptionPermissions(accountId, {
             isDemo: !!(window._rizqOfficeIsDemo || accountId === 'demo_law' || /^demo/i.test(String(accountId||'')))
           });
-          locked = !perms.isContactVisible;
-          acc.isContactVisible = perms.isContactVisible;
+          locked = !_perms.isContactVisible;
+          acc.isContactVisible = _perms.isContactVisible;
         }
       }catch(ePerm){}
       if(window._rizqOfficeIsDemo || accountId === 'demo_law' || /^demo/i.test(String(accountId||''))){
@@ -1975,8 +1976,17 @@ function openMaps(){
       }
       function maskClick(e){
         e.preventDefault();
+        if(_perms && !_perms.isDemoPage && !_perms.viewerLoggedIn && typeof window.rizqRequireAuth === 'function'){
+          window.rizqRequireAuth(function(){
+            if(typeof window._rizqLoadOfficeContacts === 'function') window._rizqLoadOfficeContacts(accountId);
+          }, 'reasonPhone');
+          return;
+        }
         if(window.RizqContactGate && accountId){
-          RizqContactGate.onMaskedContactClick(accountId, 'office', { lang: fr ? 'fr' : 'ar' });
+          RizqContactGate.onMaskedContactClick(accountId, 'office', {
+            lang: fr ? 'fr' : 'ar',
+            onAuthed: function(){ if(typeof window._rizqLoadOfficeContacts === 'function') window._rizqLoadOfficeContacts(accountId); }
+          });
         } else {
           alert(fr ? 'Numéro de contact indisponible pour le moment' : 'رقم التواصل غير متاح حالياً');
         }

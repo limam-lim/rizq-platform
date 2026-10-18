@@ -12,14 +12,32 @@
   function getViewerCredentials() {
     try {
       var session = JSON.parse(localStorage.getItem('rizq_session') || 'null');
-      if (session && session.accountId && session.accessToken) {
-        return { accountId: session.accountId, accessToken: session.accessToken };
+      if (session && (session.accountId || session.id) && (session.accessToken || session.token)) {
+        return {
+          accountId: session.accountId || session.id,
+          accessToken: session.accessToken || session.token
+        };
+      }
+      var ind = JSON.parse(localStorage.getItem('rizq_individual_session') || 'null');
+      if (ind && (ind.accountId || ind.id) && (ind.accessToken || ind.token)) {
+        return {
+          accountId: ind.accountId || ind.id,
+          accessToken: ind.accessToken || ind.token
+        };
       }
       var dash = JSON.parse(localStorage.getItem('rizq_dashboard_session') || 'null');
       if (dash && dash.id && dash.accessToken) {
         return { accountId: dash.id, accessToken: dash.accessToken };
       }
     } catch (e) { /* ignore */ }
+    /* جلسة المشتري عبر بوابة المصادقة */
+    try {
+      if (global.RizqAuthGate && typeof global.RizqAuthGate.isLoggedIn === 'function' && global.RizqAuthGate.isLoggedIn()) {
+        var s = typeof global.RizqAuthGate.getSession === 'function' ? global.RizqAuthGate.getSession() : null;
+        if (s && s.id && s.token) return { accountId: s.id, accessToken: s.token };
+        return { accountId: 'buyer', accessToken: 'session' };
+      }
+    } catch (e2) { /* ignore */ }
     return null;
   }
 
@@ -64,17 +82,28 @@
   function onMaskedContactClick(targetAccountId, module, opts) {
     opts = opts || {};
     var fr = opts.lang === 'fr';
+    var creds = getViewerCredentials();
+    /* زائر بدون حساب: اطلب تسجيل الدخول قبل أي تواصل */
+    if (!creds && typeof global.rizqRequireAuth === 'function') {
+      global.rizqRequireAuth(function () {
+        if (typeof opts.onAuthed === 'function') opts.onAuthed();
+        else if (typeof global.location !== 'undefined') global.location.reload();
+      }, opts.reasonKey || 'reasonPhone');
+      return Promise.resolve({ ok: false, access: { lockReason: 'unauthenticated', contactsLocked: true } });
+    }
     return reportContactAttempt(targetAccountId, module, opts).then(function (res) {
       var access = res && res.access ? res.access : {};
       var msg = fr
-        ? 'Coordonnées masquées — abonnement actif requis pour débloquer les contacts.'
-        : 'بيانات التواصل مخفية — يلزم اشتراك مدفوع نشط لفتح التواصل.';
-      if (access.lockReason === 'trial') {
-        msg = fr ? 'Période d\'essai — les contacts restent masqués.' : 'فترة تجريبية — بيانات التواصل مخفية.';
-      } else if (access.lockReason === 'expired') {
-        msg = fr ? 'Abonnement expiré — renouvelez pour recevoir des clients.' : 'انتهى الاشتراك — جدّد لاستقبال العملاء.';
+        ? 'Coordonnées masquées — le commerçant doit activer un forfait.'
+        : 'رقم التواصل غير متاح حالياً — يجب على التاجر تفعيل باقة اشتراك.';
+      if (access.lockReason === 'expired' || access.lockReason === 'no_subscription' || access.lockReason === 'pending' || access.lockReason === 'suspended') {
+        msg = fr
+          ? 'Numéro de contact indisponible pour le moment — forfait commerçant requis.'
+          : 'رقم التواصل غير متاح حالياً — يلزم تفعيل باقة للتاجر.';
       } else if (access.lockReason === 'unauthenticated') {
-        msg = fr ? 'Connectez-vous puis souscrivez pour voir les coordonnées.' : 'سجّل دخولك واشترك لعرض بيانات التواصل.';
+        msg = fr
+          ? 'Connectez-vous avec un compte Rizq pour voir les coordonnées du commerçant.'
+          : 'سجّل دخولك بحساب على رزق لعرض بيانات التواصل مع التاجر.';
       }
       if (typeof opts.onMessage === 'function') opts.onMessage(msg, res);
       else if (typeof global.showToast === 'function') global.showToast(msg, 'info');

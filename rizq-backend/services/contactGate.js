@@ -79,6 +79,7 @@ function getViewerContactEligibility(viewerAccountId, module) {
     return { canUnlock: false, reason: 'unauthenticated', subscriptionStatus: 'no_subscription' };
   }
   const mod = normalizeModule(module);
+  /* المناقصات: تبقى على منطق باقة الزائر */
   if (mod === 'tender') {
     const te = getTenderEntitlements(viewerAccountId);
     return {
@@ -88,26 +89,29 @@ function getViewerContactEligibility(viewerAccountId, module) {
       isTrial: !!te.isTrial,
     };
   }
+  /*
+   * المحلات/المكاتب/العقارات/المعارض:
+   * يكفي أن يكون للزائر حساب مسجّل على المنصة لفتح التواصل
+   * (شرط أن يكون للتاجر باقة أو تجربة نشطة — يُفحص في resolveContactGate).
+   */
   const rec = getAccountRecord(viewerAccountId);
   const ent = getEntitlements(viewerAccountId, rec && rec.accountType, rec || undefined);
-  if (ent.isTrial) {
-    return { canUnlock: false, reason: 'trial', subscriptionStatus: ent.subscriptionStatus, isTrial: true };
-  }
-  if (['expired', 'suspended', 'pending', 'no_subscription'].includes(ent.subscriptionStatus)) {
-    return { canUnlock: false, reason: ent.subscriptionStatus, subscriptionStatus: ent.subscriptionStatus, isTrial: false };
-  }
-  const paid = rec ? isPaymentConfirmed(rec) : false;
-  const active = ACTIVE_STATUSES.includes(ent.subscriptionStatus) && paid;
   return {
-    canUnlock: active,
-    reason: active ? 'active' : 'pending',
-    subscriptionStatus: ent.subscriptionStatus,
-    isTrial: false,
+    canUnlock: true,
+    reason: 'authenticated',
+    subscriptionStatus: ent.subscriptionStatus || 'no_subscription',
+    isTrial: !!ent.isTrial,
   };
 }
 
 /**
  * Resolve full contact gate for a viewer trying to access a target account's contacts.
+ *
+ * المحلات وما شابه:
+ *   جهات الاتصال تظهر فقط إذا
+ *   (1) التاجر لديه باقة مدفوعة أو تجربة نشطة
+ *   و (2) الزائر مسجّل الدخول بحساب على المنصة
+ * النماذج/الديمو تُستثنى على الواجهة فقط.
  */
 function resolveContactGate(viewerAccountId, targetAccountId, module, accountTypeHint) {
   const mod = normalizeModule(module);
@@ -118,8 +122,7 @@ function resolveContactGate(viewerAccountId, targetAccountId, module, accountTyp
   if (mod === 'tender') {
     contactsUnlocked = !!viewer.canUnlock;
   } else {
-    /* واجهة المحل/الوكالة العامة: ظهور الهاتف يعتمد على اشتراك البائع (مدفوع أو تجربة نشطة) */
-    contactsUnlocked = !!seller.canExpose;
+    contactsUnlocked = !!(seller.canExpose && viewer.canUnlock);
   }
 
   const contactsLocked = !contactsUnlocked;

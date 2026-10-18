@@ -1756,6 +1756,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     var visible = !perms || perms.isContactVisible;
     var fr = isFrEstate();
     var lockedLbl = fr ? 'Numéro de contact indisponible pour le moment' : 'رقم التواصل غير متاح حالياً';
+    var needLogin = !!(perms && perms.sellerCanExpose && !perms.viewerLoggedIn);
     function lockEl(el, isCall){
       if(!el) return;
       el.removeAttribute('href');
@@ -1764,9 +1765,13 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       el.setAttribute('aria-disabled', 'true');
       el.onclick = function(e){
         e.preventDefault();
-        alert(lockedLbl + '\n' + (fr
-          ? 'Le propriétaire doit activer un forfait pour afficher le contact.'
-          : 'يجب على صاحب الوكالة تفعيل باقة لإظهار رقم التواصل.'));
+        if(needLogin && typeof window.rizqRequireAuth === 'function'){
+          window.rizqRequireAuth(function(){ applyEstateContactVisibility(acc); }, 'reasonPhone');
+          return;
+        }
+        alert(lockedLbl + '\n' + (needLogin
+          ? (fr ? 'Connectez-vous avec un compte Rizq pour voir les coordonnées.' : 'سجّل دخولك بحساب على رزق لعرض بيانات التواصل مع التاجر.')
+          : (fr ? 'Le propriétaire doit activer un forfait pour afficher le contact.' : 'يجب على صاحب الوكالة تفعيل باقة لإظهار رقم التواصل.')));
       };
       if(isCall) el.textContent = fr ? '🔒 Contact verrouillé' : '🔒 ' + lockedLbl;
     }
