@@ -255,46 +255,55 @@
 @keyframes rzq-pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .rzq-mclose{background:none;border:none;color:rgba(255,255,255,.7);font-size:20px;cursor:pointer;padding:4px 8px;border-radius:8px;transition:.2s;line-height:1}
 .rzq-mclose:hover{background:rgba(255,255,255,.12);color:#fff}
-.rzq-ad-strip{background:rgba(27,58,107,.06);padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(0,0,0,.07);flex-shrink:0}
-.rzq-ad-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#C9A84C,#e8c96a);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.rzq-ad-strip{background:#eef3fb;padding:8px 12px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(27,58,107,.12);flex-shrink:0}
+.rzq-ad-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#C9A84C,#e8c96a);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .rzq-ad-info{flex:1;min-width:0}
-.rzq-ad-name{font-size:12px;font-weight:700;color:#1a2535;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rzq-ad-note{font-size:10.5px;color:#6b7280}
-.rzq-msgs{flex:1 1 auto;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-height:72px;max-height:none;-webkit-overflow-scrolling:touch}
+.rzq-ad-kicker{font-size:10px;font-weight:800;letter-spacing:.02em;color:#1B3A6B;margin-bottom:2px;text-transform:none}
+.rzq-ad-name{font-size:13px;font-weight:800;color:#0f172a;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rzq-ad-note{font-size:11px;color:#475569;margin-top:2px;line-height:1.35}
+.rzq-msgs{flex:1 1 auto;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:8px;min-height:48px;max-height:none;-webkit-overflow-scrolling:touch}
 .rzq-msgs::-webkit-scrollbar{width:4px}.rzq-msgs::-webkit-scrollbar-track{background:transparent}.rzq-msgs::-webkit-scrollbar-thumb{background:rgba(27,58,107,.15);border-radius:4px}
-.rzq-bubble{max-width:80%;padding:8px 12px;border-radius:14px;font-size:13px;line-height:1.5;word-break:break-word}
+.rzq-bubble{max-width:82%;padding:9px 12px;border-radius:14px;font-size:13.5px;line-height:1.55;word-break:break-word;color:#0f172a}
 .rzq-bubble.me{background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;align-self:flex-end;border-bottom-left-radius:3px}
-.rzq-bubble.them{background:#fff;color:#1a2535;border:1px solid rgba(0,0,0,.08);align-self:flex-start;border-bottom-right-radius:3px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.rzq-bubble .rzq-ts{font-size:10px;opacity:.5;margin-top:4px;text-align:end}
-.rzq-suggest{display:flex;gap:6px;padding:4px 10px 6px;overflow-x:auto;flex-shrink:0}
+.rzq-bubble.them{background:#fff;color:#0f172a;border:1px solid rgba(15,23,42,.1);align-self:flex-start;border-bottom-right-radius:3px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.rzq-bubble .rzq-ts{font-size:10px;opacity:.55;margin-top:4px;text-align:end}
+.rzq-suggest{display:none;gap:6px;padding:4px 10px 6px;overflow-x:auto;flex-shrink:0}
+.rzq-suggest.on{display:flex}
 .rzq-suggest::-webkit-scrollbar{display:none}
 .rzq-sq{padding:6px 10px;background:#fff;border:1.5px solid rgba(27,58,107,.15);border-radius:10px;font-size:12px;color:#1B3A6B;cursor:pointer;white-space:nowrap;font-family:inherit;transition:.2s;flex-shrink:0}
 .rzq-sq:hover{border-color:#C9A84C;color:#C9A84C;background:rgba(201,168,76,.06)}
 .rzq-typing{display:flex;align-items:center;gap:6px;padding:10px 14px;background:#fff;border-radius:16px;border-bottom-right-radius:3px;align-self:flex-start;border:1px solid rgba(0,0,0,.08);box-shadow:0 1px 4px rgba(0,0,0,.06);width:60px}
 .rzq-typing span{width:7px;height:7px;background:#9ca3af;border-radius:50%;animation:rzq-blink 1.2s infinite}.rzq-typing span:nth-child(2){animation-delay:.2s}.rzq-typing span:nth-child(3){animation-delay:.4s}
 @keyframes rzq-blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
-.rzq-name-row{padding:6px 12px 2px;display:flex;flex-direction:column;gap:5px;border-top:1px solid rgba(0,0,0,.07);flex-shrink:0;background:#f5f8ff}
-.rzq-name-input{padding:8px 10px;border:1.5px solid rgba(27,58,107,.18);border-radius:10px;font-size:12.5px;font-family:inherit;background:#fff;color:#1a2535;outline:none;transition:.2s;width:100%;box-sizing:border-box}
-.rzq-name-input:focus{border-color:#C9A84C}
-.rzq-name-input::placeholder{color:#9ca3af}
-.rzq-inp-row{padding:8px 10px 8px;display:flex;gap:6px;align-items:flex-end;border-top:1px solid rgba(0,0,0,.07);background:#fff;flex-shrink:0;position:relative;z-index:2}
-.rzq-inp{flex:1;padding:9px 12px;border:1.5px solid rgba(27,58,107,.15);border-radius:20px;font-size:13px;font-family:inherit;resize:none;outline:none;max-height:72px;overflow-y:auto;background:#f9fafb;color:#1a2535;transition:.2s;box-sizing:border-box}
+.rzq-name-row{padding:8px 12px 6px;display:flex;flex-direction:column;gap:6px;border-top:1px solid rgba(27,58,107,.1);flex-shrink:0;background:#f8fafc}
+.rzq-field{display:flex;flex-direction:column;gap:3px}
+.rzq-field-lbl{font-size:11px;font-weight:800;color:#1B3A6B}
+.rzq-name-input{padding:8px 10px;border:1.5px solid rgba(27,58,107,.22);border-radius:10px;font-size:13px;font-family:inherit;background:#fff;color:#0f172a;outline:none;transition:.2s;width:100%;box-sizing:border-box}
+.rzq-name-input:focus{border-color:#C9A84C;box-shadow:0 0 0 3px rgba(201,168,76,.15)}
+.rzq-name-input::placeholder{color:#94a3b8}
+.rzq-composer{flex-shrink:0;background:#fff;border-top:1px solid rgba(27,58,107,.12);box-shadow:0 -4px 16px rgba(15,35,65,.06);position:relative;z-index:3}
+.rzq-inp-row{padding:8px 10px 6px;display:flex;gap:6px;align-items:flex-end}
+.rzq-inp{flex:1;padding:10px 12px;border:1.5px solid rgba(27,58,107,.2);border-radius:16px;font-size:13.5px;font-family:inherit;resize:none;outline:none;max-height:72px;overflow-y:auto;background:#f8fafc;color:#0f172a;transition:.2s;box-sizing:border-box}
 .rzq-inp:focus{border-color:#C9A84C;background:#fff}
-.rzq-inp::placeholder{color:#9ca3af}
-.rzq-attach,.rzq-catalog-btn{width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(27,58,107,.18);background:#f8fafc;color:#1B3A6B;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;transition:.2s;padding:0}
-.rzq-attach:hover,.rzq-catalog-btn:hover{border-color:#C9A84C;background:rgba(201,168,76,.1)}
-.rzq-send{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#C9A84C,#e8c96a);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s;align-self:flex-end}
-.rzq-send:hover{transform:scale(1.08);box-shadow:0 4px 14px rgba(201,168,76,.45)}
-.rzq-send svg{width:17px;height:17px;fill:#1B3A6B}
-.rzq-footer{text-align:center;font-size:10px;color:#9ca3af;padding:3px 10px 8px;background:#fff;flex-shrink:0}
+.rzq-inp::placeholder{color:#64748b}
+.rzq-tool{min-width:44px;height:40px;border-radius:12px;border:1.5px solid rgba(27,58,107,.18);background:#f1f5f9;color:#1B3A6B;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;gap:0;padding:2px 6px;font-family:inherit;transition:.2s;line-height:1.05}
+.rzq-tool:hover{border-color:#C9A84C;background:rgba(201,168,76,.12)}
+.rzq-tool .ico{font-size:14px}
+.rzq-tool .lbl{font-size:9px;font-weight:800;color:#1B3A6B}
+.rzq-send{min-width:48px;height:40px;border-radius:12px;background:linear-gradient(135deg,#C9A84C,#e8c96a);border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;transition:.2s;padding:2px 8px;gap:0;font-family:inherit}
+.rzq-send:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(201,168,76,.45)}
+.rzq-send svg{width:16px;height:16px;fill:#1B3A6B}
+.rzq-send .lbl{font-size:9px;font-weight:800;color:#1B3A6B}
+.rzq-footer{text-align:center;font-size:10px;color:#64748b;padding:2px 10px 8px;background:#fff;flex-shrink:0}
 .rzq-footer strong{color:#1B3A6B}
-.rzq-priv-note{font-size:10.5px;color:#6b7280;padding:1px 4px 2px;text-align:center}
-.rzq-img-prev{display:none;padding:6px 10px;background:#fff;border-top:1px solid rgba(0,0,0,.06);flex-shrink:0;align-items:center;gap:8px}
+.rzq-priv-note{font-size:10.5px;color:#475569;padding:0 2px 2px;line-height:1.4}
+.rzq-img-prev{display:none;padding:7px 10px;background:#fffbeb;border-top:1px solid #fde68a;flex-shrink:0;align-items:center;gap:8px}
 .rzq-img-prev.on{display:flex}
-.rzq-img-prev img{width:52px;height:52px;object-fit:cover;border-radius:10px;border:1px solid rgba(27,58,107,.15)}
-.rzq-img-prev-meta{flex:1;min-width:0;font-size:11.5px;color:#334155;line-height:1.4}
+.rzq-img-prev img{width:48px;height:48px;object-fit:cover;border-radius:10px;border:1px solid #f59e0b}
+.rzq-img-prev-meta{flex:1;min-width:0;font-size:12px;font-weight:700;color:#92400e;line-height:1.35}
+.rzq-img-prev-meta small{display:block;font-weight:600;color:#b45309;font-size:10.5px;margin-top:1px}
 .rzq-img-prev-x{border:0;background:#fee2e2;color:#b91c1c;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;flex-shrink:0}
-.rzq-ad-strip.has-thumb .rzq-ad-icon{width:44px;height:44px;padding:0;overflow:hidden;background:#fff}
+.rzq-ad-strip.has-thumb .rzq-ad-icon{padding:0;overflow:hidden;background:#fff;border:1px solid rgba(27,58,107,.12)}
 .rzq-ad-strip.has-thumb .rzq-ad-icon img{width:100%;height:100%;object-fit:cover;display:block}
 .rzq-bubble img.rzq-bimg{display:block;max-width:min(220px,70vw);max-height:160px;border-radius:12px;margin:0 0 6px;object-fit:cover;border:1px solid rgba(0,0,0,.08)}
 .rzq-cat-sheet{display:none;position:absolute;inset:auto 0 0 0;max-height:55%;background:#fff;border-radius:16px 16px 0 0;box-shadow:0 -8px 28px rgba(15,35,65,.2);z-index:5;flex-direction:column;overflow:hidden}
@@ -305,46 +314,47 @@
 .rzq-cat-item:hover{border-color:#C9A84C;background:rgba(201,168,76,.08)}
 .rzq-cat-item img{width:100%;height:72px;object-fit:cover;border-radius:8px;background:#e2e8f0;display:block;margin-bottom:6px}
 .rzq-cat-item .t{font-size:12px;font-weight:700;color:#1a2535;line-height:1.35}
-.rzq-mbox{position:relative}
+.rzq-mbox{position:relative;max-height:min(82dvh,82vh)}
 @media(max-width:560px){
   #rzq-messenger-modal{padding-bottom:max(12px,env(safe-area-inset-bottom,0px))}
-  .rzq-mbox{width:calc(100% - 16px);max-width:100%;max-height:min(72dvh,72vh);margin:0 8px max(10px,env(safe-area-inset-bottom,0px));border-radius:16px}
+  .rzq-mbox{width:calc(100% - 16px);max-width:100%;max-height:min(78dvh,78vh);margin:0 8px max(10px,env(safe-area-inset-bottom,0px));border-radius:16px}
   .rzq-mhead{padding:10px 12px;border-radius:16px 16px 0 0}
-  .rzq-msgs{padding:8px 10px;min-height:56px}
-  .rzq-name-row{padding:5px 10px 1px;gap:4px}
-  .rzq-name-input{padding:7px 9px;font-size:12px}
-  .rzq-suggest{padding:3px 8px 5px}
-  .rzq-inp-row{padding:7px 8px 7px}
-  .rzq-footer{padding:2px 8px 7px}
+  .rzq-msgs{padding:8px 10px;min-height:40px}
+  .rzq-name-row{padding:6px 10px 4px;gap:5px}
+  .rzq-name-input{padding:8px 10px;font-size:13px}
+  .rzq-inp-row{padding:7px 8px 5px}
+  .rzq-footer{padding:1px 8px 7px}
+  .rzq-mhead-sub{display:none}
 }
-@media(max-height:700px){
-  .rzq-mbox{max-height:min(68dvh,68vh)}
-  .rzq-ad-strip{padding:6px 10px}
-  .rzq-suggest{display:none}
+@media(max-height:720px){
+  .rzq-mbox{max-height:min(74dvh,74vh)}
+  .rzq-suggest{display:none!important}
+  .rzq-priv-note{display:none}
+  .rzq-ad-note{display:none}
 }
 @supports not (height:1dvh){
-  .rzq-mbox{max-height:78vh}
-  @media(max-width:560px){.rzq-mbox{max-height:72vh}}
-  @media(max-height:700px){.rzq-mbox{max-height:68vh}}
+  .rzq-mbox{max-height:82vh}
+  @media(max-width:560px){.rzq-mbox{max-height:78vh}}
+  @media(max-height:720px){.rzq-mbox{max-height:74vh}}
 }
 `;
     var el = document.createElement('style');
     el.id = 'rzq-messenger-css';
-    el.setAttribute('data-v', '23.2');
+    el.setAttribute('data-v', '28.6');
     el.textContent = css;
     document.head.appendChild(el);
   }
 
   function _injectModal() {
     var existing = document.getElementById(MODAL_ID);
-    /* إعادة بناء النافذة إن كانت نسخة قديمة بلا أزرار الصورة/الكتالوج */
+    /* إعادة بناء النافذة عند تحديث وضوح المعلومات */
     if (existing) {
-      if (existing.getAttribute('data-v') === '28.5' && document.getElementById('rzq-m-attach')) return;
+      if (existing.getAttribute('data-v') === '28.6' && document.getElementById('rzq-m-adkicker')) return;
       try { existing.parentNode.removeChild(existing); } catch (eRm) {}
     }
     var div = document.createElement('div');
     div.id = MODAL_ID;
-    div.setAttribute('data-v', '28.5');
+    div.setAttribute('data-v', '28.6');
     div.innerHTML = `
 <div class="rzq-mbox" role="dialog" aria-modal="true" aria-label="مراسلة البائع">
   <div class="rzq-mhead">
@@ -360,8 +370,9 @@
   <div class="rzq-ad-strip" id="rzq-m-adstrip">
     <div class="rzq-ad-icon" id="rzq-m-adicon">📦</div>
     <div class="rzq-ad-info">
+      <div class="rzq-ad-kicker" id="rzq-m-adkicker">بخصوص</div>
       <div class="rzq-ad-name" id="rzq-m-adname">الإعلان</div>
-      <div class="rzq-ad-note" id="rzq-m-adnote">استفسار عن هذا الإعلان</div>
+      <div class="rzq-ad-note" id="rzq-m-adnote">اكتب سؤالك أدناه</div>
     </div>
   </div>
 
@@ -375,11 +386,18 @@
   </div>
 
   <div class="rzq-name-row" id="rzq-m-namerow">
-    <input class="rzq-name-input" id="rzq-m-nameinp" type="text" placeholder="اسمك (اختياري)" maxlength="40" />
-    <input class="rzq-name-input" id="rzq-m-phoneinp" type="tel" placeholder="رقم هاتفك (ليتمكن البائع من الرد عليك)" maxlength="20" />
-    <div class="rzq-priv-note" id="rzq-m-privnote">🔒 رقمك يصل للبائع فقط لغرض الرد — لا يُنشر علناً</div>
+    <div class="rzq-field">
+      <label class="rzq-field-lbl" id="rzq-m-namelbl" for="rzq-m-nameinp">الاسم</label>
+      <input class="rzq-name-input" id="rzq-m-nameinp" type="text" placeholder="اختياري" maxlength="40" />
+    </div>
+    <div class="rzq-field">
+      <label class="rzq-field-lbl" id="rzq-m-phonelbl" for="rzq-m-phoneinp">رقم الهاتف للرد</label>
+      <input class="rzq-name-input" id="rzq-m-phoneinp" type="tel" placeholder="مثال: 44 55 66 77" maxlength="20" />
+    </div>
+    <div class="rzq-priv-note" id="rzq-m-privnote">🔒 الرقم يصل للتاجر فقط للرد — لا يُعرض للعامة</div>
   </div>
 
+  <div class="rzq-composer">
   <div class="rzq-img-prev" id="rzq-m-imgprev">
     <img id="rzq-m-imgprev-el" alt=""/>
     <div class="rzq-img-prev-meta" id="rzq-m-imgprev-meta"></div>
@@ -387,17 +405,23 @@
   </div>
 
   <div class="rzq-inp-row">
-    <button type="button" class="rzq-catalog-btn" id="rzq-m-catbtn" title="إشارة لمنتج" onclick="RizqMessenger.openCatalog()" aria-label="إشارة لمنتج">🏷️</button>
-    <button type="button" class="rzq-attach" id="rzq-m-attach" title="رفع صورة" onclick="RizqMessenger.pickImage()" aria-label="رفع صورة">📷</button>
+    <button type="button" class="rzq-tool" id="rzq-m-catbtn" onclick="RizqMessenger.openCatalog()" aria-label="إشارة">
+      <span class="ico">🏷️</span><span class="lbl" id="rzq-m-catlbl">إشارة</span>
+    </button>
+    <button type="button" class="rzq-tool" id="rzq-m-attach" onclick="RizqMessenger.pickImage()" aria-label="صورة">
+      <span class="ico">📷</span><span class="lbl" id="rzq-m-attlbl">صورة</span>
+    </button>
     <input type="file" id="rzq-m-file" accept="image/*" capture="environment" style="display:none" onchange="RizqMessenger.onFilePicked(this)"/>
     <textarea class="rzq-inp" id="rzq-m-inp" rows="1" placeholder="اكتب رسالتك هنا..." maxlength="500"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();RizqMessenger.send();}"
       oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
     <button class="rzq-send" onclick="RizqMessenger.send()" aria-label="إرسال">
       <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      <span class="lbl" id="rzq-m-sendlbl">إرسال</span>
     </button>
   </div>
   <div class="rzq-footer" id="rzq-m-footer">مدعوم بـ <strong>رزق AI</strong> · تواصل مباشر وآمن</div>
+  </div>
 
   <div class="rzq-cat-sheet" id="rzq-m-catsheet" role="dialog" aria-label="اختيار من الكتالوج">
     <div class="rzq-cat-head">
@@ -514,8 +538,8 @@
     }
     img.src = _state.pendingImage;
     if (meta) {
-      meta.textContent = _state.pendingImageName
-        || _t('صورة مرفقة للاستفسار', 'Image jointe à la demande');
+      meta.innerHTML = '<span>' + _esc(_t('صورة ستُرسل مع الرسالة', 'Photo qui sera envoyée')) + '</span>'
+        + (_state.pendingImageName ? ('<small>' + _esc(_state.pendingImageName) + '</small>') : '');
     }
     row.classList.add('on');
   }
@@ -673,40 +697,62 @@
     var ctx = (_state.context || 'ad');
     var noteAr = 'استفسار عن هذا الإعلان';
     var noteFr = 'Demande concernant cette annonce';
+    var kickerAr = 'بخصوص';
+    var kickerFr = 'Concernant';
     if (ctx === 'store' || ctx === 'shop') {
-      noteAr = 'استفسار عن هذا المنتج — يمكنك إرفاق صورة';
-      noteFr = 'Demande produit — vous pouvez joindre une photo';
+      noteAr = 'اكتب سؤالك أو أرفق صورة للمنتج';
+      noteFr = 'Écrivez votre question ou joignez une photo';
+      kickerAr = 'بخصوص المنتج';
+      kickerFr = 'Produit';
     } else if (ctx === 'showroom' || ctx === 'corp') {
-      noteAr = 'استفسار عن هذا العرض — أرفق صورة إن رغبت';
-      noteFr = 'Demande article — joignez une photo si besoin';
+      noteAr = 'اكتب سؤالك أو أرفق صورة للعرض';
+      noteFr = 'Écrivez votre question ou joignez une photo';
+      kickerAr = 'بخصوص العرض';
+      kickerFr = 'Article';
     } else if (ctx === 'office') {
-      noteAr = 'استفسار عن الخدمة — يمكن إرفاق صورة أو مستند مصوّر';
-      noteFr = 'Demande service — photo ou document scanné possible';
+      noteAr = 'اكتب طلبك أو أرفق صورة للمستند';
+      noteFr = 'Décrivez votre demande ou joignez une photo';
+      kickerAr = 'بخصوص الخدمة';
+      kickerFr = 'Service';
     } else if (ctx === 'estate' || ctx === 'agency') {
-      noteAr = 'استفسار عن العقار — أشر لصورة أو ارفع صورة';
-      noteFr = 'Demande bien — indiquez ou joignez une photo';
+      noteAr = 'اكتب سؤالك عن هذا العقار';
+      noteFr = 'Posez votre question sur ce bien';
+      kickerAr = 'بخصوص العقار';
+      kickerFr = 'Bien immobilier';
+    } else {
+      noteAr = 'اكتب سؤالك أدناه';
+      noteFr = 'Écrivez votre question ci-dessous';
     }
+    _setTxt('rzq-m-adkicker', isFr ? kickerFr : kickerAr);
     _setTxt('rzq-m-adnote', isFr ? noteFr : noteAr);
+    _setTxt('rzq-m-namelbl', isFr ? 'Nom' : 'الاسم');
+    _setTxt('rzq-m-phonelbl', isFr ? 'Téléphone pour la réponse' : 'رقم الهاتف للرد');
+    _setAttr('rzq-m-nameinp', 'placeholder', isFr ? 'Facultatif' : 'اختياري');
+    _setAttr('rzq-m-phoneinp', 'placeholder', isFr ? 'Ex: 44 55 66 77' : 'مثال: 44 55 66 77');
     var catHead = document.getElementById('rzq-m-cathead');
     if (catHead) catHead.textContent = _catalogLabel();
-    var attachBtn = document.getElementById('rzq-m-attach');
-    if (attachBtn) attachBtn.title = isFr ? 'Joindre une photo' : 'رفع صورة';
+    var catLbl = document.getElementById('rzq-m-catlbl');
+    if (catLbl) catLbl.textContent = isFr ? 'Réf.' : 'إشارة';
+    var attLbl = document.getElementById('rzq-m-attlbl');
+    if (attLbl) attLbl.textContent = isFr ? 'Photo' : 'صورة';
+    var sendLbl = document.getElementById('rzq-m-sendlbl');
+    if (sendLbl) sendLbl.textContent = isFr ? 'Envoyer' : 'إرسال';
     var catBtn = document.getElementById('rzq-m-catbtn');
     if (catBtn) {
       var hasCat = _collectCatalogItems().length > 0;
       catBtn.style.display = hasCat ? '' : 'none';
       catBtn.title = _catalogLabel();
     }
-    _setAttr('rzq-m-nameinp', 'placeholder', isFr ? 'Votre nom (facultatif)' : 'اسمك (اختياري)');
-    _setAttr('rzq-m-phoneinp', 'placeholder', isFr ? 'Votre téléphone (pour que le vendeur réponde)' : 'رقم هاتفك (ليتمكن البائع من الرد عليك)');
-    _setTxt('rzq-m-privnote', isFr ? '🔒 Votre numéro est visible uniquement par le vendeur pour vous répondre' : '🔒 رقمك يصل للبائع فقط لغرض الرد — لا يُنشر علناً');
-    _setAttr('rzq-m-inp', 'placeholder', isFr ? 'Écrivez votre message...' : 'اكتب رسالتك هنا...');
+    /* الاقتراحات السريعة اختيارية — تُظهر فقط إن اتسع المكان */
+    var sug = document.getElementById('rzq-m-suggest');
+    if (sug) {
+      var tallEnough = (typeof window !== 'undefined' && window.innerHeight > 740);
+      sug.classList.toggle('on', !!tallEnough);
+    }
+    _setTxt('rzq-m-privnote', isFr ? '🔒 Visible uniquement par le commerçant pour vous répondre' : '🔒 الرقم يصل للتاجر فقط للرد — لا يُعرض للعامة');
+    _setAttr('rzq-m-inp', 'placeholder', isFr ? 'Écrivez votre message…' : 'اكتب رسالتك هنا…');
     _setTxt('rzq-m-footer', isFr ? 'Propulsé par <strong>Rizq AI</strong> · Contact direct et sécurisé' : 'مدعوم بـ <strong>رزق AI</strong> · تواصل مباشر وآمن');
 
-    // اقتراحات سريعة — سياقية حسب فئة الإعلان (إصلاح 01/08/2026: كانت 4
-    // أسئلة عامة ثابتة لكل الإعلانات بلا استثناء، الآن تُختار من
-    // SUGGESTIONS_BY_CAT حسب _state.category مع رجوع لِ'default' لأي فئة
-    // غير مُدرَجة أو إعلان بلا فئة معروفة).
     var sq = document.querySelectorAll('.rzq-sq');
     var pack = SUGGESTIONS_BY_CAT[_resolveCategoryKey(_state.category)];
     var suggestions = isFr ? pack.fr : pack.ar;
@@ -993,11 +1039,14 @@
         _renderPrevMsgs();
       }
 
-      // رسالة ترحيب إن كانت المحادثة جديدة
+      // رسالة ترحيب قصيرة وواضحة
       if (!document.querySelector('#rzq-m-msgs .rzq-bubble')) {
+        var about = _state.adTitle
+          ? (_t('بخصوص: ', 'Concernant : ') + _state.adTitle + '\n')
+          : '';
         var greet = _t(
-          'أهلاً! 😊\nأنت تتواصل مع ' + _state.sellerName + ' عبر رزق.\nرقم هاتفك لن يُكشف علناً — اكتب رسالتك بحرية.',
-          'Bonjour ! 😊\nVous contactez ' + _state.sellerName + ' via Rizq.\nVotre numéro reste confidentiel — écrivez librement.'
+          about + 'مرحباً — اكتب سؤالك لـ«' + _state.sellerName + '». رقمك يبقى خاصاً.',
+          about + 'Bonjour — écrivez votre question à «' + _state.sellerName + '». Votre numéro reste privé.'
         );
         _appendBubble(greet, 'them');
       }
@@ -1060,17 +1109,15 @@
           _state.adTitle = it.title;
           _state.adId = String(it.id || _state.adId);
           _state.adEmoji = it.emoji || _state.adEmoji;
-          if (it.image) {
-            _state.adImage = it.image;
-            _setPendingImage(it.image, _t('إشارة إلى: ', 'Référence : ') + it.title);
-          } else {
-            _state.adImage = '';
-            _setPendingImage('', '');
-          }
+          /* الإشارة تظهر في شريط «بخصوص» فقط — بدون تكرار في معاينة الصورة */
+          _state.adImage = it.image || '';
+          RizqMessenger.clearPendingImage();
           _setTxt('rzq-m-adname', _esc(it.title));
           _paintAdStripImage();
           var strip = document.getElementById('rzq-m-adstrip');
           if (strip) strip.style.display = 'flex';
+          var note = document.getElementById('rzq-m-adnote');
+          if (note) note.textContent = _t('تم اختيار هذا العنصر — اكتب سؤالك', 'Élément sélectionné — écrivez votre question');
           RizqMessenger.closeCatalog();
         });
       });
