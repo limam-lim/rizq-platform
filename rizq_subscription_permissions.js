@@ -2,8 +2,10 @@
  * rizq_subscription_permissions.js
  * صلاحيات الاشتراك والتجربة — واجهة موحّدة للواجهة العامة والداشبورد.
  *
- * isContactVisible = isPaid || isTrialActive || isDemoPage
- * isDashboardWritable = isPaid || isTrialActive || isDemoPage
+ * قاعدة المنصة:
+ *   - صفحات النماذج / الديمو: كل شيء مفتوح (اتصال، واتساب، محادثة، أزرار).
+ *   - حساب حقيقي: isContactVisible = isPaid || isTrialActive
+ *   - داشبورد حقيقي بعد انتهاء التجربة: قراءة فقط حتى الاشتراك.
  */
 (function (global) {
   'use strict';
@@ -13,6 +15,14 @@
       try { return global.RizqSub.checkSubscription(accId) || {}; } catch (e) { return {}; }
     }
     return {};
+  }
+
+  function isDemoAccountId(id) {
+    id = String(id || '');
+    if (!id) return false;
+    if (/^demo/i.test(id)) return true;           /* demo_store, demo_law, demo-corp-001, demo_estate_* */
+    if (/^acc_promo_/i.test(id)) return true;
+    return false;
   }
 
   function isDemoPage(opts) {
@@ -25,28 +35,46 @@
       if (/\/demo(?:\/|$)/i.test(String(path))) return true;
     } catch (e) {}
     if (global._rizqStoreIsDemo || global._rizqOfficeIsDemo || global._rizqEstateIsDemo || global._rizqCorpIsDemo || global._rizqShowroomIsDemo) return true;
-    var id = String(opts.accountId || global._rizqStoreAccountId || global._rizqOfficeAccountId || global._rizqEstateAccountId || '');
-    if (/^demo[_-]/i.test(id) || /^acc_promo_/i.test(id)) return true;
-    return false;
+    var id = String(opts.accountId || global._rizqStoreAccountId || global._rizqOfficeAccountId || global._rizqEstateAccountId || global._pageAccountId || '');
+    return isDemoAccountId(id);
   }
 
   function useSubscriptionPermissions(accId, opts) {
     opts = opts || {};
-    var demo = isDemoPage({ accountId: accId, forceDemo: opts.isDemo });
+    /* النماذج: دائماً مفتوحة — لا قفل اتصال ولا وضع قراءة فقط */
+    var demo = isDemoPage({ accountId: accId, forceDemo: opts.isDemo || opts.forceDemo });
+    if (demo) {
+      return {
+        accountId: accId || '',
+        status: 'demo',
+        isDemoPage: true,
+        isPaid: false,
+        isTrialActive: false,
+        isExpired: false,
+        isContactVisible: true,
+        contactsLocked: false,
+        isDashboardWritable: true,
+        upgradeMessageAr: 'انتهت الفترة المجانية. يرجى الاشتراك في إحدى الباقات لتتمكن من إضافة إعلانات جديدة وتفعيل زر الاتصال للزبائن',
+        upgradeMessageFr: 'La période d’essai est terminée. Veuillez souscrire à une offre pour publier de nouvelles annonces et activer le bouton d’appel pour vos clients.',
+        lockedContactLabelAr: 'رقم التواصل غير متاح حالياً',
+        lockedContactLabelFr: 'Numéro de contact indisponible pour le moment',
+        sub: { status: 'demo', isDemo: true }
+      };
+    }
     var sub = _statusOf(accId);
     var status = String(sub.status || 'no_subscription');
     var isTrialActive = status === 'trial' || status === 'trial_expiring' || (!!sub.isTrial && !sub.isExpired && status !== 'expired');
     var isPaid = status === 'active' || status === 'expiring_soon';
     var isExpired = status === 'expired' || status === 'no_subscription' || status === 'pending' || status === 'suspended';
-    var isContactVisible = !!(demo || isPaid || isTrialActive);
-    var isDashboardWritable = !!(demo || isPaid || isTrialActive);
+    var isContactVisible = !!(isPaid || isTrialActive);
+    var isDashboardWritable = !!(isPaid || isTrialActive);
     return {
       accountId: accId || '',
       status: status,
-      isDemoPage: demo,
+      isDemoPage: false,
       isPaid: isPaid,
       isTrialActive: isTrialActive,
-      isExpired: isExpired && !demo,
+      isExpired: isExpired,
       isContactVisible: isContactVisible,
       contactsLocked: !isContactVisible,
       isDashboardWritable: isDashboardWritable,

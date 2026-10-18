@@ -871,6 +871,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
   <script src="rizq_announcements.js" defer></script>
   <script src="rizq_reviews_engine.js" defer></script>
   <script src="rizq_subscription_engine.js" defer></script>
+  <script src="rizq_subscription_permissions.js" defer></script>
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_contact_gate.js" defer></script>
   <script src="rizq_mr_payment_catalog.js?v=1.1" defer></script>
@@ -1958,16 +1959,33 @@ function openMaps(){
       var email = acc.email || '';
       var wa = acc.whatsapp || '';
       var fr = isFr();
+      /* النماذج: كل شيء مفتوح */
+      try{
+        if(typeof useSubscriptionPermissions === 'function'){
+          var perms = useSubscriptionPermissions(accountId, {
+            isDemo: !!(window._rizqOfficeIsDemo || accountId === 'demo_law' || /^demo/i.test(String(accountId||'')))
+          });
+          locked = !perms.isContactVisible;
+          acc.isContactVisible = perms.isContactVisible;
+        }
+      }catch(ePerm){}
+      if(window._rizqOfficeIsDemo || accountId === 'demo_law' || /^demo/i.test(String(accountId||''))){
+        locked = false;
+        if(acc) acc.isContactVisible = true;
+      }
       function maskClick(e){
         e.preventDefault();
         if(window.RizqContactGate && accountId){
           RizqContactGate.onMaskedContactClick(accountId, 'office', { lang: fr ? 'fr' : 'ar' });
+        } else {
+          alert(fr ? 'Numéro de contact indisponible pour le moment' : 'رقم التواصل غير متاح حالياً');
         }
       }
       var phoneEl = document.getElementById('contact-info-phone');
       var emailEl = document.getElementById('contact-info-email');
       if(locked || (!phone && !email && !wa)){
-        if(phoneEl){ phoneEl.textContent = '••• ••• •••'; phoneEl.classList.add('rzq-contact-masked'); phoneEl.onclick = maskClick; }
+        var lockedLbl = fr ? 'Numéro de contact indisponible pour le moment' : 'رقم التواصل غير متاح حالياً';
+        if(phoneEl){ phoneEl.textContent = lockedLbl; phoneEl.classList.add('rzq-contact-masked'); phoneEl.onclick = maskClick; }
         if(emailEl){ emailEl.textContent = '•••@•••.•••'; emailEl.classList.add('rzq-contact-masked'); emailEl.onclick = maskClick; }
         ['act-wa-top','sticky-wa','act-call-top','sticky-call','act-email-top'].forEach(function(btnId){
           var el = document.getElementById(btnId);

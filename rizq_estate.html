@@ -1743,13 +1743,17 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   }
 
   function applyEstateContactVisibility(acc){
+    /* النماذج: كل شيء مفتوح — لا قفل اتصال/واتساب */
+    if(window._rizqEstateIsDemo || /[?&]demo=1\b/.test(location.search) || /^demo/i.test((acc && acc.id) || '') || /^acc_promo_/i.test((acc && acc.id) || '')){
+      return;
+    }
     var perms = null;
     try{
       if(typeof useSubscriptionPermissions === 'function'){
-        perms = useSubscriptionPermissions(acc && acc.id, { isDemo: !!window._rizqEstateIsDemo });
+        perms = useSubscriptionPermissions(acc && acc.id, { isDemo: false });
       }
     }catch(e){}
-    var visible = !perms || perms.isContactVisible || !!window._rizqEstateIsDemo;
+    var visible = !perms || perms.isContactVisible;
     var fr = isFrEstate();
     var lockedLbl = fr ? 'Numéro de contact indisponible pour le moment' : 'رقم التواصل غير متاح حالياً';
     function lockEl(el, isCall){
