@@ -2214,7 +2214,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   if(lbNext) lbNext.addEventListener('click', function(e){ e.stopPropagation(); stepLb(1); });
   modal.addEventListener('click', function(e){ if(e.target === modal) closeModal(); });
   lightbox.addEventListener('click', function(e){
-    if(e.target === lightbox || e.target.id === 'est-lb-img') closeLb();
+    if(e.target === lightbox || e.target.classList.contains('est-lb-stage')) closeLb();
   });
   document.addEventListener('keydown', function(e){
     if(e.key === 'Escape'){
