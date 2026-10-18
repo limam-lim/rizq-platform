@@ -815,6 +815,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       <a href="#est-location-card">الموقع والساعات</a>
       <a href="#est-pay-card">الدفع</a>
       <a href="#est-gallery">المعرض</a>
+      <a href="#est-desk">الاستفسار</a>
       <a href="#est-reviews">التقييمات</a>
     </nav>
     <div class="est-top-actions">
@@ -1015,20 +1016,6 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         <div class="est-rail" id="est-rail" aria-label="معرض صور العقارات"></div>
       </div>
 
-      <section class="est-reviews" id="est-reviews" aria-label="تقييمات العملاء">
-        <div class="est-section-head" style="text-align:start;margin-top:28px">
-          <div class="tag">آراء العملاء</div>
-          <h2>التقييمات والآراء</h2>
-          <p>آراء عملاء تعاملوا مع الوكالة في البيع والكراء والمعاينة.</p>
-        </div>
-        <div class="est-reviews-summary">
-          <div class="est-reviews-score"><b id="est-rev-avg">4.8</b><span>من 5</span></div>
-          <div class="est-reviews-stars" aria-hidden="true">★★★★★</div>
-          <div class="est-reviews-count" id="est-rev-count">12 تقييماً</div>
-        </div>
-        <div class="est-reviews-list" id="est-reviews-list"></div>
-      </section>
-
       <section class="est-svc-card" id="est-desk" aria-label="استفسار عقاري" style="margin-top:22px">
         <h3 id="est-desk-title" data-desk="title">📩 استفسار عن عقار</h3>
         <p class="est-svc-sub" id="est-desk-hint" data-desk="hint">اترك بياناتك وسنتواصل معك بخصوص المعاينة أو العرض.</p>
@@ -1047,6 +1034,20 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
             <a class="est-desk-wa" id="est-desk-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب الوكالة</a>
           </div>
         </form>
+      </section>
+
+      <section class="est-reviews" id="est-reviews" aria-label="تقييمات العملاء">
+        <div class="est-section-head" style="text-align:start;margin-top:28px">
+          <div class="tag">آراء العملاء</div>
+          <h2>التقييمات والآراء</h2>
+          <p>آراء عملاء تعاملوا مع الوكالة في البيع والكراء والمعاينة.</p>
+        </div>
+        <div class="est-reviews-summary">
+          <div class="est-reviews-score"><b id="est-rev-avg">4.8</b><span>من 5</span></div>
+          <div class="est-reviews-stars" aria-hidden="true">★★★★★</div>
+          <div class="est-reviews-count" id="est-rev-count">12 تقييماً</div>
+        </div>
+        <div class="est-reviews-list" id="est-reviews-list"></div>
       </section>
     </div>
   </div>
@@ -2469,6 +2470,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       ['a[href="#est-location-card"]', 'الموقع والساعات', 'Lieu & horaires'],
       ['a[href="#est-pay-card"]', 'الدفع', 'Paiement'],
       ['a[href="#est-gallery"]', 'المعرض', 'Galerie'],
+      ['a[href="#est-desk"]', 'الاستفسار', 'Demande'],
       ['a[href="#est-reviews"]', 'التقييمات', 'Avis']
     ];
     navMap.forEach(function(row){ tx(row[0], row[1], row[2]); });
