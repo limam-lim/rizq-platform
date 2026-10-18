@@ -197,55 +197,55 @@ button{font:inherit;border:0;background:none;color:inherit}
   box-shadow:0 8px 22px rgba(201,168,76,.28);
 }
 
-/* ── Hero ── */
-.est-hero{position:relative;min-height:min(84vh,760px);overflow:hidden;display:flex;align-items:flex-end}
+/* ── Hero (أقصر قليلاً — أقل عرضاً بصرياً) ── */
+.est-hero{position:relative;min-height:min(52vh,460px);max-height:560px;overflow:hidden;display:flex;align-items:flex-end}
 .est-hero-media{position:absolute;inset:0}
 .est-hero-media img{
   width:100%;height:100%;object-fit:cover;
-  transform:scale(1.06);animation:estKen 28s ease-in-out infinite alternate;
+  transform:scale(1.04);animation:estKen 28s ease-in-out infinite alternate;
   filter:saturate(1.08) contrast(1.04);
 }
-@keyframes estKen{from{transform:scale(1.06) translateY(0)}to{transform:scale(1.14) translateY(-2%)}}
+@keyframes estKen{from{transform:scale(1.04) translateY(0)}to{transform:scale(1.1) translateY(-1.5%)}}
 .est-hero-media::before{
   content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
   background:
     radial-gradient(ellipse 80% 55% at 70% 40%,transparent 30%,rgba(6,13,24,.35) 100%),
-    linear-gradient(180deg,rgba(6,13,24,.2) 0%,rgba(6,13,24,.08) 28%,rgba(6,13,24,.55) 68%,rgba(6,13,24,.96) 100%),
+    linear-gradient(180deg,rgba(6,13,24,.28) 0%,rgba(6,13,24,.12) 32%,rgba(6,13,24,.58) 72%,rgba(6,13,24,.96) 100%),
     linear-gradient(90deg,rgba(6,13,24,.72) 0%,rgba(6,13,24,.25) 42%,transparent 68%);
 }
 .est-hero-copy{
   position:relative;z-index:2;width:100%;max-width:1180px;margin:0 auto;
-  padding:48px 20px 40px;animation:estRise .9s ease both;
+  padding:28px 20px 22px;animation:estRise .9s ease both;
 }
 @keyframes estRise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 .est-kicker{
   display:inline-flex;align-items:center;gap:8px;
   border:1px solid rgba(201,168,76,.45);background:rgba(11,28,51,.55);
-  color:var(--gold2);border-radius:999px;padding:9px 16px;font:800 12px Cairo,sans-serif;
-  margin-bottom:16px;backdrop-filter:blur(10px);
+  color:var(--gold2);border-radius:999px;padding:7px 14px;font:800 12px Cairo,sans-serif;
+  margin-bottom:10px;backdrop-filter:blur(10px);
 }
 .est-kicker i{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(201,168,76,.22)}
 .est-hero h1{
-  font-family:var(--display);font-size:clamp(36px,6.2vw,68px);font-weight:700;line-height:1.12;max-width:15ch;
-  margin-bottom:12px;text-shadow:0 12px 48px rgba(0,0,0,.55);
+  font-family:var(--display);font-size:clamp(28px,4.6vw,48px);font-weight:700;line-height:1.15;max-width:16ch;
+  margin-bottom:8px;text-shadow:0 12px 48px rgba(0,0,0,.55);
 }
 .est-hero h1 em{
   font-style:normal;
   background:linear-gradient(135deg,#F3E2A8,#C9A84C 55%,#E8C96A);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-.est-hero-lead{max-width:42ch;font-size:clamp(15px,2vw,17px);line-height:1.75;color:#F4F7FC;margin-bottom:20px;text-shadow:0 2px 14px rgba(0,0,0,.55)}
-.est-hero-stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+.est-hero-lead{max-width:46ch;font-size:clamp(14px,1.8vw,16px);line-height:1.65;color:#F4F7FC;margin-bottom:12px;text-shadow:0 2px 14px rgba(0,0,0,.55)}
+.est-hero-stats{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
 .est-stat{
   min-width:110px;padding:12px 14px;border-radius:14px;
   background:rgba(14,26,44,.72);border:1px solid rgba(201,168,76,.2);backdrop-filter:blur(12px);
 }
 .est-stat b{display:block;font-size:20px;color:var(--gold2);font-weight:900}
 .est-stat span{font-size:12px;color:#D7DEEA}
-.est-hero-cta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:22px}
+.est-hero-cta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
 .est-btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  border-radius:14px;padding:13px 20px;font:800 14px Cairo,sans-serif;text-decoration:none;border:0;
+  border-radius:14px;padding:12px 18px;font:800 14px Cairo,sans-serif;text-decoration:none;border:0;
   transition:transform .2s,box-shadow .2s,filter .2s;
 }
 .est-btn:hover{transform:translateY(-2px)}
@@ -253,8 +253,13 @@ button{font:inherit;border:0;background:none;color:inherit}
   background:linear-gradient(135deg,#F3E2A8,#C9A84C 45%,#E8C96A);color:#0B1C33;
   box-shadow:0 12px 28px rgba(201,168,76,.32);
 }
+.est-btn-mail{
+  background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(243,226,168,.45);
+  backdrop-filter:blur(8px);
+}
+.est-btn-mail:hover{background:rgba(255,255,255,.22)}
 .est-btn-ghost{background:#fff;color:var(--navy);border:1px solid var(--border)}
-.est-btn-ghost:hover{background:rgba(255,255,255,.12)}
+.est-btn-ghost:hover{background:rgba(255,255,255,.92)}
 
 /* بحث البطل */
 .est-search{
@@ -621,7 +626,7 @@ html[dir="ltr"] .est-lb-nav.next{left:auto;right:max(18px, env(safe-area-inset-r
 }
 @media(max-width:640px){
   .est-card,.est-card.featured{grid-column:span 12}
-  .est-hero{min-height:88vh}
+  .est-hero{min-height:min(48vh,420px);max-height:480px}
   .est-search{grid-template-columns:1fr}
   .est-foot-inner{grid-template-columns:1fr}
   .est-chip.nav-hide-sm{display:none}
@@ -678,10 +683,10 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 }
 
 
-.est-hero-profile{padding-bottom:28px}
-.est-hero-brand-row{display:flex;gap:16px;align-items:flex-start;margin-bottom:14px}
+.est-hero-profile{padding-bottom:8px}
+.est-hero-brand-row{display:flex;gap:16px;align-items:flex-start;margin-bottom:10px}
 .est-hero-logo{display:none!important}
-.est-hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 0}
+.est-hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 0}
 .est-hero-meta span{
   display:inline-flex;align-items:center;gap:4px;padding:7px 12px;border-radius:999px;
   background:rgba(11,28,51,.62);border:1px solid rgba(255,255,255,.22);
@@ -718,7 +723,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 .est-review-card .stars{color:#C9A84C;font-size:14px;margin:4px 0 6px}
 .est-review-card .txt{color:#1e2a3a;font-size:14px;line-height:1.7;font-weight:600}
 .est-review-card .when{color:#3a4d63;font-size:12.5px;font-weight:700;margin-top:8px}
-#est-hero-name{font-family:var(--display);font-size:clamp(32px,5vw,52px);font-weight:700;line-height:1.15;margin:6px 0 8px;color:#fff;text-shadow:0 8px 28px rgba(0,0,0,.45)}
+#est-hero-name{font-family:var(--display);font-size:clamp(26px,4.2vw,44px);font-weight:700;line-height:1.15;margin:4px 0 6px;color:#fff;text-shadow:0 8px 28px rgba(0,0,0,.45)}
 
 </style>
 </head>
@@ -760,13 +765,12 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         <div class="est-hero-meta" id="est-hero-meta">
           <span id="est-hero-loc">📍 تفرغ زينة — نواكشوط</span>
           <span id="est-hero-activity">🏠 وساطة عقارية</span>
-          <span class="est-badge-verified" id="est-badge-verified">✅ وكالة عقارية معتمدة</span>
+          <span id="est-hero-email-chip" hidden>✉️ <a id="est-hero-email-txt" href="mailto:contact@atwar-immo.mr" style="color:inherit;text-decoration:none">contact@atwar-immo.mr</a></span>
         </div>
       </div>
     </div>
     <div class="est-hero-cta est-actions" id="est-hero-actions">
-      <a class="est-btn est-btn-wa" id="est-hero-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 تواصل واتساب</a>
-      <a class="est-btn est-btn-gold" id="est-hero-call" href="tel:+22242000111" dir="ltr">📞 اتصال مباشر</a>
+      <a class="est-btn est-btn-mail" id="est-hero-email" href="mailto:contact@atwar-immo.mr">✉️ البريد الإلكتروني</a>
       <button type="button" class="est-btn est-btn-ghost" id="est-hero-share">📤 مشاركة</button>
     </div>
     <form class="est-search" id="est-search" role="search" aria-label="بحث العقارات">
@@ -1400,13 +1404,29 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     var wa = waHref(AGENCY.whatsapp);
     setHref('est-top-call', call);
     setHref('est-top-wa', wa);
-    setHref('est-hero-wa', wa);
-    setHref('est-hero-call', call);
     setHref('est-bar-call', call);
     setHref('est-bar-wa', wa);
     setHref('est-modal-call', call);
     setHref('est-modal-wa', wa);
     setHref('est-desk-wa', wa);
+    var mail = String(AGENCY.email || '').trim();
+    var mailHref = mail ? ('mailto:' + mail) : '';
+    var heroMail = document.getElementById('est-hero-email');
+    var heroMailChip = document.getElementById('est-hero-email-chip');
+    var heroMailTxt = document.getElementById('est-hero-email-txt');
+    if(heroMail){
+      if(mailHref){ heroMail.href = mailHref; heroMail.style.display = ''; }
+      else { heroMail.removeAttribute('href'); heroMail.style.display = 'none'; }
+    }
+    if(heroMailChip && heroMailTxt){
+      if(mail){
+        heroMailChip.hidden = false;
+        heroMailTxt.textContent = mail;
+        heroMailTxt.href = mailHref;
+      } else {
+        heroMailChip.hidden = true;
+      }
+    }
     paintContactMeta(AGENCY);
     paintSideInfo(AGENCY);
     paintPayments(AGENCY.paymentMethods);
@@ -2042,15 +2062,12 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     navMap.forEach(function(row){ tx(row[0], row[1], row[2]); });
     tx('#est-top-call', '📞 اتصال', '📞 Appel');
     tx('#est-top-wa', '💬 واتساب', '💬 WhatsApp');
-    tx('#est-hero-wa', '💬 تواصل واتساب', '💬 WhatsApp');
-    tx('#est-hero-call', '📞 اتصال مباشر', '📞 Appeler');
+    tx('#est-hero-email', '✉️ البريد الإلكتروني', '✉️ E-mail');
     tx('#est-hero-share', '📤 مشاركة', '📤 Partager');
     tx('#est-bar-call', '📞 اتصال مباشر', '📞 Appeler');
     tx('#est-bar-wa', '💬 واتساب', '💬 WhatsApp');
     tx('a.est-pay', '💳 طرق الدفع', '💳 Paiement');
     tx('a.est-desk', '📩 استفسار', '📩 Demande');
-    var badge = document.getElementById('est-badge-verified');
-    if(badge) badge.textContent = fr ? '✅ Agence certifiée' : '✅ وكالة عقارية معتمدة';
     var labs = document.querySelectorAll('.est-search label > span');
     if(labs[0]) labs[0].textContent = fr ? 'Mot-clé ou quartier' : 'الكلمة أو الحي';
     if(labs[1]) labs[1].textContent = fr ? 'Zone' : 'المنطقة';
