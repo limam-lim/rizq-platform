@@ -1624,12 +1624,17 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   }
 
   function syncPdAllMedia(item){
-    _pdAllMedia = pdMediaList(item, 'all');
+    /* المعرض والأسهم يتبعان التبويب الحالي (مجلس/مطبخ/حمامات…) لا كل الصور دائماً */
+    _pdAllMedia = pdMediaList(item, _pdMediaTab);
+    if(!_pdAllMedia.length){
+      _pdAllMedia = pdMediaList(item, 'all');
+    }
     if(!_pdAllMedia.length){
       var fallback = coverOf(item);
       if(fallback) _pdAllMedia = [{ src:fallback, cat:'cover', label:isFrEstate()?'Principale':'الرئيسية' }];
     }
     if(_pdGalleryIdx >= _pdAllMedia.length) _pdGalleryIdx = 0;
+    if(_pdGalleryIdx < 0) _pdGalleryIdx = 0;
   }
 
   function sideThumbsFor(media, mainIdx){
@@ -1651,21 +1656,33 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     var main = media[mainIdx] || media[0];
     var sides = sideThumbsFor(media, mainIdx);
     var fr = isFrEstate();
-    var html = '<div class="main" data-src="'+esc(main.src)+'" data-i="'+mainIdx+'">'
+    var totalAll = pdMediaList(item, 'all').length;
+    var html = '<div class="main" data-src="'+esc(main.src)+'" data-i="'+mainIdx+'" data-cat="'+esc(main.cat||'')+'">'
       + '<img src="'+esc(main.src)+'" alt="'+esc(main.label || item.title)+'"/>'
-      + '<span class="est-pd-count">'+(mainIdx + 1)+' / '+media.length+'</span>';
+      + '<span class="est-pd-count">'+(mainIdx + 1)+' / '+media.length
+        + (_pdMediaTab !== 'all' && main.label ? ' · '+esc(main.label) : '')
+        + '</span>';
     if(media.length > 1){
       html += '<button type="button" class="est-pd-nav prev" data-pd-nav="-1" aria-label="'+(fr?'Photo précédente':'الصورة السابقة')+'">‹</button>'
         + '<button type="button" class="est-pd-nav next" data-pd-nav="1" aria-label="'+(fr?'Photo suivante':'الصورة التالية')+'">›</button>';
     }
-    html += '<button type="button" class="est-pd-viewall" id="est-pd-viewall">'+(fr?'Voir toutes les photos':'مشاهدة جميع الصور')+' ('+media.length+')</button></div>';
+    html += '<button type="button" class="est-pd-viewall" id="est-pd-viewall">'+(fr?'Voir toutes les photos':'مشاهدة جميع الصور')+' ('+totalAll+')</button></div>';
     sides.forEach(function(s){
-      html += '<div class="thumb" data-src="'+esc(s.m.src)+'" data-i="'+s.i+'">'
+      html += '<div class="thumb" data-src="'+esc(s.m.src)+'" data-i="'+s.i+'" data-cat="'+esc(s.m.cat||'')+'">'
         + '<img src="'+esc(s.m.src)+'" alt="'+esc(s.m.label||item.title)+'" loading="lazy"/>'
         + (s.m.label ? '<span class="est-pd-cap">'+esc(s.m.label)+'</span>' : '')
         + '</div>';
     });
     gal.innerHTML = html;
+  }
+
+  function selectPdTab(tabId){
+    if(!_pdItem) return;
+    _pdMediaTab = tabId || 'all';
+    _pdGalleryIdx = 0;
+    paintPdGallery(_pdItem);
+    paintPdTabs(_pdItem);
+    paintPdThumbs(_pdItem);
   }
 
   function stepPdGallery(dir){
@@ -1929,18 +1946,14 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     }
     var tab = e.target.closest('#est-pd-tabs button[data-tab]');
     if(tab && _pdItem){
-      _pdMediaTab = tab.getAttribute('data-tab') || 'all';
-      paintPdTabs(_pdItem);
-      paintPdThumbs(_pdItem);
+      selectPdTab(tab.getAttribute('data-tab') || 'all');
       return;
     }
     var viewAll = e.target.closest('#est-pd-viewall');
     if(viewAll && _pdItem){
       e.preventDefault();
       e.stopPropagation();
-      _pdMediaTab = 'all';
-      paintPdTabs(_pdItem);
-      paintPdThumbs(_pdItem);
+      selectPdTab('all');
       var photos = document.getElementById('est-pd-photos');
       if(photos) photos.scrollIntoView({behavior:'smooth', block:'nearest'});
       openPhotoLb((_pdAllMedia[_pdGalleryIdx] && _pdAllMedia[_pdGalleryIdx].src) || coverOf(_pdItem), _pdItem.title);
@@ -1949,13 +1962,25 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     var thumbBtn = e.target.closest('#est-pd-thumbs button[data-src]');
     if(thumbBtn && _pdItem){
       var tSrc = thumbBtn.getAttribute('data-src');
+      syncPdAllMedia(_pdItem);
       var allIx = _pdAllMedia.findIndex(function(m){ return m.src === tSrc; });
+      if(allIx < 0){
+        /* إن كانت المصغّرة من تبويب آخر، افتح قسمها */
+        var full = pdMediaList(_pdItem, 'all');
+        var hit = full.find(function(m){ return m.src === tSrc; });
+        if(hit && hit.cat){
+          _pdMediaTab = hit.cat;
+          syncPdAllMedia(_pdItem);
+          allIx = _pdAllMedia.findIndex(function(m){ return m.src === tSrc; });
+          paintPdTabs(_pdItem);
+        }
+      }
       if(allIx >= 0){
         _pdGalleryIdx = allIx;
         paintPdGallery(_pdItem);
         paintPdThumbs(_pdItem);
       }
-      openPhotoLb(tSrc, _pdItem.title);
+      openPhotoLb(tSrc, (_pdAllMedia[allIx] && _pdAllMedia[allIx].label) || _pdItem.title);
       return;
     }
     var sideThumb = e.target.closest('#est-pd-gallery .thumb[data-i]');
