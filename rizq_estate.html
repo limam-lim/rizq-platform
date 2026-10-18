@@ -95,16 +95,41 @@ button{font:inherit;border:0;background:none;color:inherit}
 }
 .est-agency-bar-id strong{display:block;font-size:15px;color:var(--navy)}
 .est-agency-bar-id span{font-size:12px;color:var(--muted)}
-.est-agency-bar-acts{display:flex;flex-wrap:wrap;gap:8px}
-.est-agency-bar-acts a{
-  display:inline-flex;align-items:center;gap:6px;border-radius:12px;padding:10px 14px;
-  font:800 12.5px Cairo,sans-serif;text-decoration:none;
+.est-agency-bar-acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
+.est-agency-bar-acts a,.est-agency-bar-acts button{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:12px;padding:10px 14px;
+  font:800 12.5px Cairo,sans-serif;text-decoration:none;border:0;cursor:pointer;white-space:nowrap;
+  transition:transform .15s,box-shadow .15s,background .15s,border-color .15s;
 }
-.est-agency-bar-acts .est-call{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347}
+.est-agency-bar-acts a:hover,.est-agency-bar-acts button:hover{transform:translateY(-1px)}
+/* اتصال + هوية كحلي للمنصة؛ واتساب يبقى أخضر */
+.est-agency-bar-acts .est-call{
+  background:linear-gradient(135deg,#1B3A6B,#0B1C33);color:#fff;
+  box-shadow:0 6px 16px rgba(11,28,51,.22);
+}
 .est-agency-bar-acts .est-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
-.est-agency-bar-acts .est-page{background:#fff;color:var(--navy);border:1px solid var(--border)}
-.est-agency-bar-acts .est-pay{background:rgba(201,168,76,.12);color:var(--gold3);border:1px solid rgba(201,168,76,.35)}
-.est-agency-bar-acts .est-desk{background:#fff;color:var(--navy);border:1px solid var(--border)}
+.est-agency-bar-acts .est-mail{
+  background:linear-gradient(135deg,#152A45,#0B1C33);color:#E8C96A;
+  border:1px solid rgba(201,168,76,.4);
+}
+.est-agency-bar-acts .est-chat{
+  background:#fff;color:var(--navy);
+  border:1.5px solid rgba(27,58,107,.45);
+}
+.est-agency-bar-acts .est-chat:hover{background:rgba(27,58,107,.06)}
+.est-agency-bar-acts .est-share{
+  background:#fff;color:var(--navy);
+  border:1.5px solid rgba(27,58,107,.35);
+}
+.est-agency-bar-acts .est-pay{
+  background:rgba(27,58,107,.08);color:var(--navy);
+  border:1.5px solid rgba(27,58,107,.35);
+}
+.est-agency-bar-acts .est-mail[hidden],.est-agency-bar-acts .est-call[hidden]{display:none!important}
+@media(max-width:720px){
+  .est-agency-bar-acts{justify-content:stretch}
+  .est-agency-bar-acts a,.est-agency-bar-acts button{flex:1 1 calc(50% - 8px);padding:10px 8px;font-size:12px}
+}
 
 /* خدمات موحّدة (دفع + غرفة استفسار) — أسفل العروض */
 .est-services{
@@ -838,13 +863,8 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         <div class="est-hero-meta" id="est-hero-meta">
           <span id="est-hero-loc">📍 تفرغ زينة — نواكشوط</span>
           <span id="est-hero-activity">🏠 وساطة عقارية</span>
-          <span id="est-hero-email-chip" hidden>✉️ <a id="est-hero-email-txt" href="mailto:contact@atwar-immo.mr" style="color:inherit;text-decoration:none">contact@atwar-immo.mr</a></span>
         </div>
       </div>
-    </div>
-    <div class="est-hero-cta est-actions" id="est-hero-actions">
-      <a class="est-btn est-btn-mail" id="est-hero-email" href="mailto:contact@atwar-immo.mr">✉️ البريد الإلكتروني</a>
-      <button type="button" class="est-btn est-btn-ghost" id="est-hero-share">📤 مشاركة</button>
     </div>
   </div>
   <div class="hero-videos" id="est-hero-videos" aria-label="فيديوهات الوكالة">
@@ -866,11 +886,13 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         <span id="est-bar-sub">وساطة عقارية · تفرغ زينة — نواكشوط</span>
       </div>
     </div>
-    <div class="est-agency-bar-acts">
-      <a class="est-call" id="est-bar-call" href="tel:+22242000111" dir="ltr">📞 اتصال مباشر</a>
+    <div class="est-agency-bar-acts" id="est-agency-bar-acts">
+      <a class="est-call" id="est-bar-call" href="tel:+22242000111" dir="ltr">📞 اتصال</a>
       <a class="est-wa" id="est-bar-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب</a>
-      <a class="est-pay" href="#est-pay-card">💳 طرق الدفع</a>
-      <a class="est-desk" href="#est-desk">📩 استفسار</a>
+      <a class="est-mail" id="est-bar-email" href="mailto:contact@atwar-immo.mr">✉️ إيميل</a>
+      <a class="est-chat" id="est-bar-chat" href="#est-desk">💬 محادثة</a>
+      <button type="button" class="est-share" id="est-bar-share">📤 مشاركة</button>
+      <a class="est-pay" id="est-bar-pay" href="#est-pay-card">💳 طريقة الدفع</a>
     </div>
   </div>
 
@@ -1687,21 +1709,15 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     setHref('est-desk-wa', wa);
     var mail = String(AGENCY.email || '').trim();
     var mailHref = mail ? ('mailto:' + mail) : '';
-    var heroMail = document.getElementById('est-hero-email');
-    var heroMailChip = document.getElementById('est-hero-email-chip');
-    var heroMailTxt = document.getElementById('est-hero-email-txt');
-    if(heroMail){
-      if(mailHref){ heroMail.href = mailHref; heroMail.style.display = ''; }
-      else { heroMail.removeAttribute('href'); heroMail.style.display = 'none'; }
+    var barMail = document.getElementById('est-bar-email');
+    if(barMail){
+      if(mailHref){ barMail.href = mailHref; barMail.hidden = false; }
+      else { barMail.removeAttribute('href'); barMail.hidden = true; }
     }
-    if(heroMailChip && heroMailTxt){
-      if(mail){
-        heroMailChip.hidden = false;
-        heroMailTxt.textContent = mail;
-        heroMailTxt.href = mailHref;
-      } else {
-        heroMailChip.hidden = true;
-      }
+    var barCall = document.getElementById('est-bar-call');
+    if(barCall){
+      if(call){ barCall.href = call; barCall.hidden = false; }
+      else { barCall.hidden = true; }
     }
     paintContactMeta(AGENCY);
     paintSideInfo(AGENCY);
@@ -2476,12 +2492,12 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     navMap.forEach(function(row){ tx(row[0], row[1], row[2]); });
     tx('#est-top-call', '📞 اتصال', '📞 Appel');
     tx('#est-top-wa', '💬 واتساب', '💬 WhatsApp');
-    tx('#est-hero-email', '✉️ البريد الإلكتروني', '✉️ E-mail');
-    tx('#est-hero-share', '📤 مشاركة', '📤 Partager');
-    tx('#est-bar-call', '📞 اتصال مباشر', '📞 Appeler');
+    tx('#est-bar-call', '📞 اتصال', '📞 Appel');
     tx('#est-bar-wa', '💬 واتساب', '💬 WhatsApp');
-    tx('a.est-pay', '💳 طرق الدفع', '💳 Paiement');
-    tx('a.est-desk', '📩 استفسار', '📩 Demande');
+    tx('#est-bar-email', '✉️ إيميل', '✉️ E-mail');
+    tx('#est-bar-chat', '💬 محادثة', '💬 Discussion');
+    tx('#est-bar-share', '📤 مشاركة', '📤 Partager');
+    tx('#est-bar-pay', '💳 طريقة الدفع', '💳 Paiement');
     var labs = document.querySelectorAll('.est-search label > span');
     if(labs[0]) labs[0].textContent = fr ? 'Wilaya' : 'الولاية';
     if(labs[1]) labs[1].textContent = fr ? 'Ville' : 'المدينة';
@@ -2628,19 +2644,29 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openAgencyMaps(); }
     });
   }
-  var shareBtn = document.getElementById('est-hero-share');
-  if(shareBtn){
-    shareBtn.addEventListener('click', function(){
-      var url = location.href;
-      var title = (AGENCY && AGENCY.name) || document.title;
-      if(navigator.share){
-        navigator.share({ title: title, url: url }).catch(function(){});
-      } else {
-        try{
-          navigator.clipboard.writeText(url);
-          alert(isFrEstate() ? 'Lien copié' : 'تم نسخ الرابط');
-        }catch(e){ prompt(isFrEstate()?'Copiez le lien':'انسخ الرابط', url); }
+  function shareEstatePage(){
+    var url = location.href;
+    var title = (AGENCY && AGENCY.name) || document.title;
+    if(navigator.share){
+      navigator.share({ title: title, url: url }).catch(function(){});
+    } else {
+      try{
+        navigator.clipboard.writeText(url);
+        alert(isFrEstate() ? 'Lien copié' : 'تم نسخ الرابط');
+      }catch(e){ prompt(isFrEstate()?'Copiez le lien':'انسخ الرابط', url); }
+    }
+  }
+  var shareBtn = document.getElementById('est-bar-share');
+  if(shareBtn) shareBtn.addEventListener('click', shareEstatePage);
+  var chatBtn = document.getElementById('est-bar-chat');
+  if(chatBtn){
+    chatBtn.addEventListener('click', function(e){
+      if(typeof window.openChat === 'function'){
+        e.preventDefault();
+        try{ window.openChat(null); }catch(err){}
+        return;
       }
+      /* بدون محادثة منصة: انتقل لنموذج الاستفسار */
     });
   }
   bootAgency();
