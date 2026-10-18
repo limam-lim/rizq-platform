@@ -121,6 +121,10 @@ button{font:inherit;border:0;background:none;color:inherit}
   background:#fff;color:var(--navy);
   border:1.5px solid rgba(27,58,107,.35);
 }
+.est-agency-bar-acts .est-desk{
+  background:linear-gradient(135deg,#152A45,#0B1C33);color:#fff;
+  border:1px solid rgba(201,168,76,.35);
+}
 .est-agency-bar-acts .est-pay{
   background:rgba(27,58,107,.08);color:var(--navy);
   border:1.5px solid rgba(27,58,107,.35);
@@ -890,6 +894,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       <a class="est-mail" id="est-bar-email" href="mailto:contact@atwar-immo.mr">✉️ إيميل</a>
       <a class="est-chat" id="est-bar-chat" href="#est-desk">💬 محادثة</a>
       <button type="button" class="est-share" id="est-bar-share">📤 مشاركة</button>
+      <a class="est-desk" id="est-bar-desk" href="#est-desk">📩 استفسار</a>
       <a class="est-pay" id="est-bar-pay" href="#est-pay-card">💳 طريقة الدفع</a>
     </div>
   </div>
@@ -2495,6 +2500,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     tx('#est-bar-email', '✉️ إيميل', '✉️ E-mail');
     tx('#est-bar-chat', '💬 محادثة', '💬 Discussion');
     tx('#est-bar-share', '📤 مشاركة', '📤 Partager');
+    tx('#est-bar-desk', '📩 استفسار', '📩 Demande');
     tx('#est-bar-pay', '💳 طريقة الدفع', '💳 Paiement');
     var labs = document.querySelectorAll('.est-search label > span');
     if(labs[0]) labs[0].textContent = fr ? 'Wilaya' : 'الولاية';
