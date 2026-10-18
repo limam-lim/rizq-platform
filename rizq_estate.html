@@ -272,27 +272,49 @@ button{font:inherit;border:0;background:none;color:inherit}
 }
 .est-search label{display:flex;flex-direction:column;gap:4px;min-width:0}
 .est-search span{font:800 11px Cairo,sans-serif;color:#8A6B1F;letter-spacing:.2px}
-.est-search input,.est-search select{
-  width:100%;border:1px solid #d5deea;background:#f4f7fc;
-  color:var(--navy);border-radius:12px;padding:11px 12px;font:700 13px Cairo,sans-serif;outline:none;
-  cursor:pointer;
+/* قوائم مخصصة: مؤشر يد دائماً (لا خط نصّي على select الأصلي) */
+.est-dd{position:relative;width:100%}
+.est-dd-btn{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  border:1px solid #d5deea;background:#f4f7fc;color:var(--navy);
+  border-radius:12px;padding:11px 12px;font:700 13px Cairo,sans-serif;
+  cursor:pointer!important;text-align:inherit;outline:none;
+  box-sizing:border-box;min-height:44px;
 }
-.est-search input[type="search"],.est-search input[type="text"]{cursor:text}
-.est-search select{
-  appearance:none;-webkit-appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238A6B1F' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:left 12px center;padding-left:28px;
+.est-dd-btn::after{
+  content:"";flex:0 0 auto;width:12px;height:8px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238A6B1F' d='M1 1l5 5 5-5'/%3E%3C/svg%3E") center/contain no-repeat;
 }
-html[dir="ltr"] .est-search select{background-position:right 12px center;padding-left:12px;padding-right:28px}
-.est-search input:focus,.est-search select:focus{border-color:rgba(201,168,76,.65);background-color:#fff}
-.est-search select:hover,.est-search-go:hover{filter:brightness(1.02)}
-.est-search select option{background:#fff;color:var(--navy);cursor:pointer}
-.est-search select:disabled{opacity:.55;cursor:not-allowed}
+.est-dd-btn:hover,.est-dd-btn:focus{border-color:rgba(201,168,76,.65);background:#fff}
+.est-dd-btn:disabled,.est-dd.is-disabled .est-dd-btn{
+  opacity:.55;cursor:not-allowed!important;pointer-events:none;
+}
+.est-dd-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.est-dd-list{
+  position:absolute;top:calc(100% + 4px);inset-inline:0;z-index:80;
+  max-height:min(280px,50vh);overflow:auto;margin:0;padding:6px;
+  list-style:none;background:#fff;border:1px solid #d5deea;border-radius:14px;
+  box-shadow:0 16px 36px rgba(15,35,65,.16);
+}
+.est-dd-list[hidden]{display:none!important}
+.est-dd-opt{
+  display:block;width:100%;border:0;background:transparent;color:var(--navy);
+  border-radius:10px;padding:10px 12px;font:700 13px Cairo,sans-serif;
+  cursor:pointer!important;text-align:inherit;
+}
+.est-dd-opt:hover,.est-dd-opt:focus{background:rgba(201,168,76,.14);outline:none}
+.est-dd-opt.is-active{background:linear-gradient(135deg,rgba(201,168,76,.22),rgba(201,168,76,.08))}
+.est-search select.est-dd-native{
+  position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;
+  overflow:hidden!important;clip:rect(0,0,0,0)!important;border:0!important;opacity:0!important;
+  pointer-events:none!important;appearance:none;
+}
 .est-search-go{
   align-self:end;padding:12px 18px;border-radius:12px;font:900 13px Cairo,sans-serif;
   background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0B1C33;white-space:nowrap;
-  box-shadow:0 8px 18px rgba(201,168,76,.28);border:0;cursor:pointer;
+  box-shadow:0 8px 18px rgba(201,168,76,.28);border:0;cursor:pointer!important;
 }
+.est-search-go:hover{filter:brightness(1.02)}
 
 /* فيديو تعريفي + إضافي على الهيرو (نفس بنية المحلات/المكاتب) */
 .est-hero .hero-videos{display:none;position:absolute;inset:0;z-index:3;pointer-events:none}
@@ -332,7 +354,7 @@ html[dir="ltr"] .est-search select{background-position:right 12px center;padding
   display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;
   margin:0 0 18px;
 }
-.est-tab,.est-deal button,.est-search-go,.est-search select{cursor:pointer}
+.est-tab,.est-deal button,.est-search-go,.est-search select{cursor:pointer!important}
 .est-tabs{display:flex;flex-wrap:wrap;gap:8px}
 .est-tab{
   border:1px solid var(--border);background:#fff;
@@ -1117,7 +1139,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   <div class="est-lb-meta" id="est-lb-meta" hidden></div>
 </div>
 
-<script src="rizq_mr_geo.js?v=1.0"></script>
+<script src="rizq_mr_geo.js?v=1.1"></script>
 <script src="rizq_estate_data.js?v=1.0"></script>
 <script src="rizq_map_preview.js?v=1.0" defer></script>
 <script src="rizq_backend_config.js"></script>
@@ -1226,6 +1248,87 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     });
   }
 
+  function closeAllEstDd(except){
+    document.querySelectorAll('.est-dd.is-open').forEach(function(dd){
+      if(except && dd === except) return;
+      dd.classList.remove('is-open');
+      var list = dd.querySelector('.est-dd-list');
+      var btn = dd.querySelector('.est-dd-btn');
+      if(list) list.hidden = true;
+      if(btn) btn.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  function syncEstDdFromSelect(sel){
+    if(!sel) return;
+    var dd = sel.closest('.est-dd');
+    if(!dd) return;
+    var btn = dd.querySelector('.est-dd-btn');
+    var list = dd.querySelector('.est-dd-list');
+    if(!btn || !list) return;
+    var fr = isFrEstate();
+    var disabled = !!sel.disabled;
+    dd.classList.toggle('is-disabled', disabled);
+    btn.disabled = disabled;
+    var optsHtml = '';
+    var selectedLabel = '';
+    Array.prototype.forEach.call(sel.options, function(opt){
+      var active = opt.value === sel.value;
+      if(active) selectedLabel = opt.textContent || '';
+      optsHtml += '<li role="none"><button type="button" class="est-dd-opt'+(active?' is-active':'')+'" role="option" data-value="'+esc(opt.value)+'" aria-selected="'+(active?'true':'false')+'">'+esc(opt.textContent||'')+'</button></li>';
+    });
+    list.innerHTML = optsHtml;
+    var lab = btn.querySelector('.est-dd-label');
+    if(lab) lab.textContent = selectedLabel || (fr ? '—' : '—');
+    btn.setAttribute('aria-label', (sel.getAttribute('aria-label') || '') + (selectedLabel ? ': '+selectedLabel : ''));
+  }
+
+  function enhanceEstSearchSelect(sel){
+    if(!sel || sel.closest('.est-dd')) return;
+    var wrap = document.createElement('div');
+    wrap.className = 'est-dd';
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(sel);
+    sel.classList.add('est-dd-native');
+    sel.setAttribute('tabindex', '-1');
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'est-dd-btn';
+    btn.setAttribute('aria-haspopup', 'listbox');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.innerHTML = '<span class="est-dd-label">—</span>';
+    var list = document.createElement('ul');
+    list.className = 'est-dd-list';
+    list.setAttribute('role', 'listbox');
+    list.hidden = true;
+    wrap.insertBefore(btn, sel);
+    wrap.insertBefore(list, sel);
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      if(sel.disabled) return;
+      var open = !wrap.classList.contains('is-open');
+      closeAllEstDd(wrap);
+      wrap.classList.toggle('is-open', open);
+      list.hidden = !open;
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    list.addEventListener('click', function(e){
+      var optBtn = e.target.closest('.est-dd-opt');
+      if(!optBtn) return;
+      e.preventDefault();
+      var val = optBtn.getAttribute('data-value') || '';
+      sel.value = val;
+      closeAllEstDd();
+      syncEstDdFromSelect(sel);
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    syncEstDdFromSelect(sel);
+  }
+
+  function enhanceAllEstSearchSelects(){
+    document.querySelectorAll('#est-search select').forEach(enhanceEstSearchSelect);
+  }
+
   function fillWilayaSelect(){
     var sel = document.getElementById('est-wilaya');
     if(!sel || !window.RizqMrGeo) return;
@@ -1236,6 +1339,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       opts += '<option value="'+esc(w.id)+'"'+(cur===w.id?' selected':'')+'>'+esc(RizqMrGeo.label(w, fr))+'</option>';
     });
     sel.innerHTML = opts;
+    syncEstDdFromSelect(sel);
   }
 
   function fillCitySelect(wilayaId){
@@ -1251,6 +1355,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     });
     sel.innerHTML = opts;
     if(!wilayaId){ state.city = ''; state.quartier = ''; }
+    syncEstDdFromSelect(sel);
   }
 
   function fillQuartierSelect(wilayaId, cityId){
@@ -1267,12 +1372,17 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     });
     sel.innerHTML = opts;
     if(!cityId) state.quartier = '';
+    syncEstDdFromSelect(sel);
   }
 
   function syncGeoSelects(){
     fillWilayaSelect();
     fillCitySelect(state.wilaya);
     fillQuartierSelect(state.wilaya, state.city);
+    var cat = document.getElementById('est-cat');
+    var deal = document.getElementById('est-deal');
+    if(cat) syncEstDdFromSelect(cat);
+    if(deal) syncEstDdFromSelect(deal);
   }
 
   /* وكالة واحدة لكل صفحة — مثل rizq_store / rizq_office / rizq_showroom */
@@ -2083,7 +2193,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         b.setAttribute('aria-selected', on ? 'true' : 'false');
       });
       var catBox = document.getElementById('est-cat');
-      if(catBox) catBox.value = state.cat;
+      if(catBox){ catBox.value = state.cat; syncEstDdFromSelect(catBox); }
       renderGrid();
     });
   });
@@ -2094,7 +2204,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         b.classList.toggle('is-on', b===btn);
       });
       var sel = document.getElementById('est-deal');
-      if(sel) sel.value = state.deal;
+      if(sel){ sel.value = state.deal; syncEstDdFromSelect(sel); }
       renderGrid();
     });
   });
@@ -2118,6 +2228,14 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       b.classList.toggle('is-on', b.getAttribute('data-deal') === state.deal);
     });
   }
+
+  enhanceAllEstSearchSelects();
+  document.addEventListener('click', function(e){
+    if(!e.target.closest('.est-dd')) closeAllEstDd();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeAllEstDd();
+  });
 
   var wilayaSel = document.getElementById('est-wilaya');
   if(wilayaSel){
@@ -2143,6 +2261,28 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   if(quartierSel){
     quartierSel.addEventListener('change', function(){
       state.quartier = quartierSel.value || '';
+      renderGrid();
+    });
+  }
+  var catSelLive = document.getElementById('est-cat');
+  if(catSelLive){
+    catSelLive.addEventListener('change', function(){
+      state.cat = catSelLive.value || 'all';
+      document.querySelectorAll('.est-tab').forEach(function(b){
+        var on = b.getAttribute('data-cat') === state.cat;
+        b.classList.toggle('is-active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      renderGrid();
+    });
+  }
+  var dealSelLive = document.getElementById('est-deal');
+  if(dealSelLive){
+    dealSelLive.addEventListener('change', function(){
+      state.deal = dealSelLive.value || 'all';
+      document.querySelectorAll('.est-deal button').forEach(function(b){
+        b.classList.toggle('is-on', b.getAttribute('data-deal') === state.deal);
+      });
       renderGrid();
     });
   }
@@ -2348,6 +2488,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         if(opt.value === 'land') opt.textContent = fr ? 'Terrains' : 'أراضي';
         if(opt.value === 'shop') opt.textContent = fr ? 'Locaux' : 'محلات';
       });
+      syncEstDdFromSelect(catSelLang);
     }
     var dealSel = document.getElementById('est-deal');
     if(dealSel && dealSel.options){
@@ -2356,6 +2497,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         if(opt.value === 'sale') opt.textContent = fr ? 'À vendre' : 'للبيع';
         if(opt.value === 'rent') opt.textContent = fr ? 'À louer' : 'للكراء';
       });
+      syncEstDdFromSelect(dealSel);
     }
     tx('.est-search-go', '🔎 ابحث', '🔎 Rechercher');
     var listHead = document.querySelector('#est-listings');

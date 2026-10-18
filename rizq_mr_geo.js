@@ -469,16 +469,16 @@
           "fr": "Bababé",
           "neighborhoods": [
             {
-              "ar": "BababÃ©",
-              "fr": "BababÃ©"
+              "ar": "Bababé",
+              "fr": "Bababé"
             },
             {
               "ar": "El Verae",
               "fr": "El Verae"
             },
             {
-              "ar": "AÃ©rÃ© M'Bar",
-              "fr": "AÃ©rÃ© M'Bar"
+              "ar": "Aéré M'Bar",
+              "fr": "Aéré M'Bar"
             }
           ]
         },
@@ -561,8 +561,8 @@
           "fr": "Boghé",
           "neighborhoods": [
             {
-              "ar": "BoghÃ©",
-              "fr": "BoghÃ©"
+              "ar": "Boghé",
+              "fr": "Boghé"
             },
             {
               "ar": "Dar El Aviye",
@@ -595,8 +595,8 @@
               "fr": "Kaedi"
             },
             {
-              "ar": "NÃ©rÃ© Walo",
-              "fr": "NÃ©rÃ© Walo"
+              "ar": "Néré Walo",
+              "fr": "Néré Walo"
             },
             {
               "ar": "Djewol",
@@ -607,8 +607,8 @@
               "fr": "Toghomadi"
             },
             {
-              "ar": "TifondÃ© CivÃ©",
-              "fr": "TifondÃ© CivÃ©"
+              "ar": "Tifondé Civé",
+              "fr": "Tifondé Civé"
             }
           ]
         },
@@ -630,8 +630,8 @@
               "fr": "Terenguel Ehel Moulaye Ely"
             },
             {
-              "ar": "N'Djadjbenni GandÃ©ga",
-              "fr": "N'Djadjbenni GandÃ©ga"
+              "ar": "N'Djadjbenni Gandéga",
+              "fr": "N'Djadjbenni Gandéga"
             },
             {
               "ar": "Edebaye Ehel Guelaye",
@@ -692,8 +692,8 @@
               "fr": "Doo"
             },
             {
-              "ar": "Dolol CivÃ©",
-              "fr": "Dolol CivÃ©"
+              "ar": "Dolol Civé",
+              "fr": "Dolol Civé"
             },
             {
               "ar": "Beilouguet Litame",
@@ -708,8 +708,8 @@
               "fr": "Toulel"
             },
             {
-              "ar": "SagnÃ©",
-              "fr": "SagnÃ©"
+              "ar": "Sagné",
+              "fr": "Sagné"
             },
             {
               "ar": "Wali Djantang",
@@ -727,8 +727,8 @@
               "fr": "Mounguel"
             },
             {
-              "ar": "Bathet MoÃ¯t",
-              "fr": "Bathet MoÃ¯t"
+              "ar": "Bathet Moït",
+              "fr": "Bathet Moït"
             },
             {
               "ar": "Bokhol",
@@ -1033,8 +1033,8 @@
           "fr": "Néma",
           "neighborhoods": [
             {
-              "ar": "NÃ©ma",
-              "fr": "NÃ©ma"
+              "ar": "Néma",
+              "fr": "Néma"
             },
             {
               "ar": "Achemime",
@@ -1141,8 +1141,8 @@
           "fr": "Aïoun",
           "neighborhoods": [
             {
-              "ar": "AÃ¯oun El Atrouss",
-              "fr": "AÃ¯oun El Atrouss"
+              "ar": "Aïoun El Atrouss",
+              "fr": "Aïoun El Atrouss"
             },
             {
               "ar": "N'Savenni",
@@ -1246,8 +1246,8 @@
               "fr": "Aweinat Thalle"
             },
             {
-              "ar": "AÃ¯n Varbe",
-              "fr": "AÃ¯n Varbe"
+              "ar": "Aïn Varbe",
+              "fr": "Aïn Varbe"
             },
             {
               "ar": "Egharghar",
@@ -1287,8 +1287,8 @@
               "fr": "أطار"
             },
             {
-              "ar": "AÃ¯n Ehel Taya",
-              "fr": "AÃ¯n Ehel Taya"
+              "ar": "Aïn Ehel Taya",
+              "fr": "Aïn Ehel Taya"
             },
             {
               "ar": "Tawaz",
@@ -1333,8 +1333,8 @@
               "fr": "Chinguitti"
             },
             {
-              "ar": "AÃ¯n Savra",
-              "fr": "AÃ¯n Savra"
+              "ar": "Aïn Savra",
+              "fr": "Aïn Savra"
             }
           ]
         }
@@ -1519,8 +1519,8 @@
           "fr": "Sélibaby",
           "neighborhoods": [
             {
-              "ar": "SÃ©libabi",
-              "fr": "SÃ©libabi"
+              "ar": "Sélibabi",
+              "fr": "Sélibabi"
             },
             {
               "ar": "Ould M'Bonny",
@@ -1573,8 +1573,8 @@
           "fr": "Ould Yengé",
           "neighborhoods": [
             {
-              "ar": "Ould YengÃ©",
-              "fr": "Ould YengÃ©"
+              "ar": "Ould Yengé",
+              "fr": "Ould Yengé"
             },
             {
               "ar": "Leebelli",
