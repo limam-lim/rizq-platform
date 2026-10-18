@@ -283,12 +283,32 @@ button{font:inherit;border:0;background:none;color:inherit}
 .est-card.featured{grid-column:span 8;min-height:440px}
 .est-card-media{position:relative;flex:1;min-height:210px;overflow:hidden}
 .est-card.featured .est-card-media{min-height:280px}
-.est-card-media img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.est-card-media img{width:100%;height:100%;object-fit:cover;transition:transform .6s,opacity .35s}
 .est-card:hover .est-card-media img{transform:scale(1.07)}
 .est-card-media::after{
-  content:'';position:absolute;inset:0;
+  content:'';position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(180deg,transparent 45%,rgba(6,13,24,.55) 100%);
 }
+.est-card-carousel{position:absolute;inset:0}
+.est-card-carousel img{position:absolute;inset:0;opacity:0}
+.est-card-carousel img.is-on{opacity:1;z-index:1}
+.est-card-dots{
+  position:absolute;bottom:14px;right:14px;z-index:3;display:flex;gap:5px;
+}
+.est-card-dots button{
+  width:7px;height:7px;border-radius:50%;border:0;padding:0;cursor:pointer;
+  background:rgba(255,255,255,.45);
+}
+.est-card-dots button.is-on{background:#F3E2A8;transform:scale(1.15)}
+.est-card-nav{
+  position:absolute;top:50%;z-index:3;transform:translateY(-50%);
+  width:28px;height:28px;border-radius:50%;border:0;cursor:pointer;
+  background:rgba(6,13,24,.45);color:#fff;font-size:14px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+}
+.est-card-nav.prev{left:8px}
+.est-card-nav.next{right:8px}
+.est-card-nav:hover{background:rgba(6,13,24,.7)}
 .est-badge{
   position:absolute;top:14px;right:14px;z-index:2;
   background:rgba(6,13,24,.75);border:1px solid rgba(201,168,76,.5);
@@ -831,28 +851,54 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 (function(){
   var LISTINGS = [
     {id:'e1', cat:'villa', deal:'sale', featured:true, title:'فيلا راقية تمليك — نواكشوط الغربية', loc:'نواكشوط الغربية', price:'4.8M MRU', beds:'5', baths:'4', area:'420 م²',
-      img:'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1400&q=80', badge:'للبيع',
+      img:'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1400&q=80',
+      imgs:[
+        'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1400&q=80',
+        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1400&q=80',
+        'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1400&q=80'
+      ], badge:'للبيع',
       desc:'فيلا بحديقة ومسبح وإطلالة واسعة — تشطيب حديث ووثائق جاهزة.'},
     {id:'e2', cat:'apartment', deal:'sale', title:'شقة فاخرة تمليك — تفرغ زينة', loc:'تفرغ زينة', price:'2.6M MRU', beds:'3', baths:'2', area:'145 م²',
-      img:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1000&q=80', badge:'للبيع',
+      img:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1000&q=80',
+      imgs:[
+        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1000&q=80',
+        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1000&q=80',
+        'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1000&q=80'
+      ], badge:'للبيع',
       desc:'شقة 3 غرف مفروشة جزئياً في موقع هادئ قريب من الخدمات — وثائق تمليك جاهزة.'},
     {id:'e3', cat:'apartment', deal:'sale', title:'شقة تمليك بإطلالة مدينة — لكصر', loc:'لكصر', price:'2.1M MRU', beds:'2', baths:'2', area:'110 م²',
-      img:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1000&q=80', badge:'للبيع',
+      img:'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1000&q=80',
+      imgs:[
+        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1000&q=80',
+        'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1000&q=80'
+      ], badge:'للبيع',
       desc:'شقة جاهزة للسكن مع إطلالة مدينة وإضاءة طبيعية ممتازة.'},
     {id:'e4', cat:'land', deal:'sale', title:'أرض سكنية 600 م² — القطب', loc:'القطب', price:'2.2M MRU', beds:'—', baths:'—', area:'600 م²',
       img:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80', badge:'أرض',
       desc:'قطعة أرض سكنية بموقع واضح ووثائق مستوفاة — جاهزة للبناء.'},
     {id:'e5', cat:'villa', deal:'sale', title:'منزل عائلي بحديقة — لكصر', loc:'لكصر', price:'3.4M MRU', beds:'4', baths:'3', area:'280 م²',
-      img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80', badge:'للبيع',
+      img:'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80',
+      imgs:[
+        'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1000&q=80',
+        'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=1000&q=80'
+      ], badge:'للبيع',
       desc:'منزل عائلي بحديقة خاصة ومساحات معيشة واسعة.'},
     {id:'e6', cat:'shop', deal:'rent', title:'محل تجاري على شارع رئيسي — سوق العاصمة', loc:'سوق العاصمة', price:'85K / شهر', beds:'—', baths:'—', area:'75 م²',
       img:'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1000&q=80', badge:'للكراء',
       desc:'محل على شارع رئيسي بحركة عالية — مناسب للتجارة اليومية.'},
     {id:'e7', cat:'apartment', deal:'sale', title:'بنتهاوس تمليك — القطب', loc:'القطب', price:'6.5M MRU', beds:'4', baths:'3', area:'260 م²',
-      img:'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1000&q=80', badge:'للبيع',
+      img:'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1000&q=80',
+      imgs:[
+        'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1000&q=80',
+        'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1000&q=80'
+      ], badge:'للبيع',
       desc:'بنتهاوس بإطلالة غروب وتراس واسع — تشطيب راقٍ.'},
     {id:'e8', cat:'villa', deal:'rent', title:'فيلا مفروشة للكراء — تفرغ زينة', loc:'تفرغ زينة', price:'280K / شهر', beds:'5', baths:'4', area:'380 م²',
-      img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80', badge:'للكراء',
+      img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80',
+      imgs:[
+        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80',
+        'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1000&q=80'
+      ], badge:'للكراء',
       desc:'فيلا مفروشة في حي راقٍ — مناسبة للعائلات والإقامات الطويلة.'}
   ];
 
@@ -1258,15 +1304,42 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       });
   }
 
+  function listingImgs(item){
+    if(item.imgs && item.imgs.length) return item.imgs.slice();
+    return item.img ? [item.img] : [];
+  }
+
   function cardHTML(item){
     var fr = isFrEstate();
+    var imgs = listingImgs(item);
+    var media;
+    if(imgs.length > 1){
+      media = '<div class="est-card-media" data-carousel="1" data-idx="0">'
+        + '<div class="est-card-carousel">'
+        + imgs.map(function(src, i){
+          return '<img src="'+esc(src)+'" alt="'+esc(item.title)+'" loading="'+(i?'lazy':'eager')+'" class="'+(i?'':'is-on')+'"/>';
+        }).join('')
+        + '</div>'
+        + '<button type="button" class="est-card-nav prev" data-dir="-1" aria-label="'+(fr?'Précédent':'السابق')+'">‹</button>'
+        + '<button type="button" class="est-card-nav next" data-dir="1" aria-label="'+(fr?'Suivant':'التالي')+'">›</button>'
+        + '<div class="est-card-dots">'
+        + imgs.map(function(_, i){
+          return '<button type="button" data-go="'+i+'" class="'+(i?'':'is-on')+'" aria-label="'+(i+1)+'"></button>';
+        }).join('')
+        + '</div>'
+        + '<span class="est-badge">'+esc(item.badge)+'</span>'
+        + '<span class="est-price">'+esc(item.price)+'</span>'
+        + '</div>';
+    } else {
+      media = '<div class="est-card-media">'
+        + '<img src="'+esc(imgs[0]||item.img||'')+'" alt="'+esc(item.title)+'" loading="lazy"/>'
+        + '<span class="est-badge">'+esc(item.badge)+'</span>'
+        + '<span class="est-price">'+esc(item.price)+'</span>'
+        + '</div>';
+    }
     return '<div class="est-card'+(item.featured?' featured':'')+'" data-id="'+esc(item.id)+'">'
+      + media
       + '<button type="button" class="est-card-open" data-id="'+esc(item.id)+'" aria-label="'+(fr?'Détails: ':'التفاصيل: ')+esc(item.title)+'" style="display:block;width:100%;text-align:inherit;background:transparent;border:0;padding:0;color:inherit;cursor:pointer">'
-      + '<div class="est-card-media">'
-      +   '<img src="'+esc(item.img)+'" alt="'+esc(item.title)+'" loading="lazy"/>'
-      +   '<span class="est-badge">'+esc(item.badge)+'</span>'
-      +   '<span class="est-price">'+esc(item.price)+'</span>'
-      + '</div>'
       + '<div class="est-card-body">'
       +   '<h3>'+esc(item.title)+'</h3>'
       +   '<div class="loc">📍 '+esc(item.loc)+'</div>'
@@ -1383,7 +1456,31 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     document.getElementById('est-listings').scrollIntoView({behavior:'smooth', block:'start'});
   });
 
+  function setCarousel(media, idx){
+    if(!media) return;
+    var imgs = media.querySelectorAll('.est-card-carousel img');
+    var dots = media.querySelectorAll('.est-card-dots button');
+    if(!imgs.length) return;
+    var n = imgs.length;
+    var i = ((idx % n) + n) % n;
+    media.setAttribute('data-idx', String(i));
+    Array.prototype.forEach.call(imgs, function(img, k){ img.classList.toggle('is-on', k === i); });
+    Array.prototype.forEach.call(dots, function(d, k){ d.classList.toggle('is-on', k === i); });
+  }
+
   grid.addEventListener('click', function(e){
+    var nav = e.target.closest('.est-card-nav');
+    var dot = e.target.closest('.est-card-dots button');
+    if(nav || dot){
+      e.preventDefault();
+      e.stopPropagation();
+      var media = e.target.closest('.est-card-media');
+      if(!media) return;
+      var cur = parseInt(media.getAttribute('data-idx') || '0', 10) || 0;
+      if(nav) setCarousel(media, cur + (parseInt(nav.getAttribute('data-dir'), 10) || 1));
+      else if(dot) setCarousel(media, parseInt(dot.getAttribute('data-go'), 10) || 0);
+      return;
+    }
     var openBtn = e.target.closest('.est-card-open') || e.target.closest('.est-card');
     if(!openBtn) return;
     var id = openBtn.getAttribute('data-id');
