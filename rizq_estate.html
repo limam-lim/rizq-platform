@@ -261,25 +261,54 @@ button{font:inherit;border:0;background:none;color:inherit}
 .est-btn-ghost{background:#fff;color:var(--navy);border:1px solid var(--border)}
 .est-btn-ghost:hover{background:rgba(255,255,255,.92)}
 
-/* بحث البطل */
+/* بحث فوق العروض (نفس منطق المحلات: البحث مع الكتالوج لا داخل الهيرو) */
+.est-search-panel{margin:0 0 16px}
 .est-search{
   display:grid;grid-template-columns:1.15fr .9fr .9fr .9fr auto;gap:8px;
-  padding:12px;border-radius:18px;
-  background:rgba(10,20,36,.78);border:1px solid rgba(201,168,76,.3);
-  backdrop-filter:blur(14px);box-shadow:0 18px 40px rgba(0,0,0,.35);
+  padding:14px;border-radius:18px;
+  background:#fff;border:1px solid var(--border);
+  box-shadow:0 8px 24px rgba(15,35,65,.06);
 }
 .est-search label{display:flex;flex-direction:column;gap:4px;min-width:0}
-.est-search span{font:800 11px Cairo,sans-serif;color:#F3E2A8;letter-spacing:.2px}
+.est-search span{font:800 11px Cairo,sans-serif;color:#8A6B1F;letter-spacing:.2px}
 .est-search input,.est-search select{
-  width:100%;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);
-  color:#fff;border-radius:12px;padding:11px 12px;font:700 13px Cairo,sans-serif;outline:none;
+  width:100%;border:1px solid #d5deea;background:#f4f7fc;
+  color:var(--navy);border-radius:12px;padding:11px 12px;font:700 13px Cairo,sans-serif;outline:none;
 }
-.est-search input:focus,.est-search select:focus{border-color:rgba(201,168,76,.55)}
-.est-search select option{background:#0B1C33;color:#fff}
+.est-search input:focus,.est-search select:focus{border-color:rgba(201,168,76,.65);background:#fff}
+.est-search select option{background:#fff;color:var(--navy)}
 .est-search-go{
   align-self:end;padding:12px 18px;border-radius:12px;font:900 13px Cairo,sans-serif;
   background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0B1C33;white-space:nowrap;
-  box-shadow:0 8px 18px rgba(201,168,76,.28);
+  box-shadow:0 8px 18px rgba(201,168,76,.28);border:0;cursor:pointer;
+}
+
+/* فيديو تعريفي + إضافي على الهيرو (نفس بنية المحلات/المكاتب) */
+.est-hero .hero-videos{display:none;position:absolute;inset:0;z-index:3;pointer-events:none}
+.est-hero.has-hero-videos .hero-videos{display:block}
+.est-hero.has-hero-videos .est-hero-copy{padding-bottom:132px}
+.est-hero .hero-video-card{
+  position:absolute;bottom:12px;width:min(200px,38vw);border-radius:12px;overflow:hidden;
+  border:1px solid rgba(201,168,76,.45);box-shadow:0 12px 28px rgba(0,0,0,.35);
+  background:#040a12;pointer-events:auto;animation:estRise .7s ease both;
+}
+.est-hero .hero-video-card--intro{right:12px;left:auto}
+.est-hero .hero-video-card--extra{left:12px;right:auto;animation-delay:.12s}
+.est-hero .hero-video-card .hero-video-mount{min-height:0}
+.est-hero .hero-video-card .rzq-iv-wrap{max-width:100%;width:100%;margin:0}
+.est-hero .hero-video-card .rzq-iv-frame{border-radius:0;aspect-ratio:16/9;min-height:0;width:100%;box-shadow:none;animation:none}
+.est-hero .hero-video-card .rzq-iv-badge,
+.est-hero .hero-video-card .rzq-iv-src,
+.est-hero .hero-video-card .rzq-iv-play-label,
+.est-hero .hero-video-card .rzq-iv-dash-hint{display:none!important}
+.est-hero .hero-video-card .rzq-iv-play{opacity:.35;width:42px;height:42px;font-size:16px}
+.est-hero .hero-video-card:hover .rzq-iv-play,
+.est-hero .hero-video-card:focus-within .rzq-iv-play{opacity:.9}
+@media(max-width:720px){
+  .est-hero.has-hero-videos .est-hero-copy{padding-bottom:118px}
+  .est-hero .hero-video-card{width:min(148px,42vw);bottom:8px;border-radius:10px}
+  .est-hero .hero-video-card--intro{right:8px}
+  .est-hero .hero-video-card--extra{left:8px}
 }
 
 /* ── Content ── */
@@ -752,7 +781,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   </div>
 </header>
 
-<section class="est-hero" aria-label="وكالة أطوار العقارية">
+<section class="est-hero" id="est-hero" aria-label="وكالة أطوار العقارية">
   <div class="est-hero-media">
     <img id="est-hero-img" src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1800&q=80" alt="وكالة أطوار العقارية" fetchpriority="high"/>
   </div>
@@ -773,42 +802,14 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       <a class="est-btn est-btn-mail" id="est-hero-email" href="mailto:contact@atwar-immo.mr">✉️ البريد الإلكتروني</a>
       <button type="button" class="est-btn est-btn-ghost" id="est-hero-share">📤 مشاركة</button>
     </div>
-    <form class="est-search" id="est-search" role="search" aria-label="بحث العقارات">
-      <label>
-        <span>الكلمة أو الحي</span>
-        <input type="search" id="est-q" name="q" placeholder="مثال: تفرغ زينة، فيلا، شقة تمليك" autocomplete="off"/>
-      </label>
-      <label>
-        <span>المنطقة</span>
-        <select id="est-city" name="city">
-          <option value="">كل المناطق</option>
-          <option>تفرغ زينة</option>
-          <option>لكصر</option>
-          <option>نواكشوط الغربية</option>
-          <option>القطب</option>
-          <option>سوق العاصمة</option>
-        </select>
-      </label>
-      <label>
-        <span>نوع العقار</span>
-        <select id="est-cat" name="cat">
-          <option value="all">الكل</option>
-          <option value="apartment">شقق</option>
-          <option value="villa">فلل ومنازل</option>
-          <option value="land">أراضي</option>
-          <option value="shop">محلات</option>
-        </select>
-      </label>
-      <label>
-        <span>للبيع أو الكراء</span>
-        <select id="est-deal" name="deal">
-          <option value="all">الكل</option>
-          <option value="sale">للبيع</option>
-          <option value="rent">للكراء</option>
-        </select>
-      </label>
-      <button type="submit" class="est-search-go">🔎 ابحث</button>
-    </form>
+  </div>
+  <div class="hero-videos" id="est-hero-videos" aria-label="فيديوهات الوكالة">
+    <div class="hero-video-card hero-video-card--intro" id="est-hero-intro-card" style="display:none">
+      <div class="hero-video-mount" id="est-hero-intro-video-mount"></div>
+    </div>
+    <div class="hero-video-card hero-video-card--extra" id="est-hero-extra-card" style="display:none">
+      <div class="hero-video-mount" id="est-hero-extra-video-mount"></div>
+    </div>
   </div>
 </section>
 
@@ -896,6 +897,45 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     </aside>
 
     <div class="est-main-col">
+      <div class="est-search-panel" id="est-search-panel">
+        <form class="est-search" id="est-search" role="search" aria-label="بحث العقارات">
+          <label>
+            <span>الكلمة أو الحي</span>
+            <input type="search" id="est-q" name="q" placeholder="مثال: تفرغ زينة، فيلا، شقة تمليك" autocomplete="off"/>
+          </label>
+          <label>
+            <span>المنطقة</span>
+            <select id="est-city" name="city">
+              <option value="">كل المناطق</option>
+              <option>تفرغ زينة</option>
+              <option>لكصر</option>
+              <option>نواكشوط الغربية</option>
+              <option>القطب</option>
+              <option>سوق العاصمة</option>
+            </select>
+          </label>
+          <label>
+            <span>نوع العقار</span>
+            <select id="est-cat" name="cat">
+              <option value="all">الكل</option>
+              <option value="apartment">شقق</option>
+              <option value="villa">فلل ومنازل</option>
+              <option value="land">أراضي</option>
+              <option value="shop">محلات</option>
+            </select>
+          </label>
+          <label>
+            <span>للبيع أو الكراء</span>
+            <select id="est-deal" name="deal">
+              <option value="all">الكل</option>
+              <option value="sale">للبيع</option>
+              <option value="rent">للكراء</option>
+            </select>
+          </label>
+          <button type="submit" class="est-search-go">🔎 ابحث</button>
+        </form>
+      </div>
+
       <div class="est-section-head" id="est-listings">
         <div class="tag">معروضات الوكالة</div>
         <h2>عقارات للبيع والكراء</h2>
@@ -1059,6 +1099,8 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 <script src="rizq_mr_payment_catalog.js?v=1.1"></script>
 <script src="rizq_account_payments.js?v=28.3"></script>
 <script src="rizq_service_desk.js?v=1.3"></script>
+<script src="rizq_intro_video.js?v=29.9"></script>
+<script src="rizq_live_showcase.js?v=1.0"></script>
 <script>
 (function(){
   var LISTINGS = (window.RizqEstateData && RizqEstateData.LISTINGS)
@@ -1156,6 +1198,8 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       logo: 'rizq-mark-inset.png?v=1',
       cover: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1800&q=80',
       desc: 'نرافقك في البيع والكراء والمعاينة — فريق محلي يعرف أحياء نواكشوط ووثائق العقار.',
+      promo_video: 'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4',
+      promo_video_extra: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4',
       hours: DEMO_HOURS.slice(),
       paymentMethods: DEMO_PAY,
       serviceDesk: Object.assign({}, DEMO_DESK, { formTitle: 'استفسار — وكالة أطوار العقارية' })
@@ -1377,6 +1421,10 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       logo: acc.logo || acc.thumb || acc.avatar || AGENCY.logo,
       cover: acc.cover || acc.thumb || AGENCY.cover,
       desc: acc.desc || acc.tagline || acc.bio || AGENCY.desc,
+      promo_video: acc.promo_video || AGENCY.promo_video || '',
+      promo_video_extra: acc.promo_video_extra || AGENCY.promo_video_extra || '',
+      youtube_channel_id: acc.youtube_channel_id || acc.youtubeChannelId || AGENCY.youtube_channel_id || '',
+      live_active: !!acc.live_active,
       hours: Array.isArray(acc.hours) ? acc.hours : (AGENCY.hours || DEMO_HOURS),
       paymentMethods: Array.isArray(acc.paymentMethods) ? acc.paymentMethods : (AGENCY.paymentMethods || []),
       serviceDesk: acc.serviceDesk || AGENCY.serviceDesk || {}
@@ -1433,7 +1481,78 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     paintDesk(AGENCY.serviceDesk, AGENCY.name);
     hidePlatformUpsellOnBoundEstate();
     renderGrid();
+    try{ mountEstateIntroVideo(); }catch(eVid){}
   }
+
+  function mountEstateIntroVideo(){
+    try{
+      if(!window.RizqIntroVideo) return;
+      var acc = window._rizqEstateProfile || AGENCY || {};
+      var fr = isFrEstate();
+      var isDemo = !!(window._rizqEstateIsDemo || /^demo_estate/i.test(acc.id || '') || /^acc_promo_/.test(acc.id || '') || /[?&]demo=1\b/.test(location.search));
+      var dashIntro = (RizqIntroVideo.demoDashboardVideo && RizqIntroVideo.demoDashboardVideo('office')) || '';
+      var dashExtra = (RizqIntroVideo.demoDashboardVideo && RizqIntroVideo.demoDashboardVideo('store')) || '';
+      var introUrl = String((isDemo ? (acc.promo_video || dashIntro) : (acc.promo_video || dashIntro)) || '').trim();
+      var extraUrl = String(acc.promo_video_extra || (isDemo ? dashExtra : '') || '').trim();
+      if(isDemo && window.RizqIntroVideo.resolveDemoUrl){
+        introUrl = RizqIntroVideo.resolveDemoUrl(introUrl, 'office', !acc.promo_video) || introUrl;
+      }
+      var hero = document.getElementById('est-hero');
+      var introCard = document.getElementById('est-hero-intro-card');
+      var extraCard = document.getElementById('est-hero-extra-card');
+      var introMount = document.getElementById('est-hero-intro-video-mount');
+      var extraMount = document.getElementById('est-hero-extra-video-mount');
+      if(!introMount || !introUrl){
+        if(hero) hero.classList.remove('has-hero-videos');
+        if(introCard) introCard.style.display = 'none';
+        if(extraCard) extraCard.style.display = 'none';
+        try{ if(window.RizqLiveShowcase) RizqLiveShowcase.maybeApplyPublic(acc, {
+          extraCard: '#est-hero-extra-card',
+          extraMount: '#est-hero-extra-video-mount',
+          hero: '#est-hero'
+        }); }catch(eLive0){}
+        return;
+      }
+      var sig = [acc.id || '', introUrl, extraUrl, fr ? 'fr' : 'ar', 'estate-hero-v1'].join('|');
+      if(hero && hero.getAttribute('data-rzq-promo-sig') === sig && introMount.querySelector('.rzq-iv-wrap') && !(extraCard && extraCard.classList.contains('is-live-now'))){
+        hero.classList.add('has-hero-videos');
+        try{ if(window.RizqLiveShowcase) RizqLiveShowcase.maybeApplyPublic(acc, {
+          extraCard: '#est-hero-extra-card',
+          extraMount: '#est-hero-extra-video-mount',
+          hero: '#est-hero'
+        }); }catch(eLive1){}
+        return;
+      }
+      if(hero) hero.setAttribute('data-rzq-promo-sig', sig);
+      var okIntro = RizqIntroVideo.mount(introMount, introUrl, {
+        accountType: 'office',
+        poster: (RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('office')) || '',
+        title: fr ? 'Vidéo de présentation' : 'فيديو تعريفي',
+        linkLabel: fr ? 'Source ↗' : 'المصدر ↗',
+        playLabel: fr ? 'Lire' : 'تشغيل'
+      });
+      if(introCard) introCard.style.display = okIntro ? '' : 'none';
+      var okExtra = false;
+      if(extraUrl && extraMount && extraCard && extraUrl !== introUrl){
+        okExtra = RizqIntroVideo.mount(extraMount, extraUrl, {
+          title: fr ? 'Vidéo supplémentaire' : 'فيديو إضافي',
+          linkLabel: fr ? 'Source ↗' : 'المصدر ↗',
+          playLabel: fr ? 'Lire' : 'تشغيل'
+        });
+        extraCard.style.display = okExtra ? '' : 'none';
+      } else if(extraCard){
+        extraCard.style.display = 'none';
+        if(extraMount) extraMount.innerHTML = '';
+      }
+      if(hero) hero.classList.toggle('has-hero-videos', !!(okIntro || okExtra));
+      try{ if(window.RizqLiveShowcase) RizqLiveShowcase.maybeApplyPublic(acc, {
+        extraCard: '#est-hero-extra-card',
+        extraMount: '#est-hero-extra-video-mount',
+        hero: '#est-hero'
+      }); }catch(eLive2){}
+    }catch(e){}
+  }
+  window.mountEstateIntroVideo = mountEstateIntroVideo;
 
   function backendBase(){
     return (typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE) || 'http://localhost:3000';

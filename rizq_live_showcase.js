@@ -339,9 +339,9 @@
     acc = resolveAccount(acc);
     if (!acc) return false;
     injectCss();
-    var extraCard = document.querySelector(selectors.extraCard || '#hero-extra-card, #office-hero-extra-card, #sr-hero-extra-card, #corp-hero-extra-card');
-    var extraMount = document.querySelector(selectors.extraMount || '#hero-extra-video-mount, #office-hero-extra-video-mount, #sr-hero-extra-video-mount, #corp-hero-extra-video-mount');
-    var hero = document.querySelector(selectors.hero || '.store-hero, .office-hero, .showroom-hero, .corp-hero');
+    var extraCard = document.querySelector(selectors.extraCard || '#hero-extra-card, #office-hero-extra-card, #sr-hero-extra-card, #corp-hero-extra-card, #est-hero-extra-card');
+    var extraMount = document.querySelector(selectors.extraMount || '#hero-extra-video-mount, #office-hero-extra-video-mount, #sr-hero-extra-video-mount, #corp-hero-extra-video-mount, #est-hero-extra-video-mount');
+    var hero = document.querySelector(selectors.hero || '.store-hero, .office-hero, .showroom-hero, .corp-hero, #est-hero, .est-hero');
     if (!extraCard || !extraMount) return false;
 
     if (!isLiveNow(acc)) {
@@ -372,6 +372,8 @@
             global.mountShowroomIntroVideo();
           } else if (typeof global.mountCorpIntroVideo === 'function') {
             global.mountCorpIntroVideo();
+          } else if (typeof global.mountEstateIntroVideo === 'function') {
+            global.mountEstateIntroVideo();
           } else {
             location.reload();
           }
