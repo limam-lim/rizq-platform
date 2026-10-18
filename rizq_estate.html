@@ -20,16 +20,17 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
+/* جسم الصفحة = هوية المنصة | وسط المحتوى فقط أبيض نقي */
 html,html.rizq-app-nav,
 body,
 body.rizq-page-light,
 body.rizq-mockup-hdr-trial,
 body.rizq-mockup-hdr-trial.rizq-page-light,
 html.rizq-app-nav body.rizq-mockup-hdr-trial.rizq-page-light{
-  background:#ffffff!important;
+  background:#eef1f5!important;
   background-image:none!important;
   background-attachment:scroll!important;
-  background-color:#ffffff!important;
+  background-color:#eef1f5!important;
 }
 body,
 body.rizq-page-light,
@@ -38,7 +39,18 @@ body.rizq-mockup-hdr-trial.rizq-page-light{
   font-family:'Cairo',system-ui,sans-serif;color:var(--text);
   min-height:100vh;
 }
-.est-wrap,.est-main-col,.est-content-grid,.est-side,.est-agency-bar,.est-grid,.est-reviews{
+/* وسط الصفحة فقط — أبيض نقي بعرض كامل */
+.est-mid{
+  background:#ffffff!important;
+  width:100%;
+  border-top:1px solid rgba(27,58,107,.06);
+  border-bottom:1px solid rgba(27,58,107,.06);
+}
+.est-wrap{
+  background:#ffffff!important;
+  max-width:1180px;margin:0 auto;padding:36px 20px 48px;position:relative;
+}
+.est-main-col,.est-content-grid,.est-side,.est-agency-bar,.est-grid,.est-reviews,.est-toolbar{
   background:#ffffff!important;
 }
 .est-section-head h2{color:var(--navy)!important}
@@ -266,7 +278,6 @@ button{font:inherit;border:0;background:none;color:inherit}
 }
 
 /* ── Content ── */
-.est-wrap{max-width:1180px;margin:0 auto;padding:36px 20px 40px;position:relative}
 .est-section-head{margin:8px 0 18px;text-align:center}
 .est-section-head .tag{color:#8A6B1F;font:900 13px Cairo,sans-serif;letter-spacing:.4px;margin-bottom:8px;display:inline-block}
 .est-section-head h2{font-family:var(--display);font-size:clamp(26px,3.6vw,40px);font-weight:700;margin-bottom:8px;color:var(--navy)}
@@ -657,7 +668,8 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   </div>
 </section>
 
-<main class="est-wrap">
+<main class="est-mid" id="est-mid">
+<div class="est-wrap">
   <div class="est-agency-bar" aria-label="تواصل مع الوكالة">
     <div class="est-agency-bar-id">
       <div>
@@ -808,6 +820,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       </section>
     </div>
   </div>
+</div>
 </main>
 
 <footer class="est-foot">
@@ -1795,10 +1808,10 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.43"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.44"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <script src="rizq_header.js?v=31.0" defer></script>
-<script src="rizq_header_mockup_trial.js?v=5.43" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.44" defer></script>
 <script src="rizq_pwa.js" defer></script>
 </body>
 </html>

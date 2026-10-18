@@ -20,12 +20,17 @@ body.rizq-mockup-hdr-trial.rizq-page-dark{
   background-attachment:fixed!important;
   color:#E8EDF5;
 }
+/* وكالة فاتحة: خلفية المنصة الرمادية الفاتحة — الوسط (.est-mid) أبيض داخل الصفحة */
 body.rizq-mockup-hdr-trial.rizq-page-light:has(.est-wrap),
 body.rizq-mockup-hdr-trial.rizq-page-light{
-  background:#ffffff!important;
+  background:#eef1f5!important;
   background-image:none!important;
   background-attachment:scroll!important;
   color:#0B1C33!important;
+}
+body.rizq-mockup-hdr-trial.rizq-page-light .est-mid,
+body.rizq-mockup-hdr-trial.rizq-page-light .est-wrap{
+  background:#ffffff!important;
 }
 body.rizq-mockup-hdr-trial:has(.est-wrap):not(.rizq-page-light) .est-section-head h2,
 body.rizq-mockup-hdr-trial.rizq-page-dark .est-section-head h2{
