@@ -133,15 +133,7 @@ button{font:inherit;border:0;background:none;color:inherit}
 .est-desk-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
 .est-meta-row{display:flex;flex-wrap:wrap;gap:10px 16px;margin:0 0 10px;font-size:12.5px;color:var(--muted)}
 .est-meta-row strong{color:#fff;font-weight:800}
-.est-card-contact{
-  display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;
-}
-.est-card-contact a{
-  display:inline-flex;align-items:center;justify-content:center;gap:4px;
-  border-radius:10px;padding:8px 6px;font:800 11.5px Cairo,sans-serif;text-decoration:none;
-}
-.est-card-contact .est-call{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347}
-.est-card-contact .est-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
+/* تواصل العروض على مستوى الوكالة فقط — لا أزرار اتصال داخل بطاقة العقار */
 .est-modal-actions .est-call{background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347}
 .est-modal-actions .est-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
 .est-nav{
@@ -473,13 +465,13 @@ button{font:inherit;border:0;background:none;color:inherit}
     <img id="est-hero-img" src="https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1800&q=80" alt="فيلا فاخرة عند الغروب" fetchpriority="high"/>
   </div>
   <div class="est-hero-copy">
-    <div class="est-kicker" id="est-kicker"><i></i> واجهة وكالة عقارية واحدة · مثل المحل والمكتب</div>
+    <div class="est-kicker" id="est-kicker"><i></i> نموذج ترويجي · وكالة واحدة على رزق</div>
     <h1>مساحات تليق بك — <em>على رزق</em></h1>
-    <p class="est-hero-lead" id="est-hero-lead">صفحة وكالة واحدة: معروضاتها، ورقمها، وواتسابها — تصميم عقاري مستقل عن المحلات والمكاتب والمعارض.</p>
+    <p class="est-hero-lead" id="est-hero-lead">نموذج ثابت لصفحة وكالة عقارية على رزق — مثل نماذج المحلات والمكاتب والمعارض والمناقصات والاستثمارات. بعد الاشتراك تفتح وكالتك الحقيقية ولوحة عملك الخاصة بلا ترويج المنصة.</p>
     <div class="est-hero-stats" id="est-hero-stats" aria-label="أرقام نموذج" data-rizq-estate-promo="1">
-      <div class="est-stat"><b id="est-stat-ads">+120</b><span>عرض عقاري</span></div>
-      <div class="est-stat"><b>8</b><span>ولايات مغطاة</span></div>
-      <div class="est-stat"><b>24/7</b><span>تواصل مع الوكالة</span></div>
+      <div class="est-stat"><b id="est-stat-ads">8</b><span>معروضات النموذج</span></div>
+      <div class="est-stat"><b>1</b><span>صفحة وكالة موحّدة</span></div>
+      <div class="est-stat"><b>✓</b><span>داشبورد بعد الاشتراك</span></div>
     </div>
     <div class="est-hero-cta">
       <a class="est-btn est-btn-gold" href="#est-listings">استكشف معروضات الوكالة</a>
@@ -522,7 +514,7 @@ button{font:inherit;border:0;background:none;color:inherit}
       <img id="est-bar-logo" src="rizq-mark-inset.png?v=1" width="44" height="44" alt=""/>
       <div>
         <strong id="est-bar-name">أطوار للعقارات</strong>
-        <span id="est-bar-sub">وكالة عقارية على رزق · نواكشوط</span>
+        <span id="est-bar-sub">نموذج وكالة عقارية على رزق · نواكشوط</span>
       </div>
     </div>
     <div class="est-agency-bar-acts">
@@ -530,14 +522,14 @@ button{font:inherit;border:0;background:none;color:inherit}
       <a class="est-wa" id="est-bar-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب</a>
       <a class="est-pay" href="#est-services">💳 طرق الدفع</a>
       <a class="est-desk" href="#est-desk">📩 استفسار</a>
-      <a class="est-page" href="rizq_estate_agencies.html">كل الوكالات</a>
+      <a class="est-page" href="rizq_estate_agencies.html">دليل الوكالات</a>
     </div>
   </div>
 
   <section class="est-services" id="est-services" aria-label="طرق الدفع وغرفة الاستفسار">
     <div class="est-svc-card" id="est-pay-card">
       <h3>💳 طرق الدفع</h3>
-      <p class="est-svc-sub">نفس نظام المحلات والمكاتب والمعارض — ادفع مباشرة للوكالة عبر الوسائل التي تفعّلها.</p>
+      <p class="est-svc-sub">تواصل ودفع على مستوى الوكالة فقط — نفس محرك المحلات والمكاتب والمعارض، بواجهة عقارية.</p>
       <div class="est-meta-row" id="est-contact-meta" hidden>
         <span>📍 <strong id="est-addr-lbl">—</strong></span>
         <span>✉️ <strong id="est-email-lbl">—</strong></span>
@@ -546,7 +538,7 @@ button{font:inherit;border:0;background:none;color:inherit}
     </div>
     <div class="est-svc-card" id="est-desk" aria-label="غرفة استفسار عقاري">
       <h3 id="est-desk-title" data-desk="title">📩 استفسار عقاري</h3>
-      <p class="est-svc-sub" id="est-desk-hint" data-desk="hint">أدخل بياناتك وسنتواصل معك بخصوص العرض أو الزيارة — مثل غرفة الطلبات في المحل والمكتب، بواجهة عقارية.</p>
+      <p class="est-svc-sub" id="est-desk-hint" data-desk="hint">استفسارك يصل للوكالة مباشرة — لا تواصل منفصل لكل عقار. مثل غرفة الطلبات في المحل والمكتب، بواجهة عقارية.</p>
       <form class="est-desk-fields" id="est-req-form" novalidate>
         <input id="est-rf-name" name="name" type="text" autocomplete="name" placeholder="الاسم الكامل *" required/>
         <input id="est-rf-phone" name="phone" type="tel" autocomplete="tel" dir="ltr" placeholder="رقم الهاتف / واتساب *" required/>
@@ -566,9 +558,9 @@ button{font:inherit;border:0;background:none;color:inherit}
   </section>
 
   <div class="est-section-head" id="est-listings">
-    <div class="tag">مجموعة مختارة من الوكالة</div>
-    <h2>عقارات بصور تروي القصة</h2>
-    <p>بطاقات كبيرة، أسعار واضحة، وتواصل مباشر مع الوكالة — اضغط أي عقار لفتح المعاينة الكاملة.</p>
+    <div class="tag">معروضات هذه الوكالة</div>
+    <h2>عقارات الوكالة بصور واضحة</h2>
+    <p>صور وأسعار ومواقع فقط — التواصل عبر أزرار الوكالة أعلاه أو من معاينة العرض، وليس من كل بطاقة.</p>
   </div>
 
   <div class="est-toolbar">
@@ -588,21 +580,21 @@ button{font:inherit;border:0;background:none;color:inherit}
   <p class="est-count" id="est-count" aria-live="polite"></p>
   <div class="est-grid" id="est-grid"></div>
 
-  <section class="est-trust" id="est-trust" aria-label="لماذا العقارات على رزق" data-rizq-estate-promo="1">
+  <section class="est-trust" id="est-trust" aria-label="لماذا وكالة على رزق" data-rizq-estate-promo="1">
     <article>
-      <div class="ico" aria-hidden="true">📸</div>
-      <h3>صور تُقنع من أول نظرة</h3>
-      <p>مساحة وسعر وموقع واضح — المشتري يفهم العرض قبل أن يراسلك.</p>
+      <div class="ico" aria-hidden="true">🏠</div>
+      <h3>نموذج ترويجي ثابت</h3>
+      <p>هذه الصفحة نموذج على المنصة — مثل المحل والمكتب والمعرض والمناقصة والاستثمار — لترى شكل وكالتك قبل الاشتراك.</p>
     </article>
     <article>
-      <div class="ico" aria-hidden="true">📍</div>
-      <h3>وصول لمن يبحث بجدية</h3>
-      <p>طلبة كراء ومشترون يصلون عبر بحث العقارات على منصة رزق.</p>
+      <div class="ico" aria-hidden="true">🔐</div>
+      <h3>بعد الاشتراك مساحة حقيقية</h3>
+      <p>تفتح صفحة وكالتك الخاصة ولوحة التحكم — معروضاتك وبيئتك العملية فقط، بلا نصوص ترويج المنصة.</p>
     </article>
     <article>
-      <div class="ico" aria-hidden="true">✅</div>
-      <h3>تواصل مباشر بثقة</h3>
-      <p>خصوصية محمية وشارات تساعد على بناء الثقة مع الجدّيين.</p>
+      <div class="ico" aria-hidden="true">📞</div>
+      <h3>تواصل موحّد للوكالة</h3>
+      <p>هاتف وواتساب ودفع واستفسار على مستوى الوكالة — العروض تعرض التفاصيل دون أزرار اتصال مكرّرة.</p>
     </article>
   </section>
 
@@ -618,20 +610,20 @@ button{font:inherit;border:0;background:none;color:inherit}
 
   <section class="est-agency" id="est-agency" aria-label="عن الوكالة">
     <div class="est-agency-copy">
-      <div class="tag" style="color:var(--gold);font:800 12px Cairo,sans-serif">هذه الوكالة على رزق</div>
+      <div class="tag" style="color:var(--gold);font:800 12px Cairo,sans-serif">نموذج وكالة على رزق</div>
       <h2 id="est-about-name">أطوار للعقارات</h2>
-      <p id="est-about-desc">صفحة وكالة واحدة (مثل صفحة محل أو مكتب أو معرض) بتصميم عقاري مستقل — معروضات، هوية، وجهات اتصال واحدة للوكالة.</p>
+      <p id="est-about-desc">نموذج ترويجي لوكالة واحدة على رزق — معروضاتها ورقمها وواتسابها وطرق دفعها في صفحة عقارية مستقلة. بعد الاشتراك تصير صفحتك حقيقية خاصة بك.</p>
       <ul class="est-agency-points" id="est-agency-points" data-rizq-estate-promo="1">
-        <li>✓ حساب واحد → صفحة وكالة واحدة (`?id=`)</li>
-        <li>✓ تواصل ودفع واستفسار موحّد (هاتف + واتساب + طرق دفع)</li>
-        <li>✓ مسار التسجيل: شركة → مكتب → وساطة عقارية</li>
-        <li>✓ الظهور في دليل الوكالات المنفصل</li>
+        <li>✓ نموذج ثابت على المنصة — مثل المحل والمكتب والمعرض والمناقصة والاستثمار</li>
+        <li>✓ بعد الاشتراك: صفحة وكالة حقيقية + داشبورد عملك (بلا ترويج المنصة)</li>
+        <li>✓ تواصل ودفع واستفسار موحّد للوكالة فقط — لا اتصال منفصل لكل عقار</li>
+        <li>✓ مسار التسجيل: شركة → مكتب → وساطة عقارية → ظهور في دليل الوكالات</li>
       </ul>
       <div class="est-hero-cta">
         <a class="est-btn est-btn-gold" id="est-about-call" href="tel:+22242000111" dir="ltr">📞 اتصل بالوكالة</a>
         <a class="est-btn est-btn-ghost" id="est-about-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب الوكالة</a>
-        <a class="est-btn est-btn-gold" id="est-reg-agency" data-rizq-estate-promo="1" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">امتلك واجهتك العقارية</a>
-        <a class="est-btn est-btn-ghost" href="rizq_estate_agencies.html">كل الوكالات العقارية</a>
+        <a class="est-btn est-btn-gold" id="est-reg-agency" data-rizq-estate-promo="1" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">افتح وكالتك على رزق</a>
+        <a class="est-btn est-btn-ghost" href="rizq_estate_agencies.html">دليل الوكالات</a>
       </div>
     </div>
     <div class="est-agency-photo">
@@ -650,20 +642,20 @@ button{font:inherit;border:0;background:none;color:inherit}
           <span class="est-brand-sub">RIZQ ESTATE</span>
         </span>
       </a>
-      <p id="est-foot-blurb">نموذج بوابة عقارية فاخرة على رزق — عرض بصري كامل للوكالات والبائعين في موريتانيا.</p>
+      <p id="est-foot-blurb">نموذج ترويجي لصفحة وكالة عقارية على رزق — بعد الاشتراك تفتح مساحتك الحقيقية ولوحة التحكم.</p>
     </div>
     <div>
       <h4>استكشف</h4>
       <a href="#est-listings">معروضات الوكالة</a>
       <a href="#est-gallery">معرض الصور</a>
-      <a href="rizq_estate_agencies.html">كل الوكالات العقارية</a>
+      <a href="rizq_estate_agencies.html">دليل الوكالات</a>
       <a href="rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA">كل الإعلانات</a>
     </div>
     <div id="est-foot-reg" data-rizq-estate-promo="1">
       <h4>للوكالات</h4>
-      <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">افتح وكالة عقارية</a>
+      <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">اشترك وافتح وكالتك</a>
       <a href="rizq_estate_agencies.html">دليل الوكالات</a>
-      <a href="rizq_landing_v8.html#virtual-estate">بوابة العقارات</a>
+      <a href="rizq_landing_v8.html#virtual-estate">سوق العقارات</a>
     </div>
     <div>
       <h4>رزق</h4>
@@ -673,10 +665,10 @@ button{font:inherit;border:0;background:none;color:inherit}
       <a href="rizq_landing_v8.html#virtual-offices">المكاتب</a>
     </div>
   </div>
-  <div class="est-foot-bar" id="est-foot-bar">© 2026 رزق | Rizq — نموذج بوابة العقارات · RIZQ ESTATE</div>
+  <div class="est-foot-bar" id="est-foot-bar">© 2026 رزق | Rizq — نموذج وكالة عقارية · RIZQ ESTATE</div>
 </footer>
 
-<!-- معاينة عقار -->
+<!-- معاينة عقار — التواصل عبر الوكالة فقط -->
 <div class="est-overlay" id="est-modal" role="dialog" aria-modal="true" aria-labelledby="est-modal-title" hidden>
   <div class="est-modal">
     <button type="button" class="est-modal-close" id="est-modal-close" aria-label="إغلاق">×</button>
@@ -690,8 +682,8 @@ button{font:inherit;border:0;background:none;color:inherit}
       <p id="est-modal-desc" style="color:var(--muted);line-height:1.75;margin-top:14px"></p>
       <div class="est-modal-actions">
         <a class="est-btn est-call" id="est-modal-call" href="tel:+22242000111" dir="ltr">📞 اتصل بالوكالة</a>
-        <a class="est-btn est-wa" id="est-modal-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب</a>
-        <a class="est-btn est-btn-ghost" id="est-modal-browse" href="rizq_estate_agencies.html">صفحة الوكالة</a>
+        <a class="est-btn est-wa" id="est-modal-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب الوكالة</a>
+        <a class="est-btn est-btn-ghost" id="est-modal-browse" href="#est-desk">📩 استفسار عن العرض</a>
       </div>
     </div>
   </div>
@@ -776,10 +768,16 @@ button{font:inherit;border:0;background:none;color:inherit}
     { type: 'sedad', bank: 'Sedad', code: '420011', phone: '+22242000111' },
     { type: 'bank', bank: 'BCI', account: 'MR13 0001 4200 0111 0000 0000 000', note: 'تحويل — عربون / أتعاب وساطة' }
   ];
+  /*
+   * معمارية رزق الموحّدة (محل / مكتب / معرض / وكالة / مناقصات / استثمارات):
+   * — النماذج على المنصة ثابتة وترويجية فقط (؟demo=1).
+   * — بعد الاشتراك تفتح صفحة حقيقية + داشبورد خاص بالمشترك بلا نصوص ترويج المنصة.
+   * — التواصل على مستوى الحساب (الوكالة) وليس على كل عرض.
+   */
   var DEMO_DESK = {
     enabled: true,
     formTitle: 'استفسار عقاري',
-    formHint: 'بياناتك تصل للوكالة مباشرة. يمكنك المتابعة عبر واتساب بعد الإرسال — مثل غرفة الطلبات في المحل والمكتب.',
+    formHint: 'بياناتك تصل للوكالة مباشرة. يمكنك المتابعة عبر واتساب بعد الإرسال — تواصل موحّد للوكالة، مثل غرفة الطلبات في المحل والمكتب.',
     docsChannel: 'whatsapp'
   };
 
@@ -790,7 +788,7 @@ button{font:inherit;border:0;background:none;color:inherit}
       email: 'atwar@estate-demo.mr', address: 'تفرغ زينة — نواكشوط',
       logo: 'rizq-mark-inset.png?v=1',
       cover: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1800&q=80',
-      desc: 'وكالة عقارية نموذجية على رزق — صفحة واحدة بجهات اتصال ودفع واستفسار بتصميم عقاري مستقل.',
+      desc: 'نموذج ترويجي ثابت لوكالة عقارية على رزق — معروضات وتواصل ودفع في صفحة واحدة. بعد الاشتراك تفتح وكالتك الحقيقية ولوحة عملك بلا ترويج المنصة.',
       paymentMethods: DEMO_PAY,
       serviceDesk: Object.assign({}, DEMO_DESK, { formTitle: 'استفسار — أطوار للعقارات' })
     },
@@ -800,7 +798,7 @@ button{font:inherit;border:0;background:none;color:inherit}
       email: 'saknia@estate-demo.mr', address: 'تفرغ زينة',
       logo: 'rizq-mark-inset.png?v=1',
       cover: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1800&q=80',
-      desc: 'وكالة واحدة للشقق العائلية والمحلات — تواصل ودفع مباشر مع الوكالة.',
+      desc: 'نموذج ترويجي لوكالة واحدة — معروضات وتواصل موحّد. بعد الاشتراك مساحتك الحقيقية فقط.',
       paymentMethods: [
         { type: 'bankily', bank: 'Bankily', code: '45102030', phone: '+22245102030' },
         { type: 'cash', bank: 'دفع عند توقيع العقد', note: 'عربون في مكتب الوكالة' }
@@ -813,7 +811,7 @@ button{font:inherit;border:0;background:none;color:inherit}
       email: 'horizon@estate-demo.mr', address: 'نواذيبو',
       logo: 'rizq-mark-inset.png?v=1',
       cover: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1800&q=80',
-      desc: 'وكالة واحدة للأراضي والفلل — رقم وواتساب وطرق دفع الوكالة على الصفحة.',
+      desc: 'نموذج ترويجي لوكالة عقارية — رقم وواتساب وطرق دفع الوكالة على الصفحة. الصفحات الحقيقية بعد الاشتراك.',
       paymentMethods: [
         { type: 'sedad', bank: 'Sedad', code: '462233', phone: '+22246223344' },
         { type: 'bank', bank: 'GBM', account: 'MR13 0002 4600 2233 0000 0000 000' }
@@ -826,7 +824,7 @@ button{font:inherit;border:0;background:none;color:inherit}
       email: 'dar@estate-demo.mr', address: 'لكصر — نواكشوط',
       logo: 'rizq-mark-inset.png?v=1',
       cover: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1800&q=80',
-      desc: 'وكالة واحدة لإدارة الكراء والبيع — واجهة مستقلة بهوية رزق العقارية.',
+      desc: 'نموذج ترويجي لوكالة إدارة عقارات على رزق — بعد الاشتراك صفحة حقيقية وداشبورد خاص.',
       paymentMethods: [
         { type: 'bankily', bank: 'Bankily', code: '36708090', phone: '+22236708090' },
         { type: 'bimbam', bank: 'BimBank', code: '367080', phone: '+22236708090' }
@@ -852,11 +850,11 @@ button{font:inherit;border:0;background:none;color:inherit}
   }
 
   /* باقات/شرح/ترويج المنصة تختفي من صفحة الوكالة الحقيقية فقط —
-     نماذج المعاينة (?demo / demo_estate_*): الشرح والترويج يبقيان ظاهرين.
-     نعتمد علم _rizqEstateIsDemo فقط (مثل المحل/المكتب) حتى لا يُبقي معرّف
-     النموذج الافتراضي الترويج ظاهراً على مسار ?id= الحقيقي. */
+     نفس قاعدة المحل/المكتب/المعرض: النموذج الترويجي (?demo) يُظهر الشرح؛
+     الحساب المشترك (?id= حقيقي) = مساحة عمل بلا ترويج المنصة. */
   function hidePlatformUpsellOnBoundEstate(){
     var isDemo = !!window._rizqEstateIsDemo;
+    var fr = isFrEstate();
     document.body.classList.toggle('rizq-estate-live', !isDemo);
     document.querySelectorAll('[data-rizq-estate-promo]').forEach(function(el){
       el.style.display = isDemo ? '' : 'none';
@@ -864,14 +862,18 @@ button{font:inherit;border:0;background:none;color:inherit}
     var footBlurb = document.getElementById('est-foot-blurb');
     if(footBlurb){
       footBlurb.textContent = isDemo
-        ? 'نموذج بوابة عقارية فاخرة على رزق — عرض بصري كامل للوكالات والبائعين في موريتانيا.'
-        : 'وكالات عقارية على رزق — معروضات واضحة وتواصل مباشر مع الوكالة.';
+        ? (fr
+          ? 'Modèle promotionnel d\'agence sur Rizq — après abonnement : page réelle + tableau de bord sans promo plateforme.'
+          : 'نموذج ترويجي لصفحة وكالة عقارية على رزق — بعد الاشتراك تفتح مساحتك الحقيقية ولوحة التحكم.')
+        : (fr
+          ? 'Votre agence sur Rizq — biens, contact et paiements uniquement.'
+          : 'وكالتك على رزق — معروضات وتواصل ودفع فقط، بلا ترويج المنصة.');
     }
     var footBar = document.getElementById('est-foot-bar');
     if(footBar){
       footBar.textContent = isDemo
-        ? '© 2026 رزق | Rizq — نموذج بوابة العقارات · RIZQ ESTATE'
-        : '© 2026 رزق | Rizq — سوق العقارات · RIZQ ESTATE';
+        ? (fr ? '© 2026 Rizq — Modèle agence immobilière · RIZQ ESTATE' : '© 2026 رزق | Rizq — نموذج وكالة عقارية · RIZQ ESTATE')
+        : (fr ? '© 2026 Rizq — Marché immobilier · RIZQ ESTATE' : '© 2026 رزق | Rizq — سوق العقارات · RIZQ ESTATE');
     }
   }
 
@@ -964,7 +966,7 @@ button{font:inherit;border:0;background:none;color:inherit}
     var kicker = document.getElementById('est-kicker');
     if(kicker){
       kicker.innerHTML = window._rizqEstateIsDemo
-        ? ('<i></i> ' + (frBoot ? 'Vitrine agence unique · ' : 'واجهة وكالة عقارية واحدة · ') + esc(AGENCY.name))
+        ? ('<i></i> ' + (frBoot ? 'Modèle promo · agence · ' : 'نموذج ترويجي · وكالة · ') + esc(AGENCY.name))
         : ('<i></i> ' + (frBoot ? 'Agence immobilière · ' : 'وكالة عقارية · ') + esc(AGENCY.name));
     }
     setText('est-hero-lead', AGENCY.desc);
@@ -1065,6 +1067,7 @@ button{font:inherit;border:0;background:none;color:inherit}
 
   function cardHTML(item){
     var fr = isFrEstate();
+    /* بطاقة العرض = تفاصيل فقط. التواصل من شريط الوكالة / المعاينة — مثل المحل والمنتجات. */
     return '<div class="est-card'+(item.featured?' featured':'')+'" data-id="'+esc(item.id)+'">'
       + '<button type="button" class="est-card-open" data-id="'+esc(item.id)+'" aria-label="'+(fr?'Aperçu: ':'معاينة: ')+esc(item.title)+'" style="display:block;width:100%;text-align:inherit;background:transparent;border:0;padding:0;color:inherit;cursor:pointer">'
       + '<div class="est-card-media">'
@@ -1081,10 +1084,6 @@ button{font:inherit;border:0;background:none;color:inherit}
       +     '<span>📐 '+esc(item.area)+'</span>'
       +   '</div>'
       + '</div></button>'
-      + '<div class="est-card-contact" style="padding:0 16px 14px">'
-      +   '<a class="est-call" href="'+esc(telHref(AGENCY.phone))+'" dir="ltr" onclick="event.stopPropagation()">'+(fr?'📞 Appeler':'📞 اتصل')+'</a>'
-      +   '<a class="est-wa" href="'+esc(waHref(AGENCY.whatsapp))+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">'+(fr?'💬 WhatsApp':'💬 واتساب')+'</a>'
-      + '</div>'
       + '</div>';
   }
 
@@ -1177,13 +1176,16 @@ button{font:inherit;border:0;background:none;color:inherit}
   });
 
   grid.addEventListener('click', function(e){
-    if(e.target.closest('.est-card-contact a')) return;
     var openBtn = e.target.closest('.est-card-open') || e.target.closest('.est-card');
     if(!openBtn) return;
     var id = openBtn.getAttribute('data-id');
     var item = LISTINGS.find(function(x){ return x.id === id; });
     if(item) openModal(item);
   });
+  var modalBrowse = document.getElementById('est-modal-browse');
+  if(modalBrowse){
+    modalBrowse.addEventListener('click', function(){ closeModal(); });
+  }
 
   function bindReg(id){
     var el = document.getElementById(id);
@@ -1234,9 +1236,9 @@ button{font:inherit;border:0;background:none;color:inherit}
       ? 'Des espaces à votre mesure — <em>sur Rizq</em>'
       : 'مساحات تليق بك — <em>على رزق</em>';
     var stats = document.querySelectorAll('.est-stat span');
-    if(stats[0]) stats[0].textContent = fr ? 'Biens' : 'عرض عقاري';
-    if(stats[1]) stats[1].textContent = fr ? 'Wilayas couvertes' : 'ولايات مغطاة';
-    if(stats[2]) stats[2].textContent = fr ? 'Contact agence' : 'تواصل مع الوكالة';
+    if(stats[0]) stats[0].textContent = fr ? 'Biens du modèle' : 'معروضات النموذج';
+    if(stats[1]) stats[1].textContent = fr ? 'Page agence unifiée' : 'صفحة وكالة موحّدة';
+    if(stats[2]) stats[2].textContent = fr ? 'Dashboard après abonnement' : 'داشبورد بعد الاشتراك';
     var labs = document.querySelectorAll('.est-search label > span');
     if(labs[0]) labs[0].textContent = fr ? 'Mot-clé ou quartier' : 'الكلمة أو الحي';
     if(labs[1]) labs[1].textContent = fr ? 'Wilaya / ville' : 'الولاية / المدينة';
@@ -1264,11 +1266,11 @@ button{font:inherit;border:0;background:none;color:inherit}
     tx('#est-bar-wa', '💬 واتساب', '💬 WhatsApp');
     tx('a.est-pay', '💳 طرق الدفع', '💳 Paiement');
     tx('a.est-desk', '📩 استفسار', '📩 Demande');
-    tx('.est-agency-bar-acts .est-page', 'كل الوكالات', 'Toutes les agences');
+    tx('.est-agency-bar-acts .est-page', 'دليل الوكالات', 'Annuaire des agences');
     tx('#est-pay-card > h3', '💳 طرق الدفع', '💳 Moyens de paiement');
     tx('#est-pay-card > .est-svc-sub',
-      'نفس نظام المحلات والمكاتب والمعارض — ادفع مباشرة للوكالة عبر الوسائل التي تفعّلها.',
-      'Même système que boutiques, bureaux et showrooms — payez directement l\'agence.');
+      'تواصل ودفع على مستوى الوكالة فقط — نفس محرك المحلات والمكاتب والمعارض، بواجهة عقارية.',
+      'Contact et paiement au niveau de l\'agence uniquement — même moteur que boutiques, bureaux et showrooms.');
     tx('#est-desk-submit', 'إرسال الاستفسار', 'Envoyer la demande');
     tx('#est-desk-wa', '💬 واتساب الوكالة', '💬 WhatsApp agence');
     ph('est-rf-name', 'الاسم الكامل *', 'Nom complet *');
@@ -1287,11 +1289,11 @@ button{font:inherit;border:0;background:none;color:inherit}
       var tag = listHead.querySelector('.tag');
       var h2 = listHead.querySelector('h2');
       var p = listHead.querySelector('p');
-      if(tag) tag.textContent = fr ? 'Sélection de l\'agence' : 'مجموعة مختارة من الوكالة';
-      if(h2) h2.textContent = fr ? 'Des biens qui racontent une histoire' : 'عقارات بصور تروي القصة';
+      if(tag) tag.textContent = fr ? 'Biens de cette agence' : 'معروضات هذه الوكالة';
+      if(h2) h2.textContent = fr ? 'Les biens de l\'agence en images claires' : 'عقارات الوكالة بصور واضحة';
       if(p) p.textContent = fr
-        ? 'Grandes cartes, prix clairs et contact direct avec l\'agence.'
-        : 'بطاقات كبيرة، أسعار واضحة، وتواصل مباشر مع الوكالة — اضغط أي عقار لفتح المعاينة الكاملة.';
+        ? 'Photos, prix et lieux seulement — contact via les boutons de l\'agence ou l\'aperçu, pas sur chaque carte.'
+        : 'صور وأسعار ومواقع فقط — التواصل عبر أزرار الوكالة أعلاه أو من معاينة العرض، وليس من كل بطاقة.';
     }
     var tabs = [
       ['all', 'الكل', 'Tous'],
@@ -1318,18 +1320,24 @@ button{font:inherit;border:0;background:none;color:inherit}
     var trust = document.querySelectorAll('#est-trust article');
     if(trust[0]){
       var t0h = trust[0].querySelector('h3'); var t0p = trust[0].querySelector('p');
-      if(t0h) t0h.textContent = fr ? 'Photos convaincantes dès le premier regard' : 'صور تُقنع من أول نظرة';
-      if(t0p) t0p.textContent = fr ? 'Surface, prix et emplacement clairs — l\'acheteur comprend avant de vous écrire.' : 'مساحة وسعر وموقع واضح — المشتري يفهم العرض قبل أن يراسلك.';
+      if(t0h) t0h.textContent = fr ? 'Modèle promo fixe' : 'نموذج ترويجي ثابت';
+      if(t0p) t0p.textContent = fr
+        ? 'Cette page est un modèle plateforme — comme boutique, bureau, showroom, appels d\'offres et investissements — pour voir la forme avant l\'abonnement.'
+        : 'هذه الصفحة نموذج على المنصة — مثل المحل والمكتب والمعرض والمناقصة والاستثمار — لترى شكل وكالتك قبل الاشتراك.';
     }
     if(trust[1]){
       var t1h = trust[1].querySelector('h3'); var t1p = trust[1].querySelector('p');
-      if(t1h) t1h.textContent = fr ? 'Atteignez les chercheurs sérieux' : 'وصول لمن يبحث بجدية';
-      if(t1p) t1p.textContent = fr ? 'Locataires et acheteurs arrivent via la recherche immobilière sur Rizq.' : 'طلبة كراء ومشترون يصلون عبر بحث العقارات على منصة رزق.';
+      if(t1h) t1h.textContent = fr ? 'Après abonnement : espace réel' : 'بعد الاشتراك مساحة حقيقية';
+      if(t1p) t1p.textContent = fr
+        ? 'Votre page agence et votre tableau de bord — biens et espace de travail uniquement, sans textes promo plateforme.'
+        : 'تفتح صفحة وكالتك الخاصة ولوحة التحكم — معروضاتك وبيئتك العملية فقط، بلا نصوص ترويج المنصة.';
     }
     if(trust[2]){
       var t2h = trust[2].querySelector('h3'); var t2p = trust[2].querySelector('p');
-      if(t2h) t2h.textContent = fr ? 'Contact direct en confiance' : 'تواصل مباشر بثقة';
-      if(t2p) t2p.textContent = fr ? 'Confidentialité et badges pour instaurer la confiance.' : 'خصوصية محمية وشارات تساعد على بناء الثقة مع الجدّيين.';
+      if(t2h) t2h.textContent = fr ? 'Contact unifié de l\'agence' : 'تواصل موحّد للوكالة';
+      if(t2p) t2p.textContent = fr
+        ? 'Téléphone, WhatsApp, paiement et demande au niveau de l\'agence — les biens affichent les détails sans boutons d\'appel répétés.'
+        : 'هاتف وواتساب ودفع واستفسار على مستوى الوكالة — العروض تعرض التفاصيل دون أزرار اتصال مكرّرة.';
     }
 
     var galH = document.querySelector('.est-gallery-head h2');
@@ -1342,22 +1350,30 @@ button{font:inherit;border:0;background:none;color:inherit}
     if(railEl) railEl.setAttribute('aria-label', fr ? 'Galerie photos' : 'معرض صور العقارات');
 
     var aboutTag = document.querySelector('#est-agency .tag');
-    if(aboutTag) aboutTag.textContent = fr ? 'Cette agence sur Rizq' : 'هذه الوكالة على رزق';
+    if(aboutTag) aboutTag.textContent = fr ? 'Modèle agence sur Rizq' : 'نموذج وكالة على رزق';
     var points = document.querySelectorAll('#est-agency-points li');
-    if(points[0]) points[0].textContent = fr ? '✓ Un compte → une page agence (`?id=`)' : '✓ حساب واحد → صفحة وكالة واحدة (`?id=`)';
-    if(points[1]) points[1].textContent = fr ? '✓ Contact, paiement et demande unifiés (tél. + WhatsApp + paiements)' : '✓ تواصل ودفع واستفسار موحّد (هاتف + واتساب + طرق دفع)';
-    if(points[2]) points[2].textContent = fr ? '✓ Inscription : société → bureau → courtage immobilier' : '✓ مسار التسجيل: شركة → مكتب → وساطة عقارية';
-    if(points[3]) points[3].textContent = fr ? '✓ Visibilité dans l\'annuaire des agences' : '✓ الظهور في دليل الوكالات المنفصل';
+    if(points[0]) points[0].textContent = fr
+      ? '✓ Modèle fixe sur la plateforme — comme boutique, bureau, showroom, appels d\'offres et investissements'
+      : '✓ نموذج ثابت على المنصة — مثل المحل والمكتب والمعرض والمناقصة والاستثمار';
+    if(points[1]) points[1].textContent = fr
+      ? '✓ Après abonnement : page agence réelle + tableau de bord (sans promo plateforme)'
+      : '✓ بعد الاشتراك: صفحة وكالة حقيقية + داشبورد عملك (بلا ترويج المنصة)';
+    if(points[2]) points[2].textContent = fr
+      ? '✓ Contact, paiement et demande unifiés au niveau de l\'agence — pas d\'appel par bien'
+      : '✓ تواصل ودفع واستفسار موحّد للوكالة فقط — لا اتصال منفصل لكل عقار';
+    if(points[3]) points[3].textContent = fr
+      ? '✓ Inscription : société → bureau → courtage → annuaire des agences'
+      : '✓ مسار التسجيل: شركة → مكتب → وساطة عقارية → ظهور في دليل الوكالات';
 
-    tx('#est-reg-agency', 'امتلك واجهتك العقارية', 'Possédez votre vitrine immobilière');
+    tx('#est-reg-agency', 'افتح وكالتك على رزق', 'Ouvrez votre agence sur Rizq');
     tx('#est-about-call', '📞 اتصل بالوكالة', '📞 Appeler l\'agence');
     tx('#est-about-wa', '💬 واتساب الوكالة', '💬 WhatsApp agence');
     var aboutGhost = document.querySelector('#est-agency .est-btn-ghost[href="rizq_estate_agencies.html"]');
-    if(aboutGhost) aboutGhost.textContent = fr ? 'Toutes les agences' : 'كل الوكالات العقارية';
+    if(aboutGhost) aboutGhost.textContent = fr ? 'Annuaire des agences' : 'دليل الوكالات';
 
     tx('#est-modal-call', '📞 اتصل بالوكالة', '📞 Appeler l\'agence');
-    tx('#est-modal-wa', '💬 واتساب', '💬 WhatsApp');
-    tx('#est-modal-browse', 'صفحة الوكالة', 'Page de l\'agence');
+    tx('#est-modal-wa', '💬 واتساب الوكالة', '💬 WhatsApp agence');
+    tx('#est-modal-browse', '📩 استفسار عن العرض', '📩 Demande sur ce bien');
     var modalClose = document.getElementById('est-modal-close');
     if(modalClose) modalClose.setAttribute('aria-label', fr ? 'Fermer' : 'إغلاق');
     var lbClose = document.getElementById('est-lb-close');
@@ -1366,8 +1382,8 @@ button{font:inherit;border:0;background:none;color:inherit}
     if(lb) lb.setAttribute('aria-label', fr ? 'Image agrandie' : 'صورة مكبرة');
 
     tx('#est-foot-blurb',
-      'نموذج بوابة عقارية فاخرة على رزق — عرض بصري كامل للوكالات والبائعين في موريتانيا.',
-      'Vitrine immobilière premium sur Rizq — agences et vendeurs en Mauritanie.');
+      'نموذج ترويجي لصفحة وكالة عقارية على رزق — بعد الاشتراك تفتح مساحتك الحقيقية ولوحة التحكم.',
+      'Modèle promotionnel d\'agence sur Rizq — après abonnement : page réelle + tableau de bord.');
     var footCols = document.querySelectorAll('.est-foot-inner > div');
     if(footCols[1]){
       var h4a = footCols[1].querySelector('h4');
@@ -1375,16 +1391,16 @@ button{font:inherit;border:0;background:none;color:inherit}
       var fa = footCols[1].querySelectorAll('a');
       if(fa[0]) fa[0].textContent = fr ? 'Biens de l\'agence' : 'معروضات الوكالة';
       if(fa[1]) fa[1].textContent = fr ? 'Galerie photos' : 'معرض الصور';
-      if(fa[2]) fa[2].textContent = fr ? 'Toutes les agences' : 'كل الوكالات العقارية';
+      if(fa[2]) fa[2].textContent = fr ? 'Annuaire des agences' : 'دليل الوكالات';
       if(fa[3]) fa[3].textContent = fr ? 'Toutes les annonces' : 'كل الإعلانات';
     }
     if(footCols[2]){
       var h4b = footCols[2].querySelector('h4');
       if(h4b) h4b.textContent = fr ? 'Pour les agences' : 'للوكالات';
       var fb = footCols[2].querySelectorAll('a');
-      if(fb[0]) fb[0].textContent = fr ? 'Ouvrir une agence' : 'افتح وكالة عقارية';
+      if(fb[0]) fb[0].textContent = fr ? 'S\'abonner et ouvrir votre agence' : 'اشترك وافتح وكالتك';
       if(fb[1]) fb[1].textContent = fr ? 'Annuaire des agences' : 'دليل الوكالات';
-      if(fb[2]) fb[2].textContent = fr ? 'Portail immobilier' : 'بوابة العقارات';
+      if(fb[2]) fb[2].textContent = fr ? 'Marché immobilier' : 'سوق العقارات';
     }
     if(footCols[3]){
       var h4c = footCols[3].querySelector('h4');
@@ -1396,8 +1412,8 @@ button{font:inherit;border:0;background:none;color:inherit}
       if(fc[3]) fc[3].textContent = fr ? 'Bureaux' : 'المكاتب';
     }
     tx('#est-foot-bar',
-      '© 2026 رزق | Rizq — نموذج بوابة العقارات · RIZQ ESTATE',
-      '© 2026 Rizq — Portail immobilier · RIZQ ESTATE');
+      '© 2026 رزق | Rizq — نموذج وكالة عقارية · RIZQ ESTATE',
+      '© 2026 Rizq — Modèle agence immobilière · RIZQ ESTATE');
 
     if(window._rizqEstateProfile){
       paintPayments(window._rizqEstatePaymentMethods || window._rizqEstateProfile.paymentMethods);
@@ -1405,11 +1421,16 @@ button{font:inherit;border:0;background:none;color:inherit}
       /* أعد صياغة الشريط الفرعي حسب اللغة دون مسح اسم الوكالة */
       var act = window._rizqEstateProfile.activity || (fr ? 'Agence immobilière' : 'وكالة عقارية');
       var city = window._rizqEstateProfile.city || '';
-      setText('est-bar-sub', act + (fr ? ' sur Rizq · ' : ' على رزق · ') + city);
+      var demoPrefix = window._rizqEstateIsDemo
+        ? (fr ? 'Modèle agence sur Rizq · ' : 'نموذج وكالة عقارية على رزق · ')
+        : (fr ? ' sur Rizq · ' : ' على رزق · ');
+      setText('est-bar-sub', window._rizqEstateIsDemo
+        ? (demoPrefix + city)
+        : (act + (fr ? ' sur Rizq · ' : ' على رزق · ') + city));
       var kick = document.getElementById('est-kicker');
       if(kick){
         kick.innerHTML = window._rizqEstateIsDemo
-          ? ('<i></i> ' + (fr ? 'Vitrine agence unique · ' : 'واجهة وكالة عقارية واحدة · ') + esc(window._rizqEstateProfile.name || ''))
+          ? ('<i></i> ' + (fr ? 'Modèle promo · agence · ' : 'نموذج ترويجي · وكالة · ') + esc(window._rizqEstateProfile.name || ''))
           : ('<i></i> ' + (fr ? 'Agence immobilière · ' : 'وكالة عقارية · ') + esc(window._rizqEstateProfile.name || ''));
       }
     }
