@@ -289,7 +289,13 @@ button{font:inherit;border:0;background:none;color:inherit}
 #est-hero #est-hero-email-chip{display:none!important}
 
 /* بحث فوق العروض: ولاية → مدينة → حي */
-.est-search-panel{margin:0 0 16px}
+/* عنوان المعروضات + البحث = هيرو واحد فوق الشبكة */
+.est-listings-hero{
+  margin:0 0 18px;padding:8px 0 4px;
+  text-align:center;
+}
+.est-listings-hero .est-section-head{margin:0 0 16px}
+.est-search-panel{margin:0}
 .est-search{
   display:grid;grid-template-columns:1.05fr 1.05fr 1.05fr .85fr .85fr auto;gap:8px;
   padding:14px;border-radius:18px;
@@ -966,52 +972,53 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     </aside>
 
     <div class="est-main-col">
-      <div class="est-search-panel" id="est-search-panel">
-        <form class="est-search" id="est-search" role="search" aria-label="بحث العقارات">
-          <label>
-            <span>الولاية</span>
-            <select id="est-wilaya" name="wilaya" aria-label="الولاية">
-              <option value="">كل الولايات</option>
-            </select>
-          </label>
-          <label>
-            <span>المدينة</span>
-            <select id="est-city" name="city" aria-label="المدينة" disabled>
-              <option value="">كل المدن</option>
-            </select>
-          </label>
-          <label>
-            <span>الحي أو المنطقة</span>
-            <select id="est-quartier" name="quartier" aria-label="الحي أو المنطقة" disabled>
-              <option value="">كل الأحياء</option>
-            </select>
-          </label>
-          <label>
-            <span>نوع العقار</span>
-            <select id="est-cat" name="cat" aria-label="نوع العقار">
-              <option value="all">الكل</option>
-              <option value="apartment">شقق</option>
-              <option value="villa">فلل ومنازل</option>
-              <option value="land">أراضي</option>
-              <option value="shop">محلات</option>
-            </select>
-          </label>
-          <label>
-            <span>للبيع أو الكراء</span>
-            <select id="est-deal" name="deal" aria-label="للبيع أو الكراء">
-              <option value="all">الكل</option>
-              <option value="sale">للبيع</option>
-              <option value="rent">للكراء</option>
-            </select>
-          </label>
-          <button type="submit" class="est-search-go">🔎 ابحث</button>
-        </form>
-      </div>
-
-      <div class="est-section-head" id="est-listings">
-        <div class="tag">معروضات الوكالة</div>
-        <h2>عقارات للبيع والكراء</h2>
-        <p>شقق وفلل وأراضي ومحلات — افتح أي عرض بزر «عرض التفاصيل» للاطلاع على الوصف والتواصل مع الوكالة.</p>
+      <div class="est-listings-hero" id="est-listings">
+        <div class="est-section-head">
+          <div class="tag">معروضات الوكالة</div>
+          <h2>عقارات للبيع والكراء</h2>
+          <p>شقق وفلل وأراضي ومحلات — افتح أي عرض بزر «عرض التفاصيل» للاطلاع على الوصف والتواصل مع الوكالة.</p>
+        </div>
+        <div class="est-search-panel" id="est-search-panel">
+          <form class="est-search" id="est-search" role="search" aria-label="بحث العقارات">
+            <label>
+              <span>الولاية</span>
+              <select id="est-wilaya" name="wilaya" aria-label="الولاية">
+                <option value="">كل الولايات</option>
+              </select>
+            </label>
+            <label>
+              <span>المدينة</span>
+              <select id="est-city" name="city" aria-label="المدينة" disabled>
+                <option value="">كل المدن</option>
+              </select>
+            </label>
+            <label>
+              <span>الحي أو المنطقة</span>
+              <select id="est-quartier" name="quartier" aria-label="الحي أو المنطقة" disabled>
+                <option value="">كل الأحياء</option>
+              </select>
+            </label>
+            <label>
+              <span>نوع العقار</span>
+              <select id="est-cat" name="cat" aria-label="نوع العقار">
+                <option value="all">الكل</option>
+                <option value="apartment">شقق</option>
+                <option value="villa">فلل ومنازل</option>
+                <option value="land">أراضي</option>
+                <option value="shop">محلات</option>
+              </select>
+            </label>
+            <label>
+              <span>للبيع أو الكراء</span>
+              <select id="est-deal" name="deal" aria-label="للبيع أو الكراء">
+                <option value="all">الكل</option>
+                <option value="sale">للبيع</option>
+                <option value="rent">للكراء</option>
+              </select>
+            </label>
+            <button type="submit" class="est-search-go">🔎 ابحث</button>
+          </form>
+        </div>
       </div>
 
       <div class="est-toolbar">
