@@ -268,7 +268,6 @@ button{font:inherit;border:0;background:none;color:inherit}
 }
 .est-stat b{display:block;font-size:20px;color:var(--gold2);font-weight:900}
 .est-stat span{font-size:12px;color:#D7DEEA}
-.est-hero-cta{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px}
 .est-btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   border-radius:14px;padding:12px 18px;font:800 14px Cairo,sans-serif;text-decoration:none;border:0;
@@ -279,13 +278,11 @@ button{font:inherit;border:0;background:none;color:inherit}
   background:linear-gradient(135deg,#F3E2A8,#C9A84C 45%,#E8C96A);color:#0B1C33;
   box-shadow:0 12px 28px rgba(201,168,76,.32);
 }
-.est-btn-mail{
-  background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(243,226,168,.45);
-  backdrop-filter:blur(8px);
-}
-.est-btn-mail:hover{background:rgba(255,255,255,.22)}
-.est-btn-ghost{background:#fff;color:var(--navy);border:1px solid var(--border)}
-.est-btn-ghost:hover{background:rgba(255,255,255,.92)}
+/* الهيرو بدون بريد/مشاركة — التواصل في شريط الوكالة فقط */
+#est-hero .est-hero-cta,
+#est-hero #est-hero-email,
+#est-hero #est-hero-share,
+#est-hero #est-hero-email-chip{display:none!important}
 
 /* بحث فوق العروض: ولاية → مدينة → حي */
 .est-search-panel{margin:0 0 16px}
