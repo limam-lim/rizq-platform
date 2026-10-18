@@ -118,6 +118,7 @@
     adTitle:    '',
     adId:       '',
     adEmoji:    '📦',
+    adImage:    '', // صورة المنتج/العقار/العرض المشار إليه من الصفحة
     category:   '',
     lang:       'ar',
     visitorId:  '',
@@ -129,8 +130,13 @@
     msgs:       [],
     seenServerIds: {},
     pollTimer: null,
-    pollAttempts: 0
+    pollAttempts: 0,
+    pendingImage: '', // dataURL يرفعها الزبون للاستفسار
+    pendingImageName: '',
+    catalogItems: null
   };
+
+  var MAX_CHAT_IMAGE_BYTES = 380000; /* ~ بعد الضغط base64 */
 
   function _stopPoll() {
     if (_state.pollTimer) {
@@ -271,16 +277,35 @@
 .rzq-name-input{padding:8px 10px;border:1.5px solid rgba(27,58,107,.18);border-radius:10px;font-size:12.5px;font-family:inherit;background:#fff;color:#1a2535;outline:none;transition:.2s;width:100%;box-sizing:border-box}
 .rzq-name-input:focus{border-color:#C9A84C}
 .rzq-name-input::placeholder{color:#9ca3af}
-.rzq-inp-row{padding:8px 10px 8px;display:flex;gap:8px;border-top:1px solid rgba(0,0,0,.07);background:#fff;flex-shrink:0;position:relative;z-index:2}
+.rzq-inp-row{padding:8px 10px 8px;display:flex;gap:6px;align-items:flex-end;border-top:1px solid rgba(0,0,0,.07);background:#fff;flex-shrink:0;position:relative;z-index:2}
 .rzq-inp{flex:1;padding:9px 12px;border:1.5px solid rgba(27,58,107,.15);border-radius:20px;font-size:13px;font-family:inherit;resize:none;outline:none;max-height:72px;overflow-y:auto;background:#f9fafb;color:#1a2535;transition:.2s;box-sizing:border-box}
 .rzq-inp:focus{border-color:#C9A84C;background:#fff}
 .rzq-inp::placeholder{color:#9ca3af}
+.rzq-attach,.rzq-catalog-btn{width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(27,58,107,.18);background:#f8fafc;color:#1B3A6B;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;transition:.2s;padding:0}
+.rzq-attach:hover,.rzq-catalog-btn:hover{border-color:#C9A84C;background:rgba(201,168,76,.1)}
 .rzq-send{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#C9A84C,#e8c96a);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s;align-self:flex-end}
 .rzq-send:hover{transform:scale(1.08);box-shadow:0 4px 14px rgba(201,168,76,.45)}
 .rzq-send svg{width:17px;height:17px;fill:#1B3A6B}
 .rzq-footer{text-align:center;font-size:10px;color:#9ca3af;padding:3px 10px 8px;background:#fff;flex-shrink:0}
 .rzq-footer strong{color:#1B3A6B}
 .rzq-priv-note{font-size:10.5px;color:#6b7280;padding:1px 4px 2px;text-align:center}
+.rzq-img-prev{display:none;padding:6px 10px;background:#fff;border-top:1px solid rgba(0,0,0,.06);flex-shrink:0;align-items:center;gap:8px}
+.rzq-img-prev.on{display:flex}
+.rzq-img-prev img{width:52px;height:52px;object-fit:cover;border-radius:10px;border:1px solid rgba(27,58,107,.15)}
+.rzq-img-prev-meta{flex:1;min-width:0;font-size:11.5px;color:#334155;line-height:1.4}
+.rzq-img-prev-x{border:0;background:#fee2e2;color:#b91c1c;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;flex-shrink:0}
+.rzq-ad-strip.has-thumb .rzq-ad-icon{width:44px;height:44px;padding:0;overflow:hidden;background:#fff}
+.rzq-ad-strip.has-thumb .rzq-ad-icon img{width:100%;height:100%;object-fit:cover;display:block}
+.rzq-bubble img.rzq-bimg{display:block;max-width:min(220px,70vw);max-height:160px;border-radius:12px;margin:0 0 6px;object-fit:cover;border:1px solid rgba(0,0,0,.08)}
+.rzq-cat-sheet{display:none;position:absolute;inset:auto 0 0 0;max-height:55%;background:#fff;border-radius:16px 16px 0 0;box-shadow:0 -8px 28px rgba(15,35,65,.2);z-index:5;flex-direction:column;overflow:hidden}
+.rzq-cat-sheet.on{display:flex}
+.rzq-cat-head{padding:10px 14px;font-weight:800;font-size:13px;color:#1B3A6B;border-bottom:1px solid rgba(0,0,0,.07);display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.rzq-cat-list{overflow-y:auto;padding:8px;display:grid;grid-template-columns:1fr 1fr;gap:8px;-webkit-overflow-scrolling:touch}
+.rzq-cat-item{border:1px solid rgba(27,58,107,.12);border-radius:12px;padding:8px;background:#f8fafc;cursor:pointer;text-align:start;font-family:inherit}
+.rzq-cat-item:hover{border-color:#C9A84C;background:rgba(201,168,76,.08)}
+.rzq-cat-item img{width:100%;height:72px;object-fit:cover;border-radius:8px;background:#e2e8f0;display:block;margin-bottom:6px}
+.rzq-cat-item .t{font-size:12px;font-weight:700;color:#1a2535;line-height:1.35}
+.rzq-mbox{position:relative}
 @media(max-width:560px){
   #rzq-messenger-modal{padding-bottom:max(12px,env(safe-area-inset-bottom,0px))}
   .rzq-mbox{width:calc(100% - 16px);max-width:100%;max-height:min(72dvh,72vh);margin:0 8px max(10px,env(safe-area-inset-bottom,0px));border-radius:16px}
@@ -311,9 +336,15 @@
   }
 
   function _injectModal() {
-    if (document.getElementById(MODAL_ID)) return;
+    var existing = document.getElementById(MODAL_ID);
+    /* إعادة بناء النافذة إن كانت نسخة قديمة بلا أزرار الصورة/الكتالوج */
+    if (existing) {
+      if (existing.getAttribute('data-v') === '28.5' && document.getElementById('rzq-m-attach')) return;
+      try { existing.parentNode.removeChild(existing); } catch (eRm) {}
+    }
     var div = document.createElement('div');
     div.id = MODAL_ID;
+    div.setAttribute('data-v', '28.5');
     div.innerHTML = `
 <div class="rzq-mbox" role="dialog" aria-modal="true" aria-label="مراسلة البائع">
   <div class="rzq-mhead">
@@ -349,7 +380,16 @@
     <div class="rzq-priv-note" id="rzq-m-privnote">🔒 رقمك يصل للبائع فقط لغرض الرد — لا يُنشر علناً</div>
   </div>
 
+  <div class="rzq-img-prev" id="rzq-m-imgprev">
+    <img id="rzq-m-imgprev-el" alt=""/>
+    <div class="rzq-img-prev-meta" id="rzq-m-imgprev-meta"></div>
+    <button type="button" class="rzq-img-prev-x" onclick="RizqMessenger.clearPendingImage()" aria-label="إزالة">✕</button>
+  </div>
+
   <div class="rzq-inp-row">
+    <button type="button" class="rzq-catalog-btn" id="rzq-m-catbtn" title="إشارة لمنتج" onclick="RizqMessenger.openCatalog()" aria-label="إشارة لمنتج">🏷️</button>
+    <button type="button" class="rzq-attach" id="rzq-m-attach" title="رفع صورة" onclick="RizqMessenger.pickImage()" aria-label="رفع صورة">📷</button>
+    <input type="file" id="rzq-m-file" accept="image/*" capture="environment" style="display:none" onchange="RizqMessenger.onFilePicked(this)"/>
     <textarea class="rzq-inp" id="rzq-m-inp" rows="1" placeholder="اكتب رسالتك هنا..." maxlength="500"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();RizqMessenger.send();}"
       oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
@@ -358,6 +398,14 @@
     </button>
   </div>
   <div class="rzq-footer" id="rzq-m-footer">مدعوم بـ <strong>رزق AI</strong> · تواصل مباشر وآمن</div>
+
+  <div class="rzq-cat-sheet" id="rzq-m-catsheet" role="dialog" aria-label="اختيار من الكتالوج">
+    <div class="rzq-cat-head">
+      <span id="rzq-m-cathead">اختر عنصراً للإشارة</span>
+      <button type="button" class="rzq-mclose" style="color:#64748b" onclick="RizqMessenger.closeCatalog()" aria-label="إغلاق">✕</button>
+    </div>
+    <div class="rzq-cat-list" id="rzq-m-catlist"></div>
+  </div>
 </div>`;
     div.addEventListener('click', function(e){ if(e.target === div) RizqMessenger.close(); });
     document.body.appendChild(div);
@@ -422,12 +470,18 @@
   /* ══════════════════════════════
      عرض الرسائل
   ══════════════════════════════ */
-  function _appendBubble(text, side) {
+  function _appendBubble(text, side, imageUrl) {
     var msgs = document.getElementById('rzq-m-msgs');
     if (!msgs) return;
     var d = document.createElement('div');
     d.className = 'rzq-bubble ' + side;
-    d.innerHTML = _esc(text).replace(/\n/g,'<br>') + '<div class="rzq-ts">' + _tsDisplay() + '</div>';
+    var html = '';
+    if (imageUrl) {
+      html += '<img class="rzq-bimg" src="' + _esc(imageUrl) + '" alt=""/>';
+    }
+    if (text) html += _esc(text).replace(/\n/g,'<br>');
+    html += '<div class="rzq-ts">' + _tsDisplay() + '</div>';
+    d.innerHTML = html;
     msgs.appendChild(d);
     _scrollBottom();
   }
@@ -441,8 +495,168 @@
     var msgs = _loadMsgs(_state.sellerKey);
     var mine = msgs.filter(function(m){ return m.visitorId === _state.visitorId && m.adId === _state.adId; });
     mine.forEach(function(m){
-      _appendBubble(m.text, 'me');
+      _appendBubble(m.text, 'me', m.image || '');
     });
+  }
+
+  function _setPendingImage(dataUrl, label) {
+    _state.pendingImage = dataUrl || '';
+    _state.pendingImageName = label || '';
+    var row = document.getElementById('rzq-m-imgprev');
+    var img = document.getElementById('rzq-m-imgprev-el');
+    var meta = document.getElementById('rzq-m-imgprev-meta');
+    if (!row || !img) return;
+    if (!_state.pendingImage) {
+      row.classList.remove('on');
+      img.removeAttribute('src');
+      if (meta) meta.textContent = '';
+      return;
+    }
+    img.src = _state.pendingImage;
+    if (meta) {
+      meta.textContent = _state.pendingImageName
+        || _t('صورة مرفقة للاستفسار', 'Image jointe à la demande');
+    }
+    row.classList.add('on');
+  }
+
+  function _paintAdStripImage() {
+    var strip = document.getElementById('rzq-m-adstrip');
+    var icon = document.getElementById('rzq-m-adicon');
+    if (!strip || !icon) return;
+    if (_state.adImage) {
+      strip.classList.add('has-thumb');
+      icon.innerHTML = '<img src="' + _esc(_state.adImage) + '" alt=""/>';
+    } else {
+      strip.classList.remove('has-thumb');
+      icon.textContent = _state.adEmoji || '📦';
+    }
+  }
+
+  /** ضغط صورة قبل الإرفاق (حد حجم معقول للمحادثة) */
+  function _compressImageFile(file, cb) {
+    if (!file || !/^image\//i.test(file.type || '')) {
+      cb(null, _t('اختر صورة صالحة', 'Choisissez une image valide'));
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      cb(null, _t('الصورة كبيرة جداً (الحد 8MB)', 'Image trop lourde (max 8 Mo)'));
+      return;
+    }
+    var reader = new FileReader();
+    reader.onerror = function(){ cb(null, _t('تعذّر قراءة الصورة', 'Lecture de l\'image impossible')); };
+    reader.onload = function(){
+      var src = String(reader.result || '');
+      var im = new Image();
+      im.onload = function(){
+        try {
+          var maxW = 960;
+          var w = im.width || maxW;
+          var h = im.height || maxW;
+          var scale = w > maxW ? (maxW / w) : 1;
+          var cw = Math.max(1, Math.round(w * scale));
+          var ch = Math.max(1, Math.round(h * scale));
+          var canvas = document.createElement('canvas');
+          canvas.width = cw; canvas.height = ch;
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(im, 0, 0, cw, ch);
+          var quality = 0.72;
+          var out = canvas.toDataURL('image/jpeg', quality);
+          while (out.length > MAX_CHAT_IMAGE_BYTES && quality > 0.4) {
+            quality -= 0.1;
+            out = canvas.toDataURL('image/jpeg', quality);
+          }
+          if (out.length > MAX_CHAT_IMAGE_BYTES * 1.35) {
+            cb(null, _t('تعذّر ضغط الصورة بما يكفي', 'Impossible de compresser assez l\'image'));
+            return;
+          }
+          cb(out, null);
+        } catch (eC) {
+          cb(src.length < MAX_CHAT_IMAGE_BYTES * 1.5 ? src : null,
+            src.length < MAX_CHAT_IMAGE_BYTES * 1.5 ? null : _t('الصورة كبيرة جداً', 'Image trop lourde'));
+        }
+      };
+      im.onerror = function(){ cb(null, _t('تعذّر تحميل الصورة', 'Chargement de l\'image impossible')); };
+      im.src = src;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function _catalogLabel() {
+    var ctx = _state.context || 'ad';
+    if (ctx === 'store' || ctx === 'shop') return _t('اختر منتجاً من المحل', 'Choisir un produit');
+    if (ctx === 'showroom' || ctx === 'corp') return _t('اختر عرضاً من المعرض', 'Choisir un article');
+    if (ctx === 'estate' || ctx === 'agency') return _t('اختر عقاراً للإشارة', 'Choisir un bien');
+    if (ctx === 'office') return _t('اختر خدمة للإشارة', 'Choisir un service');
+    return _t('اختر عنصراً للإشارة', 'Choisir un élément');
+  }
+
+  /** جمع عناصر الكتالوج حسب نوع الصفحة (محل/معرض/عقارات/مكتب) */
+  function _collectCatalogItems() {
+    if (Array.isArray(_state.catalogItems) && _state.catalogItems.length) return _state.catalogItems.slice(0, 40);
+    var out = [];
+    var ctx = _state.context || '';
+    function pushItem(it) {
+      if (!it) return;
+      var title = it.title || it.name || it.nameAr || it.nameF || '';
+      if (!title) return;
+      var img = it.image || it.img || it.imgData || (it.imgDataArr && it.imgDataArr[0])
+        || (it.images && it.images[0]) || (it.media && it.media.cover) || '';
+      out.push({
+        id: String(it.id || title),
+        title: String(title),
+        image: img ? String(img) : '',
+        emoji: it.emoji || _state.adEmoji || '📦',
+        price: it.price || ''
+      });
+    }
+    try {
+      if (ctx === 'store' || ctx === 'shop' || !ctx) {
+        var feat = window.STORE_FEATURED_PRODUCTS;
+        if (feat && typeof feat === 'object') {
+          Object.keys(feat).forEach(function(k){ pushItem(feat[k]); });
+        }
+        var sid = _state.sellerAccountId || _state.sellerKey || '';
+        if (sid) {
+          var prods = JSON.parse(localStorage.getItem('store_products_' + sid) || '[]');
+          if (Array.isArray(prods)) prods.forEach(pushItem);
+        }
+      }
+      if (ctx === 'showroom' || ctx === 'corp') {
+        if (Array.isArray(window._allItems)) window._allItems.forEach(pushItem);
+      }
+      if (ctx === 'estate' || ctx === 'agency') {
+        var drafts = JSON.parse(localStorage.getItem('rizq_estate_drafts') || '[]');
+        if (Array.isArray(drafts)) drafts.forEach(function(d){
+          pushItem({
+            id: d.id, title: d.title, price: d.price, emoji: '🏠',
+            image: (d.media && d.media.cover) || d.cover || ''
+          });
+        });
+        if (window.RizqEstateData && Array.isArray(RizqEstateData.LISTINGS)) {
+          RizqEstateData.LISTINGS.slice(0, 20).forEach(function(d){
+            pushItem({
+              id: d.id, title: d.title, price: d.price, emoji: '🏠',
+              image: (d.media && d.media.cover) || d.cover || d.img || ''
+            });
+          });
+        }
+      }
+      if (ctx === 'office') {
+        var services = window._rizqOfficeServices || window.OFFICE_SERVICES || [];
+        if (Array.isArray(services)) services.forEach(function(s){
+          pushItem({ id: s.id, title: s.name || s.title, emoji: s.emoji || '📂', image: s.image || '' });
+        });
+      }
+    } catch (eCat) {}
+    /* إزالة التكرار */
+    var seen = {};
+    return out.filter(function(x){
+      var k = x.id + '|' + x.title;
+      if (seen[k]) return false;
+      seen[k] = 1;
+      return true;
+    }).slice(0, 36);
   }
 
   /* ══════════════════════════════
@@ -460,16 +674,29 @@
     var noteAr = 'استفسار عن هذا الإعلان';
     var noteFr = 'Demande concernant cette annonce';
     if (ctx === 'store' || ctx === 'shop') {
-      noteAr = 'استفسار عن هذا المنتج';
-      noteFr = 'Demande concernant ce produit';
+      noteAr = 'استفسار عن هذا المنتج — يمكنك إرفاق صورة';
+      noteFr = 'Demande produit — vous pouvez joindre une photo';
     } else if (ctx === 'showroom' || ctx === 'corp') {
-      noteAr = 'استفسار عن هذا العرض';
-      noteFr = 'Demande concernant cet article';
+      noteAr = 'استفسار عن هذا العرض — أرفق صورة إن رغبت';
+      noteFr = 'Demande article — joignez une photo si besoin';
     } else if (ctx === 'office') {
-      noteAr = 'استفسار عن هذه الخدمة';
-      noteFr = 'Demande concernant ce service';
+      noteAr = 'استفسار عن الخدمة — يمكن إرفاق صورة أو مستند مصوّر';
+      noteFr = 'Demande service — photo ou document scanné possible';
+    } else if (ctx === 'estate' || ctx === 'agency') {
+      noteAr = 'استفسار عن العقار — أشر لصورة أو ارفع صورة';
+      noteFr = 'Demande bien — indiquez ou joignez une photo';
     }
     _setTxt('rzq-m-adnote', isFr ? noteFr : noteAr);
+    var catHead = document.getElementById('rzq-m-cathead');
+    if (catHead) catHead.textContent = _catalogLabel();
+    var attachBtn = document.getElementById('rzq-m-attach');
+    if (attachBtn) attachBtn.title = isFr ? 'Joindre une photo' : 'رفع صورة';
+    var catBtn = document.getElementById('rzq-m-catbtn');
+    if (catBtn) {
+      var hasCat = _collectCatalogItems().length > 0;
+      catBtn.style.display = hasCat ? '' : 'none';
+      catBtn.title = _catalogLabel();
+    }
     _setAttr('rzq-m-nameinp', 'placeholder', isFr ? 'Votre nom (facultatif)' : 'اسمك (اختياري)');
     _setAttr('rzq-m-phoneinp', 'placeholder', isFr ? 'Votre téléphone (pour que le vendeur réponde)' : 'رقم هاتفك (ليتمكن البائع من الرد عليك)');
     _setTxt('rzq-m-privnote', isFr ? '🔒 Votre numéro est visible uniquement par le vendeur pour vous répondre' : '🔒 رقمك يصل للبائع فقط لغرض الرد — لا يُنشر علناً');
@@ -699,9 +926,13 @@
       _state.adTitle         = opts.adTitle     || '';
       _state.adId            = String(opts.adId || 'g');
       _state.adEmoji         = opts.adEmoji     || '📦';
+      _state.adImage         = opts.adImage || opts.productImage || opts.image || '';
       _state.category        = opts.category    || ''; // فئة الإعلان — لاختيار أسئلة سريعة سياقية
-      /* store|showroom|office|ad — يحدد نص الشريط (منتج vs إعلان) */
+      /* store|showroom|office|estate|ad — يحدد نص الشريط (منتج vs إعلان) */
       _state.context         = String(opts.context || opts.module || 'ad').toLowerCase();
+      _state.catalogItems    = Array.isArray(opts.catalogItems) ? opts.catalogItems : null;
+      _state.pendingImage    = '';
+      _state.pendingImageName = '';
       _state.visitorId       = _getVisitorId();
       _state.visitorName     = '';
       _state.threadKey       = null;
@@ -724,12 +955,14 @@
       // بيانات الإعلان في الرأس
       _setTxt('rzq-m-av',   _state.adEmoji);
       _setTxt('rzq-m-name', _esc(_state.sellerName));
-      _setTxt('rzq-m-adicon', _state.adEmoji);
       _setTxt('rzq-m-adname', _esc(_state.adTitle || _state.sellerName));
+      _paintAdStripImage();
+      _setPendingImage('', '');
+      RizqMessenger.closeCatalog();
 
       // إخفاء/إظهار قسم الإعلان
       var strip = document.getElementById('rzq-m-adstrip');
-      if (strip) strip.style.display = _state.adTitle ? 'flex' : 'none';
+      if (strip) strip.style.display = (_state.adTitle || _state.adImage) ? 'flex' : 'none';
 
       // مشترٍ مسجَّل دخوله (بائع فردي أو AuthGate): لا حاجة لطلب الاسم/الهاتف يدوياً
       var nr = document.getElementById('rzq-m-namerow');
@@ -782,6 +1015,72 @@
       }, 400);
     },
 
+    pickImage: function() {
+      var f = document.getElementById('rzq-m-file');
+      if (f) { f.value = ''; f.click(); }
+    },
+    onFilePicked: function(input) {
+      var file = input && input.files && input.files[0];
+      if (!file) return;
+      _compressImageFile(file, function(dataUrl, err){
+        if (!dataUrl) {
+          _appendBubble(err || _t('تعذّر إرفاق الصورة', 'Impossible de joindre l\'image'), 'them');
+          return;
+        }
+        _setPendingImage(dataUrl, file.name || _t('صورة مرفوعة', 'Photo jointe'));
+      });
+    },
+    clearPendingImage: function() {
+      _setPendingImage('', '');
+      var f = document.getElementById('rzq-m-file');
+      if (f) f.value = '';
+    },
+    openCatalog: function() {
+      var items = _collectCatalogItems();
+      var sheet = document.getElementById('rzq-m-catsheet');
+      var list = document.getElementById('rzq-m-catlist');
+      var head = document.getElementById('rzq-m-cathead');
+      if (!sheet || !list) return;
+      if (head) head.textContent = _catalogLabel();
+      if (!items.length) {
+        _appendBubble(_t('لا عناصر متاحة للإشارة حالياً — يمكنك رفع صورة.', 'Aucun élément à indiquer — joignez une photo.'), 'them');
+        return;
+      }
+      list.innerHTML = items.map(function(it, idx){
+        var img = it.image
+          ? '<img src="' + _esc(it.image) + '" alt=""/>'
+          : '<div style="height:72px;border-radius:8px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:6px">' + _esc(it.emoji || '📦') + '</div>';
+        var price = it.price ? (' · ' + _esc(String(it.price))) : '';
+        return '<button type="button" class="rzq-cat-item" data-idx="' + idx + '">' + img + '<div class="t">' + _esc(it.title) + price + '</div></button>';
+      }).join('');
+      list.querySelectorAll('.rzq-cat-item').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var it = items[Number(btn.getAttribute('data-idx'))];
+          if (!it) return;
+          _state.adTitle = it.title;
+          _state.adId = String(it.id || _state.adId);
+          _state.adEmoji = it.emoji || _state.adEmoji;
+          if (it.image) {
+            _state.adImage = it.image;
+            _setPendingImage(it.image, _t('إشارة إلى: ', 'Référence : ') + it.title);
+          } else {
+            _state.adImage = '';
+            _setPendingImage('', '');
+          }
+          _setTxt('rzq-m-adname', _esc(it.title));
+          _paintAdStripImage();
+          var strip = document.getElementById('rzq-m-adstrip');
+          if (strip) strip.style.display = 'flex';
+          RizqMessenger.closeCatalog();
+        });
+      });
+      sheet.classList.add('on');
+    },
+    closeCatalog: function() {
+      var sheet = document.getElementById('rzq-m-catsheet');
+      if (sheet) sheet.classList.remove('on');
+    },
+
     /** إرسال رسالة */
     send: function() {
       var inp      = document.getElementById('rzq-m-inp');
@@ -790,7 +1089,13 @@
       if (!inp) return;
 
       var text = inp.value.trim();
-      if (!text) return;
+      var imageUrl = _state.pendingImage || '';
+      if (!text && !imageUrl) return;
+      if (!text && imageUrl) {
+        text = _state.pendingImageName
+          ? (_t('استفسار بخصوص: ', 'Demande concernant : ') + _state.pendingImageName)
+          : _t('استفسار مع صورة مرفقة', 'Demande avec photo jointe');
+      }
 
       // اسم الزائر
       var name = nameInp ? (nameInp.value.trim() || '') : '';
@@ -813,10 +1118,12 @@
         return;
       }
 
-      // عرض الرسالة
-      _appendBubble(text, 'me');
+      // عرض الرسالة (مع الصورة إن وُجدت)
+      _appendBubble(text, 'me', imageUrl);
       inp.value = '';
       inp.style.height = 'auto';
+      var sentImage = imageUrl;
+      RizqMessenger.clearPendingImage();
 
       // إخفاء الاقتراحات بعد أول رسالة
       var sq = document.getElementById('rzq-m-suggest');
@@ -826,11 +1133,25 @@
       var nr = document.getElementById('rzq-m-namerow');
       if (nr) nr.style.display = 'none';
 
+      // نص يُرسل للخادم: إشارة للصورة إن لم يكن الرابط عاماً (dataURL محلي)
+      var backendText = text;
+      if (sentImage) {
+        if (/^https?:\/\//i.test(sentImage)) {
+          backendText = text + '\n' + _t('[صورة]: ', '[Image]: ') + sentImage;
+        } else {
+          backendText = text + '\n' + _t('[مرفق صورة للاستفسار — تظهر عند البائع في المحادثة]', '[Photo jointe — visible chez le vendeur]');
+        }
+        if (_state.adTitle) {
+          backendText = _t('بخصوص: ', 'Concernant : ') + _state.adTitle + '\n' + backendText;
+        }
+      }
+
       // حفظ الرسالة محلياً (احتياط/عرض فوري) لداشبورد البائع القديم
       var msgs = _loadMsgs(_state.sellerKey);
       msgs.push({
         name:       name,
         text:       text,
+        image:      sentImage || '',
         phone:      phone,
         time:       _ts(),
         read:       false,
@@ -871,7 +1192,7 @@
       var hasBackend = !!(typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE && _state.sellerAccountId);
       if (hasBackend) {
         // لا نعرض رداً وهمياً — ننتظر رد الوكيل/البائع الحي من الخادم
-        _sendToBackend(text, name, phone).then(function(data){
+        _sendToBackend(backendText, name, phone).then(function(data){
           if (data && (_state.threadKey || (data.message && data.message.threadKey))) {
             _startReplyPoll();
           } else {
@@ -920,6 +1241,11 @@
   ══════════════════════════════ */
   global.openChat = function(adOverride) {
     var ad = adOverride || global._currentAd || null;
+    var img = '';
+    if (ad) {
+      img = ad.adImage || ad.image || ad.img || ad.cover
+        || (ad.images && ad.images[0]) || (ad.imgDataArr && ad.imgDataArr[0]) || ad.imgData || '';
+    }
     RizqMessenger.open({
       sellerKey:  _deriveSellerKey(ad),
       sellerAccountId: (ad && ad.accountId) ? String(ad.accountId) : (global._pageAccountId || ''),
@@ -927,7 +1253,10 @@
       adTitle:    (ad && (ad.title_ar || ad.title)) || global._pageTitle || document.title || '',
       adId:       (ad && ad.id) ? String(ad.id) : 'g',
       adEmoji:    (ad && ad.emoji) ? ad.emoji : (global._pageEmoji || '📦'),
+      adImage:    img,
       category:   (ad && (ad.cat || ad.category)) ? String(ad.cat || ad.category) : (global._pageCategory || ''),
+      context:    (ad && (ad.context || ad.module)) || global._pageModule || global._pageCategory || 'ad',
+      module:     (ad && (ad.module || ad.context)) || global._pageModule || global._pageCategory || 'ad',
       lang:       typeof _getLang === 'function' ? _getLang() : 'ar'
     });
   };

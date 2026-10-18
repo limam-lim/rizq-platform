@@ -1003,7 +1003,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 <script src="rizq_announcements.js" defer></script>
 <script src="rizq_subscription_engine.js" defer></script>
 <script src="rizq_subscription_permissions.js" defer></script>
-<script src="rizq_messenger.js?v=28.3" defer></script>
+<script src="rizq_messenger.js?v=28.5" defer></script>
 <script>
 // إصلاح جوهري: هذه الصفحة كانت تستخدم نظام إشعار قانوني محلي منفصل تماماً
 // (openDisc/closeDisc خاصة بها، بلا أي دعم لنص الأدمن المخصص rizq_disc_nav_ar/fr
@@ -1550,13 +1550,16 @@ function openShowroomChat(){
 function openItemChat(itemId, itemName){
   if(!window.RizqMessenger) return showToast(_t('⚠️ خدمة الرسائل غير متوفرة','⚠️ Service de messagerie indisponible'));
   var name = _acc ? _acc.name : document.getElementById('showroom-name').textContent;
+  var item = (_allItems || []).find(function(it){ return String(it.id) === String(itemId); });
+  var pImg = item ? ((item.imgDataArr && item.imgDataArr[0]) || item.imgData || item.image || item.img || '') : '';
   RizqMessenger.open({
     sellerKey : _showroomId,
     sellerAccountId: _showroomId,
     sellerName: name,
-    adTitle   : itemName || _t('استفسار عن عرض','Demande sur article'),
+    adTitle   : itemName || (item && (item.name || item.nameFr)) || _t('استفسار عن عرض','Demande sur article'),
     adId      : itemId || _showroomId,
-    adEmoji   : '🏛️',
+    adEmoji   : (item && item.emoji) || '🏛️',
+    adImage   : pImg,
     context   : 'showroom',
     module    : 'showroom'
   });
