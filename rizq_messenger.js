@@ -166,6 +166,39 @@
     } catch(e) { return null; }
   }
 
+  /** اسم الزائر من تسجيل المنصة (بدون خانات في نافذة المحادثة) */
+  function _resolveVisitorProfile() {
+    var name = '';
+    var phone = '';
+    try {
+      if (window.RizqAuthGate && typeof window.RizqAuthGate.getSession === 'function') {
+        var ag = window.RizqAuthGate.getSession();
+        if (ag) {
+          name = ag.name || ag.fullName || ag.displayName || '';
+          phone = ag.whatsapp || ag.phone || ag.phoneIntl || '';
+        }
+      }
+    } catch (e0) {}
+    var buyer = _getAuthGateBuyer();
+    if (buyer) {
+      if (!name) name = buyer.name || buyer.fullName || '';
+      if (!phone) phone = buyer.whatsapp || buyer.phone || buyer.phoneIntl || '';
+    }
+    var ind = _getBuyerSession();
+    if (ind) {
+      if (!name) name = ind.name || ind.fullName || ind.owner || '';
+      if (!phone) phone = ind.whatsapp || ind.phone || ind.phoneIntl || '';
+    }
+    try {
+      var sess = JSON.parse(localStorage.getItem('rizq_session') || 'null');
+      if (sess) {
+        if (!name) name = sess.name || sess.fullName || sess.owner || '';
+        if (!phone) phone = sess.whatsapp || sess.phone || '';
+      }
+    } catch (e1) {}
+    return { name: String(name || '').trim(), phone: String(phone || '').trim() };
+  }
+
   /* ══════════════════════════════
      دوال مساعدة
   ══════════════════════════════ */
@@ -275,12 +308,6 @@
 .rzq-typing{display:flex;align-items:center;gap:6px;padding:10px 14px;background:#fff;border-radius:16px;border-bottom-right-radius:3px;align-self:flex-start;border:1px solid rgba(0,0,0,.08);box-shadow:0 1px 4px rgba(0,0,0,.06);width:60px}
 .rzq-typing span{width:7px;height:7px;background:#9ca3af;border-radius:50%;animation:rzq-blink 1.2s infinite}.rzq-typing span:nth-child(2){animation-delay:.2s}.rzq-typing span:nth-child(3){animation-delay:.4s}
 @keyframes rzq-blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
-.rzq-name-row{padding:8px 12px 6px;display:flex;flex-direction:column;gap:6px;border-top:1px solid rgba(27,58,107,.1);flex-shrink:0;background:#f8fafc}
-.rzq-field{display:flex;flex-direction:column;gap:3px}
-.rzq-field-lbl{font-size:11px;font-weight:800;color:#1B3A6B}
-.rzq-name-input{padding:8px 10px;border:1.5px solid rgba(27,58,107,.22);border-radius:10px;font-size:13px;font-family:inherit;background:#fff;color:#0f172a;outline:none;transition:.2s;width:100%;box-sizing:border-box}
-.rzq-name-input:focus{border-color:#C9A84C;box-shadow:0 0 0 3px rgba(201,168,76,.15)}
-.rzq-name-input::placeholder{color:#94a3b8}
 .rzq-composer{flex-shrink:0;background:#fff;border-top:1px solid rgba(27,58,107,.12);box-shadow:0 -4px 16px rgba(15,35,65,.06);position:relative;z-index:3}
 .rzq-inp-row{padding:8px 10px 6px;display:flex;gap:6px;align-items:flex-end}
 .rzq-inp{flex:1;padding:10px 12px;border:1.5px solid rgba(27,58,107,.2);border-radius:16px;font-size:13.5px;font-family:inherit;resize:none;outline:none;max-height:72px;overflow-y:auto;background:#f8fafc;color:#0f172a;transition:.2s;box-sizing:border-box}
@@ -296,7 +323,6 @@
 .rzq-send .lbl{font-size:9px;font-weight:800;color:#1B3A6B}
 .rzq-footer{text-align:center;font-size:10px;color:#64748b;padding:2px 10px 8px;background:#fff;flex-shrink:0}
 .rzq-footer strong{color:#1B3A6B}
-.rzq-priv-note{font-size:10.5px;color:#475569;padding:0 2px 2px;line-height:1.4}
 .rzq-img-prev{display:none;padding:7px 10px;background:#fffbeb;border-top:1px solid #fde68a;flex-shrink:0;align-items:center;gap:8px}
 .rzq-img-prev.on{display:flex}
 .rzq-img-prev img{width:48px;height:48px;object-fit:cover;border-radius:10px;border:1px solid #f59e0b}
@@ -320,8 +346,6 @@
   .rzq-mbox{width:calc(100% - 16px);max-width:100%;max-height:min(78dvh,78vh);margin:0 8px max(10px,env(safe-area-inset-bottom,0px));border-radius:16px}
   .rzq-mhead{padding:10px 12px;border-radius:16px 16px 0 0}
   .rzq-msgs{padding:8px 10px;min-height:40px}
-  .rzq-name-row{padding:6px 10px 4px;gap:5px}
-  .rzq-name-input{padding:8px 10px;font-size:13px}
   .rzq-inp-row{padding:7px 8px 5px}
   .rzq-footer{padding:1px 8px 7px}
   .rzq-mhead-sub{display:none}
@@ -329,7 +353,6 @@
 @media(max-height:720px){
   .rzq-mbox{max-height:min(74dvh,74vh)}
   .rzq-suggest{display:none!important}
-  .rzq-priv-note{display:none}
   .rzq-ad-note{display:none}
 }
 @supports not (height:1dvh){
@@ -340,7 +363,7 @@
 `;
     var el = document.createElement('style');
     el.id = 'rzq-messenger-css';
-    el.setAttribute('data-v', '28.6');
+    el.setAttribute('data-v', '28.7');
     el.textContent = css;
     document.head.appendChild(el);
   }
@@ -349,12 +372,12 @@
     var existing = document.getElementById(MODAL_ID);
     /* إعادة بناء النافذة عند تحديث وضوح المعلومات */
     if (existing) {
-      if (existing.getAttribute('data-v') === '28.6' && document.getElementById('rzq-m-adkicker')) return;
+      if (existing.getAttribute('data-v') === '28.7' && document.getElementById('rzq-m-adkicker') && !document.getElementById('rzq-m-namerow')) return;
       try { existing.parentNode.removeChild(existing); } catch (eRm) {}
     }
     var div = document.createElement('div');
     div.id = MODAL_ID;
-    div.setAttribute('data-v', '28.6');
+    div.setAttribute('data-v', '28.7');
     div.innerHTML = `
 <div class="rzq-mbox" role="dialog" aria-modal="true" aria-label="مراسلة البائع">
   <div class="rzq-mhead">
@@ -385,17 +408,7 @@
     <button class="rzq-sq" onclick="RizqMessenger.quickSend(this.textContent)">هل يمكن التفاوض؟</button>
   </div>
 
-  <div class="rzq-name-row" id="rzq-m-namerow">
-    <div class="rzq-field">
-      <label class="rzq-field-lbl" id="rzq-m-namelbl" for="rzq-m-nameinp">الاسم</label>
-      <input class="rzq-name-input" id="rzq-m-nameinp" type="text" placeholder="اختياري" maxlength="40" />
-    </div>
-    <div class="rzq-field">
-      <label class="rzq-field-lbl" id="rzq-m-phonelbl" for="rzq-m-phoneinp">رقم الهاتف للرد</label>
-      <input class="rzq-name-input" id="rzq-m-phoneinp" type="tel" placeholder="مثال: 44 55 66 77" maxlength="20" />
-    </div>
-    <div class="rzq-priv-note" id="rzq-m-privnote">🔒 الرقم يصل للتاجر فقط للرد — لا يُعرض للعامة</div>
-  </div>
+  <!-- الاسم يُؤخذ من تسجيل المنصة؛ الهاتف يُطلب لاحقاً أو عبر نموذج الاستفسار — لا خانات هنا -->
 
   <div class="rzq-composer">
   <div class="rzq-img-prev" id="rzq-m-imgprev">
@@ -725,10 +738,6 @@
     }
     _setTxt('rzq-m-adkicker', isFr ? kickerFr : kickerAr);
     _setTxt('rzq-m-adnote', isFr ? noteFr : noteAr);
-    _setTxt('rzq-m-namelbl', isFr ? 'Nom' : 'الاسم');
-    _setTxt('rzq-m-phonelbl', isFr ? 'Téléphone pour la réponse' : 'رقم الهاتف للرد');
-    _setAttr('rzq-m-nameinp', 'placeholder', isFr ? 'Facultatif' : 'اختياري');
-    _setAttr('rzq-m-phoneinp', 'placeholder', isFr ? 'Ex: 44 55 66 77' : 'مثال: 44 55 66 77');
     var catHead = document.getElementById('rzq-m-cathead');
     if (catHead) catHead.textContent = _catalogLabel();
     var catLbl = document.getElementById('rzq-m-catlbl');
@@ -749,7 +758,6 @@
       var tallEnough = (typeof window !== 'undefined' && window.innerHeight > 740);
       sug.classList.toggle('on', !!tallEnough);
     }
-    _setTxt('rzq-m-privnote', isFr ? '🔒 Visible uniquement par le commerçant pour vous répondre' : '🔒 الرقم يصل للتاجر فقط للرد — لا يُعرض للعامة');
     _setAttr('rzq-m-inp', 'placeholder', isFr ? 'Écrivez votre message…' : 'اكتب رسالتك هنا…');
     _setTxt('rzq-m-footer', isFr ? 'Propulsé par <strong>Rizq AI</strong> · Contact direct et sécurisé' : 'مدعوم بـ <strong>رزق AI</strong> · تواصل مباشر وآمن');
 
@@ -1010,16 +1018,10 @@
       var strip = document.getElementById('rzq-m-adstrip');
       if (strip) strip.style.display = (_state.adTitle || _state.adImage) ? 'flex' : 'none';
 
-      // مشترٍ مسجَّل دخوله (بائع فردي أو AuthGate): لا حاجة لطلب الاسم/الهاتف يدوياً
-      var nr = document.getElementById('rzq-m-namerow');
-      if (nr) nr.style.display = (_state.buyerAccountId || _state.authGateBuyer) ? 'none' : 'flex';
-      if (_state.authGateBuyer) {
-        var nameInp0 = document.getElementById('rzq-m-nameinp');
-        var phoneInp0 = document.getElementById('rzq-m-phoneinp');
-        var b = _state.authGateBuyer;
-        if (nameInp0) nameInp0.value = b.name || '';
-        if (phoneInp0) phoneInp0.value = b.whatsapp || b.phone || b.phoneIntl || '';
-      }
+      /* لا خانات اسم/هاتف في النافذة — الهوية من تسجيل المنصة */
+      var profile = _resolveVisitorProfile();
+      if (profile.name) _state.visitorName = profile.name;
+      if (profile.phone) _state.buyerPhone = profile.phone;
 
       // مسح الرسائل السابقة وإعادة تحميلها
       var msgsEl = document.getElementById('rzq-m-msgs');
@@ -1039,14 +1041,17 @@
         _renderPrevMsgs();
       }
 
-      // رسالة ترحيب قصيرة وواضحة
+      // رسالة ترحيب قصيرة — تظهر باسم الزبون إن وُجد من التسجيل
       if (!document.querySelector('#rzq-m-msgs .rzq-bubble')) {
         var about = _state.adTitle
           ? (_t('بخصوص: ', 'Concernant : ') + _state.adTitle + '\n')
           : '';
+        var who = _state.visitorName
+          ? (_t('مرحباً ', 'Bonjour ') + _state.visitorName + ' — ')
+          : _t('مرحباً — ', 'Bonjour — ');
         var greet = _t(
-          about + 'مرحباً — اكتب سؤالك لـ«' + _state.sellerName + '». رقمك يبقى خاصاً.',
-          about + 'Bonjour — écrivez votre question à «' + _state.sellerName + '». Votre numéro reste privé.'
+          about + who + 'اكتب سؤالك لـ«' + _state.sellerName + '».',
+          about + who + 'écrivez votre question à «' + _state.sellerName + '».'
         );
         _appendBubble(greet, 'them');
       }
@@ -1130,9 +1135,7 @@
 
     /** إرسال رسالة */
     send: function() {
-      var inp      = document.getElementById('rzq-m-inp');
-      var nameInp  = document.getElementById('rzq-m-nameinp');
-      var phoneInp = document.getElementById('rzq-m-phoneinp');
+      var inp = document.getElementById('rzq-m-inp');
       if (!inp) return;
 
       var text = inp.value.trim();
@@ -1144,26 +1147,12 @@
           : _t('استفسار مع صورة مرفقة', 'Demande avec photo jointe');
       }
 
-      // اسم الزائر
-      var name = nameInp ? (nameInp.value.trim() || '') : '';
-      if (!name && _state.authGateBuyer) name = _state.authGateBuyer.name || '';
+      /* الهوية من تسجيل المنصة — بلا خانات في النافذة */
+      var profile = _resolveVisitorProfile();
+      var name = profile.name || _state.visitorName || '';
       if (!name) name = _t('زائر', 'Visiteur') + ' ' + _state.visitorId;
       _state.visitorName = name;
-      var phone = phoneInp ? phoneInp.value.trim() : '';
-      if (!phone && _state.authGateBuyer) {
-        phone = _state.authGateBuyer.whatsapp || _state.authGateBuyer.phone || _state.authGateBuyer.phoneIntl || '';
-      }
-
-      // الخادم يطلب رقم الهاتف للزائر الضيف — لا ترسل بلا رقم
-      var needsPhone = !_state.buyerAccountId && !!(typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE && _state.sellerAccountId);
-      if (needsPhone && !String(phone || '').replace(/\D/g, '')) {
-        _appendBubble(_t(
-          'أدخل رقم هاتفك أولاً حتى يصل رد البائع إليك.',
-          'Entrez votre numéro pour que le vendeur puisse vous répondre.'
-        ), 'them');
-        if (phoneInp) phoneInp.focus();
-        return;
-      }
+      var phone = profile.phone || _state.buyerPhone || '';
 
       // عرض الرسالة (مع الصورة إن وُجدت)
       _appendBubble(text, 'me', imageUrl);
@@ -1175,10 +1164,6 @@
       // إخفاء الاقتراحات بعد أول رسالة
       var sq = document.getElementById('rzq-m-suggest');
       if (sq) sq.style.display = 'none';
-
-      // إخفاء حقل الاسم بعد أول رسالة (زائر ضيف فقط — المشترك المسجَّل مخفي أصلاً)
-      var nr = document.getElementById('rzq-m-namerow');
-      if (nr) nr.style.display = 'none';
 
       // نص يُرسل للخادم: إشارة للصورة إن لم يكن الرابط عاماً (dataURL محلي)
       var backendText = text;
