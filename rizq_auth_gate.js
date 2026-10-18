@@ -1344,7 +1344,42 @@
     if (typeof fn === 'function') try { fn(); } catch (e) {}
   }
 
+  /**
+   * صفحات النماذج الترويجية (?demo=1 / demo_* / acc_promo_*):
+   * واجهة عرض — جهات الاتصال والمحادثة مفتوحة للزوار بلا تسجيل دخول.
+   */
+  function isPromoDemoContext() {
+    try {
+      if (window._rizqStoreIsDemo || window._rizqOfficeIsDemo || window._rizqEstateIsDemo || window._rizqCorpIsDemo || window._rizqShowroomIsDemo) {
+        return true;
+      }
+    } catch (e0) {}
+    try {
+      var q = new URLSearchParams(location.search || '');
+      if (q.get('demo') === '1') return true;
+      var id = q.get('id') || q.get('store') || q.get('office') || q.get('agency') || q.get('corp') || '';
+      if (/^demo/i.test(id) || /^acc_promo_/i.test(id)) return true;
+    } catch (e1) {}
+    try {
+      if (typeof useSubscriptionPermissions === 'function') {
+        var perms = useSubscriptionPermissions('', {});
+        if (perms && perms.isDemoPage) return true;
+      } else if (window.RizqSubscriptionPermissions && typeof window.RizqSubscriptionPermissions.isDemoPage === 'function') {
+        if (window.RizqSubscriptionPermissions.isDemoPage({})) return true;
+      }
+    } catch (e2) {}
+    try {
+      if (/\/demo(?:\/|$)/i.test(String(location.pathname || ''))) return true;
+    } catch (e3) {}
+    return false;
+  }
+
   function requireAuth(actionFn, reasonKey) {
+    /* النماذج الترويجية: لا إغلاق أمام الزوار */
+    if (isPromoDemoContext()) {
+      if (typeof actionFn === 'function') actionFn();
+      return true;
+    }
     if (!isLoggedIn()) {
       _pendingAction = actionFn;
       rememberAfterAuthHref();
@@ -1383,7 +1418,8 @@
   }
 
   function gateLink(el, ev, reasonKey) {
-    if (isLoggedIn()) return true;
+    /* واجهة ترويجية: اسمح بالاتصال/واتساب/إيميل مباشرة */
+    if (isPromoDemoContext() || isLoggedIn()) return true;
     if (ev && ev.preventDefault) ev.preventDefault();
     var rawHref = el && el.href ? el.href : '';
     var targetHref = sanitizeAfterAuthHref(rawHref);
@@ -1413,11 +1449,29 @@
     openAccountChoice: openAccountChoice,
     ensureEmailOtpVerified: ensureEmailOtpVerified,
     isLoggedIn: isLoggedIn,
+    isPromoDemoContext: isPromoDemoContext,
     getSession: getSession,
     logout: function () { clearSession(); }
   };
+  /** محادثة عامة: بلا تسجيل في النماذج الترويجية؛ تسجيل إلزامي للمحلات الحقيقية */
+  function openPublicChat(actionFn, reasonKey) {
+    var run = typeof actionFn === 'function'
+      ? actionFn
+      : function () {
+          if (typeof global.openChat === 'function') global.openChat(null);
+          else if (typeof window.openChat === 'function') window.openChat(null);
+        };
+    if (isPromoDemoContext()) {
+      run();
+      return true;
+    }
+    return requireAuth(run, reasonKey || 'reasonMsg');
+  }
+
   window.rizqRequireAuth = requireAuth;
   window.rizqGateLink = gateLink;
+  window.rizqIsPromoDemo = isPromoDemoContext;
+  window.rizqOpenChat = openPublicChat;
 
   loadOtpConfig();
   verifySessionSilently();

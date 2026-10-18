@@ -2728,7 +2728,12 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         var desk = document.getElementById('est-desk');
         if(desk) desk.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-      if(typeof window.rizqRequireAuth === 'function'){
+      /* النماذج الترويجية: المحادثة بلا تسجيل — المحلات الحقيقية فقط تطلب حساباً */
+      if(typeof window.rizqOpenChat === 'function'){
+        window.rizqOpenChat(launch, 'reasonMsg');
+      } else if(window._rizqEstateIsDemo || /[?&]demo=1\b/.test(location.search)){
+        launch();
+      } else if(typeof window.rizqRequireAuth === 'function'){
         window.rizqRequireAuth(launch, 'reasonMsg');
       } else {
         launch();

@@ -83,7 +83,20 @@
     opts = opts || {};
     var fr = opts.lang === 'fr';
     var creds = getViewerCredentials();
-    /* زائر بدون حساب: اطلب تسجيل الدخول قبل أي تواصل */
+    var isPromo = false;
+    try {
+      if (typeof global.rizqIsPromoDemo === 'function') isPromo = !!global.rizqIsPromoDemo();
+      else if (global.RizqAuthGate && typeof global.RizqAuthGate.isPromoDemoContext === 'function') {
+        isPromo = !!global.RizqAuthGate.isPromoDemoContext();
+      } else if (/[?&]demo=1(?:&|$)/.test(String((global.location && global.location.search) || ''))) {
+        isPromo = true;
+      }
+    } catch (ePromo) {}
+    /* النماذج الترويجية: لا تطلب تسجيلاً */
+    if (isPromo) {
+      return Promise.resolve({ ok: true, access: { lockReason: 'demo', contactsLocked: false } });
+    }
+    /* زائر بدون حساب على صفحة حقيقية: اطلب تسجيل الدخول */
     if (!creds && typeof global.rizqRequireAuth === 'function') {
       global.rizqRequireAuth(function () {
         if (typeof opts.onAuthed === 'function') opts.onAuthed();
