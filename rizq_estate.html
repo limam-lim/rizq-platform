@@ -50,7 +50,7 @@ body.rizq-mockup-hdr-trial.rizq-page-light{
   background:#ffffff!important;
   max-width:1180px;margin:0 auto;padding:36px 20px 48px;position:relative;
 }
-.est-main-col,.est-content-grid,.est-side,.est-agency-bar,.est-grid,.est-reviews,.est-toolbar{
+.est-main-col,.est-content-grid,.est-side,.est-grid,.est-reviews,.est-toolbar{
   background:#ffffff!important;
 }
 .est-section-head h2{color:var(--navy)!important}
@@ -80,21 +80,21 @@ button{font:inherit;border:0;background:none;color:inherit}
   box-shadow:0 0 0 1.5px rgba(240,215,138,.55),0 0 16px rgba(201,168,76,.22)}
 .est-brand-ar{font-weight:900;font-size:19px;color:var(--gold);line-height:1;display:block}
 .est-brand-sub{font-size:7.5px;letter-spacing:1.6px;color:rgba(201,168,76,.75);font-style:italic;text-transform:uppercase}
-/* شريط تواصل الوكالة */
+/* شريط تواصل الوكالة — خلفية كحلي هوية المنصة */
 .est-agency-bar{
   display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;
   margin:0 0 18px;padding:14px 16px;border-radius:16px;
-  background:#ffffff;
-  border:1px solid var(--border);
-  box-shadow:0 8px 24px rgba(15,35,65,.06);
+  background:linear-gradient(135deg,#1B3A6B 0%,#152A45 48%,#0B1C33 100%)!important;
+  border:1px solid rgba(201,168,76,.35);
+  box-shadow:0 10px 28px rgba(11,28,51,.28);
 }
 .est-agency-bar-id{display:flex;align-items:center;gap:12px;min-width:0}
 .est-agency-bar-id img{
   width:44px;height:44px;border-radius:12px;object-fit:cover;flex-shrink:0;
   border:1.5px solid rgba(201,168,76,.55);background:#fff;
 }
-.est-agency-bar-id strong{display:block;font-size:15px;color:var(--navy)}
-.est-agency-bar-id span{font-size:12px;color:var(--muted)}
+.est-agency-bar-id strong{display:block;font-size:15px;color:#fff}
+.est-agency-bar-id span{font-size:12px;color:rgba(244,247,252,.78)}
 .est-agency-bar-acts{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end}
 .est-agency-bar-acts a,.est-agency-bar-acts button{
   display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:12px;padding:10px 14px;
@@ -102,32 +102,32 @@ button{font:inherit;border:0;background:none;color:inherit}
   transition:transform .15s,box-shadow .15s,background .15s,border-color .15s;
 }
 .est-agency-bar-acts a:hover,.est-agency-bar-acts button:hover{transform:translateY(-1px)}
-/* اتصال + هوية كحلي للمنصة؛ واتساب يبقى أخضر */
+/* أزرار متناسقة مع الخلفية الكحلية؛ واتساب يبقى أخضر */
 .est-agency-bar-acts .est-call{
-  background:linear-gradient(135deg,#1B3A6B,#0B1C33);color:#fff;
-  box-shadow:0 6px 16px rgba(11,28,51,.22);
+  background:linear-gradient(135deg,#F3E2A8,#C9A84C 45%,#E8C96A);color:#0B1C33;
+  box-shadow:0 6px 16px rgba(201,168,76,.35);
 }
 .est-agency-bar-acts .est-wa{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff}
 .est-agency-bar-acts .est-mail{
-  background:linear-gradient(135deg,#152A45,#0B1C33);color:#E8C96A;
-  border:1px solid rgba(201,168,76,.4);
+  background:rgba(255,255,255,.08);color:#E8C96A;
+  border:1px solid rgba(201,168,76,.45);
 }
 .est-agency-bar-acts .est-chat{
-  background:#fff;color:var(--navy);
-  border:1.5px solid rgba(27,58,107,.45);
+  background:rgba(255,255,255,.1);color:#fff;
+  border:1.5px solid rgba(255,255,255,.32);
 }
-.est-agency-bar-acts .est-chat:hover{background:rgba(27,58,107,.06)}
+.est-agency-bar-acts .est-chat:hover{background:rgba(255,255,255,.16)}
 .est-agency-bar-acts .est-share{
-  background:#fff;color:var(--navy);
-  border:1.5px solid rgba(27,58,107,.35);
+  background:rgba(255,255,255,.1);color:#fff;
+  border:1.5px solid rgba(255,255,255,.28);
 }
 .est-agency-bar-acts .est-desk{
-  background:linear-gradient(135deg,#152A45,#0B1C33);color:#fff;
-  border:1px solid rgba(201,168,76,.35);
+  background:rgba(201,168,76,.16);color:#F3E2A8;
+  border:1px solid rgba(201,168,76,.5);
 }
 .est-agency-bar-acts .est-pay{
-  background:rgba(27,58,107,.08);color:var(--navy);
-  border:1.5px solid rgba(27,58,107,.35);
+  background:rgba(255,255,255,.08);color:#F4F7FC;
+  border:1.5px solid rgba(255,255,255,.26);
 }
 .est-agency-bar-acts .est-mail[hidden],.est-agency-bar-acts .est-call[hidden]{display:none!important}
 @media(max-width:720px){
