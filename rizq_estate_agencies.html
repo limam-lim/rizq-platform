@@ -34,7 +34,7 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
 
 .ag-hero{
   position:relative;overflow:hidden;text-align:center;
-  padding:18px 4% 14px;
+  padding:28px 4% 24px;
   background:
     radial-gradient(ellipse 80% 60% at 50% -10%,rgba(201,168,76,.18),transparent 55%),
     linear-gradient(165deg,#071020 0%,#0f2347 48%,#1B3A6B 100%);
@@ -60,51 +60,12 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
   -webkit-background-clip:text;background-clip:text;color:transparent;
 }
 .ag-sub{
-  color:rgba(255,255,255,.78);font-size:12.5px;font-weight:600;
-  max-width:640px;margin:0 auto 10px;line-height:1.45;
+  color:rgba(255,255,255,.78);font-size:13px;font-weight:600;
+  max-width:520px;margin:0 auto 16px;line-height:1.55;
 }
-
-.ag-type-gate{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;
-  max-width:1080px;margin:0 auto 10px;
-}
-.ag-gate{
-  position:relative;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;
-  padding:9px 10px;text-decoration:none;border-radius:12px;overflow:hidden;
-  font-family:'Cairo',sans-serif;font-weight:800;color:#fff;
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.08) 0%,transparent 40%),
-    linear-gradient(165deg,#2a4f8f 0%,#1B3A6B 55%,#0f2347 100%);
-  border:1.5px solid rgba(201,168,76,.45);
-  box-shadow:0 4px 14px rgba(8,15,30,.28),inset 0 1px 0 rgba(255,255,255,.12);
-  transition:transform .25s,box-shadow .25s,border-color .2s,filter .2s;
-}
-.ag-gate::before{
-  content:'';position:absolute;top:0;left:18%;right:18%;height:2px;border-radius:0 0 2px 2px;
-  background:linear-gradient(90deg,transparent,var(--gold),var(--gold2),var(--gold),transparent);
-}
-.ag-gate:hover{
-  transform:translateY(-2px);filter:brightness(1.05);border-color:#E8C96A;
-  box-shadow:0 8px 18px rgba(8,15,30,.35),0 0 12px rgba(201,168,76,.18);
-}
-.ag-gate.active{
-  border-color:#E8C96A;
-  background:
-    linear-gradient(180deg,rgba(240,215,138,.16) 0%,transparent 40%),
-    linear-gradient(165deg,#3a5fa0 0%,#1B3A6B 55%,#0c1c38 100%);
-  box-shadow:0 6px 16px rgba(8,15,30,.35),0 0 0 1.5px rgba(201,168,76,.35);
-}
-.ag-gate-ico{
-  width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;
-  font-size:1.1em;line-height:1;flex-shrink:0;
-  background:linear-gradient(145deg,#F0D78A,#C9A84C,#b89840);
-  border:1px solid #fff8e0;
-  box-shadow:0 2px 8px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.5);
-}
-.ag-gate-label{font-size:13px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3);white-space:nowrap}
 
 .ag-own-wrap{
-  max-width:560px;margin:0 auto;padding:6px 8px;border-radius:12px;
+  max-width:480px;margin:0 auto;padding:6px 8px;border-radius:12px;
   background:linear-gradient(165deg,#0D1B2A 0%,#152a4a 55%,#1B3A6B 100%);
   border:1px solid rgba(255,255,255,.1);
   box-shadow:0 4px 14px rgba(8,15,30,.28);
@@ -212,15 +173,11 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
 .ag-foot a{color:var(--navy);text-decoration:none;font-weight:800}
 
 @media(max-width:720px){
-  .ag-type-gate{gap:6px}
-  .ag-gate{padding:8px 6px;gap:5px}
-  .ag-gate-label{font-size:11.5px}
-  .ag-gate-ico{width:28px;height:28px;font-size:1em}
-  .ag-hero{padding:14px 3% 12px}
+  .ag-hero{padding:18px 3% 16px}
   .ag-own-btn{font-size:12px;padding:9px 12px}
 }
 @media(prefers-reduced-motion:reduce){
-  .ag-gate,.ag-own-btn,.ag-card{transition:none}
+  .ag-own-btn,.ag-card{transition:none}
 }
 </style>
 <script src="rizq_pwa.js" defer></script>
@@ -229,17 +186,9 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
 
 <section class="ag-hero" aria-label="دليل الوكالات العقارية">
   <div class="ag-hero-inner">
-    <p class="ag-kicker" id="ag-kicker">رزق · دليل الوكالات</p>
+    <p class="ag-kicker" id="ag-kicker">رزق · سوق العقارات</p>
     <h1 id="ag-title">دليل <span>الوكالات العقارية</span></h1>
     <p class="ag-sub" id="ag-sub">وكالات موثوقة بهوية واضحة — اختر وكالة وافتح صفحتها.</p>
-    <nav class="ag-type-gate" aria-label="أقسام الدليل">
-      <a class="ag-gate" href="rizq_directory.html?type=store"><span class="ag-gate-ico" aria-hidden="true">🏪</span><span class="ag-gate-label" data-ag-t="gate-store">المحلات</span></a>
-      <a class="ag-gate" href="rizq_directory.html?type=corp"><span class="ag-gate-ico" aria-hidden="true">🏭</span><span class="ag-gate-label" data-ag-t="gate-corp">المعارض</span></a>
-      <a class="ag-gate active" href="rizq_estate_agencies.html" aria-current="page"><span class="ag-gate-ico" aria-hidden="true">🏠</span><span class="ag-gate-label" data-ag-t="gate-estate">الوكالات</span></a>
-      <a class="ag-gate" href="rizq_directory.html?type=office"><span class="ag-gate-ico" aria-hidden="true">🏛️</span><span class="ag-gate-label" data-ag-t="gate-office">المكاتب</span></a>
-      <a class="ag-gate" href="rizq_directory.html?type=tenders"><span class="ag-gate-ico" aria-hidden="true">📋</span><span class="ag-gate-label" data-ag-t="gate-tenders">المناقصات</span></a>
-      <a class="ag-gate" href="rizq_directory.html?type=investments"><span class="ag-gate-ico" aria-hidden="true">📈</span><span class="ag-gate-label" data-ag-t="gate-invest">الاستثمارات</span></a>
-    </nav>
     <div class="ag-own-wrap" data-rizq-estate-promo="1">
       <a class="ag-own-btn" id="ag-reg-own" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">✨ امتلك وكالتك العقارية على رزق</a>
     </div>
@@ -542,7 +491,7 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
         var el = document.getElementById(id);
         if(el) el.textContent = fr ? frTxt : ar;
       }
-      setTxt('ag-kicker', 'رزق · دليل الوكالات', 'Rizq · Annuaire des agences');
+      setTxt('ag-kicker', 'رزق · سوق العقارات', 'Rizq · Marché immobilier');
       var title = document.getElementById('ag-title');
       if(title) title.innerHTML = fr
         ? 'Annuaire des <span>agences immobilières</span>'
@@ -553,20 +502,6 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
       setTxt('ag-filter-label', 'تصفية حسب النشاط', 'Filtrer par activité');
       setTxt('ag-reg-own', '✨ امتلك وكالتك العقارية على رزق', '✨ Possédez votre agence sur Rizq');
       setTxt('ag-demo-link', 'نموذج وكالة', 'Agence modèle');
-
-      var gateMap = {
-        'gate-store': ['المحلات','Boutiques'],
-        'gate-corp': ['المعارض','Showrooms'],
-        'gate-estate': ['الوكالات','Agences'],
-        'gate-office': ['المكاتب','Bureaux'],
-        'gate-tenders': ['المناقصات','Appels d\'offres'],
-        'gate-invest': ['الاستثمارات','Investissements']
-      };
-      Object.keys(gateMap).forEach(function(k){
-        document.querySelectorAll('[data-ag-t="'+k+'"]').forEach(function(el){
-          el.textContent = fr ? gateMap[k][1] : gateMap[k][0];
-        });
-      });
 
       searchEl.placeholder = fr ? 'Rechercher une agence ou une ville…' : 'ابحث بالاسم أو المدينة…';
       wilayaEl.options[0].textContent = fr ? 'Tous les wilayas' : 'كل الولايات';
