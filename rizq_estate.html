@@ -1040,9 +1040,9 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
           <p>آراء عملاء تعاملوا مع الوكالة في البيع والكراء والمعاينة.</p>
         </div>
         <div class="est-reviews-summary">
-          <div class="est-reviews-score"><b id="est-rev-avg">4.8</b><span>من 5</span></div>
-          <div class="est-reviews-stars" aria-hidden="true">★★★★★</div>
-          <div class="est-reviews-count" id="est-rev-count">12 تقييماً</div>
+          <div class="est-reviews-score"><b id="est-rev-avg">—</b><span>من 5</span></div>
+          <div class="est-reviews-stars" id="est-rev-stars" aria-hidden="true">☆☆☆☆☆</div>
+          <div class="est-reviews-count" id="est-rev-count">0 تقييم</div>
         </div>
         <div class="est-reviews-list" id="est-reviews-list"></div>
       </section>
@@ -1143,6 +1143,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_subscription_engine.js" defer></script>
 <script src="rizq_subscription_permissions.js" defer></script>
+<script src="rizq_reviews_engine.js"></script>
 <script src="rizq_auth_gate.js?v=23.1" defer></script>
 <script src="rizq_contact_gate.js" defer></script>
 <script src="rizq_messenger.js?v=28.7" defer></script>
@@ -2015,20 +2016,132 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       + '</div>';
   }
 
+  function resolveEstateReviewTarget(){
+    var id = window._rizqEstateAccountId || (window._rizqEstateProfile && window._rizqEstateProfile.id) || (AGENCY && AGENCY.id) || '';
+    try{
+      var p = new URLSearchParams(location.search);
+      id = p.get('id') || p.get('estate') || p.get('agency') || id;
+      if(!id && (window._rizqEstateIsDemo || p.get('demo') === '1')) id = 'demo_estate_atwar';
+    }catch(e){}
+    return id || null;
+  }
+
   function renderReviews(){
     var box = document.getElementById('est-reviews-list');
-    if(!box || !REVIEWS) return;
+    if(!box) return;
     var fr = isFrEstate();
-    box.innerHTML = REVIEWS.map(function(r){
+    var targetId = resolveEstateReviewTarget();
+    var live = [];
+    if(targetId && window.RizqReviews){
+      window._rizqEstateReviewsTarget = targetId;
+      live = RizqReviews.getReviews(targetId).map(function(r){
+        return {
+          name: r.reviewerName || (fr ? 'Client Rizq' : 'زبون رزق'),
+          stars: r.rating,
+          text: r.comment || (fr ? '(Sans commentaire)' : '(بدون تعليق)'),
+          when: ''
+        };
+      });
+    }
+    /* النماذج: اعرض آراء العرض إن لم يُضف الزائر تقييماً بعد */
+    var list = live.length ? live : ((window._rizqEstateIsDemo || /^demo/i.test(String(targetId||'')) || /^acc_promo_/i.test(String(targetId||''))) ? (REVIEWS || []) : []);
+    var avgEl = document.getElementById('est-rev-avg');
+    var countEl = document.getElementById('est-rev-count');
+    var starsEl = document.getElementById('est-rev-stars');
+    if(targetId && window.RizqReviews){
+      var stats = RizqReviews.getStats(targetId);
+      if(avgEl) avgEl.textContent = stats.count ? String(stats.average) : '—';
+      if(countEl) countEl.textContent = stats.count
+        ? (stats.count + (fr ? ' avis' : ' تقييم'))
+        : (fr ? '0 avis' : '0 تقييم');
+      if(starsEl){
+        var n = Math.round(stats.average || 0);
+        starsEl.textContent = stats.count ? ('★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n)) : '☆☆☆☆☆';
+      }
+    } else if(list.length){
+      var sum = list.reduce(function(s, r){ return s + (Number(r.stars) || 0); }, 0);
+      var avg = Math.round((sum / list.length) * 10) / 10;
+      if(avgEl) avgEl.textContent = String(avg);
+      if(countEl) countEl.textContent = list.length + (fr ? ' avis' : ' تقييم');
+      if(starsEl){
+        var n2 = Math.round(avg);
+        starsEl.textContent = '★★★★★'.slice(0, n2) + '☆☆☆☆☆'.slice(0, 5 - n2);
+      }
+    } else {
+      if(avgEl) avgEl.textContent = '—';
+      if(countEl) countEl.textContent = fr ? '0 avis' : '0 تقييم';
+      if(starsEl) starsEl.textContent = '☆☆☆☆☆';
+    }
+
+    var listHtml = list.length ? list.map(function(r){
       var stars = '★★★★★'.slice(0, r.stars||5) + '☆☆☆☆☆'.slice(0, 5-(r.stars||5));
       return '<article class="est-review-card">'
         + '<div class="who">'+esc(r.name)+'</div>'
         + '<div class="stars" aria-label="'+(r.stars||5)+'/5">'+stars+'</div>'
         + '<div class="txt">'+esc(r.text)+'</div>'
-        + '<div class="when">'+esc(r.when||'')+'</div>'
+        + (r.when ? '<div class="when">'+esc(r.when)+'</div>' : '')
         + '</article>';
-    }).join('');
+    }).join('') : ('<p style="font-size:13px;color:#6a7a8a;padding:8px 0">'+(fr?"Aucun avis pour l'instant — soyez le premier.":'لا توجد آراء حتى الآن — كن أول من يقيّم.')+'</p>');
+
+    var formHtml = '';
+    if(targetId && window.RizqReviews){
+      var starPicker = '<div id="est-star-picker" style="display:flex;gap:5px;margin-bottom:10px;font-size:24px">'
+        + [1,2,3,4,5].map(function(n){ return '<span data-n="'+n+'" onclick="window._rizqEstateSetStar('+n+')" id="est-star-'+n+'" style="cursor:pointer;color:rgba(13,27,42,.18)">★</span>'; }).join('')
+        + '</div>';
+      formHtml = '<div style="margin-top:16px;padding-top:16px;border-top:1px solid #e0e8f0">'
+        + '<div style="font-size:14px;font-weight:700;color:var(--navy,#1B3A6B);margin-bottom:10px">'+(fr?'✍️ Laisser un avis':'✍️ أضف تقييمك')+'</div>'
+        + '<div id="est-review-msg" style="font-size:12px;margin-bottom:8px"></div>'
+        + starPicker
+        + '<input type="text" id="est-review-name" maxlength="60" placeholder="'+(fr?'Votre nom (optionnel)':'اسمك (اختياري)')+'" style="width:100%;padding:10px 12px;border:1px solid #e0e8f0;border-radius:8px;font-size:13px;margin-bottom:8px;font-family:inherit;box-sizing:border-box">'
+        + '<textarea id="est-review-comment" maxlength="500" rows="3" placeholder="'+(fr?'Votre commentaire...':'اكتب تعليقك...')+'" style="width:100%;padding:10px 12px;border:1px solid #e0e8f0;border-radius:8px;font-size:13px;margin-bottom:10px;font-family:inherit;resize:vertical;box-sizing:border-box"></textarea>'
+        + '<button type="button" onclick="window._rizqEstateSubmitReview()" style="width:100%;padding:12px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);color:#fff;border:none;border-radius:8px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit">'+(fr?'Envoyer mon avis':'إرسال التقييم')+'</button>'
+        + '</div>';
+    }
+    box.innerHTML = listHtml + formHtml;
   }
+
+  window._rizqEstateSetStar = function(n){
+    window._rizqEstateSelectedStars = n;
+    for(var i=1;i<=5;i++){
+      var el = document.getElementById('est-star-'+i);
+      if(el) el.style.color = i<=n ? '#F5A623' : 'rgba(13,27,42,.18)';
+    }
+  };
+
+  window._rizqEstateSubmitReview = function(){
+    var fr = isFrEstate();
+    var targetId = window._rizqEstateReviewsTarget || resolveEstateReviewTarget();
+    var msgEl = document.getElementById('est-review-msg');
+    if(!targetId || !window.RizqReviews) return;
+    var rating = window._rizqEstateSelectedStars || 0;
+    var nameEl = document.getElementById('est-review-name');
+    var commentEl = document.getElementById('est-review-comment');
+    var res = RizqReviews.addReview(targetId, {
+      rating: rating,
+      comment: commentEl ? commentEl.value : '',
+      reviewerName: nameEl ? nameEl.value : ''
+    });
+    if(!res.ok){
+      var errs = {
+        invalid_rating: fr ? 'Merci de choisir une note entre 1 et 5 étoiles.' : 'الرجاء اختيار تقييم بين 1 و5 نجوم.',
+        already_reviewed: fr ? 'Vous avez déjà évalué cette agence depuis cet appareil.' : 'لقد سبق أن قيّمت هذه الوكالة من هذا الجهاز.',
+        invalid_target: fr ? "Impossible d'identifier cette agence." : 'تعذر تحديد هذه الوكالة.'
+      };
+      if(msgEl){ msgEl.textContent = errs[res.error] || (fr?'Une erreur est survenue.':'حدث خطأ ما.'); msgEl.style.color='#dc2626'; }
+      return;
+    }
+    if(typeof showToast==='function') showToast(fr?'✅ Merci pour votre avis !':'✅ شكراً على تقييمك!');
+    try{
+      if(typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE){
+        fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/reviews', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ targetId: targetId, rating: rating, comment: commentEl?commentEl.value:'', reviewerName: nameEl?nameEl.value:'' })
+        }).catch(function(){});
+      }
+    }catch(e){}
+    window._rizqEstateSelectedStars = 0;
+    renderReviews();
+  };
 
   function renderGrid(){
     var list = filtered();

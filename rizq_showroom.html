@@ -1001,6 +1001,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 <script src="rizq_announcements.js" defer></script>
 <script src="rizq_subscription_engine.js" defer></script>
 <script src="rizq_subscription_permissions.js" defer></script>
+<script src="rizq_reviews_engine.js" defer></script>
 <script src="rizq_messenger.js?v=28.7" defer></script>
 <script>
 // إصلاح جوهري: هذه الصفحة كانت تستخدم نظام إشعار قانوني محلي منفصل تماماً
@@ -1446,6 +1447,7 @@ function applyAccountData(){
   }
   /* إعادة تركيب الفيديو التعريفي بعد جلب الحساب (محلي أو خادم) */
   mountShowroomIntroVideo();
+  if(typeof window._rizqRenderShowroomReviews === 'function') window._rizqRenderShowroomReviews();
 }
 
 /* فيديوهات هادئة على الهيرو (تعريفي + إضافي) — يُستدعى عند التحميل وبعد applyAccountData */
@@ -1889,13 +1891,13 @@ function applyLang(){
   document.getElementById('cat-jewel').textContent = isFr ? '💎 Bijoux' : '💎 مجوهرات';
   document.getElementById('empty-title-lbl').textContent = isFr ? 'Aucun article dans cette catégorie' : 'لا يوجد عروض في هذا القسم';
   document.getElementById('empty-sub-lbl').textContent   = isFr ? 'Essayez une autre catégorie ou contactez le showroom' : 'جرّب قسماً آخر أو تواصل مع المعرض مباشرة';
-  // Reviews
+  // Reviews — يُعاد رسم القائمة + نموذج الإضافة عبر محرك التقييمات
   document.getElementById('reviews-title-lbl').textContent = isFr ? '⭐ Avis clients' : '⭐ تقييمات الزبائن';
-  document.getElementById('rev-count-txt').textContent     = isFr ? '0 avis' : '0 تقييم';
-  document.getElementById('rev-score').textContent         = '—';
-  var _revList = document.getElementById('reviews-list');
-  if (_revList && !_revList.children.length) {
-    _revList.innerHTML = '<p style="color:#8a8474;font-size:13px;padding:12px 0">' + (isFr ? 'Aucun avis pour le moment.' : 'لا توجد تقييمات بعد.') + '</p>';
+  if(typeof window._rizqRenderShowroomReviews === 'function'){
+    window._rizqRenderShowroomReviews();
+  } else {
+    document.getElementById('rev-count-txt').textContent = isFr ? '0 avis' : '0 تقييم';
+    document.getElementById('rev-score').textContent = '—';
   }
   var _ss=document.getElementById('showroom-since'); if(_ss && !_ss.hasAttribute('data-acc')) _ss.textContent=isFr?'Membre —':'عضو —';
   var _sc2=document.getElementById('showroom-city'); if(_sc2&&!_sc2.hasAttribute('data-acc')) _sc2.textContent=isFr?'Nouakchott, Mauritanie':'نواكشوط، موريتانيا';
@@ -2094,6 +2096,150 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 <script>
 /* فيديو تعريفي — تركيب أولي + احتياط إن تأخّر applyAccountData */
 try { if(typeof mountShowroomIntroVideo === 'function') mountShowroomIntroVideo(); } catch(e){}
+</script>
+<script>
+/* ═══ تقييمات المعرض — عرض + نموذج إضافة للزائر (نماذج وحقيقي) ═══ */
+(function(){
+  function isFr(){ try{ return (localStorage.getItem('rizq_lang')||'ar')==='fr'; }catch(e){ return false; } }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function starsHTML(n){ var s=''; for(var i=1;i<=5;i++) s += (i<=n?'★':'☆'); return s; }
+  function timeAgo(iso, fr){
+    try{
+      var diffMs = Date.now() - new Date(iso).getTime();
+      var mins = Math.floor(diffMs/60000);
+      if(mins < 1)  return fr ? "à l'instant" : 'الآن';
+      if(mins < 60) return fr ? ('il y a '+mins+' min') : ('منذ '+mins+' دقيقة');
+      var hrs = Math.floor(mins/60);
+      if(hrs < 24)  return fr ? ('il y a '+hrs+'h') : ('منذ '+hrs+' ساعة');
+      var days = Math.floor(hrs/24);
+      if(days < 30) return fr ? ('il y a '+days+' j') : ('منذ '+days+' يوم');
+      var months = Math.floor(days/30);
+      if(months < 12) return fr ? ('il y a '+months+' mois') : ('منذ '+months+' شهر');
+      var years = Math.floor(months/12);
+      return fr ? ('il y a '+years+' an(s)') : ('منذ '+years+' سنة');
+    }catch(e){ return ''; }
+  }
+  function resolveShowroomTarget(){
+    try{
+      var p = new URLSearchParams(location.search);
+      var id = p.get('id') || p.get('corp') || p.get('showroom') || (typeof _showroomId !== 'undefined' ? _showroomId : '') || '';
+      var demo = !!(window._rizqShowroomIsDemo || p.get('demo') === '1'
+        || id === 'demo-corp-001' || id === 'demo_showroom' || /^demo/i.test(id) || /^acc_promo_/i.test(id));
+      if(!id && demo) id = 'demo-corp-001';
+      return id || null;
+    }catch(e){ return null; }
+  }
+  function render(){
+    var targetId = resolveShowroomTarget();
+    var fr = isFr();
+    var listEl = document.getElementById('reviews-list');
+    var scoreEl = document.getElementById('rev-score');
+    var countEl = document.getElementById('rev-count-txt');
+    var starsEl = document.querySelector('#reviews-section .showroom-reviews-stars');
+    var breakdown = document.getElementById('showroom-rating-breakdown');
+    if(!targetId || !window.RizqReviews){
+      if(scoreEl) scoreEl.textContent = '—';
+      if(countEl) countEl.textContent = fr ? '0 avis' : '0 تقييم';
+      if(listEl) listEl.innerHTML = '<p style="color:#8a8474;font-size:13px;padding:12px 0">'+(fr?'Aucun avis pour le moment.':'لا توجد تقييمات بعد.')+'</p>';
+      return;
+    }
+    window._rizqShowroomReviewsTarget = targetId;
+    var stats = RizqReviews.getStats(targetId);
+    var list = RizqReviews.getReviews(targetId);
+    if(scoreEl) scoreEl.textContent = stats.count ? String(stats.average) : '—';
+    if(countEl) countEl.textContent = stats.count ? (stats.count+(fr?' avis':' تقييم')) : (fr?'0 avis':'0 تقييم');
+    if(starsEl) starsEl.textContent = stats.count ? starsHTML(Math.round(stats.average)) : '☆☆☆☆☆';
+    if(breakdown){
+      var dist=[0,0,0,0,0];
+      list.forEach(function(r){ if(r.rating>=1&&r.rating<=5) dist[r.rating-1]++; });
+      var html='';
+      for(var star=5; star>=3; star--){
+        var cnt = dist[star-1];
+        var pct = stats.count ? Math.round(cnt/stats.count*100) : 0;
+        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+          + '<span style="font-size:12px;color:#8a8474;width:20px">'+star+'★</span>'
+          + '<div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:#F5A623;border-radius:4px"></div></div>'
+          + '<span style="font-size:12px;color:#8a8474">'+pct+'%</span></div>';
+      }
+      breakdown.innerHTML = html;
+    }
+    if(!listEl) return;
+    var listHtml = list.length ? list.map(function(r){
+      var name = r.reviewerName || (fr?'Client Rizq':'زبون رزق');
+      return '<div style="border:1px solid #e8edf3;border-radius:10px;padding:14px 16px;margin-bottom:12px;background:#fafbfd">'
+        + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+        + '<div style="width:38px;height:38px;border-radius:50%;background:#1B3A6B;color:#C9A84C;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0">'+esc(name.trim().charAt(0)||'👤')+'</div>'
+        + '<div><div style="font-weight:700;font-size:13px;color:#1a2535">'+esc(name)+'</div>'
+        + '<div style="font-size:11px;color:#8a9ab5">'+timeAgo(r.createdAt,fr)+'</div></div>'
+        + '<div style="margin-'+(fr?'left':'right')+':auto;color:#F5A623;font-size:14px">'+starsHTML(r.rating)+'</div>'
+        + '</div><div style="font-size:13px;color:#4a5a6a;line-height:1.6">'+esc(r.comment || (fr?'(Sans commentaire)':'(بدون تعليق)'))+'</div></div>';
+    }).join('') : ('<p style="font-size:13px;color:#6a7a8a;padding:8px 0">'+(fr?"Aucun avis pour l'instant — soyez le premier à évaluer ce showroom.":'لا توجد آراء حتى الآن — كن أول من يقيّم هذا المعرض.')+'</p>');
+    var starPicker = '<div id="sr-star-picker" style="display:flex;gap:5px;margin-bottom:10px;font-size:24px">'
+      + [1,2,3,4,5].map(function(n){ return '<span data-n="'+n+'" onclick="_rizqShowroomSetStar('+n+')" id="sr-star-'+n+'" style="cursor:pointer;color:rgba(13,27,42,.18)">★</span>'; }).join('')
+      + '</div>';
+    var formHtml = '<div style="margin-top:16px;padding-top:16px;border-top:1px solid #e0e8f0">'
+      + '<div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:10px">'+(fr?'✍️ Laisser un avis':'✍️ أضف تقييمك')+'</div>'
+      + '<div id="sr-review-msg" style="font-size:12px;margin-bottom:8px"></div>'
+      + starPicker
+      + '<input type="text" id="sr-review-name" maxlength="60" placeholder="'+(fr?'Votre nom (optionnel)':'اسمك (اختياري)')+'" style="width:100%;padding:10px 12px;border:1px solid #e0e8f0;border-radius:8px;font-size:13px;margin-bottom:8px;font-family:inherit;box-sizing:border-box">'
+      + '<textarea id="sr-review-comment" maxlength="500" rows="3" placeholder="'+(fr?'Votre commentaire...':'اكتب تعليقك...')+'" style="width:100%;padding:10px 12px;border:1px solid #e0e8f0;border-radius:8px;font-size:13px;margin-bottom:10px;font-family:inherit;resize:vertical;box-sizing:border-box"></textarea>'
+      + '<button type="button" onclick="_rizqShowroomSubmitReview()" style="width:100%;padding:12px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);color:#fff;border:none;border-radius:8px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit">'+(fr?'Envoyer mon avis':'إرسال التقييم')+'</button>'
+      + '</div>';
+    listEl.innerHTML = listHtml + formHtml;
+  }
+  window._rizqShowroomSetStar = function(n){
+    window._rizqShowroomSelectedStars = n;
+    for(var i=1;i<=5;i++){
+      var el = document.getElementById('sr-star-'+i);
+      if(el) el.style.color = i<=n ? '#F5A623' : 'rgba(13,27,42,.18)';
+    }
+  };
+  window._rizqShowroomSubmitReview = function(){
+    var fr = isFr();
+    var targetId = window._rizqShowroomReviewsTarget || resolveShowroomTarget();
+    var msgEl = document.getElementById('sr-review-msg');
+    if(!targetId || !window.RizqReviews) return;
+    var rating = window._rizqShowroomSelectedStars || 0;
+    var nameEl = document.getElementById('sr-review-name');
+    var commentEl = document.getElementById('sr-review-comment');
+    var res = RizqReviews.addReview(targetId, {
+      rating: rating,
+      comment: commentEl ? commentEl.value : '',
+      reviewerName: nameEl ? nameEl.value : ''
+    });
+    if(!res.ok){
+      var errs = {
+        invalid_rating: fr ? 'Merci de choisir une note entre 1 et 5 étoiles.' : 'الرجاء اختيار تقييم بين 1 و5 نجوم.',
+        already_reviewed: fr ? 'Vous avez déjà évalué ce showroom depuis cet appareil.' : 'لقد سبق أن قيّمت هذا المعرض من هذا الجهاز.',
+        invalid_target: fr ? "Impossible d'identifier ce showroom." : 'تعذر تحديد هذا المعرض.'
+      };
+      if(msgEl){ msgEl.textContent = errs[res.error] || (fr?'Une erreur est survenue.':'حدث خطأ ما.'); msgEl.style.color='#dc2626'; }
+      return;
+    }
+    if(typeof showToast==='function') showToast(fr?'✅ Merci pour votre avis !':'✅ شكراً على تقييمك!');
+    try{
+      if(typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE){
+        fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/reviews', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ targetId: targetId, rating: rating, comment: commentEl?commentEl.value:'', reviewerName: nameEl?nameEl.value:'' })
+        }).catch(function(){});
+      }
+    }catch(e){}
+    window._rizqShowroomSelectedStars = 0;
+    render();
+  };
+  window._rizqRenderShowroomReviews = render;
+  function boot(){
+    if(window.RizqReviews){ render(); return; }
+    var tries = 0;
+    var t = setInterval(function(){
+      tries++;
+      if(window.RizqReviews || tries > 40){ clearInterval(t); render(); }
+    }, 50);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
 </script>
 </body>
 </html>

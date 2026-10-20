@@ -2019,11 +2019,12 @@ function rizqShare(title, url) {
     function resolveStoreAccount(){
       try{
         var params = new URLSearchParams(location.search);
-        var id = params.get('id') || params.get('store') || '';
-        if(!id) return null;
-        var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
-        var acc = accs.find(function(a){ return a.id === id && a.status === 'approved' && a.type === 'store'; });
-        return acc ? id : null;
+        var id = params.get('id') || params.get('store') || window._rizqStoreAccountId || '';
+        var demo = !!(window._rizqStoreIsDemo || params.get('demo') === '1'
+          || id === 'demo_store' || /^demo/i.test(id) || /^acc_promo_/i.test(id));
+        if(!id && demo) id = 'demo_store';
+        /* أي صفحة محل عامة (?id=) قابلة للتقييم — نماذج + حساب حقيقي */
+        return id || null;
       }catch(e){ return null; }
     }
 
@@ -2474,6 +2475,7 @@ function rizqShare(title, url) {
       if(oldRib) oldRib.remove();
       /* أبقِ ?demo=1 لربط صفحة المنتجات وإظهار كل الخدمات */
       try{ history.replaceState(null, '', 'rizq_store.html?demo=1&id=demo_store'); }catch(e2){}
+      if(typeof window._rizqRenderStoreReviews === 'function') window._rizqRenderStoreReviews();
       return acc;
     }
 

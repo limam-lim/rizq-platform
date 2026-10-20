@@ -938,7 +938,11 @@ var _lang = (function(){try{return localStorage.getItem('rizq_lang')||'ar';}catc
 var RIZQ_CORP_ID = (function(){
   try{
     var p = new URLSearchParams(location.search);
-    return p.get('id') || p.get('corp') || '';
+    var id = p.get('id') || p.get('corp') || '';
+    if(!id && (p.get('demo') === '1' || /\/demo(?:\/|$)/i.test(location.pathname||''))){
+      id = 'demo-corp-001';
+    }
+    return id;
   }catch(e){ return ''; }
 })();
 var RIZQ_CORP_ACCOUNT = (function(){
@@ -1204,9 +1208,16 @@ function _applyCorpLang(lang){
 
 function _renderCorpReviews(lang){
   var isFr = lang==='fr';
-
-  // تقييمات حقيقية فقط — لا بطاقات تجريبية وهمية عند غياب الحساب
-  if(typeof RIZQ_CORP_ID !== 'undefined' && RIZQ_CORP_ID && window.RizqReviews){
+  var id = (typeof RIZQ_CORP_ID !== 'undefined' && RIZQ_CORP_ID) ? RIZQ_CORP_ID : '';
+  if(!id){
+    try{
+      var p = new URLSearchParams(location.search);
+      id = p.get('id') || p.get('corp') || '';
+      if(!id && p.get('demo') === '1') id = 'demo-corp-001';
+    }catch(e0){}
+  }
+  if(id && window.RizqReviews){
+    RIZQ_CORP_ID = id;
     _renderCorpRealReviews(isFr);
     return;
   }

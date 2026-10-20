@@ -1839,11 +1839,12 @@ function openMaps(){
     function resolveOfficeAccount(){
       try{
         var params = new URLSearchParams(location.search);
-        var id = params.get('id') || params.get('office') || '';
-        if(!id) return null;
-        var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
-        var acc = accs.find(function(a){ return a.id === id && a.status === 'approved' && a.type === 'office'; });
-        return acc ? id : null;
+        var id = params.get('id') || params.get('office') || window._rizqOfficeAccountId || '';
+        var demo = !!(window._rizqOfficeIsDemo || params.get('demo') === '1'
+          || id === 'demo_law' || /^demo/i.test(id) || /^acc_promo_/i.test(id));
+        if(!id && demo) id = 'demo_law';
+        /* أي صفحة مكتب عامة (?id=) قابلة للتقييم — نماذج + حساب حقيقي */
+        return id || null;
       }catch(e){ return null; }
     }
 
@@ -2244,6 +2245,7 @@ function openMaps(){
           applyDemoLawOffice();
           id = DEMO_LAW_ID;
           try{ history.replaceState(null, '', 'rizq_office.html?demo=1&id=demo_law'); }catch(eHist){}
+          if(typeof window._rizqRenderOfficeReviews === 'function') window._rizqRenderOfficeReviews();
           var oldRib = document.getElementById('rizq-demo-ribbon');
           if(oldRib) oldRib.remove();
         }
