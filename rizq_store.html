@@ -908,14 +908,28 @@ footer{
 }
 
 @media(max-width:800px){
+  /* رحلة الجوال: منتجات → تعريف → موقع → ساعات → استفسار → دفع → تقييمات */
   .content-grid{
     grid-template-columns:1fr;
-    /* على الهاتف: المنتجات أولاً ثم الموقع */
-    grid-template-areas:"main" "side";
+    grid-template-areas:none;
+    display:flex;
+    flex-direction:column;
     gap:18px;
   }
+  .content-grid > aside#info-section,
+  .content-grid > .store-main-col,
+  #store-under-band{display:contents}
   .content-grid > aside#info-section{position:static;width:100%;max-width:100%}
-  .content-grid > .store-main-col > main{padding:14px;border-radius:16px;width:100%;max-width:100%;overflow:visible}
+  .content-grid > .store-main-col > main{
+    order:1;
+    padding:14px;border-radius:16px;width:100%;max-width:100%;overflow:visible
+  }
+  #about-section{order:2}
+  #store-location-card{order:3}
+  #hours-card-el{order:4}
+  #store-service-desk{order:5}
+  #store-delivery-card{order:6}
+  #reviews-section{order:7}
   #store-packages{padding:40px 4%!important;overflow:visible}
   #store-packages-grid{overflow:visible!important}
   .store-hero{height:auto;min-height:0!important;padding:0;overflow:hidden}
@@ -1405,7 +1419,7 @@ footer{
       </div>
 
       <!-- Location -->
-      <div class="info-card">
+      <div class="info-card" id="store-location-card">
         <div class="info-card-title" data-t="info-title-location">📍 الموقع والتواصل</div>
         <div class="info-row">
           <span class="info-icon">🏠</span>
@@ -1444,7 +1458,7 @@ footer{
       </div>
 
       <!-- Delivery -->
-      <div class="info-card">
+      <div class="info-card" id="store-delivery-card">
         <div class="info-card-title" data-t="info-title-delivery">🚚 خيارات التسليم</div>
         <div class="delivery-opts">
           <div class="delivery-opt selected" id="dopt-delivery" onclick="selectDelivery('delivery')">
@@ -1609,7 +1623,7 @@ footer{
 </section>
 
 <!-- ══ باقات المحلات ══ -->
-<section id="store-packages" style="padding:70px 5%;background:#f7f9fc;border-top:1px solid #e7ecf3">
+<section id="store-packages" style="display:none;padding:70px 5%;background:#f7f9fc;border-top:1px solid #e7ecf3">
   <div style="max-width:1380px;margin:0 auto">
     <div class="portal-pkg-head" style="text-align:center;margin-bottom:42px">
       <p style="font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;text-transform:uppercase;margin-bottom:8px" data-t="pkg-eyebrow">Rizq Stores — الباقات</p>
@@ -2019,11 +2033,12 @@ function rizqShare(title, url) {
     function resolveStoreAccount(){
       try{
         var params = new URLSearchParams(location.search);
-        var id = params.get('id') || params.get('store') || '';
-        if(!id) return null;
-        var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
-        var acc = accs.find(function(a){ return a.id === id && a.status === 'approved' && a.type === 'store'; });
-        return acc ? id : null;
+        var id = params.get('id') || params.get('store') || window._rizqStoreAccountId || '';
+        var demo = !!(window._rizqStoreIsDemo || params.get('demo') === '1'
+          || id === 'demo_store' || /^demo/i.test(id) || /^acc_promo_/i.test(id));
+        if(!id && demo) id = 'demo_store';
+        /* أي صفحة محل عامة (?id=) قابلة للتقييم — نماذج + حساب حقيقي */
+        return id || null;
       }catch(e){ return null; }
     }
 
@@ -2170,7 +2185,15 @@ function rizqShare(title, url) {
 
     function renderStorePaymentMethods(acc){
       var box = document.getElementById('store-payment-methods');
-      if(!box || typeof RizqAccountPayments === 'undefined') return;
+      if(!box) return;
+      if(Array.isArray(acc && acc.paymentMethods)) window._rizqStorePaymentMethods = acc.paymentMethods;
+      /* طرق الدفع التفصيلية للسلة فقط — لا على واجهة المحل */
+      if(window.RizqSubscriptionPermissions && !RizqSubscriptionPermissions.shouldShowStorefrontPayments()){
+        box.style.display = 'none';
+        box.innerHTML = '';
+        return;
+      }
+      if(typeof RizqAccountPayments === 'undefined') return;
       RizqAccountPayments.renderPublic(box, acc && acc.paymentMethods, { fr: isFr() });
     }
 
@@ -2466,6 +2489,7 @@ function rizqShare(title, url) {
       if(oldRib) oldRib.remove();
       /* أبقِ ?demo=1 لربط صفحة المنتجات وإظهار كل الخدمات */
       try{ history.replaceState(null, '', 'rizq_store.html?demo=1&id=demo_store'); }catch(e2){}
+      if(typeof window._rizqRenderStoreReviews === 'function') window._rizqRenderStoreReviews();
       return acc;
     }
 
@@ -2677,19 +2701,26 @@ function rizqShare(title, url) {
         }
         window._rizqStoreProfile = acc;
 
-        // باقات اشتراك المنصة تختفي من صفحة المحل الحقيقي فقط.
-        // نماذج المعاينة (?demo / demo_store / acc_promo_*): كل الخدمات ظاهرة بدون استثناء.
+        // باقات المنصة للنماذج فقط — المحل الحقيقي صفحة نقية (منتجات + هوية).
         (function hidePlatformUpsellOnBoundStore(){
-          if(window._rizqStoreIsDemo || id === 'demo_store' || isStorePreviewPortal(id, params)){
-            var pkgDemo = document.getElementById('store-packages');
-            if(pkgDemo) pkgDemo.style.display = '';
-            return;
+          var isPreview = !!(window._rizqStoreIsDemo || id === 'demo_store' || isStorePreviewPortal(id, params));
+          if(window.RizqSubscriptionPermissions && typeof RizqSubscriptionPermissions.applyPublicMerchantSurface === 'function'){
+            RizqSubscriptionPermissions.applyPublicMerchantSurface({
+              accountId: id,
+              isDemo: isPreview,
+              packageIds: ['store-packages'],
+              paymentIds: ['store-payment-methods'],
+              hideListingPrefacture: true
+            });
+          } else {
+            var pkg = document.getElementById('store-packages');
+            if(pkg) pkg.style.display = isPreview ? '' : 'none';
           }
-          var pkg = document.getElementById('store-packages');
-          if(pkg) pkg.style.display = 'none';
-          document.querySelectorAll('.rizq-promo-card, .promo-card, [data-t="store-promo"]').forEach(function(el){
-            el.style.display = 'none';
-          });
+          if(!isPreview){
+            document.querySelectorAll('.rizq-promo-card, .promo-card, [data-t="store-promo"]').forEach(function(el){
+              el.style.display = 'none';
+            });
+          }
         })();
 
         // ── الهوية الأساسية ──
@@ -2847,8 +2878,17 @@ function rizqShare(title, url) {
                 var fr = isFr();
                 var emptyBannerApi = document.getElementById('store-empty-banner');
                 if(emptyBannerApi) emptyBannerApi.style.display = 'none';
-                /* لا نخفي باقات المعاينة — فقط الحسابات الحقيقية */
-                if(!(window._rizqStoreIsDemo || id === 'demo_store' || /^acc_promo_/.test(id))){
+                /* باقات المعاينة فقط — الحساب الحقيقي بدون باقات ولا طرق دفع على الواجهة */
+                var apiIsDemo = !!(window._rizqStoreIsDemo || id === 'demo_store' || /^acc_promo_/.test(id));
+                if(window.RizqSubscriptionPermissions && typeof RizqSubscriptionPermissions.applyPublicMerchantSurface === 'function'){
+                  RizqSubscriptionPermissions.applyPublicMerchantSurface({
+                    accountId: id,
+                    isDemo: apiIsDemo,
+                    packageIds: ['store-packages'],
+                    paymentIds: ['store-payment-methods'],
+                    hideListingPrefacture: true
+                  });
+                } else if(!apiIsDemo){
                   var pkgHide = document.getElementById('store-packages');
                   if(pkgHide) pkgHide.style.display = 'none';
                 }
@@ -2870,9 +2910,6 @@ function rizqShare(title, url) {
                   var ve=document.getElementById('badge-verified-lbl'); if(ve) ve.style.display=b.verified?'':'none';
                   var pe=document.getElementById('premium-badge-lbl'); if(pe) pe.style.display=b.premium?'':'none';
                   var vpe=document.getElementById('verified-plus-badge-lbl'); if(vpe) vpe.style.display=b.verifiedPlus?'inline-flex':'none';
-                }
-                if(typeof RizqAccountPayments !== 'undefined'){
-                  RizqAccountPayments.renderPublic(document.getElementById('store-payment-methods'), acc.paymentMethods, { fr: isFr() });
                 }
                 window._rizqStoreAccountId = id;
                 if(acc.serviceDesk) window._rizqStoreServiceDesk = acc.serviceDesk;

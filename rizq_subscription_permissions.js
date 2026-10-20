@@ -153,11 +153,89 @@
     });
   }
 
+  /**
+   * باقات اشتراك المنصة: للنماذج/المعاينة فقط (قبل اشتراك التاجر).
+   * صفحة محل/مكتب/معرض/وكالة حقيقية = بدون باقات.
+   */
+  function shouldShowPlatformPackages(accountId, opts) {
+    return isDemoPage({ accountId: accountId, isDemo: !!(opts && (opts.isDemo || opts.forceDemo)) });
+  }
+
+  /**
+   * تفاصيل طرق دفع التاجر لا تُعرض على الواجهة العامة —
+   * تظهر عند مرحلة الدفع (سلة / تأكيد طلب).
+   */
+  function shouldShowStorefrontPayments() {
+    return false;
+  }
+
+  /**
+   * PREFACTUR على بطاقات المنتجات/الخدمات: لا —
+   * الفاتورة جزء من رحلة الدفع فقط.
+   */
+  function shouldShowListingPrefacture() {
+    return false;
+  }
+
+  /**
+   * فاتورة السلة: بعد اختيار تحويل بنكي أو استلام من المحل أو توصيل.
+   */
+  function shouldShowCheckoutPrefacture(ctx) {
+    ctx = ctx || {};
+    var pay = String(ctx.paymentMethod || '');
+    var del = String(ctx.deliveryType || '');
+    return pay === 'bank' || del === 'pickup' || del === 'delivery';
+  }
+
+  /**
+   * يطبّق سياسة السطح العام: باقات / طرق دفع الواجهة / أزرار فاتورة البطاقات.
+   * opts: { accountId, isDemo, packageIds[], paymentIds[], hideListingPrefacture?, prefactureRoot? }
+   */
+  function applyPublicMerchantSurface(opts) {
+    opts = opts || {};
+    var accountId = opts.accountId || '';
+    var showPkg = shouldShowPlatformPackages(accountId, opts);
+    var showPay = shouldShowStorefrontPayments();
+    (opts.packageIds || []).forEach(function (id) {
+      var el = typeof id === 'string' ? document.getElementById(id) : id;
+      if (el) el.style.display = showPkg ? '' : 'none';
+    });
+    (opts.paymentIds || []).forEach(function (id) {
+      var el = typeof id === 'string' ? document.getElementById(id) : id;
+      if (!el) return;
+      if (!showPay) {
+        el.style.display = 'none';
+        try { el.innerHTML = ''; } catch (eClr) {}
+      }
+    });
+    if (opts.hideListingPrefacture !== false && !shouldShowListingPrefacture()) {
+      var root = opts.prefactureRoot || document;
+      try {
+        root.querySelectorAll('.rizq-prf-trigger, .rizq-prf-trigger-gold').forEach(function (btn) {
+          if (!btn || btn.id === 'cart-prefacture-btn') return;
+          if (btn.closest && btn.closest('#cart-content, .cart-aside, #cart-summary, aside.summary')) return;
+          /* أزرار مكتب الخدمة تُدار محلياً إن وُجد اختيار دفع */
+          if (btn.id === 'calc-prf-btn' || btn.id === 'req-prf-btn') return;
+          btn.style.display = 'none';
+          btn.setAttribute('hidden', 'hidden');
+          btn.setAttribute('aria-hidden', 'true');
+        });
+      } catch (ePrf) {}
+    }
+    return { showPackages: showPkg, showStorefrontPayments: showPay };
+  }
+
   global.RizqSubscriptionPermissions = {
     useSubscriptionPermissions: useSubscriptionPermissions,
     isDemoPage: isDemoPage,
+    isDemoAccountId: isDemoAccountId,
     isViewerLoggedIn: isViewerLoggedIn,
-    disableFormsAndShowUpgradeBanner: disableFormsAndShowUpgradeBanner
+    disableFormsAndShowUpgradeBanner: disableFormsAndShowUpgradeBanner,
+    shouldShowPlatformPackages: shouldShowPlatformPackages,
+    shouldShowStorefrontPayments: shouldShowStorefrontPayments,
+    shouldShowListingPrefacture: shouldShowListingPrefacture,
+    shouldShowCheckoutPrefacture: shouldShowCheckoutPrefacture,
+    applyPublicMerchantSurface: applyPublicMerchantSurface
   };
   global.useSubscriptionPermissions = useSubscriptionPermissions;
 })(typeof window !== 'undefined' ? window : this);

@@ -470,6 +470,7 @@ main, .page-content.active, .main-content, .results-area,
 </style>
   
   <script src="rizq_backend_config.js"></script>
+  <script src="rizq_subscription_permissions.js"></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
   <script src="rizq_store_commerce.js?v=29.1" defer></script>
   <script src="rizq_stock.js" defer></script>
@@ -739,7 +740,7 @@ main, .page-content.active, .main-content, .results-area,
       </p>
     </div>
 
-    <button type="button" class="order-btn rizq-prf-trigger-gold" id="cart-prefacture-btn" onclick="issueCartPrefacture()" style="width:100%;margin-bottom:10px;border:none;cursor:pointer;font-family:inherit">
+    <button type="button" class="order-btn rizq-prf-trigger-gold" id="cart-prefacture-btn" onclick="issueCartPrefacture()" style="width:100%;margin-bottom:10px;border:none;cursor:pointer;font-family:inherit;display:none" hidden>
       <span data-t-fr="PREFACTUR · Voir avant paiement">PREFACTUR · فاتورة قبل الدفع</span>
     </button>
 
@@ -1298,6 +1299,22 @@ function clearCart() {
   showToast(isAr ? '🗑 تم مسح السلة' : '🗑 Panier vidé');
 }
 
+function syncCartPrefactureVisibility(){
+  var btn = document.getElementById('cart-prefacture-btn');
+  if(!btn) return;
+  var show = true;
+  if(window.RizqSubscriptionPermissions && typeof RizqSubscriptionPermissions.shouldShowCheckoutPrefacture === 'function'){
+    show = !!RizqSubscriptionPermissions.shouldShowCheckoutPrefacture({
+      paymentMethod: paymentMethod,
+      deliveryType: deliveryType
+    });
+  } else {
+    show = paymentMethod === 'bank' || deliveryType === 'pickup' || deliveryType === 'delivery';
+  }
+  btn.style.display = show ? '' : 'none';
+  if(show) btn.removeAttribute('hidden'); else btn.setAttribute('hidden', 'hidden');
+}
+
 function selectDelivery(type) {
   deliveryType = type;
   ['delivery','pickup'].forEach(t => {
@@ -1308,6 +1325,7 @@ function selectDelivery(type) {
   if (addrSection) addrSection.style.display = type === 'delivery' ? 'block' : 'none';
   updateSummary();
   buildWALink();
+  syncCartPrefactureVisibility();
 }
 
 function selectPayment(method) {
@@ -1328,6 +1346,7 @@ function selectPayment(method) {
       box.style.display = 'none';
     }
   }
+  syncCartPrefactureVisibility();
 }
 
 function _demoCartPayments(){
@@ -1691,6 +1710,7 @@ function showToast(msg) {
 
 // INIT
 renderCart();
+try{ syncCartPrefactureVisibility(); }catch(ePref0){}
 
 // Handle empty cart on load
 document.addEventListener('DOMContentLoaded', () => {
@@ -1699,6 +1719,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('cart-content').style.display = 'none';
   }
   try { autofillDeliveryFromAccount(); } catch (eFill) {}
+  try{ syncCartPrefactureVisibility(); }catch(ePref1){}
 });
 </script>
 

@@ -480,6 +480,7 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
   <script src="rizq_announcements.js" defer></script>
   <script src="rizq_reviews_engine.js" defer></script>
   <script src="rizq_subscription_engine.js" defer></script>
+  <script src="rizq_subscription_permissions.js" defer></script>
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_terms_gate.js" defer></script>
   <script src="rizq_pwa.js" defer></script>
@@ -806,8 +807,8 @@ input[type="tel"],[data-phone]{direction:ltr!important;text-align:left!important
   </div>
 </div>
 
-<!-- PACKAGES SECTION -->
-<section class="pkg-section" id="corp-packages">
+<!-- PACKAGES SECTION — نماذج المعاينة فقط؛ تُخفى عن المعرض الحقيقي -->
+<section class="pkg-section" id="corp-packages" style="display:none">
   <div class="pkg-inner">
     <div style="text-align:center;margin-bottom:42px">
       <p style="font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;text-transform:uppercase;margin-bottom:8px" id="pkg-label">Rizq Corp — الباقات</p>
@@ -937,7 +938,11 @@ var _lang = (function(){try{return localStorage.getItem('rizq_lang')||'ar';}catc
 var RIZQ_CORP_ID = (function(){
   try{
     var p = new URLSearchParams(location.search);
-    return p.get('id') || p.get('corp') || '';
+    var id = p.get('id') || p.get('corp') || '';
+    if(!id && (p.get('demo') === '1' || /\/demo(?:\/|$)/i.test(location.pathname||''))){
+      id = 'demo-corp-001';
+    }
+    return id;
   }catch(e){ return ''; }
 })();
 var RIZQ_CORP_ACCOUNT = (function(){
@@ -1203,9 +1208,16 @@ function _applyCorpLang(lang){
 
 function _renderCorpReviews(lang){
   var isFr = lang==='fr';
-
-  // تقييمات حقيقية فقط — لا بطاقات تجريبية وهمية عند غياب الحساب
-  if(typeof RIZQ_CORP_ID !== 'undefined' && RIZQ_CORP_ID && window.RizqReviews){
+  var id = (typeof RIZQ_CORP_ID !== 'undefined' && RIZQ_CORP_ID) ? RIZQ_CORP_ID : '';
+  if(!id){
+    try{
+      var p = new URLSearchParams(location.search);
+      id = p.get('id') || p.get('corp') || '';
+      if(!id && p.get('demo') === '1') id = 'demo-corp-001';
+    }catch(e0){}
+  }
+  if(id && window.RizqReviews){
+    RIZQ_CORP_ID = id;
     _renderCorpRealReviews(isFr);
     return;
   }
@@ -1394,7 +1406,6 @@ function renderCorpItems(items){
       + '<div class="item-cat">' + _corpEsc(_corpCatLabel(it.cat)) + '</div>'
       + '<div class="item-price-row"><span class="item-price">' + _corpEsc(priceTxt) + '</span>'
       + '<button class="contact-item-btn" onclick="event.stopPropagation();openCorpItemDetail(\'' + _corpEsc(iid).replace(/'/g,"\\'") + '\')">' + (isFr?'👁 Fiche':'👁 تفاصيل') + '</button></div>'
-      + '<button type="button" class="rizq-prf-trigger" style="width:100%;margin-top:8px" onclick="event.stopPropagation();issueCorpPrefacture(\'' + _corpEsc(iid).replace(/'/g,"\\'") + '\')">PREFACTUR</button>'
       + '</div></div>';
   }).join('');
   try { window._corpItemsCache = items; } catch (e) {}
@@ -1411,6 +1422,20 @@ function rebuildCorpCatTabs(cats){
   function apply(){
     var acc = (typeof RIZQ_CORP_ACCOUNT !== 'undefined') ? RIZQ_CORP_ACCOUNT : null;
     var id  = (typeof RIZQ_CORP_ID !== 'undefined') ? RIZQ_CORP_ID : '';
+    var corpDemo = !!(id === 'demo-corp-001' || /^demo/i.test(String(id||'')) || /^acc_promo_/.test(String(id||'')) || /[?&]demo=1\b/.test(location.search));
+    window._rizqCorpIsDemo = corpDemo;
+    if(window.RizqSubscriptionPermissions && typeof RizqSubscriptionPermissions.applyPublicMerchantSurface === 'function'){
+      RizqSubscriptionPermissions.applyPublicMerchantSurface({
+        accountId: id,
+        isDemo: corpDemo,
+        packageIds: ['corp-packages'],
+        hideListingPrefacture: true,
+        prefactureRoot: document.getElementById('items-grid') || document
+      });
+    } else {
+      var pkgBoot = document.getElementById('corp-packages');
+      if(pkgBoot) pkgBoot.style.display = corpDemo ? '' : 'none';
+    }
 
     if(acc && id){
       // ── الهوية الأساسية ──
@@ -1634,7 +1659,6 @@ function rebuildCorpCatTabs(cats){
                 + '<div class="item-cat">'+esc(typeof _corpCatLabel==='function'?_corpCatLabel(p.cat||''):(p.cat||''))+'</div>'
                 + '<div class="item-price-row"><span class="item-price">'+priceTxt+'</span>'
                 + '<button class="contact-item-btn" onclick="event.stopPropagation();openCorpItemDetail(\''+esc(iid).replace(/'/g,"\\'")+'\')">'+(frUi?'👁 Fiche':'👁 تفاصيل')+'</button></div>'
-                + '<button type="button" class="rizq-prf-trigger" style="width:100%;margin-top:8px" onclick="event.stopPropagation();issueCorpPrefacture(\''+esc(iid).replace(/'/g,"\\'")+'\')">PREFACTUR</button>'
                 + '</div></div>';
             });
             if(addedHtml){
@@ -1964,6 +1988,20 @@ window.mountCorpIntroVideo = function(url, accHint){
     if(!window.RizqIntroVideo) return;
     var fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr';
     var isDemo = !!(corpId === 'demo-corp-001' || /^demo/i.test(corpId) || /^acc_promo_/.test(corpId) || new URLSearchParams(location.search).get('demo') === '1');
+    window._rizqCorpIsDemo = isDemo;
+    if(window.RizqSubscriptionPermissions && typeof RizqSubscriptionPermissions.applyPublicMerchantSurface === 'function'){
+      RizqSubscriptionPermissions.applyPublicMerchantSurface({
+        accountId: corpId,
+        isDemo: isDemo,
+        packageIds: ['corp-packages'],
+        paymentIds: [],
+        hideListingPrefacture: true,
+        prefactureRoot: document.getElementById('items-grid') || document
+      });
+    } else {
+      var pkgEl = document.getElementById('corp-packages');
+      if(pkgEl) pkgEl.style.display = isDemo ? '' : 'none';
+    }
     var acc = accHint || (typeof RIZQ_CORP_ACCOUNT !== 'undefined' && RIZQ_CORP_ACCOUNT) || {};
     var dashUrl = (RizqIntroVideo.demoDashboardVideo && RizqIntroVideo.demoDashboardVideo('corp')) || '';
     var introUrl = String((isDemo ? (dashUrl || url || acc.promo_video) : (url || acc.promo_video || dashUrl)) || '').trim();

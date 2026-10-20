@@ -288,13 +288,10 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 .info-card{background:#fff;border-radius:var(--radius);padding:20px;border:1px solid #ece3d1;border-top:3px solid var(--gold);box-shadow:0 14px 32px rgba(27,58,107,.1)}
 .info-card-title{font-size:12.5px;font-weight:800;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:1px}
 
-/* غرفة الطلبات + التقييمات — شريط أفقي تحت الكتالوج بنفس ترتيب المحل */
+/* غرفة الطلبات تحت الكتالوج — التقييمات قسم منفصل أسفل معلومات المعرض */
 .showroom-under-band{
-  display:grid;
-  grid-template-columns:1.08fr 0.92fr;
-  gap:12px;
+  display:block;
   margin:20px 0 8px;
-  align-items:stretch;
   width:100%;
   min-width:0;
   box-sizing:border-box;
@@ -313,7 +310,6 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   box-shadow:none;
   border:1px solid rgba(27,58,107,.08);
   background:#fff;
-  height:100%;
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
@@ -354,18 +350,19 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   background:linear-gradient(135deg,#0D1B2A,#1B3A6B);color:#fff;font-weight:800;font-size:12.5px;
   cursor:pointer;font-family:inherit;min-height:48px
 }
-#reviews-section.showroom-reviews-hz{
-  margin:0;
-  padding:12px 12px 10px;
+#reviews-section.showroom-reviews-below{
+  margin:20px 0 8px;
+  padding:18px 16px 14px;
   background:#fff;
   border:1px solid rgba(27,58,107,.08);
-  border-radius:14px;
-  box-shadow:none;
-  height:100%;
+  border-radius:16px;
+  border-top:3px solid var(--gold);
+  box-shadow:0 12px 32px rgba(15,35,65,.06);
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
   min-width:0;
+  width:100%;
 }
 #reviews-section .showroom-reviews-inner{
   background:transparent!important;border:none!important;border-radius:0!important;
@@ -373,17 +370,17 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   display:flex;flex-direction:column;
 }
 #reviews-section .showroom-reviews-summary{
-  display:flex;align-items:flex-start;gap:12px;margin-bottom:8px;flex-wrap:wrap
+  display:flex;align-items:flex-start;gap:16px;margin-bottom:12px;flex-wrap:wrap
 }
-#reviews-section .showroom-reviews-score{text-align:center;min-width:72px}
-#reviews-section #rev-score{font-size:28px;font-weight:900;color:var(--navy);line-height:1}
-#reviews-section .showroom-reviews-stars{color:#F5A623;font-size:14px;margin:3px 0}
-#reviews-section #rev-count-txt{font-size:11px;color:#6a7a8a}
+#reviews-section .showroom-reviews-score{text-align:center;min-width:88px}
+#reviews-section #rev-score{font-size:36px;font-weight:900;color:var(--navy);line-height:1}
+#reviews-section .showroom-reviews-stars{color:#F5A623;font-size:16px;margin:3px 0}
+#reviews-section #rev-count-txt{font-size:12px;color:#6a7a8a}
 #reviews-section #reviews-list{flex:1 1 auto}
 @media(max-width:800px){
-  .showroom-under-band{grid-template-columns:1fr;gap:12px;padding:12px;border-radius:16px}
+  .showroom-under-band{padding:12px;border-radius:16px}
   #showroom-service-desk.showroom-desk-hz,
-  #reviews-section.showroom-reviews-hz{padding:12px 10px 10px;border-radius:12px}
+  #reviews-section.showroom-reviews-below{padding:12px 10px 10px;border-radius:12px}
   .showroom-desk-form{grid-template-columns:1fr}
   .showroom-desk-span2{grid-column:auto}
   .showroom-desk-actions{grid-template-columns:1fr}
@@ -695,7 +692,77 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
         </div>
       </div>
 
-    <!-- غرفة الطلبات + التقييمات — أفقيان تحت الكتالوج بنفس ترتيب المحل -->
+  <!-- رحلة الواجهة: كتالوج → تعريف → موقع → ساعات → استفسار → دفع → تقييمات -->
+  <div class="visit-strip" id="info-section">
+
+      <!-- About — الفيديو التعريفي يعيش هنا مع نص «عن المعرض» -->
+      <div class="info-card" id="about-section">
+        <div class="info-card-title" id="about-title-lbl">📖 عن المعرض</div>
+        <div style="font-size:13px;color:#4a5364;line-height:1.75" id="about-text">
+          معرض متخصص في بيع وعرض السيارات والمعدات والإلكترونيات — جميع المعروضات موثّقة ومفحوصة ومصحوبة بضمان.
+        </div>
+        <section class="video-intro-section" id="video-intro-section" style="display:none" aria-label="فيديو تعريفي">
+          <div id="intro-video-mount"></div>
+        </section>
+        <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap" id="tags-container">
+          <span style="background:#eef2ff;color:#3730a3;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">🚗 سيارات</span>
+          <span style="background:#fff7ed;color:#c2410c;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">💻 إلكترونيات</span>
+          <span style="background:#f0fdf4;color:#15803d;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">🛋️ أثاث</span>
+          <span style="background:#fdf4ff;color:#7e22ce;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">⚙️ معدات</span>
+        </div>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="info-card" id="showroom-location-card">
+        <div class="info-card-title" id="info-card-title1">📍 الموقع والتواصل</div>
+        <div class="info-row">
+          <span class="info-icon">🏠</span>
+          <div>
+            <div class="info-label" id="info-label-addr">العنوان</div>
+            <div class="info-value" id="info-address">حي التوجين، شارع الاستقلال — نواكشوط</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <span class="info-icon">📞</span>
+          <div>
+            <div class="info-label" id="info-label-phone">الهاتف وواتساب</div>
+            <div class="info-value"><span dir="ltr" style="direction:ltr;unicode-bidi:isolate;display:inline-block" id="info-phone">+222 44 00 00 00</span></div>
+          </div>
+        </div>
+        <div class="info-row">
+          <span class="info-icon">📧</span>
+          <div>
+            <div class="info-label" id="info-label-email">البريد الإلكتروني</div>
+            <div class="info-value" id="info-email">showroom@rizq.mr</div>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <div class="map-placeholder" id="showroom-map-preview" onclick="openMaps()" role="button" tabindex="0" aria-label="عرض على الخريطة">
+            <div class="map-icon">🗺️</div>
+            <div class="map-text" id="map-text-lbl">عرض على الخريطة</div>
+            <div class="map-addr" id="info-city-lbl">نواكشوط، موريتانيا</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hours -->
+      <div class="info-card" id="showroom-hours-card">
+        <div class="info-card-title" id="info-title-hours">🕐 ساعات العمل</div>
+        <div class="hours-row"><span class="hours-day" id="day-sun">الأحد</span><span class="hours-time">09:00 — 20:00</span></div>
+        <div class="hours-row"><span class="hours-day" id="day-mon">الإثنين</span><span class="hours-time">09:00 — 20:00</span></div>
+        <div class="hours-row"><span class="hours-day" id="day-tue">الثلاثاء</span><span class="hours-time">09:00 — 20:00</span></div>
+        <div class="hours-row"><span class="hours-day" id="day-wed">الأربعاء</span><span class="hours-time">09:00 — 20:00</span></div>
+        <div class="hours-row"><span class="hours-day" id="day-thu">الخميس</span><span class="hours-time">09:00 — 20:00</span></div>
+        <div class="hours-row"><span class="hours-day" id="day-fri">الجمعة</span><span class="hours-closed" id="hours-closed-lbl">مغلق</span></div>
+        <div class="hours-row"><span class="hours-day" id="day-sat">السبت</span><span class="hours-time">10:00 — 18:00</span></div>
+        <div style="margin-top:12px;padding:8px 12px;background:#f0fbf4;border-radius:8px;border:1px solid rgba(46,204,113,0.3)">
+          <span style="color:#16a34a;font-size:12.5px;font-weight:600" id="open-now-txt">🟢 مفتوح الآن</span>
+        </div>
+      </div>
+
+  </div>
+
+    <!-- غرفة الطلبات بعد التعريف والموقع والساعات -->
     <div class="showroom-under-band" id="showroom-under-band">
       <section class="info-card showroom-desk-hz" id="showroom-service-desk" style="border-top:3px solid var(--gold);display:flex!important" aria-label="غرفة الطلبات">
         <div class="showroom-desk-eyebrow" id="sr-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
@@ -747,118 +814,49 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
           </div>
         </div>
       </section>
-
-      <section class="showroom-reviews-hz" id="reviews-section" aria-label="تقييمات الزبائن">
-        <div class="info-card-title" style="margin-bottom:8px" id="reviews-title-lbl">⭐ تقييمات الزبائن</div>
-        <div class="showroom-reviews-inner">
-          <div class="showroom-reviews-summary">
-            <div class="showroom-reviews-score">
-              <div id="rev-score">—</div>
-              <div class="showroom-reviews-stars">☆☆☆☆☆</div>
-              <div id="rev-count-txt">0 تقييم</div>
-            </div>
-            <div id="showroom-rating-breakdown" style="flex:1;min-width:120px">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-                <span style="font-size:12px;color:#8a8474;width:20px">5★</span>
-                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
-                <span style="font-size:12px;color:#8a8474">0%</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-                <span style="font-size:12px;color:#8a8474;width:20px">4★</span>
-                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
-                <span style="font-size:12px;color:#8a8474">0%</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <span style="font-size:12px;color:#8a8474;width:20px">3★</span>
-                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
-                <span style="font-size:12px;color:#8a8474">0%</span>
-              </div>
-            </div>
-          </div>
-          <div id="reviews-list"></div>
-        </div>
-      </section>
     </div>
 
-  <!-- VISIT STRIP — معلومات المعرض بعد الكتالوج وشريط الطلبات (مثل ترتيب المحل) -->
-  <div class="visit-strip" id="info-section">
+    <div class="info-card" id="showroom-payment-methods" style="display:block;margin:16px 0 8px">
+      <div class="info-card-title" id="sr-pay-title">🏦 طرق الدفع</div>
+      <div id="showroom-pay-box"></div>
+    </div>
 
-      <!-- Contact Info -->
-      <div class="info-card">
-        <div class="info-card-title" id="info-card-title1">📍 الموقع والتواصل</div>
-        <div class="info-row">
-          <span class="info-icon">🏠</span>
-          <div>
-            <div class="info-label" id="info-label-addr">العنوان</div>
-            <div class="info-value" id="info-address">حي التوجين، شارع الاستقلال — نواكشوط</div>
+    <!-- التقييمات في نهاية رحلة الزائر -->
+    <section class="showroom-reviews-below" id="reviews-section" aria-label="تقييمات الزبائن">
+      <div class="info-card-title" style="margin-bottom:10px" id="reviews-title-lbl">⭐ تقييمات الزبائن</div>
+      <div class="showroom-reviews-inner">
+        <div class="showroom-reviews-summary">
+          <div class="showroom-reviews-score">
+            <div id="rev-score">—</div>
+            <div class="showroom-reviews-stars">☆☆☆☆☆</div>
+            <div id="rev-count-txt">0 تقييم</div>
+          </div>
+          <div id="showroom-rating-breakdown" style="flex:1;min-width:160px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <span style="font-size:12px;color:#8a8474;width:20px">5★</span>
+              <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
+              <span style="font-size:12px;color:#8a8474">0%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <span style="font-size:12px;color:#8a8474;width:20px">4★</span>
+              <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
+              <span style="font-size:12px;color:#8a8474">0%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:12px;color:#8a8474;width:20px">3★</span>
+              <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
+              <span style="font-size:12px;color:#8a8474">0%</span>
+            </div>
           </div>
         </div>
-        <div class="info-row">
-          <span class="info-icon">📞</span>
-          <div>
-            <div class="info-label" id="info-label-phone">الهاتف وواتساب</div>
-            <div class="info-value"><span dir="ltr" style="direction:ltr;unicode-bidi:isolate;display:inline-block" id="info-phone">+222 44 00 00 00</span></div>
-          </div>
-        </div>
-        <div class="info-row">
-          <span class="info-icon">📧</span>
-          <div>
-            <div class="info-label" id="info-label-email">البريد الإلكتروني</div>
-            <div class="info-value" id="info-email">showroom@rizq.mr</div>
-          </div>
-        </div>
-        <div style="margin-top:14px">
-          <div class="map-placeholder" id="showroom-map-preview" onclick="openMaps()" role="button" tabindex="0" aria-label="عرض على الخريطة">
-            <div class="map-icon">🗺️</div>
-            <div class="map-text" id="map-text-lbl">عرض على الخريطة</div>
-            <div class="map-addr" id="info-city-lbl">نواكشوط، موريتانيا</div>
-          </div>
-        </div>
+        <div id="reviews-list"></div>
       </div>
-
-      <!-- Hours -->
-      <div class="info-card">
-        <div class="info-card-title" id="info-title-hours">🕐 ساعات العمل</div>
-        <div class="hours-row"><span class="hours-day" id="day-sun">الأحد</span><span class="hours-time">09:00 — 20:00</span></div>
-        <div class="hours-row"><span class="hours-day" id="day-mon">الإثنين</span><span class="hours-time">09:00 — 20:00</span></div>
-        <div class="hours-row"><span class="hours-day" id="day-tue">الثلاثاء</span><span class="hours-time">09:00 — 20:00</span></div>
-        <div class="hours-row"><span class="hours-day" id="day-wed">الأربعاء</span><span class="hours-time">09:00 — 20:00</span></div>
-        <div class="hours-row"><span class="hours-day" id="day-thu">الخميس</span><span class="hours-time">09:00 — 20:00</span></div>
-        <div class="hours-row"><span class="hours-day" id="day-fri">الجمعة</span><span class="hours-closed" id="hours-closed-lbl">مغلق</span></div>
-        <div class="hours-row"><span class="hours-day" id="day-sat">السبت</span><span class="hours-time">10:00 — 18:00</span></div>
-        <div style="margin-top:12px;padding:8px 12px;background:#f0fbf4;border-radius:8px;border:1px solid rgba(46,204,113,0.3)">
-          <span style="color:#16a34a;font-size:12.5px;font-weight:600" id="open-now-txt">🟢 مفتوح الآن</span>
-        </div>
-      </div>
-
-      <div class="info-card" id="showroom-payment-methods" style="display:block">
-        <div class="info-card-title" id="sr-pay-title">🏦 طرق الدفع</div>
-        <div id="showroom-pay-box"></div>
-      </div>
-
-      <!-- About — الفيديو التعريفي يعيش هنا مع نص «عن المعرض» -->
-      <div class="info-card" id="about-section">
-        <div class="info-card-title" id="about-title-lbl">📖 عن المعرض</div>
-        <div style="font-size:13px;color:#4a5364;line-height:1.75" id="about-text">
-          معرض متخصص في بيع وعرض السيارات والمعدات والإلكترونيات — جميع المعروضات موثّقة ومفحوصة ومصحوبة بضمان.
-        </div>
-        <section class="video-intro-section" id="video-intro-section" style="display:none" aria-label="فيديو تعريفي">
-          <div id="intro-video-mount"></div>
-        </section>
-        <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap" id="tags-container">
-          <span style="background:#eef2ff;color:#3730a3;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">🚗 سيارات</span>
-          <span style="background:#fff7ed;color:#c2410c;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">💻 إلكترونيات</span>
-          <span style="background:#f0fdf4;color:#15803d;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">🛋️ أثاث</span>
-          <span style="background:#fdf4ff;color:#7e22ce;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700">⚙️ معدات</span>
-        </div>
-      </div>
-
-  </div>
+    </section>
 
 </main>
 </div>
 
-<!-- بطاقة الضمان — بعد الموقع وساعات العمل (أسفل الواجهة قبل الباقات) -->
+<!-- بطاقة الضمان — بعد التقييمات (أسفل الواجهة قبل الباقات) -->
 <section class="rizq-close-band" id="showroom-close-band" aria-label="ضمانات المعرض">
   <div class="rizq-close-inner">
     <p class="rizq-close-eyebrow" id="sr-close-eyebrow">RIZQ · تجربة آمنة</p>
@@ -876,8 +874,8 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   </div>
 </section>
 
-<!-- ══ PACKAGES ══ -->
-<section class="pkg-section" id="pkg-section">
+<!-- ══ PACKAGES — نماذج فقط؛ تُخفى عن المعرض الحقيقي ══ -->
+<section class="pkg-section" id="pkg-section" style="display:none">
   <div class="pkg-section-inner">
     <div style="text-align:center;margin-bottom:28px">
       <p style="font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;text-transform:uppercase;margin-bottom:8px" id="pkg-eyebrow">Rizq Showrooms — الباقات</p>
@@ -1003,6 +1001,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 <script src="rizq_announcements.js" defer></script>
 <script src="rizq_subscription_engine.js" defer></script>
 <script src="rizq_subscription_permissions.js" defer></script>
+<script src="rizq_reviews_engine.js" defer></script>
 <script src="rizq_messenger.js?v=28.7" defer></script>
 <script>
 // إصلاح جوهري: هذه الصفحة كانت تستخدم نظام إشعار قانوني محلي منفصل تماماً
@@ -1310,9 +1309,7 @@ function renderCatalog(){
       +'<button type="button" onclick="event.stopPropagation();addToCartShowroom(\''+esc(item.id)+'\')" style="width:100%;margin-top:8px;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0F2347;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit">'
       +'🛒 '+_t('أضف للسلة','Ajouter au panier')
       +'</button>'
-      +'<button type="button" class="rizq-prf-trigger" style="width:100%;margin-top:8px" onclick="event.stopPropagation();issueShowroomPrefacture(\''+esc(item.id)+'\')">'
-      +'PREFACTUR · '+_t('فاتورة قبل','Préfacture')
-      +'</button>'
+      /* PREFACTUR في السلة فقط بعد اختيار تحويل/استلام/توصيل */
       +'</div></div>';
   }).join('');
   try { updateShowroomShopCounts(); } catch (eCnt) {}
@@ -1347,14 +1344,20 @@ function applyAccountData(){
   }
 
   if(!_acc) return;
-  // باقات المنصة: تُخفى عن زائر المعرض الحقيقي فقط — نماذج المعاينة تُظهر كل الخدمات
-  var _pkgSec = document.getElementById('pkg-section');
-  if(_pkgSec){
-    if(window._rizqShowroomIsDemo || _showroomId === 'demo-corp-001' || _showroomId === 'demo_showroom' || /^acc_promo_/.test(_showroomId)){
-      _pkgSec.style.display = '';
-    } else {
-      _pkgSec.style.display = 'none';
-    }
+  // باقات المنصة للنماذج فقط — المعرض الحقيقي بدون باقات ولا طرق دفع على الواجهة
+  var _srIsDemo = !!(window._rizqShowroomIsDemo || _showroomId === 'demo-corp-001' || _showroomId === 'demo_showroom' || /^acc_promo_/.test(_showroomId));
+  if(window.RizqSubscriptionPermissions && typeof RizqSubscriptionPermissions.applyPublicMerchantSurface === 'function'){
+    RizqSubscriptionPermissions.applyPublicMerchantSurface({
+      accountId: _showroomId,
+      isDemo: _srIsDemo,
+      packageIds: ['pkg-section'],
+      paymentIds: ['showroom-payment-methods', 'showroom-pay-box'],
+      hideListingPrefacture: true,
+      prefactureRoot: document.getElementById('items-grid') || document
+    });
+  } else {
+    var _pkgSec = document.getElementById('pkg-section');
+    if(_pkgSec) _pkgSec.style.display = _srIsDemo ? '' : 'none';
   }
   if(_acc.serviceDesk) window._rizqShowroomServiceDesk = _acc.serviceDesk;
   if(Array.isArray(_acc.paymentMethods)) window._rizqShowroomPaymentMethods = _acc.paymentMethods;
@@ -1365,12 +1368,6 @@ function applyAccountData(){
     }
     var deskRoot = document.getElementById('showroom-service-desk');
     if(deskRoot) deskRoot.style.display = 'flex';
-  }
-  if(typeof RizqAccountPayments !== 'undefined' && Array.isArray(_acc.paymentMethods) && _acc.paymentMethods.length){
-    var payWrap = document.getElementById('showroom-payment-methods');
-    var payBox = document.getElementById('showroom-pay-box');
-    if(payWrap) payWrap.style.display = '';
-    RizqAccountPayments.renderPublic(payBox || payWrap, _acc.paymentMethods, { fr: _lang==='fr' });
   }
   var cartHref = _showroomId
     ? ('rizq_cart.html?id=' + encodeURIComponent(_showroomId) + '&module=showroom')
@@ -1450,6 +1447,7 @@ function applyAccountData(){
   }
   /* إعادة تركيب الفيديو التعريفي بعد جلب الحساب (محلي أو خادم) */
   mountShowroomIntroVideo();
+  if(typeof window._rizqRenderShowroomReviews === 'function') window._rizqRenderShowroomReviews();
 }
 
 /* فيديوهات هادئة على الهيرو (تعريفي + إضافي) — يُستدعى عند التحميل وبعد applyAccountData */
@@ -1893,13 +1891,13 @@ function applyLang(){
   document.getElementById('cat-jewel').textContent = isFr ? '💎 Bijoux' : '💎 مجوهرات';
   document.getElementById('empty-title-lbl').textContent = isFr ? 'Aucun article dans cette catégorie' : 'لا يوجد عروض في هذا القسم';
   document.getElementById('empty-sub-lbl').textContent   = isFr ? 'Essayez une autre catégorie ou contactez le showroom' : 'جرّب قسماً آخر أو تواصل مع المعرض مباشرة';
-  // Reviews
+  // Reviews — يُعاد رسم القائمة + نموذج الإضافة عبر محرك التقييمات
   document.getElementById('reviews-title-lbl').textContent = isFr ? '⭐ Avis clients' : '⭐ تقييمات الزبائن';
-  document.getElementById('rev-count-txt').textContent     = isFr ? '0 avis' : '0 تقييم';
-  document.getElementById('rev-score').textContent         = '—';
-  var _revList = document.getElementById('reviews-list');
-  if (_revList && !_revList.children.length) {
-    _revList.innerHTML = '<p style="color:#8a8474;font-size:13px;padding:12px 0">' + (isFr ? 'Aucun avis pour le moment.' : 'لا توجد تقييمات بعد.') + '</p>';
+  if(typeof window._rizqRenderShowroomReviews === 'function'){
+    window._rizqRenderShowroomReviews();
+  } else {
+    document.getElementById('rev-count-txt').textContent = isFr ? '0 avis' : '0 تقييم';
+    document.getElementById('rev-score').textContent = '—';
   }
   var _ss=document.getElementById('showroom-since'); if(_ss && !_ss.hasAttribute('data-acc')) _ss.textContent=isFr?'Membre —':'عضو —';
   var _sc2=document.getElementById('showroom-city'); if(_sc2&&!_sc2.hasAttribute('data-acc')) _sc2.textContent=isFr?'Nouakchott, Mauritanie':'نواكشوط، موريتانيا';
@@ -2098,6 +2096,150 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 <script>
 /* فيديو تعريفي — تركيب أولي + احتياط إن تأخّر applyAccountData */
 try { if(typeof mountShowroomIntroVideo === 'function') mountShowroomIntroVideo(); } catch(e){}
+</script>
+<script>
+/* ═══ تقييمات المعرض — عرض + نموذج إضافة للزائر (نماذج وحقيقي) ═══ */
+(function(){
+  function isFr(){ try{ return (localStorage.getItem('rizq_lang')||'ar')==='fr'; }catch(e){ return false; } }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function starsHTML(n){ var s=''; for(var i=1;i<=5;i++) s += (i<=n?'★':'☆'); return s; }
+  function timeAgo(iso, fr){
+    try{
+      var diffMs = Date.now() - new Date(iso).getTime();
+      var mins = Math.floor(diffMs/60000);
+      if(mins < 1)  return fr ? "à l'instant" : 'الآن';
+      if(mins < 60) return fr ? ('il y a '+mins+' min') : ('منذ '+mins+' دقيقة');
+      var hrs = Math.floor(mins/60);
+      if(hrs < 24)  return fr ? ('il y a '+hrs+'h') : ('منذ '+hrs+' ساعة');
+      var days = Math.floor(hrs/24);
+      if(days < 30) return fr ? ('il y a '+days+' j') : ('منذ '+days+' يوم');
+      var months = Math.floor(days/30);
+      if(months < 12) return fr ? ('il y a '+months+' mois') : ('منذ '+months+' شهر');
+      var years = Math.floor(months/12);
+      return fr ? ('il y a '+years+' an(s)') : ('منذ '+years+' سنة');
+    }catch(e){ return ''; }
+  }
+  function resolveShowroomTarget(){
+    try{
+      var p = new URLSearchParams(location.search);
+      var id = p.get('id') || p.get('corp') || p.get('showroom') || (typeof _showroomId !== 'undefined' ? _showroomId : '') || '';
+      var demo = !!(window._rizqShowroomIsDemo || p.get('demo') === '1'
+        || id === 'demo-corp-001' || id === 'demo_showroom' || /^demo/i.test(id) || /^acc_promo_/i.test(id));
+      if(!id && demo) id = 'demo-corp-001';
+      return id || null;
+    }catch(e){ return null; }
+  }
+  function render(){
+    var targetId = resolveShowroomTarget();
+    var fr = isFr();
+    var listEl = document.getElementById('reviews-list');
+    var scoreEl = document.getElementById('rev-score');
+    var countEl = document.getElementById('rev-count-txt');
+    var starsEl = document.querySelector('#reviews-section .showroom-reviews-stars');
+    var breakdown = document.getElementById('showroom-rating-breakdown');
+    if(!targetId || !window.RizqReviews){
+      if(scoreEl) scoreEl.textContent = '—';
+      if(countEl) countEl.textContent = fr ? '0 avis' : '0 تقييم';
+      if(listEl) listEl.innerHTML = '<p style="color:#8a8474;font-size:13px;padding:12px 0">'+(fr?'Aucun avis pour le moment.':'لا توجد تقييمات بعد.')+'</p>';
+      return;
+    }
+    window._rizqShowroomReviewsTarget = targetId;
+    var stats = RizqReviews.getStats(targetId);
+    var list = RizqReviews.getReviews(targetId);
+    if(scoreEl) scoreEl.textContent = stats.count ? String(stats.average) : '—';
+    if(countEl) countEl.textContent = stats.count ? (stats.count+(fr?' avis':' تقييم')) : (fr?'0 avis':'0 تقييم');
+    if(starsEl) starsEl.textContent = stats.count ? starsHTML(Math.round(stats.average)) : '☆☆☆☆☆';
+    if(breakdown){
+      var dist=[0,0,0,0,0];
+      list.forEach(function(r){ if(r.rating>=1&&r.rating<=5) dist[r.rating-1]++; });
+      var html='';
+      for(var star=5; star>=3; star--){
+        var cnt = dist[star-1];
+        var pct = stats.count ? Math.round(cnt/stats.count*100) : 0;
+        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+          + '<span style="font-size:12px;color:#8a8474;width:20px">'+star+'★</span>'
+          + '<div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:#F5A623;border-radius:4px"></div></div>'
+          + '<span style="font-size:12px;color:#8a8474">'+pct+'%</span></div>';
+      }
+      breakdown.innerHTML = html;
+    }
+    if(!listEl) return;
+    var listHtml = list.length ? list.map(function(r){
+      var name = r.reviewerName || (fr?'Client Rizq':'زبون رزق');
+      return '<div style="border:1px solid #e8edf3;border-radius:10px;padding:14px 16px;margin-bottom:12px;background:#fafbfd">'
+        + '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
+        + '<div style="width:38px;height:38px;border-radius:50%;background:#1B3A6B;color:#C9A84C;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0">'+esc(name.trim().charAt(0)||'👤')+'</div>'
+        + '<div><div style="font-weight:700;font-size:13px;color:#1a2535">'+esc(name)+'</div>'
+        + '<div style="font-size:11px;color:#8a9ab5">'+timeAgo(r.createdAt,fr)+'</div></div>'
+        + '<div style="margin-'+(fr?'left':'right')+':auto;color:#F5A623;font-size:14px">'+starsHTML(r.rating)+'</div>'
+        + '</div><div style="font-size:13px;color:#4a5a6a;line-height:1.6">'+esc(r.comment || (fr?'(Sans commentaire)':'(بدون تعليق)'))+'</div></div>';
+    }).join('') : ('<p style="font-size:13px;color:#6a7a8a;padding:8px 0">'+(fr?"Aucun avis pour l'instant — soyez le premier à évaluer ce showroom.":'لا توجد آراء حتى الآن — كن أول من يقيّم هذا المعرض.')+'</p>');
+    var starPicker = '<div id="sr-star-picker" style="display:flex;gap:5px;margin-bottom:10px;font-size:24px">'
+      + [1,2,3,4,5].map(function(n){ return '<span data-n="'+n+'" onclick="_rizqShowroomSetStar('+n+')" id="sr-star-'+n+'" style="cursor:pointer;color:rgba(13,27,42,.18)">★</span>'; }).join('')
+      + '</div>';
+    var formHtml = '<div style="margin-top:16px;padding-top:16px;border-top:1px solid #e0e8f0">'
+      + '<div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:10px">'+(fr?'✍️ Laisser un avis':'✍️ أضف تقييمك')+'</div>'
+      + '<div id="sr-review-msg" style="font-size:12px;margin-bottom:8px"></div>'
+      + starPicker
+      + '<input type="text" id="sr-review-name" maxlength="60" placeholder="'+(fr?'Votre nom (optionnel)':'اسمك (اختياري)')+'" style="width:100%;padding:10px 12px;border:1px solid #e0e8f0;border-radius:8px;font-size:13px;margin-bottom:8px;font-family:inherit;box-sizing:border-box">'
+      + '<textarea id="sr-review-comment" maxlength="500" rows="3" placeholder="'+(fr?'Votre commentaire...':'اكتب تعليقك...')+'" style="width:100%;padding:10px 12px;border:1px solid #e0e8f0;border-radius:8px;font-size:13px;margin-bottom:10px;font-family:inherit;resize:vertical;box-sizing:border-box"></textarea>'
+      + '<button type="button" onclick="_rizqShowroomSubmitReview()" style="width:100%;padding:12px;background:linear-gradient(135deg,#0D1B2A,#1B3A6B);color:#fff;border:none;border-radius:8px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit">'+(fr?'Envoyer mon avis':'إرسال التقييم')+'</button>'
+      + '</div>';
+    listEl.innerHTML = listHtml + formHtml;
+  }
+  window._rizqShowroomSetStar = function(n){
+    window._rizqShowroomSelectedStars = n;
+    for(var i=1;i<=5;i++){
+      var el = document.getElementById('sr-star-'+i);
+      if(el) el.style.color = i<=n ? '#F5A623' : 'rgba(13,27,42,.18)';
+    }
+  };
+  window._rizqShowroomSubmitReview = function(){
+    var fr = isFr();
+    var targetId = window._rizqShowroomReviewsTarget || resolveShowroomTarget();
+    var msgEl = document.getElementById('sr-review-msg');
+    if(!targetId || !window.RizqReviews) return;
+    var rating = window._rizqShowroomSelectedStars || 0;
+    var nameEl = document.getElementById('sr-review-name');
+    var commentEl = document.getElementById('sr-review-comment');
+    var res = RizqReviews.addReview(targetId, {
+      rating: rating,
+      comment: commentEl ? commentEl.value : '',
+      reviewerName: nameEl ? nameEl.value : ''
+    });
+    if(!res.ok){
+      var errs = {
+        invalid_rating: fr ? 'Merci de choisir une note entre 1 et 5 étoiles.' : 'الرجاء اختيار تقييم بين 1 و5 نجوم.',
+        already_reviewed: fr ? 'Vous avez déjà évalué ce showroom depuis cet appareil.' : 'لقد سبق أن قيّمت هذا المعرض من هذا الجهاز.',
+        invalid_target: fr ? "Impossible d'identifier ce showroom." : 'تعذر تحديد هذا المعرض.'
+      };
+      if(msgEl){ msgEl.textContent = errs[res.error] || (fr?'Une erreur est survenue.':'حدث خطأ ما.'); msgEl.style.color='#dc2626'; }
+      return;
+    }
+    if(typeof showToast==='function') showToast(fr?'✅ Merci pour votre avis !':'✅ شكراً على تقييمك!');
+    try{
+      if(typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE){
+        fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/reviews', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ targetId: targetId, rating: rating, comment: commentEl?commentEl.value:'', reviewerName: nameEl?nameEl.value:'' })
+        }).catch(function(){});
+      }
+    }catch(e){}
+    window._rizqShowroomSelectedStars = 0;
+    render();
+  };
+  window._rizqRenderShowroomReviews = render;
+  function boot(){
+    if(window.RizqReviews){ render(); return; }
+    var tries = 0;
+    var t = setInterval(function(){
+      tries++;
+      if(window.RizqReviews || tries > 40){ clearInterval(t); render(); }
+    }, 50);
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
 </script>
 </body>
 </html>
