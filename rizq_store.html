@@ -908,14 +908,28 @@ footer{
 }
 
 @media(max-width:800px){
+  /* رحلة الجوال: منتجات → تعريف → موقع → ساعات → استفسار → دفع → تقييمات */
   .content-grid{
     grid-template-columns:1fr;
-    /* على الهاتف: المنتجات أولاً ثم الموقع */
-    grid-template-areas:"main" "side";
+    grid-template-areas:none;
+    display:flex;
+    flex-direction:column;
     gap:18px;
   }
+  .content-grid > aside#info-section,
+  .content-grid > .store-main-col,
+  #store-under-band{display:contents}
   .content-grid > aside#info-section{position:static;width:100%;max-width:100%}
-  .content-grid > .store-main-col > main{padding:14px;border-radius:16px;width:100%;max-width:100%;overflow:visible}
+  .content-grid > .store-main-col > main{
+    order:1;
+    padding:14px;border-radius:16px;width:100%;max-width:100%;overflow:visible
+  }
+  #about-section{order:2}
+  #store-location-card{order:3}
+  #hours-card-el{order:4}
+  #store-service-desk{order:5}
+  #store-delivery-card{order:6}
+  #reviews-section{order:7}
   #store-packages{padding:40px 4%!important;overflow:visible}
   #store-packages-grid{overflow:visible!important}
   .store-hero{height:auto;min-height:0!important;padding:0;overflow:hidden}
@@ -1405,7 +1419,7 @@ footer{
       </div>
 
       <!-- Location -->
-      <div class="info-card">
+      <div class="info-card" id="store-location-card">
         <div class="info-card-title" data-t="info-title-location">📍 الموقع والتواصل</div>
         <div class="info-row">
           <span class="info-icon">🏠</span>
@@ -1444,7 +1458,7 @@ footer{
       </div>
 
       <!-- Delivery -->
-      <div class="info-card">
+      <div class="info-card" id="store-delivery-card">
         <div class="info-card-title" data-t="info-title-delivery">🚚 خيارات التسليم</div>
         <div class="delivery-opts">
           <div class="delivery-opt selected" id="dopt-delivery" onclick="selectDelivery('delivery')">

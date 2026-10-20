@@ -694,11 +694,29 @@ html[dir="ltr"] #hours-card-el .hours-row{direction:ltr!important}
 /* ════════ RESPONSIVE ════════ */
 @media(max-width:900px){.about-stats{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:820px){
-  .main-wrap{grid-template-columns:1fr;grid-template-areas:"main" "side"}
+  /* رحلة الجوال: خدمات → تعريف → موقع/ساعات → استفسار → دفع → تقييمات */
+  .main-wrap{
+    grid-template-columns:1fr;
+    grid-template-areas:none;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .main-wrap > aside#info-section,
+  .main-wrap > .office-main,
+  #office-under-band{display:contents}
+  .sidebar-sticky{position:static}
+  #svc-section{order:1}
+  #about-section{order:2}
+  #trust-section{order:3}
+  #location-card{order:4}
+  #office-service-desk{order:5}
+  #office-pay-card{order:6}
+  #reviews-section{order:7}
+  #office-promo-card{order:8}
   .hero-inner{grid-template-columns:1fr}
   .hero-card{border-radius:16px;margin-top:24px}
   .stats-strip-inner{grid-template-columns:repeat(2,1fr)}
-  .sidebar-sticky{position:static}
 }
 @media(max-width:500px){.trust-grid{grid-template-columns:1fr}.about-stats{grid-template-columns:repeat(2,1fr)}}
 
@@ -1048,7 +1066,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
 
   <!-- ── SIDEBAR يمين RTL: الموقع والساعات والدفع (التقييمات تحت الخدمات مثل المحل) ── -->
   <aside class="sidebar-sticky" id="info-section">
-    <div class="contact-card fade-in">
+    <div class="contact-card fade-in" id="office-pay-card">
       <div class="open-badge-new closed" id="open-badge" data-t="open-badge">جارٍ التحقق...</div>
       <div id="office-payment-methods" style="display:none;margin-top:4px"></div>
     </div>
@@ -1101,7 +1119,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
     </div>
 
     <!-- RIZQ PROMO CARD -->
-    <div class="promo-card fade-in">
+    <div class="promo-card fade-in" id="office-promo-card">
       <div style="font-size:20px;margin-bottom:8px">🚀</div>
       <div style="font-size:14px;font-weight:800;color:var(--gold2);margin-bottom:6px" id="promo-card-title" data-t="promo-card-title">أنشئ مكتبك على رزق</div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6" id="promo-card-sub" data-t="promo-card-sub">احضر رقمياً، واجذب زبائن جدد يومياً</div>
@@ -1241,7 +1259,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
     </div>
 
     <!-- TRUST -->
-    <div class="card fade-in">
+    <div class="card fade-in" id="trust-section">
       <div class="section-head">
         <div class="section-bar"></div>
         <div class="section-ttl" id="trust-section-ttl" data-t="trust-section-ttl">لماذا نختلف؟</div>

@@ -758,8 +758,26 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 .est-map-placeholder .map-txt{font:800 14px Cairo,sans-serif;color:var(--navy)}
 .est-map-placeholder .map-addr{font-size:13px;color:#2f3c4d;font-weight:700;max-width:95%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media(max-width:980px){
-  .est-content-grid,html[dir="rtl"] .est-content-grid{grid-template-columns:1fr}
+  /* رحلة الجوال: منتجات → تعريف → موقع → ساعات → استفسار → دفع → تقييمات */
+  .est-content-grid,html[dir="rtl"] .est-content-grid{
+    grid-template-columns:1fr;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .est-side,.est-main-col{display:contents}
   .est-side{position:static}
+  #est-listings{order:1}
+  #est-count{order:2}
+  #est-grid{order:3}
+  #est-gallery{order:4}
+  .est-rail-wrap{order:5}
+  #est-about-card{order:10}
+  #est-location-card{order:11}
+  #est-hours-card{order:12}
+  #est-desk{order:13}
+  #est-pay-card{order:14}
+  #est-reviews{order:15}
 }
 
 
