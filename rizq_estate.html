@@ -896,31 +896,35 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         <div class="est-info-row">
           <span class="ico" aria-hidden="true">🏠</span>
           <div>
-            <div class="est-info-label">العنوان</div>
+            <div class="est-info-label" id="est-lbl-address">العنوان</div>
             <div class="est-info-value" id="est-info-address">شارع الوكالة — تفرغ زينة، نواكشوط</div>
           </div>
         </div>
         <div class="est-info-row">
           <span class="ico" aria-hidden="true">📱</span>
           <div>
-            <div class="est-info-label">الهاتف وواتساب</div>
+            <div class="est-info-label" id="est-lbl-phone">الهاتف وواتساب</div>
             <div class="est-info-value rizq-phone-ltr" id="est-info-phone" dir="ltr">+222 42 00 01 11</div>
           </div>
         </div>
         <div class="est-info-row">
           <span class="ico" aria-hidden="true">📧</span>
           <div>
-            <div class="est-info-label">البريد</div>
+            <div class="est-info-label" id="est-lbl-email">البريد</div>
             <div class="est-info-value" id="est-info-email">contact@atwar-immo.mr</div>
           </div>
         </div>
-        <div class="est-info-label" style="margin:8px 0 6px">مناطق التغطية</div>
+        <div class="est-info-label" id="est-lbl-coverage" style="margin:8px 0 6px">مناطق التغطية</div>
         <div class="est-coverage" id="est-coverage">
-          <span>نواكشوط</span><span>تفرغ زينة</span><span>لكصر</span><span>القطب</span><span>الرياض</span>
+          <span data-ar="نواكشوط" data-fr="Nouakchott">نواكشوط</span>
+          <span data-ar="تفرغ زينة" data-fr="Tevragh Zeina">تفرغ زينة</span>
+          <span data-ar="لكصر" data-fr="Ksar">لكصر</span>
+          <span data-ar="القطب" data-fr="Al Qutb">القطب</span>
+          <span data-ar="الرياض" data-fr="Riyadh">الرياض</span>
         </div>
         <div class="est-map-placeholder map-placeholder" id="est-map-preview" role="button" tabindex="0" aria-label="عرض على الخريطة">
           <div class="map-ico">🗺️</div>
-          <div class="map-txt">عرض على الخريطة</div>
+          <div class="map-txt" id="est-map-txt">عرض على الخريطة</div>
           <div class="map-addr" id="est-map-addr">تفرغ زينة — نواكشوط</div>
         </div>
       </div>
@@ -2642,6 +2646,16 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     tx('#est-location-card .est-info-card-title', '📍 الموقع والتغطية', '📍 Lieu & couverture');
     tx('#est-hours-card .est-info-card-title', '🕐 ساعات العمل', '🕐 Horaires');
     tx('#est-pay-card .est-info-card-title', '💳 طرق الدفع والتحويل', '💳 Paiement');
+    tx('#est-lbl-address', 'العنوان', 'Adresse');
+    tx('#est-lbl-phone', 'الهاتف وواتساب', 'Téléphone & WhatsApp');
+    tx('#est-lbl-email', 'البريد', 'E-mail');
+    tx('#est-lbl-coverage', 'مناطق التغطية', 'Zones de couverture');
+    tx('#est-map-txt', 'عرض على الخريطة', 'Voir sur la carte');
+    document.querySelectorAll('#est-coverage span[data-ar]').forEach(function(sp){
+      sp.textContent = fr ? (sp.getAttribute('data-fr') || sp.getAttribute('data-ar')) : (sp.getAttribute('data-ar') || sp.textContent);
+    });
+    var pdMapTxt = document.querySelector('#est-pd-map .map-txt');
+    if(pdMapTxt) pdMapTxt.textContent = fr ? 'Voir sur la carte' : 'عرض على الخريطة';
     var galH = document.querySelector('.est-gallery-head h2');
     var galP = document.querySelector('.est-gallery-head p');
     if(galH) galH.textContent = fr ? 'Galerie photos' : 'معرض الصور';
