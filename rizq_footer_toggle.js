@@ -265,6 +265,16 @@
     document.querySelectorAll('#rzq-ft-desc, footer .footer-desc, [data-t="ft-desc"]').forEach(function (el) {
       el.textContent = desc;
     });
+    /* شريط الحقوق / التوقيع — لا يعتمد على مفاتيح data-t الناقصة */
+    document.querySelectorAll('#rzq-site-ft-copy, #rzq-ft-copy, footer .footer-bottom .footer-copy[data-t="ft-copy"], footer .footer-bottom > .footer-copy:first-child').forEach(function (el) {
+      if (el.id === 'rzq-site-ft-sig' || el.querySelector('#rzq-site-ft-sig-pre, #rzq-sig-pre, #ft-sig-pre')) return;
+      var frCopy = el.getAttribute('data-t-fr') || '© 2026 Rizq — Tous droits réservés 🇲🇷';
+      el.textContent = fr ? frCopy : '© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷';
+    });
+    document.querySelectorAll('#rzq-site-ft-sig-pre, #rzq-sig-pre, #ft-sig-pre, [data-t="ft-sig"] > span:first-child, [data-t="signed-by"]').forEach(function (el) {
+      var frSig = el.getAttribute('data-t-fr') || 'Signé par';
+      el.textContent = fr ? frSig : 'بتوقيع';
+    });
     var why2 = document.querySelector('[data-t="why2-title"]');
     if (why2) {
       why2.textContent = fr
