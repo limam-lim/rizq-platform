@@ -2,11 +2,11 @@
   "pass": [
     {
       "name": "Landing LANG key parity",
-      "detail": "140 keys in AR and FR"
+      "detail": "273 keys in AR and FR"
     },
     {
       "name": "rizq_i18n_data.js key parity",
-      "detail": "1529 keys AR+FR"
+      "detail": "1796 keys AR+FR"
     },
     {
       "name": "i18n FR dictionary no Arabic",
@@ -42,10 +42,10 @@
     },
     {
       "name": "Landing hash targets",
-      "detail": "#pricing #about present"
+      "detail": "#pricing present (about → rizq_platform)"
     },
     {
-      "name": "rizq_admin.html loads rizq_packages_config.js",
+      "name": "rizq_cp_panel.html loads rizq_packages_config.js",
       "detail": "present"
     },
     {
@@ -114,7 +114,7 @@
     },
     {
       "name": "PATCH /api/accounts/mine channel flags",
-      "detail": "widget/whatsapp/calls"
+      "detail": "widget/whatsapp/calls + diamond guard"
     },
     {
       "name": "POST /api/site-config overlay fields",
@@ -189,8 +189,12 @@
       "detail": "OK"
     },
     {
+      "name": "node scripts/audit-agents.js",
+      "detail": "53/53"
+    },
+    {
       "name": "node scripts/comprehensive-system-audit.js",
-      "detail": "86/100 (exit 1)"
+      "detail": "91/100"
     }
   ],
   "warn": [
@@ -199,10 +203,5 @@
       "detail": "file not present — live admin prices fall back to PKG defaults"
     }
   ],
-  "fail": [
-    {
-      "name": "node scripts/audit-agents.js",
-      "detail": "t..js (node:internal/modules/cjs/loader:1985:10)\r\n    at Module.load (node:internal/modules/cjs/loader:1577:32)\r\n    at Module._load (node:internal/modules/cjs/loader:1379:12)\r\n    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)\r\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\r\n    at node:internal/main/run_main_module:33:47\r\n\r\nNode.js v24.16.0\r\n"
-    }
-  ]
+  "fail": []
 }
