@@ -896,31 +896,35 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         <div class="est-info-row">
           <span class="ico" aria-hidden="true">🏠</span>
           <div>
-            <div class="est-info-label">العنوان</div>
+            <div class="est-info-label" id="est-lbl-address">العنوان</div>
             <div class="est-info-value" id="est-info-address">شارع الوكالة — تفرغ زينة، نواكشوط</div>
           </div>
         </div>
         <div class="est-info-row">
           <span class="ico" aria-hidden="true">📱</span>
           <div>
-            <div class="est-info-label">الهاتف وواتساب</div>
+            <div class="est-info-label" id="est-lbl-phone">الهاتف وواتساب</div>
             <div class="est-info-value rizq-phone-ltr" id="est-info-phone" dir="ltr">+222 42 00 01 11</div>
           </div>
         </div>
         <div class="est-info-row">
           <span class="ico" aria-hidden="true">📧</span>
           <div>
-            <div class="est-info-label">البريد</div>
+            <div class="est-info-label" id="est-lbl-email">البريد</div>
             <div class="est-info-value" id="est-info-email">contact@atwar-immo.mr</div>
           </div>
         </div>
-        <div class="est-info-label" style="margin:8px 0 6px">مناطق التغطية</div>
+        <div class="est-info-label" id="est-lbl-coverage" style="margin:8px 0 6px">مناطق التغطية</div>
         <div class="est-coverage" id="est-coverage">
-          <span>نواكشوط</span><span>تفرغ زينة</span><span>لكصر</span><span>القطب</span><span>الرياض</span>
+          <span data-ar="نواكشوط" data-fr="Nouakchott">نواكشوط</span>
+          <span data-ar="تفرغ زينة" data-fr="Tevragh Zeina">تفرغ زينة</span>
+          <span data-ar="لكصر" data-fr="Ksar">لكصر</span>
+          <span data-ar="القطب" data-fr="Al Qutb">القطب</span>
+          <span data-ar="الرياض" data-fr="Riyadh">الرياض</span>
         </div>
         <div class="est-map-placeholder map-placeholder" id="est-map-preview" role="button" tabindex="0" aria-label="عرض على الخريطة">
           <div class="map-ico">🗺️</div>
-          <div class="map-txt">عرض على الخريطة</div>
+          <div class="map-txt" id="est-map-txt">عرض على الخريطة</div>
           <div class="map-addr" id="est-map-addr">تفرغ زينة — نواكشوط</div>
         </div>
       </div>
@@ -1111,7 +1115,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       <div class="est-pd-map">
         <div class="est-map-placeholder map-placeholder" id="est-pd-map" role="button" tabindex="0" aria-label="عرض الموقع على الخريطة">
           <div class="map-ico">🗺️</div>
-          <div class="map-txt">موقع العقار على الخريطة</div>
+          <div class="map-txt" id="est-pd-map-txt">موقع العقار على الخريطة</div>
           <div class="map-addr" id="est-pd-map-addr">—</div>
         </div>
         <div class="est-pd-nearby" id="est-pd-nearby"></div>
@@ -1177,19 +1181,56 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   var _lbList = [];
 
   var REVIEWS = [
-    { name:'محمد ولد أحمد', stars:5, text:'تعامل واضح ومعاينة في نفس اليوم. ساعدوني في إتمام عقد الكراء بدون تعقيد.', when:'منذ أسبوعين' },
-    { name:'آمنة بنت سيد', stars:5, text:'وجدنا شقة تمليك مناسبة في تفرغ زينة. المتابعة عبر واتساب كانت سريعة.', when:'منذ شهر' },
-    { name:'يوسف كان', stars:4, text:'وكالة محترمة — شرحوا لنا الوثائق والأسعار بشفافية قبل الزيارة.', when:'منذ 3 أسابيع' }
+    { name:'محمد ولد أحمد', nameFr:'Mohamed Ould Ahmed', stars:5, text:'تعامل واضح ومعاينة في نفس اليوم. ساعدوني في إتمام عقد الكراء بدون تعقيد.', textFr:'Échanges clairs et visite le jour même. Ils m’ont aidé à finaliser le bail sans complication.', when:'منذ أسبوعين', whenFr:'Il y a 2 semaines' },
+    { name:'آمنة بنت سيد', nameFr:'Amina Mint Sidi', stars:5, text:'وجدنا شقة تمليك مناسبة في تفرغ زينة. المتابعة عبر واتساب كانت سريعة.', textFr:'Nous avons trouvé un appartement adapté à Tevragh Zeina. Le suivi WhatsApp était rapide.', when:'منذ شهر', whenFr:'Il y a 1 mois' },
+    { name:'يوسف كان', nameFr:'Youssouf Kane', stars:4, text:'وكالة محترمة — شرحوا لنا الوثائق والأسعار بشفافية قبل الزيارة.', textFr:'Agence sérieuse — ils ont expliqué documents et prix avec transparence avant la visite.', when:'منذ 3 أسابيع', whenFr:'Il y a 3 semaines' }
   ];
 
   var GALLERY = [
-    {img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80', cap:'صالة استقبال المكتب — تفرغ زينة'},
-    {img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80', cap:'واجهة فيلا معروضة للبيع'},
-    {img:'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=80', cap:'مطبخ مفتوح داخل شقة تمليك'},
-    {img:'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1200&q=80', cap:'غرفة نوم رئيسية — شقة فاخرة'},
-    {img:'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80', cap:'تراس بإطلالة مفتوحة'},
-    {img:'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=1200&q=80', cap:'حمّام بتشطيب حديث'}
+    {img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80', cap:'صالة استقبال المكتب — تفرغ زينة', capFr:'Hall d’accueil — Tevragh Zeina'},
+    {img:'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80', cap:'واجهة فيلا معروضة للبيع', capFr:'Façade de villa à vendre'},
+    {img:'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=80', cap:'مطبخ مفتوح داخل شقة تمليك', capFr:'Cuisine ouverte — appartement'},
+    {img:'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1200&q=80', cap:'غرفة نوم رئيسية — شقة فاخرة', capFr:'Chambre principale — appartement'},
+    {img:'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1200&q=80', cap:'تراس بإطلالة مفتوحة', capFr:'Terrasse avec vue dégagée'},
+    {img:'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=1200&q=80', cap:'حمّام بتشطيب حديث', capFr:'Salle de bain moderne'}
   ];
+
+  var DAY_FR = {
+    'الأحد':'Dimanche','الإثنين':'Lundi','الاثنين':'Lundi','الثلاثاء':'Mardi',
+    'الأربعاء':'Mercredi','الخميس':'Jeudi','الجمعة':'Vendredi','السبت':'Samedi'
+  };
+  function estPick(item, arKey, frKey, fr){
+    if(window.RizqEstateData && typeof RizqEstateData.pick === 'function'){
+      return RizqEstateData.pick(item, arKey, frKey, fr);
+    }
+    if(fr && item && item[frKey]) return item[frKey];
+    return (item && item[arKey]) || '';
+  }
+  function estBadge(item, fr){
+    var b = estPick(item, 'badge', 'badgeFr', fr);
+    if(fr && window.RizqEstateData && RizqEstateData.BADGE_FR && RizqEstateData.BADGE_FR[item.badge]){
+      return RizqEstateData.BADGE_FR[item.badge];
+    }
+    return b;
+  }
+  function estFurnish(item, fr){
+    var f = estPick(item, 'furnish', 'furnishFr', fr);
+    if(fr && window.RizqEstateData && RizqEstateData.FURNISH_FR && item.furnish && RizqEstateData.FURNISH_FR[item.furnish]){
+      return RizqEstateData.FURNISH_FR[item.furnish];
+    }
+    return f;
+  }
+  function estFeatures(item, fr){
+    if(fr && Array.isArray(item.featuresFr) && item.featuresFr.length) return item.featuresFr;
+    return item.features || [];
+  }
+  function estPrice(item, fr){
+    return estPick(item, 'price', 'priceFr', fr) || item.price || '';
+  }
+  function estDayLabel(day, fr){
+    if(!fr) return day || '';
+    return DAY_FR[day] || day || '';
+  }
 
   var state = { cat:'all', deal:'all', wilaya:'', city:'', quartier:'' };
   var grid = document.getElementById('est-grid');
@@ -1400,81 +1441,114 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   var DEMO_PAY = [
     { type: 'bankily', bank: 'Bankily', code: '42000111', phone: '+22242000111', note: 'بعد التحويل أرسل اسمك ورقم العرض على واتساب الوكالة' },
     { type: 'masrivi', bank: 'Masrivi', code: '42000111', phone: '+22242000111', note: 'حوّل باسم وكالة أطوار العقارية ثم أكّد عبر واتساب' },
-    { type: 'sedad', bank: 'Sedad', code: '420011', phone: '+22242000111', note: 'رمز Sedad للوكالة — أكّد الدفع برسالة' },
-    { type: 'bank', bank: 'BCI', account: 'MR13 0001 4200 0111 0000 0000 000', note: 'تحويل بنكي لعربون أو أتعاب الوكالة' },
-    { type: 'cash', bank: 'نقداً في المكتب', note: 'الدفع نقداً عند توقيع العقد في مقر الوكالة بتفرغ زينة' }
+    { type: 'sedad', bank: 'Sedad', code: '420011', phone: '+22242000111', note: 'رمز Sedad للوكالة — أكّد الدفع برسالة', noteFr: 'Code Sedad de l’agence — confirmez le paiement par message' },
+    { type: 'bank', bank: 'BCI', account: 'MR13 0001 4200 0111 0000 0000 000', note: 'تحويل بنكي لعربون أو أتعاب الوكالة', noteFr: 'Virement pour acompte ou honoraires de l’agence' },
+    {
+      type: 'cash', bank: 'نقداً في المكتب', bankFr: 'Espèces au bureau',
+      note: 'الدفع نقداً عند توقيع العقد في مقر الوكالة بتفرغ زينة',
+      noteFr: 'Paiement en espèces à la signature au bureau Tevragh Zeina'
+    }
   ];
   var DEMO_DESK = {
     enabled: true,
     formTitle: 'استفسار عقاري',
+    formTitleFr: 'Demande immobilière',
     formHint: 'اترك بياناتك وسنتواصل معك بخصوص المعاينة أو العرض.',
+    formHintFr: 'Laissez vos coordonnées — nous vous recontactons pour une visite ou une offre.',
     docsChannel: 'whatsapp'
   };
   var DEMO_HOURS = [
-    { day: 'الأحد', open: true, from: '09:00', to: '18:00' },
-    { day: 'الإثنين', open: true, from: '09:00', to: '18:00' },
-    { day: 'الثلاثاء', open: true, from: '09:00', to: '18:00' },
-    { day: 'الأربعاء', open: true, from: '09:00', to: '18:00' },
-    { day: 'الخميس', open: true, from: '09:00', to: '18:00' },
-    { day: 'الجمعة', open: true, from: '16:00', to: '19:00' },
-    { day: 'السبت', open: true, from: '09:00', to: '13:00' }
+    { day: 'الأحد', dayFr: 'Dimanche', open: true, from: '09:00', to: '18:00' },
+    { day: 'الإثنين', dayFr: 'Lundi', open: true, from: '09:00', to: '18:00' },
+    { day: 'الثلاثاء', dayFr: 'Mardi', open: true, from: '09:00', to: '18:00' },
+    { day: 'الأربعاء', dayFr: 'Mercredi', open: true, from: '09:00', to: '18:00' },
+    { day: 'الخميس', dayFr: 'Jeudi', open: true, from: '09:00', to: '18:00' },
+    { day: 'الجمعة', dayFr: 'Vendredi', open: true, from: '16:00', to: '19:00' },
+    { day: 'السبت', dayFr: 'Samedi', open: true, from: '09:00', to: '13:00' }
   ];
 
   var DEMO_AGENCIES = {
     demo_estate_atwar: {
-      id: 'demo_estate_atwar', name: 'وكالة أطوار العقارية', city: 'نواكشوط',
-      activity: 'وساطة عقارية', phone: '+222 42 00 01 11', whatsapp: '22242000111',
-      email: 'contact@atwar-immo.mr', address: 'شارع الوكالة — تفرغ زينة، نواكشوط',
+      id: 'demo_estate_atwar', name: 'وكالة أطوار العقارية', nameFr: 'Agence Atwar Immobilier',
+      city: 'نواكشوط', cityFr: 'Nouakchott',
+      activity: 'وساطة عقارية', activityFr: 'Courtage immobilier',
+      phone: '+222 42 00 01 11', whatsapp: '22242000111',
+      email: 'contact@atwar-immo.mr',
+      address: 'شارع الوكالة — تفرغ زينة، نواكشوط',
+      addressFr: 'Avenue de l’agence — Tevragh Zeina, Nouakchott',
       logo: 'rizq-mark-inset.png?v=1',
       cover: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1800&q=80',
       desc: 'نرافقك في البيع والكراء والمعاينة — فريق محلي يعرف أحياء نواكشوط ووثائق العقار.',
+      descFr: 'Vente, location et visites — équipe locale qui connaît les quartiers de Nouakchott et les dossiers fonciers.',
       promo_video: 'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4',
       promo_video_extra: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4',
       hours: DEMO_HOURS.slice(),
       paymentMethods: DEMO_PAY,
-      serviceDesk: Object.assign({}, DEMO_DESK, { formTitle: 'استفسار — وكالة أطوار العقارية' })
+      serviceDesk: Object.assign({}, DEMO_DESK, {
+        formTitle: 'استفسار — وكالة أطوار العقارية',
+        formTitleFr: 'Demande — Agence Atwar Immobilier',
+        formHintFr: 'Laissez vos coordonnées — nous vous recontactons pour une visite ou une offre.'
+      })
     },
     demo_estate_saknia: {
-      id: 'demo_estate_saknia', name: 'سكنية العقارية', city: 'تفرغ زينة',
-      activity: 'بيع وإيجار', phone: '+222 45 10 20 30', whatsapp: '22245102030',
-      email: 'saknia@estate-demo.mr', address: 'تفرغ زينة',
+      id: 'demo_estate_saknia', name: 'سكنية العقارية', nameFr: 'Saknia Immobilier',
+      city: 'تفرغ زينة', cityFr: 'Tevragh Zeina',
+      activity: 'بيع وإيجار', activityFr: 'Vente & location',
+      phone: '+222 45 10 20 30', whatsapp: '22245102030',
+      email: 'saknia@estate-demo.mr', address: 'تفرغ زينة', addressFr: 'Tevragh Zeina',
       hours: DEMO_HOURS.slice(),
       logo: 'rizq-mark-inset.png?v=1',
       cover: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1800&q=80',
       desc: 'شقق عائلية ومحلات تجارية في تفرغ زينة — معاينة ومتابعة يومية.',
+      descFr: 'Appartements familiaux et locaux à Tevragh Zeina — visites et suivi quotidien.',
       paymentMethods: [
         { type: 'bankily', bank: 'Bankily', code: '45102030', phone: '+22245102030' },
-        { type: 'cash', bank: 'دفع عند توقيع العقد', note: 'عربون في مكتب الوكالة' }
+        { type: 'cash', bank: 'دفع عند توقيع العقد', bankFr: 'Paiement à la signature', note: 'عربون في مكتب الوكالة', noteFr: 'Acompte au bureau de l’agence' }
       ],
-      serviceDesk: Object.assign({}, DEMO_DESK, { formTitle: 'استفسار — سكنية العقارية' })
+      serviceDesk: Object.assign({}, DEMO_DESK, {
+        formTitle: 'استفسار — سكنية العقارية',
+        formTitleFr: 'Demande — Saknia Immobilier'
+      })
     },
     demo_estate_horizon: {
-      id: 'demo_estate_horizon', name: 'هورايزن للإسكان', city: 'نواذيبو',
-      activity: 'تطوير ووساطة', phone: '+222 46 22 33 44', whatsapp: '22246223344',
-      email: 'horizon@estate-demo.mr', address: 'نواذيبو',
+      id: 'demo_estate_horizon', name: 'هورايزن للإسكان', nameFr: 'Horizon Habitat',
+      city: 'نواذيبو', cityFr: 'Nouadhibou',
+      activity: 'تطوير ووساطة', activityFr: 'Promotion & courtage',
+      phone: '+222 46 22 33 44', whatsapp: '22246223344',
+      email: 'horizon@estate-demo.mr', address: 'نواذيبو', addressFr: 'Nouadhibou',
       hours: DEMO_HOURS.slice(),
       logo: 'rizq-mark-inset.png?v=1',
       cover: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1800&q=80',
       desc: 'أراضي وفلل في نواذيبو وضواحيها — معاينة وتنسيق العقود مع المالك.',
+      descFr: 'Terrains et villas à Nouadhibou et alentours — visites et coordination des contrats.',
       paymentMethods: [
         { type: 'sedad', bank: 'Sedad', code: '462233', phone: '+22246223344' },
         { type: 'bank', bank: 'GBM', account: 'MR13 0002 4600 2233 0000 0000 000' }
       ],
-      serviceDesk: Object.assign({}, DEMO_DESK, { formTitle: 'استفسار — هورايزن للإسكان' })
+      serviceDesk: Object.assign({}, DEMO_DESK, {
+        formTitle: 'استفسار — هورايزن للإسكان',
+        formTitleFr: 'Demande — Horizon Habitat'
+      })
     },
     demo_estate_dar: {
-      id: 'demo_estate_dar', name: 'دار الأمين العقارية', city: 'لكصر',
-      activity: 'إدارة عقارات', phone: '+222 36 70 80 90', whatsapp: '22236708090',
-      email: 'dar@estate-demo.mr', address: 'لكصر — نواكشوط',
+      id: 'demo_estate_dar', name: 'دار الأمين العقارية', nameFr: 'Dar Al-Amine Immobilier',
+      city: 'لكصر', cityFr: 'Ksar',
+      activity: 'إدارة عقارات', activityFr: 'Gestion immobilière',
+      phone: '+222 36 70 80 90', whatsapp: '22236708090',
+      email: 'dar@estate-demo.mr', address: 'لكصر — نواكشوط', addressFr: 'Ksar — Nouakchott',
       hours: DEMO_HOURS.slice(),
       logo: 'rizq-mark-inset.png?v=1',
       cover: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1800&q=80',
       desc: 'إدارة كراء وبيع في لكصر — متابعة العقود والمستأجرين بشفافية.',
+      descFr: 'Gestion locative et vente au Ksar — suivi transparent des baux et locataires.',
       paymentMethods: [
         { type: 'bankily', bank: 'Bankily', code: '36708090', phone: '+22236708090' },
         { type: 'bimbam', bank: 'BimBank', code: '367080', phone: '+22236708090' }
       ],
-      serviceDesk: Object.assign({}, DEMO_DESK, { formTitle: 'استفسار — دار الأمين العقارية' })
+      serviceDesk: Object.assign({}, DEMO_DESK, {
+        formTitle: 'استفسار — دار الأمين العقارية',
+        formTitleFr: 'Demande — Dar Al-Amine Immobilier'
+      })
     }
   };
 
@@ -1541,11 +1615,16 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   function paintDesk(desk, name){
     window._rizqEstateServiceDesk = desk || {};
     var root = document.getElementById('est-desk');
+    var frDesk = isFrEstate();
     if(window.RizqServiceDesk && typeof RizqServiceDesk.applyPublicLabels === 'function'){
-      RizqServiceDesk.applyPublicLabels(root, window._rizqEstateServiceDesk, name || AGENCY.name);
+      RizqServiceDesk.applyPublicLabels(root, window._rizqEstateServiceDesk, name || AGENCY.name, { fr: frDesk });
     } else {
-      var title = (desk && desk.formTitle) || ('استفسار عقاري — ' + (name || AGENCY.name || ''));
-      var hint = (desk && desk.formHint) || 'أدخل بياناتك وسنتواصل معك بخصوص العرض أو الزيارة.';
+      var title = frDesk
+        ? ((desk && (desk.formTitleFr || desk.formTitle)) || ('Demande immobilière — ' + (name || AGENCY.name || '')))
+        : ((desk && desk.formTitle) || ('استفسار عقاري — ' + (name || AGENCY.name || '')));
+      var hint = frDesk
+        ? ((desk && (desk.formHintFr || desk.formHint)) || 'Laissez vos coordonnées — nous vous recontactons pour une offre ou une visite.')
+        : ((desk && desk.formHint) || 'أدخل بياناتك وسنتواصل معك بخصوص العرض أو الزيارة.');
       setText('est-desk-title', '📩 ' + title);
       setText('est-desk-hint', hint);
     }
@@ -1567,7 +1646,8 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     var fr = isFrEstate();
     if(box){
       box.innerHTML = list.map(function(h){
-        var day = esc(h.day || h.name || '');
+        var dayRaw = h.day || h.name || '';
+        var day = esc(fr ? (h.dayFr || estDayLabel(dayRaw, true)) : dayRaw);
         if(h.open === false || h.closed){
           return '<div class="est-hours-row"><span class="est-hours-day">'+day+'</span><span class="est-hours-closed">'+(fr?'Fermé':'مغلق')+'</span></div>';
         }
@@ -1596,10 +1676,15 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   }
 
   function paintSideInfo(acc){
-    var addr = acc.address || acc.city || '—';
+    var frSide = isFrEstate();
+    var addr = frSide
+      ? (acc.addressFr || acc.cityFr || acc.address || acc.city || '—')
+      : (acc.address || acc.city || '—');
     var phone = acc.phone || '—';
     var email = acc.email || '—';
-    var about = acc.desc || acc.tagline || '';
+    var about = frSide
+      ? (acc.descFr || acc.taglineFr || acc.desc || acc.tagline || '')
+      : (acc.desc || acc.tagline || '');
     setText('est-side-about', about);
     setText('est-info-address', addr);
     setText('est-info-phone', phone);
@@ -1642,15 +1727,20 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     AGENCY = {
       id: acc.id || AGENCY.id,
       name: acc.name || AGENCY.name,
+      nameFr: acc.nameFr || AGENCY.nameFr || '',
       city: acc.city || acc.wilaya || AGENCY.city,
+      cityFr: acc.cityFr || AGENCY.cityFr || '',
       activity: acc.activity || acc.sector || AGENCY.activity,
+      activityFr: acc.activityFr || AGENCY.activityFr || '',
       phone: acc.phone || acc.tel || AGENCY.phone,
       whatsapp: String(acc.whatsapp || acc.wa || acc.phone || AGENCY.whatsapp).replace(/\D/g,''),
       email: acc.email || AGENCY.email || '',
       address: acc.address || acc.city || AGENCY.address || '',
+      addressFr: acc.addressFr || AGENCY.addressFr || '',
       logo: acc.logo || acc.thumb || acc.avatar || AGENCY.logo,
       cover: acc.cover || acc.thumb || AGENCY.cover,
       desc: acc.desc || acc.tagline || acc.bio || AGENCY.desc,
+      descFr: acc.descFr || acc.taglineFr || AGENCY.descFr || '',
       promo_video: acc.promo_video || AGENCY.promo_video || '',
       promo_video_extra: acc.promo_video_extra || AGENCY.promo_video_extra || '',
       youtube_channel_id: acc.youtube_channel_id || acc.youtubeChannelId || AGENCY.youtube_channel_id || '',
@@ -1668,21 +1758,27 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     window._pageCategory = 'estate';
     window._pageModule = 'estate';
     var frBoot = isFrEstate();
-    document.title = AGENCY.name + (frBoot ? ' | Agence immobilière — Rizq' : ' | وكالة عقارية — رزق');
+    var dispName = frBoot ? (AGENCY.nameFr || AGENCY.name) : AGENCY.name;
+    var dispDesc = frBoot ? (AGENCY.descFr || AGENCY.desc) : AGENCY.desc;
+    var dispAddr = frBoot ? (AGENCY.addressFr || AGENCY.cityFr || AGENCY.address || AGENCY.city || '') : (AGENCY.address || AGENCY.city || '');
+    var dispAct = frBoot
+      ? (AGENCY.activityFr || AGENCY.activity || 'Courtage immobilier')
+      : (AGENCY.activity || 'وساطة عقارية');
+    document.title = dispName + (frBoot ? ' | Agence immobilière — Rizq' : ' | وكالة عقارية — رزق');
 
     var kicker = document.getElementById('est-kicker');
     if(kicker){
       kicker.innerHTML = '<i></i> ' + (frBoot ? 'Agence immobilière certifiée ✅' : 'وكالة عقارية معتمدة ✅');
     }
-    setText('est-hero-name', AGENCY.name);
-    setText('est-hero-lead', AGENCY.desc);
-    setText('est-hero-loc', '📍 ' + (AGENCY.address || AGENCY.city || ''));
-    setText('est-hero-activity', '🏠 ' + (AGENCY.activity || (frBoot ? 'Courtage immobilier' : 'وساطة عقارية')));
-    setText('est-bar-name', AGENCY.name);
-    setText('est-bar-sub', (AGENCY.activity || (frBoot ? 'Courtage immobilier' : 'وساطة عقارية')) + ' · ' + (AGENCY.address || AGENCY.city || ''));
+    setText('est-hero-name', dispName);
+    setText('est-hero-lead', dispDesc);
+    setText('est-hero-loc', '📍 ' + dispAddr);
+    setText('est-hero-activity', '🏠 ' + dispAct);
+    setText('est-bar-name', dispName);
+    setText('est-bar-sub', dispAct + ' · ' + dispAddr);
 
     var hero = document.getElementById('est-hero-img');
-    if(hero && AGENCY.cover){ hero.src = AGENCY.cover; hero.alt = AGENCY.name; }
+    if(hero && AGENCY.cover){ hero.src = AGENCY.cover; hero.alt = dispName; }
 
     var call = telHref(AGENCY.phone);
     var wa = waHref(AGENCY.whatsapp);
@@ -1709,9 +1805,11 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     paintContactMeta(AGENCY);
     paintSideInfo(AGENCY);
     paintPayments(AGENCY.paymentMethods);
-    paintDesk(AGENCY.serviceDesk, AGENCY.name);
+    paintDesk(AGENCY.serviceDesk, frBoot ? (AGENCY.nameFr || AGENCY.name) : AGENCY.name);
     hidePlatformUpsellOnBoundEstate();
     renderGrid();
+    renderReviews();
+    renderRail();
     try{ mountEstateIntroVideo(); }catch(eVid){}
   }
 
@@ -1938,7 +2036,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     if(item.cat === 'land'){
       bits.push('<span>📐 '+esc(areaLabel(item.area, fr))+'</span>');
       if(item.land && item.land.frontage) bits.push('<span>📏 '+(fr?'Façade ':'واجهة ')+esc(item.land.frontage)+' م</span>');
-      if(item.land && item.land.zoning) bits.push('<span>🏷 '+esc(item.land.zoning)+'</span>');
+      if(item.land && item.land.zoning) bits.push('<span>🏷 '+esc(fr ? (item.land.zoningFr || item.land.zoning) : item.land.zoning)+'</span>');
       if(item.land && item.land.deed) bits.push('<span>📄 '+esc(item.land.deed)+'</span>');
       return bits.join('');
     }
@@ -1946,14 +2044,18 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     if(item.living != null) bits.push('<span>🛋 '+(fr ? (item.living+' salons') : (item.living+' صالون'))+'</span>');
     if(item.baths != null) bits.push('<span>🛁 '+esc(specText('baths', item.baths, fr))+'</span>');
     bits.push('<span>📐 '+esc(areaLabel(item.area, fr))+'</span>');
-    if(item.builtArea != null) bits.push('<span>🏗 '+(fr?'Bâti ':'مبنية ')+esc(item.builtArea)+' م²</span>');
+    if(item.builtArea != null) bits.push('<span>🏗 '+(fr?'Bâti ':'مبنية ')+esc(item.builtArea)+(fr?' m²':' م²')+'</span>');
     if(item.parking != null) bits.push('<span>🚗 '+(fr?'Parking ':'كراج ')+esc(item.parking)+'</span>');
-    if(item.furnish) bits.push('<span>🛋 '+esc(item.furnish)+'</span>');
+    if(item.furnish) bits.push('<span>🛋 '+esc(estFurnish(item, fr))+'</span>');
     return bits.join('');
   }
 
   function cardHTML(item){
     var fr = isFrEstate();
+    var title = estPick(item, 'title', 'titleFr', fr);
+    var loc = estPick(item, 'loc', 'locFr', fr);
+    var badge = estBadge(item, fr);
+    var price = estPrice(item, fr);
     var imgs = listingImgs(item);
     if(!imgs.length) imgs = [coverOf(item)];
     var media;
@@ -1961,7 +2063,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       media = '<div class="est-card-media" data-carousel="1" data-idx="0">'
         + '<div class="est-card-carousel">'
         + imgs.map(function(src, i){
-          return '<img src="'+esc(src)+'" alt="'+esc(item.title)+'" loading="'+(i?'lazy':'eager')+'" class="'+(i?'':'is-on')+'"/>';
+          return '<img src="'+esc(src)+'" alt="'+esc(title)+'" loading="'+(i?'lazy':'eager')+'" class="'+(i?'':'is-on')+'"/>';
         }).join('')
         + '</div>'
         + '<button type="button" class="est-card-nav prev" data-dir="-1" aria-label="'+(fr?'Précédent':'السابق')+'">‹</button>'
@@ -1971,22 +2073,22 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
           return '<button type="button" data-go="'+i+'" class="'+(i?'':'is-on')+'" aria-label="'+(i+1)+'"></button>';
         }).join('')
         + '</div>'
-        + '<span class="est-badge">'+esc(item.badge)+'</span>'
-        + '<span class="est-price">'+esc(item.price)+'</span>'
+        + '<span class="est-badge">'+esc(badge)+'</span>'
+        + '<span class="est-price">'+esc(price)+'</span>'
         + '</div>';
     } else {
       media = '<div class="est-card-media">'
-        + '<img src="'+esc(imgs[0]||item.img||'')+'" alt="'+esc(item.title)+'" loading="lazy"/>'
-        + '<span class="est-badge">'+esc(item.badge)+'</span>'
-        + '<span class="est-price">'+esc(item.price)+'</span>'
+        + '<img src="'+esc(imgs[0]||item.img||'')+'" alt="'+esc(title)+'" loading="lazy"/>'
+        + '<span class="est-badge">'+esc(badge)+'</span>'
+        + '<span class="est-price">'+esc(price)+'</span>'
         + '</div>';
     }
     return '<div class="est-card'+(item.featured?' featured':'')+'" data-id="'+esc(item.id)+'">'
       + media
-      + '<button type="button" class="est-card-open" data-id="'+esc(item.id)+'" aria-label="'+(fr?'Détails: ':'التفاصيل: ')+esc(item.title)+'" style="display:block;width:100%;text-align:inherit;background:transparent;border:0;padding:0;color:inherit;cursor:pointer">'
+      + '<button type="button" class="est-card-open" data-id="'+esc(item.id)+'" aria-label="'+(fr?'Détails: ':'التفاصيل: ')+esc(title)+'" style="display:block;width:100%;text-align:inherit;background:transparent;border:0;padding:0;color:inherit;cursor:pointer">'
       + '<div class="est-card-body">'
-      +   '<h3>'+esc(item.title)+'</h3>'
-      +   '<div class="loc">📍 '+(fr?'Quartier: ':'الحي: ')+esc(item.loc)+'</div>'
+      +   '<h3>'+esc(title)+'</h3>'
+      +   '<div class="loc">📍 '+(fr?'Quartier: ':'الحي: ')+esc(loc)+'</div>'
       +   '<div class="est-meta">'+ribbonHTML(item, fr)+'</div>'
       +   '<span class="est-card-cta">'+(fr?'Voir les détails':'عرض التفاصيل')+'</span>'
       + '</div></button>'
@@ -2000,10 +2102,10 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     box.innerHTML = REVIEWS.map(function(r){
       var stars = '★★★★★'.slice(0, r.stars||5) + '☆☆☆☆☆'.slice(0, 5-(r.stars||5));
       return '<article class="est-review-card">'
-        + '<div class="who">'+esc(r.name)+'</div>'
+        + '<div class="who">'+esc(fr ? (r.nameFr || r.name) : r.name)+'</div>'
         + '<div class="stars" aria-label="'+(r.stars||5)+'/5">'+stars+'</div>'
-        + '<div class="txt">'+esc(r.text)+'</div>'
-        + '<div class="when">'+esc(r.when||'')+'</div>'
+        + '<div class="txt">'+esc(fr ? (r.textFr || r.text) : r.text)+'</div>'
+        + '<div class="when">'+esc(fr ? (r.whenFr || r.when || '') : (r.when||''))+'</div>'
         + '</article>';
     }).join('');
   }
@@ -2022,16 +2124,18 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   }
 
   function renderRail(){
+    var frRail = isFrEstate();
     rail.innerHTML = GALLERY.map(function(g, i){
-      return '<figure class="est-shot" data-gi="'+i+'" tabindex="0" role="button" aria-label="تكبير: '+esc(g.cap)+'">'
-        + '<img src="'+esc(g.img)+'" alt="'+esc(g.cap)+'" loading="lazy"/>'
-        + '<figcaption>'+esc(g.cap)+'</figcaption></figure>';
+      var cap = frRail ? (g.capFr || g.cap) : g.cap;
+      return '<figure class="est-shot" data-gi="'+i+'" tabindex="0" role="button" aria-label="'+(frRail?'Agrandir: ':'تكبير: ')+esc(cap)+'">'
+        + '<img src="'+esc(g.img)+'" alt="'+esc(cap)+'" loading="lazy"/>'
+        + '<figcaption>'+esc(cap)+'</figcaption></figure>';
     }).join('');
   }
 
   function pdMediaList(item, tab){
     var all = (window.RizqEstateData && RizqEstateData.allMedia)
-      ? RizqEstateData.allMedia(item)
+      ? RizqEstateData.allMedia(item, isFrEstate())
       : listingImgs(item).map(function(s){ return { src:s, cat:'cover', label:'' }; });
     if(!tab || tab === 'all') return all;
     return all.filter(function(x){ return x.cat === tab; });
@@ -2136,11 +2240,14 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   }
 
   function paintPdMap(item){
-    var addr = (item.street ? item.street + ' — ' : '') + (item.loc || '');
+    var frMap = isFrEstate();
+    var addr = (estPick(item, 'street', 'streetFr', frMap) ? estPick(item, 'street', 'streetFr', frMap) + ' — ' : '') + (estPick(item, 'loc', 'locFr', frMap) || '');
     setText('est-pd-map-addr', addr || '—');
     var near = document.getElementById('est-pd-nearby');
     if(near){
-      var pts = (item.map && item.map.nearby) || [];
+      var pts = (frMap && item.map && item.map.nearbyFr && item.map.nearbyFr.length)
+        ? item.map.nearbyFr
+        : ((item.map && item.map.nearby) || []);
       near.innerHTML = pts.map(function(p){ return '<span>📍 '+esc(p)+'</span>'; }).join('');
     }
     try{
@@ -2156,16 +2263,19 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     _pdItem = item;
     _pdMediaTab = 'all';
     _pdGalleryIdx = 0;
-    document.getElementById('est-modal-title').textContent = item.title;
-    document.getElementById('est-modal-loc').textContent = '📍 '+(item.street ? item.street+' · ' : '')+(frModal?'':'')+item.loc;
-    document.getElementById('est-modal-price').textContent = item.price;
-    document.getElementById('est-modal-badge').textContent = item.badge;
-    document.getElementById('est-modal-desc').textContent = item.desc;
+    var mTitle = estPick(item, 'title', 'titleFr', frModal);
+    var mStreet = estPick(item, 'street', 'streetFr', frModal);
+    var mLoc = estPick(item, 'loc', 'locFr', frModal);
+    document.getElementById('est-modal-title').textContent = mTitle;
+    document.getElementById('est-modal-loc').textContent = '📍 '+(mStreet ? mStreet+' · ' : '')+mLoc;
+    document.getElementById('est-modal-price').textContent = estPrice(item, frModal);
+    document.getElementById('est-modal-badge').textContent = estBadge(item, frModal);
+    document.getElementById('est-modal-desc').textContent = estPick(item, 'desc', 'descFr', frModal);
     var ribbon = document.getElementById('est-pd-ribbon');
     if(ribbon) ribbon.innerHTML = ribbonHTML(item, frModal);
     var chips = document.getElementById('est-pd-chips');
     if(chips){
-      var feats = item.features || [];
+      var feats = estFeatures(item, frModal);
       chips.innerHTML = feats.map(function(f){ return '<span>✓ '+esc(f)+'</span>'; }).join('');
       chips.style.display = feats.length ? '' : 'none';
     }
@@ -2224,7 +2334,11 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     }
   }
   function openLb(g){
-    _lbList = GALLERY.map(function(x){ return { src:x.img, img:x.img, label:x.cap, cap:x.cap }; });
+    var frLb = isFrEstate();
+    _lbList = GALLERY.map(function(x){
+      var cap = frLb ? (x.capFr || x.cap) : x.cap;
+      return { src:x.img, img:x.img, label:cap, cap:cap };
+    });
     _lbIdx = Math.max(0, GALLERY.findIndex(function(x){ return x.img === g.img; }));
     if(_lbIdx < 0) _lbIdx = 0;
     paintLbFrame();
@@ -2532,6 +2646,15 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     tx('#est-location-card .est-info-card-title', '📍 الموقع والتغطية', '📍 Lieu & couverture');
     tx('#est-hours-card .est-info-card-title', '🕐 ساعات العمل', '🕐 Horaires');
     tx('#est-pay-card .est-info-card-title', '💳 طرق الدفع والتحويل', '💳 Paiement');
+    tx('#est-lbl-address', 'العنوان', 'Adresse');
+    tx('#est-lbl-phone', 'الهاتف وواتساب', 'Téléphone & WhatsApp');
+    tx('#est-lbl-email', 'البريد', 'E-mail');
+    tx('#est-lbl-coverage', 'مناطق التغطية', 'Zones de couverture');
+    tx('#est-map-txt', 'عرض على الخريطة', 'Voir sur la carte');
+    document.querySelectorAll('#est-coverage span[data-ar]').forEach(function(sp){
+      sp.textContent = fr ? (sp.getAttribute('data-fr') || sp.getAttribute('data-ar')) : (sp.getAttribute('data-ar') || sp.textContent);
+    });
+    tx('#est-pd-map-txt', 'موقع العقار على الخريطة', 'Emplacement sur la carte');
     var galH = document.querySelector('.est-gallery-head h2');
     var galP = document.querySelector('.est-gallery-head p');
     if(galH) galH.textContent = fr ? 'Galerie photos' : 'معرض الصور';
@@ -2569,13 +2692,26 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     tx('#est-modal-quote', '💬 طلب عرض سعر / تفاوض', '💬 Devis / négociation');
     if(_pdItem){ paintPdTabs(_pdItem); paintPdGallery(_pdItem); paintPdThumbs(_pdItem); }
     tx('#est-foot-blurb', 'وكالة أطوار العقارية — بيع وكراء ومعاينة في نواكشوط.', 'Agence Atwar — vente, location et visites à Nouakchott.');
+    var mapPrev = document.getElementById('est-map-preview');
+    if(mapPrev) mapPrev.setAttribute('aria-label', fr ? 'Voir sur la carte' : 'عرض على الخريطة');
+    var pdMap = document.getElementById('est-pd-map');
+    if(pdMap) pdMap.setAttribute('aria-label', fr ? 'Voir l’emplacement sur la carte' : 'عرض الموقع على الخريطة');
+    var lb = document.getElementById('est-lightbox');
+    if(lb) lb.setAttribute('aria-label', fr ? 'Image agrandie' : 'صورة مكبرة');
+    var lbClose = document.getElementById('est-lb-close');
+    if(lbClose) lbClose.setAttribute('aria-label', fr ? 'Fermer' : 'إغلاق');
+    var lbPrev = document.getElementById('est-lb-prev');
+    if(lbPrev) lbPrev.setAttribute('aria-label', fr ? 'Image précédente' : 'الصورة السابقة');
+    var lbNext = document.getElementById('est-lb-next');
+    if(lbNext) lbNext.setAttribute('aria-label', fr ? 'Image suivante' : 'الصورة التالية');
     if(window._rizqEstateProfile){
-      paintPayments(window._rizqEstatePaymentMethods || window._rizqEstateProfile.paymentMethods);
-      paintDesk(window._rizqEstateServiceDesk || window._rizqEstateProfile.serviceDesk, window._rizqEstateProfile.name);
-      paintSideInfo(window._rizqEstateProfile);
+      applyAgency(window._rizqEstateProfile);
+    } else {
+      paintPayments(window._rizqEstatePaymentMethods || []);
+      renderGrid();
+      renderReviews();
+      renderRail();
     }
-    renderGrid();
-    renderReviews();
     } finally { __estLangBusy = false; }
   }
 

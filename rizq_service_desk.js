@@ -48,7 +48,9 @@
     return {
       enabled: desk.enabled !== false,
       formTitle: String(desk.formTitle || '').trim().slice(0, 120),
+      formTitleFr: String(desk.formTitleFr || '').trim().slice(0, 120),
       formHint: String(desk.formHint || '').trim().slice(0, 240),
+      formHintFr: String(desk.formHintFr || '').trim().slice(0, 240),
       docsChannel: (ch === 'email' || ch === 'both' || ch === 'whatsapp' || ch === 'platform') ? ch : 'platform',
     };
   }
@@ -56,16 +58,19 @@
   function applyPublicLabels(root, desk, accountName) {
     if (!root) return;
     desk = normalizeDesk(desk);
-    var title = desk.formTitle
-      || t('طلب خدمة', 'Demande de service');
-    if (accountName && !desk.formTitle) {
+    var fr = isFr();
+    var title = (fr && desk.formTitleFr) ? desk.formTitleFr : desk.formTitle;
+    if (!title) title = t('طلب خدمة', 'Demande de service');
+    if (accountName && !(desk.formTitle || desk.formTitleFr)) {
       title = t('طلب خدمة — ', 'Demande — ') + accountName;
     }
-    var hint = desk.formHint
-      || t(
+    var hint = (fr && desk.formHintFr) ? desk.formHintFr : desk.formHint;
+    if (!hint) {
+      hint = t(
         'أدخل بياناتك وسنتواصل معك. يمكنك رفع بيان الدفع (صورة أو PDF) مباشرة على المنصة.',
         'Saisissez vos coordonnées. Vous pouvez joindre un justificatif de paiement (image ou PDF) sur la plateforme.'
       );
+    }
     var titleEl = root.querySelector('[data-desk="title"]') || root.querySelector('#req-title');
     var hintEl = root.querySelector('[data-desk="hint"]') || root.querySelector('#req-sub');
     if (titleEl) titleEl.textContent = '📩 ' + title;

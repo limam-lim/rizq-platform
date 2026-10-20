@@ -218,53 +218,57 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
 </main>
 
 <footer class="ag-foot">
-  © 2026 رزق —
-  <a href="rizq_directory.html">دليل الأعمال</a>
+  <span id="ag-foot-copy">© 2026 رزق —</span>
+  <a id="ag-foot-dir" href="rizq_directory.html">دليل الأعمال</a>
   <span id="ag-demo-sep" data-rizq-estate-promo="1"> · </span>
   <a id="ag-demo-link" data-rizq-estate-promo="1" href="rizq_estate.html?demo=1&amp;id=demo_estate_atwar">نموذج وكالة</a>
 </footer>
 
 <script>
 (function(){
+  var CITY_FR = {
+    'نواكشوط':'Nouakchott','تفرغ زينة':'Tevragh Zeina','نواذيبو':'Nouadhibou',
+    'لكصر':'Ksar','أطار':'Atar','كيفة':'Kiffa','روصو':'Rosso'
+  };
   var DEMO = [
     {
       id: 'demo_estate_atwar',
-      name: 'أطوار للعقارات',
-      activity: 'وساطة عقارية',
-      city: 'نواكشوط',
-      tagline: 'فلل وشقق وأراضي',
+      name: 'أطوار للعقارات', nameFr: 'Atwar Immobilier',
+      activity: 'وساطة عقارية', activityFr: 'Courtage immobilier',
+      city: 'نواكشوط', cityFr: 'Nouakchott',
+      tagline: 'فلل وشقق وأراضي', taglineFr: 'Villas, appartements et terrains',
       logo: 'rizq-mark-inset.png?v=1',
-      badge: 'نموذج',
+      badge: 'نموذج', badgeFr: 'Modèle',
       href: 'rizq_estate.html?demo=1&id=demo_estate_atwar'
     },
     {
       id: 'demo_estate_saknia',
-      name: 'سكنية العقارية',
-      activity: 'بيع وإيجار',
-      city: 'تفرغ زينة',
-      tagline: 'شقق عائلية ومحلات',
+      name: 'سكنية العقارية', nameFr: 'Saknia Immobilier',
+      activity: 'بيع وإيجار', activityFr: 'Vente & location',
+      city: 'تفرغ زينة', cityFr: 'Tevragh Zeina',
+      tagline: 'شقق عائلية ومحلات', taglineFr: 'Appartements familiaux et locaux',
       logo: 'rizq-mark-inset.png?v=1',
-      badge: 'نموذج',
+      badge: 'نموذج', badgeFr: 'Modèle',
       href: 'rizq_estate.html?demo=1&id=demo_estate_saknia'
     },
     {
       id: 'demo_estate_horizon',
-      name: 'هورايزن للإسكان',
-      activity: 'تطوير ووساطة',
-      city: 'نواذيبو',
-      tagline: 'أراضي وفلل جاهزة',
+      name: 'هورايزن للإسكان', nameFr: 'Horizon Habitat',
+      activity: 'تطوير ووساطة', activityFr: 'Promotion & courtage',
+      city: 'نواذيبو', cityFr: 'Nouadhibou',
+      tagline: 'أراضي وفلل جاهزة', taglineFr: 'Terrains et villas prêts',
       logo: 'rizq-mark-inset.png?v=1',
-      badge: 'نموذج',
+      badge: 'نموذج', badgeFr: 'Modèle',
       href: 'rizq_estate.html?demo=1&id=demo_estate_horizon'
     },
     {
       id: 'demo_estate_dar',
-      name: 'دار الأمين العقارية',
-      activity: 'إدارة عقارات',
-      city: 'لكصر',
-      tagline: 'إدارة كراء وبيع',
+      name: 'دار الأمين العقارية', nameFr: 'Dar Al-Amine Immobilier',
+      activity: 'إدارة عقارات', activityFr: 'Gestion immobilière',
+      city: 'لكصر', cityFr: 'Ksar',
+      tagline: 'إدارة كراء وبيع', taglineFr: 'Gestion locative et vente',
       logo: 'rizq-mark-inset.png?v=1',
-      badge: 'نموذج',
+      badge: 'نموذج', badgeFr: 'Modèle',
       href: 'rizq_estate.html?demo=1&id=demo_estate_dar'
     }
   ];
@@ -352,10 +356,21 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
   function cardHTML(a, isExample){
     var fr = isFrAg();
     var href = a.href || ('rizq_estate.html?id=' + encodeURIComponent(a.id||''));
-    var act = a.activity || (fr ? 'Agence immobilière' : 'وكالة عقارية');
+    var name = fr ? (a.nameFr || a.name) : a.name;
+    var act = fr
+      ? (a.activityFr || a.activity || 'Agence immobilière')
+      : (a.activity || 'وكالة عقارية');
+    var city = fr
+      ? (a.cityFr || CITY_FR[a.city] || a.city || '')
+      : (a.city || '');
+    var tagline = fr ? (a.taglineFr || a.tagline || '') : (a.tagline || '');
     var openLbl = fr ? 'Visiter l\'agence ←' : 'زيارة الوكالة ←';
     var badge = a.badge;
-    if(fr && badge === 'نموذج') badge = 'Modèle';
+    if(fr){
+      if(badge === 'نموذج') badge = a.badgeFr || 'Modèle';
+      else if(badge === 'موثّق' || badge === 'موثق') badge = 'Vérifié';
+      else if(a.badgeFr) badge = a.badgeFr;
+    }
     var thumb = a.logo
       ? '<img src="'+esc(a.logo)+'" alt="" loading="lazy"/>'
       : '🏠';
@@ -363,14 +378,14 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
       + '<div class="ag-card-top">'
       +   '<div class="ag-thumb">'+thumb+'</div>'
       +   '<div>'
-      +     '<div class="ag-name">'+esc(a.name)
+      +     '<div class="ag-name">'+esc(name)
       +       (badge ? ' <span class="ag-example-badge">'+esc(badge)+'</span>' : '')
       +     '</div>'
       +     '<div class="ag-type">'+esc(act)+'</div>'
       +   '</div>'
       + '</div>'
-      + (a.city ? '<div class="ag-city">📍 '+esc(a.city)+'</div>' : '')
-      + (a.tagline ? '<div class="ag-tagline">'+esc(a.tagline)+'</div>' : '')
+      + (city ? '<div class="ag-city">📍 '+esc(city)+'</div>' : '')
+      + (tagline ? '<div class="ag-tagline">'+esc(tagline)+'</div>' : '')
       + '<span class="ag-cta">'+openLbl+'</span>'
       + '</a>';
   }
@@ -420,14 +435,20 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
   }
 
   function mapAccount(a){
+    var city = a.city || a.wilaya || a.location || '';
     return {
       id: a.id,
       name: a.name || 'وكالة عقارية',
+      nameFr: a.nameFr || a.name || 'Agence immobilière',
       activity: a.activity || a.sector || 'وساطة عقارية',
-      city: a.city || a.wilaya || a.location || '',
+      activityFr: a.activityFr || a.sectorFr || 'Courtage immobilier',
+      city: city,
+      cityFr: a.cityFr || CITY_FR[city] || city,
       tagline: a.tagline || a.bio || '',
+      taglineFr: a.taglineFr || a.bioFr || a.tagline || a.bio || '',
       logo: a.logo || a.avatar || 'rizq-mark-inset.png?v=1',
       badge: a.verified ? 'موثّق' : '',
+      badgeFr: a.verified ? 'Vérifié' : '',
       href: 'rizq_estate.html?id=' + encodeURIComponent(a.id||'')
     };
   }
@@ -502,9 +523,23 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
       setTxt('ag-filter-label', 'تصفية حسب النشاط', 'Filtrer par activité');
       setTxt('ag-reg-own', '✨ امتلك وكالتك العقارية على رزق', '✨ Possédez votre agence sur Rizq');
       setTxt('ag-demo-link', 'نموذج وكالة', 'Agence modèle');
+      setTxt('ag-foot-copy', '© 2026 رزق —', '© 2026 Rizq —');
+      setTxt('ag-foot-dir', 'دليل الأعمال', 'Annuaire des entreprises');
+      document.title = fr ? 'Annuaire des agences immobilières — Rizq' : 'دليل الوكالات العقارية — رزق';
+
+      var hero = document.querySelector('.ag-hero');
+      if(hero) hero.setAttribute('aria-label', fr ? 'Annuaire des agences immobilières' : 'دليل الوكالات العقارية');
+      wilayaEl.setAttribute('aria-label', fr ? 'Wilaya' : 'الولاية');
 
       searchEl.placeholder = fr ? 'Rechercher une agence ou une ville…' : 'ابحث بالاسم أو المدينة…';
-      wilayaEl.options[0].textContent = fr ? 'Tous les wilayas' : 'كل الولايات';
+      if(wilayaEl && wilayaEl.options){
+        for(var wi = 0; wi < wilayaEl.options.length; wi++){
+          var opt = wilayaEl.options[wi];
+          var v = opt.value;
+          if(!v){ opt.textContent = fr ? 'Toutes les wilayas' : 'كل الولايات'; }
+          else { opt.textContent = fr ? (CITY_FR[v] || v) : v; }
+        }
+      }
       var listLabel = document.getElementById('ag-list');
       if(listLabel) listLabel.setAttribute('aria-label', fr ? 'Liste des agences immobilières' : 'قائمة الوكالات العقارية');
 

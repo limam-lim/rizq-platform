@@ -1,18 +1,34 @@
 /**
  * dynamicKnowledge.js — تحليل ملفات Excel/CSV واستخراج معرفة ديناميكية للوكيل الماسي
  * يُخزَّن الناتج في rizq_subscribers_store.json → profile.dynamicKnowledge (معزول لكل subscriberId)
+ *
+ * Excel: exceljs (آمن) — CSV يبقى محلّياً بلا اعتماد.
  */
 'use strict';
 
-const XLSX = require('xlsx');
+const ExcelJS = require('exceljs');
 
 const MAX_TEXT_CHARS = 48000;
 const MAX_ROWS_PER_SHEET = 200;
 const MAX_COLS = 30;
+const MAX_SHEETS = 8;
 
 function _normCell(v) {
   if (v == null) return '';
-  if (typeof v === 'object' && v instanceof Date) return v.toISOString().slice(0, 16).replace('T', ' ');
+  if (typeof v === 'object') {
+    if (v instanceof Date) return v.toISOString().slice(0, 16).replace('T', ' ');
+    if (Array.isArray(v.richText)) {
+      return v.richText.map((t) => (t && t.text != null ? String(t.text) : '')).join('').trim();
+    }
+    if (v.text != null) return String(v.text).trim();
+    if (v.result != null) return _normCell(v.result);
+    if (v.hyperlink != null && v.text == null) return String(v.hyperlink).trim();
+    if (typeof v.toString === 'function' && v.toString !== Object.prototype.toString) {
+      const s = v.toString();
+      if (s && s !== '[object Object]') return String(s).trim();
+    }
+    return '';
+  }
   return String(v).trim();
 }
 
@@ -39,18 +55,31 @@ function _parseCsv(buffer) {
   return [{ name: 'CSV', rows }];
 }
 
-function _parseXlsx(buffer) {
-  const wb = XLSX.read(buffer, { type: 'buffer', cellDates: true });
+/**
+ * قراءة .xlsx عبر exceljs — نفس شكل الصفوف السابق (مصفوفة نصوص).
+ * ملفات .xls القديمة غير مدعومة (صيغة ثنائية مهجورة) — حوّل إلى .xlsx.
+ */
+async function _parseXlsx(buffer) {
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(buffer);
   const sheets = [];
-  wb.SheetNames.slice(0, 8).forEach((name) => {
-    const sheet = wb.Sheets[name];
-    const raw = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: false });
-    const rows = (raw || [])
-      .slice(0, MAX_ROWS_PER_SHEET)
-      .map((row) => (Array.isArray(row) ? row : []).slice(0, MAX_COLS).map(_normCell))
-      .filter((row) => row.some((c) => c));
-    if (rows.length) sheets.push({ name, rows });
-  });
+  const list = workbook.worksheets.slice(0, MAX_SHEETS);
+  for (let i = 0; i < list.length; i++) {
+    const worksheet = list[i];
+    const rows = [];
+    worksheet.eachRow({ includeEmpty: false }, (row) => {
+      if (rows.length >= MAX_ROWS_PER_SHEET) return;
+      const cells = [];
+      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        if (colNumber > MAX_COLS) return;
+        while (cells.length < colNumber - 1) cells.push('');
+        cells.push(_normCell(cell.value));
+      });
+      const trimmed = cells.slice(0, MAX_COLS);
+      if (trimmed.some((c) => c)) rows.push(trimmed);
+    });
+    if (rows.length) sheets.push({ name: worksheet.name || ('Sheet' + (i + 1)), rows });
+  }
   return sheets;
 }
 
@@ -69,9 +98,9 @@ function _rowsToText(sheets) {
 /**
  * @param {string} fileName
  * @param {Buffer} buffer
- * @returns {{ ok: boolean, dynamicKnowledge?: object, error?: string }}
+ * @returns {Promise<{ ok: boolean, dynamicKnowledge?: object, error?: string, detail?: string }>}
  */
-function parseKnowledgeFile(fileName, buffer) {
+async function parseKnowledgeFile(fileName, buffer) {
   if (!buffer || !Buffer.isBuffer(buffer) || !buffer.length) {
     return { ok: false, error: 'empty_file' };
   }
@@ -82,9 +111,19 @@ function parseKnowledgeFile(fileName, buffer) {
   const ext = String(fileName || '').toLowerCase().split('.').pop();
   let sheets = [];
   try {
-    if (ext === 'csv') sheets = _parseCsv(buffer);
-    else if (ext === 'xlsx' || ext === 'xls') sheets = _parseXlsx(buffer);
-    else return { ok: false, error: 'unsupported_format' };
+    if (ext === 'csv') {
+      sheets = _parseCsv(buffer);
+    } else if (ext === 'xlsx') {
+      sheets = await _parseXlsx(buffer);
+    } else if (ext === 'xls') {
+      return {
+        ok: false,
+        error: 'unsupported_format',
+        detail: 'xls_legacy_use_xlsx',
+      };
+    } else {
+      return { ok: false, error: 'unsupported_format' };
+    }
   } catch (e) {
     return { ok: false, error: 'parse_failed', detail: e.message };
   }

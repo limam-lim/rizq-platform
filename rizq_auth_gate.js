@@ -273,9 +273,10 @@
   function isLoggedIn() {
     var s = getSession();
     if (!s || !s.id || !s.token) return false;
-    // توكنات الخادم ≥ 20 حرفاً (randomBytes) — ارفض الجلسات المزوّرة القصيرة
+    // توكنات الخادم ≥ 20 حرفاً (randomBytes) — ارفض الجلسات المزوّرة/المحلية الوهمية
     var tok = String(s.token);
     var id = String(s.id);
+    if (tok === 'local' || /^local_/i.test(id)) return false;
     if (tok.length < 20 || id.length < 4) return false;
     return true;
   }
@@ -1095,25 +1096,10 @@
     btn.textContent = dict.verifying;
 
     if (!apiBase()) {
-      if (!isLocalDevHost()) {
-        btn.disabled = false;
-        btn.textContent = dict.verifyBtn;
-        alert(networkErrorMsg(dict));
-        return;
-      }
+      // لا جلسة وهمية بدون خادم — التسجيل الحقيقي يتطلب OTP على الـ API
       btn.disabled = false;
       btn.textContent = dict.verifyBtn;
-      finishRegister({
-        id: 'local_' + Date.now(),
-        name: data.name,
-        phone: data.phoneMr || data.phone,
-        phoneIntl: data.phoneIntl,
-        whatsapp: data.whatsapp,
-        email: data.email,
-        city: data.city || '',
-        address: data.address || '',
-        token: 'local'
-      });
+      alert(networkErrorMsg(dict));
       return;
     }
 
@@ -1388,8 +1374,15 @@
     }
     var s = getSession();
     var base = apiBase();
+    // بدون عنوان خادم: لا fail-open على جلسة localStorage (حتى لو طول التوكن ≥ 20)
+    if (!base) {
+      _pendingAction = actionFn;
+      rememberAfterAuthHref();
+      openModal(reasonKey);
+      return false;
+    }
     // عند توفر الخادم: تحقّق من الجلسة قبل كشف الهاتف/الاتصال (يمنع تزوير localStorage)
-    if (base && s && s.token) {
+    if (s && s.token) {
       fetch(base + '/api/auth/me', {
         headers: {
           'Authorization': 'Bearer ' + s.token,
@@ -1413,8 +1406,10 @@
       });
       return true;
     }
-    if (typeof actionFn === 'function') actionFn();
-    return true;
+    _pendingAction = actionFn;
+    rememberAfterAuthHref();
+    openModal(reasonKey);
+    return false;
   }
 
   function gateLink(el, ev, reasonKey) {

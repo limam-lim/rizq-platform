@@ -146,17 +146,42 @@
       + '    </div>'
       + '  </div>'
       + '  <div class="footer-bottom">'
-      + '    <p class="footer-copy" data-t="ft-copy">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</p>'
-      + '    <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" title="ADMINIA SARL — التعريف بالشركة / À propos">'
+      + '    <p class="footer-copy" id="rzq-site-ft-copy" data-t="ft-copy" data-t-fr="© 2026 Rizq — Tous droits réservés 🇲🇷">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</p>'
+      + '    <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" title="ADMINIA SARL — À propos">'
       + '      <div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#C9A84C;letter-spacing:2px;font-family:sans-serif">AML</div>'
       + '      <div>'
       + '        <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:2px;font-family:Georgia,serif;line-height:1">ADMINIA <span style="color:#C9A84C">SARL</span></div>'
       + '        <div style="font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:1.5px;margin-top:3px">POWERED BY <span style="color:rgba(201,168,76,0.6);font-weight:700">M. LIMAM</span></div>'
       + '      </div>'
       + '    </a>'
-      + '    <p class="footer-copy" data-t="ft-sig" style="display:flex;align-items:center;gap:4px"><span>بتوقيع</span><span style="color:#C9A84C">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong></p>'
+      + '    <p class="footer-copy" id="rzq-site-ft-sig" data-t="ft-sig" style="display:flex;align-items:center;gap:4px"><span id="rzq-site-ft-sig-pre" data-t-fr="Signé par">بتوقيع</span><span style="color:#C9A84C">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong></p>'
       + '  </div>'
       + '</footer>';
+  }
+
+  function isFrFooter() {
+    try {
+      var ls = localStorage.getItem('rizq_lang');
+      if (ls === 'fr') return true;
+      if (ls === 'ar') return false;
+    } catch (e) {}
+    return (document.documentElement.lang || '').toLowerCase().indexOf('fr') === 0;
+  }
+
+  function applyFooterLang() {
+    var fr = isFrFooter();
+    var copy = document.getElementById('rzq-site-ft-copy');
+    if (copy) {
+      copy.textContent = fr
+        ? (copy.getAttribute('data-t-fr') || '© 2026 Rizq — Tous droits réservés 🇲🇷')
+        : '© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷';
+    }
+    var sig = document.getElementById('rzq-site-ft-sig-pre');
+    if (sig) sig.textContent = fr ? (sig.getAttribute('data-t-fr') || 'Signé par') : 'بتوقيع';
+    var root = document.getElementById('rizq-site-footer');
+    if (root && window.RizqI18n && typeof window.RizqI18n.applyStaticDom === 'function') {
+      try { window.RizqI18n.applyStaticDom(root); } catch (e) {}
+    }
   }
 
   function ensureToggle() {
@@ -206,12 +231,15 @@
     mount.insertAdjacentHTML('beforeend', footerHtml());
     ensureToggle();
     ensureSocialLinks();
+    applyFooterLang();
     try {
       if (typeof window._rzqApplyFooterStats === 'function') window._rzqApplyFooterStats();
     } catch (e2) {}
   }
 
   window.RizqEnsureSiteFooter = boot;
+  window.RizqApplySiteFooterLang = applyFooterLang;
+  document.addEventListener('rizq:langchange', applyFooterLang);
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot);
