@@ -160,8 +160,9 @@ function scriptBundle(htmlRel) {
 }
 
 function auditButtons() {
+  // rizq_admin.html is a public 404 decoy — real control panel is rizq_cp_panel.html
   const dashboards = [
-    'rizq_admin.html',
+    'rizq_cp_panel.html',
     'rizq_dashboard.html',
     'rizq_dashboard_store.html',
     'rizq_dashboard_office.html',
@@ -196,7 +197,7 @@ function auditButtons() {
 }
 
 function auditLinks() {
-  const pages = ['rizq_landing_v8.html', 'rizq_admin.html', 'rizq_dashboard.html',
+  const pages = ['rizq_landing_v8.html', 'rizq_cp_panel.html', 'rizq_dashboard.html',
     'rizq_dashboard_store.html', 'rizq_dashboard_office.html', 'rizq_dashboard_corp.html'];
   const broken = [];
   const hashMissing = [];
@@ -234,7 +235,7 @@ function auditLinks() {
 /* ── 3. Integration + syntax ── */
 function auditIntegration() {
   const required = [
-    ['rizq_admin.html', 'rizq_packages_config.js'],
+    ['rizq_cp_panel.html', 'rizq_packages_config.js'],
     ['rizq_landing_v8.html', 'rizq_packages_config.js'],
     ['rizq_dashboard_store.html', 'rizq_packages_config.js'],
     ['rizq_dashboard_office.html', 'rizq_packages_config.js'],
@@ -271,8 +272,10 @@ function auditIntegration() {
 }
 
 function auditPersistWiring() {
-  const admin = read('rizq_admin.html');
+  // Real admin UI lives in rizq_cp_panel.html (rizq_admin.html is a decoy 404)
+  const admin = read('rizq_cp_panel.html');
   const server = read('rizq-backend/server.js');
+  const accountsMine = read('rizq-backend/routes/accountsManage.js');
   const landing = read('rizq_landing_v8.html');
   const store = read('rizq_dashboard_store.html');
   const office = read('rizq_dashboard_office.html');
@@ -291,10 +294,13 @@ function auditPersistWiring() {
   if (admin.includes('_adminPostSiteConfig({ site:')) ok('Admin site identity → API', 'posted');
   else fail('Admin site identity → API', 'not posted');
 
-  if (server.includes('if (b.widget_enabled !== undefined)')
-    && server.includes('if (b.whatsapp_enabled !== undefined)')
-    && server.includes('if (b.calls_enabled !== undefined)')) {
-    ok('PATCH /api/accounts/mine channel flags', 'widget/whatsapp/calls');
+  // Channel flags are applied in accountsManage PATCH /api/accounts/mine/:id
+  // (extracted from server.js) — require diamond via packageAccessGuard.
+  if (accountsMine.includes('if (b.widget_enabled !== undefined)')
+    && accountsMine.includes('if (b.whatsapp_enabled !== undefined)')
+    && accountsMine.includes('if (b.calls_enabled !== undefined)')
+    && accountsMine.includes('assertAiAgentAccess')) {
+    ok('PATCH /api/accounts/mine channel flags', 'widget/whatsapp/calls + diamond guard');
   } else fail('PATCH /api/accounts/mine channel flags', 'channel flags not accepted');
   if (server.includes('body.prices') && server.includes('body.platformFlags') && server.includes('body.channelsPublic')) {
     ok('POST /api/site-config overlay fields', 'prices + flags + channelsPublic');

@@ -438,12 +438,18 @@ function validateReply(reply, mergedFacts, lang, userMessage) {
   }
 
   const uncertain = /\b(ربما|أظن|قد يكون|I think|maybe|probably|je pense|quizás|tal vez)\b/i.test(reply);
+  // Defensive defaults — callers (and audits) may pass a partial facts object
+  const facts = mergedFacts && typeof mergedFacts === 'object' ? mergedFacts : {};
+  const prices = Array.isArray(facts.prices) ? facts.prices : [];
+  const packagePrices = Array.isArray(facts.packagePrices) ? facts.packagePrices : [];
+  const adIds = Array.isArray(facts.adIds) ? facts.adIds : [];
+  const trustScores = Array.isArray(facts.trustScores) ? facts.trustScores : [];
   const hasGrounding = !!(
-    mergedFacts.prices.length
-    || mergedFacts.packagePrices.length
-    || mergedFacts.adIds.length
-    || mergedFacts.trustScores.length
-    || mergedFacts.reviewAverage
+    prices.length
+    || packagePrices.length
+    || adIds.length
+    || trustScores.length
+    || facts.reviewAverage
   );
   const platformQuery = isPlatformOrPackageQuery(userMessage);
   const adQuery = isAdSpecificQuery(userMessage);
@@ -476,8 +482,8 @@ function validateReply(reply, mergedFacts, lang, userMessage) {
   }
 
   const priceMentions = extractMoneyMentions(reply);
-  if (priceMentions.length && mergedFacts.prices.length) {
-    const known = [...new Set(mergedFacts.prices.map(normalizeAmount).filter((d) => d.length >= 3))];
+  if (priceMentions.length && prices.length) {
+    const known = [...new Set(prices.map(normalizeAmount).filter((d) => d.length >= 3))];
     const knownSet = new Set(known);
     const suspicious = priceMentions.some((m) => {
       const digits = normalizeAmount(m);
@@ -723,7 +729,11 @@ async function handleWidgetChat(body) {
   }
 
   let validated = validateReply(replyText, pageMerged, detectedLang, text);
-  if (!validated.grounded && (pageMerged.prices.length || pageMerged.packagePrices.length || pageMerged.adIds.length || pageMerged.trustScores.length)) {
+  const pmPrices = Array.isArray(pageMerged.prices) ? pageMerged.prices : [];
+  const pmPkg = Array.isArray(pageMerged.packagePrices) ? pageMerged.packagePrices : [];
+  const pmAds = Array.isArray(pageMerged.adIds) ? pageMerged.adIds : [];
+  const pmTrust = Array.isArray(pageMerged.trustScores) ? pageMerged.trustScores : [];
+  if (!validated.grounded && (pmPrices.length || pmPkg.length || pmAds.length || pmTrust.length)) {
     const fromFacts = buildFactReply(pageMerged, detectedLang, text);
     if (fromFacts) {
       validated = { reply: fromFacts, grounded: true, reviewed: true };

@@ -3031,7 +3031,7 @@ app.post('/api/subscriber/knowledge/instructions', (req, res) => {
   });
 });
 
-app.post('/api/subscriber/knowledge/upload', (req, res) => {
+app.post('/api/subscriber/knowledge/upload', async (req, res) => {
   const b = req.body || {};
   const accountId = String(b.accountId || '').trim();
   const token = extractAccountToken(req) || '';
@@ -3057,7 +3057,12 @@ app.post('/api/subscriber/knowledge/upload', (req, res) => {
     return res.status(400).json({ ok: false, error: 'file_too_large', message: 'الحد الأقصى لملف المعرفة 2 ميجابايت' });
   }
 
-  const parsed = parseKnowledgeFile(fileName, buffer);
+  let parsed;
+  try {
+    parsed = await parseKnowledgeFile(fileName, buffer);
+  } catch (eParse) {
+    return res.status(400).json({ ok: false, error: 'parse_failed', detail: eParse.message });
+  }
   if (!parsed.ok) {
     return res.status(400).json({ ok: false, error: parsed.error || 'parse_failed', detail: parsed.detail });
   }

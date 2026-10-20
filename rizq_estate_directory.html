@@ -6,6 +6,13 @@
 <title>دليل الوكالات العقارية — رزق</title>
 <script>
 (function(){
+  try{
+    if(localStorage.getItem('rizq_lang') === 'fr'){
+      document.documentElement.lang = 'fr';
+      document.documentElement.dir = 'ltr';
+      document.title = 'Annuaire des agences immobilières — Rizq';
+    }
+  }catch(e){}
   location.replace('rizq_estate_agencies.html');
 })();
 </script>
@@ -13,7 +20,17 @@
 </head>
 <body>
 <p style="font-family:sans-serif;padding:24px;text-align:center">
-  <a href="rizq_estate_agencies.html">← دليل الوكالات العقارية</a>
+  <a id="est-dir-redirect" href="rizq_estate_agencies.html">← دليل الوكالات العقارية</a>
 </p>
+<script>
+(function(){
+  try{
+    if(localStorage.getItem('rizq_lang') === 'fr'){
+      var a = document.getElementById('est-dir-redirect');
+      if(a) a.textContent = '← Annuaire des agences immobilières';
+    }
+  }catch(e){}
+})();
+</script>
 </body>
 </html>

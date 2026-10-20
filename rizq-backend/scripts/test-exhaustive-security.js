@@ -4,6 +4,9 @@
  */
 'use strict';
 
+const path = require('path');
+try { require('dotenv').config({ path: path.join(__dirname, '..', '.env') }); } catch (eDot) { /* optional */ }
+
 const crypto = require('crypto');
 const platformStore = require('../db/platformStore');
 const repos = require('../db/repos');
