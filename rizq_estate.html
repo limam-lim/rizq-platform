@@ -1115,7 +1115,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       <div class="est-pd-map">
         <div class="est-map-placeholder map-placeholder" id="est-pd-map" role="button" tabindex="0" aria-label="عرض الموقع على الخريطة">
           <div class="map-ico">🗺️</div>
-          <div class="map-txt">موقع العقار على الخريطة</div>
+          <div class="map-txt" id="est-pd-map-txt">موقع العقار على الخريطة</div>
           <div class="map-addr" id="est-pd-map-addr">—</div>
         </div>
         <div class="est-pd-nearby" id="est-pd-nearby"></div>
@@ -2654,8 +2654,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     document.querySelectorAll('#est-coverage span[data-ar]').forEach(function(sp){
       sp.textContent = fr ? (sp.getAttribute('data-fr') || sp.getAttribute('data-ar')) : (sp.getAttribute('data-ar') || sp.textContent);
     });
-    var pdMapTxt = document.querySelector('#est-pd-map .map-txt');
-    if(pdMapTxt) pdMapTxt.textContent = fr ? 'Voir sur la carte' : 'عرض على الخريطة';
+    tx('#est-pd-map-txt', 'موقع العقار على الخريطة', 'Emplacement sur la carte');
     var galH = document.querySelector('.est-gallery-head h2');
     var galP = document.querySelector('.est-gallery-head p');
     if(galH) galH.textContent = fr ? 'Galerie photos' : 'معرض الصور';
