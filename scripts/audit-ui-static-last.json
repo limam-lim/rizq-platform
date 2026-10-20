@@ -69,6 +69,10 @@
       "detail": "present"
     },
     {
+      "name": "site-config.json packages",
+      "detail": "empty packages object"
+    },
+    {
       "name": "getCatalog(general)",
       "detail": "6 SKUs, diamond=true"
     },
@@ -197,11 +201,6 @@
       "detail": "91/100"
     }
   ],
-  "warn": [
-    {
-      "name": "site-config.json",
-      "detail": "file not present — live admin prices fall back to PKG defaults"
-    }
-  ],
+  "warn": [],
   "fail": []
 }

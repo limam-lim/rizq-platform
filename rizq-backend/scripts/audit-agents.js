@@ -219,9 +219,15 @@ const server = app.listen(0, async () => {
         && widgetPkgs.packages.map((p) => p.price).join(',') === storeCanonical.map((p) => p.price).join(',')
     );
 
-    process.env.BACKEND_SHARED_SECRET = process.env.BACKEND_SHARED_SECRET || 'test-secret';
-    const tog = await req('POST', '/api/agent/toggle', { subscriberPhone: '44112233', active: true, secret: 'test-secret' });
-    ok('HTTP agent/toggle', tog.status === 200 && tog.body.ok);
+    // استخدم نفس السرّ الفعّال في البيئة (قد يكون من .env) وليس قيمة ثابتة
+    const toggleSecret = process.env.BACKEND_SHARED_SECRET || 'test-secret';
+    process.env.BACKEND_SHARED_SECRET = toggleSecret;
+    const tog = await req('POST', '/api/agent/toggle', {
+      subscriberPhone: '44112233',
+      active: true,
+      secret: toggleSecret,
+    });
+    ok('HTTP agent/toggle', tog.status === 200 && tog.body.ok, 'status=' + tog.status);
 
     const Quota = require('../../rizq_quota_guard_agent');
     // Limits come from catalog (default 2000 msgs) — drive % via large message batches
