@@ -288,13 +288,10 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 .info-card{background:#fff;border-radius:var(--radius);padding:20px;border:1px solid #ece3d1;border-top:3px solid var(--gold);box-shadow:0 14px 32px rgba(27,58,107,.1)}
 .info-card-title{font-size:12.5px;font-weight:800;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:1px}
 
-/* غرفة الطلبات + التقييمات — شريط أفقي تحت الكتالوج بنفس ترتيب المحل */
+/* غرفة الطلبات تحت الكتالوج — التقييمات قسم منفصل أسفل معلومات المعرض */
 .showroom-under-band{
-  display:grid;
-  grid-template-columns:1.08fr 0.92fr;
-  gap:12px;
+  display:block;
   margin:20px 0 8px;
-  align-items:stretch;
   width:100%;
   min-width:0;
   box-sizing:border-box;
@@ -313,7 +310,6 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   box-shadow:none;
   border:1px solid rgba(27,58,107,.08);
   background:#fff;
-  height:100%;
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
@@ -354,18 +350,19 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   background:linear-gradient(135deg,#0D1B2A,#1B3A6B);color:#fff;font-weight:800;font-size:12.5px;
   cursor:pointer;font-family:inherit;min-height:48px
 }
-#reviews-section.showroom-reviews-hz{
-  margin:0;
-  padding:12px 12px 10px;
+#reviews-section.showroom-reviews-below{
+  margin:20px 0 8px;
+  padding:18px 16px 14px;
   background:#fff;
   border:1px solid rgba(27,58,107,.08);
-  border-radius:14px;
-  box-shadow:none;
-  height:100%;
+  border-radius:16px;
+  border-top:3px solid var(--gold);
+  box-shadow:0 12px 32px rgba(15,35,65,.06);
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
   min-width:0;
+  width:100%;
 }
 #reviews-section .showroom-reviews-inner{
   background:transparent!important;border:none!important;border-radius:0!important;
@@ -373,17 +370,17 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   display:flex;flex-direction:column;
 }
 #reviews-section .showroom-reviews-summary{
-  display:flex;align-items:flex-start;gap:12px;margin-bottom:8px;flex-wrap:wrap
+  display:flex;align-items:flex-start;gap:16px;margin-bottom:12px;flex-wrap:wrap
 }
-#reviews-section .showroom-reviews-score{text-align:center;min-width:72px}
-#reviews-section #rev-score{font-size:28px;font-weight:900;color:var(--navy);line-height:1}
-#reviews-section .showroom-reviews-stars{color:#F5A623;font-size:14px;margin:3px 0}
-#reviews-section #rev-count-txt{font-size:11px;color:#6a7a8a}
+#reviews-section .showroom-reviews-score{text-align:center;min-width:88px}
+#reviews-section #rev-score{font-size:36px;font-weight:900;color:var(--navy);line-height:1}
+#reviews-section .showroom-reviews-stars{color:#F5A623;font-size:16px;margin:3px 0}
+#reviews-section #rev-count-txt{font-size:12px;color:#6a7a8a}
 #reviews-section #reviews-list{flex:1 1 auto}
 @media(max-width:800px){
-  .showroom-under-band{grid-template-columns:1fr;gap:12px;padding:12px;border-radius:16px}
+  .showroom-under-band{padding:12px;border-radius:16px}
   #showroom-service-desk.showroom-desk-hz,
-  #reviews-section.showroom-reviews-hz{padding:12px 10px 10px;border-radius:12px}
+  #reviews-section.showroom-reviews-below{padding:12px 10px 10px;border-radius:12px}
   .showroom-desk-form{grid-template-columns:1fr}
   .showroom-desk-span2{grid-column:auto}
   .showroom-desk-actions{grid-template-columns:1fr}
@@ -695,7 +692,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
         </div>
       </div>
 
-    <!-- غرفة الطلبات + التقييمات — أفقيان تحت الكتالوج بنفس ترتيب المحل -->
+    <!-- غرفة الطلبات تحت الكتالوج — التقييمات أسفل معلومات المعرض -->
     <div class="showroom-under-band" id="showroom-under-band">
       <section class="info-card showroom-desk-hz" id="showroom-service-desk" style="border-top:3px solid var(--gold);display:flex!important" aria-label="غرفة الطلبات">
         <div class="showroom-desk-eyebrow" id="sr-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
@@ -745,37 +742,6 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
             </div>
             <button type="button" id="sr-req-submit" class="rzq-desk-submit" onclick="submitShowroomServiceReq()">📤 إرسال الطلب للمعرض</button>
           </div>
-        </div>
-      </section>
-
-      <section class="showroom-reviews-hz" id="reviews-section" aria-label="تقييمات الزبائن">
-        <div class="info-card-title" style="margin-bottom:8px" id="reviews-title-lbl">⭐ تقييمات الزبائن</div>
-        <div class="showroom-reviews-inner">
-          <div class="showroom-reviews-summary">
-            <div class="showroom-reviews-score">
-              <div id="rev-score">—</div>
-              <div class="showroom-reviews-stars">☆☆☆☆☆</div>
-              <div id="rev-count-txt">0 تقييم</div>
-            </div>
-            <div id="showroom-rating-breakdown" style="flex:1;min-width:120px">
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-                <span style="font-size:12px;color:#8a8474;width:20px">5★</span>
-                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
-                <span style="font-size:12px;color:#8a8474">0%</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-                <span style="font-size:12px;color:#8a8474;width:20px">4★</span>
-                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
-                <span style="font-size:12px;color:#8a8474">0%</span>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <span style="font-size:12px;color:#8a8474;width:20px">3★</span>
-                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
-                <span style="font-size:12px;color:#8a8474">0%</span>
-              </div>
-            </div>
-          </div>
-          <div id="reviews-list"></div>
         </div>
       </section>
     </div>
@@ -855,10 +821,42 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 
   </div>
 
+    <!-- التقييمات تحت غرفة الطلبات ومعلومات المعرض -->
+    <section class="showroom-reviews-below" id="reviews-section" aria-label="تقييمات الزبائن">
+      <div class="info-card-title" style="margin-bottom:10px" id="reviews-title-lbl">⭐ تقييمات الزبائن</div>
+      <div class="showroom-reviews-inner">
+        <div class="showroom-reviews-summary">
+          <div class="showroom-reviews-score">
+            <div id="rev-score">—</div>
+            <div class="showroom-reviews-stars">☆☆☆☆☆</div>
+            <div id="rev-count-txt">0 تقييم</div>
+          </div>
+          <div id="showroom-rating-breakdown" style="flex:1;min-width:160px">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <span style="font-size:12px;color:#8a8474;width:20px">5★</span>
+              <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
+              <span style="font-size:12px;color:#8a8474">0%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+              <span style="font-size:12px;color:#8a8474;width:20px">4★</span>
+              <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
+              <span style="font-size:12px;color:#8a8474">0%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:12px;color:#8a8474;width:20px">3★</span>
+              <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
+              <span style="font-size:12px;color:#8a8474">0%</span>
+            </div>
+          </div>
+        </div>
+        <div id="reviews-list"></div>
+      </div>
+    </section>
+
 </main>
 </div>
 
-<!-- بطاقة الضمان — بعد الموقع وساعات العمل (أسفل الواجهة قبل الباقات) -->
+<!-- بطاقة الضمان — بعد التقييمات (أسفل الواجهة قبل الباقات) -->
 <section class="rizq-close-band" id="showroom-close-band" aria-label="ضمانات المعرض">
   <div class="rizq-close-inner">
     <p class="rizq-close-eyebrow" id="sr-close-eyebrow">RIZQ · تجربة آمنة</p>
