@@ -1147,7 +1147,15 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
           <div id="calc-price" style="font-size:22px;font-weight:900;color:var(--teal)"></div>
           <div style="font-size:10.5px;color:var(--muted);margin-top:6px" id="calc-note" data-t="calc-note">تقدير أولي فقط وليس عرض سعر نهائي — التأكيد يتم من المكتب مباشرة</div>
           <button class="req-btn" style="margin-top:10px;width:100%" onclick="calcToRequest()" id="calc-req-btn" data-t="calc-req-btn">② التالي — أدخل اسمك ورقم هاتفك</button>
-          <button type="button" class="rizq-prf-trigger-gold" style="margin-top:8px;width:100%" onclick="issueOfficePrefactureFromCalc()" id="calc-prf-btn" data-t="calc-prf-btn">PREFACTUR · فاتورة قبل</button>
+          <div id="office-fulfill-calc" style="margin-top:10px;text-align:right">
+            <div style="font-size:11px;font-weight:800;color:var(--navy);margin-bottom:6px">كيف ستتم الخدمة؟</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end">
+              <button type="button" class="office-fulfill-opt" data-fulfill="bank" onclick="selectOfficeFulfill('bank')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer">تحويل بنكي</button>
+              <button type="button" class="office-fulfill-opt" data-fulfill="pickup" onclick="selectOfficeFulfill('pickup')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer">استلام بالمكتب</button>
+              <button type="button" class="office-fulfill-opt" data-fulfill="delivery" onclick="selectOfficeFulfill('delivery')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer">زيارة / متابعة</button>
+            </div>
+          </div>
+          <button type="button" class="rizq-prf-trigger-gold" style="margin-top:8px;width:100%;display:none" hidden onclick="issueOfficePrefactureFromCalc()" id="calc-prf-btn" data-t="calc-prf-btn">PREFACTUR · فاتورة قبل</button>
         </div>
       </div>
     </div>
@@ -1207,7 +1215,15 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
               <div id="rf-doc-error" style="display:none;margin-top:7px;font-size:11.5px;color:#b91c1c"></div>
             </div>
             <button type="button" class="req-btn rzq-desk-submit" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب للمكتب</button>
-            <button type="button" class="rizq-prf-trigger" onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn" data-t="req-prf-btn">PREFACTUR · فاتورة قبل</button>
+            <div id="office-fulfill-req" style="margin-top:8px;text-align:right">
+              <div style="font-size:11px;font-weight:800;color:var(--navy);margin-bottom:6px">كيف ستتم الخدمة؟</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end">
+                <button type="button" class="office-fulfill-opt" data-fulfill="bank" onclick="selectOfficeFulfill('bank')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer">تحويل بنكي</button>
+                <button type="button" class="office-fulfill-opt" data-fulfill="pickup" onclick="selectOfficeFulfill('pickup')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer">استلام بالمكتب</button>
+                <button type="button" class="office-fulfill-opt" data-fulfill="delivery" onclick="selectOfficeFulfill('delivery')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer">زيارة / متابعة</button>
+              </div>
+            </div>
+            <button type="button" class="rizq-prf-trigger" style="display:none" hidden onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn" data-t="req-prf-btn">PREFACTUR · فاتورة قبل</button>
           </div>
         </div>
       </section>
@@ -1551,7 +1567,37 @@ function _runPrefacture(fn){
   fn();
 }
 
+var officeFulfillMode = '';
+function selectOfficeFulfill(mode){
+  officeFulfillMode = String(mode || '');
+  document.querySelectorAll('.office-fulfill-opt').forEach(function(btn){
+    var on = btn.getAttribute('data-fulfill') === officeFulfillMode;
+    btn.style.borderColor = on ? '#C9A84C' : '#d5deea';
+    btn.style.background = on ? 'rgba(201,168,76,.14)' : '#fff';
+  });
+  var show = false;
+  if(window.RizqSubscriptionPermissions && typeof RizqSubscriptionPermissions.shouldShowCheckoutPrefacture === 'function'){
+    show = !!RizqSubscriptionPermissions.shouldShowCheckoutPrefacture({
+      paymentMethod: officeFulfillMode === 'bank' ? 'bank' : 'cod',
+      deliveryType: officeFulfillMode === 'bank' ? '' : officeFulfillMode
+    });
+  } else {
+    show = officeFulfillMode === 'bank' || officeFulfillMode === 'pickup' || officeFulfillMode === 'delivery';
+  }
+  ['calc-prf-btn','req-prf-btn'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    el.style.display = show ? '' : 'none';
+    if(show) el.removeAttribute('hidden'); else el.setAttribute('hidden','hidden');
+  });
+}
+window.selectOfficeFulfill = selectOfficeFulfill;
+
 function issueOfficePrefactureFromCalc(){
+  if(!officeFulfillMode){
+    showToast(_t2('اختر طريقة الخدمة أولاً (تحويل / استلام / زيارة)','Choisissez d’abord le mode (virement / retrait / visite)'), 'error');
+    return;
+  }
   var typeEl = document.getElementById('calc-type');
   var priceEl = document.getElementById('calc-price');
   if (!typeEl || !typeEl.value) {
@@ -1587,6 +1633,10 @@ function issueOfficePrefactureFromCalc(){
 }
 
 function issueOfficePrefactureFromRequest(){
+  if(!officeFulfillMode){
+    showToast(_t2('اختر طريقة الخدمة أولاً (تحويل / استلام / زيارة)','Choisissez d’abord le mode (virement / retrait / visite)'), 'error');
+    return;
+  }
   var name = ((document.getElementById('rf-name') || {}).value || '').trim();
   var phone = ((document.getElementById('rf-phone') || {}).value || '').trim();
   var svcEl = document.getElementById('rf-service');
@@ -1938,7 +1988,15 @@ function openMaps(){
 
     function renderOfficePaymentMethods(acc){
       var box = document.getElementById('office-payment-methods');
-      if(!box || typeof RizqAccountPayments === 'undefined') return;
+      if(!box) return;
+      if(Array.isArray(acc && acc.paymentMethods)) window._rizqOfficePaymentMethods = acc.paymentMethods;
+      /* تفاصيل الدفع في رحلة الطلب فقط — لا على واجهة المكتب العامة */
+      if(window.RizqSubscriptionPermissions && !RizqSubscriptionPermissions.shouldShowStorefrontPayments()){
+        box.style.display = 'none';
+        box.innerHTML = '';
+        return;
+      }
+      if(typeof RizqAccountPayments === 'undefined') return;
       RizqAccountPayments.renderPublic(box, acc && acc.paymentMethods, { fr: isFr() });
     }
 
@@ -2276,23 +2334,28 @@ function openMaps(){
 
         document.body.classList.remove('rizq-empty-office');
 
-        // باقات المنصة تختفي من صفحة المكتب الحقيقي فقط.
-        // نماذج المعاينة (demo_law / ?demo / acc_promo_*): كل الخدمات ظاهرة بدون استثناء.
+        // باقات المنصة للنماذج فقط — المكتب الحقيقي صفحة خدمات نقية.
         (function hidePlatformUpsellOnBoundOffice(){
-          if(window._rizqOfficeIsDemo || id === DEMO_LAW_ID || /^acc_promo_/.test(id)){
+          var isPreview = !!(window._rizqOfficeIsDemo || id === DEMO_LAW_ID || /^acc_promo_/.test(id));
+          if(window.RizqSubscriptionPermissions && typeof RizqSubscriptionPermissions.applyPublicMerchantSurface === 'function'){
+            RizqSubscriptionPermissions.applyPublicMerchantSurface({
+              accountId: id,
+              isDemo: isPreview,
+              packageIds: ['office-packages', 'sec-packages-btn'],
+              paymentIds: ['office-payment-methods'],
+              hideListingPrefacture: true
+            });
+          } else {
             ['office-packages','sec-packages-btn'].forEach(function(oid){
               var el = document.getElementById(oid);
-              if(el) el.style.display = '';
+              if(el) el.style.display = isPreview ? '' : 'none';
             });
-            return;
           }
-          ['office-packages','sec-packages-btn'].forEach(function(oid){
-            var el = document.getElementById(oid);
-            if(el) el.style.display = 'none';
-          });
-          document.querySelectorAll('.promo-card').forEach(function(el){ el.style.display = 'none'; });
-          var promoOv = document.getElementById('promo-overlay');
-          if(promoOv) promoOv.style.display = 'none';
+          if(!isPreview){
+            document.querySelectorAll('.promo-card').forEach(function(el){ el.style.display = 'none'; });
+            var promoOv = document.getElementById('promo-overlay');
+            if(promoOv) promoOv.style.display = 'none';
+          }
         })();
 
         // ── الهوية الأساسية ──
@@ -2345,9 +2408,15 @@ function openMaps(){
           setHref('act-call-top', 'tel:' + demoAcc.phone.replace(/\s/g,''));
           setHref('sticky-call', 'tel:' + demoAcc.phone.replace(/\s/g,''));
           setHref('act-email-top', 'mailto:' + demoAcc.email);
-          if(typeof RizqAccountPayments !== 'undefined'){
-            RizqAccountPayments.renderPublic(document.getElementById('office-payment-methods'), demoAcc.paymentMethods, { fr: isFr() });
-          }
+          if(Array.isArray(demoAcc.paymentMethods)) window._rizqOfficePaymentMethods = demoAcc.paymentMethods;
+          (function hideOfficeStorefrontPay(){
+            var payBox = document.getElementById('office-payment-methods');
+            if(!payBox) return;
+            if(window.RizqSubscriptionPermissions && !RizqSubscriptionPermissions.shouldShowStorefrontPayments()){
+              payBox.style.display = 'none';
+              payBox.innerHTML = '';
+            }
+          })();
           /* بدون شريط تقني — النموذج يبدو كمكتب حقيقي */
           var oldRibOf = document.getElementById('rizq-demo-ribbon');
           if(oldRibOf) oldRibOf.remove();
@@ -2764,8 +2833,8 @@ window._rizqProfile = (function() {
   <script src="rizq_secretary_agent.js"></script>
 
 
-<!-- ════ PACKAGES SECTION ════ -->
-<section class="pkg-section" id="office-packages">
+<!-- ════ PACKAGES SECTION — نماذج فقط؛ تُخفى عن المكتب الحقيقي ════ -->
+<section class="pkg-section" id="office-packages" style="display:none">
   <div class="pkg-section-inner">
     <div class="pkg-section-head">
       <p style="font-size:12px;letter-spacing:2px;color:var(--teal2);font-weight:700;text-transform:uppercase;margin-bottom:8px" data-t="pkg-eyebrow">Rizq Office — الباقات</p>

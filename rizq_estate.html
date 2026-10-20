@@ -1496,6 +1496,19 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 
   function hidePlatformUpsellOnBoundEstate(){
     document.body.classList.toggle('rizq-estate-live', !window._rizqEstateIsDemo);
+    if(window.RizqSubscriptionPermissions && typeof RizqSubscriptionPermissions.applyPublicMerchantSurface === 'function'){
+      RizqSubscriptionPermissions.applyPublicMerchantSurface({
+        accountId: window._rizqEstateAccountId || (window._rizqEstateProfile && window._rizqEstateProfile.id) || '',
+        isDemo: !!window._rizqEstateIsDemo,
+        packageIds: [],
+        paymentIds: ['est-payment-methods', 'est-pay-card'],
+        hideListingPrefacture: true
+      });
+      var payBar = document.getElementById('est-bar-pay');
+      if(payBar && window.RizqSubscriptionPermissions && !RizqSubscriptionPermissions.shouldShowStorefrontPayments()){
+        payBar.style.display = 'none';
+      }
+    }
   }
 
 
@@ -1511,6 +1524,15 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   function paintPayments(methods){
     window._rizqEstatePaymentMethods = Array.isArray(methods) ? methods : [];
     var box = document.getElementById('est-payment-methods');
+    var payCard = document.getElementById('est-pay-card');
+    var payBar = document.getElementById('est-bar-pay');
+    /* طرق الدفع تظهر عند مرحلة الدفع — لا على واجهة الوكالة العامة */
+    if(window.RizqSubscriptionPermissions && !RizqSubscriptionPermissions.shouldShowStorefrontPayments()){
+      if(box){ box.style.display = 'none'; box.innerHTML = ''; }
+      if(payCard) payCard.style.display = 'none';
+      if(payBar) payBar.style.display = 'none';
+      return;
+    }
     if(!box) return;
     var fr = isFrEstate();
     function draw(){

@@ -876,8 +876,8 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   </div>
 </section>
 
-<!-- ══ PACKAGES ══ -->
-<section class="pkg-section" id="pkg-section">
+<!-- ══ PACKAGES — نماذج فقط؛ تُخفى عن المعرض الحقيقي ══ -->
+<section class="pkg-section" id="pkg-section" style="display:none">
   <div class="pkg-section-inner">
     <div style="text-align:center;margin-bottom:28px">
       <p style="font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;text-transform:uppercase;margin-bottom:8px" id="pkg-eyebrow">Rizq Showrooms — الباقات</p>
@@ -1310,9 +1310,7 @@ function renderCatalog(){
       +'<button type="button" onclick="event.stopPropagation();addToCartShowroom(\''+esc(item.id)+'\')" style="width:100%;margin-top:8px;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0F2347;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit">'
       +'🛒 '+_t('أضف للسلة','Ajouter au panier')
       +'</button>'
-      +'<button type="button" class="rizq-prf-trigger" style="width:100%;margin-top:8px" onclick="event.stopPropagation();issueShowroomPrefacture(\''+esc(item.id)+'\')">'
-      +'PREFACTUR · '+_t('فاتورة قبل','Préfacture')
-      +'</button>'
+      /* PREFACTUR في السلة فقط بعد اختيار تحويل/استلام/توصيل */
       +'</div></div>';
   }).join('');
   try { updateShowroomShopCounts(); } catch (eCnt) {}
@@ -1347,14 +1345,20 @@ function applyAccountData(){
   }
 
   if(!_acc) return;
-  // باقات المنصة: تُخفى عن زائر المعرض الحقيقي فقط — نماذج المعاينة تُظهر كل الخدمات
-  var _pkgSec = document.getElementById('pkg-section');
-  if(_pkgSec){
-    if(window._rizqShowroomIsDemo || _showroomId === 'demo-corp-001' || _showroomId === 'demo_showroom' || /^acc_promo_/.test(_showroomId)){
-      _pkgSec.style.display = '';
-    } else {
-      _pkgSec.style.display = 'none';
-    }
+  // باقات المنصة للنماذج فقط — المعرض الحقيقي بدون باقات ولا طرق دفع على الواجهة
+  var _srIsDemo = !!(window._rizqShowroomIsDemo || _showroomId === 'demo-corp-001' || _showroomId === 'demo_showroom' || /^acc_promo_/.test(_showroomId));
+  if(window.RizqSubscriptionPermissions && typeof RizqSubscriptionPermissions.applyPublicMerchantSurface === 'function'){
+    RizqSubscriptionPermissions.applyPublicMerchantSurface({
+      accountId: _showroomId,
+      isDemo: _srIsDemo,
+      packageIds: ['pkg-section'],
+      paymentIds: ['showroom-payment-methods', 'showroom-pay-box'],
+      hideListingPrefacture: true,
+      prefactureRoot: document.getElementById('items-grid') || document
+    });
+  } else {
+    var _pkgSec = document.getElementById('pkg-section');
+    if(_pkgSec) _pkgSec.style.display = _srIsDemo ? '' : 'none';
   }
   if(_acc.serviceDesk) window._rizqShowroomServiceDesk = _acc.serviceDesk;
   if(Array.isArray(_acc.paymentMethods)) window._rizqShowroomPaymentMethods = _acc.paymentMethods;
@@ -1365,12 +1369,6 @@ function applyAccountData(){
     }
     var deskRoot = document.getElementById('showroom-service-desk');
     if(deskRoot) deskRoot.style.display = 'flex';
-  }
-  if(typeof RizqAccountPayments !== 'undefined' && Array.isArray(_acc.paymentMethods) && _acc.paymentMethods.length){
-    var payWrap = document.getElementById('showroom-payment-methods');
-    var payBox = document.getElementById('showroom-pay-box');
-    if(payWrap) payWrap.style.display = '';
-    RizqAccountPayments.renderPublic(payBox || payWrap, _acc.paymentMethods, { fr: _lang==='fr' });
   }
   var cartHref = _showroomId
     ? ('rizq_cart.html?id=' + encodeURIComponent(_showroomId) + '&module=showroom')

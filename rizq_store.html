@@ -1609,7 +1609,7 @@ footer{
 </section>
 
 <!-- ══ باقات المحلات ══ -->
-<section id="store-packages" style="padding:70px 5%;background:#f7f9fc;border-top:1px solid #e7ecf3">
+<section id="store-packages" style="display:none;padding:70px 5%;background:#f7f9fc;border-top:1px solid #e7ecf3">
   <div style="max-width:1380px;margin:0 auto">
     <div class="portal-pkg-head" style="text-align:center;margin-bottom:42px">
       <p style="font-size:12px;letter-spacing:2px;color:var(--gold);font-weight:700;text-transform:uppercase;margin-bottom:8px" data-t="pkg-eyebrow">Rizq Stores — الباقات</p>
@@ -2170,7 +2170,15 @@ function rizqShare(title, url) {
 
     function renderStorePaymentMethods(acc){
       var box = document.getElementById('store-payment-methods');
-      if(!box || typeof RizqAccountPayments === 'undefined') return;
+      if(!box) return;
+      if(Array.isArray(acc && acc.paymentMethods)) window._rizqStorePaymentMethods = acc.paymentMethods;
+      /* طرق الدفع التفصيلية للسلة فقط — لا على واجهة المحل */
+      if(window.RizqSubscriptionPermissions && !RizqSubscriptionPermissions.shouldShowStorefrontPayments()){
+        box.style.display = 'none';
+        box.innerHTML = '';
+        return;
+      }
+      if(typeof RizqAccountPayments === 'undefined') return;
       RizqAccountPayments.renderPublic(box, acc && acc.paymentMethods, { fr: isFr() });
     }
 
@@ -2677,19 +2685,26 @@ function rizqShare(title, url) {
         }
         window._rizqStoreProfile = acc;
 
-        // باقات اشتراك المنصة تختفي من صفحة المحل الحقيقي فقط.
-        // نماذج المعاينة (?demo / demo_store / acc_promo_*): كل الخدمات ظاهرة بدون استثناء.
+        // باقات المنصة للنماذج فقط — المحل الحقيقي صفحة نقية (منتجات + هوية).
         (function hidePlatformUpsellOnBoundStore(){
-          if(window._rizqStoreIsDemo || id === 'demo_store' || isStorePreviewPortal(id, params)){
-            var pkgDemo = document.getElementById('store-packages');
-            if(pkgDemo) pkgDemo.style.display = '';
-            return;
+          var isPreview = !!(window._rizqStoreIsDemo || id === 'demo_store' || isStorePreviewPortal(id, params));
+          if(window.RizqSubscriptionPermissions && typeof RizqSubscriptionPermissions.applyPublicMerchantSurface === 'function'){
+            RizqSubscriptionPermissions.applyPublicMerchantSurface({
+              accountId: id,
+              isDemo: isPreview,
+              packageIds: ['store-packages'],
+              paymentIds: ['store-payment-methods'],
+              hideListingPrefacture: true
+            });
+          } else {
+            var pkg = document.getElementById('store-packages');
+            if(pkg) pkg.style.display = isPreview ? '' : 'none';
           }
-          var pkg = document.getElementById('store-packages');
-          if(pkg) pkg.style.display = 'none';
-          document.querySelectorAll('.rizq-promo-card, .promo-card, [data-t="store-promo"]').forEach(function(el){
-            el.style.display = 'none';
-          });
+          if(!isPreview){
+            document.querySelectorAll('.rizq-promo-card, .promo-card, [data-t="store-promo"]').forEach(function(el){
+              el.style.display = 'none';
+            });
+          }
         })();
 
         // ── الهوية الأساسية ──
@@ -2847,8 +2862,17 @@ function rizqShare(title, url) {
                 var fr = isFr();
                 var emptyBannerApi = document.getElementById('store-empty-banner');
                 if(emptyBannerApi) emptyBannerApi.style.display = 'none';
-                /* لا نخفي باقات المعاينة — فقط الحسابات الحقيقية */
-                if(!(window._rizqStoreIsDemo || id === 'demo_store' || /^acc_promo_/.test(id))){
+                /* باقات المعاينة فقط — الحساب الحقيقي بدون باقات ولا طرق دفع على الواجهة */
+                var apiIsDemo = !!(window._rizqStoreIsDemo || id === 'demo_store' || /^acc_promo_/.test(id));
+                if(window.RizqSubscriptionPermissions && typeof RizqSubscriptionPermissions.applyPublicMerchantSurface === 'function'){
+                  RizqSubscriptionPermissions.applyPublicMerchantSurface({
+                    accountId: id,
+                    isDemo: apiIsDemo,
+                    packageIds: ['store-packages'],
+                    paymentIds: ['store-payment-methods'],
+                    hideListingPrefacture: true
+                  });
+                } else if(!apiIsDemo){
                   var pkgHide = document.getElementById('store-packages');
                   if(pkgHide) pkgHide.style.display = 'none';
                 }
@@ -2870,9 +2894,6 @@ function rizqShare(title, url) {
                   var ve=document.getElementById('badge-verified-lbl'); if(ve) ve.style.display=b.verified?'':'none';
                   var pe=document.getElementById('premium-badge-lbl'); if(pe) pe.style.display=b.premium?'':'none';
                   var vpe=document.getElementById('verified-plus-badge-lbl'); if(vpe) vpe.style.display=b.verifiedPlus?'inline-flex':'none';
-                }
-                if(typeof RizqAccountPayments !== 'undefined'){
-                  RizqAccountPayments.renderPublic(document.getElementById('store-payment-methods'), acc.paymentMethods, { fr: isFr() });
                 }
                 window._rizqStoreAccountId = id;
                 if(acc.serviceDesk) window._rizqStoreServiceDesk = acc.serviceDesk;
