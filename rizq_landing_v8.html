@@ -6275,20 +6275,11 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
     <!-- ══ STEP 0: نوع الحساب (خاص / شركة) ══ -->
     <div id="p-type" style="display:none">
-      <h3 style="font-family:'Noto Naskh Arabic',serif;font-size:22px;font-weight:700;margin-bottom:6px">إنشاء حساب جديد</h3>
-      <p style="color:var(--text-muted);font-size:12px;margin-bottom:24px">كيف تريد الانضمام إلى رزق؟</p>
+      <h3 style="font-family:'Noto Naskh Arabic',serif;font-size:22px;font-weight:700;margin-bottom:6px">إنشاء حساب نشر</h3>
+      <p style="color:var(--text-muted);font-size:12px;margin-bottom:24px">للنشر والإدارة فقط — حساب التصفح والشراء من «حسابي».</p>
 
       <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
-        <!-- تصفح / مشتري — نفس مسار الهاتف (rizq_register.html) -->
-        <div id="type-browse" onclick="selectType('browse')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
-          <div class="cat-icon-box" style="flex-shrink:0">🛒</div>
-          <div style="flex:1">
-            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px"><span class="ar-only">حساب تصفح</span><span class="fr-only">Compte navigation</span></div>
-            <div style="font-size:11.5px;color:var(--text-muted)"><span class="ar-only">للمشترين — تصفّح ومفضلة وتواصل بسرعة</span><span class="fr-only">Acheteurs — parcourir, favoris et contact</span></div>
-          </div>
-          <div id="chk-browse" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
-        </div>
-
+        <!-- حساب التصفح/الشراء للمشتري يبقى في «حسابي» (rizq_auth_gate) فقط — لا نكرّره هنا -->
         <!-- خاص / بائع فرد -->
         <div id="type-private" onclick="selectType('private')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
           <div class="cat-icon-box" style="flex-shrink:0">🧑‍💼</div>
@@ -11149,10 +11140,10 @@ const TR = {
     'li-divider':      'أو',
     'li-new':          'إنشاء حساب جديد مجاناً',
     // Auth — type
-    'type-title':      'إنشاء حساب جديد',
-    'type-sub':        'كيف تريد الانضمام إلى رزق؟',
-    'type-priv-title': 'حساب خاص',
-    'type-priv-sub':   'للأفراد — بع واشترِ بسهولة',
+    'type-title':      'إنشاء حساب نشر',
+    'type-sub':        'للنشر والإدارة فقط — حساب التصفح والشراء من «حسابي».',
+    'type-priv-title': 'حساب خاص (بائع)',
+    'type-priv-sub':   'للأفراد — انشر إعلاناتك بسهولة',
     'type-co-title':   'شركة أو مؤسسة',
     'type-co-sub':     'للتجار والشركات — حساب موثّق',
     'type-next':       'التالي ←',
@@ -11266,10 +11257,10 @@ const TR = {
     'li-btn':          'Se connecter →',
     'li-divider':      'ou',
     'li-new':          'Créer un compte gratuitement',
-    'type-title':      'Créer un compte',
-    'type-sub':        'Comment souhaitez-vous rejoindre Rizq ?',
-    'type-priv-title': 'Compte particulier',
-    'type-priv-sub':   'Pour les particuliers — achetez et vendez facilement',
+    'type-title':      'Créer un compte de publication',
+    'type-sub':        'Publication et gestion uniquement — navigation/achat via « Mon compte ».',
+    'type-priv-title': 'Compte privé (vendeur)',
+    'type-priv-sub':   'Pour les particuliers — publiez vos annonces',
     'type-co-title':   'Entreprise ou organisation',
     'type-co-sub':     'Pour les commerçants et entreprises — compte vérifié',
     'type-next':       'Suivant →',
@@ -13238,8 +13229,13 @@ function submitIndividualReg(){
 }
 
 function selectType(t){
+  /* browse = مسار المشتري عبر «حسابي» فقط — لا بطاقة مكررة في إنشاء حساب البائع */
+  if(t==='browse'){
+    location.href='rizq_register.html?mode=buyer';
+    return;
+  }
   acctType=t;
-  ['browse','private','company'].forEach(x=>{
+  ['private','company'].forEach(x=>{
     const card=document.getElementById('type-'+x);
     const chk=document.getElementById('chk-'+x);
     if(!card||!chk) return;
@@ -13262,7 +13258,6 @@ function selectType(t){
 function goFromType(){
   if(!acctType){alert(isAr?'يرجى اختيار نوع الحساب':'Veuillez choisir le type de compte');return;}
   if(acctType==='browse'){
-    // نفس مسار حساب التصفح على الهاتف وسطح المكتب
     location.href='rizq_register.html?mode=buyer';
     return;
   }
