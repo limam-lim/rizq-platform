@@ -309,6 +309,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
 <script src="rizq_dashboard_agent_knowledge.js"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
+<script src="rizq_subscription_permissions.js"></script>
 <script src="rizq_mr_payment_catalog.js?v=1.1"></script>
 <script src="rizq_account_payments.js?v=28.3"></script>
 <script src="rizq_invoice_engine.js"></script>
@@ -319,7 +320,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
 <script src="rizq_account_route.js?v=9"></script>
-<script src="rizq_dashboard_shared.js?v=1"></script>
+<script src="rizq_dashboard_shared.js?v=2"></script>
 <script src="rizq_seller_onboarding.js"></script>
 <script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
@@ -1468,6 +1469,9 @@ function initDashboard(){
     initSubscriptionLifecycle(acc.id, 'corp');
     // جلسة عامة موحَّدة يقرأها rizq_tenders.html — ميزة المناقصات الجديدة
     try{ localStorage.setItem('rizq_active_session', JSON.stringify({id: acc.id, token: acc.token, type:'corp', name: acc.name||''})); localStorage.setItem('rizq_session_id', acc.id); }catch(e){}
+  }
+  if(window.RizqDash && typeof RizqDash.applySubscriptionLock==='function'){
+    RizqDash.applySubscriptionLock((acc && acc.id) || '', document.querySelector('.main-content') || document.body, { isDemo: !!IS_DEMO });
   }
   // Sidebar + hero labels (respect FR demo translations)
   _refreshCorpAccountLabels();

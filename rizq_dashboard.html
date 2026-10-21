@@ -397,6 +397,7 @@ main, .page-content.active, .main-content, .results-area,
 <script src="rizq_disclaimer.js"></script>
   <script src="rizq_packages_config.js"></script>
   <script src="rizq_subscription_engine.js"></script>
+  <script src="rizq_subscription_permissions.js"></script>
   <script src="rizq_invoice_engine.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
@@ -405,7 +406,7 @@ main, .page-content.active, .main-content, .results-area,
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
 <script src="rizq_account_route.js?v=9"></script>
-<script src="rizq_dashboard_shared.js?v=1"></script>
+<script src="rizq_dashboard_shared.js?v=2"></script>
 <script src="rizq_seller_onboarding.js"></script>
 <script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
@@ -2640,6 +2641,15 @@ function _initDashboardWithAccount(acc){
   applyDashAvatars();
   if(typeof renderSubscriptionPanel==='function') renderSubscriptionPanel();
   if(typeof initSubscriptionLifecycle==='function') initSubscriptionLifecycle(acc.id, 'individual');
+  // قفل كتابة موحّد (W3) — نفس سياسة المحل/المكتب/الشركة/العقارات
+  if(window.RizqDash && typeof RizqDash.applySubscriptionLock==='function'){
+    RizqDash.applySubscriptionLock(acc.id, document.querySelector('.page-content') || document.body, { isDemo: !!IS_DEMO });
+  } else if(typeof useSubscriptionPermissions==='function' && window.RizqSubscriptionPermissions){
+    var _permsInd = useSubscriptionPermissions(acc.id, { isDemo: !!IS_DEMO });
+    if(window.RizqSubscriptionPermissions.disableFormsAndShowUpgradeBanner){
+      window.RizqSubscriptionPermissions.disableFormsAndShowUpgradeBanner(document.querySelector('.page-content') || document.body, _permsInd);
+    }
+  }
   if(typeof renderMyInvoices==='function') renderMyInvoices();
   if(window.RizqAccount && typeof RizqAccount.initShareLinkInput==='function'){
     RizqAccount.initShareLinkInput('share-link-input', acc);

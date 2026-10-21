@@ -117,7 +117,7 @@ const ADS_REQUESTS_FILE = path.join(DATA_DIR, 'ads-requests.json');
 // والمحلات فقط، بينما تبقى بقية الأقسام (مكاتب/شركات/مناقصات/فيديوهات
 // إعلانية) مبنية وجاهزة لكن مخفية خلف علم تفعيل، تُفتح لاحقاً من لوحة
 // الأدمن بضغطة زر بلا أي تعديل كود أو إعادة نشر. ──
-const DEFAULT_MODULE_FLAGS = { individual: true, store: true, office: true, corp: true, tenders: true, investments: true, videoAds: true };
+const DEFAULT_MODULE_FLAGS = { individual: true, store: true, office: true, corp: true, estate: true, tenders: true, investments: true, videoAds: true };
 function getModuleFlags() {
   const cfg = repos.getSiteConfig();
   return Object.assign({}, DEFAULT_MODULE_FLAGS, cfg.moduleFlags || {});
@@ -1929,12 +1929,16 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
   // (moduleFlags)، حتى لو تجاوز طالب التسجيل واجهة الموقع وأرسل الطلب
   // مباشرة لهذا الـ endpoint. الإخفاء في الواجهة وحده غير كافٍ أمنياً. ──
   const reqType = String(b.type || '').toLowerCase().trim();
-  const ALLOWED_ACCOUNT_TYPES = ['individual', 'store', 'office', 'corp'];
+  const ALLOWED_ACCOUNT_TYPES = ['individual', 'store', 'office', 'corp', 'estate'];
   if (!ALLOWED_ACCOUNT_TYPES.includes(reqType)) {
     return res.status(400).json({ ok: false, error: 'نوع الحساب غير مدعوم', code: 'invalid_type' });
   }
   const flags = getModuleFlags();
-  if (Object.prototype.hasOwnProperty.call(flags, reqType) && !flags[reqType]) {
+  // estate يستخدم علم office إن لم يُعرَّف علم مستقل
+  const flagKey = (reqType === 'estate' && !Object.prototype.hasOwnProperty.call(flags, 'estate'))
+    ? 'office'
+    : reqType;
+  if (Object.prototype.hasOwnProperty.call(flags, flagKey) && !flags[flagKey]) {
     return res.status(403).json({ error: 'هذا القسم غير مفتوح للتسجيل حالياً' });
   }
 
@@ -1953,9 +1957,23 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
   }
 
   let activityFields = { ok: true, activityId: null, activity: null, category: String(b.category || '').slice(0, 40) };
-  if (['store', 'office', 'corp'].includes(reqType)) {
-    activityFields = normalizeAccountActivityFields(b, reqType);
-    if (!activityFields.ok) {
+  if (['store', 'office', 'corp', 'estate'].includes(reqType)) {
+    // العقارات: إن لم يُرسل activityId نثبّت نشاط وساطة افتراضي
+    if (reqType === 'estate' && !String(b.activityId || b.activity || '').trim()) {
+      b.activityId = 'es_agency';
+      b.activity = b.activity || 'مكتب / وكالة عقارية';
+      b.category = b.category || 'عقارات';
+    }
+    activityFields = normalizeAccountActivityFields(b, reqType === 'estate' ? 'estate' : reqType);
+    if (!activityFields.ok && reqType === 'estate') {
+      // تساهل مضبوط: سجّل الحقول النصية إن فشل كتالوج النشاط
+      activityFields = {
+        ok: true,
+        activityId: String(b.activityId || 'es_agency').slice(0, 80),
+        activity: String(b.activity || 'مكتب / وكالة عقارية').slice(0, 120),
+        category: String(b.category || 'عقارات').slice(0, 40),
+      };
+    } else if (!activityFields.ok) {
       return res.status(400).json({ ok: false, error: activityFields.error, code: activityFields.code });
     }
   }
@@ -1973,8 +1991,8 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
   const accessToken = genAccessToken();
   const sellerEmail = String(b.email || '').trim().toLowerCase();
   const sellerPassword = String(b.password || '').slice(0, 128);
-  // محل / مكتب / معرض(شركة): بريد + كلمة مرور إلزاميان لتسجيل الدخول لاحقاً
-  if (['store', 'office', 'corp'].includes(reqType)) {
+  // محل / مكتب / معرض(شركة) / عقارات: بريد + كلمة مرور إلزاميان لتسجيل الدخول لاحقاً
+  if (['store', 'office', 'corp', 'estate'].includes(reqType)) {
     if (!sellerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sellerEmail)) {
       return res.status(400).json({
         ok: false,
@@ -2113,6 +2131,16 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     dashToken: dashToken || undefined,
     autoVerified: autoApproved || false,
     createdAt: new Date().toISOString(),
+    // حقول عمودي العقارات (تُحفظ عند type=estate)
+    estateSubType: reqType === 'estate'
+      ? String(b.estateSubType || b.subType || 'agency').slice(0, 40)
+      : undefined,
+    licenseNumber: reqType === 'estate'
+      ? String(b.licenseNumber || b.license || '').slice(0, 80)
+      : undefined,
+    focusAreas: reqType === 'estate'
+      ? String(b.focusAreas || b.focus || '').slice(0, 300)
+      : undefined,
   };
   list.push(acc);
   writeAccounts(list);
@@ -4024,6 +4052,9 @@ if (process.env.NODE_ENV !== 'production' && process.env.RIZQ_SERVE_STATIC !== '
   app.get('/', (_req, res) => {
     // Canonical home is rizq_landing_v8.html (index.html is a thin redirect stub).
     res.sendFile(path.join(FRONTEND_ROOT, 'rizq_landing_v8.html'));
+  });
+  app.get(['/real-estate', '/real-estate/', '/estates', '/estates/'], (_req, res) => {
+    res.sendFile(path.join(FRONTEND_ROOT, 'rizq_real_estate_register.html'));
   });
   app.use((req, res, next) => {
     if (req.path.startsWith('/rizq-backend')) return notFoundHandler(req, res);

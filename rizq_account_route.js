@@ -9,7 +9,8 @@
     individual: 'rizq_dashboard.html',
     store: 'rizq_dashboard_store.html',
     office: 'rizq_dashboard_office.html',
-    corp: 'rizq_dashboard_corp.html'
+    corp: 'rizq_dashboard_corp.html',
+    estate: 'rizq_dashboard_estate.html'
   };
 
   var SESSION_KEYS = [
@@ -249,6 +250,7 @@
       store: 'rizq_store.html',
       office: 'rizq_office.html',
       corp: 'rizq_corp.html',
+      estate: 'rizq_estate.html',
       individual: 'rizq_profile.html'
     };
     var page = map[type] || 'rizq_profile.html';

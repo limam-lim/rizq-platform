@@ -2,7 +2,7 @@
  * سياسة التوثيق — يجب أن تتطابق مع rizq_verification_policy.js
  */
 const ID_ONLY_TYPES = ['individual', 'store'];
-const ACTIVITY_PLUS_ID_TYPES = ['office', 'corp', 'showroom', 'exhibition'];
+const ACTIVITY_PLUS_ID_TYPES = ['office', 'corp', 'showroom', 'exhibition', 'estate'];
 const MODULE_ACTIVITY_PLUS_ID = ['tenders'];
 
 const INSTANT_AUTO_APPROVE = ID_ONLY_TYPES;

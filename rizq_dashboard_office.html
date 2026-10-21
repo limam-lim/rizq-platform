@@ -269,6 +269,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
 <script src="rizq_merchant_activities.js?v=1"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
+<script src="rizq_subscription_permissions.js"></script>
   <script src="rizq_mr_payment_catalog.js?v=1.1"></script>
   <script src="rizq_account_payments.js?v=28.3"></script>
   <script src="rizq_service_desk.js?v=1.3"></script>
@@ -285,7 +286,7 @@ html.rizq-dash-embed .content{padding:10px 12px!important}
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
 <script src="rizq_account_route.js?v=9"></script>
-<script src="rizq_dashboard_shared.js?v=1"></script>
+<script src="rizq_dashboard_shared.js?v=2"></script>
 <script src="rizq_seller_onboarding.js"></script>
 <script src="rizq_status_summary.js"></script>
 <script src="rizq_profile_photo.js?v=2"></script>
@@ -1253,6 +1254,9 @@ function _initWithAccount(acc){
   // جلسة عامة موحَّدة يقرأها rizq_tenders.html — ميزة المناقصات الجديدة
   if(!IS_DEMO){ try{ localStorage.setItem('rizq_active_session', JSON.stringify({id: acc.id, token: SESSION_TOKEN, type:'office', name: acc.name||''})); }catch(e){} }
   if(!IS_DEMO && OFFICE && OFFICE.id) { initSubscriptionLifecycle(OFFICE.id, 'office'); }
+  if(window.RizqDash && typeof RizqDash.applySubscriptionLock==='function'){
+    RizqDash.applySubscriptionLock((OFFICE && OFFICE.id) || SESSION_ID, document.querySelector('.main-content') || document.body, { isDemo: !!IS_DEMO });
+  }
   services=IS_DEMO?DEMO_SERVICES:JSON.parse(localStorage.getItem('office_services_'+SESSION_ID)||'[]');
   // إصلاح جوهري: تُستدعى الآن بعد حل window.REAL_ACCESS_TOKEN بدل التوازي معه
   if(!IS_DEMO) _resolveRealAccessToken(acc).then(function(){

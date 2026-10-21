@@ -13,7 +13,7 @@
   'use strict';
 
   var ID_ONLY = ['individual', 'store'];
-  var ACTIVITY_PLUS_ID = ['office', 'corp', 'showroom', 'exhibition'];
+  var ACTIVITY_PLUS_ID = ['office', 'corp', 'showroom', 'exhibition', 'estate'];
   var MODULE_ACTIVITY_PLUS_ID = ['tenders'];
 
   function includes(list, type) {

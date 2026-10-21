@@ -69,6 +69,12 @@
       { id: 'ind_services', nameAr: 'خدمات ووظائف', nameFr: 'Services & emplois' },
       { id: 'ind_agri', nameAr: 'ماشية وزراعة', nameFr: 'Bétail & agriculture' },
     ],
+    estate: [
+      { id: 'agency', nameAr: 'وساطة ووكالات عقارية', nameFr: 'Courtage & agences' },
+      { id: 'development', nameAr: 'تطوير وترقية عقارية', nameFr: 'Promotion immobilière' },
+      { id: 'owner', nameAr: 'مالك فردي / محفظة خاصة', nameFr: 'Propriétaire / portefeuille' },
+      { id: 'management', nameAr: 'إدارة أملاك ومعاينات', nameFr: 'Gestion & visites' },
+    ],
   };
 
   /** Expandable flat catalog — add entries without UI code changes */
@@ -152,11 +158,15 @@
     { id: 'of_surveying', sectorId: 'engineering', accountTypes: ['office'], nameAr: 'مساحة و топographie', nameFr: 'Topographie & arpentage', icon: '📐' },
     { id: 'of_architecture', sectorId: 'realestate', accountTypes: ['office'], nameAr: 'تصميم معماري', nameFr: 'Architecture & design', icon: '📐' },
     { id: 'of_interior_design', sectorId: 'realestate', accountTypes: ['office'], nameAr: 'تصميم داخلي وديكور', nameFr: 'Design intérieur', icon: '🖼️' },
-    { id: 'of_realestate_agency', sectorId: 'realestate', accountTypes: ['office'], nameAr: 'وساطة عقارية', nameFr: 'Agence immobilière', icon: '🏠' },
-    { id: 'of_property_mgmt', sectorId: 'realestate', accountTypes: ['office'], nameAr: 'إدارة عقارات', nameFr: 'Gestion immobilière', icon: '🔑' },
-    { id: 'of_valuation', sectorId: 'realestate', accountTypes: ['office'], nameAr: 'تقييم عقاري', nameFr: 'Évaluation immobilière', icon: '📊' },
-    { id: 'of_realestate_dev', sectorId: 'realestate', accountTypes: ['office', 'corp'], nameAr: 'تطوير عقاري', nameFr: 'Promotion immobilière', icon: '🏗️' },
-    { id: 'of_land_broker', sectorId: 'realestate', accountTypes: ['office'], nameAr: 'وساطة أراضي ومزارع', nameFr: 'Courtage terrains & fermes', icon: '🌾' },
+    { id: 'of_realestate_agency', sectorId: 'realestate', accountTypes: ['office', 'estate'], nameAr: 'وساطة عقارية', nameFr: 'Agence immobilière', icon: '🏠' },
+    { id: 'of_property_mgmt', sectorId: 'realestate', accountTypes: ['office', 'estate'], nameAr: 'إدارة عقارات', nameFr: 'Gestion immobilière', icon: '🔑' },
+    { id: 'of_valuation', sectorId: 'realestate', accountTypes: ['office', 'estate'], nameAr: 'تقييم عقاري', nameFr: 'Évaluation immobilière', icon: '📊' },
+    { id: 'of_realestate_dev', sectorId: 'realestate', accountTypes: ['office', 'corp', 'estate'], nameAr: 'تطوير عقاري', nameFr: 'Promotion immobilière', icon: '🏗️' },
+    { id: 'of_land_broker', sectorId: 'realestate', accountTypes: ['office', 'estate'], nameAr: 'وساطة أراضي ومزارع', nameFr: 'Courtage terrains & fermes', icon: '🌾' },
+    { id: 'es_agency', sectorId: 'agency', accountTypes: ['estate'], nameAr: 'مكتب / وكالة عقارية', nameFr: 'Agence immobilière', icon: '🏠' },
+    { id: 'es_developer', sectorId: 'development', accountTypes: ['estate'], nameAr: 'مطور عقاري', nameFr: 'Promoteur immobilier', icon: '🏗️' },
+    { id: 'es_owner', sectorId: 'owner', accountTypes: ['estate'], nameAr: 'مالك فردي', nameFr: 'Propriétaire individuel', icon: '🔑' },
+    { id: 'es_mgmt', sectorId: 'management', accountTypes: ['estate'], nameAr: 'إدارة أملاك ومعاينات', nameFr: 'Gestion & visites', icon: '📋' },
     { id: 'of_business_consult', sectorId: 'consulting', accountTypes: ['office'], nameAr: 'استشارات أعمال', nameFr: 'Conseil en affaires', icon: '💡' },
     { id: 'of_hr_recruitment', sectorId: 'consulting', accountTypes: ['office'], nameAr: 'موارد بشرية وتوظيف', nameFr: 'RH & recrutement', icon: '👥' },
     { id: 'of_marketing', sectorId: 'consulting', accountTypes: ['office'], nameAr: 'تسويق وإعلان', nameFr: 'Marketing & publicité', icon: '📣' },
@@ -239,6 +249,7 @@
     var x = String(t || '').toLowerCase();
     if (x === 'shop') return 'store';
     if (x === 'private' || x === 'personal') return 'individual';
+    if (x === 'real_estate' || x === 'realestate' || x === 'agency_estate') return 'estate';
     return x;
   }
 
