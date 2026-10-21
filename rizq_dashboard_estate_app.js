@@ -12,24 +12,36 @@ var PROPS = [];
 var INQS = [];
 var HOURS = {};
 var STORE_KEY = '';
+
+function _estIsFr() {
+  try {
+    if (document.documentElement.lang && /^fr/i.test(document.documentElement.lang)) return true;
+    if (document.body && document.body.classList.contains('rizq-lang-fr')) return true;
+    if (window.RizqI18n && typeof RizqI18n.getLang === 'function' && /^fr/i.test(String(RizqI18n.getLang() || ''))) return true;
+    if (localStorage.getItem('rizq_lang') === 'fr') return true;
+  } catch (e) {}
+  return false;
+}
+function _t2(ar, fr) { return _estIsFr() ? (fr || ar) : ar; }
+
 var PANEL_TITLES = {
-  overview: '📊 نظرة عامة',
-  requests: '📩 طلبات المعاينة',
-  properties: '🏠 عقاراتي',
-  tenders: '📋 المناقصات',
-  profile: '🏢 معلومات الوكالة',
-  hours: '🕐 ساعات العمل',
-  photos: '📸 معرض الصور',
-  subscription: '💳 اشتراكي',
-  referral: '🎁 إحالة الأصدقاء',
-  verifiedplus: '🛡️ شارة موثّق⁺',
-  mypayments: '🏦 طرق الدفع',
-  settings: '⚙️ الإعدادات'
+  overview: _t2('📊 نظرة عامة', '📊 Aperçu'),
+  requests: _t2('📩 طلبات المعاينة', '📩 Demandes de visite'),
+  properties: _t2('🏠 عقاراتي', '🏠 Mes biens'),
+  tenders: _t2('📋 المناقصات', '📋 Appels d\'offres'),
+  profile: _t2('🏢 معلومات الوكالة', '🏢 Infos agence'),
+  hours: _t2('🕐 ساعات العمل', '🕐 Horaires'),
+  photos: _t2('📸 معرض الصور', '📸 Galerie'),
+  subscription: _t2('💳 اشتراكي', '💳 Abonnement'),
+  referral: _t2('🎁 إحالة الأصدقاء', '🎁 Parrainage'),
+  verifiedplus: _t2('🛡️ شارة موثّق⁺', '🛡️ Badge Vérifié⁺'),
+  mypayments: _t2('🏦 طرق الدفع', '🏦 Paiements'),
+  settings: _t2('⚙️ الإعدادات', '⚙️ Paramètres')
 };
 var DAYS = [
-  { id: 'sat', ar: 'السبت' }, { id: 'sun', ar: 'الأحد' }, { id: 'mon', ar: 'الإثنين' },
-  { id: 'tue', ar: 'الثلاثاء' }, { id: 'wed', ar: 'الأربعاء' }, { id: 'thu', ar: 'الخميس' },
-  { id: 'fri', ar: 'الجمعة' }
+  { id: 'sat', ar: _t2('السبت', 'Sam') }, { id: 'sun', ar: _t2('الأحد', 'Dim') }, { id: 'mon', ar: _t2('الإثنين', 'Lun') },
+  { id: 'tue', ar: _t2('الثلاثاء', 'Mar') }, { id: 'wed', ar: _t2('الأربعاء', 'Mer') }, { id: 'thu', ar: _t2('الخميس', 'Jeu') },
+  { id: 'fri', ar: _t2('الجمعة', 'Ven') }
 ];
 
 function escapeHtml(s) {
@@ -41,6 +53,49 @@ function escapeAttr(s) {
 }
 function toast(msg, type) {
   if (typeof showToast === 'function') showToast(msg, type || 'ok');
+}
+
+/** يمنع خلط FR داخل واجهة AR (والعكس): يضبط dir/lang ويحدّث عناوين الشريط */
+function applyEstateLangShell() {
+  var fr = _estIsFr();
+  try {
+    document.documentElement.lang = fr ? 'fr' : 'ar';
+    document.documentElement.dir = fr ? 'ltr' : 'rtl';
+    document.body.classList.toggle('rizq-lang-fr', fr);
+    document.body.classList.toggle('rizq-lang-ar', !fr);
+  } catch (e) {}
+  var map = {
+    overview: PANEL_TITLES.overview,
+    requests: PANEL_TITLES.requests,
+    properties: PANEL_TITLES.properties,
+    tenders: PANEL_TITLES.tenders,
+    profile: PANEL_TITLES.profile,
+    hours: PANEL_TITLES.hours,
+    photos: PANEL_TITLES.photos,
+    subscription: PANEL_TITLES.subscription,
+    referral: PANEL_TITLES.referral,
+    verifiedplus: PANEL_TITLES.verifiedplus,
+    mypayments: PANEL_TITLES.mypayments,
+    settings: PANEL_TITLES.settings
+  };
+  document.querySelectorAll('.sb-item[onclick]').forEach(function (el) {
+    var m = String(el.getAttribute('onclick') || '').match(/showPanel\('([^']+)'/);
+    if (!m || !map[m[1]]) return;
+    var spans = el.querySelectorAll('span');
+    var label = null;
+    for (var i = 0; i < spans.length; i++) {
+      if (!spans[i].classList.contains('sb-icon') && !spans[i].classList.contains('sb-badge')) {
+        label = spans[i];
+        break;
+      }
+    }
+    if (!label) return;
+    var full = map[m[1]];
+    var space = full.indexOf(' ');
+    label.textContent = space > 0 ? full.slice(space + 1) : full;
+  });
+  var logout = document.querySelector('.sb-logout span:not(.sb-icon)');
+  if (logout) logout.textContent = _t2('تسجيل الخروج', 'Déconnexion');
 }
 
 function toggleSidebar() {
@@ -178,8 +233,12 @@ function renderSidebarMeta() {
   }
   var badge = document.getElementById('sb-type-badge');
   if (badge) {
-    var map = { agency: 'مكتب / وكالة', developer: 'مطور عقاري', owner: 'مالك فردي' };
-    badge.textContent = map[(ACCOUNT && ACCOUNT.estateSubType) || 'agency'] || 'وكالة عقارية';
+    var map = {
+      agency: _t2('مكتب / وكالة', 'Agence'),
+      developer: _t2('مطور عقاري', 'Promoteur'),
+      owner: _t2('مالك فردي', 'Propriétaire')
+    };
+    badge.textContent = map[(ACCOUNT && ACCOUNT.estateSubType) || 'agency'] || _t2('وكالة عقارية', 'Agence immobilière');
   }
 }
 
@@ -685,6 +744,7 @@ function boot() {
           });
         } catch (e) {}
       }
+      applyEstateLangShell();
       loadLocal();
       renderAll();
       showPanel('overview', document.querySelector('.sb-item'));

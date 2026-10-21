@@ -1736,11 +1736,17 @@ function _initDashboardWithAccount(acc){
     // بدل التوازي معه، حتى لا يرسلا dashToken فيفشلان دوماً بصمت (401 catch).
     _resolveRealAccessToken(acc).then(function(realToken){
       if(realToken){
+        /* W4: accessToken في sessionStorage/الذاكرة فقط — ممنوع localStorage */
+        if(window.RizqDash && typeof RizqDash.rememberAccessToken === 'function'){
+          try{ RizqDash.rememberAccessToken(acc.id, realToken); }catch(eMem){}
+        } else {
+          window.REAL_ACCESS_TOKEN = realToken;
+          try{ sessionStorage.setItem('rizq_access_mem_' + acc.id, realToken); }catch(eSs){}
+        }
         try{
           var s = JSON.parse(localStorage.getItem('rizq_individual_session')||'{}');
-          s.accessToken = realToken;
-          localStorage.setItem('rizq_individual_session', JSON.stringify(s));
-        }catch(e){}
+          if(s && s.accessToken){ delete s.accessToken; localStorage.setItem('rizq_individual_session', JSON.stringify(s)); }
+        }catch(ePurge){}
         // مزامنة صلاحيات الباقة من الخادم (حدود/ميزات حية بما فيها media)
         if(typeof RizqSub !== 'undefined' && typeof RizqSub.syncEntitlementsFromServer === 'function'){
           try{ RizqSub.syncEntitlementsFromServer(acc.id, realToken); }catch(eSync){}
