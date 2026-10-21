@@ -148,6 +148,32 @@ body.rizq-dash,
   box-shadow: 0 6px 16px rgba(220, 38, 38, 0.3);
 }
 
+/* Hero / welcome banner CTAs — same rhythm as .btn */
+.rizq-dash .welcome-banner button,
+.rizq-dash #hero-banner button,
+.rizq-dash [id^="hero-"] button,
+.rizq-dash .card-title + button,
+.rizq-dash #services-showcase ~ * .btn,
+.rizq-dash .rizq-pkg-widget__actions .btn {
+  min-height: var(--rizq-btn-h-sm);
+  padding-inline: var(--rizq-btn-px-sm) !important;
+  border-radius: 9px !important;
+  font-size: 12.5px !important;
+  font-weight: 800 !important;
+  font-family: inherit !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.rizq-dash .welcome-banner button:hover,
+.rizq-dash #hero-banner button:hover {
+  transform: translateY(-2px);
+}
+
 /* Icon / bell buttons keep square rhythm */
 .rizq-dash .notif-bell,
 .rizq-dash .btn-icon {
