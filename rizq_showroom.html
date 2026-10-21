@@ -423,8 +423,31 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 .sss-cart .sss-count{background:rgba(13,27,42,.12);color:#0D1B2A}
 .item-card{background:#fff;border-radius:2px;overflow:hidden;border:1px solid #ece3d1;box-shadow:0 4px 16px rgba(27,58,107,.06);transition:all .3s;cursor:pointer;position:relative}
 .item-card:hover{transform:translateY(-6px);box-shadow:0 20px 38px rgba(27,58,107,.16)}
-.item-index{position:absolute;top:12px;left:12px;font-family:Georgia,serif;font-size:11px;font-weight:700;color:var(--gold-dk,#8a6f2a);background:#fff;border:1px solid var(--gold);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:2}
+.item-index{position:absolute;top:12px;right:12px;font-family:Georgia,serif;font-size:11px;font-weight:700;color:var(--gold-dk,#8a6f2a);background:#fff;border:1px solid var(--gold);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:2}
 .item-img{height:190px;background:linear-gradient(160deg,#faf6ec,#f3ecda);display:flex;align-items:center;justify-content:center;position:relative;border-bottom:1px solid #ece3d1}
+.sr-wish-btn{
+  position:absolute;top:10px;left:10px;z-index:8;
+  width:34px;height:34px;border-radius:50%;
+  background:rgba(8,15,30,.55);border:1px solid rgba(201,168,76,.55);
+  color:#E8C96A;font-size:15px;line-height:1;cursor:pointer;padding:0;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 14px rgba(0,0,0,.22);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:transform .2s,background .2s,border-color .2s,color .2s;
+}
+html[dir="ltr"] .sr-wish-btn{left:auto;right:10px}
+.sr-wish-btn:hover,.sr-wish-btn.active{
+  background:linear-gradient(145deg,#E8C96A,#C9A84C);border-color:#fff8e0;color:#0f2347;transform:scale(1.06);
+}
+.rzq-add-cart-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;margin-top:8px;padding:11px 14px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0F2347;
+  font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;
+  box-shadow:0 6px 16px rgba(201,168,76,.28);
+  transition:transform .15s,filter .15s,box-shadow .2s;
+}
+.rzq-add-cart-btn:hover{transform:translateY(-1px);filter:brightness(1.03);box-shadow:0 8px 20px rgba(201,168,76,.38)}
 .item-medallion{width:88px;height:88px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#f3ecda 70%);border:2px solid var(--gold);box-shadow:0 6px 18px rgba(201,168,76,.25),inset 0 0 0 4px #fff;display:flex;align-items:center;justify-content:center;font-size:44px}
 .item-badge{position:absolute;top:8px;right:8px;left:auto;z-index:7;background:linear-gradient(180deg,#FFE9A8,#E8C96A 55%,#C9A84C);color:#0f2347;font-size:9.5px;font-weight:900;padding:3px 8px;border-radius:4px;letter-spacing:.2px;box-shadow:0 3px 10px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.5)}
 /* شارة المخزون: ركن سفلي صغير — لا تغطي صورة المنتج */
@@ -989,6 +1012,7 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 <script src="rizq_stock.js?v=1.1" defer></script>
 <script src="rizq_site_banner.js" defer></script>
 <script src="rizq_auth_gate.js?v=23.1" defer></script>
+<script src="rizq_ux_polish.js?v=23.2" defer></script>
 <script src="rizq_contact_gate.js" defer></script>
 <script src="rizq_mr_payment_catalog.js?v=1.1" defer></script>
 <script src="rizq_account_payments.js?v=28.3" defer></script>
@@ -1290,10 +1314,19 @@ function renderCatalog(){
     }
     var specsClean = (window.RizqStoreCommerce && RizqStoreCommerce.cleanDesc)
       ? RizqStoreCommerce.cleanDesc(specs) : specs;
+    var wishOn = false;
+    try{
+      var wids = _srWishIds();
+      wishOn = wids.some(function(p){ return String(p.id||p) === String(item.id); });
+    }catch(eW){}
+    var wishLbl = _t('المفضلة','Favoris');
+    var idJs = JSON.stringify(String(item.id));
     return '<div class="item-card" data-cat="'+esc(item.cat||'')+'" onclick="openShowroomItemDetail(\''+esc(item.id)+'\')">'
       +'<div class="item-index">'+num+'</div>'
       +'<div class="item-img">'
       +(item.image ? '<img src="'+esc(item.image)+'" style="width:100%;height:100%;object-fit:cover" loading="lazy">' : '<div class="item-medallion">'+esc(item.emoji||'📦')+'</div>')
+      +'<button type="button" class="sr-wish-btn'+(wishOn?' active':'')+'" data-wish-id="'+esc(item.id)+'" title="'+esc(wishLbl)+'" aria-label="'+esc(wishLbl)+'" aria-pressed="'+(wishOn?'true':'false')+'"'
+      +" onclick='event.stopPropagation();toggleShowroomItemWish("+idJs+")'>"+(wishOn?'❤':'♡')+'</button>'
       +(item.featured ? '<span class="item-badge">'+_t('مميز','Vedette')+'</span>' : '')
       +stockBadge
       +'</div>'
@@ -1306,8 +1339,8 @@ function renderCatalog(){
       +'<button class="btn-inquire" onclick="event.stopPropagation();openShowroomItemDetail(\''+esc(item.id)+'\')">'
       +'👁 '+_t('عرض التفاصيل','Voir la fiche')
       +'</button>'
-      +'<button type="button" onclick="event.stopPropagation();addToCartShowroom(\''+esc(item.id)+'\')" style="width:100%;margin-top:8px;padding:10px;border:none;border-radius:10px;background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0F2347;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit">'
-      +'🛒 '+_t('أضف للسلة','Ajouter au panier')
+      +'<button type="button" class="rzq-add-cart-btn" onclick="event.stopPropagation();addToCartShowroom(\''+esc(item.id)+'\')">'
+      +'<span aria-hidden="true">🛒</span> '+_t('أضف إلى السلة','Ajouter au panier')
       +'</button>'
       /* PREFACTUR في السلة فقط بعد اختيار تحويل/استلام/توصيل */
       +'</div></div>';
@@ -1586,12 +1619,79 @@ function openShowroomItemDetail(itemId){
 
 var SR_WISH_KEY = 'rizq_showroom_wishlist';
 function _srWishIds(){
-  try { var v = JSON.parse(localStorage.getItem(SR_WISH_KEY) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; }
+  try {
+    var v = JSON.parse(localStorage.getItem(SR_WISH_KEY) || '[]');
+    if (!Array.isArray(v)) return [];
+    return v.map(function(p){
+      if (p && typeof p === 'object') return p;
+      return { id: String(p) };
+    });
+  } catch (e) { return []; }
+}
+function _srWishScopeId(){
+  return String(_showroomId || (new URLSearchParams(location.search).get('id') || 'showroom'));
+}
+function _srWishGlobalId(itemId){
+  return 'showroom:' + _srWishScopeId() + ':' + String(itemId);
+}
+function _saveSrWish(list){
+  try { localStorage.setItem(SR_WISH_KEY, JSON.stringify(list || [])); } catch (e) {}
+}
+function toggleShowroomItemWish(itemId){
+  itemId = String(itemId || '');
+  if (!itemId) return;
+  var run = function(){
+    var list = _srWishIds();
+    var idx = list.findIndex(function(p){ return String(p.id) === itemId; });
+    var added;
+    var item = (_allItems || []).find(function(it){ return String(it.id) === itemId; });
+    var name = item ? ((_lang==='fr' && item.nameFr) ? item.nameFr : (item.name || itemId)) : itemId;
+    if (idx > -1) { list.splice(idx, 1); added = false; }
+    else {
+      list.push({
+        id: itemId,
+        name: name,
+        price: item ? (item.price || '') : '',
+        emoji: item ? (item.emoji || '🏛️') : '🏛️',
+        showroomId: _srWishScopeId()
+      });
+      added = true;
+    }
+    _saveSrWish(list);
+    try{
+      var meta = {
+        type: 'showroom',
+        title: name,
+        price: item ? (item.price || '') : '',
+        emoji: item ? (item.emoji || '🏛️') : '🏛️',
+        sourceId: _srWishScopeId(),
+        sourceName: (document.getElementById('sr-name') && document.getElementById('sr-name').textContent) || '',
+        href: 'rizq_showroom.html?id=' + encodeURIComponent(_srWishScopeId())
+      };
+      if (window.RizqUx && typeof RizqUx.syncTypedFavorite === 'function') {
+        RizqUx.syncTypedFavorite(_srWishGlobalId(itemId), added, meta);
+      }
+    }catch(eSync){}
+    try { renderCatalog(); } catch (eR) {}
+    updateShowroomShopCounts();
+    showToast(added
+      ? _t('❤️ أُضيف إلى المفضلة','❤️ Ajouté aux favoris')
+      : _t('أُزيل من المفضلة','Retiré des favoris'));
+  };
+  if (typeof window.rizqRequireAuth === 'function') {
+    window.rizqRequireAuth(run, 'reasonFav');
+    return;
+  }
+  run();
 }
 function toggleShowroomWish(){
-  showToast(_t('❤ افتح تفاصيل عرض ثم أضفه للمفضلة من البطاقة، أو تابع السلة','❤ Ouvrez une fiche article, ou allez au panier'));
-  try { document.getElementById('catalog-section')?.scrollIntoView({ behavior: 'smooth' }); } catch (e) {}
+  if (window.RizqUx && typeof RizqUx.openWishlist === 'function') {
+    RizqUx.openWishlist();
+    return;
+  }
+  window.location.href = 'rizq_favorites.html';
 }
+window.toggleShowroomItemWish = toggleShowroomItemWish;
 function updateShowroomShopCounts(){
   var cartN = 0;
   try {

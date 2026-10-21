@@ -42,6 +42,92 @@
     return wishlistIds().indexOf(String(id)) !== -1;
   }
 
+  function isTypedWishlistId(id) {
+    return /^(store|estate|showroom|office):/i.test(String(id || ''));
+  }
+
+  function parseWishlistId(id) {
+    id = String(id || '');
+    var m = id.match(/^(store|estate|showroom|office):([^:]+):(.+)$/i);
+    if (m) {
+      return { type: m[1].toLowerCase(), sourceId: m[2], itemId: m[3], id: id };
+    }
+    return { type: 'ad', sourceId: '', itemId: id, id: id };
+  }
+
+  function wishlistMetaMap() {
+    try {
+      var v = JSON.parse(localStorage.getItem('rizq_wishlist_meta') || '{}');
+      return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function setWishlistMetaEntry(id, meta) {
+    id = String(id || '');
+    if (!id) return;
+    var map = wishlistMetaMap();
+    if (meta && typeof meta === 'object') {
+      map[id] = {
+        type: meta.type || parseWishlistId(id).type,
+        title: meta.title || meta.name || '',
+        price: meta.price || '',
+        emoji: meta.emoji || '',
+        href: meta.href || '',
+        sourceId: meta.sourceId || parseWishlistId(id).sourceId || '',
+        sourceName: meta.sourceName || '',
+        updatedAt: new Date().toISOString()
+      };
+    } else {
+      delete map[id];
+    }
+    try {
+      localStorage.setItem('rizq_wishlist_meta', JSON.stringify(map));
+    } catch (e) {}
+  }
+
+  /** مفضلة موحّدة: إعلانات + محل + معرض + عقار (+ مكتب إن وُجد) */
+  function collectUnifiedFavorites() {
+    var ids = wishlistIds();
+    var meta = wishlistMetaMap();
+    var typeLabel = {
+      ad: t('إعلان', 'Annonce'),
+      store: t('محل', 'Boutique'),
+      showroom: t('معرض', 'Showroom'),
+      estate: t('عقار', 'Immobilier'),
+      office: t('مكتب', 'Bureau')
+    };
+    return ids.map(function (id) {
+      var parsed = parseWishlistId(id);
+      var m = meta[id] || {};
+      var type = (m.type || parsed.type || 'ad').toLowerCase();
+      var href = m.href || '';
+      if (!href) {
+        if (type === 'store' && parsed.sourceId) {
+          href = 'rizq_store.html?id=' + encodeURIComponent(parsed.sourceId);
+        } else if (type === 'showroom' && parsed.sourceId) {
+          href = 'rizq_showroom.html?id=' + encodeURIComponent(parsed.sourceId);
+        } else if (type === 'estate' && parsed.sourceId) {
+          href = 'rizq_estate.html?id=' + encodeURIComponent(parsed.sourceId) + '&open=' + encodeURIComponent(parsed.itemId);
+        } else if (type === 'ad') {
+          href = 'rizq_browse.html?ad=' + encodeURIComponent(parsed.itemId);
+        }
+      }
+      return {
+        id: id,
+        type: type,
+        typeLabel: typeLabel[type] || typeLabel.ad,
+        title: m.title || m.name || (type === 'ad' ? parsed.itemId : id),
+        price: m.price || '',
+        emoji: m.emoji || (type === 'estate' ? '🏠' : type === 'store' ? '🛍️' : type === 'showroom' ? '🏛️' : '♡'),
+        href: href,
+        sourceId: m.sourceId || parsed.sourceId || '',
+        sourceName: m.sourceName || ''
+      };
+    });
+  }
+
   /** حساب زائر (مشتري) أو جلسة أعمال — بدون أي منهما لا تُحفظ مفضلة */
   function hasWishlistAccount() {
     try {
@@ -64,8 +150,14 @@
   function clearGuestWishlist() {
     try {
       var raw = localStorage.getItem('rizq_wishlist');
-      if (!raw || raw === '[]') return false;
+      var hadMeta = false;
+      try {
+        var mm = localStorage.getItem('rizq_wishlist_meta');
+        hadMeta = !!(mm && mm !== '{}' && mm !== 'null');
+      } catch (eM) {}
+      if ((!raw || raw === '[]') && !hadMeta) return false;
       localStorage.setItem('rizq_wishlist', '[]');
+      try { localStorage.setItem('rizq_wishlist_meta', '{}'); } catch (eMeta) {}
       try {
         document.dispatchEvent(new CustomEvent('rizq_wishlist', { detail: { ids: [], clearedGuest: true, count: 0 } }));
       } catch (e) {}
@@ -81,17 +173,32 @@
       localStorage.setItem('rizq_wishlist', JSON.stringify(ids));
     } catch (e) {}
     try {
+      if (!ids.length) {
+        localStorage.setItem('rizq_wishlist_meta', '{}');
+      } else {
+        var map = wishlistMetaMap();
+        var keep = {};
+        ids.forEach(function (id) { keep[id] = true; });
+        Object.keys(map).forEach(function (k) {
+          if (!keep[k]) delete map[k];
+        });
+        localStorage.setItem('rizq_wishlist_meta', JSON.stringify(map));
+      }
+    } catch (eMeta) {}
+    try {
       document.dispatchEvent(new CustomEvent('rizq_wishlist', { detail: { ids: ids, count: ids.length } }));
     } catch (e2) {}
     updateFavBadges();
   }
 
-  /** احذف معرّفات لم تُرجعها /api/ads/batch (إعلانات وهمية/محذوفة) حتى لا يبقى العداد كاذباً */
+  /** احذف معرّفات إعلانات لم تُرجعها /api/ads/batch — مع الإبقاء على مفضّلات المحل/المعرض/العقار */
   function pruneWishlistToExisting(foundIds) {
     var keep = {};
     (foundIds || []).forEach(function (id) { keep[String(id)] = true; });
     var prev = wishlistIds();
-    var next = prev.filter(function (id) { return keep[id]; });
+    var next = prev.filter(function (id) {
+      return keep[id] || isTypedWishlistId(id);
+    });
     if (next.length !== prev.length) setWishlistIds(next);
     return next;
   }
@@ -116,7 +223,7 @@
     opts = opts || {};
     if (!opts.force && !hasWishlistAccount()) {
       requireWishlistAuth(function () {
-        var added = wishlistToggle(id, { force: true, _authResume: true });
+        var added = wishlistToggle(id, { force: true, _authResume: true, meta: opts.meta || null });
         if (opts.afterAuthToast !== false) toastFav(!!added);
         if (typeof opts.onDone === 'function') {
           try { opts.onDone(added); } catch (eDone) {}
@@ -131,9 +238,11 @@
     if (i === -1) {
       ids.push(id);
       added = true;
+      if (opts.meta) setWishlistMetaEntry(id, opts.meta);
     } else {
       ids.splice(i, 1);
       added = false;
+      setWishlistMetaEntry(id, null);
     }
     try {
       localStorage.setItem('rizq_wishlist', JSON.stringify(ids));
@@ -145,6 +254,21 @@
     if (typeof opts.onDone === 'function' && !opts._authResume) {
       try { opts.onDone(added); } catch (eDone2) {}
     }
+    return added;
+  }
+
+  /** مزامنة مفضلة مصدر (محل/معرض/عقار) مع المفضلة العامة */
+  function syncTypedFavorite(gid, added, meta) {
+    gid = String(gid || '');
+    if (!gid) return false;
+    var hasG = wishlistHas(gid);
+    if (added && !hasG) {
+      return wishlistToggle(gid, { force: true, afterAuthToast: false, meta: meta || null });
+    }
+    if (!added && hasG) {
+      return wishlistToggle(gid, { force: true, afterAuthToast: false });
+    }
+    if (added && hasG && meta) setWishlistMetaEntry(gid, meta);
     return added;
   }
 
@@ -185,9 +309,8 @@
   }
 
   function updateFavBadges() {
-    // بلا حساب: أخفِ العداد فقط — المسح يتم عند محاولة الإضافة/فتح المفضلة
-    // (تجنّب سباق تحميل rizq_auth_gate المؤجّل)
-    var n = hasWishlistAccount() ? wishlistIds().length : 0;
+    // مثل السلة العامة: أظهر العدد من التخزين المحلي (الإضافة ما زالت محمية عند المصدر)
+    var n = wishlistIds().length;
     var heart = n > 0 ? '♥' : '♡';
     var wlBlock = document.getElementById('wishlist-block');
     if (wlBlock) wlBlock.classList.toggle('has-favs', n > 0);
@@ -212,15 +335,19 @@
     return '<div class="rzq-wishlist-empty" style="text-align:center;padding:36px 22px;background:linear-gradient(135deg,rgba(201,168,76,.12),rgba(27,58,107,.05));border:2px solid rgba(201,168,76,.35);border-radius:20px;max-width:540px;margin:0 auto;box-shadow:0 8px 28px rgba(27,58,107,.08)">'
       + '<div class="rizq-gold-heart" style="font-size:42px;display:block;margin:0 auto 16px">♡</div>'
       + '<p style="font-size:18px;font-weight:900;color:#0f2347!important;margin:0 0 12px;line-height:1.55">'
-      + (fr ? 'Aucune annonce en favori' : 'لا توجد إعلانات في المفضلة بعد')
+      + (fr ? 'Aucun favori pour le moment' : 'لا عناصر في المفضلة بعد')
       + '</p>'
       + '<p style="font-size:15px;font-weight:700;color:#1B3A6B!important;margin:0;line-height:1.85">'
       + (fr
-        ? 'Parcourez les annonces et touchez le cœur doré <span class="rizq-gold-heart" style="font-size:18px">♡</span> pour sauvegarder.'
-        : 'تصفّح الإعلانات واضغط على القلب الذهبي <span class="rizq-gold-heart" style="font-size:18px">♡</span> لحفظ الإعلان.')
+        ? 'Touchez le cœur doré <span class="rizq-gold-heart" style="font-size:18px">♡</span> sur une annonce, un produit, un article de showroom ou un bien immobilier.'
+        : 'اضغط القلب الذهبي <span class="rizq-gold-heart" style="font-size:18px">♡</span> على إعلان أو منتج محل أو عرض معرض أو عقار لحفظه هنا.')
       + '</p>'
-      + '<div style="margin-top:20px"><a href="rizq_browse.html" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#C9A84C,#FFD700);color:#0f2347;font-weight:900;font-size:15px;padding:12px 22px;border-radius:14px;text-decoration:none;box-shadow:0 4px 16px rgba(201,168,76,.35)">'
-      + (fr ? 'Parcourir les annonces →' : 'تصفح الإعلانات ←') + '</a></div></div>';
+      + '<div style="margin-top:20px;display:flex;flex-wrap:wrap;gap:10px;justify-content:center">'
+      + '<a href="rizq_browse.html" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#C9A84C,#FFD700);color:#0f2347;font-weight:900;font-size:14px;padding:11px 18px;border-radius:14px;text-decoration:none;box-shadow:0 4px 16px rgba(201,168,76,.35)">'
+      + (fr ? 'Annonces' : 'الإعلانات') + '</a>'
+      + '<a href="rizq_directory.html" style="display:inline-flex;align-items:center;gap:8px;background:#1B3A6B;color:#fff;font-weight:900;font-size:14px;padding:11px 18px;border-radius:14px;text-decoration:none">'
+      + (fr ? 'Boutiques' : 'المحلات') + '</a>'
+      + '</div></div>';
   }
 
   function openWishlist(e) {
@@ -228,39 +355,19 @@
       e.preventDefault();
       e.stopPropagation();
     }
-    if (!hasWishlistAccount()) {
-      clearGuestWishlist();
-      updateFavBadges();
-      requireWishlistAuth(function () { openWishlist(); });
+    /* مثل السلة العامة: افتح صفحة المفضلة دون إجبار تسجيل عند المعاينة */
+    var path = String(location.pathname || '');
+    if (/rizq_favorites\.html/i.test(path)) {
+      try {
+        var list = document.getElementById('fav-list');
+        if (list) list.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (eScroll) {}
+      if (typeof global.RizqRenderUnifiedFavorites === 'function') {
+        try { global.RizqRenderUnifiedFavorites(); } catch (eR) {}
+      }
       return;
     }
-    var block = document.getElementById('wishlist-block');
-    if (!block) {
-      window.location.href = 'rizq_landing_v8.html#wishlist-block';
-      return;
-    }
-    var section = document.getElementById('rizq-live-activity');
-    if (section) section.style.display = '';
-    block.style.display = '';
-    var wlTitle = document.getElementById('wishlist-block-title');
-    if (wlTitle) {
-      var fr = lang() === 'fr';
-      if (!wlTitle.hasAttribute('data-t-ar')) wlTitle.setAttribute('data-t-ar', wlTitle.textContent.trim());
-      wlTitle.textContent = fr ? (wlTitle.getAttribute('data-t-fr') || 'Vos favoris') : wlTitle.getAttribute('data-t-ar');
-    }
-    var done = function () {
-      setTimeout(function () {
-        block.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        try { history.replaceState(null, '', '#wishlist-block'); } catch (eH) { location.hash = 'wishlist-block'; }
-      }, 100);
-    };
-    if (typeof window.RizqRenderWishlist === 'function') {
-      window.RizqRenderWishlist(true).then(done);
-      return;
-    }
-    var mount = document.getElementById('wishlist-mount');
-    if (mount) mount.innerHTML = wishlistEmptyHtml();
-    done();
+    window.location.href = 'rizq_favorites.html';
   }
 
   function cartItems() {
@@ -900,7 +1007,38 @@
     st.textContent =
       '.nav-fav-ico,.rizq-gold-heart,.rizq-hdr-fav-ico{color:#E8C96A;font-weight:800;-webkit-text-fill-color:#E8C96A;text-shadow:0 0 10px rgba(201,168,76,.55)}' +
       '.nav-fav-btn.has-favs .nav-fav-ico,.rizq-hdr-fav.has-favs .rizq-hdr-fav-ico,#wishlist-block.has-favs [data-rizq-fav-heart]{color:#FFD700;-webkit-text-fill-color:#FFD700;text-shadow:0 0 14px rgba(255,215,0,.6)}' +
-      '.rzq-wishlist-empty .rizq-gold-heart{font-size:42px;line-height:1}';
+      '.rzq-wishlist-empty .rizq-gold-heart{font-size:42px;line-height:1}' +
+      /* قلب المفضلة بهوية الإعلانات (كحلي زجاجي + ذهب) — محل / معرض / عقار */
+      '.rzq-fav-btn,.wish-btn,.est-wish-btn,.sr-wish-btn{' +
+        'position:absolute;z-index:8;top:10px;left:10px;right:auto;' +
+        'width:34px;height:34px;border-radius:50%;' +
+        'display:flex;align-items:center;justify-content:center;' +
+        'border:1px solid rgba(201,168,76,.55);background:rgba(8,15,30,.55);' +
+        'backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);' +
+        'color:#E8C96A;font-size:15px;line-height:1;cursor:pointer;padding:0;' +
+        'box-shadow:0 4px 14px rgba(0,0,0,.22);' +
+        'transition:transform .2s,background .2s,border-color .2s,color .2s' +
+      '}' +
+      'html[dir="ltr"] .rzq-fav-btn,html[dir="ltr"] .wish-btn,html[dir="ltr"] .est-wish-btn,html[dir="ltr"] .sr-wish-btn{left:auto;right:10px}' +
+      '.rzq-fav-btn:hover,.wish-btn:hover,.est-wish-btn:hover,.sr-wish-btn:hover,' +
+      '.rzq-fav-btn.active,.wish-btn.active,.est-wish-btn.active,.sr-wish-btn.active,' +
+      '.rzq-fav-btn.is-on,.est-pd-wish.is-on{' +
+        'background:linear-gradient(145deg,#E8C96A,#C9A84C)!important;' +
+        'border-color:#fff8e0!important;color:#0f2347!important;transform:scale(1.06)' +
+      '}' +
+      '.est-pd-wish{' +
+        'border:1.5px solid rgba(201,168,76,.45)!important;background:rgba(8,15,30,.04)!important;color:#1B3A6B!important' +
+      '}' +
+      /* زر أضف للسلة بهوية ذهبية موحّدة */
+      '.add-cart-btn,.rzq-add-cart-btn{' +
+        'display:inline-flex;align-items:center;justify-content:center;gap:8px;' +
+        'width:100%;margin-top:10px;padding:11px 14px;border:none;border-radius:12px;' +
+        'background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0F2347;' +
+        'font:inherit;font-weight:800;font-size:13.5px;cursor:pointer;' +
+        'box-shadow:0 6px 16px rgba(201,168,76,.28);' +
+        'transition:transform .15s,filter .15s,box-shadow .2s' +
+      '}' +
+      '.add-cart-btn:hover,.rzq-add-cart-btn:hover{transform:translateY(-1px);filter:brightness(1.03);box-shadow:0 8px 20px rgba(201,168,76,.38)}';
     document.head.appendChild(st);
   }
 
@@ -943,6 +1081,12 @@
     wishlistIds: wishlistIds,
     wishlistHas: wishlistHas,
     wishlistToggle: wishlistToggle,
+    syncTypedFavorite: syncTypedFavorite,
+    collectUnifiedFavorites: collectUnifiedFavorites,
+    parseWishlistId: parseWishlistId,
+    isTypedWishlistId: isTypedWishlistId,
+    setWishlistMetaEntry: setWishlistMetaEntry,
+    wishlistMetaMap: wishlistMetaMap,
     hasWishlistAccount: hasWishlistAccount,
     requireWishlistAuth: requireWishlistAuth,
     clearGuestWishlist: clearGuestWishlist,

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+  <link rel="stylesheet" href="rizq-theme.css?v=17.2"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
+  <script>document.documentElement.classList.add('rizq-app-nav')</script>
+  <title data-t-ar="المفضلة | رزق" data-t-fr="Favoris | Rizq">المفضلة | رزق</title>
+  <style>
+    :root{--navy:#1B3A6B;--navy2:#0F2347;--gold:#C9A84C;--gold2:#E8C96A;--border:rgba(201,168,76,.22)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Cairo',system-ui,sans-serif;background:#f0f3f8;color:#1a2a3a;min-height:100vh}
+    .fav-hero{
+      background:linear-gradient(135deg,#06111C 0%,#0F2347 45%,#1B3A6B 100%);
+      border-bottom:1px solid rgba(201,168,76,.35);color:#fff;
+    }
+    .fav-hero-inner{max-width:960px;margin:0 auto;padding:28px 18px 24px}
+    .fav-hero h1{font-size:clamp(22px,3vw,30px);font-weight:900;margin:0 0 8px;color:#F3E2A8}
+    .fav-hero p{font-size:14.5px;line-height:1.7;color:rgba(255,255,255,.78);max-width:46ch}
+    .fav-wrap{max-width:960px;margin:0 auto;padding:22px 16px 48px}
+    .fav-toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .fav-count{font-weight:800;color:var(--navy);font-size:14px}
+    .fav-clear{
+      border:1px solid rgba(27,58,107,.18);background:#fff;color:#4a5f78;
+      border-radius:999px;padding:8px 14px;font:inherit;font-weight:800;font-size:12.5px;cursor:pointer;
+    }
+    .fav-clear:hover{border-color:rgba(201,168,76,.45);color:var(--navy)}
+    .fav-list{display:grid;gap:12px}
+    .fav-card{
+      display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+      background:#fff;border:1px solid #dbe3ef;border-radius:16px;padding:14px 16px;
+      box-shadow:0 6px 18px rgba(15,35,65,.06);
+    }
+    .fav-emoji{
+      width:48px;height:48px;border-radius:14px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;font-size:24px;
+      background:linear-gradient(160deg,#0f2347,#1B3A6B);border:1px solid rgba(201,168,76,.4);
+    }
+    .fav-body{flex:1;min-width:160px}
+    .fav-type{
+      display:inline-flex;align-items:center;gap:4px;
+      font-size:11px;font-weight:900;color:#8A6B1F;background:rgba(201,168,76,.16);
+      border-radius:999px;padding:3px 9px;margin-bottom:6px;
+    }
+    .fav-title{font-size:15px;font-weight:800;color:var(--navy);line-height:1.35}
+    .fav-meta{font-size:12.5px;color:#5a6b7d;margin-top:4px;font-weight:650}
+    .fav-price{font-size:14px;font-weight:900;color:#8A6B1F;margin-top:4px}
+    .fav-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .fav-open{
+      display:inline-flex;align-items:center;justify-content:center;gap:6px;
+      padding:9px 14px;border-radius:11px;text-decoration:none;font-weight:800;font-size:12.5px;
+      background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0F2347;
+      box-shadow:0 4px 12px rgba(201,168,76,.25);
+    }
+    .fav-remove{
+      border:1px solid rgba(27,58,107,.15);background:#fff;color:#6a7a8a;
+      border-radius:11px;padding:9px 12px;font:inherit;font-weight:800;font-size:12.5px;cursor:pointer;
+    }
+    .fav-remove:hover{border-color:#e84040;color:#e84040}
+    .fav-empty{margin-top:8px}
+    .fav-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+    .fav-links a{
+      display:inline-flex;align-items:center;gap:6px;padding:10px 14px;border-radius:12px;
+      text-decoration:none;font-weight:800;font-size:13px;
+      background:#fff;border:1px solid #d5deea;color:var(--navy);
+    }
+    .fav-links a:hover{border-color:rgba(201,168,76,.5)}
+  </style>
+</head>
+<body data-t-ns="favorites">
+<script src="rizq_backend_config.js"></script>
+<script src="rizq_auth_gate.js?v=23.1" defer></script>
+<script src="rizq_ux_polish.js?v=23.2" defer></script>
+<script src="rizq_header.js?v=31.1"></script>
+<script>document.documentElement.classList.add('rizq-app-nav')</script>
+
+<section class="fav-hero" aria-label="المفضلة">
+  <div class="fav-hero-inner">
+    <h1 id="fav-hero-title">♡ المفضلة العامة</h1>
+    <p id="fav-hero-sub">تجمع ما أعجبك من الإعلانات والمحلات والمعارض وسوق العقارات — بنفس أسلوب السلة العامة على المنصة.</p>
+  </div>
+</section>
+
+<main class="fav-wrap">
+  <div class="fav-toolbar">
+    <div class="fav-count" id="fav-count">0 عنصر</div>
+    <button type="button" class="fav-clear" id="fav-clear" hidden>مسح الكل</button>
+  </div>
+  <div class="fav-list" id="fav-list"></div>
+  <div class="fav-links" id="fav-links">
+    <a href="rizq_browse.html">الإعلانات</a>
+    <a href="rizq_directory.html">المحلات والمعارض</a>
+    <a href="rizq_estate_directory.html">سوق العقارات</a>
+    <a href="rizq_cart.html">🛒 السلة العامة</a>
+  </div>
+</main>
+
+<script>
+(function(){
+  function isFr(){
+    try{
+      if(window.RizqI18n && typeof RizqI18n.getLang === 'function') return RizqI18n.getLang() === 'fr';
+      return localStorage.getItem('rizq_lang') === 'fr';
+    }catch(e){ return false; }
+  }
+  function esc(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  function applyLang(){
+    var fr = isFr();
+    document.documentElement.lang = fr ? 'fr' : 'ar';
+    document.documentElement.dir = fr ? 'ltr' : 'rtl';
+    var t = document.getElementById('fav-hero-title');
+    var s = document.getElementById('fav-hero-sub');
+    if(t) t.textContent = fr ? '♡ Favoris généraux' : '♡ المفضلة العامة';
+    if(s) s.textContent = fr
+      ? 'Regroupe vos coups de cœur : annonces, boutiques, showrooms et immobilier — comme le panier général.'
+      : 'تجمع ما أعجبك من الإعلانات والمحلات والمعارض وسوق العقارات — بنفس أسلوب السلة العامة على المنصة.';
+    var c = document.getElementById('fav-clear');
+    if(c) c.textContent = fr ? 'Tout effacer' : 'مسح الكل';
+  }
+  function renderUnifiedFavorites(){
+    applyLang();
+    var fr = isFr();
+    var listEl = document.getElementById('fav-list');
+    var countEl = document.getElementById('fav-count');
+    var clearBtn = document.getElementById('fav-clear');
+    if(!listEl) return;
+    /* مثل السلة العامة: اعرض المحفوظ محلياً دون مسح عند الزيارة */
+    var items = (window.RizqUx && typeof RizqUx.collectUnifiedFavorites === 'function')
+      ? RizqUx.collectUnifiedFavorites()
+      : [];
+    if(countEl){
+      countEl.textContent = fr
+        ? (items.length + ' élément' + (items.length === 1 ? '' : 's'))
+        : (items.length + ' عنصر' + (items.length === 1 ? '' : 'ات'));
+    }
+    if(clearBtn) clearBtn.hidden = items.length < 1;
+    if(!items.length){
+      listEl.innerHTML = '<div class="fav-empty">'+(window.RizqUx && RizqUx.wishlistEmptyHtml ? RizqUx.wishlistEmptyHtml() : '')+'</div>';
+      return;
+    }
+    listEl.innerHTML = items.map(function(it){
+      var idJs = JSON.stringify(String(it.id));
+      return '<article class="fav-card" data-fav-id="'+esc(it.id)+'">'
+        + '<div class="fav-emoji" aria-hidden="true">'+esc(it.emoji || '♡')+'</div>'
+        + '<div class="fav-body">'
+        +   '<div class="fav-type">'+esc(it.typeLabel || it.type)+'</div>'
+        +   '<div class="fav-title">'+esc(it.title || it.id)+'</div>'
+        +   (it.sourceName ? '<div class="fav-meta">'+esc(it.sourceName)+'</div>' : '')
+        +   (it.price ? '<div class="fav-price">'+esc(it.price)+'</div>' : '')
+        + '</div>'
+        + '<div class="fav-actions">'
+        +   (it.href ? '<a class="fav-open" href="'+esc(it.href)+'">'+(fr?'Ouvrir':'فتح')+'</a>' : '')
+        +   '<button type="button" class="fav-remove" onclick=\'removeFav('+idJs+')\'>'+(fr?'Retirer':'إزالة')+'</button>'
+        + '</div>'
+        + '</article>';
+    }).join('');
+  }
+  function removeFav(id){
+    if(window.RizqUx && typeof RizqUx.wishlistToggle === 'function'){
+      if(RizqUx.wishlistHas && RizqUx.wishlistHas(id)){
+        RizqUx.wishlistToggle(id, { force: true, afterAuthToast: false });
+      }
+    }
+    renderUnifiedFavorites();
+  }
+  window.removeFav = removeFav;
+  window.RizqRenderUnifiedFavorites = renderUnifiedFavorites;
+  var clearBtn = document.getElementById('fav-clear');
+  if(clearBtn){
+    clearBtn.addEventListener('click', function(){
+      var fr = isFr();
+      if(!confirm(fr ? 'Effacer tous les favoris ?' : 'مسح كل المفضلة؟')) return;
+      if(window.RizqUx && typeof RizqUx.setWishlistIds === 'function'){
+        RizqUx.setWishlistIds([]);
+        try{ localStorage.setItem('rizq_wishlist_meta', '{}'); }catch(e){}
+      }
+      renderUnifiedFavorites();
+    });
+  }
+  document.addEventListener('rizq_wishlist', renderUnifiedFavorites);
+  document.addEventListener('rizq:langchange', renderUnifiedFavorites);
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', renderUnifiedFavorites);
+  else renderUnifiedFavorites();
+})();
+</script>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.44"/>
+<script src="rizq_header_mockup_trial.js?v=5.44" defer></script>
+<script src="rizq_pwa.js" defer></script>
+</body>
+</html>

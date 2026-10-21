@@ -310,30 +310,37 @@
     }
   }
 
+  function isShowroomPage() {
+    try {
+      var path = String(location.pathname || location.href || '').toLowerCase();
+      if (path.indexOf('rizq_showroom') >= 0) return true;
+      return !!(document.body && document.body.getAttribute('data-t-ns') === 'showroom');
+    } catch (e) {
+      return false;
+    }
+  }
+
   function commerceToolbarHtml() {
-    var inner = '';
-    if (!isCommercePage()) {
-      inner = '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_landing_v8.html#wishlist-block" aria-label="' + t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '"><span class="rizq-hdr-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span><span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
-    } else {
-      // صفحات المحل: سلة (+ مفضلة المحل) — لا تُفرَّغ الأداة مبكراً
-      if (isStorePage()) {
-        // مفضلة منتجات المحل (لوحة wish-panel المحلية) — ليست مفضلة إعلانات المنصّة
-        inner +=
-          '<button type="button" class="rizq-hdr-store-wish" id="rizq-hdr-store-wish" onclick="if(typeof toggleWishPanel===\'function\')toggleWishPanel()" aria-label="' +
-          t2('مفضلة المحل', 'Favoris boutique') +
-          '" title="' +
-          t2('مفضلة المحل', 'Favoris boutique') +
-          '">❤<span class="rizq-hdr-fav-count" data-rizq-store-wish-count hidden>0</span></button>';
-      } else {
-        inner +=
-          '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_landing_v8.html#wishlist-block" aria-label="' +
-          t2('المفضلة', 'Favoris') +
-          '" title="' +
-          t2('المفضلة', 'Favoris') +
-          '"><span class="rizq-hdr-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span><span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
-      }
+    /* مفضلة عامة (مثل السلة العامة) + سلة على صفحات التجارة */
+    var inner =
+      '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_favorites.html" aria-label="' +
+      t2('المفضلة', 'Favoris') +
+      '" title="' +
+      t2('المفضلة', 'Favoris') +
+      '"><span class="rizq-hdr-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span><span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
+    if (isCommercePage() || isShowroomPage()) {
+      var cartHref = 'rizq_cart.html';
+      try {
+        var sid = new URLSearchParams(location.search).get('id') || new URLSearchParams(location.search).get('store') || '';
+        if (sid) {
+          cartHref += '?id=' + encodeURIComponent(sid);
+          if (isShowroomPage()) cartHref += '&module=showroom';
+        }
+      } catch (eCart) {}
       inner +=
-        '<a class="rizq-hdr-cart" id="rizq-hdr-cart" data-rizq-cart-wrap href="rizq_cart.html" aria-label="' +
+        '<a class="rizq-hdr-cart" id="rizq-hdr-cart" data-rizq-cart-wrap href="' +
+        cartHref +
+        '" aria-label="' +
         t2('السلة', 'Panier') +
         '" title="' +
         t2('السلة', 'Panier') +
@@ -1047,7 +1054,7 @@
   }
 
   function deskFavHtml() {
-    // على المحل/المنتجات/السلة: أدوات التجارة (مفضلة المحل + السلة)
+    // مفضلة عامة (+ سلة على صفحات التجارة) — نفس أسلوب الواجهة
     var commerce = commerceToolbarHtml();
     if (commerce) {
       return commerce.replace(
@@ -1056,7 +1063,7 @@
       );
     }
     return '<span class="rizq-toolbar-tools nav-toolbar-tools" data-rizq-toolbar="tools" role="group" aria-label="' + t2('أدوات', 'Outils') + '">' +
-      '<a href="rizq_landing_v8.html#wishlist-block" class="nav-account-btn nav-fav-btn" id="rizq-desk-fav" data-rizq-fav-wrap aria-label="' +
+      '<a href="rizq_favorites.html" class="nav-account-btn nav-fav-btn" id="rizq-desk-fav" data-rizq-fav-wrap aria-label="' +
       t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '" style="text-decoration:none">' +
       '<span class="nav-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span>' +
       '<span class="nav-fav-lbl" data-hdr="fav">' + t2('المفضلة', 'Favoris') + '</span>' +
