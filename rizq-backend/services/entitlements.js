@@ -635,7 +635,7 @@ function mapPackageIdToPlanType(packageId, accountType) {
   if (/^vid-/.test(id)) return mapMediaPackageToPlanType({ packageId: id });
   const type = String(accountType || 'individual').toLowerCase();
   if (type === 'store' || type === 'shop') return 'store_monthly';
-  if (type === 'office') return 'office_monthly';
+  if (type === 'office' || type === 'estate') return 'office_monthly';
   if (type === 'corp') return 'corp_monthly';
   return null;
 }
@@ -665,7 +665,7 @@ function mapPackageNameToPlanType(pkgName, accountType, packageId) {
     if (/شهر|month/.test(name)) return 'store_monthly';
     return 'store_monthly';
   }
-  if (type === 'office') {
+  if (type === 'office' || type === 'estate') {
     if (/تجريب|trial|مجان/.test(name)) return 'office_trial';
     if (/ماس|diamond|diamant/.test(name)) {
       if (/pro|pro للمكاتب|متقدم.*pro/i.test(name)) return 'office_diamond_pro';
@@ -708,7 +708,7 @@ function resolvePlanDefinition(planType, accountType) {
   if (OFFICE_PLANS[planType]) return OFFICE_PLANS[planType];
   if (CORP_PLANS[planType]) return CORP_PLANS[planType];
   if (t === 'store') return STORE_PLANS.store_trial;
-  if (t === 'office') return OFFICE_PLANS.office_basic;
+  if (t === 'office' || t === 'estate') return OFFICE_PLANS.office_basic;
   if (t === 'corp') return CORP_PLANS.corp_trial;
   return FREE_FALLBACK;
 }

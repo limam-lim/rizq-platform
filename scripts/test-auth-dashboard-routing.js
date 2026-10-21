@@ -15,6 +15,7 @@ const DASH = {
   store: 'rizq_dashboard_store.html',
   office: 'rizq_dashboard_office.html',
   corp: 'rizq_dashboard_corp.html',
+  estate: 'rizq_dashboard_estate.html',
 };
 
 function assert(cond, msg) {
@@ -229,30 +230,42 @@ async function main() {
   const storeAct = { activityId: 'st_cars_used', activity: 'بيع سيارات مستعملة', category: 'سيارات' };
   const officeAct = { activityId: 'of_law', activity: 'مكتب محاماة', category: 'خدمات' };
   const corpAct = { activityId: 'st_cars_new', activity: 'بيع سيارات جديدة', category: 'سيارات' };
+  const estateAct = {
+    activityId: 'es_agency',
+    activity: 'مكتب / وكالة عقارية',
+    category: 'عقارات',
+    estateSubType: 'agency',
+    licenseNumber: 'LIC-TEST-001',
+    focusAreas: 'تفرغ زينة',
+  };
 
   const results = [];
   results.push(await registerAndLogin('individual'));
   results.push(await registerAndLogin('store', storeAct));
   results.push(await registerAndLogin('office', officeAct));
   results.push(await registerAndLogin('corp', corpAct));
+  results.push(await registerAndLogin('estate', estateAct));
 
   const store = results.find((r) => r.type === 'store');
   await assertVerifyDashTypeLock(store);
 
-  /* الفجوة المغلقة: مكتب/شركة بعد موافقة الأدمن يدخلان لوحتهما */
+  /* الفجوة المغلقة: مكتب/شركة/عقارات بعد موافقة الأدمن يدخلون لوحاتهم */
   const office = results.find((r) => r.type === 'office');
   const corp = results.find((r) => r.type === 'corp');
+  const estate = results.find((r) => r.type === 'estate');
   const officeLive = await adminApproveThenEnter(office);
   const corpLive = await adminApproveThenEnter(corp);
+  const estateLive = await adminApproveThenEnter(estate);
   results.push(officeLive);
   results.push(corpLive);
+  results.push(estateLive);
 
   console.log('OK auth→dashboard routing + security gates + admin-approve lifecycle');
   results.forEach((r) => {
     console.log(' -', r.type, r.status, r.via ? '(' + r.via + ')' : '', '→', r.urlPath);
   });
-  console.log('CHECKLIST_COVERED: otp-auto-approve, pending-gate, bcrypt-login, server-dashToken, verify-dash type lock, admin-approve office/corp → dashboard');
-  console.log('ACHIEVEMENTS_PRESERVED: type-map, recoverSessionParams, bcrypt seller-login, verify-dash type lock, OTP gate, server dashToken');
+  console.log('CHECKLIST_COVERED: otp-auto-approve, pending-gate, bcrypt-login, server-dashToken, verify-dash type lock, admin-approve office/corp/estate → dashboard');
+  console.log('ACHIEVEMENTS_PRESERVED: type-map, recoverSessionParams, bcrypt seller-login, verify-dash type lock, OTP gate, server dashToken, estate route');
 }
 
 main().catch((e) => {

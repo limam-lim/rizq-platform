@@ -25,7 +25,8 @@ var LS_KEYS = {
   video: 'rizq_video_packages',
   tender: 'rizq_tender_packages',
   investment: 'rizq_investment_packages',
-  verified_plus: 'rizq_verified_plus_packages'
+  verified_plus: 'rizq_verified_plus_packages',
+  estate: 'rizq_estate_packages'
 };
 
 var NAMES = {
@@ -60,6 +61,12 @@ var NAMES = {
   'of-year':  { ar: 'سنوية', fr: 'Annuelle', en: 'Yearly', es: 'Anual', hs: 'سنوية' },
   'of-diam-std': { ar: 'الماسية الأساسية للمكاتب', fr: 'Diamant Standard bureau', en: 'Office Diamond Standard', es: 'Diamante Standard oficina', hs: 'الماسية الأساسية للمكاتب' },
   'of-diam-pro': { ar: 'الماسية Pro للمكاتب', fr: 'Diamant Pro bureau', en: 'Office Diamond Pro', es: 'Diamante Pro oficina', hs: 'الماسية Pro للمكاتب' },
+  'es-trial': { ar: 'تجريبية عقارات', fr: 'Essai immobilier', en: 'Estate trial', es: 'Prueba inmobiliaria', hs: 'تجريبية عقارات' },
+  'es-month': { ar: 'شهرية عقارات', fr: 'Mensuel immobilier', en: 'Estate monthly', es: 'Mensual inmobiliaria', hs: 'شهرية عقارات' },
+  'es-quart': { ar: 'ربعية عقارات', fr: 'Trimestriel immobilier', en: 'Estate quarterly', es: 'Trimestral inmobiliaria', hs: 'ربعية عقارات' },
+  'es-year':  { ar: 'سنوية عقارات', fr: 'Annuel immobilier', en: 'Estate yearly', es: 'Anual inmobiliaria', hs: 'سنوية عقارات' },
+  'es-diam-std': { ar: 'الماسية الأساسية للعقارات', fr: 'Diamant Standard immobilier', en: 'Estate Diamond Standard', es: 'Diamante Standard inmobiliario', hs: 'الماسية الأساسية للعقارات' },
+  'es-diam-pro': { ar: 'الماسية Pro للعقارات', fr: 'Diamant Pro immobilier', en: 'Estate Diamond Pro', es: 'Diamante Pro inmobiliario', hs: 'الماسية Pro للعقارات' },
   'of-diam':  { ar: 'الماسية الأساسية للمكاتب', fr: 'Diamant Standard bureau', en: 'Office Diamond Standard', es: 'Diamante Standard oficina', hs: 'الماسية الأساسية للمكاتب' },
   'vid-single':   { ar: 'إعلان فيديو واحد', fr: 'Vidéo unique', en: 'Single Video Ad', es: 'Vídeo único', hs: 'إعلان فيديو واحد' },
   'vid-basic':    { ar: 'أساسي فيديو', fr: 'Basique vidéo', en: 'Basic Video', es: 'Vídeo básico', hs: 'أساسي فيديو' },
@@ -592,6 +599,27 @@ var CATALOGS = {
       features_fr: ['Tous les avantages trimestriels', '35% d\'économie vs mensuel', 'Produits illimités', 'Support VIP 24/7', 'Rapports annuels'] },
     Object.assign({ id: 'st-diam-std' }, _storeDiamondStandardFields()),
     Object.assign({ id: 'st-diam-pro' }, _storeDiamondProFields())
+  ],
+
+  estate: [
+    { id: 'es-trial', price: null, pricePending: true, durationDays: 10, maxCatalogItems: 3, discountPct: 0,
+      features: ['حتى 3 عقارات نشطة', 'صفحة الوكالة العامة', 'استقبال طلبات المعاينة', 'ساعات عمل'],
+      features_fr: ['Jusqu\'à 3 biens actifs', 'Page agence publique', 'Demandes de visite', 'Horaires'] },
+    { id: 'es-month', price: null, pricePending: true, durationDays: 30, maxCatalogItems: 25, discountPct: 0, highlight: true,
+      features: ['حتى 25 عقاراً نشطاً', 'شارة وكالة موثوقة', 'خريطة ومواصفات كاملة', 'طرق دفع + إحالة'],
+      features_fr: ['Jusqu\'à 25 biens actifs', 'Badge agence vérifiée', 'Carte et fiches complètes', 'Paiements + parrainage'] },
+    { id: 'es-quart', price: null, pricePending: true, durationDays: 90, maxCatalogItems: 80, discountPct: 0,
+      features: ['حتى 80 عقاراً', 'أولوية في نتائج البحث', 'إحصائيات زيارات', 'دعم بالأولوية'],
+      features_fr: ['Jusqu\'à 80 biens', 'Priorité recherche', 'Statistiques de vues', 'Support prioritaire'] },
+    { id: 'es-year', price: null, pricePending: true, durationDays: 365, maxCatalogItems: 200, discountPct: 0,
+      features: ['حتى 200 عقار', 'فيديو تعريفي', 'تقارير سنوية', 'دعم VIP'],
+      features_fr: ['Jusqu\'à 200 biens', 'Vidéo de présentation', 'Rapports annuels', 'Support VIP'] },
+    { id: 'es-diam-std', price: null, pricePending: true, durationDays: 30, maxCatalogItems: Infinity, discountPct: 0, diamond: true, diamondTier: 'diamond_standard',
+      features: ['عقارات غير محدودة', 'أولوية ظهور', 'جاهزية قنوات التواصل للمنصة'],
+      features_fr: ['Biens illimités', 'Visibilité prioritaire', 'Canaux plateforme prêts'] },
+    { id: 'es-diam-pro', price: null, pricePending: true, durationDays: 30, maxCatalogItems: Infinity, discountPct: 0, diamond: true, diamondTier: 'diamond_pro',
+      features: ['كل مزايا الماسية الأساسية', 'حصص أعلى للمنصة', 'دعم مؤسسي'],
+      features_fr: ['Tous les avantages Diamond Standard', 'Quotas plateforme élevés', 'Support entreprise'] }
   ],
   office: [
     { id: 'of-trial', price: 0, durationDays: 10, maxCatalogItems: 3, discountPct: 0,

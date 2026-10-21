@@ -1823,6 +1823,25 @@ var _editAdId = null;
   }catch(e){}
 })();
 
+function _postWriteToken(sess){
+  /* accessToken لا يُقرأ من localStorage — ذاكرة / sessionStorage فقط */
+  if(window.REAL_ACCESS_TOKEN) return window.REAL_ACCESS_TOKEN;
+  var id = sess && sess.id;
+  if(id && window.RizqDash && typeof RizqDash.readEphemeralAccessToken === 'function'){
+    try{
+      var t = RizqDash.readEphemeralAccessToken(id);
+      if(t) return t;
+    }catch(e){}
+  }
+  if(id){
+    try{
+      var mem = sessionStorage.getItem('rizq_access_mem_' + id);
+      if(mem) return mem;
+    }catch(e2){}
+  }
+  return (sess && sess.token) || '';
+}
+
 function saveAdEdit(){
   if(!_editAdId) return;
   var sess = null;
@@ -1867,7 +1886,7 @@ function saveAdEdit(){
 
   fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/ads/' + encodeURIComponent(_editAdId), {
     method: 'PATCH',
-    headers: { 'Content-Type':'application/json', 'x-account-token': (sess.accessToken || sess.token) },
+    headers: { 'Content-Type':'application/json', 'x-account-token': _postWriteToken(sess) },
     body: JSON.stringify(body)
   }).then(function(r){ return r.ok ? r.json() : Promise.reject(); })
     .then(function(){

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="تسجيل حساب عقاري في منصة رزق — مكاتب ووكالات ومطورون وملاك"/>
+<title>تسجيل حساب عقاري | رزق</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet"/>
+<script src="rizq_backend_config.js"></script>
+<script src="rizq_account_route.js"></script>
+<script src="rizq_dashboard_shared.js?v=3"></script>
+<script src="rizq_merchant_activities.js"></script>
+<script src="rizq_phone_utils.js"></script>
+<style>
+:root{
+  --navy:#0B1C33; --navy2:#0F2347; --gold:#C9A84C; --gold2:#E8C96A;
+  --bg:#eef2f7; --card:#fff; --muted:#4a5568; --line:rgba(27,58,107,.12);
+  --ok:#166534; --bad:#991b1b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo',system-ui,sans-serif;background:
+  radial-gradient(1200px 500px at 100% -10%,rgba(201,168,76,.18),transparent 55%),
+  radial-gradient(900px 420px at -10% 0%,rgba(15,35,71,.12),transparent 50%),
+  var(--bg);color:var(--navy);min-height:100vh}
+.top{background:linear-gradient(135deg,#06111C,#0F2347);color:#fff;padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{font-weight:900;font-size:18px;letter-spacing:.02em}
+.brand span{color:var(--gold2)}
+.top a{color:var(--gold2);text-decoration:none;font-weight:800;font-size:13px}
+.wrap{max-width:720px;margin:0 auto;padding:28px 16px 56px}
+.hero{margin:0 0 18px}
+.hero h1{font-size:clamp(22px,4vw,30px);font-weight:900;line-height:1.35;margin:0 0 8px}
+.hero p{color:var(--muted);font-weight:600;font-size:14.5px;line-height:1.7}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;
+  box-shadow:0 10px 28px rgba(15,35,65,.06)}
+.card h2{font-size:15px;font-weight:900;margin:0 0 14px;padding-bottom:10px;
+  border-bottom:1.5px solid rgba(201,168,76,.35)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:flex;flex-direction:column;gap:6px;font:800 12.5px Cairo,sans-serif;color:#2f3c4d}
+input,select,textarea{
+  border:1px solid var(--line);border-radius:12px;padding:11px 12px;
+  font:600 13.5px Cairo,sans-serif;color:var(--navy);background:#fff;outline:none
+}
+textarea{min-height:78px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:rgba(201,168,76,.75)}
+.full{grid-column:1/-1}
+.subtypes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.subtypes label{flex-direction:row;align-items:center;gap:8px;font-weight:700;
+  background:#f4f7fc;border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer}
+.subtypes input{accent-color:var(--gold)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.btn{border:0;border-radius:12px;padding:12px 18px;font:900 13.5px Cairo,sans-serif;cursor:pointer}
+.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0B1C33}
+.btn-ghost{background:#fff;border:1px solid var(--line);color:var(--navy)}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.msg{margin-top:12px;padding:12px 14px;border-radius:12px;font:700 13px Cairo,sans-serif;display:none}
+.msg.ok{display:block;background:#ecfdf5;color:var(--ok);border:1px solid #a7f3d0}
+.msg.bad{display:block;background:#fef2f2;color:var(--bad);border:1px solid #fecaca}
+.otp-row{display:none;grid-template-columns:1fr auto;gap:8px;margin-top:8px}
+.otp-row.show{display:grid}
+.hint{font:600 12px Cairo,sans-serif;color:var(--muted);margin-top:4px;line-height:1.55}
+.login-box{margin-top:16px;padding-top:14px;border-top:1px dashed var(--line)}
+@media(max-width:720px){.grid,.subtypes{grid-template-columns:1fr}.otp-row.show{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">رزق <span>| سوق العقارات</span></div>
+  <div style="display:flex;gap:14px;flex-wrap:wrap">
+    <a href="rizq_landing_v8.html">الرئيسية</a>
+    <a href="rizq_estate_agencies.html">دليل الوكالات</a>
+    <a href="rizq_estate.html">تصفح العقارات</a>
+    <a href="rizq_landing_v8.html?openRegister=1&amp;regPage=1">حساب محل / مكتب</a>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>إنشاء حساب سوق العقارات</h1>
+    <p>سجّل وكالتك أو مطورك أو محفظتك العقارية — بعد الموافقة تفتح <strong>لوحة داشبورد العقارات</strong> لإدارة الإعلانات وطلبات المعاينة والاشتراك، بنفس منطق المحل والمكتب والمعرض.</p>
+  </section>
+
+  <form class="card" id="estate-reg" novalidate>
+    <h2>1) نوع الحساب</h2>
+    <div class="subtypes" role="radiogroup" aria-label="نوع الحساب العقاري">
+      <label><input type="radio" name="estateSubType" value="agency" checked/> مكتب / وكالة</label>
+      <label><input type="radio" name="estateSubType" value="developer"/> مطور عقاري</label>
+      <label><input type="radio" name="estateSubType" value="owner"/> مالك فردي</label>
+    </div>
+
+    <h2 style="margin-top:22px">2) بيانات النشاط</h2>
+    <div class="grid">
+      <label class="full">اسم المكتب / المطور / المالك
+        <input id="f-name" name="name" type="text" required maxlength="120" placeholder="مثال: وكالة أطوار العقارية"/>
+      </label>
+      <label>رقم الترخيص / السجل التجاري
+        <input id="f-license" name="licenseNumber" type="text" maxlength="80" placeholder="اختياري إن وُجد"/>
+      </label>
+      <label>المدينة الرئيسية
+        <input id="f-city" name="city" type="text" required maxlength="60" placeholder="نواكشوط" value="نواكشوط"/>
+      </label>
+      <label class="full">المناطق المستهدفة
+        <input id="f-focus" name="focusAreas" type="text" maxlength="300" placeholder="تفرغ زينة، لكصر، عرفات…"/>
+      </label>
+      <label>النشاط
+        <select id="f-activity" name="activityId" required>
+          <option value="es_agency">مكتب / وكالة عقارية</option>
+          <option value="es_developer">مطور عقاري</option>
+          <option value="es_owner">مالك فردي</option>
+          <option value="es_mgmt">إدارة أملاك ومعاينات</option>
+        </select>
+      </label>
+      <label>الهاتف (موريتانيا)
+        <input id="f-phone" name="phone" type="tel" required inputmode="numeric" placeholder="22123456" maxlength="8"/>
+      </label>
+    </div>
+
+    <h2 style="margin-top:22px">3) الدخول</h2>
+    <div class="grid">
+      <label class="full">البريد الإلكتروني
+        <input id="f-email" name="email" type="email" required placeholder="agency@example.com"/>
+      </label>
+      <label>كلمة المرور
+        <input id="f-pass" name="password" type="password" required minlength="8" placeholder="8 أحرف على الأقل"/>
+      </label>
+      <label>تأكيد كلمة المرور
+        <input id="f-pass2" type="password" required minlength="8"/>
+      </label>
+      <label>رقم الهوية / NNI
+        <input id="f-nni" name="nni" type="text" required inputmode="numeric" maxlength="10" placeholder="10 أرقام"/>
+      </label>
+    </div>
+    <p class="hint">حسابات العقارات تخضع لمراجعة الإدارة قبل تفعيل اللوحة (مثل المكاتب المهنية).</p>
+
+    <div class="otp-row" id="otp-row">
+      <input id="f-otp" type="text" inputmode="numeric" maxlength="8" placeholder="رمز OTP من البريد"/>
+      <button type="button" class="btn btn-ghost" id="btn-otp">إرسال الرمز</button>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn btn-gold" id="btn-submit">إنشاء الحساب العقاري</button>
+      <button type="button" class="btn btn-ghost" id="btn-login-toggle">لدي حساب — دخول</button>
+    </div>
+    <div class="msg" id="msg" role="status"></div>
+
+    <div class="login-box" id="login-box" hidden>
+      <h2>دخول حساب عقاري موجود</h2>
+      <div class="grid">
+        <label>البريد
+          <input id="login-email" type="email" placeholder="agency@example.com"/>
+        </label>
+        <label>كلمة المرور
+          <input id="login-pass" type="password"/>
+        </label>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-gold" id="btn-login">دخول إلى لوحة العقارات</button>
+      </div>
+    </div>
+  </form>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  var base = (window.RIZQ_BACKEND_BASE || '').replace(/\/$/, '');
+  var msg = document.getElementById('msg');
+  var form = document.getElementById('estate-reg');
+
+  function show(text, ok) {
+    msg.className = 'msg ' + (ok ? 'ok' : 'bad');
+    msg.textContent = text;
+  }
+
+  function selectedSubType() {
+    var el = form.querySelector('input[name="estateSubType"]:checked');
+    return el ? el.value : 'agency';
+  }
+
+  form.querySelectorAll('input[name="estateSubType"]').forEach(function (r) {
+    r.addEventListener('change', function () {
+      var map = { agency: 'es_agency', developer: 'es_developer', owner: 'es_owner' };
+      var sel = document.getElementById('f-activity');
+      if (sel && map[r.value]) sel.value = map[r.value];
+    });
+  });
+
+  document.getElementById('btn-login-toggle').addEventListener('click', function () {
+    var box = document.getElementById('login-box');
+    box.hidden = !box.hidden;
+  });
+
+  document.getElementById('btn-otp').addEventListener('click', function () {
+    var email = document.getElementById('f-email').value.trim();
+    var name = document.getElementById('f-name').value.trim();
+    var phone = document.getElementById('f-phone').value.replace(/\D/g, '').slice(-8);
+    if (!email) { show('أدخل البريد أولاً', false); return; }
+    fetch(base + '/api/otp/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ channel: 'buyer', email: email, name: name || 'عقارات', phoneMr: phone || '22123456', whatsapp: '+222' + (phone || '22123456') })
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d && d.ok) show(d.devHint ? ('رمز التطوير: ' + d.devHint) : 'تم إرسال الرمز إلى بريدك', true);
+      else show((d && d.error) || 'تعذّر إرسال OTP', false);
+    }).catch(function () { show('خطأ شبكة أثناء إرسال OTP', false); });
+  });
+
+  document.getElementById('btn-login').addEventListener('click', function () {
+    var email = document.getElementById('login-email').value.trim();
+    var password = document.getElementById('login-pass').value;
+    if (!email || !password) { show('أدخل البريد و كلمة المرور', false); return; }
+    fetch(base + '/api/accounts/seller-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: password })
+    }).then(function (r) { return r.json().then(function (d) { return { status: r.status, data: d }; }); })
+      .then(function (res) {
+        var d = res.data;
+        if (!d || !d.ok || !d.account) {
+          show((d && d.error) || 'فشل الدخول', false);
+          return;
+        }
+        if (d.account.type !== 'estate') {
+          show('هذا الحساب ليس من نوع عقارات. استخدم مسار الدخول العام.', false);
+          return;
+        }
+        finishSession(d.account);
+      }).catch(function () { show('خطأ شبكة أثناء الدخول', false); });
+  });
+
+  function finishSession(acc) {
+    var token = acc.dashToken || acc.token;
+    if (!token) {
+      show('الحساب بانتظار موافقة الإدارة — ستصلك إشعارات عند التفعيل.', true);
+      return;
+    }
+    var rec = {
+      id: acc.id,
+      type: 'estate',
+      name: acc.name,
+      email: acc.email,
+      status: acc.status || 'approved',
+      token: token,
+      /* accessToken kept in memory via RizqDash */
+      city: acc.city || '',
+      estateSubType: acc.estateSubType || '',
+      licenseNumber: acc.licenseNumber || '',
+      focusAreas: acc.focusAreas || ''
+    };
+    try {
+      var list = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+      var i = list.findIndex(function (a) { return a && a.id === rec.id; });
+      if (i >= 0) list[i] = Object.assign({}, list[i], rec);
+      else list.push(rec);
+      localStorage.setItem('rizq_pending_accounts', JSON.stringify(list));
+    } catch (e) {}
+    if (window.RizqAccount && typeof RizqAccount.setActiveSession === 'function') {
+      RizqAccount.setActiveSession(rec);
+    }
+    if (acc.accessToken && window.RizqDash && RizqDash.rememberAccessToken) {
+      RizqDash.rememberAccessToken(rec.id, acc.accessToken);
+    }
+    var url = (window.RizqAccount && RizqAccount.buildDashboardUrl)
+      ? RizqAccount.buildDashboardUrl(rec)
+      : ('rizq_dashboard_estate.html?id=' + encodeURIComponent(rec.id));
+    show('تم — جارٍ فتح لوحة العقارات…', true);
+    location.href = url;
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var name = document.getElementById('f-name').value.trim();
+    var email = document.getElementById('f-email').value.trim().toLowerCase();
+    var password = document.getElementById('f-pass').value;
+    var password2 = document.getElementById('f-pass2').value;
+    var phone = document.getElementById('f-phone').value.replace(/\D/g, '').slice(-8);
+    var nni = document.getElementById('f-nni').value.replace(/\D/g, '');
+    var city = document.getElementById('f-city').value.trim();
+    if (!name || !email || !password || !phone || !nni || !city) {
+      show('أكمل الحقول الإلزامية', false); return;
+    }
+    if (password.length < 8) { show('كلمة المرور قصيرة', false); return; }
+    if (password !== password2) { show('كلمتا المرور غير متطابقتين', false); return; }
+    if (nni.length < 8) { show('رقم الهوية غير صالح', false); return; }
+
+    var btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    var id = 'ACC_' + String(Date.now()) + String(Math.floor(Math.random() * 1e6)).padStart(6, '0').slice(0, 6);
+    // تأكد صيغة ACC_<10-20 digits>
+    if (!/^ACC_\d{10,20}$/.test(id)) {
+      id = 'ACC_' + String(Date.now()).slice(0, 13) + String(Math.floor(Math.random() * 1e6)).padStart(6, '0');
+    }
+
+    var payload = {
+      id: id,
+      type: 'estate',
+      name: name,
+      email: email,
+      password: password,
+      phone: phone,
+      city: city,
+      nni: nni,
+      activityId: document.getElementById('f-activity').value,
+      activity: document.getElementById('f-activity').selectedOptions[0].textContent,
+      category: 'عقارات',
+      estateSubType: selectedSubType(),
+      subType: selectedSubType(),
+      licenseNumber: document.getElementById('f-license').value.trim(),
+      focusAreas: document.getElementById('f-focus').value.trim()
+    };
+
+    function doRegister() {
+      return fetch(base + '/api/accounts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(function (r) { return r.json().then(function (d) { return { status: r.status, data: d }; }); });
+    }
+
+    var otpCode = document.getElementById('f-otp').value.trim();
+    var chain = Promise.resolve();
+    if (otpCode) {
+      chain = fetch(base + '/api/otp/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ channel: 'buyer', email: email, code: otpCode })
+      }).then(function (r) { return r.json(); });
+    }
+
+    chain.then(function () { return doRegister(); })
+      .then(function (res) {
+        btn.disabled = false;
+        var d = res.data;
+        if (!d || !d.ok) {
+          if (d && d.otpRequired) {
+            document.getElementById('otp-row').classList.add('show');
+            show(d.message || 'فعّل البريد برمز OTP أو انتظر موافقة الإدارة', false);
+            return;
+          }
+          show((d && d.error) || 'فشل التسجيل', false);
+          return;
+        }
+        if (d.status === 'pending' || !d.dashToken) {
+          show('تم إنشاء الطلب بنجاح. حسابك العقاري بانتظار موافقة الإدارة.', true);
+          return;
+        }
+        finishSession({
+          id: d.id,
+          type: 'estate',
+          name: name,
+          email: email,
+          status: d.status,
+          dashToken: d.dashToken,
+          city: city,
+          estateSubType: selectedSubType(),
+          licenseNumber: payload.licenseNumber,
+          focusAreas: payload.focusAreas
+        });
+      })
+      .catch(function () {
+        btn.disabled = false;
+        show('خطأ شبكة أثناء التسجيل', false);
+      });
+  });
+})();
+</script>
+</body>
+</html>

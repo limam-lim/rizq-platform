@@ -9,7 +9,8 @@
     individual: 'rizq_dashboard.html',
     store: 'rizq_dashboard_store.html',
     office: 'rizq_dashboard_office.html',
-    corp: 'rizq_dashboard_corp.html'
+    corp: 'rizq_dashboard_corp.html',
+    estate: 'rizq_dashboard_estate.html'
   };
 
   var SESSION_KEYS = [
@@ -249,6 +250,7 @@
       store: 'rizq_store.html',
       office: 'rizq_office.html',
       corp: 'rizq_corp.html',
+      estate: 'rizq_estate.html',
       individual: 'rizq_profile.html'
     };
     var page = map[type] || 'rizq_profile.html';
@@ -275,7 +277,12 @@
     rec.email = serverAcc.email || rec.email || '';
     rec.status = serverAcc.status || rec.status || 'approved';
     rec.token = serverAcc.dashToken || serverAcc.token || rec.token || '';
-    rec.backendAccessToken = serverAcc.accessToken || rec.backendAccessToken || '';
+    // W4: لا تُخزَّن accessToken في localStorage — الذاكرة/sessionStorage فقط عبر RizqDash
+    if (serverAcc.accessToken && typeof window !== 'undefined' && window.RizqDash && window.RizqDash.rememberAccessToken) {
+      try { window.RizqDash.rememberAccessToken(rec.id, serverAcc.accessToken); } catch (eMem) {}
+    }
+    delete rec.backendAccessToken;
+    delete rec.accessToken;
     if (typeof serverAcc.suspended !== 'undefined') rec.suspended = !!serverAcc.suspended;
     delete rec.password;
     ['phone', 'city', 'address', 'desc', 'promo_video', 'promo_video_extra', 'category', 'whatsapp', 'facebook', 'thumb', 'cover', 'tagline', 'package', 'package_price', 'plan', 'planName'].forEach(function (k) {
@@ -290,6 +297,16 @@
 
   function accountAccessToken(acc) {
     if (!acc) return '';
+    try {
+      if (typeof window !== 'undefined' && window.RizqDash && window.RizqDash.readEphemeralAccessToken) {
+        var mem = window.RizqDash.readEphemeralAccessToken(acc.id);
+        if (mem) return mem;
+      }
+    } catch (e) {}
+    try {
+      if (typeof window !== 'undefined' && window.REAL_ACCESS_TOKEN) return window.REAL_ACCESS_TOKEN;
+    } catch (e2) {}
+    /* توافق مؤقت مع سجلات قديمة قبل التطهير — لا يُعاد كتابتها */
     return acc.backendAccessToken || acc.accessToken || '';
   }
 
@@ -317,8 +334,10 @@
           clearSession();
           return null;
         }
+        if (token && typeof window !== 'undefined' && window.RizqDash && window.RizqDash.rememberAccessToken) {
+          try { window.RizqDash.rememberAccessToken(acc.id, token); } catch (eR) {}
+        }
         var merged = mergeServerAccount(Object.assign({}, data.account, {
-          accessToken: token,
           dashToken: data.account.dashToken || acc.token
         }));
         return merged || null;

@@ -259,15 +259,24 @@
     store      : { 'st-trial': 10, 'st-month': 100, 'st-quart': 500, 'st-year': Infinity, 'st-diam-std': Infinity, 'st-diam-pro': Infinity },
     corp       : { 'cp-trial': Infinity, 'cp-month': 30, 'cp-quart': Infinity, 'cp-year': Infinity, 'cp-diam-std': Infinity, 'cp-diam-pro': Infinity },
     office     : { 'of-trial': 3, 'of-month': Infinity, 'of-quart': Infinity, 'of-year': Infinity, 'of-diam-std': Infinity, 'of-diam-pro': Infinity },
+    estate     : { 'es-trial': 3, 'es-month': 25, 'es-quart': 80, 'es-year': 200, 'es-diam-std': Infinity, 'es-diam-pro': Infinity },
     tender     : { 'tnd-trial': 0, 'tnd-month': Infinity, 'tnd-quart': Infinity, 'tnd-year': Infinity },
     ads        : { 'vid-single': 1, 'vid-basic': 3, 'vid-pro': 10, 'vid-business': Infinity },
     video      : { 'vid-single': 1, 'vid-basic': 3, 'vid-pro': 10, 'vid-business': Infinity },
   };
-  // فئة غير معروفة بالجدول أو اسم باقة غير مطابق تماماً → القيمة الافتراضية.
-  // للفرد فقط نفترض الأدنى (1) تحوطاً؛ لبقية الفئات نفترض "غير محدود" تفادياً
-  // لحجب مشترك دافع فعلياً بسبب اختلاف بسيط في اسم الباقة (أكثر أماناً تجارياً
-  // من حجب زبون دفع فعلاً بالخطأ).
-  var POST_LIMIT_FALLBACK = { individual: 1 };
+  // Default Deny / Restricted Free Tier — باقة أو فئة غير معروفة → حد ضيق
+  // (لا Infinity أبداً على مسار fallback). يمنع نشراً بلا سقف عند خطأ تسمية.
+  var POST_LIMIT_FALLBACK = {
+    individual: 1,
+    store: 3,
+    office: 3,
+    corp: 3,
+    estate: 3,
+    tender: 0,
+    ads: 0,
+    video: 0
+  };
+  var POST_LIMIT_UNKNOWN_CATEGORY = 1;
 
   var AI_FEATURES = [
     'auto_reply_calls', 'vip_manager', 'ai_agent_full', 'widget_channel',
@@ -298,11 +307,16 @@
 
   function getPostLimit(accId, category) {
     var sub = checkSubscription(accId);
-    var table = POST_LIMITS[category];
-    if(!table) return Infinity;
+    var cat = category === 'estate' ? 'estate' : category;
+    var table = POST_LIMITS[cat] || (cat === 'estate' ? POST_LIMITS.office : null);
+    if (!table) {
+      return Object.prototype.hasOwnProperty.call(POST_LIMIT_FALLBACK, cat)
+        ? POST_LIMIT_FALLBACK[cat]
+        : POST_LIMIT_UNKNOWN_CATEGORY;
+    }
     var pkgId = resolveAccountPackageId(accId, sub);
     // باقات الفيديو معزولة بمفتاح accountId::video — اقرأ packageId من هناك
-    if ((category === 'video' || category === 'ads') && (!pkgId || !/^vid-/.test(pkgId))) {
+    if ((cat === 'video' || cat === 'ads') && (!pkgId || !/^vid-/.test(pkgId))) {
       try {
         var packs = JSON.parse(localStorage.getItem('rizq_account_packages') || '{}');
         var vRec = packs[accId + '::video'] || packs[accId];
@@ -310,9 +324,25 @@
       } catch (e) { /* ignore */ }
     }
     if (pkgId && Object.prototype.hasOwnProperty.call(table, pkgId)) return table[pkgId];
-    if (/diam-pro|diamond_pro/.test(pkgId)) return Infinity;
-    if (/diam|diamond/.test(pkgId)) return Infinity;
-    return Object.prototype.hasOwnProperty.call(POST_LIMIT_FALLBACK, category) ? POST_LIMIT_FALLBACK[category] : Infinity;
+    // باقات ماسية معروفة بالـ id فقط — وإلا Default Deny
+    if (pkgId && (/diam-pro|diamond_pro/.test(pkgId) || /diam|diamond/.test(pkgId))) {
+      if (Object.prototype.hasOwnProperty.call(table, pkgId)) return table[pkgId];
+      // معرف ماسي غير مدرج في الجدول → لا Infinity؛ استخدم أعلى حد صريح معروف أو fallback
+      var knownDiam = Object.keys(table).filter(function (k) { return /diam|diamond/.test(k); });
+      if (knownDiam.length) {
+        var maxKnown = 0;
+        knownDiam.forEach(function (k) {
+          var v = table[k];
+          if (v === Infinity) maxKnown = Infinity;
+          else if (typeof v === 'number' && v > maxKnown) maxKnown = v;
+        });
+        if (maxKnown === Infinity) return Infinity;
+        if (maxKnown > 0) return maxKnown;
+      }
+    }
+    return Object.prototype.hasOwnProperty.call(POST_LIMIT_FALLBACK, cat)
+      ? POST_LIMIT_FALLBACK[cat]
+      : POST_LIMIT_UNKNOWN_CATEGORY;
   }
 
   // ── الفحص الموحّد قبل نشر أي منتج/إعلان/عرض — يجمع بين حد الخطة
