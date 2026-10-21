@@ -798,6 +798,50 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   font:800 12.5px Cairo,sans-serif;padding:6px 11px;border-radius:999px;
   background:#eef3fb;border:1px solid #d5deea;color:var(--navy);
 }
+.est-wish-btn{
+  position:absolute;top:10px;left:10px;z-index:5;
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.92);color:#94a3b8;
+  border:1.5px solid rgba(27,58,107,.12);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;line-height:1;cursor:pointer;
+  box-shadow:0 4px 14px rgba(15,35,65,.12);
+  transition:transform .2s,color .2s,background .2s,border-color .2s;
+}
+html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
+.est-wish-btn:hover{transform:scale(1.1);color:#e84040}
+.est-wish-btn.active{color:#e84040;background:#fff;border-color:rgba(232,64,64,.35)}
+.est-wish-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 12px;border-radius:999px;
+  background:#fff;border:1.5px solid rgba(27,58,107,.12);
+  color:#1B3A6B;font-size:12.5px;font-weight:800;cursor:pointer;
+  box-shadow:0 2px 10px rgba(15,35,65,.06);
+}
+.est-wish-chip .est-wish-count{
+  min-width:18px;height:18px;padding:0 5px;border-radius:9px;
+  background:rgba(201,168,76,.18);color:#8A6B1F;
+  font-size:11px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;
+}
+.est-wish-chip.has-favs{border-color:rgba(201,168,76,.45)}
+.est-wish-chip.has-favs .est-wish-ico{color:#e84040}
+.est-pd-wish{
+  min-height:44px;padding:0 16px;border-radius:12px;
+  border:1.5px solid rgba(27,58,107,.15);background:#fff;
+  color:#1B3A6B;font-weight:800;font-size:13px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+}
+.est-pd-wish.is-on{border-color:rgba(232,64,64,.35);color:#b91c1c;background:#fff5f5}
+.est-wish-overlay{
+  display:none;position:fixed;inset:0;z-index:12010;
+  background:rgba(10,25,47,.55);align-items:center;justify-content:center;padding:16px;
+}
+.est-wish-overlay.open{display:flex}
+.est-wish-panel{
+  background:linear-gradient(160deg,#0f2347,#1B3A6B);color:#fff;
+  border-radius:18px;padding:22px;max-width:420px;width:100%;
+  box-shadow:0 24px 60px rgba(0,0,0,.35);max-height:80vh;overflow:auto;
+}
 .est-card-cta{
   margin-top:12px;display:inline-flex;align-items:center;justify-content:center;
   width:100%;padding:11px 12px;border-radius:10px;
@@ -849,6 +893,11 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
       <a href="#est-reviews">التقييمات</a>
     </nav>
     <div class="est-top-actions">
+      <button type="button" class="est-wish-chip" id="est-top-wish" onclick="toggleEstateWishPanel()" title="المفضلة" aria-label="المفضلة">
+        <span class="est-wish-ico" aria-hidden="true">♡</span>
+        <span data-t="est-wish-label">المفضلة</span>
+        <span class="est-wish-count" id="est-wish-count">0</span>
+      </button>
       <a class="est-chip" id="est-top-call" href="tel:+22242000111" dir="ltr">📞 اتصال</a>
       <a class="est-chip solid" id="est-top-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 واتساب</a>
     </div>
@@ -1139,12 +1188,24 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
         <div class="est-pd-nearby" id="est-pd-nearby"></div>
       </div>
       <div class="est-pd-cta" id="est-pd-cta">
+        <button type="button" class="est-pd-wish" id="est-modal-wish" data-wish-id="">♡ المفضلة</button>
         <button type="button" class="est-btn est-btn-visit" id="est-modal-visit">📅 حجز معاينة ميدانية</button>
         <a class="est-btn est-wa" id="est-modal-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 تواصل واتساب مباشر</a>
         <button type="button" class="est-btn est-btn-quote" id="est-modal-quote">💬 طلب عرض سعر / تفاوض</button>
         <a class="est-btn est-call" id="est-modal-call" href="tel:+22242000111" dir="ltr">📞 اتصال</a>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- لوحة مفضلة العقارات -->
+<div class="est-wish-overlay" id="est-wish-overlay" onclick="if(event.target===this)toggleEstateWishPanel()">
+  <div class="est-wish-panel" role="dialog" aria-labelledby="est-wish-panel-title">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px">
+      <div id="est-wish-panel-title" style="font-size:16px;font-weight:900;color:#e8c96a">❤ المفضلة</div>
+      <button type="button" onclick="toggleEstateWishPanel()" style="background:rgba(255,255,255,.1);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px">×</button>
+    </div>
+    <div id="est-wish-panel-list"></div>
   </div>
 </div>
 
@@ -1167,6 +1228,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
 <script src="rizq_subscription_permissions.js" defer></script>
 <script src="rizq_reviews_engine.js"></script>
 <script src="rizq_auth_gate.js?v=23.1" defer></script>
+<script src="rizq_ux_polish.js?v=23.1" defer></script>
 <script src="rizq_contact_gate.js" defer></script>
 <script src="rizq_messenger.js?v=28.7" defer></script>
 <script src="rizq_mr_payment_catalog.js?v=1.1"></script>
@@ -2091,6 +2153,150 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     return bits.join('');
   }
 
+  function estateWishScopeId(){
+    try{
+      var p = new URLSearchParams(location.search);
+      return p.get('id') || p.get('estate') || p.get('agency')
+        || window._rizqEstateAccountId
+        || (window._rizqEstateProfile && window._rizqEstateProfile.id)
+        || (AGENCY && AGENCY.id)
+        || 'demo_estate';
+    }catch(e){
+      return 'demo_estate';
+    }
+  }
+  function estateWishKey(){ return 'rizq_wishlist_estate_'+estateWishScopeId(); }
+  function estateWishGlobalId(propId){ return 'estate:'+estateWishScopeId()+':'+String(propId); }
+  function getEstateWishList(){
+    try{
+      var v = JSON.parse(localStorage.getItem(estateWishKey())||'[]');
+      return Array.isArray(v) ? v : [];
+    }catch(e){ return []; }
+  }
+  function saveEstateWishList(list){
+    try{ localStorage.setItem(estateWishKey(), JSON.stringify(list||[])); }catch(e){}
+  }
+  function estateWishHas(propId){
+    var sid = String(propId||'');
+    return getEstateWishList().some(function(p){ return String(p.id)===sid; });
+  }
+  function renderEstateWishUI(){
+    var list = getEstateWishList();
+    var ids = list.map(function(p){ return String(p.id); });
+    var fr = isFrEstate();
+    document.querySelectorAll('.est-wish-btn').forEach(function(btn){
+      var id = String(btn.getAttribute('data-wish-id')||'');
+      var on = ids.indexOf(id) > -1;
+      btn.classList.toggle('active', on);
+      btn.textContent = on ? '❤' : '♡';
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    var modalWish = document.getElementById('est-modal-wish');
+    if(modalWish){
+      var mid = String(modalWish.getAttribute('data-wish-id')||'');
+      var mon = mid && ids.indexOf(mid) > -1;
+      modalWish.classList.toggle('is-on', !!mon);
+      modalWish.textContent = (mon ? '❤ ' : '♡ ') + (fr ? 'Favoris' : 'المفضلة');
+    }
+    var countEl = document.getElementById('est-wish-count');
+    if(countEl) countEl.textContent = String(list.length);
+    var chip = document.getElementById('est-top-wish');
+    if(chip){
+      chip.classList.toggle('has-favs', list.length > 0);
+      var ico = chip.querySelector('.est-wish-ico');
+      if(ico) ico.textContent = list.length ? '❤' : '♡';
+    }
+    var panel = document.getElementById('est-wish-panel-list');
+    if(panel){
+      if(!list.length){
+        panel.innerHTML = '<p style="color:rgba(255,255,255,.6);font-size:13px;text-align:center;padding:18px 0">'
+          +(fr ? 'Aucun bien en favori — appuyez sur ♡ sur une carte' : 'لا عقارات في المفضلة بعد — اضغط ♡ على أي بطاقة')
+          +'</p>';
+      } else {
+        panel.innerHTML = list.map(function(p){
+          var idJs = JSON.stringify(String(p.id));
+          return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(201,168,76,.15)">'
+            + '<div style="font-size:22px">🏠</div>'
+            + '<div style="flex:1;min-width:0">'
+            +   '<div style="font-weight:800;color:#fff;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(p.title||'')+'</div>'
+            +   '<div style="color:#C9A84C;font-size:12.5px;font-weight:700">'+esc(p.price||'')+'</div>'
+            + '</div>'
+            + '<button type="button" onclick=\'estateWishToggle('+idJs+')\' style="background:none;border:none;color:rgba(255,255,255,.45);font-size:16px;cursor:pointer" aria-label="✕">✕</button>'
+            + '</div>';
+        }).join('');
+      }
+    }
+    if(window.RizqUx && typeof RizqUx.updateFavBadges === 'function'){
+      try{ RizqUx.updateFavBadges(); }catch(e){}
+    }
+  }
+  function estateWishToggle(propId, meta){
+    propId = String(propId||'');
+    if(!propId) return false;
+    var run = function(){
+      var list = getEstateWishList();
+      var idx = list.findIndex(function(p){ return String(p.id)===propId; });
+      var added;
+      if(idx > -1){ list.splice(idx, 1); added = false; }
+      else {
+        meta = meta || {};
+        var item = null;
+        try{
+          var all = (typeof LISTINGS !== 'undefined' && LISTINGS) || (typeof window.ESTATE_LISTINGS !== 'undefined' && window.ESTATE_LISTINGS) || [];
+          for(var i=0;i<all.length;i++){ if(String(all[i].id)===propId){ item = all[i]; break; } }
+        }catch(eFind){}
+        var fr = isFrEstate();
+        list.push({
+          id: propId,
+          title: meta.title || (item ? estPick(item, 'title', 'titleFr', fr) : propId),
+          price: meta.price || (item ? estPrice(item, fr) : ''),
+          agencyId: estateWishScopeId(),
+          addedAt: new Date().toISOString()
+        });
+        added = true;
+      }
+      saveEstateWishList(list);
+      /* مزامنة مع مفضلة المنصة العامة (شارة الهيدر) */
+      try{
+        if(window.RizqUx && typeof RizqUx.wishlistToggle === 'function'){
+          var gid = estateWishGlobalId(propId);
+          var hasG = RizqUx.wishlistHas && RizqUx.wishlistHas(gid);
+          if(added && !hasG) RizqUx.wishlistToggle(gid, { force: true, afterAuthToast: false });
+          if(!added && hasG) RizqUx.wishlistToggle(gid, { force: true, afterAuthToast: false });
+        }
+      }catch(eSync){}
+      renderEstateWishUI();
+      if(typeof showToast === 'function'){
+        var frT = isFrEstate();
+        showToast(added
+          ? (frT ? '❤️ Ajouté aux favoris' : '❤️ أُضيف إلى المفضلة')
+          : (frT ? 'Retiré des favoris' : 'أُزيل من المفضلة'));
+      } else if(window.RizqUx && typeof RizqUx.showToast === 'function'){
+        RizqUx.showToast(added
+          ? (isFrEstate() ? '❤️ Ajouté aux favoris' : '❤️ أُضيف إلى المفضلة')
+          : (isFrEstate() ? 'Retiré des favoris' : 'أُزيل من المفضلة'));
+      }
+      return added;
+    };
+    if(typeof window.rizqRequireAuth === 'function'){
+      window.rizqRequireAuth(run, 'reasonFav');
+      return false;
+    }
+    if(window.RizqUx && typeof RizqUx.requireWishlistAuth === 'function'){
+      return RizqUx.requireWishlistAuth(run);
+    }
+    return run();
+  }
+  function toggleEstateWishPanel(){
+    var el = document.getElementById('est-wish-overlay');
+    if(!el) return;
+    el.classList.toggle('open');
+    if(el.classList.contains('open')) renderEstateWishUI();
+  }
+  window.estateWishToggle = estateWishToggle;
+  window.toggleEstateWishPanel = toggleEstateWishPanel;
+  window.renderEstateWishUI = renderEstateWishUI;
+
   function cardHTML(item){
     var fr = isFrEstate();
     var title = estPick(item, 'title', 'titleFr', fr);
@@ -2099,6 +2305,10 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     var price = estPrice(item, fr);
     var imgs = listingImgs(item);
     if(!imgs.length) imgs = [coverOf(item)];
+    var wishOn = estateWishHas(item.id);
+    var wishLbl = fr ? 'Favoris' : 'المفضلة';
+    var wishBtn = '<button type="button" class="est-wish-btn'+(wishOn?' active':'')+'" data-wish-id="'+esc(item.id)+'"'
+      + ' title="'+esc(wishLbl)+'" aria-label="'+esc(wishLbl)+'" aria-pressed="'+(wishOn?'true':'false')+'">'+(wishOn?'❤':'♡')+'</button>';
     var media;
     if(imgs.length > 1){
       media = '<div class="est-card-media" data-carousel="1" data-idx="0">'
@@ -2114,12 +2324,14 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
           return '<button type="button" data-go="'+i+'" class="'+(i?'':'is-on')+'" aria-label="'+(i+1)+'"></button>';
         }).join('')
         + '</div>'
+        + wishBtn
         + '<span class="est-badge">'+esc(badge)+'</span>'
         + '<span class="est-price">'+esc(price)+'</span>'
         + '</div>';
     } else {
       media = '<div class="est-card-media">'
         + '<img src="'+esc(imgs[0]||item.img||'')+'" alt="'+esc(title)+'" loading="lazy"/>'
+        + wishBtn
         + '<span class="est-badge">'+esc(badge)+'</span>'
         + '<span class="est-price">'+esc(price)+'</span>'
         + '</div>';
@@ -2274,6 +2486,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     grid.innerHTML = list.length
       ? list.map(cardHTML).join('')
       : '<div class="est-empty">'+(fr?'Aucun bien correspondant. Modifiez la recherche ou les filtres.':'لا عقارات مطابقة حالياً. عدّل البحث أو التصفية.')+'</div>';
+    renderEstateWishUI();
   }
 
   function renderRail(){
@@ -2424,6 +2637,13 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     document.getElementById('est-modal-price').textContent = estPrice(item, frModal);
     document.getElementById('est-modal-badge').textContent = estBadge(item, frModal);
     document.getElementById('est-modal-desc').textContent = estPick(item, 'desc', 'descFr', frModal);
+    var wishBtn = document.getElementById('est-modal-wish');
+    if(wishBtn){
+      wishBtn.setAttribute('data-wish-id', String(item.id||''));
+      var on = estateWishHas(item.id);
+      wishBtn.classList.toggle('is-on', on);
+      wishBtn.textContent = (on ? '❤ ' : '♡ ') + (frModal ? 'Favoris' : 'المفضلة');
+    }
     var ribbon = document.getElementById('est-pd-ribbon');
     if(ribbon) ribbon.innerHTML = ribbonHTML(item, frModal);
     var chips = document.getElementById('est-pd-chips');
@@ -2589,6 +2809,14 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   }
 
   grid.addEventListener('click', function(e){
+    var wish = e.target.closest('.est-wish-btn');
+    if(wish){
+      e.preventDefault();
+      e.stopPropagation();
+      var wid = wish.getAttribute('data-wish-id');
+      if(wid) estateWishToggle(wid);
+      return;
+    }
     var nav = e.target.closest('.est-card-nav');
     var dot = e.target.closest('.est-card-dots button');
     if(nav || dot){
@@ -2719,6 +2947,15 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   if(visitBtn) visitBtn.addEventListener('click', function(){ openAgencyWa('visit'); });
   var quoteBtn = document.getElementById('est-modal-quote');
   if(quoteBtn) quoteBtn.addEventListener('click', function(){ openAgencyWa('quote'); });
+  var modalWishBtn = document.getElementById('est-modal-wish');
+  if(modalWishBtn){
+    modalWishBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var wid = modalWishBtn.getAttribute('data-wish-id');
+      if(wid) estateWishToggle(wid);
+    });
+  }
 
   var __estLangBusy = false;
   function applyEstateLang(){
@@ -2749,6 +2986,13 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
     navMap.forEach(function(row){ tx(row[0], row[1], row[2]); });
     tx('#est-top-call', '📞 اتصال', '📞 Appel');
     tx('#est-top-wa', '💬 واتساب', '💬 WhatsApp');
+    tx('[data-t="est-wish-label"]', 'المفضلة', 'Favoris');
+    var wishChip = document.getElementById('est-top-wish');
+    if(wishChip){
+      wishChip.setAttribute('title', fr ? 'Favoris' : 'المفضلة');
+      wishChip.setAttribute('aria-label', fr ? 'Favoris' : 'المفضلة');
+    }
+    tx('#est-wish-panel-title', '❤ المفضلة', '❤ Favoris');
     tx('#est-bar-call', '📞 اتصال', '📞 Appel');
     tx('#est-bar-wa', '💬 واتساب', '💬 WhatsApp');
     tx('#est-bar-email', '✉️ إيميل', '✉️ E-mail');
@@ -3014,6 +3258,7 @@ html[dir="rtl"] .est-content-grid{grid-template-columns:320px minmax(0,1fr)}
   renderGrid();
   renderRail();
   renderReviews();
+  renderEstateWishUI();
   try{
     var openId = new URLSearchParams(location.search).get('open');
     if(openId){
