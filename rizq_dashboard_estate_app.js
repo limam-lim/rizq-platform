@@ -281,20 +281,30 @@ function renderServicesShowcase() {
   var root = document.getElementById('services-showcase');
   if (!root) return;
   var tiles = [
-    { title: 'عقاراتي', panel: 'properties', ok: true },
-    { title: 'طلبات معاينة', panel: 'requests', ok: true },
-    { title: 'مناقصات', panel: 'tenders', ok: true },
-    { title: 'إحالة', panel: 'referral', ok: true },
-    { title: 'موثّق⁺', panel: 'verifiedplus', ok: true },
-    { title: 'طرق دفع', panel: 'mypayments', ok: true },
-    { title: 'ساعات عمل', panel: 'hours', ok: true },
-    { title: 'معرض صور', panel: 'photos', ok: true }
+    { icon: '🏠', title: 'عقاراتي', tip: 'إدارة العقارات والمواصفات', panel: 'properties', ok: true },
+    { icon: '📩', title: 'طلبات معاينة', tip: 'استفسارات المشترين والمستأجرين', panel: 'requests', ok: true },
+    { icon: '📋', title: 'مناقصات', tip: 'مناقصات وفرص عقارية', panel: 'tenders', ok: true },
+    { icon: '🕐', title: 'ساعات عمل', tip: 'جدول الفتح والإغلاق', panel: 'hours', ok: true },
+    { icon: '📸', title: 'معرض صور', tip: 'صور وخطط أرضية', panel: 'photos', ok: true },
+    { icon: '🎁', title: 'إحالة', tip: 'دعوة الأصدقاء', panel: 'referral', ok: true },
+    { icon: '🛡️', title: 'موثّق⁺', tip: 'شارة الثقة', panel: 'verifiedplus', ok: true },
+    { icon: '🏦', title: 'طرق دفع', tip: 'حسابات التحويل', panel: 'mypayments', ok: true },
+    { icon: '💳', title: 'اشتراكي', tip: 'الباقة وحدود العقارات', panel: 'subscription', ok: true }
   ];
   root.innerHTML = tiles.map(function (t) {
-    return '<div onclick="showPanel(\'' + t.panel + '\',null)" style="background:#fff;border:2px solid rgba(27,58,107,.12);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer">' +
-      '<div style="font-size:13px;font-weight:800;color:#1B3A6B">' + escapeHtml(t.title) + '</div>' +
-      '<div style="font-size:11px;color:#16a34a;margin-top:6px;font-weight:700">متاح</div></div>';
+    if (window.RizqDashUI && typeof RizqDashUI.buildSvcTile === 'function') {
+      return RizqDashUI.buildSvcTile({
+        icon: t.icon, label: t.title, tip: t.tip, avail: !!t.ok, action: t.panel
+      });
+    }
+    return '<div class="svc-tile" onclick="showPanel(\'' + t.panel + '\',null)">' +
+      '<div class="svc-tile__badge ok">متاح</div>' +
+      '<div class="svc-tile__icon">' + t.icon + '</div>' +
+      '<div class="svc-tile__label">' + escapeHtml(t.title) + '</div>' +
+      '<div class="svc-tile__tip">' + escapeHtml(t.tip) + '</div>' +
+      '<div class="svc-tile__dot"></div></div>';
   }).join('');
+  try { if (window.RizqDashUI && RizqDashUI.refreshPackageWidget) RizqDashUI.refreshPackageWidget(); } catch (eSC) {}
 }
 
 function renderRequests() {

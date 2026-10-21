@@ -3119,31 +3119,39 @@ function saveMyPayment(){
     function reqPkg(f){ return (f && typeof RizqSub!=='undefined') ? RizqSub.getMinPackageForFeature(ACC_TYPE, f) : null; }
 
     var services=[
-      {icon:'📦',label:_t2('نشر المنتجات/الخدمات','Publier produits/services'),feature:null,tip:_t2('انشر منتجاتك وخدماتك أمام آلاف المشترين','Publiez vos produits et services devant des milliers d\'acheteurs')},
-      {icon:'💬',label:_t2('التواصل المباشر','Communication directe'),feature:null,tip:_t2('استقبل رسائل واستفسارات الزبائن مباشرة','Recevez messages et demandes des clients directement')},
-      {icon:'📤',label:_t2('مشاركة الصفحة','Partage de la page'),feature:null,tip:_t2('شارك رابط صفحتك على وسائل التواصل','Partagez le lien de votre page sur les réseaux sociaux')},
-      {icon:'📊',label:_t2('إحصائيات الزيارات','Statistiques de visites'),feature:'analytics',tip:_t2('تابع عدد من زار صفحتك وتفاعل معها','Suivez le nombre de visiteurs et leurs interactions')},
-      {icon:'🥇',label:_t2('صدارة النتائج','Mise en avant dans les résultats'),feature:'priority_listing',tip:_t2('ظهور متقدم في نتائج البحث','Apparition prioritaire dans les résultats de recherche')},
-      {icon:'🤖',label:_t2('وكيل ذكي','Agent intelligent'),feature:'ai_agent_full',tip:_t2('رد تلقائي ذكي على الاستفسارات 24/7','Réponse automatique intelligente aux demandes 24/7')},
-      {icon:'📞',label:_t2('رد تلقائي مكالمات','Réponse automatique aux appels'),feature:'auto_reply_calls',tip:_t2('لا تفوتك مكالمة — الذكاء الاصطناعي يرد عنك','Ne manquez aucun appel — l\'IA répond pour vous')},
-      {icon:'💎',label:_t2('مدير حساب VIP','Gestionnaire de compte VIP'),feature:'vip_manager',tip:_t2('دعم شخصي من فريق رزق على مدار الساعة','Support personnel de l\'équipe Rizq 24h/24')},
+      {icon:'📦',label:_t2('منتجاتي','Mes produits'),feature:null,action:'products',tip:_t2('إدارة الكتالوج والمخزون','Gérer catalogue et stock')},
+      {icon:'🕐',label:_t2('ساعات العمل','Horaires'),feature:null,action:'hours',tip:_t2('جدول الفتح والإغلاق لكل يوم','Ouverture / fermeture par jour')},
+      {icon:'💬',label:_t2('الرسائل','Messages'),feature:null,action:'messages',tip:_t2('استقبل رسائل الزبائن مباشرة','Recevez les messages clients')},
+      {icon:'📩',label:_t2('الطلبات','Demandes'),feature:null,action:'requests',tip:_t2('طلبات التواصل والطلبات','Demandes de contact')},
+      {icon:'📸',label:_t2('صور المحل','Photos boutique'),feature:null,action:'photos',tip:_t2('معرض صور واجهتك العامة','Galerie de votre vitrine')},
+      {icon:'📤',label:_t2('مشاركة الصفحة','Partage'),feature:null,action:'share',tip:_t2('شارك رابط صفحتك','Partagez le lien de votre page')},
+      {icon:'📊',label:_t2('إحصائيات الزيارات','Statistiques'),feature:'analytics',action:'overview',tip:_t2('تابع زيارات صفحتك','Suivez les visites')},
+      {icon:'🥇',label:_t2('صدارة النتائج','Mise en avant'),feature:'priority_listing',action:'subscription',tip:_t2('ظهور متقدم في البحث','Apparition prioritaire')},
+      {icon:'🤖',label:_t2('الوكيل الذكي','Agent intelligent'),feature:'ai_agent_full',action:'agents',tip:_t2('تدريب الردود التلقائية 24/7','Studio IA 24/7')},
+      {icon:'📞',label:_t2('رد تلقائي مكالمات','Réponse auto appels'),feature:'auto_reply_calls',action:'agents',tip:_t2('الذكاء الاصطناعي يرد عنك','L\'IA répond pour vous')},
+      {icon:'💳',label:_t2('اشتراكي','Mon abonnement'),feature:null,action:'subscription',tip:_t2('الباقة والحدود والترقية','Forfait, quotas et upgrade')},
+      {icon:'💎',label:_t2('مدير حساب VIP','Gestionnaire VIP'),feature:'vip_manager',action:'subscription',tip:_t2('دعم شخصي من فريق رزق','Support personnel Rizq')},
     ];
 
     el.innerHTML=services.map(function(s){
       var avail=has(s.feature);
-      // إصلاح: بدل شارة "ترقية" عامة لا تحدد أي باقة، نعرض اسم أقل باقة حقيقية
-      // تمنح هذه الخدمة تحديداً (مصدرها RizqSub.getMinPackageForFeature) — لا لبس.
       var need=avail?null:reqPkg(s.feature);
+      if(window.RizqDashUI && typeof RizqDashUI.buildSvcTile==='function'){
+        return RizqDashUI.buildSvcTile({
+          icon:s.icon, label:s.label, tip:s.tip, feature:s.feature,
+          avail:avail, needPkg:need, action:avail?s.action:(s.action||'subscription')
+        });
+      }
       var lockTxt = '🔒 '+(need ? (_t2('يتطلب: ','Nécessite : ')+need) : _t2('ترقية','Mise à niveau'));
-      return '<div onclick="'+(avail?'':'showPanel(\'subscription\',null)')+'" style="background:#fff;border:2px solid '+(avail?'rgba(27,58,107,.18)':'rgba(201,168,76,.35)')+';border-radius:14px;padding:16px 10px 12px;text-align:center;position:relative;cursor:'+(avail?'default':'pointer')+';box-shadow:0 2px 8px rgba(27,58,107,.06);transition:box-shadow .2s,transform .2s" onmouseover="this.style.boxShadow=\'0 6px 18px rgba(27,58,107,.13)\';this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.boxShadow=\'0 2px 8px rgba(27,58,107,.06)\';this.style.transform=\'none\'">'
-        +(avail?''
-          :'<div style="position:absolute;top:-1px;right:-1px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:9.5px;font-weight:900;padding:3px 9px;border-radius:0 12px 0 10px;letter-spacing:.2px;white-space:nowrap">'+lockTxt+'</div>')
-        +'<div style="font-size:30px;margin-bottom:8px;line-height:1">'+s.icon+'</div>'
-        +'<div style="font-size:12px;font-weight:800;color:#1B3A6B;margin-bottom:5px;line-height:1.3">'+s.label+'</div>'
-        +'<div style="font-size:10.5px;color:#2C3A4F;line-height:1.45">'+s.tip+'</div>'
-        +(avail?'<div style="margin-top:10px;display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 8px rgba(16,185,129,.6)"></div>':'')
+      return '<div class="svc-tile'+(avail?'':' is-locked')+'" onclick="'+(avail?(s.action==='share'?'openShareModal()':"showPanel('"+s.action+"',null)"):'showPanel(\'subscription\',null)')+'" style="cursor:pointer">'
+        +'<div class="svc-tile__badge '+(avail?'ok':'lock')+'">'+(avail?_t2('متاح','Disponible'):lockTxt)+'</div>'
+        +'<div class="svc-tile__icon">'+s.icon+'</div>'
+        +'<div class="svc-tile__label">'+s.label+'</div>'
+        +'<div class="svc-tile__tip">'+s.tip+'</div>'
+        +(avail?'<div class="svc-tile__dot"></div>':'')
       +'</div>';
     }).join('');
+    try{ if(window.RizqDashUI){ RizqDashUI.refreshPackageWidget&&RizqDashUI.refreshPackageWidget(); } }catch(eSC){}
   }
 
 

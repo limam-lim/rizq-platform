@@ -19,6 +19,8 @@
 <meta property="og:locale" content="ar_MR"/>
 <meta name="twitter:card" content="summary"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet"/>
+
 <title>لوحة التحكم | رزق</title>
   
   <script src="rizq_backend_config.js"></script>
@@ -42,6 +44,7 @@
 
 <script src="rizq_pwa.js" defer></script>
 <link rel="stylesheet" href="rizq_dashboard_individual.css?v=1"/>
+<link rel="stylesheet" href="rizq_dashboard_premium.css?v=1"/>
 </head>
 <body data-t-ns="dashboard" class="rizq-dash">
 
@@ -158,6 +161,15 @@
           </div>
         </div>
         <div class="chart-bars" id="chart-bars"></div>
+      </div>
+
+      <!-- خدمات رزق المتاحة -->
+      <div class="card" style="margin:0 0 18px;background:#fff;border:1px solid #e2e8f5;border-radius:14px;padding:18px;box-shadow:0 2px 10px rgba(15,35,65,.04)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+          <div class="card-title" style="font-size:15px;font-weight:800;color:#1B3A6B">✨ خدمات <span style="color:#C9A84C;font-weight:900">رزق</span> المتاحة لك</div>
+          <button type="button" class="btn btn-gold btn-sm" onclick="showPanel('subscription',null)">⬆️ ترقية</button>
+        </div>
+        <div id="services-showcase" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px"></div>
       </div>
 
       <!-- Quick recent ads -->
@@ -522,6 +534,7 @@
     <text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">&#x631;</text>
   </svg>
 </a>
+<script src="rizq_dashboard_ui.js?v=1"></script>
 <script src="rizq_dashboard_individual_app.js?v=2"></script>
 </body>
 </html>
