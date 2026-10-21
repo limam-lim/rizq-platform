@@ -1347,7 +1347,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     // يُحفَظ إطلاقاً في site-config.json (يُتجاهَل بصمت هنا)، فلا يظهر أبداً
     // لجهاز أدمن آخر يفتح نفس اللوحة، خلافاً لكل الفئات الأخرى المُصلَحة هنا
     // فعلياً. أضيفت 'tender' + 'verified_plus' (فئة "موثّق⁺" الجديدة).
-    const PKG_CAT_KEYS = ['general', 'individual', 'office', 'store', 'corp', 'video', 'tender', 'verified_plus'];
+    const PKG_CAT_KEYS = ['general', 'individual', 'office', 'store', 'corp', 'estate', 'video', 'tender', 'verified_plus'];
     const existingPkgs = (current.packages && typeof current.packages === 'object') ? current.packages : {};
     const mergedPkgs = Object.assign({}, existingPkgs);
     PKG_CAT_KEYS.forEach((key) => {

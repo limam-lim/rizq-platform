@@ -1,590 +1,380 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<title>لوحة العقارات | رزق</title>
-<link rel="icon" type="image/svg+xml" href="favicon.svg"/>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="rizq_dashboard_layout.css"/>
-<script src="rizq_backend_config.js"></script>
-<script src="rizq_account_route.js"></script>
-<script src="rizq_subscription_engine.js"></script>
-<script src="rizq_subscription_permissions.js"></script>
-<script src="rizq_dashboard_shared.js"></script>
-<style>
-:root{--navy:#0B1C33;--gold:#C9A84C;--gold2:#E8C96A;--bg:#eef1f5;--line:rgba(27,58,107,.12);--muted:#3d4a5c}
-*{box-sizing:border-box}
-body{margin:0;font-family:'Cairo',system-ui,sans-serif;background:var(--bg);color:var(--navy)}
-.app{display:flex;min-height:100vh}
-.sidebar{width:250px;background:linear-gradient(180deg,#06111C,#0F2347);color:#fff;padding:18px 0;flex-shrink:0}
-.sb-brand{padding:0 18px 16px;font-weight:900;font-size:16px;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:10px}
-.sb-brand span{color:var(--gold2)}
-.sb-item{display:flex;align-items:center;gap:10px;padding:11px 18px;cursor:pointer;color:rgba(255,255,255,.65);font-weight:700;font-size:13.5px;border-right:3px solid transparent}
-.sb-item:hover,.sb-item.active{background:rgba(201,168,76,.08);color:var(--gold2);border-right-color:var(--gold)}
-.main{flex:1;min-width:0;display:flex;flex-direction:column}
-.topbar{background:#fff;border-bottom:1px solid var(--line);padding:12px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.topbar h1{font-size:17px;font-weight:900;margin:0}
-.btn{border:0;border-radius:10px;padding:9px 14px;font:800 12.5px Cairo,sans-serif;cursor:pointer}
-.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#0B1C33}
-.btn-outline{background:#fff;border:1px solid var(--line);color:var(--navy)}
-.btn-danger{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
-.content{padding:18px;flex:1}
-.panel{display:none}
-.panel.active{display:block}
-.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:16px}
-.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
-.kpi .n{font-size:22px;font-weight:900}
-.kpi .l{font-size:12px;color:var(--muted);font-weight:700;margin-top:4px}
-.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
-.card h2{font-size:15px;font-weight:900;margin:0 0 12px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-label{display:flex;flex-direction:column;gap:5px;font:800 12px Cairo,sans-serif;color:#2f3c4d}
-input,select,textarea{border:1px solid var(--line);border-radius:10px;padding:10px 11px;font:600 13px Cairo,sans-serif;color:var(--navy)}
-textarea{min-height:80px;resize:vertical}
-.full{grid-column:1/-1}
-.chips{display:flex;flex-wrap:wrap;gap:8px}
-.chips label{flex-direction:row;align-items:center;gap:6px;background:#f4f7fc;border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-weight:700;cursor:pointer}
-.prop{display:grid;grid-template-columns:96px 1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #eef2f8}
-.prop img,.prop .ph{width:96px;height:72px;border-radius:10px;object-fit:cover;background:#e8eef8}
-.prop .t{font-weight:900;font-size:14px}
-.prop .m{font-size:12px;color:var(--muted);margin-top:3px}
-.inq{padding:12px 0;border-bottom:1px solid #eef2f8}
-.inq .who{font-weight:900}
-.inq .meta{font-size:12px;color:var(--muted);margin-top:3px}
-#access-denied{display:none;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;padding:24px}
-@media(max-width:860px){.app{flex-direction:column}.sidebar{width:100%;display:flex;overflow-x:auto;padding:10px}.sb-brand{display:none}.sb-item{white-space:nowrap;border-right:0;border-bottom:2px solid transparent}.sb-item.active{border-bottom-color:var(--gold)}.grid,.grid-3{grid-template-columns:1fr}.prop{grid-template-columns:72px 1fr}}
-</style>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta name="color-scheme" content="light">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>داشبورد العقارات — منصة رزق</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <script src="rizq_backend_config.js"></script>
+  <script src="rizq_phone_utils.js?v=1.0"></script>
+  <script src="rizq_packages_config.js?v=17.0"></script>
+  <script src="rizq_merchant_activities.js?v=2.2"></script>
+  <script src="rizq_disclaimer.js"></script>
+  <script src="rizq_subscription_engine.js"></script>
+  <script src="rizq_subscription_permissions.js"></script>
+  <script src="rizq_mr_payment_catalog.js?v=1.1"></script>
+  <script src="rizq_account_payments.js?v=28.3"></script>
+  <script src="rizq_service_desk.js?v=1.3"></script>
+  <script src="rizq_intro_video.js?v=29.9"></script>
+  <script src="rizq_invoice_engine.js"></script>
+  <script src="rizq_i18n_data.js"></script>
+  <script src="rizq_i18n.js"></script>
+  <script src="rizq_lang_guard.js?v=1.0"></script>
+  <script src="rizq_locale_helpers.js"></script>
+  <link rel="stylesheet" href="rizq_dashboard_layout.css">
+  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
+  <script src="rizq_account_route.js?v=9"></script>
+  <script src="rizq_dashboard_shared.js?v=3"></script>
+  <script src="rizq_seller_onboarding.js"></script>
+  <script src="rizq_status_summary.js"></script>
+  <script src="rizq_profile_photo.js?v=2"></script>
+  <script src="rizq_pwa.js" defer></script>
+  <link rel="stylesheet" href="rizq_dashboard_estate.css?v=2"/>
 </head>
-<body>
-<div id="access-denied">
-  <h2>يجب تسجيل الدخول</h2>
-  <p>سجّل حساباً عقارياً أو سجّل الدخول للوصول إلى اللوحة.</p>
-  <a class="btn btn-gold" href="rizq_real_estate_register.html">تسجيل / دخول عقاري</a>
+<body data-t-ns="dashboard_estate" class="rizq-dash" style="font-family:'Cairo',Segoe UI,Arial,sans-serif">
+
+<div id="access-denied" style="display:none;position:fixed;inset:0;background:#f8faff;z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;padding:20px">
+  <div style="font-size:60px">🔒</div>
+  <h2 style="font-size:20px;font-weight:800;color:var(--navy)">يجب تسجيل الدخول</h2>
+  <p style="color:var(--text-muted);font-size:13px;max-width:340px">سجّل حساباً عقارياً أو سجّل الدخول للوصول إلى لوحة التحكم على <span style="color:#e8c96a;font-weight:900">رزق</span>.</p>
+  <a href="rizq_real_estate_register.html" style="padding:11px 26px;background:var(--royal,#1B3A6B);color:#fff;border-radius:11px;font-weight:700">تسجيل / دخول عقاري</a>
+  <a href="rizq_landing_v8.html" style="font-size:13px;color:var(--gold,#C9A84C);font-weight:700">الصفحة الرئيسية</a>
 </div>
 
-<div class="app" id="app-shell">
-  <aside class="sidebar" id="sidebar">
-    <div class="sb-brand">رزق <span>عقارات</span></div>
-    <div class="sb-item active" data-panel="overview">نظرة عامة</div>
-    <div class="sb-item" data-panel="properties">عقاراتي</div>
-    <div class="sb-item" data-panel="inquiries">الاستفسارات والمعاينات</div>
-    <div class="sb-item" data-panel="agents">الوكيل العقاري الذكي</div>
-    <div class="sb-item" data-panel="profile">الملف</div>
-    <div class="sb-item" data-panel="subscription">اشتراكي</div>
-    <div class="sb-item" data-panel="settings">الإعدادات</div>
-  </aside>
+<div class="mobile-bar">
+  <div class="mobile-bar-controls">
+    <button type="button" class="btn btn-outline btn-sm" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+  </div>
+  <div class="mobile-bar-title" style="font-size:15px;font-weight:800;color:var(--navy)">داشبورد العقارات</div>
+</div>
+<div class="sb-overlay" id="sb-overlay" onclick="toggleSidebar()"></div>
 
-  <div class="main">
-    <header class="topbar">
-      <h1 id="top-title">لوحة العقارات</h1>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button type="button" class="btn btn-gold" id="btn-new-prop">+ عقار جديد</button>
-        <a class="btn btn-outline" id="btn-public" href="rizq_estate.html">الصفحة العامة</a>
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
+    <div>
+      <div class="sb-logo-text"><span style="color:#e8c96a;font-weight:900">رزق</span></div>
+      <div class="sb-logo-sub">RIZQ PLATFORM</div>
+    </div>
+  </div>
+  <div class="sb-office-info">
+    <div class="sb-av-row">
+      <div class="sb-av" id="sb-av"></div>
+      <div class="sb-office-name" id="sb-estate-name">...</div>
+    </div>
+    <span class="sb-type-badge" id="sb-type-badge">وكالة عقارية</span>
+    <div class="sb-sub-row"><div class="sub-dot" id="sb-sub-dot"></div><span id="sb-sub-text">...</span></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">الرئيسية</div>
+    <div class="sb-item active" onclick="showPanel('overview',this)"><span class="sb-icon">📊</span><span>نظرة عامة</span></div>
+    <div class="sb-item" onclick="showPanel('requests',this)"><span class="sb-icon">📩</span><span>طلبات المعاينة</span><span class="sb-badge" id="req-badge" style="display:none">0</span></div>
+    <div class="sb-section">العقارات</div>
+    <div class="sb-item" onclick="showPanel('properties',this)"><span class="sb-icon">🏠</span><span>عقاراتي</span></div>
+    <div class="sb-item" onclick="showPanel('tenders',this)"><span class="sb-icon">📋</span><span>المناقصات</span></div>
+    <div class="sb-item" onclick="showPanel('profile',this)"><span class="sb-icon">🏢</span><span>معلومات الوكالة</span></div>
+    <div class="sb-item" onclick="showPanel('hours',this)"><span class="sb-icon">🕐</span><span>ساعات العمل</span></div>
+    <div class="sb-item" onclick="showPanel('photos',this)"><span class="sb-icon">📸</span><span>معرض الصور</span></div>
+    <div class="sb-section">الحساب</div>
+    <div class="sb-item" onclick="showPanel('subscription',this)"><span class="sb-icon">💳</span><span>اشتراكي</span></div>
+    <div class="sb-item" onclick="showPanel('referral',this)"><span class="sb-icon">🎁</span><span>إحالة الأصدقاء</span></div>
+    <div class="sb-item" onclick="showPanel('verifiedplus',this)"><span class="sb-icon">🛡️</span><span>شارة موثّق⁺</span></div>
+    <div class="sb-item" onclick="showPanel('mypayments',this)"><span class="sb-icon">🏦</span><span>طرق الدفع</span></div>
+    <div class="sb-item" onclick="showPanel('settings',this)"><span class="sb-icon">⚙️</span><span>الإعدادات</span></div>
+  </nav>
+  <div class="sb-footer">
+    <div class="sb-logout" onclick="logout()"><span class="sb-icon">🚪</span><span>تسجيل الخروج</span></div>
+  </div>
+</aside>
+
+<div class="main" id="app-shell">
+  <div class="topbar" style="background:#1B3A6B">
+    <div class="topbar-title" id="topbar-title">📊 نظرة عامة</div>
+    <div class="topbar-controls" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <div class="notif-bell" onclick="showPanel('requests',null)" title="طلبات المعاينة">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5a5.5 5.5 0 1 1 11 0c0 6.2 2.5 7.5 2.5 7.5H4s2.5-1.3 2.5-7.5"/><path d="M10 20.2a2 2 0 0 0 4 0"/></svg>
+        <span class="notif-count" id="notif-count">0</span>
       </div>
-    </header>
+      <button type="button" class="btn btn-outline btn-sm" onclick="openShareModal()">📤 مشاركة</button>
+      <button type="button" class="btn btn-outline btn-sm" onclick="openPropForm()">➕ عقار جديد</button>
+      <button type="button" class="btn btn-outline btn-sm" onclick="previewMyPage()">👁️ معاينة</button>
+      <button type="button" class="btn btn-gold btn-sm" onclick="showPanel('subscription',null)">💳 اشتراكي</button>
+    </div>
+  </div>
 
-    <div class="content" id="dash-root">
-      <section class="panel active" id="panel-overview">
-        <div class="kpis">
-          <div class="kpi"><div class="n" id="kpi-listings">0</div><div class="l">إجمالي العقارات</div></div>
-          <div class="kpi"><div class="n" id="kpi-active">0</div><div class="l">نشطة</div></div>
-          <div class="kpi"><div class="n" id="kpi-inquiries">0</div><div class="l">استفسارات</div></div>
-          <div class="kpi"><div class="n" id="kpi-views">0</div><div class="l">مشاهدات</div></div>
-          <div class="kpi"><div class="n" id="kpi-sub">—</div><div class="l">حالة الاشتراك</div></div>
-        </div>
-        <div class="card">
-          <h2>مرحباً، <span id="welcome-name">—</span></h2>
-          <p style="color:var(--muted);font-weight:600;line-height:1.7;margin:0">أدر محفظتك العقارية، تابع طلبات المعاينة، وفعّل الوكيل الذكي للرد على العملاء.</p>
-        </div>
-      </section>
+  <div class="content" id="dash-root">
+    <div id="rizq-sub-slot"></div>
+    <div id="rizq-status-summary-mount"></div>
 
-      <section class="panel" id="panel-properties">
-        <div class="card" id="prop-form-card" hidden>
-          <h2 id="prop-form-title">إضافة عقار</h2>
-          <form id="prop-form">
-            <input type="hidden" id="pf-id"/>
-            <div class="grid">
-              <label>نوع العقار
-                <select id="pf-type" required>
-                  <option value="apartment">شقة</option>
-                  <option value="villa">فيلا</option>
-                  <option value="house">منزل</option>
-                  <option value="land">أرض</option>
-                  <option value="commercial">تجاري / مكتب</option>
-                </select>
-              </label>
-              <label>نوع الصفقة
-                <select id="pf-deal" required>
-                  <option value="sale">للبيع</option>
-                  <option value="rent">للإيجار</option>
-                  <option value="daily">إيجار يومي / موسمي</option>
-                </select>
-              </label>
-              <label class="full">العنوان
-                <input id="pf-title" required maxlength="160" placeholder="شقة فاخرة — تفرغ زينة"/>
-              </label>
-              <label>السعر (MRU)<input id="pf-price" required placeholder="2.6M أو 150000"/></label>
-              <label>المساحة م²<input id="pf-area" type="number" min="0" value="120"/></label>
-              <label>غرف<input id="pf-rooms" type="number" min="0" value="3"/></label>
-              <label>حمّامات<input id="pf-baths" type="number" min="0" value="2"/></label>
-              <label>الطابق<input id="pf-floor" type="text" placeholder="2 أو أرضي"/></label>
-              <label>التشطيب
-                <select id="pf-finish">
-                  <option>فاخر</option><option selected>جيد</option><option>عادي</option><option>على العظم</option>
-                </select>
-              </label>
-              <label>الولاية / المدينة<input id="pf-city" placeholder="نواكشوط"/></label>
-              <label>الحي / المنطقة<input id="pf-zone" placeholder="تفرغ زينة"/></label>
-              <label class="full">الوصف<textarea id="pf-desc" maxlength="2000"></textarea></label>
-              <label class="full">صور (روابط مفصولة بفاصلة)<input id="pf-photos" placeholder="https://...jpg, https://..."/></label>
-              <label class="full">مخطط طابق / فيديو جولة<input id="pf-media" placeholder="رابط مخطط أو فيديو"/></label>
-              <label class="full">إحداثيات الخريطة (lat,lng)<input id="pf-map" placeholder="18.09,-15.97"/></label>
-            </div>
-            <div class="chips" style="margin-top:10px">
-              <label><input type="checkbox" value="parking" class="pf-amen"/> موقف</label>
-              <label><input type="checkbox" value="elevator" class="pf-amen"/> مصعد</label>
-              <label><input type="checkbox" value="pool" class="pf-amen"/> مسبح</label>
-              <label><input type="checkbox" value="garden" class="pf-amen"/> حديقة</label>
-              <label><input type="checkbox" value="security" class="pf-amen"/> حراسة</label>
-              <label><input type="checkbox" value="ac" class="pf-amen"/> تكييف</label>
-            </div>
-            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-              <button type="submit" class="btn btn-gold">حفظ العقار</button>
-              <button type="button" class="btn btn-outline" id="pf-cancel">إلغاء</button>
-            </div>
-          </form>
-        </div>
-        <div class="card">
-          <h2>كتالوج العقارات <span id="prop-limit-hint" style="font-size:12px;color:var(--muted);font-weight:700"></span></h2>
-          <div id="prop-list"></div>
-        </div>
-      </section>
-
-      <section class="panel" id="panel-inquiries">
-        <div class="card">
-          <h2>الاستفسارات وطلبات المعاينة</h2>
-          <div id="inq-list"><p style="color:var(--muted);font-weight:600">لا طلبات بعد.</p></div>
-        </div>
-      </section>
-
-      <section class="panel" id="panel-agents">
-        <div class="card">
-          <h2>الوكيل العقاري الذكي</h2>
-          <p style="color:var(--muted);font-weight:600;line-height:1.7;margin:0 0 12px">درّب الوكيل على محفظة عقاراتك للرد على العملاء على مدار الساعة (يتطلب باقة تدعم الذكاء الاصطناعي).</p>
-          <label>تعليمات مخصّصة للوكيل
-            <textarea id="agent-instructions" placeholder="مثال: ركّز على شقق تفرغ زينة للإيجار الشهري…"></textarea>
-          </label>
-          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-            <button type="button" class="btn btn-gold" id="btn-save-agent">حفظ التعليمات</button>
-            <button type="button" class="btn btn-outline" id="btn-test-agent">اختبار رد</button>
+    <!-- OVERVIEW -->
+    <div class="panel active" id="panel-overview">
+      <div id="hero-banner" style="background:linear-gradient(135deg,#0f2347 0%,#1B3A6B 50%,#1a3a8f 100%);border-radius:20px;padding:0;overflow:hidden;position:relative;margin-bottom:20px;min-height:180px;display:flex">
+        <div style="position:absolute;top:-40px;right:-40px;width:220px;height:220px;border-radius:50%;background:rgba(201,168,76,.07);pointer-events:none"></div>
+        <div style="padding:26px 28px 22px;flex:1;position:relative;z-index:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <div style="width:6px;height:6px;border-radius:50%;background:#10b981;box-shadow:0 0 8px #10b98188"></div>
+            <div style="font-size:10px;color:rgba(255,255,255,.45);letter-spacing:2px">لوحة تحكم · منصة <a href="rizq_landing_v8.html" style="color:#e8c96a;font-weight:900;text-decoration:none">رزق</a></div>
           </div>
-          <pre id="agent-out" style="margin-top:12px;background:#f8fafc;border-radius:10px;padding:12px;white-space:pre-wrap;font:600 12.5px Cairo,sans-serif;display:none"></pre>
-        </div>
-      </section>
-
-      <section class="panel" id="panel-profile">
-        <div class="card">
-          <h2>ملف الوكالة / الحساب</h2>
-          <div class="grid">
-            <label class="full">الاسم<input id="pr-name"/></label>
-            <label>المدينة<input id="pr-city"/></label>
-            <label>الترخيص<input id="pr-license"/></label>
-            <label class="full">المناطق المستهدفة<input id="pr-focus"/></label>
-            <label class="full">الوصف<textarea id="pr-desc"></textarea></label>
+          <div id="wb-name" style="font-size:28px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:6px">...</div>
+          <div id="wb-sub" style="font-size:12px;color:rgba(255,255,255,.5);margin-bottom:14px">سوق العقارات</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+            <div id="wb-plan-badge" style="background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:11px;font-weight:900;padding:5px 14px;border-radius:10px">—</div>
+            <div id="wb-status-badge" style="background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#34d399;font-size:11px;font-weight:700;padding:5px 12px;border-radius:10px">● نشط</div>
           </div>
-          <button type="button" class="btn btn-gold" style="margin-top:12px" id="btn-save-profile">حفظ الملف</button>
-        </div>
-      </section>
-
-      <section class="panel" id="panel-subscription">
-        <div class="card">
-          <h2>اشتراكي وحدود النشر</h2>
-          <div id="sub-box" style="font-weight:700;line-height:1.8;color:var(--muted)">جارٍ التحميل…</div>
-        </div>
-      </section>
-
-      <section class="panel" id="panel-settings">
-        <div class="card">
-          <h2>الإعدادات</h2>
-          <p style="font-weight:600;color:var(--muted);margin:0 0 10px">افتح صفحتك العامة أو ارجع لتسجيل الدخول.</p>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <a class="btn btn-outline" href="rizq_real_estate_register.html">صفحة التسجيل العقاري</a>
-            <a class="btn btn-outline" href="rizq_landing_v8.html">الرئيسية</a>
+            <button onclick="previewMyPage()" style="background:linear-gradient(135deg,#C9A84C,#e8c96a);border:none;color:#0f2347;padding:10px 20px;border-radius:11px;font-size:12px;font-weight:900;cursor:pointer;font-family:inherit">👁 عاين صفحتي</button>
+            <button onclick="openShareModal()" style="background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);color:#fff;padding:10px 16px;border-radius:11px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">📤 مشاركة</button>
           </div>
         </div>
-      </section>
+      </div>
+
+      <div class="quick-actions">
+        <div class="qa-card" onclick="openPropForm()"><div class="qa-icon" style="background:linear-gradient(135deg,#1B3A6B,#234d8f)">🏠</div><div class="qa-label">إضافة عقار</div></div>
+        <div class="qa-card" onclick="openShareModal()"><div class="qa-icon" style="background:linear-gradient(135deg,#0f9960,#16a34a)">📤</div><div class="qa-label">مشاركة الوكالة</div></div>
+        <div class="qa-card" onclick="showPanel('requests',null)"><div class="qa-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">📩</div><div class="qa-label">المعاينات</div></div>
+        <div class="qa-card" onclick="showPanel('subscription',null)"><div class="qa-icon" style="background:linear-gradient(135deg,#C9A84C,#e8c96a)">💳</div><div class="qa-label">اشتراكي</div></div>
+      </div>
+
+      <div class="stats-grid" id="ov-stats"></div>
+
+      <div class="card" style="margin-top:0">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+          <div class="card-title">✨ خدمات <span style="color:#C9A84C;font-weight:900">رزق</span> المتاحة لك</div>
+          <button onclick="showPanel('subscription',null)" style="background:linear-gradient(135deg,#C9A84C,#e8c96a);border:none;color:#0f2347;padding:6px 14px;border-radius:9px;font-size:11px;font-weight:800;cursor:pointer">⬆️ ترقية</button>
+        </div>
+        <div id="services-showcase" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:10px"></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px">
+        <div class="card">
+          <div class="card-header"><div class="card-title">📩 آخر الطلبات</div><button class="btn btn-outline btn-sm" onclick="showPanel('requests',null)">الكل</button></div>
+          <div id="ov-requests"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">💳 الاشتراك</div><button class="btn btn-outline btn-sm" onclick="showPanel('subscription',null)">إدارة</button></div>
+          <div id="ov-sub"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REQUESTS / VIEWINGS -->
+    <div class="panel" id="panel-requests">
+      <div class="card">
+        <div class="card-header"><div class="card-title">📩 طلبات المعاينة والاستفسارات</div></div>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px;line-height:1.55">هنا تظهر طلبات العملاء للمعاينة والاتصال — بنفس منطق غرف الطلبات في منصة رزق.</p>
+        <div id="requests-list"></div>
+      </div>
+    </div>
+
+    <!-- PROPERTIES -->
+    <div class="panel" id="panel-properties">
+      <div class="card" id="prop-form-card" style="display:none;border:2px dashed rgba(27,58,107,.15);background:#fafcff">
+        <div class="card-header">
+          <div class="card-title" id="prop-form-title">➕ إضافة عقار</div>
+          <button class="btn btn-outline btn-sm" type="button" onclick="closePropForm()">إغلاق</button>
+        </div>
+        <form id="prop-form">
+          <input type="hidden" id="pf-id"/>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">نوع العقار *</label>
+              <select class="form-input" id="pf-type" required>
+                <option value="apartment">شقة</option>
+                <option value="villa">فيلا</option>
+                <option value="house">منزل</option>
+                <option value="land">أرض</option>
+                <option value="commercial">تجاري / مكتب</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">نوع الصفقة *</label>
+              <select class="form-input" id="pf-deal" required>
+                <option value="sale">للبيع</option>
+                <option value="rent">للإيجار</option>
+                <option value="daily">إيجار يومي / موسمي</option>
+              </select>
+            </div>
+            <div class="form-group" style="grid-column:1/-1"><label class="form-label">العنوان *</label><input class="form-input" id="pf-title" required maxlength="160" placeholder="شقة فاخرة — تفرغ زينة"/></div>
+            <div class="form-group"><label class="form-label">السعر (MRU) *</label><input class="form-input" id="pf-price" required placeholder="150000"/></div>
+            <div class="form-group"><label class="form-label">المساحة م²</label><input class="form-input" id="pf-area" type="number" min="0" value="120"/></div>
+            <div class="form-group"><label class="form-label">غرف</label><input class="form-input" id="pf-rooms" type="number" min="0" value="3"/></div>
+            <div class="form-group"><label class="form-label">حمّامات</label><input class="form-input" id="pf-baths" type="number" min="0" value="2"/></div>
+            <div class="form-group"><label class="form-label">الطابق</label><input class="form-input" id="pf-floor" placeholder="2 أو أرضي"/></div>
+            <div class="form-group"><label class="form-label">التشطيب</label>
+              <select class="form-input" id="pf-finish"><option>فاخر</option><option selected>جيد</option><option>عادي</option><option>على العظم</option></select>
+            </div>
+            <div class="form-group"><label class="form-label">المدينة</label><input class="form-input" id="pf-city" placeholder="نواكشوط"/></div>
+            <div class="form-group"><label class="form-label">الحي / المنطقة</label><input class="form-input" id="pf-zone" placeholder="تفرغ زينة"/></div>
+            <div class="form-group" style="grid-column:1/-1"><label class="form-label">الوصف</label><textarea class="form-input" id="pf-desc" maxlength="2000"></textarea></div>
+            <div class="form-group" style="grid-column:1/-1"><label class="form-label">صور (روابط مفصولة بفاصلة)</label><input class="form-input" id="pf-photos" placeholder="https://..."/></div>
+            <div class="form-group" style="grid-column:1/-1"><label class="form-label">مخطط / جولة فيديو</label><input class="form-input" id="pf-media" placeholder="رابط مخطط أو فيديو"/></div>
+            <div class="form-group" style="grid-column:1/-1"><label class="form-label">إحداثيات الخريطة (lat,lng)</label><input class="form-input" id="pf-map" placeholder="18.09,-15.97"/></div>
+          </div>
+          <div class="amen-chips">
+            <label><input type="checkbox" value="parking" class="pf-amen"/> موقف</label>
+            <label><input type="checkbox" value="elevator" class="pf-amen"/> مصعد</label>
+            <label><input type="checkbox" value="pool" class="pf-amen"/> مسبح</label>
+            <label><input type="checkbox" value="garden" class="pf-amen"/> حديقة</label>
+            <label><input type="checkbox" value="security" class="pf-amen"/> حراسة</label>
+            <label><input type="checkbox" value="ac" class="pf-amen"/> تكييف</label>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+            <button type="button" class="btn btn-outline btn-sm" onclick="closePropForm()">إلغاء</button>
+            <button type="submit" class="btn btn-primary">💾 حفظ العقار</button>
+          </div>
+        </form>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏠 عقاراتي <span id="prop-limit-hint" style="font-size:12px;color:var(--text-muted);font-weight:700"></span></div>
+          <button class="btn btn-gold btn-sm" type="button" onclick="openPropForm()">➕ عقار جديد</button>
+        </div>
+        <div id="prop-list"></div>
+      </div>
+    </div>
+
+    <!-- TENDERS -->
+    <div class="panel" id="panel-tenders">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📋 غرفة المناقصات</div>
+          <a class="btn btn-outline btn-sm" href="rizq_tenders.html">🔍 تصفّح المناقصات</a>
+        </div>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:16px">انشر احتياجك أو قدّم عروضك — نفس غرفة المناقصات في منصة رزق.</p>
+        <div id="tender-sub-status" style="margin-bottom:16px"></div>
+        <button class="btn btn-primary" onclick="location.href='rizq_tenders.html'">+ انشر مناقصة جديدة</button>
+        <div id="tenders-mine-list" style="margin-top:20px"></div>
+      </div>
+    </div>
+
+    <!-- REFERRAL -->
+    <div class="panel" id="panel-referral">
+      <div class="card">
+        <div class="card-header"><div class="card-title">🎁 برنامج الإحالة — جيب صاحبك واربح</div></div>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:16px">شارك رابطك. عند اشتراك صديقك تحصل على أيام إضافية فوق باقتك.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+          <input id="referral-link-input" readonly style="flex:1;min-width:220px;padding:10px 14px;border-radius:10px;border:1px solid rgba(201,168,76,.3);background:#f8faff;font-size:13px" onclick="this.select()"/>
+          <button class="btn btn-primary" onclick="copyReferralLink()">📋 نسخ الرابط</button>
+        </div>
+        <div id="referral-stats"></div>
+      </div>
+    </div>
+
+    <!-- VERIFIED+ -->
+    <div class="panel" id="panel-verifiedplus">
+      <div class="card">
+        <div class="card-header"><div class="card-title">🛡️ شارة موثّق⁺</div></div>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:16px">تحقق هوية مُعزَّز من فريق رزق لبناء أعلى ثقة لدى العملاء.</p>
+        <div id="vplus-status"></div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="panel" id="panel-profile">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏢 معلومات الوكالة</div>
+          <button class="btn btn-primary" type="button" onclick="saveProfile()">💾 حفظ</button>
+        </div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">اسم الوكالة / المكتب *</label><input class="form-input" id="p-name"/></div>
+          <div class="form-group"><label class="form-label">النوع الفرعي</label>
+            <select class="form-input" id="p-subtype">
+              <option value="agency">مكتب / وكالة</option>
+              <option value="developer">مطور عقاري</option>
+              <option value="owner">مالك فردي</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">رقم الترخيص / السجل</label><input class="form-input" id="p-license"/></div>
+          <div class="form-group"><label class="form-label">المدينة</label><input class="form-input" id="p-city"/></div>
+          <div class="form-group" style="grid-column:1/-1"><label class="form-label">المناطق المستهدفة</label><input class="form-input" id="p-focus" placeholder="تفرغ زينة، لكصر…"/></div>
+          <div class="form-group"><label class="form-label">الهاتف</label><input class="form-input" id="p-phone"/></div>
+          <div class="form-group"><label class="form-label">واتساب</label><input class="form-input" id="p-whatsapp"/></div>
+          <div class="form-group" style="grid-column:1/-1"><label class="form-label">الوصف</label><textarea class="form-input" id="p-desc"></textarea></div>
+          <div class="form-group" style="grid-column:1/-1"><label class="form-label">فيديو تعريفي (رابط)</label><input class="form-input" id="p-video" placeholder="YouTube / Facebook"/></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOURS -->
+    <div class="panel" id="panel-hours">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🕐 ساعات العمل</div>
+          <button class="btn btn-primary" type="button" onclick="saveHours()">💾 حفظ</button>
+        </div>
+        <div id="hours-grid"></div>
+      </div>
+    </div>
+
+    <!-- PHOTOS -->
+    <div class="panel" id="panel-photos">
+      <div class="card">
+        <div class="card-header"><div class="card-title">📸 معرض الوكالة</div></div>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px">أضف روابط صور الغلاف والمعرض لصفحتك العامة.</p>
+        <div class="form-group"><label class="form-label">صورة الغلاف</label><input class="form-input" id="ph-cover" placeholder="https://..."/></div>
+        <div class="form-group"><label class="form-label">صور المعرض (مفصولة بفاصلة)</label><textarea class="form-input" id="ph-gallery" placeholder="https://a.jpg, https://b.jpg"></textarea></div>
+        <button class="btn btn-primary" type="button" onclick="savePhotos()">💾 حفظ المعرض</button>
+      </div>
+    </div>
+
+    <!-- SUBSCRIPTION -->
+    <div class="panel" id="panel-subscription">
+      <div class="card">
+        <div class="card-header"><div class="card-title">💳 اشتراكي وحدود النشر</div></div>
+        <div id="sub-current" style="margin-bottom:18px;font-weight:700;line-height:1.8;color:var(--text-muted)"></div>
+        <div class="card-title" style="margin-bottom:12px">باقات سوق العقارات</div>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px">الباقات مبنية وجاهزة — الأسعار تُحدَّث لاحقاً من لوحة الإدارة.</p>
+        <div class="pkg-grid" id="pkg-grid"></div>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="panel" id="panel-mypayments">
+      <div class="card">
+        <div class="card-header"><div class="card-title">🏦 طرق الدفع</div></div>
+        <div id="mypayments-root"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="panel" id="panel-settings">
+      <div class="card">
+        <div class="card-header"><div class="card-title">⚙️ الإعدادات</div></div>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.7">إدارة الحساب والروابط العامة لمنصة رزق.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-outline" type="button" onclick="previewMyPage()">الصفحة العامة</button>
+          <a class="btn btn-outline" href="rizq_real_estate_register.html">التسجيل العقاري</a>
+          <a class="btn btn-outline" href="rizq_landing_v8.html">الرئيسية</a>
+          <button class="btn btn-danger" type="button" onclick="logout()">تسجيل الخروج</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<script>
-(function () {
-  'use strict';
-  var ACCOUNT = null;
-  var CTX = null;
-  var PROPS = [];
-  var INQS = [];
-  var STORE_KEY = '';
+<!-- Share modal -->
+<div class="modal-overlay" id="share-modal">
+  <div class="modal-box">
+    <div style="font-size:16px;font-weight:900;color:#1B3A6B;margin-bottom:12px">مشاركة صفحتك على رزق</div>
+    <div class="share-link-row">
+      <input class="share-link-input" id="share-link-input" readonly onclick="this.select()"/>
+      <button class="btn btn-primary btn-sm" type="button" onclick="copyShareLink()">نسخ</button>
+    </div>
+    <div class="share-btns">
+      <button class="share-btn share-btn-wa" type="button" onclick="shareWhatsApp()">واتساب</button>
+      <button class="share-btn share-btn-copy" type="button" onclick="copyShareLink()">نسخ الرابط</button>
+    </div>
+    <button class="btn btn-outline" style="width:100%" type="button" onclick="closeShareModal()">إغلاق</button>
+  </div>
+</div>
 
-  function t2(ar, fr) {
-    try { return (localStorage.getItem('rizq_lang') || 'ar') === 'fr' ? fr : ar; } catch (e) { return ar; }
-  }
-
-  function showPanel(id) {
-    document.querySelectorAll('.panel').forEach(function (p) { p.classList.toggle('active', p.id === 'panel-' + id); });
-    document.querySelectorAll('.sb-item').forEach(function (el) {
-      el.classList.toggle('active', el.getAttribute('data-panel') === id);
-    });
-    var titles = {
-      overview: 'نظرة عامة', properties: 'عقاراتي', inquiries: 'الاستفسارات والمعاينات',
-      agents: 'الوكيل العقاري الذكي', profile: 'الملف', subscription: 'اشتراكي', settings: 'الإعدادات'
-    };
-    document.getElementById('top-title').textContent = titles[id] || 'لوحة العقارات';
-  }
-
-  document.querySelectorAll('.sb-item').forEach(function (el) {
-    el.addEventListener('click', function () { showPanel(el.getAttribute('data-panel')); });
-  });
-
-  function loadLocal() {
-    STORE_KEY = 'rizq_estate_listings_' + (ACCOUNT && ACCOUNT.id ? ACCOUNT.id : 'demo');
-    try {
-      var raw = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
-      PROPS = Array.isArray(raw) ? raw : [];
-    } catch (e) { PROPS = []; }
-    try {
-      var iq = JSON.parse(localStorage.getItem('rizq_estate_inquiries_' + (ACCOUNT && ACCOUNT.id)) || '[]');
-      INQS = Array.isArray(iq) ? iq : [];
-    } catch (e2) { INQS = []; }
-  }
-
-  function saveLocal() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(PROPS)); } catch (e) {}
-  }
-
-  function listingLimit() {
-    if (!ACCOUNT || typeof RizqSub === 'undefined' || !RizqSub.checkPostLimit) {
-      return { allowed: true, limit: 3, used: PROPS.length, remaining: Math.max(0, 3 - PROPS.length) };
-    }
-    return RizqSub.checkPostLimit(ACCOUNT.id, 'estate', PROPS.filter(function (p) { return p.status !== 'archived'; }).length);
-  }
-
-  function renderKpis() {
-    var active = PROPS.filter(function (p) { return p.status !== 'archived'; }).length;
-    var views = PROPS.reduce(function (s, p) { return s + (Number(p.views) || 0); }, 0);
-    document.getElementById('kpi-listings').textContent = String(PROPS.length);
-    document.getElementById('kpi-active').textContent = String(active);
-    document.getElementById('kpi-inquiries').textContent = String(INQS.length);
-    document.getElementById('kpi-views').textContent = String(views);
-    var subLabel = '—';
-    if (typeof RizqSub !== 'undefined' && ACCOUNT) {
-      try {
-        var st = RizqSub.checkSubscription(ACCOUNT.id) || {};
-        subLabel = st.status || 'no_subscription';
-      } catch (e) {}
-    }
-    document.getElementById('kpi-sub').textContent = subLabel;
-    document.getElementById('welcome-name').textContent = (ACCOUNT && (ACCOUNT.name || ACCOUNT.owner)) || '—';
-  }
-
-  function renderProps() {
-    var lim = listingLimit();
-    var hint = document.getElementById('prop-limit-hint');
-    if (hint) {
-      hint.textContent = lim.limit === Infinity
-        ? t2('(بلا حد في باقتك)', '(illimité)')
-        : t2('(المستخدم ' + lim.used + ' / الحد ' + lim.limit + ')', '(' + lim.used + ' / ' + lim.limit + ')');
-    }
-    var list = document.getElementById('prop-list');
-    if (!PROPS.length) {
-      list.innerHTML = '<p style="color:var(--muted);font-weight:600">لا عقارات بعد — أضف أول عقار.</p>';
-      return;
-    }
-    list.innerHTML = PROPS.map(function (p, i) {
-      var photo = (p.photos && p.photos[0]) || '';
-      var deal = p.deal === 'sale' ? 'بيع' : (p.deal === 'daily' ? 'يومي' : 'إيجار');
-      return '<div class="prop">'
-        + (photo ? '<img src="' + escapeAttr(photo) + '" alt=""/>' : '<div class="ph"></div>')
-        + '<div><div class="t">' + escapeHtml(p.title) + '</div>'
-        + '<div class="m">' + escapeHtml(deal) + ' · ' + escapeHtml(p.type) + ' · ' + escapeHtml(String(p.price || '')) + ' MRU</div>'
-        + '<div class="m">' + escapeHtml(p.city || '') + (p.zone ? ' — ' + escapeHtml(p.zone) : '') + '</div></div>'
-        + '<div style="display:flex;flex-direction:column;gap:6px">'
-        + '<button type="button" class="btn btn-outline" data-edit="' + i + '">تعديل</button>'
-        + '<button type="button" class="btn btn-danger" data-del="' + i + '">حذف</button>'
-        + '</div></div>';
-    }).join('');
-    list.querySelectorAll('[data-edit]').forEach(function (b) {
-      b.addEventListener('click', function () { openForm(PROPS[Number(b.getAttribute('data-edit'))]); });
-    });
-    list.querySelectorAll('[data-del]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var idx = Number(b.getAttribute('data-del'));
-        PROPS.splice(idx, 1);
-        saveLocal();
-        renderAll();
-        if (typeof showToast === 'function') showToast(t2('تم الحذف', 'Supprimé'), 'ok');
-      });
-    });
-  }
-
-  function renderInquiries() {
-    var el = document.getElementById('inq-list');
-    if (!INQS.length) {
-      el.innerHTML = '<p style="color:var(--muted);font-weight:600">لا طلبات بعد. ستظهر هنا استفسارات المشترين وطلبات المعاينة.</p>';
-      return;
-    }
-    el.innerHTML = INQS.map(function (q) {
-      return '<div class="inq"><div class="who">' + escapeHtml(q.name || 'عميل') + '</div>'
-        + '<div class="meta">' + escapeHtml(q.kind || 'استفسار') + ' · ' + escapeHtml(q.phone || '') + '</div>'
-        + '<div class="meta">' + escapeHtml(q.message || '') + '</div></div>';
-    }).join('');
-  }
-
-  function renderSub() {
-    var box = document.getElementById('sub-box');
-    var lim = listingLimit();
-    var lines = [];
-    if (typeof RizqSub !== 'undefined' && ACCOUNT) {
-      try {
-        var st = RizqSub.checkSubscription(ACCOUNT.id) || {};
-        lines.push('الحالة: ' + (st.status || '—'));
-        lines.push('الباقة: ' + (st.pkg || st.package || '—'));
-        if (st.daysLeft != null) lines.push('الأيام المتبقية: ' + st.daysLeft);
-      } catch (e) {}
-    }
-    lines.push('حد العقارات النشطة: ' + (lim.limit === Infinity ? 'غير محدود' : lim.limit));
-    lines.push('المستخدم حالياً: ' + lim.used);
-    if (!lim.allowed) lines.push('⚠ وصلت للحد — رقِّ باقتك أو أرشف عقاراً قديماً.');
-    box.textContent = lines.join('\n');
-  }
-
-  function renderProfile() {
-    if (!ACCOUNT) return;
-    document.getElementById('pr-name').value = ACCOUNT.name || '';
-    document.getElementById('pr-city').value = ACCOUNT.city || '';
-    document.getElementById('pr-license').value = ACCOUNT.licenseNumber || '';
-    document.getElementById('pr-focus').value = ACCOUNT.focusAreas || '';
-    document.getElementById('pr-desc').value = ACCOUNT.desc || '';
-    var pub = document.getElementById('btn-public');
-    if (pub && ACCOUNT.id) pub.href = 'rizq_estate.html?id=' + encodeURIComponent(ACCOUNT.id);
-  }
-
-  function renderAll() {
-    renderKpis();
-    renderProps();
-    renderInquiries();
-    renderSub();
-    renderProfile();
-  }
-
-  function openForm(existing) {
-    document.getElementById('prop-form-card').hidden = false;
-    document.getElementById('prop-form-title').textContent = existing ? 'تعديل عقار' : 'إضافة عقار';
-    document.getElementById('pf-id').value = existing ? existing.id : '';
-    document.getElementById('pf-type').value = (existing && existing.type) || 'apartment';
-    document.getElementById('pf-deal').value = (existing && existing.deal) || 'sale';
-    document.getElementById('pf-title').value = (existing && existing.title) || '';
-    document.getElementById('pf-price').value = (existing && existing.price) || '';
-    document.getElementById('pf-area').value = (existing && existing.area) || 120;
-    document.getElementById('pf-rooms').value = (existing && existing.rooms) || 3;
-    document.getElementById('pf-baths').value = (existing && existing.baths) || 2;
-    document.getElementById('pf-floor').value = (existing && existing.floor) || '';
-    document.getElementById('pf-finish').value = (existing && existing.finish) || 'جيد';
-    document.getElementById('pf-city').value = (existing && existing.city) || (ACCOUNT && ACCOUNT.city) || '';
-    document.getElementById('pf-zone').value = (existing && existing.zone) || '';
-    document.getElementById('pf-desc').value = (existing && existing.desc) || '';
-    document.getElementById('pf-photos').value = (existing && existing.photos) ? existing.photos.join(', ') : '';
-    document.getElementById('pf-media').value = (existing && existing.media) || '';
-    document.getElementById('pf-map').value = (existing && existing.map) || '';
-    var am = (existing && existing.amenities) || [];
-    document.querySelectorAll('.pf-amen').forEach(function (c) {
-      c.checked = am.indexOf(c.value) !== -1;
-    });
-    showPanel('properties');
-  }
-
-  document.getElementById('btn-new-prop').addEventListener('click', function () {
-    var lim = listingLimit();
-    if (!lim.allowed) {
-      if (typeof showToast === 'function') showToast(lim.msg || 'وصلت لحد الباقة', 'error');
-      showPanel('subscription');
-      return;
-    }
-    openForm(null);
-  });
-  document.getElementById('pf-cancel').addEventListener('click', function () {
-    document.getElementById('prop-form-card').hidden = true;
-  });
-
-  document.getElementById('prop-form').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var id = document.getElementById('pf-id').value || ('est_' + Date.now());
-    var photos = document.getElementById('pf-photos').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
-    var amenities = [];
-    document.querySelectorAll('.pf-amen:checked').forEach(function (c) { amenities.push(c.value); });
-    var row = {
-      id: id,
-      type: document.getElementById('pf-type').value,
-      deal: document.getElementById('pf-deal').value,
-      title: document.getElementById('pf-title').value.trim(),
-      price: document.getElementById('pf-price').value.trim(),
-      area: Number(document.getElementById('pf-area').value) || 0,
-      rooms: Number(document.getElementById('pf-rooms').value) || 0,
-      baths: Number(document.getElementById('pf-baths').value) || 0,
-      floor: document.getElementById('pf-floor').value.trim(),
-      finish: document.getElementById('pf-finish').value,
-      city: document.getElementById('pf-city').value.trim(),
-      zone: document.getElementById('pf-zone').value.trim(),
-      desc: document.getElementById('pf-desc').value.trim(),
-      photos: photos,
-      media: document.getElementById('pf-media').value.trim(),
-      map: document.getElementById('pf-map').value.trim(),
-      amenities: amenities,
-      status: 'active',
-      views: 0,
-      updatedAt: new Date().toISOString()
-    };
-    var idx = PROPS.findIndex(function (p) { return p.id === id; });
-    if (idx < 0) {
-      var lim = listingLimit();
-      if (!lim.allowed) {
-        if (typeof showToast === 'function') showToast(lim.msg || 'حد الباقة', 'error');
-        return;
-      }
-      PROPS.unshift(row);
-    } else {
-      row.views = PROPS[idx].views || 0;
-      PROPS[idx] = row;
-    }
-    saveLocal();
-    syncPropToCatalog(row);
-    document.getElementById('prop-form-card').hidden = true;
-    renderAll();
-    if (typeof showToast === 'function') showToast(t2('تم الحفظ', 'Enregistré'), 'ok');
-  });
-
-  function syncPropToCatalog(row) {
-    if (!CTX || !CTX.accessToken || !window.RIZQ_BACKEND_BASE || !ACCOUNT) return;
-    var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
-    var body = {
-      accountId: ACCOUNT.id,
-      kind: 'product',
-      title: row.title,
-      price: row.price,
-      desc: row.desc,
-      category: 'عقارات',
-      city: row.city,
-      meta: {
-        estate: true,
-        propertyType: row.type,
-        deal: row.deal,
-        area: row.area,
-        rooms: row.rooms,
-        baths: row.baths,
-        floor: row.floor,
-        finish: row.finish,
-        zone: row.zone,
-        amenities: row.amenities,
-        map: row.map,
-        media: row.media,
-        localId: row.id
-      },
-      images: row.photos
-    };
-    fetch(base + '/api/catalog', {
-      method: 'POST',
-      headers: Object.assign({ 'Content-Type': 'application/json' }, RizqDash.authHeaders(CTX.accessToken)),
-      body: JSON.stringify(body)
-    }).catch(function () {});
-  }
-
-  document.getElementById('btn-save-profile').addEventListener('click', function () {
-    if (!ACCOUNT) return;
-    ACCOUNT.name = document.getElementById('pr-name').value.trim();
-    ACCOUNT.city = document.getElementById('pr-city').value.trim();
-    ACCOUNT.licenseNumber = document.getElementById('pr-license').value.trim();
-    ACCOUNT.focusAreas = document.getElementById('pr-focus').value.trim();
-    ACCOUNT.desc = document.getElementById('pr-desc').value.trim();
-    try {
-      var list = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
-      var i = list.findIndex(function (a) { return a && a.id === ACCOUNT.id; });
-      if (i >= 0) {
-        list[i] = Object.assign({}, list[i], ACCOUNT);
-        localStorage.setItem('rizq_pending_accounts', JSON.stringify(list));
-      }
-    } catch (e) {}
-    if (CTX && CTX.accessToken && window.RIZQ_BACKEND_BASE) {
-      var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
-      fetch(base + '/api/accounts/mine/' + encodeURIComponent(ACCOUNT.id), {
-        method: 'PATCH',
-        headers: Object.assign({ 'Content-Type': 'application/json' }, RizqDash.authHeaders(CTX.accessToken)),
-        body: JSON.stringify({
-          name: ACCOUNT.name,
-          city: ACCOUNT.city,
-          desc: ACCOUNT.desc,
-          licenseNumber: ACCOUNT.licenseNumber,
-          focusAreas: ACCOUNT.focusAreas
-        })
-      }).catch(function () {});
-    }
-    renderKpis();
-    if (typeof showToast === 'function') showToast(t2('تم حفظ الملف', 'Profil enregistré'), 'ok');
-  });
-
-  document.getElementById('btn-save-agent').addEventListener('click', function () {
-    var text = document.getElementById('agent-instructions').value.trim();
-    try { localStorage.setItem('rizq_estate_agent_' + (ACCOUNT && ACCOUNT.id), text); } catch (e) {}
-    if (typeof showToast === 'function') showToast(t2('حُفظت التعليمات', 'Instructions enregistrées'), 'ok');
-  });
-
-  document.getElementById('btn-test-agent').addEventListener('click', function () {
-    var out = document.getElementById('agent-out');
-    out.style.display = 'block';
-    if (!CTX || !CTX.accessToken || !window.RIZQ_BACKEND_BASE) {
-      out.textContent = t2('الوكيل غير متاح بدون اتصال بالخادم / باقة مدعومة.', 'Agent indisponible sans serveur / forfait AI.');
-      return;
-    }
-    out.textContent = t2('جارٍ الاختبار…', 'Test…');
-    var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
-    fetch(base + '/api/subscriber/chat', {
-      method: 'POST',
-      headers: Object.assign({ 'Content-Type': 'application/json' }, RizqDash.authHeaders(CTX.accessToken)),
-      body: JSON.stringify({
-        accountId: ACCOUNT.id,
-        message: 'لخّص عقاراتي المتاحة للبيع أو الإيجار باختصار.',
-        instructions: document.getElementById('agent-instructions').value.trim()
-      })
-    }).then(function (r) { return r.json(); }).then(function (d) {
-      out.textContent = (d && (d.reply || d.message || d.error)) || JSON.stringify(d);
-    }).catch(function () {
-      out.textContent = t2('فشل الاتصال بالوكيل', 'Échec agent');
-    });
-  });
-
-  RizqDash.bootstrapDashboard({
-    expectedType: 'estate',
-    writeRoot: document.getElementById('dash-root'),
-    onDenied: function () {
-      document.getElementById('app-shell').style.display = 'none';
-      RizqDash.showAccessDenied();
-    },
-    onReady: function (acc, ctx) {
-      ACCOUNT = acc;
-      CTX = ctx;
-      document.getElementById('app-shell').style.display = '';
-      try {
-        document.getElementById('agent-instructions').value =
-          localStorage.getItem('rizq_estate_agent_' + acc.id) || '';
-      } catch (e) {}
-      loadLocal();
-      renderAll();
-      showPanel('overview');
-    }
-  });
-})();
-</script>
+<script src="rizq_dashboard_estate_app.js?v=2"></script>
 </body>
 </html>
