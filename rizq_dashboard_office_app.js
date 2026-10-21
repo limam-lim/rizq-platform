@@ -136,7 +136,7 @@ function showPanel(id,el){
   if(t)t.textContent=(typeof _officeLang!=='undefined'&&_officeLang==='fr'?TITLES_FR[id]:TITLES[id])||'';
   if(id==='overview')renderOverview();
   if(id==='requests'){ _rizqMergeRequestsFromBackend(); _rizqMergeServiceRequests(); loadOfficeServiceDeskForm(); renderRequests(); }
-  if(id==='services')renderServices();
+  if(id==='services'){ renderServices(); try{ mountOfficeListingContext(); }catch(eSvcCtx){} }
   if(id==='hours')renderHours();
   if(id==='subscription'){renderSubPanel();renderPackagesDisplay();renderVideoPackagesDisplay();}
   if(id==='agents')renderAgentsOffice();
@@ -979,13 +979,26 @@ function saveService(){
   var price = document.getElementById('svc-price') ? document.getElementById('svc-price').value.trim() : '';
   var desc  = document.getElementById('svc-desc')  ? document.getElementById('svc-desc').value.trim()  : '';
   if(!name){showToast(_t2('يرجى إدخال اسم الخدمة','Veuillez saisir le nom du service'),'error');return;}
+  var _listingForm = (typeof RizqListingContext !== 'undefined')
+    ? RizqListingContext.collectForm({
+        categorySelect: 'svc-category-id',
+        subcatSelect: 'svc-subcategory-id',
+        attrsMount: 'svc-attrs-mount',
+        context: RizqListingContext.sellerContext(typeof OFFICE!=='undefined'?OFFICE:{id:SESSION_ID,type:'office'}, { accountType:'office', accountId:SESSION_ID }),
+      })
+    : { categoryId:'', subcat:'', attrs:{} };
+  if(!_listingForm.subcat){
+    showToast(_t2('اختر النوع / الفرع للخدمة','Choisissez le sous-type du service'),'error');
+    return;
+  }
 
   var adData = {
     id: 'OFC-' + Date.now(),
     title: name,
     desc:  desc,
     price: price,
-    category: 'services',
+    category: _listingForm.categoryId || 'خدمات',
+    subcat: _listingForm.subcat,
     images: [],
     seller: typeof accData !== 'undefined' ? (accData.name||_t2('مكتب','Bureau')) : _t2('مكتب','Bureau'),
     seller_trust_score: 70,
@@ -1000,10 +1013,27 @@ function saveService(){
     // ونستخدم نفس مفتاح التخزين المستخدم في التحميل والحذف.
     var _newSvc = {
       id: data.id, name: name, price: price, desc: desc,
+      duration: document.getElementById('svc-duration') ? document.getElementById('svc-duration').value.trim() : '',
+      emoji: document.getElementById('svc-emoji') ? document.getElementById('svc-emoji').value.trim() : '📄',
+      categoryId: _listingForm.categoryId || '',
+      category: _listingForm.categoryId || '',
+      subCategoryId: _listingForm.subcat || '',
+      subcat: _listingForm.subcat || '',
+      attrs: _listingForm.attrs || {},
+      accountType: 'office',
+      storeId: SESSION_ID,
+      activityId: (typeof OFFICE!=='undefined' && OFFICE && OFFICE.activityId) || '',
+      listingSource: 'dashboard_catalog',
       status: data._status || 'active',
       date: new Date().toLocaleDateString('ar-MR-u-nu-latn')
     };
-    services.unshift(_newSvc);
+    if(typeof window._editSvcIdx === 'number' && services[window._editSvcIdx]){
+      _newSvc.id = services[window._editSvcIdx].id || _newSvc.id;
+      _newSvc._backendId = services[window._editSvcIdx]._backendId || null;
+      services[window._editSvcIdx] = _newSvc;
+    } else {
+      services.unshift(_newSvc);
+    }
     if(!IS_DEMO) localStorage.setItem('office_services_'+(typeof SESSION_ID!=='undefined'?SESSION_ID:'demo'), JSON.stringify(services));
     if(!IS_DEMO) _rizqSyncCatalogItem(_newSvc);
     // سجّل الإعلان في العداد الشهري عند الانتهاء
@@ -1011,7 +1041,7 @@ function saveService(){
       var _subSt = RizqSub.checkSubscription(SESSION_ID);
       if(_subSt.status==='expired'||_subSt.status==='no_subscription') RizqSub.recordAdPost(SESSION_ID);
     }
-    ['svc-name','svc-price','svc-desc'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    clearSvcForm();
     showToast(data._status==='pending_review'?_t2('⏳ الخدمة قيد المراجعة','⏳ Service en cours de vérification'):_t2('✅ تم إضافة الخدمة','✅ Service ajouté'));
     if(typeof renderServices === 'function') renderServices();
     if(typeof showPanel === 'function') showPanel('services');
@@ -1027,8 +1057,25 @@ function saveService(){
     });
   } else { doSave(adData); }
 }
-function clearSvcForm(){['svc-name','svc-price','svc-duration','svc-emoji','svc-desc'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});window._editSvcIdx=null;}
-function editService(i){const s=services[i];document.getElementById('svc-name').value=s.name||'';document.getElementById('svc-price').value=s.price||'';document.getElementById('svc-duration').value=s.duration||'';document.getElementById('svc-emoji').value=s.emoji||'';document.getElementById('svc-desc').value=s.desc||'';window._editSvcIdx=i;if(!_svcOpen)toggleServiceForm();}
+function mountOfficeListingContext(opts){
+  opts = opts || {};
+  if(typeof RizqListingContext === 'undefined') return;
+  var acc = (typeof OFFICE!=='undefined' && OFFICE) ? OFFICE : { id: SESSION_ID, type: 'office' };
+  var hint = document.getElementById('svc-listing-ctx-hint');
+  if(hint) hint.innerHTML = RizqListingContext.syncHintHtml((typeof _officeLang!=='undefined' && _officeLang==='fr')?'fr':'ar');
+  RizqListingContext.mountSelectors({
+    categorySelect: 'svc-category-id',
+    subcatSelect: 'svc-subcategory-id',
+    attrsMount: 'svc-attrs-mount',
+    context: RizqListingContext.sellerContext(acc, { accountType:'office', accountId: SESSION_ID }),
+    lockCategory: true,
+    selectedSubcat: opts.selectedSubcat || '',
+    attrs: opts.attrs || {},
+    lang: (typeof _officeLang!=='undefined' && _officeLang==='fr')?'fr':'ar',
+  });
+}
+function clearSvcForm(){['svc-name','svc-price','svc-duration','svc-emoji','svc-desc'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});window._editSvcIdx=null;mountOfficeListingContext();}
+function editService(i){const s=services[i];document.getElementById('svc-name').value=s.name||'';document.getElementById('svc-price').value=s.price||'';document.getElementById('svc-duration').value=s.duration||'';document.getElementById('svc-emoji').value=s.emoji||'';document.getElementById('svc-desc').value=s.desc||'';window._editSvcIdx=i;if(!_svcOpen)toggleServiceForm();mountOfficeListingContext({ selectedSubcat: s.subcat||s.subCategoryId||'', attrs: s.attrs||{} });}
 function deleteService(i){
   if(!confirm(_t2('حذف الخدمة؟','Supprimer ce service ?')))return;
   if(!IS_DEMO) _rizqDeleteCatalogItem(services[i]);
@@ -1047,7 +1094,24 @@ function _rizqSyncCatalogItem(svc){
   try{
     if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN) return;
     var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
-    var body = { accountId: SESSION_ID, kind:'service', name: svc.name, price: svc.price, desc: svc.desc, status: svc.status==='pending_review'?'pending_review':(svc.status==='inactive'?'inactive':'active') };
+    var ctx = (typeof RizqListingContext !== 'undefined')
+      ? RizqListingContext.sellerContext((typeof OFFICE!=='undefined'?OFFICE:null), { accountType:'office', accountId: SESSION_ID })
+      : { store_id: SESSION_ID, account_id: SESSION_ID, account_type: 'office', activity_id: '', badges: {} };
+    var body = {
+      accountId: SESSION_ID, storeId: SESSION_ID, kind:'service',
+      name: svc.name, price: svc.price, desc: svc.desc,
+      duration: svc.duration || '', emoji: svc.emoji || '',
+      categoryId: svc.categoryId || '', category: svc.categoryId || '',
+      subCategoryId: svc.subcat || '', subcat: svc.subcat || '',
+      attrs: svc.attrs || {}, cat: svc.subcat || svc.categoryId || '',
+      accountType: 'office', activityId: svc.activityId || ctx.activity_id || '',
+      listingSource: 'dashboard_catalog',
+      sellerContext: { storeName: ctx.store_name || (OFFICE && OFFICE.name) || '', badges: ctx.badges || {} },
+      status: svc.status==='pending_review'?'pending_review':(svc.status==='inactive'?'inactive':'active')
+    };
+    if(typeof RizqListingContext !== 'undefined'){
+      body = RizqListingContext.enrichPayload(body, ctx, { categoryId: svc.categoryId, subcat: svc.subcat, attrs: svc.attrs || {} });
+    }
     if(svc._backendId){
       fetch(base+'/api/catalog/'+encodeURIComponent(svc._backendId), {
         method:'PATCH', headers:{'Content-Type':'application/json','x-account-token':(window.REAL_ACCESS_TOKEN || SESSION_TOKEN)}, body: JSON.stringify(body)
@@ -1531,6 +1595,7 @@ function _applyOfficeLang(lang, silent){
   try{ if(typeof renderServicesShowcase==='function') renderServicesShowcase(); }catch(e){}
   try{ if(typeof renderRequests==='function') renderRequests(); }catch(e){}
   try{ if(typeof renderServices==='function') renderServices(); }catch(e){}
+  try{ if(typeof mountOfficeListingContext==='function') mountOfficeListingContext(); }catch(e){}
   try{ if(typeof renderSubPanel==='function') renderSubPanel(); }catch(e){}
   try{ if(typeof renderSubOverview==='function') renderSubOverview(); }catch(e){}
   try{ if(typeof renderHours==='function') renderHours(); }catch(e){}

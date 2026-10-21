@@ -40,11 +40,16 @@ function validateMerchantActivity(opts) {
   }
 
   const row = cat.findById(activityId);
+  const marketplace = (typeof cat.marketplaceSpecForActivity === 'function')
+    ? cat.marketplaceSpecForActivity(activityId)
+    : null;
   return {
     ok: true,
     activityId,
     activity: row ? (row.nameAr || activityId) : activityId,
     category: cat.legacyCategoryFromActivity(activityId),
+    marketplaceCategoryId: marketplace && marketplace.categoryId ? marketplace.categoryId : null,
+    preferredSubcat: marketplace && marketplace.preferredSubcat ? marketplace.preferredSubcat : null,
   };
 }
 
@@ -67,4 +72,11 @@ module.exports = {
   loadCatalog,
   validateMerchantActivity,
   normalizeAccountActivityFields,
+  marketplaceSpecForActivity: function (activityId) {
+    const cat = loadCatalog();
+    if (typeof cat.marketplaceSpecForActivity === 'function') {
+      return cat.marketplaceSpecForActivity(activityId);
+    }
+    return null;
+  },
 };

@@ -1060,6 +1060,27 @@ function toggleAddForm(){
   body.style.display = _formOpen ? 'block' : 'none';
   btn.textContent = _formOpen ? _t2('تصغير ↑','Réduire ↑') : _t2('إضافة منتج ↓','Ajouter un produit ↓');
 }
+function _storeListingAccount(){
+  return STORE || (typeof accData !== 'undefined' ? accData : null) || { id: SESSION_ID, type: 'store' };
+}
+function mountStoreListingContext(opts){
+  opts = opts || {};
+  if(typeof RizqListingContext === 'undefined') return null;
+  var acc = _storeListingAccount();
+  var hint = document.getElementById('prod-listing-ctx-hint');
+  if(hint) hint.innerHTML = RizqListingContext.syncHintHtml(_storeDashLang());
+  return RizqListingContext.mountSelectors({
+    categorySelect: 'prod-category-id',
+    subcatSelect: 'prod-subcategory-id',
+    attrsMount: 'prod-attrs-mount',
+    context: RizqListingContext.sellerContext(acc, { accountType: 'store', accountId: SESSION_ID }),
+    lockCategory: true,
+    selectedSubcat: opts.selectedSubcat || '',
+    attrs: opts.attrs || {},
+    lang: _storeDashLang(),
+  });
+}
+
 function openAddProduct(){
   if(window._rizqDashReadOnly){
     alert(_t2('انتهت الفترة المجانية. يرجى الاشتراك في إحدى الباقات لتتمكن من إضافة إعلانات جديدة وتفعيل زر الاتصال للزبائن','La période d’essai est terminée. Veuillez souscrire à une offre pour publier de nouvelles annonces et activer le bouton d’appel pour vos clients.'));
@@ -1075,6 +1096,7 @@ function openAddProduct(){
   if(btn) btn.textContent = _t2('تصغير ↑','Réduire ↑');
   var anchor = document.getElementById('panel-products');
   if(anchor) anchor.scrollIntoView({ behavior:'smooth', block:'start' });
+  mountStoreListingContext();
 }
 
 function clearProductForm(){
@@ -1097,6 +1119,7 @@ function clearProductForm(){
   window.__rzqProdSizeStock = {};
   if(typeof rebuildProdSizeStockUI==='function') rebuildProdSizeStockUI({});
   if(typeof applyStoreInventoryPresets==='function') applyStoreInventoryPresets();
+  mountStoreListingContext();
 }
 
 // معرض صور المنتج (حتى 6 صور) — يحل محل الصورة الواحدة السابقة لدعم
@@ -1147,9 +1170,18 @@ function _rizqSyncCatalogItem(prod){
   try{
     if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN) return;
     var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
+    var ctx = (typeof RizqListingContext !== 'undefined')
+      ? RizqListingContext.sellerContext(_storeListingAccount(), { accountType: 'store', accountId: SESSION_ID })
+      : { store_id: SESSION_ID, account_id: SESSION_ID, account_type: 'store', activity_id: '', badges: {} };
     var body = {
-      accountId: SESSION_ID, kind:'product', name: prod.name, price: prod.price, cat: prod.cat,
+      accountId: SESSION_ID, storeId: SESSION_ID, kind:'product', name: prod.name, price: prod.price, cat: prod.cat,
       topicId: prod.topicId || '',
+      categoryId: prod.categoryId || '', category: prod.categoryId || '',
+      subCategoryId: prod.subcat || '', subcat: prod.subcat || '',
+      attrs: prod.attrs || {},
+      accountType: 'store', activityId: prod.activityId || ctx.activity_id || '',
+      listingSource: 'dashboard_catalog',
+      sellerContext: { storeName: ctx.store_name || (STORE && STORE.name) || '', badges: ctx.badges || {} },
       brandId: prod.brandId || '', brandName: prod.brandName || '', brandNameFr: prod.brandNameFr || '',
       modelId: prod.modelId || '', modelName: prod.modelName || '', modelNameFr: prod.modelNameFr || '',
       desc: prod.desc, stock: prod.stock, variants: prod.variants, sizeStock: prod.sizeStock || null,
@@ -1157,6 +1189,11 @@ function _rizqSyncCatalogItem(prod){
       status: prod.status==='pending_review' ? 'pending_review' : (prod.status==='inactive'?'inactive':'active'),
       images: (prod.imgDataArr && prod.imgDataArr.length) ? prod.imgDataArr : (prod.imgData ? [prod.imgData] : [])
     };
+    if(typeof RizqListingContext !== 'undefined'){
+      body = RizqListingContext.enrichPayload(body, ctx, {
+        categoryId: prod.categoryId, subcat: prod.subcat, attrs: prod.attrs || {}
+      });
+    }
     if(prod._backendId){
       fetch(base+'/api/catalog/'+encodeURIComponent(prod._backendId), {
         method:'PATCH', headers:{'Content-Type':'application/json','x-account-token':(window.REAL_ACCESS_TOKEN || SESSION_TOKEN)}, body: JSON.stringify(body)
@@ -1355,12 +1392,25 @@ function saveProduct(){
   const name = document.getElementById('prod-name').value.trim();
   const price = document.getElementById('prod-price').value;
   if(!name||!price){showToast(_t2('يرجى إدخال الاسم والسعر','Veuillez saisir le nom et le prix'),'error');return;}
+  var _listingForm = (typeof RizqListingContext !== 'undefined')
+    ? RizqListingContext.collectForm({
+        categorySelect: 'prod-category-id',
+        subcatSelect: 'prod-subcategory-id',
+        attrsMount: 'prod-attrs-mount',
+        context: RizqListingContext.sellerContext(_storeListingAccount(), { accountType: 'store', accountId: SESSION_ID }),
+      })
+    : { categoryId: '', subcat: '', attrs: {} };
+  if(!_listingForm.subcat){
+    showToast(_t2('اختر النوع / الفرع للمنتج (مثل هواتف ذكية)','Choisissez le sous-type du produit'),'error');
+    return;
+  }
   const adData = {
     id: 'STR-' + Date.now(),
     title: name,
     desc: document.getElementById('prod-desc') ? document.getElementById('prod-desc').value.trim() : '',
     price: price,
-    category: 'store',
+    category: _listingForm.categoryId || 'store',
+    subcat: _listingForm.subcat,
     images: [],
     seller: typeof accData !== 'undefined' ? (accData.name||_t2('محل','Boutique')) : _t2('محل','Boutique'),
     seller_trust_score: 70,
@@ -1393,6 +1443,15 @@ function saveProduct(){
       name, price,
       topicId: topic ? topic.id : (topicId || (_editing && _editing.topicId) || ''),
       cat: catName || (topic ? topic.nameAr : ''),
+      categoryId: _listingForm.categoryId || '',
+      category: _listingForm.categoryId || '',
+      subCategoryId: _listingForm.subcat || '',
+      subcat: _listingForm.subcat || '',
+      attrs: _listingForm.attrs || {},
+      accountType: 'store',
+      storeId: SESSION_ID,
+      activityId: (_storeListingAccount() && _storeListingAccount().activityId) || '',
+      listingSource: 'dashboard_catalog',
       desc: document.getElementById('prod-desc') ? document.getElementById('prod-desc').value.trim() : '',
       stock: document.getElementById('prod-stock') ? document.getElementById('prod-stock').value : '',
       variants: document.getElementById('prod-variants') ? document.getElementById('prod-variants').value.trim() : '',
@@ -1489,6 +1548,7 @@ function editProduct(i){
   if(typeof rebuildProdSizeStockUI==='function') rebuildProdSizeStockUI(window.__rzqProdSizeStock);
   if(typeof applyStoreInventoryPresets==='function') applyStoreInventoryPresets();
   openAddProduct();
+  mountStoreListingContext({ selectedSubcat: p.subcat || p.subCategoryId || '', attrs: p.attrs || {} });
 }
 
 function deleteProduct(i){

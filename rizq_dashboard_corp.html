@@ -22,7 +22,10 @@
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
 <script src="rizq_packages_config.js?v=16.3"></script>
-<script src="rizq_merchant_activities.js?v=1"></script>
+<script src="rizq_merchant_activities.js?v=2.2"></script>
+<script src="rizq_categories_config.js?v=1.0"></script>
+<script src="rizq_dyn_filters.js?v=1.0"></script>
+<script src="rizq_listing_context.js?v=1.0"></script>
 <script src="rizq_brands_catalog.js?v=9"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
@@ -302,15 +305,19 @@
             <div class="form-group"><label class="form-label" data-t="pr-price-label">السعر (MRU)</label><input class="form-input" id="pr-price" type="number" placeholder="0"/></div>
           </div>
           <div class="form-grid">
-            <div class="form-group"><label class="form-label" data-t="pr-cat-label">التصنيف</label>
-              <select class="form-input" id="pr-cat">
-                <option data-t="pr-cat-opt-vehicles">سيارات ومركبات</option><option data-t="pr-cat-opt-realestate">عقارات</option><option data-t="pr-cat-opt-electronics">إلكترونيات</option>
-                <option data-t="pr-cat-opt-fashion">ملابس وأزياء</option><option data-t="pr-cat-opt-furniture">أثاث ومنزل</option><option data-t="pr-cat-opt-food">مواد غذائية</option><option data-t="pr-cat-opt-heavy">معدات ثقيلة</option><option data-t="pr-cat-opt-other">أخرى</option>
+            <div class="form-group"><label class="form-label" data-t="pr-cat-label">قسم السوق (مربوط بنشاطك)</label>
+              <select class="form-input" id="pr-cat" aria-label="category_id">
+                <option value="">—</option>
               </select>
             </div>
-            <div class="form-group"><label class="form-label" data-t="pr-emoji-label">الأيقونة (emoji)</label><input class="form-input" id="pr-emoji" placeholder="🚗" maxlength="4"/></div>
+            <div class="form-group"><label class="form-label">النوع / الفرع *</label>
+              <select class="form-input" id="pr-subcategory-id" aria-label="sub_category_id"></select>
+            </div>
           </div>
+          <div id="pr-attrs-mount" style="margin-top:10px;display:none"></div>
+          <div id="pr-listing-ctx-hint"></div>
           <div class="form-grid">
+            <div class="form-group"><label class="form-label" data-t="pr-emoji-label">الأيقونة (emoji)</label><input class="form-input" id="pr-emoji" placeholder="🚗" maxlength="4"/></div>
             <div class="form-group"><label class="form-label" data-t="pr-brand-label">الماركة</label>
               <select class="form-input" id="pr-brand" onchange="onCorpBrandChange()"><option value="">— الماركة —</option></select>
             </div>

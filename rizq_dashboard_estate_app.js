@@ -389,15 +389,66 @@ function closePropForm() {
   if (card) card.style.display = 'none';
 }
 
+function _estatePreferredSubcat(type, deal) {
+  var sale = deal === 'sale';
+  var rent = deal === 'rent' || deal === 'daily';
+  if (type === 'apartment') return sale ? 'شقق للبيع' : (deal === 'daily' ? 'إيجار يومي / سياحي' : 'شقق للكراء');
+  if (type === 'villa' || type === 'house') return sale ? 'منازل وفيلات' : 'منازل للكراء';
+  if (type === 'land') return 'أراضي';
+  if (type === 'commercial') return sale ? 'محلات تجارية' : 'محلات للكراء';
+  return sale ? 'شقق للبيع' : 'شقق للكراء';
+}
+function mountEstateListingContext(opts) {
+  opts = opts || {};
+  if (typeof RizqListingContext === 'undefined') return;
+  var hint = document.getElementById('pf-listing-ctx-hint');
+  if (hint) hint.innerHTML = RizqListingContext.syncHintHtml((typeof _estIsFr === 'function' && _estIsFr()) ? 'fr' : 'ar');
+  var preferred = opts.selectedSubcat || '';
+  if (!preferred) {
+    var tEl = document.getElementById('pf-type');
+    var dEl = document.getElementById('pf-deal');
+    preferred = _estatePreferredSubcat(tEl ? tEl.value : 'apartment', dEl ? dEl.value : 'sale');
+  }
+  RizqListingContext.mountSelectors({
+    categorySelect: 'pf-category-id',
+    subcatSelect: 'pf-subcategory-id',
+    attrsMount: 'pf-attrs-mount',
+    context: RizqListingContext.sellerContext(ACCOUNT || {}, { accountType: 'estate', accountId: (ACCOUNT && ACCOUNT.id) || SESSION_ID }),
+    lockCategory: true,
+    selectedSubcat: preferred,
+    attrs: opts.attrs || {},
+    lang: (typeof _estIsFr === 'function' && _estIsFr()) ? 'fr' : 'ar',
+  });
+}
 function bindPropForm() {
   var form = document.getElementById('prop-form');
   if (!form) return;
+  var typeEl = document.getElementById('pf-type');
+  var dealEl = document.getElementById('pf-deal');
+  function syncEstateSubcat() {
+    try { mountEstateListingContext(); } catch (eM) {}
+  }
+  if (typeEl && !typeEl._rizqCtxBound) { typeEl.addEventListener('change', syncEstateSubcat); typeEl._rizqCtxBound = true; }
+  if (dealEl && !dealEl._rizqCtxBound) { dealEl.addEventListener('change', syncEstateSubcat); dealEl._rizqCtxBound = true; }
+  try { mountEstateListingContext(); } catch (e0) {}
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var id = document.getElementById('pf-id').value || ('est_' + Date.now());
     var photos = document.getElementById('pf-photos').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
     var amenities = [];
     document.querySelectorAll('.pf-amen:checked').forEach(function (c) { amenities.push(c.value); });
+    var listingForm = (typeof RizqListingContext !== 'undefined')
+      ? RizqListingContext.collectForm({
+          categorySelect: 'pf-category-id',
+          subcatSelect: 'pf-subcategory-id',
+          attrsMount: 'pf-attrs-mount',
+          context: RizqListingContext.sellerContext(ACCOUNT || {}, { accountType: 'estate', accountId: (ACCOUNT && ACCOUNT.id) || SESSION_ID }),
+        })
+      : { categoryId: 'عقارات', subcat: '', attrs: {} };
+    if (!listingForm.subcat) {
+      toast('اختر النوع / الفرع للعقار', 'error');
+      return;
+    }
     var row = {
       id: id,
       type: document.getElementById('pf-type').value,
@@ -416,6 +467,14 @@ function bindPropForm() {
       media: document.getElementById('pf-media').value.trim(),
       map: document.getElementById('pf-map').value.trim(),
       amenities: amenities,
+      categoryId: listingForm.categoryId || 'عقارات',
+      subCategoryId: listingForm.subcat,
+      subcat: listingForm.subcat,
+      attrs: listingForm.attrs || {},
+      accountType: 'estate',
+      storeId: (ACCOUNT && ACCOUNT.id) || SESSION_ID,
+      activityId: (ACCOUNT && ACCOUNT.activityId) || '',
+      listingSource: 'dashboard_catalog',
       status: 'active',
       views: 0,
       updatedAt: new Date().toISOString()
@@ -440,34 +499,58 @@ function bindPropForm() {
 function syncPropToCatalog(row) {
   if (!CTX || !CTX.accessToken || !window.RIZQ_BACKEND_BASE || !ACCOUNT || IS_DEMO) return;
   var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
+  var ctx = (typeof RizqListingContext !== 'undefined')
+    ? RizqListingContext.sellerContext(ACCOUNT, { accountType: 'estate', accountId: ACCOUNT.id })
+    : { store_id: ACCOUNT.id, account_id: ACCOUNT.id, account_type: 'estate', activity_id: ACCOUNT.activityId || '', badges: {} };
+  var body = {
+    accountId: ACCOUNT.id,
+    storeId: ACCOUNT.id,
+    kind: 'product',
+    name: row.title,
+    title: row.title,
+    price: row.price,
+    desc: row.desc,
+    categoryId: row.categoryId || 'عقارات',
+    category: row.categoryId || 'عقارات',
+    subCategoryId: row.subcat || '',
+    subcat: row.subcat || '',
+    cat: row.subcat || row.categoryId || 'عقارات',
+    attrs: Object.assign({}, row.attrs || {}, {
+      area: row.area, rooms: row.rooms, baths: row.baths, floor: row.floor, finish: row.finish
+    }),
+    accountType: 'estate',
+    activityId: row.activityId || ACCOUNT.activityId || '',
+    listingSource: 'dashboard_catalog',
+    sellerContext: { storeName: ACCOUNT.name || '', badges: ctx.badges || {} },
+    city: row.city,
+    meta: {
+      estate: true,
+      propertyType: row.type,
+      deal: row.deal,
+      area: row.area,
+      rooms: row.rooms,
+      baths: row.baths,
+      floor: row.floor,
+      finish: row.finish,
+      zone: row.zone,
+      amenities: row.amenities,
+      map: row.map,
+      media: row.media,
+      localId: row.id
+    },
+    images: row.photos
+  };
+  if (typeof RizqListingContext !== 'undefined') {
+    body = RizqListingContext.enrichPayload(body, ctx, {
+      categoryId: row.categoryId || 'عقارات',
+      subcat: row.subcat || '',
+      attrs: body.attrs
+    });
+  }
   fetch(base + '/api/catalog', {
     method: 'POST',
     headers: Object.assign({ 'Content-Type': 'application/json' }, RizqDash.authHeaders(CTX.accessToken)),
-    body: JSON.stringify({
-      accountId: ACCOUNT.id,
-      kind: 'product',
-      title: row.title,
-      price: row.price,
-      desc: row.desc,
-      category: 'عقارات',
-      city: row.city,
-      meta: {
-        estate: true,
-        propertyType: row.type,
-        deal: row.deal,
-        area: row.area,
-        rooms: row.rooms,
-        baths: row.baths,
-        floor: row.floor,
-        finish: row.finish,
-        zone: row.zone,
-        amenities: row.amenities,
-        map: row.map,
-        media: row.media,
-        localId: row.id
-      },
-      images: row.photos
-    })
+    body: JSON.stringify(body)
   }).catch(function () {});
 }
 
