@@ -86,8 +86,9 @@
       '<div class="rmh-cart-panel" id="rmh-cart-panel" role="dialog" aria-label="ملخص السلة">' +
       '<h4>سلتك — لم تُكمَل بعد</h4><div id="rmh-cart-body"><p class="rmh-cart-empty">السلة فارغة</p></div>' +
       '<a class="rmh-cart-open-full" href="rizq_cart.html">فتح السلة بالتفاصيل</a></div></div>' +
-      '<a class="rmh-ico" href="rizq_browse.html?fav=1" aria-label="المفضلة">' +
-      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 20s-6.5-4.2-8.5-8A4.6 4.6 0 0 1 12 7.2 4.6 4.6 0 0 1 20.5 12c-2 3.8-8.5 8-8.5 8z"/></svg></a>' +
+      '<a class="rmh-ico rmh-fav-link" href="rizq_favorites.html" data-rizq-fav-wrap aria-label="المفضلة العامة" title="المفضلة العامة">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 20s-6.5-4.2-8.5-8A4.6 4.6 0 0 1 12 7.2 4.6 4.6 0 0 1 20.5 12c-2 3.8-8.5 8-8.5 8z"/></svg>' +
+      '<span class="rmh-cart-badge rmh-fav-badge" id="rmh-fav-badge" data-rizq-fav-count hidden>0</span></a>' +
       '<div class="rizq-help-dd rmh-help-dd" id="rmh-help-wrap" data-rizq-toolbar="help">' +
       '<button type="button" class="rizq-help-dd-btn rmh-ico" id="rmh-help-btn" aria-haspopup="true" aria-expanded="false" aria-controls="rmh-help-menu" aria-label="المساعدة والدعم" title="المساعدة والدعم">' +
       '<span class="rizq-help-dd-chev" aria-hidden="true">▾</span>' +
@@ -186,10 +187,32 @@
   function readCart() {
     try {
       var c = JSON.parse(localStorage.getItem('rizq_cart') || '[]');
-      if (Array.isArray(c) && c.length) return c;
-    } catch (e) { /* ignore */ }
-    // معاينة النموذج فقط — لا تُكتب في localStorage
+      return Array.isArray(c) ? c : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function readCartForPanel() {
+    var c = readCart();
+    if (c.length) return c;
+    // معاينة النموذج فقط عند الفراغ — لا تُكتب في localStorage ولا تُحسب في الشارة
     return (DEMO_CART || []).slice();
+  }
+
+  function readWishlistCount() {
+    try {
+      if (window.RizqUx && typeof window.RizqUx.harvestLocalWishlists === 'function') {
+        window.RizqUx.harvestLocalWishlists({ silent: true });
+      }
+      if (window.RizqUx && typeof window.RizqUx.wishlistIds === 'function') {
+        return window.RizqUx.wishlistIds().length;
+      }
+      var ids = JSON.parse(localStorage.getItem('rizq_wishlist') || '[]');
+      return Array.isArray(ids) ? ids.length : 0;
+    } catch (e) {
+      return 0;
+    }
   }
 
   function moduleOf(item) {
@@ -218,6 +241,32 @@
     }, 0);
   }
 
+  function refreshFavBadge() {
+    var badge = document.getElementById('rmh-fav-badge');
+    if (!badge) return;
+    var n = readWishlistCount();
+    badge.textContent = n > 99 ? '99+' : String(n);
+    if (n > 0) {
+      badge.hidden = false;
+      try { badge.removeAttribute('hidden'); } catch (eH) {}
+      badge.classList.remove('is-empty');
+    } else {
+      badge.hidden = true;
+      badge.classList.add('is-empty');
+    }
+    var link = document.querySelector('.rmh-fav-link');
+    if (link) {
+      var fr = false;
+      try { fr = (localStorage.getItem('rizq_lang') || 'ar') === 'fr'; } catch (eL) {}
+      var lbl = n > 0
+        ? (fr ? ('Favoris généraux (' + n + ')') : ('المفضلة العامة (' + n + ')'))
+        : (fr ? 'Favoris généraux' : 'المفضلة العامة');
+      link.setAttribute('aria-label', lbl);
+      link.setAttribute('title', lbl);
+      link.classList.toggle('has-favs', n > 0);
+    }
+  }
+
   function refreshBadge() {
     var badge = document.getElementById('rmh-cart-badge');
     if (!badge) return;
@@ -225,6 +274,7 @@
     badge.textContent = String(n);
     if (n > 0) {
       badge.hidden = false;
+      try { badge.removeAttribute('hidden'); } catch (eH2) {}
       badge.classList.remove('is-empty');
     } else {
       badge.hidden = true;
@@ -241,7 +291,8 @@
     var body = document.getElementById('rmh-cart-body');
     if (!body) return;
     var fr = document.documentElement.lang === 'fr';
-    var items = readCart();
+    // الشارة تعتمد readCart() فقط؛ اللوحة تعرض السلة الحقيقية أو معاينة DEMO عند الفراغ
+    var items = readCartForPanel();
     if (!items.length) {
       body.innerHTML = '<p class="rmh-cart-empty">' + (fr ? 'Panier vide' : 'السلة فارغة') + '</p>';
       return;
@@ -1037,6 +1088,7 @@
     markActiveFromPage();
     fillCategories();
     refreshBadge();
+    refreshFavBadge();
     renderCartPanel();
     wireCart();
     wireLang();
@@ -1052,6 +1104,8 @@
       ensureHeroTagline();
       syncMockHdrHeight();
       markActiveFromPage();
+      refreshBadge();
+      refreshFavBadge();
     }, 1200);
     window.addEventListener('resize', syncMockHdrHeight);
     window.addEventListener('storage', function (ev) {
@@ -1059,6 +1113,21 @@
         refreshBadge();
         renderCartPanel();
       }
+      if (
+        ev.key === 'rizq_wishlist' ||
+        ev.key === 'rizq_wishlist_meta' ||
+        (ev.key && ev.key.indexOf('rizq_wishlist_') === 0) ||
+        ev.key === 'rizq_showroom_wishlist'
+      ) {
+        refreshFavBadge();
+      }
+    });
+    document.addEventListener('rizq_wishlist', function () {
+      refreshFavBadge();
+    });
+    document.addEventListener('rizq_cart', function () {
+      refreshBadge();
+      renderCartPanel();
     });
   }
 
