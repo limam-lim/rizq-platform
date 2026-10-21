@@ -5703,7 +5703,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="rzq-disc-wrap fade-in" style="margin-top:22px">
       <div class="rizq-dual-cta">
         <a class="landing-ads-browse-full" href="rizq_estate_agencies.html" data-t="browse-estate">عرض سوق كل العقارات ←</a>
-        <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency" onclick="openRegisterAs('company','office','of_realestate_agency');return false"
+        <a href="rizq_real_estate_register.html" onclick="openRegisterAs('estate');return false"
            class="rizq-dual-cta-own" data-t="ve-btn1">امتلك واجهتك العقارية على رزق</a>
       </div>
       <p class="rizq-sub-cta-sub" data-t="ve-btn1-sub">اشترك الآن. عقارك يصل لمن يبحث بجدية.</p>
@@ -6290,12 +6290,22 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           <div id="chk-private" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
         </div>
 
+        <!-- سوق العقارات — مسار مستقل → داشبورد العقارات -->
+        <div id="type-estate" onclick="selectType('estate')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
+          <div class="cat-icon-box" style="flex-shrink:0">🏠</div>
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px"><span class="ar-only">سوق العقارات</span><span class="fr-only">Marché immobilier</span></div>
+            <div style="font-size:11.5px;color:var(--text-muted)"><span class="ar-only">وكالة · مطور · مالك — لوحة عقارات مستقلة مثل المحل والمكتب</span><span class="fr-only">Agence · promoteur · propriétaire — tableau immobilier dédié</span></div>
+          </div>
+          <div id="chk-estate" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
+        </div>
+
         <!-- شركة -->
         <div id="type-company" onclick="selectType('company')" style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:18px 16px;cursor:pointer;transition:all .35s;text-align:right">
           <div class="cat-icon-box" style="flex-shrink:0">🏛️</div>
           <div style="flex:1">
             <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px"><span class="ar-only">شركة أو مؤسسة</span><span class="fr-only">Société ou établissement</span></div>
-            <div style="font-size:11.5px;color:var(--text-muted)"><span class="ar-only">للتجار والشركات — حساب موثّق</span><span class="fr-only">Commerçants et entreprises — compte vérifié</span></div>
+            <div style="font-size:11.5px;color:var(--text-muted)"><span class="ar-only">محل · مكتب · معرض/مصنع — حساب موثّق</span><span class="fr-only">Boutique · bureau · showroom — compte vérifié</span></div>
           </div>
           <div id="chk-company" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
         </div>
@@ -6361,7 +6371,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           <div style="width:46px;height:46px;background:linear-gradient(135deg,var(--royal),var(--royal-light));border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:1px solid rgba(201,168,76,.2)">🏢</div>
           <div style="flex:1;text-align:right">
             <div data-t-fr="Bureau virtuel" style="font-size:14px;font-weight:700;color:#1b3a6b;margin-bottom:2px">مكتب افتراضي</div>
-            <div data-t-fr="Avocat, assurance, immobilier, services administratifs — licence d'activité requise" style="font-size:11px;color:var(--text-muted)">محامٍ، تأمين، عقار، خدمات إدارية — رخصة النشاط مطلوبة</div>
+            <div data-t-fr="Avocat, assurance, services administratifs — licence d'activité requise (l'immobilier = Marché immobilier)" style="font-size:11px;color:var(--text-muted)">محامٍ، تأمين، خدمات إدارية — رخصة النشاط (العقارات من «سوق العقارات»)</div>
           </div>
           <div id="chk-biz-office" style="width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
         </div>
@@ -11144,8 +11154,10 @@ const TR = {
     'type-sub':        'للنشر والإدارة فقط — حساب التصفح والشراء من «حسابي».',
     'type-priv-title': 'حساب خاص (بائع)',
     'type-priv-sub':   'للأفراد — انشر إعلاناتك بسهولة',
+    'type-estate-title': 'سوق العقارات',
+    'type-estate-sub':   'وكالة · مطور · مالك — لوحة عقارات مستقلة مثل المحل والمكتب',
     'type-co-title':   'شركة أو مؤسسة',
-    'type-co-sub':     'للتجار والشركات — حساب موثّق',
+    'type-co-sub':     'محل · مكتب · معرض/مصنع — حساب موثّق',
     'type-next':       'التالي ←',
     'type-back':       '← عودة لتسجيل الدخول',
     // Auth — nationality
@@ -11261,8 +11273,10 @@ const TR = {
     'type-sub':        'Publication et gestion uniquement — navigation/achat via « Mon compte ».',
     'type-priv-title': 'Compte privé (vendeur)',
     'type-priv-sub':   'Pour les particuliers — publiez vos annonces',
+    'type-estate-title': 'Marché immobilier',
+    'type-estate-sub':   'Agence · promoteur · propriétaire — tableau immobilier dédié',
     'type-co-title':   'Entreprise ou organisation',
-    'type-co-sub':     'Pour les commerçants et entreprises — compte vérifié',
+    'type-co-sub':     'Boutique · bureau · showroom — compte vérifié',
     'type-next':       'Suivant →',
     'type-back':       '← Retour à la connexion',
     'nat-title':       'Compte particulier',
@@ -11430,6 +11444,8 @@ function applyFullTranslation(lang) {
   const typeSub     = q('#p-type > p');
   const typePrivT   = q('#type-private > div:nth-child(2) > div:first-child');
   const typePrivS   = q('#type-private > div:nth-child(2) > div:last-child');
+  const typeEstT    = q('#type-estate > div:nth-child(2) > div:first-child');
+  const typeEstS    = q('#type-estate > div:nth-child(2) > div:last-child');
   const typeCoT     = q('#type-company > div:nth-child(2) > div:first-child');
   const typeCoS     = q('#type-company > div:nth-child(2) > div:last-child');
   const typeNext    = q('#p-type .m-btn-main');
@@ -11438,6 +11454,8 @@ function applyFullTranslation(lang) {
   if(typeSub)   typeSub.textContent   = t['type-sub'];
   if(typePrivT) typePrivT.textContent  = t['type-priv-title'];
   if(typePrivS) typePrivS.textContent  = t['type-priv-sub'];
+  if(typeEstT)  typeEstT.textContent   = t['type-estate-title'];
+  if(typeEstS)  typeEstS.textContent   = t['type-estate-sub'];
   if(typeCoT)   typeCoT.textContent    = t['type-co-title'];
   if(typeCoS)   typeCoS.textContent    = t['type-co-sub'];
   if(typeNext)  typeNext.textContent   = t['type-next'];
@@ -12154,6 +12172,15 @@ document.getElementById('modal').addEventListener('click',function(e){
     try{
       var p=new URLSearchParams(window.location.search);
       if(p.get('openRegister')==='1' && !openedRegister && typeof openModal==='function'){
+        var preTypeEarly=p.get('preType')||p.get('type')||'';
+        var preBizEarly=p.get('preBiz')||p.get('biz')||'';
+        var preActivityEarly=p.get('preActivity')||p.get('activity')||'';
+        /* روابط قديمة (مكتب+وساطة عقارية) → مسار سوق العقارات المستقل */
+        if(preTypeEarly==='estate' || preBizEarly==='estate' || preActivityEarly==='of_realestate_agency' || /^es_/.test(preActivityEarly)){
+          openedRegister=true;
+          location.replace('rizq_real_estate_register.html');
+          return;
+        }
         openedRegister=true;
         if(p.get('regPage')!=='1'){
           document.documentElement.classList.add('rizq-reg-page');
@@ -12164,9 +12191,9 @@ document.getElementById('modal').addEventListener('click',function(e){
           }catch(eR){}
         }
         openModal('register');
-        var preType=p.get('preType')||p.get('type')||'';
-        var preBiz=p.get('preBiz')||p.get('biz')||'';
-        var preActivity=p.get('preActivity')||p.get('activity')||'';
+        var preType=preTypeEarly;
+        var preBiz=preBizEarly;
+        var preActivity=preActivityEarly;
         if(preActivity){
           try { window._rizqPreActivity = String(preActivity).slice(0, 80); } catch(ePA) {}
         }
@@ -12229,6 +12256,14 @@ function setDot(active,total){
 
 // نوع الحساب
 function openRegisterAs(type, biz, activityId){
+  /* سوق العقارات = مسار مستقل (ليس مكتب of_realestate) */
+  var t = String(type || '');
+  var b = String(biz || '');
+  var act = String(activityId || '');
+  if(t==='estate' || b==='estate' || act==='of_realestate_agency' || /^es_/.test(act)){
+    location.href='rizq_real_estate_register.html';
+    return;
+  }
   var q='./?openRegister=1&regPage=1';
   if(type) q+='&preType='+encodeURIComponent(type);
   if(biz) q+='&preBiz='+encodeURIComponent(biz);
@@ -13235,7 +13270,7 @@ function selectType(t){
     return;
   }
   acctType=t;
-  ['private','company'].forEach(x=>{
+  ['private','estate','company'].forEach(x=>{
     const card=document.getElementById('type-'+x);
     const chk=document.getElementById('chk-'+x);
     if(!card||!chk) return;
@@ -13259,6 +13294,11 @@ function goFromType(){
   if(!acctType){alert(isAr?'يرجى اختيار نوع الحساب':'Veuillez choisir le type de compte');return;}
   if(acctType==='browse'){
     location.href='rizq_register.html?mode=buyer';
+    return;
+  }
+  if(acctType==='estate'){
+    /* مسار مستقل مثل المحل/المكتب → تسجيل عقاري ثم داشبورد العقارات */
+    location.href='rizq_real_estate_register.html';
     return;
   }
   if(acctType==='private'){
@@ -13881,6 +13921,7 @@ function goSubscribePackage(tab){
       if(tab === 'stores'){ openRegisterAs('company', 'store'); return false; }
       if(tab === 'corp'){ openRegisterAs('company', 'corp'); return false; }
       if(tab === 'offices'){ openRegisterAs('company', 'office'); return false; }
+      if(tab === 'estate' || tab === 'estates' || tab === 'realestate'){ openRegisterAs('estate'); return false; }
       if(tab === 'tender' || tab === 'investment'){ openRegisterAs('company'); return false; }
       if(tab === 'individual'){ openRegisterAs('private'); return false; }
     }
@@ -14874,6 +14915,7 @@ function pkgModalCTA(){
   else if(origin==='stores') openRegisterAs('company','store');
   else if(origin==='offices') openRegisterAs('company','office');
   else if(origin==='corp') openRegisterAs('company','corp');
+  else if(origin==='estate' || origin==='estates' || origin==='realestate') openRegisterAs('estate');
   else location.href='rizq_register.html?mode=seller';
 }
 </script>
@@ -15047,6 +15089,7 @@ function closeRvidPopup(){ document.getElementById('rvid-overlay').classList.rem
       if (!flags || typeof flags !== 'object') return;
       if (window.RizqDynamicNav) window.RizqDynamicNav.apply(flags);
       if (flags.individual === false) { var tp = document.getElementById('type-private'); if (tp) tp.style.display = 'none'; }
+      if (flags.estate === false)     { var te = document.getElementById('type-estate');  if (te) te.style.display = 'none'; }
       if (flags.store === false)      { var bs = document.getElementById('biz-store');    if (bs) bs.style.display = 'none'; }
       if (flags.office === false)     { var bo = document.getElementById('biz-office');   if (bo) bo.style.display = 'none'; }
       if (flags.corp === false)       { var bc = document.getElementById('biz-corp');     if (bc) bc.style.display = 'none'; }

@@ -190,7 +190,7 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
     <h1 id="ag-title">دليل <span>الوكالات العقارية</span></h1>
     <p class="ag-sub" id="ag-sub">وكالات موثوقة بهوية واضحة — اختر وكالة وافتح صفحتها.</p>
     <div class="ag-own-wrap" data-rizq-estate-promo="1">
-      <a class="ag-own-btn" id="ag-reg-own" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office&amp;preActivity=of_realestate_agency">✨ امتلك وكالتك العقارية على رزق</a>
+      <a class="ag-own-btn" id="ag-reg-own" href="rizq_real_estate_register.html">✨ امتلك وكالتك العقارية على رزق</a>
     </div>
   </div>
 </section>
@@ -492,7 +492,10 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
     el.addEventListener('click', function(e){
       if(typeof window.openRegisterAs === 'function'){
         e.preventDefault();
-        window.openRegisterAs('company','office','of_realestate_agency');
+        window.openRegisterAs('estate');
+      } else {
+        e.preventDefault();
+        location.href = 'rizq_real_estate_register.html';
       }
     });
   }
