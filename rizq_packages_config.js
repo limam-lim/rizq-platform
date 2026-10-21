@@ -615,11 +615,11 @@ var CATALOGS = {
       features: ['حتى 200 عقار', 'فيديو تعريفي', 'تقارير سنوية', 'دعم VIP'],
       features_fr: ['Jusqu\'à 200 biens', 'Vidéo de présentation', 'Rapports annuels', 'Support VIP'] },
     { id: 'es-diam-std', price: null, pricePending: true, durationDays: 30, maxCatalogItems: Infinity, discountPct: 0, diamond: true, diamondTier: 'diamond_standard',
-      features: ['عقارات غير محدودة', 'أولوية ظهور', 'جاهزية قنوات التواصل للمنصة'],
-      features_fr: ['Biens illimités', 'Visibilité prioritaire', 'Canaux plateforme prêts'] },
+      features: ['عقارات غير محدودة', 'أولوية ظهور', 'الوكيل الذكي (ردود واستفسارات)', 'جاهزية قنوات التواصل للمنصة'],
+      features_fr: ['Biens illimités', 'Visibilité prioritaire', 'Agent intelligent (réponses)', 'Canaux plateforme prêts'] },
     { id: 'es-diam-pro', price: null, pricePending: true, durationDays: 30, maxCatalogItems: Infinity, discountPct: 0, diamond: true, diamondTier: 'diamond_pro',
-      features: ['كل مزايا الماسية الأساسية', 'حصص أعلى للمنصة', 'دعم مؤسسي'],
-      features_fr: ['Tous les avantages Diamond Standard', 'Quotas plateforme élevés', 'Support entreprise'] }
+      features: ['كل مزايا الماسية الأساسية', 'الوكيل الذكي + رد تلقائي مكالمات', 'حصص أعلى للمنصة', 'دعم مؤسسي'],
+      features_fr: ['Tous les avantages Diamond Standard', 'Agent IA + réponse auto appels', 'Quotas plateforme élevés', 'Support entreprise'] }
   ],
   office: [
     { id: 'of-trial', price: 0, durationDays: 10, maxCatalogItems: 3, discountPct: 0,
@@ -1004,7 +1004,7 @@ function enrichForDisplay(pkg, lang) {
 }
 
 /** Bump when code defaults change — triggers localStorage re-seed on next page load */
-var CATALOG_SYNC_REVISION = '2026-09-16-trial-10d';
+var CATALOG_SYNC_REVISION = '2026-10-21-estate-ai-unified';
 var CATALOG_SYNC_LS_KEY = 'rizq_catalog_sync_revision';
 var STALE_PKG_FEATURE_MARKERS = [
   'فيديو إعلاني واحد',

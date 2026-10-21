@@ -1,4 +1,4 @@
-/* rizq_dashboard_estate_app.js — لوحة عقارات بهوية منصة رزق (بدون وكيل ذكي) */
+/* rizq_dashboard_estate_app.js — لوحة عقارات بهوية منصة رزق (+ وكيل ذكي موحّد) */
 if (window.RizqDash && RizqDash.purgeSensitiveTokensFromStorage) {
   try { RizqDash.purgeSensitiveTokensFromStorage(); RizqDash.stripUrlToken(); } catch (e0) {}
 }
@@ -36,7 +36,8 @@ var PANEL_TITLES = {
   referral: _t2('🎁 إحالة الأصدقاء', '🎁 Parrainage'),
   verifiedplus: _t2('🛡️ شارة موثّق⁺', '🛡️ Badge Vérifié⁺'),
   mypayments: _t2('🏦 طرق الدفع', '🏦 Paiements'),
-  settings: _t2('⚙️ الإعدادات', '⚙️ Paramètres')
+  settings: _t2('⚙️ الإعدادات', '⚙️ Paramètres'),
+  agents: _t2('🤖 الوكيل الذكي', '🤖 Agent intelligent')
 };
 var DAYS = [
   { id: 'sat', ar: _t2('السبت', 'Sam') }, { id: 'sun', ar: _t2('الأحد', 'Dim') }, { id: 'mon', ar: _t2('الإثنين', 'Lun') },
@@ -76,7 +77,8 @@ function applyEstateLangShell() {
     referral: PANEL_TITLES.referral,
     verifiedplus: PANEL_TITLES.verifiedplus,
     mypayments: PANEL_TITLES.mypayments,
-    settings: PANEL_TITLES.settings
+    settings: PANEL_TITLES.settings,
+    agents: PANEL_TITLES.agents
   };
   document.querySelectorAll('.sb-item[onclick]').forEach(function (el) {
     var m = String(el.getAttribute('onclick') || '').match(/showPanel\('([^']+)'/);
@@ -121,7 +123,17 @@ function showPanel(id, el) {
   if (id === 'subscription') renderPackages();
   if (id === 'referral') renderReferral();
   if (id === 'verifiedplus') renderVerifiedPlus();
-  if (id === 'mypayments') renderPayments();
+  if (id === 'mypayments') {
+    renderPayments();
+    if (typeof renderMyPayments === 'function') renderMyPayments();
+    try {
+      if (window.RizqMrPaymentCatalog) {
+        if (typeof RizqMrPaymentCatalog.renderReference === 'function') RizqMrPaymentCatalog.renderReference('#mr-pay-catalog-ref');
+        if (typeof RizqMrPaymentCatalog.enhanceField === 'function') RizqMrPaymentCatalog.enhanceField('#mypay-bank');
+      }
+    } catch (ePay) {}
+  }
+  if (id === 'agents') renderAgents();
   if (id === 'tenders') renderTenders();
   if (window.innerWidth < 900) {
     var sb = document.getElementById('sidebar');
@@ -288,6 +300,7 @@ function renderServicesShowcase() {
     { icon: '📸', title: 'معرض صور', tip: 'صور وخطط أرضية', panel: 'photos', ok: true },
     { icon: '🎁', title: 'إحالة', tip: 'دعوة الأصدقاء', panel: 'referral', ok: true },
     { icon: '🛡️', title: 'موثّق⁺', tip: 'شارة الثقة', panel: 'verifiedplus', ok: true },
+    { icon: '🤖', title: 'الوكيل الذكي', tip: 'ردود تلقائية واستوديو تدريب', panel: 'agents', ok: true },
     { icon: '🏦', title: 'طرق دفع', tip: 'حسابات التحويل', panel: 'mypayments', ok: true },
     { icon: '💳', title: 'اشتراكي', tip: 'الباقة وحدود العقارات', panel: 'subscription', ok: true }
   ];
@@ -681,24 +694,182 @@ function renderVerifiedPlus() {
     : '<div style="padding:12px;border-radius:12px;background:#fff7ed;color:#9a3412;font-weight:700;line-height:1.7">غير مفعّلة بعد. اطلب التفعيل من الإدارة عبر طلب موثّق⁺ في المنصة.</div>';
 }
 
+function getMyPayKey() {
+  return 'rizq_my_payments_' + ((ACCOUNT && ACCOUNT.id) || SESSION_ID || 'demo');
+}
+var DEMO_PAYMENTS = [];
+function getMyPayments() {
+  var accId = (ACCOUNT && ACCOUNT.id) || SESSION_ID || 'demo';
+  if (typeof RizqAccountPayments !== 'undefined') {
+    return RizqAccountPayments.getLocal(accId, IS_DEMO, DEMO_PAYMENTS);
+  }
+  if (IS_DEMO) return DEMO_PAYMENTS.slice();
+  try { return JSON.parse(localStorage.getItem(getMyPayKey()) || '[]'); } catch (e) { return []; }
+}
+function saveMyPayments(arr) {
+  var accId = (ACCOUNT && ACCOUNT.id) || SESSION_ID || 'demo';
+  if (typeof RizqAccountPayments !== 'undefined') {
+    return RizqAccountPayments.persist(accId, arr, window.REAL_ACCESS_TOKEN || SESSION_TOKEN, IS_DEMO).then(function (saved) {
+      if (Array.isArray(saved)) localStorage.setItem(getMyPayKey(), JSON.stringify(saved));
+    });
+  }
+  localStorage.setItem(getMyPayKey(), JSON.stringify(arr || []));
+  return Promise.resolve();
+}
 function renderPayments() {
-  var root = document.getElementById('mypayments-root');
-  if (!root) return;
-  if (typeof RizqAccountPayments !== 'undefined' && ACCOUNT && !IS_DEMO) {
-    root.innerHTML = '<div id="estate-pay-mount"></div>';
-    try {
-      if (typeof RizqAccountPayments.render === 'function') {
-        RizqAccountPayments.render('estate-pay-mount', ACCOUNT.id, (CTX && CTX.accessToken) || window.REAL_ACCESS_TOKEN);
-      } else if (typeof RizqAccountPayments.mount === 'function') {
-        RizqAccountPayments.mount(root, ACCOUNT.id);
-      } else {
-        root.innerHTML = '<p style="font-size:12.5px;color:var(--text-muted)">أضف Bankily / Masrivi / تحويل بنكي من إعدادات الدفع في المنصة. ستظهر هنا بعد الربط.</p>';
-      }
-    } catch (e) {
-      root.innerHTML = '<p style="font-size:12.5px;color:var(--text-muted)">وحدة طرق الدفع جاهزة للربط مع حسابك.</p>';
+  /* واجهة موحّدة عبر #my-payment-list + كتالوج موريتانيا — لا مزيد من النص البديل */
+  if (typeof renderMyPayments === 'function') renderMyPayments();
+  try {
+    if (window.RizqMrPaymentCatalog && typeof RizqMrPaymentCatalog.renderReference === 'function') {
+      RizqMrPaymentCatalog.renderReference('#mr-pay-catalog-ref');
+    }
+  } catch (e) {}
+}
+function renderMyPayments() {
+  var el = document.getElementById('my-payment-list');
+  if (!el) return;
+  var methods = getMyPayments();
+  if (!methods.length) {
+    el.innerHTML = '<div style="text-align:center;padding:32px;color:#9aa7bd;font-size:13px">' +
+      _t2('لا توجد طرق دفع بعد — اضغط "+ إضافة طريقة دفع" للبدء', 'Aucun moyen de paiement — cliquez sur "+ Ajouter"') + '</div>';
+    return;
+  }
+  var typeLabels = {
+    bank: _t2('🏦 تحويل بنكي', '🏦 Virement'), bankily: '📱 Bankily', sedad: '📱 Sedad',
+    bimbam: '📱 BIMBAM', mobile: _t2('📱 تطبيق آخر', '📱 Autre app'), cash: _t2('💵 نقداً', '💵 Espèces'),
+    instore: _t2('🏪 في الوكالة', '🏪 En agence'), custom: _t2('✏️ مخصص', '✏️ Perso')
+  };
+  el.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px">' + methods.map(function (m, i) {
+    var lbl = typeLabels[m.type] || m.type;
+    var bits = [];
+    if (m.code) bits.push('🔢 ' + escapeHtml(m.code));
+    if (m.phone) bits.push('📞 ' + escapeHtml(m.phone));
+    if (m.account) bits.push('🏦 ' + escapeHtml(m.account));
+    return '<div style="background:#f8faff;border:1.5px solid #e0e8ff;border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
+      '<div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
+      '<span style="font-size:13px;font-weight:700;color:#1B3A6B">' + escapeHtml(m.bank || lbl) + '</span>' +
+      '<span style="background:#e0e8ff;color:#1B3A6B;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700">' + lbl + '</span></div>' +
+      (bits.length ? '<div style="font-family:monospace;font-size:12.5px;font-weight:700;color:#0f2347;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px">' +
+        bits.map(function (b) { return '<span style="background:#e8f0fe;padding:4px 10px;border-radius:7px">' + b + '</span>'; }).join('') + '</div>' : '') +
+      (m.note ? '<div style="font-size:11.5px;color:#2C3A4F">' + escapeHtml(m.note) + '</div>' : '') +
+      '</div><div style="display:flex;gap:6px">' +
+      '<button type="button" data-idx="' + i + '" onclick="editMyPayment(this)" style="background:#e8f0fe;border:none;padding:6px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;color:#1B3A6B">✏️</button>' +
+      '<button type="button" data-idx="' + i + '" onclick="deleteMyPayment(this)" style="background:#fee2e2;border:none;padding:6px 10px;border-radius:7px;cursor:pointer;font-size:12px">🗑️</button>' +
+      '</div></div>';
+  }).join('') + '</div>';
+}
+function showAddMyPayModal() {
+  var title = document.getElementById('my-pay-modal-title');
+  if (title) title.textContent = _t2('إضافة طريقة دفع', 'Ajouter un moyen de paiement');
+  ['mypay-bank', 'mypay-code', 'mypay-phone', 'mypay-account', 'mypay-note'].forEach(function (id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  var typ = document.getElementById('mypay-type'); if (typ) typ.value = 'bank';
+  var idx = document.getElementById('mypay-edit-idx'); if (idx) idx.value = '';
+  var modal = document.getElementById('my-pay-modal');
+  if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+  try {
+    if (window.RizqMrPaymentCatalog && typeof RizqMrPaymentCatalog.enhanceField === 'function') {
+      RizqMrPaymentCatalog.enhanceField('#mypay-bank');
+    }
+  } catch (e) {}
+}
+function closeMyPayModal() {
+  var modal = document.getElementById('my-pay-modal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+function editMyPayment(btn) {
+  var i = parseInt(btn.getAttribute('data-idx'), 10);
+  var m = getMyPayments()[i];
+  if (!m) return;
+  var title = document.getElementById('my-pay-modal-title');
+  if (title) title.textContent = _t2('تعديل طريقة الدفع', 'Modifier le moyen de paiement');
+  var typ = document.getElementById('mypay-type'); if (typ) typ.value = m.type || 'bank';
+  var bank = document.getElementById('mypay-bank'); if (bank) bank.value = m.bank || '';
+  var code = document.getElementById('mypay-code'); if (code) code.value = m.code || '';
+  var phone = document.getElementById('mypay-phone'); if (phone) phone.value = m.phone || '';
+  var account = document.getElementById('mypay-account'); if (account) account.value = m.account || '';
+  var note = document.getElementById('mypay-note'); if (note) note.value = m.note || '';
+  var idx = document.getElementById('mypay-edit-idx'); if (idx) idx.value = String(i);
+  var modal = document.getElementById('my-pay-modal');
+  if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+}
+function deleteMyPayment(btn) {
+  if (!confirm(_t2('حذف طريقة الدفع هذه؟', 'Supprimer ce moyen de paiement ?'))) return;
+  var i = parseInt(btn.getAttribute('data-idx'), 10);
+  var methods = getMyPayments();
+  methods.splice(i, 1);
+  saveMyPayments(methods).then(function () {
+    renderMyPayments();
+    toast(_t2('تم الحذف', 'Supprimé'), 'ok');
+  });
+}
+function saveMyPayment() {
+  var type = (document.getElementById('mypay-type') || {}).value || 'bank';
+  var bank = ((document.getElementById('mypay-bank') || {}).value || '').trim();
+  var code = ((document.getElementById('mypay-code') || {}).value || '').trim();
+  var phone = ((document.getElementById('mypay-phone') || {}).value || '').trim();
+  var account = ((document.getElementById('mypay-account') || {}).value || '').trim();
+  var note = ((document.getElementById('mypay-note') || {}).value || '').trim();
+  if (!bank && type !== 'cash' && type !== 'instore') {
+    alert(_t2('يرجى إدخال اسم البنك/الخدمة', 'Veuillez saisir le nom de la banque / du service'));
+    return;
+  }
+  if (type !== 'cash' && type !== 'instore' && !code && !phone && !account) {
+    alert(_t2('أدخل على الأقل: رمز أو هاتف أو رقم حساب', 'Saisissez au moins : code, téléphone ou n° de compte'));
+    return;
+  }
+  var entry = { type: type, bank: bank || type, code: code, phone: phone, account: account, note: note, addedAt: new Date().toISOString() };
+  var methods = getMyPayments();
+  var editIdx = (document.getElementById('mypay-edit-idx') || {}).value;
+  if (editIdx !== '' && editIdx != null) methods[parseInt(editIdx, 10)] = entry;
+  else methods.push(entry);
+  saveMyPayments(methods).then(function () {
+    closeMyPayModal();
+    renderMyPayments();
+    toast(_t2('✅ تم الحفظ', '✅ Enregistré'), 'ok');
+  });
+}
+
+function renderAgents() {
+  var badge = document.getElementById('auto-reply-badge');
+  var content = document.getElementById('auto-reply-content');
+  if (!badge || !content) return;
+  var accId = (ACCOUNT && ACCOUNT.id) || SESSION_ID || '';
+  var isDiamond = false;
+  try {
+    if (typeof RizqSub !== 'undefined' && accId && RizqSub.hasFeature(accId, 'ai_agent_full')) isDiamond = true;
+    else if (ACCOUNT && (ACCOUNT.plan === 'diamond' || ACCOUNT.diamond || /ماس|diamond/i.test(String(ACCOUNT.package || ACCOUNT.planName || ACCOUNT.plan || '')))) isDiamond = true;
+  } catch (e) {}
+  if (IS_DEMO) isDiamond = true;
+  if (isDiamond) {
+    badge.textContent = _t2('✅ مفعّل', '✅ Activé');
+    badge.style.cssText = 'background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px';
+    content.innerHTML =
+      '<p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.7">' +
+      _t2('الوكيل يرد على استفسارات الزوار حول عقاراتك ومواعيدك — درّبه ببياناتك ثم اختبره هنا.',
+        'L\'agent répond aux questions sur vos biens et disponibilités — entraînez-le puis testez ici.') +
+      '</p>' +
+      '<div id="agent-knowledge-upload"></div><div id="agent-chat-test" style="margin-top:12px"></div>';
+    if (typeof RizqDashboardAgentKnowledge !== 'undefined') {
+      RizqDashboardAgentKnowledge.renderKnowledgePanel({ mountId: 'agent-knowledge-upload', accountId: accId });
+    }
+    if (typeof RizqDashboardAgentChat !== 'undefined') {
+      RizqDashboardAgentChat.renderAgentChatPanel({ mountId: 'agent-chat-test', accountId: accId });
     }
   } else {
-    root.innerHTML = '<p style="font-size:12.5px;color:var(--text-muted)">طرق الدفع (Bankily، Masrivi، نقداً، تحويل بنكي) تُدار من نفس محرك المنصة بعد تسجيل الدخول الحقيقي.</p>';
+    badge.textContent = _t2('🔒 ماسية فقط', '🔒 Diamant uniquement');
+    badge.style.cssText = 'background:#f3f4f6;color:#6b7280;font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px';
+    content.innerHTML =
+      '<div style="text-align:center;padding:28px"><div style="font-size:40px;margin-bottom:12px">🔒</div>' +
+      '<p style="font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:6px">' +
+      _t2('ميزة حصرية للباقة الماسية', 'Fonctionnalité exclusive au forfait Diamant') + '</p>' +
+      '<p style="font-size:12.5px;color:var(--text-muted);max-width:300px;margin:0 auto 16px">' +
+      _t2('الوكيل يظهر لكل أنواع الحسابات في القائمة — التفعيل الكامل يتطلب باقة ماسية.',
+        'L\'agent apparaît pour tous les comptes — l\'activation complète nécessite le forfait Diamant.') + '</p>' +
+      '<button type="button" class="btn btn-gold" onclick="showPanel(\'subscription\',null)">' +
+      _t2('📦 ترقية الباقة', '📦 Améliorer le forfait') + '</button></div>';
   }
 }
 

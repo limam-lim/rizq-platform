@@ -25,6 +25,8 @@
   <script src="rizq_service_desk.js?v=1.3"></script>
   <script src="rizq_intro_video.js?v=29.9"></script>
   <script src="rizq_invoice_engine.js"></script>
+  <script src="rizq_dashboard_agent_chat.js"></script>
+  <script src="rizq_dashboard_agent_knowledge.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
   <script src="rizq_lang_guard.js?v=1.0"></script>
@@ -84,6 +86,8 @@
     <div class="sb-item" onclick="showPanel('profile',this)"><span class="sb-icon">🏢</span><span>معلومات الوكالة</span></div>
     <div class="sb-item" onclick="showPanel('hours',this)"><span class="sb-icon">🕐</span><span>ساعات العمل</span></div>
     <div class="sb-item" onclick="showPanel('photos',this)"><span class="sb-icon">📸</span><span>معرض الصور</span></div>
+    <div class="sb-section">ذكاء اصطناعي</div>
+    <div class="sb-item" onclick="showPanel('agents',this)"><span class="sb-icon">🤖</span><span>الوكيل الذكي</span></div>
     <div class="sb-section">الحساب</div>
     <div class="sb-item" onclick="showPanel('subscription',this)"><span class="sb-icon">💳</span><span>اشتراكي</span></div>
     <div class="sb-item" onclick="showPanel('referral',this)"><span class="sb-icon">🎁</span><span>إحالة الأصدقاء</span></div>
@@ -336,11 +340,64 @@
       </div>
     </div>
 
-    <!-- PAYMENTS -->
+    <!-- PAYMENTS — نفس واجهة المحل/المكتب الموحّدة -->
     <div class="panel" id="panel-mypayments">
+      <div id="rzq-pay-section" style="margin-bottom:20px"></div>
       <div class="card">
-        <div class="card-header"><div class="card-title">🏦 طرق الدفع</div></div>
-        <div id="mypayments-root"></div>
+        <div class="card-header" style="margin-bottom:16px">
+          <div class="card-title">🏦 طرق الدفع الخاصة بك</div>
+          <button type="button" class="btn btn-primary btn-sm" onclick="showAddMyPayModal()">+ إضافة طريقة دفع</button>
+        </div>
+        <p style="font-size:13px;color:#2C3A4F;margin-bottom:16px">هذه الرموز يراها زبائنك عند تصفح وكالتك — يستخدمونها لتحويل ثمن المشتريات/الإيجار إليك مباشرة.</p>
+        <div id="mr-pay-catalog-ref" style="margin-bottom:14px;padding:12px 14px;border-radius:12px;background:#f8faff;border:1px solid #e0e8f5"></div>
+        <div id="my-payment-list"></div>
+      </div>
+      <div id="my-pay-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.5);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:16px">
+        <div style="background:#fff;border-radius:18px;max-width:420px;width:100%;padding:28px;box-shadow:0 20px 50px rgba(0,0,0,.25)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+            <div style="font-size:16px;font-weight:800;color:#1B3A6B" id="my-pay-modal-title">إضافة طريقة دفع</div>
+            <button type="button" onclick="closeMyPayModal()" style="background:#f0f4ff;border:none;color:#1B3A6B;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px">×</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px">نوع طريقة الدفع</label>
+              <select id="mypay-type" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;color:#1B3A6B;background:#f8faff">
+                <option value="bank">🏦 تحويل بنكي (BCI / BNM / GBM...)</option>
+                <option value="bankily">📱 بنكيلي (Bankily)</option>
+                <option value="sedad">📱 سداد (Sedad)</option>
+                <option value="bimbam">📱 بيماه / BIMBAM</option>
+                <option value="mobile">📱 تطبيق دفع آخر</option>
+                <option value="cash">💵 دفع عند الاستلام</option>
+                <option value="instore">🏪 الدفع في الوكالة</option>
+                <option value="custom">✏️ طريقة مخصصة</option>
+              </select>
+            </div>
+            <div id="mypay-bank-fields">
+              <div style="margin-bottom:10px">
+                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px">اسم البنك / المحفظة (كتالوج موريتانيا)</label>
+                <input id="mypay-bank" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;box-sizing:border-box" placeholder="أو اكتب اسماً مخصصاً..."/>
+              </div>
+              <div style="margin-bottom:10px">
+                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px">🔢 رمز الدفع (إن وُجد)</label>
+                <input id="mypay-code" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;font-family:monospace;box-sizing:border-box" placeholder="مثال: 44556677" dir="ltr"/>
+              </div>
+              <div style="margin-bottom:10px">
+                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px">📞 رقم الهاتف المرتبط بالدفع</label>
+                <input id="mypay-phone" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;font-family:monospace;box-sizing:border-box" placeholder="+222 …" dir="ltr"/>
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px">🏦 رقم الحساب البنكي</label>
+                <input id="mypay-account" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;font-family:monospace;box-sizing:border-box" placeholder="رقم الحساب / IBAN" dir="ltr"/>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:700;color:#4a5568;display:block;margin-bottom:5px">ملاحظة للزبون (اختياري)</label>
+              <input id="mypay-note" style="width:100%;padding:10px 12px;border:1.5px solid #e2e8f5;border-radius:9px;font-size:13px;box-sizing:border-box" placeholder="مثال: أرسل اسمك بعد التحويل"/>
+            </div>
+          </div>
+          <input type="hidden" id="mypay-edit-idx" value=""/>
+          <button type="button" onclick="saveMyPayment()" class="btn btn-gold" style="margin-top:18px;width:100%">💾 حفظ</button>
+        </div>
       </div>
     </div>
 
@@ -355,6 +412,17 @@
           <a class="btn btn-outline" href="rizq_landing_v8.html">الرئيسية</a>
           <button class="btn btn-danger" type="button" onclick="logout()">تسجيل الخروج</button>
         </div>
+      </div>
+    </div>
+
+    <!-- AGENTS — موحّد مع المحل/المكتب (التفعيل حسب الباقة الماسية) -->
+    <div class="panel" id="panel-agents">
+      <div class="card" id="auto-reply-card">
+        <div class="card-header">
+          <div class="card-title">🤖 الوكيل الذكي</div>
+          <span id="auto-reply-badge" style="font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px"></span>
+        </div>
+        <div id="auto-reply-content"></div>
       </div>
     </div>
   </div>
