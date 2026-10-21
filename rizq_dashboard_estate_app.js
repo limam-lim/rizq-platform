@@ -12,6 +12,13 @@ var PROPS = [];
 var INQS = [];
 var HOURS = {};
 var STORE_KEY = '';
+var _payPkg = null;
+var _payFile = null;
+var _propPhotosDraft = [];
+var _agencyGalleryDraft = [];
+var MAX_LISTING_PHOTO_BYTES = 1.5 * 1024 * 1024;
+var MAX_PROP_PHOTOS = 6;
+var MAX_AGENCY_GALLERY = 8;
 
 function _estIsFr() {
   try {
@@ -378,7 +385,11 @@ function openPropForm(existing) {
   document.getElementById('pf-city').value = (existing && existing.city) || (ACCOUNT && ACCOUNT.city) || '';
   document.getElementById('pf-zone').value = (existing && existing.zone) || '';
   document.getElementById('pf-desc').value = (existing && existing.desc) || '';
-  document.getElementById('pf-photos').value = (existing && existing.photos) ? existing.photos.join(', ') : '';
+  _propPhotosDraft = (existing && Array.isArray(existing.photos)) ? existing.photos.slice() : [];
+  renderPropPhotosPreview();
+  var fp = document.getElementById('pf-floorplan');
+  if (fp) fp.value = (existing && existing.floorplan) || '';
+  renderFloorplanPreview();
   document.getElementById('pf-media').value = (existing && existing.media) || '';
   document.getElementById('pf-map').value = (existing && existing.map) || '';
   var am = (existing && existing.amenities) || [];
@@ -395,7 +406,8 @@ function bindPropForm() {
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var id = document.getElementById('pf-id').value || ('est_' + Date.now());
-    var photos = document.getElementById('pf-photos').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    var photos = _propPhotosDraft.slice(0, MAX_PROP_PHOTOS);
+    var floorplanEl = document.getElementById('pf-floorplan');
     var amenities = [];
     document.querySelectorAll('.pf-amen:checked').forEach(function (c) { amenities.push(c.value); });
     var row = {
@@ -413,6 +425,7 @@ function bindPropForm() {
       zone: document.getElementById('pf-zone').value.trim(),
       desc: document.getElementById('pf-desc').value.trim(),
       photos: photos,
+      floorplan: floorplanEl ? floorplanEl.value : '',
       media: document.getElementById('pf-media').value.trim(),
       map: document.getElementById('pf-map').value.trim(),
       amenities: amenities,
@@ -511,8 +524,11 @@ function fillProfile() {
   document.getElementById('p-whatsapp').value = ACCOUNT.whatsapp || ACCOUNT.phone || '';
   document.getElementById('p-desc').value = ACCOUNT.desc || '';
   document.getElementById('p-video').value = ACCOUNT.promo_video || '';
-  document.getElementById('ph-cover').value = ACCOUNT.cover || '';
-  document.getElementById('ph-gallery').value = Array.isArray(ACCOUNT.gallery) ? ACCOUNT.gallery.join(', ') : (ACCOUNT.gallery || '');
+  var coverEl = document.getElementById('ph-cover');
+  if (coverEl) coverEl.value = ACCOUNT.cover || '';
+  _agencyGalleryDraft = Array.isArray(ACCOUNT.gallery) ? ACCOUNT.gallery.slice() : [];
+  renderAgencyCoverPreview();
+  renderAgencyGalleryPreview();
 }
 
 function saveProfile() {
@@ -544,8 +560,9 @@ function saveProfile() {
 
 function savePhotos() {
   if (!ACCOUNT) return;
-  ACCOUNT.cover = document.getElementById('ph-cover').value.trim();
-  ACCOUNT.gallery = document.getElementById('ph-gallery').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+  var coverEl = document.getElementById('ph-cover');
+  ACCOUNT.cover = coverEl ? coverEl.value.trim() : (ACCOUNT.cover || '');
+  ACCOUNT.gallery = _agencyGalleryDraft.slice(0, MAX_AGENCY_GALLERY);
   persistAccountLocal();
   patchAccountRemote({ cover: ACCOUNT.cover, gallery: ACCOUNT.gallery });
   toast('تم حفظ المعرض', 'ok');
@@ -576,8 +593,11 @@ function patchAccountRemote(body) {
 }
 
 function fmtPrice(p) {
-  if (p == null || p === '' || Number.isNaN(Number(p))) {
-    return '<span class="price-pending">السعر قريباً</span>';
+  if (window.RizqSub && RizqSub.isPriceUnset && RizqSub.isPriceUnset(p)) {
+    return '<span class="price-pending">السعر بانتظار تحديد الإدارة</span>';
+  }
+  if (window.RizqSub && RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(p)) {
+    return '<strong style="font-size:18px;color:#059669">مجاناً</strong>';
   }
   return '<strong style="font-size:18px;color:#1B3A6B">' + Number(p).toLocaleString('ar-MR') + '</strong> <span style="font-size:12px;color:#64748b">MRU</span>';
 }
@@ -586,12 +606,13 @@ function renderPackages() {
   var st = subStatus();
   var lim = listingLimit();
   var cur = document.getElementById('sub-current');
+  var limLabel = (lim.limit === Infinity) ? 'غير محدود' : (lim.limit != null ? lim.limit : 3);
   if (cur) {
     cur.innerHTML = 'الحالة: ' + escapeHtml(st.status || '—') +
       ' · الباقة: ' + escapeHtml(st.pkg || st.package || '—') +
       (st.daysLeft != null ? ' · الأيام: ' + st.daysLeft : '') +
-      '<br>حد العقارات النشطة: ' + (lim.limit === Infinity ? 'غير محدود' : lim.limit) +
-      ' · المستخدم: ' + lim.used;
+      '<br>حد العقارات النشطة: ' + limLabel +
+      ' · المستخدم: ' + (lim.used != null ? lim.used : PROPS.length);
   }
   var grid = document.getElementById('pkg-grid');
   if (!grid) return;
@@ -606,17 +627,18 @@ function renderPackages() {
     return;
   }
   grid.innerHTML = list.map(function (pkg) {
-    var name = (window.RizqPackagesConfig && RizqPackagesConfig.packageDisplayName)
-      ? RizqPackagesConfig.packageDisplayName(pkg.id, 'ar')
+    var name = (window.RizqPackagesConfig && RizqPackagesConfig.localizedName)
+      ? RizqPackagesConfig.localizedName(pkg, 'ar')
       : (pkg.name_ar || pkg.name || pkg.id);
     var feats = pkg.features || [];
+    var maxItems = pkg.maxCatalogItems === Infinity ? '∞' : (pkg.maxCatalogItems != null ? pkg.maxCatalogItems : '—');
     return '<div class="pkg-card' + (pkg.highlight ? ' highlight' : '') + '">' +
       '<h3>' + escapeHtml(name) + '</h3>' +
-      '<div style="margin:8px 0 4px">' + fmtPrice(pkg.pricePending ? null : pkg.price) + '</div>' +
+      '<div style="margin:8px 0 4px">' + fmtPrice(pkg.price) + '</div>' +
       '<div style="font-size:12px;color:#64748b;font-weight:700">' + (pkg.durationDays || 30) + ' يوماً · حتى ' +
-      (pkg.maxCatalogItems === Infinity ? '∞' : (pkg.maxCatalogItems || '—')) + ' عقار</div>' +
+      maxItems + ' عقار</div>' +
       '<ul>' + feats.map(function (f) { return '<li>' + escapeHtml(f) + '</li>'; }).join('') + '</ul>' +
-      '<button type="button" class="btn btn-gold btn-sm" style="margin-top:12px;width:100%" data-pkg="' + escapeAttr(pkg.id) + '">طلب تفعيل</button>' +
+      '<button type="button" class="btn btn-gold btn-sm" style="margin-top:12px;width:100%" data-pkg="' + escapeAttr(pkg.id) + '">اشترك / ارفع الوصل</button>' +
       '</div>';
   }).join('');
   grid.querySelectorAll('[data-pkg]').forEach(function (btn) {
@@ -631,26 +653,20 @@ function requestPackage(pkgId) {
     toast('في الوضع التجريبي — سجّل حساباً حقيقياً لطلب الباقة', 'ok');
     return;
   }
-  if (!window.RIZQ_BACKEND_BASE) {
-    toast('الخادم غير متصل', 'error');
+  var pkg = null;
+  try {
+    var list = (window.RizqPackagesConfig && RizqPackagesConfig.getCatalog)
+      ? (RizqPackagesConfig.getCatalog('estate', 'ar') || []) : [];
+    pkg = list.filter(function (p) { return p && p.id === pkgId; })[0] || null;
+  } catch (e) {}
+  if (!pkg) {
+    toast('الباقة غير موجودة', 'error');
     return;
   }
-  var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
-  var tok = (CTX && CTX.accessToken) || window.REAL_ACCESS_TOKEN || '';
-  fetch(base + '/api/sub-requests', {
-    method: 'POST',
-    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { 'x-account-token': tok } : {}),
-    body: JSON.stringify({
-      accountId: ACCOUNT.id,
-      category: 'estate',
-      packageId: pkgId,
-      note: 'طلب باقة عقارات من لوحة التحكم'
-    })
-  }).then(function (r) { return r.json().catch(function () { return null; }); })
-    .then(function (d) {
-      if (d && (d.ok || d.id)) toast('تم إرسال طلب الباقة للإدارة', 'ok');
-      else toast((d && d.error) || 'تعذّر إرسال الطلب — تواصل مع الإدارة', 'error');
-    }).catch(function () { toast('خطأ شبكة', 'error'); });
+  var name = (window.RizqPackagesConfig && RizqPackagesConfig.localizedName)
+    ? RizqPackagesConfig.localizedName(pkg, 'ar')
+    : (pkg.name_ar || pkg.name || pkg.id);
+  openPayModal(name, pkg.price, 'package', pkgId);
 }
 
 function renderReferral() {
@@ -709,6 +725,243 @@ function renderAll() {
   renderHours();
   fillProfile();
 }
+
+/* ── Media helpers (file → compressed data URL) ───────────────────── */
+function _readImageAsDataUrl(file, maxBytes, cb) {
+  if (!file || !/^image\//.test(file.type || '')) {
+    toast('اختر ملف صورة صالح (JPG / PNG / WebP)', 'error');
+    return;
+  }
+  if (file.size > maxBytes) {
+    toast('حجم الصورة كبير (الحد 1.5MB) — صغّرها وأعد المحاولة', 'error');
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function () {
+    var src = reader.result;
+    var img = new Image();
+    img.onload = function () {
+      try {
+        var maxW = 1600;
+        var w = img.width, h = img.height;
+        if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        cb(canvas.toDataURL('image/jpeg', 0.82));
+      } catch (e) { cb(src); }
+    };
+    img.onerror = function () { cb(src); };
+    img.src = src;
+  };
+  reader.onerror = function () { toast('تعذّر قراءة الصورة', 'error'); };
+  reader.readAsDataURL(file);
+}
+
+function renderPropPhotosPreview() {
+  var wrap = document.getElementById('pf-photos-preview');
+  var hidden = document.getElementById('pf-photos');
+  if (hidden) hidden.value = _propPhotosDraft.join(',');
+  if (!wrap) return;
+  if (!_propPhotosDraft.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = _propPhotosDraft.map(function (src, i) {
+    return '<div style="position:relative;width:72px;height:72px;border-radius:10px;overflow:hidden;border:1px solid rgba(27,58,107,.15)">' +
+      '<img src="' + src + '" alt="" style="width:100%;height:100%;object-fit:cover"/>' +
+      '<button type="button" onclick="removePropPhoto(' + i + ')" style="position:absolute;top:2px;left:2px;background:#ef4444;color:#fff;border:none;border-radius:6px;width:20px;height:20px;cursor:pointer;font-size:11px">×</button></div>';
+  }).join('');
+}
+function removePropPhoto(i) {
+  _propPhotosDraft.splice(i, 1);
+  renderPropPhotosPreview();
+}
+function handlePropPhotosInput(inp) {
+  var files = inp && inp.files ? Array.prototype.slice.call(inp.files) : [];
+  inp.value = '';
+  files.forEach(function (file) {
+    if (_propPhotosDraft.length >= MAX_PROP_PHOTOS) {
+      toast('وصلت للحد الأقصى: ' + MAX_PROP_PHOTOS + ' صور', 'error');
+      return;
+    }
+    _readImageAsDataUrl(file, MAX_LISTING_PHOTO_BYTES, function (dataUrl) {
+      if (_propPhotosDraft.length >= MAX_PROP_PHOTOS) return;
+      _propPhotosDraft.push(dataUrl);
+      renderPropPhotosPreview();
+    });
+  });
+}
+function renderFloorplanPreview() {
+  var wrap = document.getElementById('pf-floorplan-preview');
+  var el = document.getElementById('pf-floorplan');
+  if (!wrap || !el) return;
+  if (!el.value) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = '<img src="' + el.value + '" alt="" style="max-height:120px;border-radius:10px;border:1px solid rgba(27,58,107,.12)"/>';
+}
+function handlePropFloorplanInput(inp) {
+  var file = inp && inp.files && inp.files[0];
+  inp.value = '';
+  if (!file) return;
+  _readImageAsDataUrl(file, MAX_LISTING_PHOTO_BYTES, function (dataUrl) {
+    var el = document.getElementById('pf-floorplan');
+    if (el) el.value = dataUrl;
+    renderFloorplanPreview();
+  });
+}
+function renderAgencyCoverPreview() {
+  var wrap = document.getElementById('ph-cover-preview');
+  var el = document.getElementById('ph-cover');
+  if (!wrap || !el) return;
+  if (!el.value) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = '<img src="' + el.value + '" alt="" style="max-height:140px;width:100%;object-fit:cover;border-radius:12px;border:1px solid rgba(27,58,107,.12)"/>';
+}
+function handleAgencyCoverInput(inp) {
+  var file = inp && inp.files && inp.files[0];
+  inp.value = '';
+  if (!file) return;
+  _readImageAsDataUrl(file, MAX_LISTING_PHOTO_BYTES, function (dataUrl) {
+    var el = document.getElementById('ph-cover');
+    if (el) el.value = dataUrl;
+    renderAgencyCoverPreview();
+  });
+}
+function renderAgencyGalleryPreview() {
+  var wrap = document.getElementById('ph-gallery-preview');
+  if (!wrap) return;
+  if (!_agencyGalleryDraft.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = _agencyGalleryDraft.map(function (src, i) {
+    return '<div style="position:relative;width:72px;height:72px;border-radius:10px;overflow:hidden;border:1px solid rgba(27,58,107,.15)">' +
+      '<img src="' + src + '" alt="" style="width:100%;height:100%;object-fit:cover"/>' +
+      '<button type="button" onclick="removeAgencyGalleryPhoto(' + i + ')" style="position:absolute;top:2px;left:2px;background:#ef4444;color:#fff;border:none;border-radius:6px;width:20px;height:20px;cursor:pointer;font-size:11px">×</button></div>';
+  }).join('');
+}
+function removeAgencyGalleryPhoto(i) {
+  _agencyGalleryDraft.splice(i, 1);
+  renderAgencyGalleryPreview();
+}
+function handleAgencyGalleryInput(inp) {
+  var files = inp && inp.files ? Array.prototype.slice.call(inp.files) : [];
+  inp.value = '';
+  files.forEach(function (file) {
+    if (_agencyGalleryDraft.length >= MAX_AGENCY_GALLERY) {
+      toast('وصلت للحد الأقصى: ' + MAX_AGENCY_GALLERY + ' صور', 'error');
+      return;
+    }
+    _readImageAsDataUrl(file, MAX_LISTING_PHOTO_BYTES, function (dataUrl) {
+      if (_agencyGalleryDraft.length >= MAX_AGENCY_GALLERY) return;
+      _agencyGalleryDraft.push(dataUrl);
+      renderAgencyGalleryPreview();
+    });
+  });
+}
+
+/* ── Payment receipt modal ────────────────────────────────────────── */
+function openPayModal(pkgName, pkgPrice, category, pkgId) {
+  _payPkg = { name: pkgName, price: pkgPrice, category: category || 'package', id: pkgId || '' };
+  _payFile = null;
+  var nameEl = document.getElementById('pay-pkg-name');
+  var amtEl = document.getElementById('pay-amount');
+  var recName = document.getElementById('pay-receipt-name');
+  var recFile = document.getElementById('pay-receipt-file');
+  var zone = document.getElementById('pay-upload-zone');
+  if (nameEl) nameEl.textContent = pkgName || '';
+  if (amtEl) {
+    if (window.RizqSub && RizqSub.isPriceUnset && RizqSub.isPriceUnset(pkgPrice)) {
+      amtEl.textContent = '—';
+    } else if (window.RizqSub && RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(pkgPrice)) {
+      amtEl.textContent = 'مجاناً';
+    } else {
+      amtEl.textContent = Number(pkgPrice).toLocaleString('ar-MR') + ' MRU';
+    }
+  }
+  if (recName) { recName.style.display = 'none'; recName.textContent = ''; }
+  if (recFile) recFile.value = '';
+  if (zone) zone.style.borderColor = 'rgba(27,58,107,.2)';
+
+  var codes = [];
+  try { codes = JSON.parse(localStorage.getItem('rizq_bank_codes') || '[]').filter(function (b) { return b.active !== false; }); } catch (e) {}
+  var el = document.getElementById('pay-banks');
+  if (el) {
+    if (!codes.length) {
+      el.innerHTML = '<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:12px;font-size:12.5px;color:#92400e;text-align:center">⚠️ لا توجد طرق دفع ظاهرة — تواصل مع الدعم أو راجع إعدادات الأدمن</div>';
+    } else {
+      el.innerHTML = codes.map(function (b) {
+        return '<div style="background:#f8f9ff;border:1.5px solid #e0e8ff;border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">' +
+          '<div><div style="font-size:13px;font-weight:700;color:#1B3A6B">' + escapeHtml(b.bank) + '</div>' +
+          (b.instruction ? '<div style="font-size:11px;color:#777;margin-top:2px">' + escapeHtml(b.instruction) + '</div>' : '') + '</div>' +
+          '<span style="font-family:monospace;font-size:14px;font-weight:700;color:#0f2347;background:#e0e8ff;padding:5px 10px;border-radius:7px;direction:ltr">' + escapeHtml(b.code) + '</span></div>';
+      }).join('');
+    }
+  }
+
+  if (typeof RizqSub !== 'undefined' && typeof RizqSub.configurePayModalFreeMode === 'function') {
+    RizqSub.configurePayModalFreeMode(pkgPrice, _estIsFr() ? 'fr' : 'ar');
+  }
+  var m = document.getElementById('pay-modal');
+  if (m) { m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+}
+function closePayModal() {
+  var m = document.getElementById('pay-modal');
+  if (m) m.style.display = 'none';
+  document.body.style.overflow = '';
+  _payPkg = null;
+  _payFile = null;
+}
+function handlePayReceipt(inp) {
+  if (!inp.files || !inp.files[0]) return;
+  var f = inp.files[0];
+  if (f.size > MAX_LISTING_PHOTO_BYTES) {
+    toast('حجم الوصل كبير (الحد 1.5MB)', 'error');
+    inp.value = '';
+    return;
+  }
+  _payFile = f;
+  var el = document.getElementById('pay-receipt-name');
+  if (el) { el.textContent = '✅ ' + f.name; el.style.display = 'block'; }
+  var zone = document.getElementById('pay-upload-zone');
+  if (zone) zone.style.borderColor = '#059669';
+}
+function submitPayment() {
+  if (!_payPkg) return;
+  if (typeof RizqSub === 'undefined' || typeof RizqSub.submitSubscriptionRequest !== 'function') {
+    toast('محرك الاشتراك غير محمّل', 'error');
+    return;
+  }
+  if (RizqSub.isPriceUnset && RizqSub.isPriceUnset(_payPkg.price)) {
+    toast('السعر غير مضبوط — حدّده السوبر أدمن من لوحة الباقات أولاً', 'error');
+    return;
+  }
+  var isFree = RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(_payPkg.price);
+  if (!isFree && Number(_payPkg.price) > 0 && !_payFile) {
+    toast('يرجى رفع صورة وصل الدفع أولاً', 'error');
+    return;
+  }
+  var submitBtn = document.getElementById('pay-submit-btn');
+  var prevLabel = submitBtn ? submitBtn.textContent : '';
+  if (submitBtn) {
+    if (submitBtn.disabled) return;
+    submitBtn.disabled = true;
+    submitBtn.textContent = '...جارٍ الإرسال';
+  }
+  RizqSub.submitSubscriptionRequest({
+    file: _payFile,
+    pkgName: _payPkg.name,
+    price: _payPkg.price,
+    accountName: (ACCOUNT && ACCOUNT.name) || 'وكالة عقارية',
+    accountId: (ACCOUNT && ACCOUNT.id) || SESSION_ID || '',
+    accessToken: (CTX && CTX.accessToken) || window.REAL_ACCESS_TOKEN || '',
+    category: 'package'
+  }).then(function () {
+    closePayModal();
+    toast('تم إرسال الطلب — مراجعة الإدارة / المالية / الوكيل خلال 24 ساعة', 'ok');
+    renderPackages();
+  }).catch(function (err) {
+    toast((err && err.msg) || 'تعذّر إرسال الطلب', 'error');
+  }).finally(function () {
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = prevLabel; }
+  });
+}
+document.getElementById('pay-modal') && document.getElementById('pay-modal').addEventListener('click', function (e) {
+  if (e.target === this) closePayModal();
+});
 
 function boot() {
   bindPropForm();

@@ -601,25 +601,32 @@ var CATALOGS = {
     Object.assign({ id: 'st-diam-pro' }, _storeDiamondProFields())
   ],
 
+  /* أسعار افتراضية MRU — السوبر أدمن يعدّلها من لوحة الباقات (rizq_estate_packages / site-config). */
   estate: [
-    { id: 'es-trial', price: null, pricePending: true, durationDays: 10, maxCatalogItems: 3, discountPct: 0,
+    { id: 'es-trial', price: 0, durationDays: 10, maxCatalogItems: 3, discountPct: 0,
       features: ['حتى 3 عقارات نشطة', 'صفحة الوكالة العامة', 'استقبال طلبات المعاينة', 'ساعات عمل'],
       features_fr: ['Jusqu\'à 3 biens actifs', 'Page agence publique', 'Demandes de visite', 'Horaires'] },
-    { id: 'es-month', price: null, pricePending: true, durationDays: 30, maxCatalogItems: 25, discountPct: 0, highlight: true,
+    { id: 'es-month', price: 4000, durationDays: 30, maxCatalogItems: 25, discountPct: 2, highlight: true,
       features: ['حتى 25 عقاراً نشطاً', 'شارة وكالة موثوقة', 'خريطة ومواصفات كاملة', 'طرق دفع + إحالة'],
       features_fr: ['Jusqu\'à 25 biens actifs', 'Badge agence vérifiée', 'Carte et fiches complètes', 'Paiements + parrainage'] },
-    { id: 'es-quart', price: null, pricePending: true, durationDays: 90, maxCatalogItems: 80, discountPct: 0,
+    { id: 'es-quart', price: 10500, durationDays: 90, maxCatalogItems: 80, discountPct: 3,
       features: ['حتى 80 عقاراً', 'أولوية في نتائج البحث', 'إحصائيات زيارات', 'دعم بالأولوية'],
       features_fr: ['Jusqu\'à 80 biens', 'Priorité recherche', 'Statistiques de vues', 'Support prioritaire'] },
-    { id: 'es-year', price: null, pricePending: true, durationDays: 365, maxCatalogItems: 200, discountPct: 0,
+    { id: 'es-year', price: 32000, durationDays: 365, maxCatalogItems: 200, discountPct: 3,
       features: ['حتى 200 عقار', 'فيديو تعريفي', 'تقارير سنوية', 'دعم VIP'],
       features_fr: ['Jusqu\'à 200 biens', 'Vidéo de présentation', 'Rapports annuels', 'Support VIP'] },
-    { id: 'es-diam-std', price: null, pricePending: true, durationDays: 30, maxCatalogItems: Infinity, discountPct: 0, diamond: true, diamondTier: 'diamond_standard',
-      features: ['عقارات غير محدودة', 'أولوية ظهور', 'جاهزية قنوات التواصل للمنصة'],
-      features_fr: ['Biens illimités', 'Visibilité prioritaire', 'Canaux plateforme prêts'] },
-    { id: 'es-diam-pro', price: null, pricePending: true, durationDays: 30, maxCatalogItems: Infinity, discountPct: 0, diamond: true, diamondTier: 'diamond_pro',
-      features: ['كل مزايا الماسية الأساسية', 'حصص أعلى للمنصة', 'دعم مؤسسي'],
-      features_fr: ['Tous les avantages Diamond Standard', 'Quotas plateforme élevés', 'Support entreprise'] }
+    Object.assign({ id: 'es-diam-std', maxCatalogItems: Infinity }, _diamondStandardFields(4500), {
+      name: 'الماسية الأساسية للعقارات',
+      name_ar: 'الماسية الأساسية للعقارات',
+      features: ['عقارات غير محدودة', 'نائب ذكي نصي للوكالة (موقع + واتساب)', '2,000 محادثة نصية شهرياً', 'أولوية ظهور'],
+      features_fr: ['Biens illimités', 'Adjoint texte (site + WhatsApp)', '2 000 conversations / mois', 'Visibilité prioritaire']
+    }),
+    Object.assign({ id: 'es-diam-pro', maxCatalogItems: Infinity }, _diamondProFields(8500), {
+      name: 'الماسية Pro للعقارات',
+      name_ar: 'الماسية Pro للعقارات',
+      features: ['كل مزايا الماسية الأساسية', 'نائب ذكي نصي + صوتي', '4,000 محادثة + 300 دقيقة صوتية', 'دعم مؤسسي'],
+      features_fr: ['Tous les avantages Diamond Standard', 'Adjoint texte + voix', '4 000 conversations + 300 min', 'Support entreprise']
+    })
   ],
   office: [
     { id: 'of-trial', price: 0, durationDays: 10, maxCatalogItems: 3, discountPct: 0,
@@ -875,9 +882,25 @@ function _nameMapFor(pkg) {
   return null;
 }
 
+/** سعر غير مضبوط (null/undefined/NaN/'') — لا يُعامل كمجاني أبداً. */
+function isPriceUnset(price) {
+  if (price === 0 || price === '0') return false;
+  if (price == null || price === '') return true;
+  var n = Number(price);
+  return !isFinite(n);
+}
+
+/** مجاني فقط إذا السعر صريح = 0 (رقم أو نص). */
+function isExplicitFreePrice(price) {
+  return price === 0 || price === '0' || (typeof price === 'number' && price === 0);
+}
+
 function _defaultCta(pkg, lang) {
   lang = _normLang(lang);
-  if (!Number((pkg && pkg.price) || 0)) {
+  if (isPriceUnset(pkg && pkg.price)) {
+    return lang === 'fr' ? 'Prix à confirmer' : 'السعر قيد التأكيد';
+  }
+  if (isExplicitFreePrice(pkg && pkg.price)) {
     return lang === 'fr' ? 'Commencer gratuitement' : 'ابدأ مجاناً';
   }
   if (pkg && pkg.id && /-month$/.test(String(pkg.id))) {
@@ -1004,7 +1027,7 @@ function enrichForDisplay(pkg, lang) {
 }
 
 /** Bump when code defaults change — triggers localStorage re-seed on next page load */
-var CATALOG_SYNC_REVISION = '2026-09-16-trial-10d';
+var CATALOG_SYNC_REVISION = '2026-10-21-estate-prices';
 var CATALOG_SYNC_LS_KEY = 'rizq_catalog_sync_revision';
 var STALE_PKG_FEATURE_MARKERS = [
   'فيديو إعلاني واحد',
@@ -1063,9 +1086,23 @@ function _mergeLive(defaults, live) {
     return _stampCatalogRev({
       id: pkgId,
       // Prefer live admin price always — only replace known stale tender prices.
-      price: staleTenderHit
-        ? Number(base.price)
-        : (livePkg.price != null ? Number(livePkg.price) : (base.price || 0)),
+      // Never coerce missing price to 0 (that was treated as "free" and bypassed payment).
+      price: (function () {
+        if (staleTenderHit) return Number(base.price);
+        if (livePkg.pricePending === true && (livePkg.price == null || livePkg.price === '')) {
+          return base.price != null ? Number(base.price) : null;
+        }
+        if (livePkg.price != null && livePkg.price !== '') {
+          var ln = Number(livePkg.price);
+          return isFinite(ln) ? ln : (base.price != null ? Number(base.price) : null);
+        }
+        if (base.price != null && base.price !== '') {
+          var bn = Number(base.price);
+          return isFinite(bn) ? bn : null;
+        }
+        return null;
+      })(),
+      pricePending: false,
       durationDays: livePkg.durationDays != null ? Number(livePkg.durationDays) : (base.durationDays || 30),
       maxCatalogItems: refresh && base.maxCatalogItems != null ? base.maxCatalogItems : (livePkg.maxCatalogItems != null ? livePkg.maxCatalogItems : base.maxCatalogItems),
       maxVideosPerMonth: refresh && base.maxVideosPerMonth != null ? base.maxVideosPerMonth : (livePkg.maxVideosPerMonth != null ? livePkg.maxVideosPerMonth : base.maxVideosPerMonth),
@@ -1522,6 +1559,8 @@ var API = {
   isDiamondPackage: isDiamondPackage,
   resolveDiamondTierFromPkg: resolveDiamondTierFromPkg,
   diamondCopy: diamondCopy,
+  isPriceUnset: isPriceUnset,
+  isExplicitFreePrice: isExplicitFreePrice,
   enrichForDisplay: enrichForDisplay,
   translateFeatureList: translateFeatureList,
   getDiamondPackage: getDiamondPackage,

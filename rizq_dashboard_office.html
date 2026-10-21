@@ -293,6 +293,22 @@
             <div class="form-group"><label class="form-label" data-t="svc-emoji-label">الأيقونة (emoji)</label><input class="form-input" id="svc-emoji" placeholder="📄" maxlength="4"/></div>
           </div>
           <div class="form-group"><label class="form-label" data-t="svc-desc-label">وصف الخدمة</label><textarea class="form-input" id="svc-desc" placeholder="اشرح الخدمة بإيجاز..." data-ph="svc-desc-ph"></textarea></div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">صورة الغلاف</label>
+              <div id="svc-cover-preview" style="margin-bottom:8px"></div>
+              <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('svc-cover-input').click()">🖼️ رفع غلاف</button>
+              <input type="file" id="svc-cover-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleSvcCoverInput(this)"/>
+              <p style="font-size:10px;color:#94a3b8;margin-top:4px">JPG / PNG / WebP — حد 1.5MB</p>
+            </div>
+            <div class="form-group">
+              <label class="form-label">صورة مصغّرة</label>
+              <div id="svc-thumb-preview" style="margin-bottom:8px"></div>
+              <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('svc-thumb-input').click()">📷 رفع مصغّرة</button>
+              <input type="file" id="svc-thumb-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleSvcThumbInput(this)"/>
+              <p style="font-size:10px;color:#94a3b8;margin-top:4px">تظهر في قائمة الخدمات والصفحة العامة</p>
+            </div>
+          </div>
           <div style="display:flex;gap:8px;justify-content:flex-end">
             <button class="btn btn-outline btn-sm" onclick="clearSvcForm()" data-t="svc-clear">🔄 مسح</button>
             <button class="btn btn-primary" onclick="saveService()" data-t="svc-save">💾 حفظ الخدمة</button>
@@ -569,6 +585,7 @@
       </div>
       <!-- Bank Codes -->
       <div id="pay-banks" style="margin-bottom:18px"></div>
+      <div id="pay-price-unset-block" style="display:none;background:#fff7ed;border:1px solid #fdba74;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:#9a3412;font-weight:700;line-height:1.65"></div>
       <!-- Upload Receipt -->
       <div style="border:2px dashed rgba(27,58,107,.2);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:border-color .2s" onclick="document.getElementById('pay-receipt-file').click()" onmouseover="this.style.borderColor='rgba(27,58,107,.4)'" onmouseout="this.style.borderColor='rgba(27,58,107,.2)'" id="pay-upload-zone">
         <div style="font-size:28px;margin-bottom:6px">🧾</div>

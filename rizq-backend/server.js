@@ -35,6 +35,7 @@ const { normalizeAccountActivityFields, loadCatalog } = require('./services/merc
 const { refreshCurrencyRates, sanitizeCurrencyList, mergeCurrencyConfig } = require('./services/currencyRates');
 const { parseKnowledgeFile, formatDynamicKnowledgeForPrompt } = require('./services/dynamicKnowledge');
 const { recordUsage, setupQuotaGuardAPI } = require('../rizq_quota_guard_agent');
+const { storeReceipt } = require('./services/receiptStorage');
 
 const app = express();
 app.disable('x-powered-by');
@@ -2373,6 +2374,17 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
   const token = req.header('x-account-token') || '';
   const owner = verifyAccountOwner(String(b.accountId).slice(0, 60), token);
   if (!owner) return res.status(401).json({ ok: false, error: 'unauthorized' });
+  // P0: null/undefined/NaN ليست مجانية — لا نحوّلها إلى 0
+  const rawPrice = b.price;
+  const priceUnset = rawPrice == null || rawPrice === '' || !Number.isFinite(Number(rawPrice));
+  if (priceUnset) {
+    return res.status(400).json({
+      ok: false,
+      error: 'price_unset',
+      message: 'سعر الباقة غير مضبوط — حدّده السوبر أدمن من لوحة إدارة الباقات أولاً',
+    });
+  }
+  const parsedPrice = Number(rawPrice);
   const list = readSubRequests();
   const clientId = typeof b.id === 'string' && /^sub_\d{10,20}$/.test(b.id) ? b.id : null;
   const id = clientId && !list.some((r) => r.id === clientId)
@@ -2390,8 +2402,10 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
   const rec = {
     id,
     pkg: String(b.pkg).slice(0, 60),
-    price: Number(b.price) || 0,
-    expectedPrice: Number(b.expectedPrice) || Number(b.price) || 0,
+    price: parsedPrice,
+    expectedPrice: (b.expectedPrice != null && b.expectedPrice !== '' && Number.isFinite(Number(b.expectedPrice)))
+      ? Number(b.expectedPrice)
+      : parsedPrice,
     submittedAt: b.submittedAt || new Date().toISOString(),
     status: 'pending',
     account: String(b.account || '').slice(0, 120),

@@ -936,13 +936,74 @@ function toggleServiceForm(){
   document.getElementById('svc-toggle-btn').textContent=_tm?(_svcOpen?_tm.t('svc-collapse','dashboard_office'):_tm.t('svc-expand','dashboard_office')):(_svcOpen?'تصغير ↑':'إضافة خدمة ↓');
 }
 
+var _svcCoverDraft = null;
+var _svcThumbDraft = null;
+var MAX_SVC_PHOTO_BYTES = 1.5 * 1024 * 1024;
+
+function _readSvcImage(file, maxW, cb){
+  if(!file || !/^image\//.test(file.type||'')){
+    showToast(_t2('اختر ملف صورة صالح (JPG / PNG / WebP)','Choisissez une image valide (JPG / PNG / WebP)'),'error');
+    return;
+  }
+  if(file.size > MAX_SVC_PHOTO_BYTES){
+    showToast(_t2('حجم الصورة كبير (الحد 1.5MB)','Image trop volumineuse (max 1,5 Mo)'),'error');
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(){
+    var img = new Image();
+    img.onload = function(){
+      try{
+        var w = img.width, h = img.height;
+        if(w > maxW){ h = Math.round(h * maxW / w); w = maxW; }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        cb(canvas.toDataURL('image/jpeg', 0.82));
+      }catch(e){ cb(reader.result); }
+    };
+    img.onerror = function(){ cb(reader.result); };
+    img.src = reader.result;
+  };
+  reader.onerror = function(){ showToast(_t2('تعذّر قراءة الصورة','Impossible de lire l\'image'),'error'); };
+  reader.readAsDataURL(file);
+}
+function renderSvcCoverPreview(){
+  var wrap = document.getElementById('svc-cover-preview');
+  if(!wrap) return;
+  if(!_svcCoverDraft){ wrap.innerHTML = ''; return; }
+  wrap.innerHTML = '<img src="'+_svcCoverDraft+'" alt="" style="max-height:110px;width:100%;object-fit:cover;border-radius:10px;border:1px solid rgba(27,58,107,.12)"/>';
+}
+function renderSvcThumbPreview(){
+  var wrap = document.getElementById('svc-thumb-preview');
+  if(!wrap) return;
+  if(!_svcThumbDraft){ wrap.innerHTML = ''; return; }
+  wrap.innerHTML = '<img src="'+_svcThumbDraft+'" alt="" style="max-height:88px;width:88px;object-fit:cover;border-radius:10px;border:1px solid rgba(27,58,107,.12)"/>';
+}
+function handleSvcCoverInput(inp){
+  var file = inp && inp.files && inp.files[0];
+  if(inp) inp.value = '';
+  if(!file) return;
+  _readSvcImage(file, 1200, function(dataUrl){ _svcCoverDraft = dataUrl; renderSvcCoverPreview(); });
+}
+function handleSvcThumbInput(inp){
+  var file = inp && inp.files && inp.files[0];
+  if(inp) inp.value = '';
+  if(!file) return;
+  _readSvcImage(file, 480, function(dataUrl){ _svcThumbDraft = dataUrl; renderSvcThumbPreview(); });
+}
+
 function renderServices(){
   const cnt=document.getElementById('svc-count');if(cnt)cnt.textContent=services.length+' '+_t2('خدمة','service(s)');
   const el=document.getElementById('services-list');if(!el)return;
   if(!services.length){el.innerHTML='<div style="text-align:center;padding:36px;color:var(--text-muted)"><div style="font-size:40px;margin-bottom:10px">📋</div><p>'+_t2('لا توجد خدمات — أضف خدمتك الأولى','Aucun service — ajoutez votre premier service')+'</p></div>';return;}
-  el.innerHTML=services.map((s,i)=>`
+  el.innerHTML=services.map((s,i)=>{
+    var media = (s.thumb || s.cover)
+      ? '<img src="'+(s.thumb||s.cover)+'" alt="" style="width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid rgba(27,58,107,.12)"/>'
+      : '<div class="service-icon-box">'+(s.emoji||'📄')+'</div>';
+    return `
     <div class="service-card">
-      <div class="service-icon-box">${s.emoji||'📄'}</div>
+      ${media}
       <div style="flex:1">
         <div class="service-name">${escapeHtml(s.name)}</div>
         <div class="service-price">${Number(s.price||0).toLocaleString()} MRU ${s.duration?`<span style="font-size:11px;color:var(--text-muted);font-weight:400">· ${escapeHtml(s.duration)}</span>`:''}</div>
@@ -952,7 +1013,8 @@ function renderServices(){
         <button class="btn btn-outline btn-sm" onclick="editService(${i})" title="${_t2('تعديل','Modifier')}">✏️</button>
         <button class="btn btn-danger btn-sm" onclick="deleteService(${i})" title="${_t2('حذف','Supprimer')}">🗑️</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
     RizqStatusSummary.render({ items: services, itemType: 'catalog' });
   }
@@ -978,15 +1040,26 @@ function saveService(){
   var name  = document.getElementById('svc-name')  ? document.getElementById('svc-name').value.trim()  : '';
   var price = document.getElementById('svc-price') ? document.getElementById('svc-price').value.trim() : '';
   var desc  = document.getElementById('svc-desc')  ? document.getElementById('svc-desc').value.trim()  : '';
+  var duration = document.getElementById('svc-duration') ? document.getElementById('svc-duration').value.trim() : '';
+  var emoji = document.getElementById('svc-emoji') ? document.getElementById('svc-emoji').value.trim() : '';
   if(!name){showToast(_t2('يرجى إدخال اسم الخدمة','Veuillez saisir le nom du service'),'error');return;}
 
+  var editIdx = (typeof window._editSvcIdx === 'number') ? window._editSvcIdx : null;
+  var existing = (editIdx != null && services[editIdx]) ? services[editIdx] : null;
+  var svcImages = [];
+  if(_svcCoverDraft) svcImages.push(_svcCoverDraft);
+  else if(_svcThumbDraft) svcImages.push(_svcThumbDraft);
+  else if(existing && Array.isArray(existing.images)) svcImages = existing.images.slice();
+
   var adData = {
-    id: 'OFC-' + Date.now(),
+    id: (existing && existing.id) || ('OFC-' + Date.now()),
     title: name,
     desc:  desc,
     price: price,
     category: 'services',
-    images: [],
+    images: svcImages,
+    cover: _svcCoverDraft || (existing && existing.cover) || '',
+    thumb: _svcThumbDraft || (existing && existing.thumb) || '',
     seller: typeof accData !== 'undefined' ? (accData.name||_t2('مكتب','Bureau')) : _t2('مكتب','Bureau'),
     seller_trust_score: 70,
   };
@@ -1000,19 +1073,27 @@ function saveService(){
     // ونستخدم نفس مفتاح التخزين المستخدم في التحميل والحذف.
     var _newSvc = {
       id: data.id, name: name, price: price, desc: desc,
-      status: data._status || 'active',
-      date: new Date().toLocaleDateString('ar-MR-u-nu-latn')
+      duration: duration, emoji: emoji || '📄',
+      cover: data.cover || _svcCoverDraft || (existing && existing.cover) || '',
+      thumb: data.thumb || _svcThumbDraft || (existing && existing.thumb) || '',
+      images: Array.isArray(data.images) ? data.images.slice() : svcImages.slice(),
+      status: data._status || (existing && existing.status) || 'active',
+      date: (existing && existing.date) || new Date().toLocaleDateString('ar-MR-u-nu-latn')
     };
-    services.unshift(_newSvc);
+    if(editIdx != null && services[editIdx]){
+      services[editIdx] = _newSvc;
+    } else {
+      services.unshift(_newSvc);
+    }
     if(!IS_DEMO) localStorage.setItem('office_services_'+(typeof SESSION_ID!=='undefined'?SESSION_ID:'demo'), JSON.stringify(services));
     if(!IS_DEMO) _rizqSyncCatalogItem(_newSvc);
-    // سجّل الإعلان في العداد الشهري عند الانتهاء
-    if(typeof RizqSub !== 'undefined' && typeof SESSION_ID !== 'undefined' && SESSION_ID){
+    // سجّل الإعلان في العداد الشهري عند الانتهاء (إضافة جديدة فقط)
+    if(editIdx == null && typeof RizqSub !== 'undefined' && typeof SESSION_ID !== 'undefined' && SESSION_ID){
       var _subSt = RizqSub.checkSubscription(SESSION_ID);
       if(_subSt.status==='expired'||_subSt.status==='no_subscription') RizqSub.recordAdPost(SESSION_ID);
     }
-    ['svc-name','svc-price','svc-desc'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-    showToast(data._status==='pending_review'?_t2('⏳ الخدمة قيد المراجعة','⏳ Service en cours de vérification'):_t2('✅ تم إضافة الخدمة','✅ Service ajouté'));
+    clearSvcForm();
+    showToast(data._status==='pending_review'?_t2('⏳ الخدمة قيد المراجعة','⏳ Service en cours de vérification'):(editIdx!=null?_t2('✅ تم تحديث الخدمة','✅ Service mis à jour'):_t2('✅ تم إضافة الخدمة','✅ Service ajouté')));
     if(typeof renderServices === 'function') renderServices();
     if(typeof showPanel === 'function') showPanel('services');
   }
@@ -1027,8 +1108,28 @@ function saveService(){
     });
   } else { doSave(adData); }
 }
-function clearSvcForm(){['svc-name','svc-price','svc-duration','svc-emoji','svc-desc'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});window._editSvcIdx=null;}
-function editService(i){const s=services[i];document.getElementById('svc-name').value=s.name||'';document.getElementById('svc-price').value=s.price||'';document.getElementById('svc-duration').value=s.duration||'';document.getElementById('svc-emoji').value=s.emoji||'';document.getElementById('svc-desc').value=s.desc||'';window._editSvcIdx=i;if(!_svcOpen)toggleServiceForm();}
+function clearSvcForm(){
+  ['svc-name','svc-price','svc-duration','svc-emoji','svc-desc'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  _svcCoverDraft = null; _svcThumbDraft = null;
+  renderSvcCoverPreview(); renderSvcThumbPreview();
+  var ci=document.getElementById('svc-cover-input'); if(ci) ci.value='';
+  var ti=document.getElementById('svc-thumb-input'); if(ti) ti.value='';
+  window._editSvcIdx=null;
+}
+function editService(i){
+  const s=services[i];
+  document.getElementById('svc-name').value=s.name||'';
+  document.getElementById('svc-price').value=s.price||'';
+  document.getElementById('svc-duration').value=s.duration||'';
+  document.getElementById('svc-emoji').value=s.emoji||'';
+  document.getElementById('svc-desc').value=s.desc||'';
+  _svcCoverDraft = s.cover || '';
+  _svcThumbDraft = s.thumb || '';
+  renderSvcCoverPreview();
+  renderSvcThumbPreview();
+  window._editSvcIdx=i;
+  if(!_svcOpen)toggleServiceForm();
+}
 function deleteService(i){
   if(!confirm(_t2('حذف الخدمة؟','Supprimer ce service ?')))return;
   if(!IS_DEMO) _rizqDeleteCatalogItem(services[i]);
@@ -1047,7 +1148,20 @@ function _rizqSyncCatalogItem(svc){
   try{
     if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN) return;
     var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
-    var body = { accountId: SESSION_ID, kind:'service', name: svc.name, price: svc.price, desc: svc.desc, status: svc.status==='pending_review'?'pending_review':(svc.status==='inactive'?'inactive':'active') };
+    var imgs = [];
+    if(svc.cover) imgs.push(svc.cover);
+    if(svc.thumb && svc.thumb !== svc.cover) imgs.push(svc.thumb);
+    if(Array.isArray(svc.images)){
+      svc.images.forEach(function(im){ if(im && imgs.indexOf(im) < 0) imgs.push(im); });
+    }
+    var body = {
+      accountId: SESSION_ID, kind:'service', name: svc.name, price: svc.price, desc: svc.desc,
+      duration: svc.duration || '', emoji: svc.emoji || '',
+      cover: svc.cover || '', thumb: svc.thumb || '',
+      images: imgs.slice(0, 6),
+      image: imgs[0] || svc.thumb || svc.cover || '',
+      status: svc.status==='pending_review'?'pending_review':(svc.status==='inactive'?'inactive':'active')
+    };
     if(svc._backendId){
       fetch(base+'/api/catalog/'+encodeURIComponent(svc._backendId), {
         method:'PATCH', headers:{'Content-Type':'application/json','x-account-token':(window.REAL_ACCESS_TOKEN || SESSION_TOKEN)}, body: JSON.stringify(body)
@@ -1714,7 +1828,16 @@ function openPayModal(pkgName, pkgPrice, category){
   _payPkg = {name: pkgName, price: pkgPrice, category: category || 'package'};
   _payFile = null;
   document.getElementById('pay-pkg-name').textContent = pkgName;
-  document.getElementById('pay-amount').textContent = pkgPrice > 0 ? Number(pkgPrice).toLocaleString() + ' MRU' : _t2('مجاناً','Gratuit');
+  var amtEl = document.getElementById('pay-amount');
+  if(amtEl){
+    if(typeof RizqSub !== 'undefined' && RizqSub.isPriceUnset && RizqSub.isPriceUnset(pkgPrice)){
+      amtEl.textContent = '—';
+    } else if(typeof RizqSub !== 'undefined' && RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(pkgPrice)){
+      amtEl.textContent = _t2('مجاناً','Gratuit');
+    } else {
+      amtEl.textContent = Number(pkgPrice).toLocaleString() + ' MRU';
+    }
+  }
   document.getElementById('pay-receipt-name').style.display = 'none';
   document.getElementById('pay-receipt-file').value = '';
   var vidWrap = document.getElementById('pay-video-url-wrap');
@@ -1809,7 +1932,16 @@ function handlePayReceipt(inp){
 
 function submitPayment(){
   if(!_payPkg) return;
-  if(_payPkg.price > 0 && !_payFile){
+  if(typeof RizqSub === 'undefined' || typeof RizqSub.submitSubscriptionRequest !== 'function'){
+    showToast(_t2('محرك الاشتراك غير محمّل','Moteur d\'abonnement non chargé'),'error');
+    return;
+  }
+  if(RizqSub.isPriceUnset && RizqSub.isPriceUnset(_payPkg.price)){
+    showToast(_t2('السعر غير مضبوط — حدّده السوبر أدمن من لوحة الباقات أولاً','Prix non défini — le Super Admin doit le fixer d\'abord'),'error');
+    return;
+  }
+  var isFree = RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(_payPkg.price);
+  if(!isFree && Number(_payPkg.price) > 0 && !_payFile){
     alert(_t2('يرجى رفع صورة وصل الدفع أولاً','Veuillez d\'abord téléverser une photo du reçu de paiement'));
     return;
   }

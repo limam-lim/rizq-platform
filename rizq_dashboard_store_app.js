@@ -2755,7 +2755,16 @@ function openPayModal(pkgName, pkgPrice, category){
   _payPkg = {name: pkgName, price: pkgPrice, category: category || 'package'};
   _payFile = null;
   document.getElementById('pay-pkg-name').textContent = pkgName;
-  document.getElementById('pay-amount').textContent = pkgPrice > 0 ? Number(pkgPrice).toLocaleString() + ' MRU' : _t2('مجاناً','Gratuit');
+  var amtEl = document.getElementById('pay-amount');
+  if(amtEl){
+    if(typeof RizqSub !== 'undefined' && RizqSub.isPriceUnset && RizqSub.isPriceUnset(pkgPrice)){
+      amtEl.textContent = '—';
+    } else if(typeof RizqSub !== 'undefined' && RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(pkgPrice)){
+      amtEl.textContent = _t2('مجاناً','Gratuit');
+    } else {
+      amtEl.textContent = Number(pkgPrice).toLocaleString() + ' MRU';
+    }
+  }
   document.getElementById('pay-receipt-name').style.display = 'none';
   document.getElementById('pay-receipt-file').value = '';
   var vidWrap = document.getElementById('pay-video-url-wrap');
@@ -2850,7 +2859,16 @@ function handlePayReceipt(inp){
 
 function submitPayment(){
   if(!_payPkg) return;
-  if(_payPkg.price > 0 && !_payFile){
+  if(typeof RizqSub === 'undefined' || typeof RizqSub.submitSubscriptionRequest !== 'function'){
+    showToast(_t2('محرك الاشتراك غير محمّل','Moteur d\'abonnement non chargé'),'error');
+    return;
+  }
+  if(RizqSub.isPriceUnset && RizqSub.isPriceUnset(_payPkg.price)){
+    showToast(_t2('السعر غير مضبوط — حدّده السوبر أدمن من لوحة الباقات أولاً','Prix non défini — le Super Admin doit le fixer d\'abord'),'error');
+    return;
+  }
+  var isFree = RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(_payPkg.price);
+  if(!isFree && Number(_payPkg.price) > 0 && !_payFile){
     alert(_storeLang==='ar'?'يرجى رفع صورة وصل الدفع أولاً':'Veuillez d\'abord télécharger le reçu de paiement');
     return;
   }
