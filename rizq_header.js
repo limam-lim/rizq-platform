@@ -1832,7 +1832,7 @@
       }
       if (!document.querySelector('script[src*="rizq_header_mockup_trial.js"]')) {
         var s = document.createElement('script');
-        s.src = 'rizq_header_mockup_trial.js?v=5.45';
+        s.src = 'rizq_header_mockup_trial.js?v=5.46';
         s.defer = true;
         (document.head || document.documentElement).appendChild(s);
       }

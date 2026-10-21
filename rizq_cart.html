@@ -571,7 +571,7 @@ body.cart-is-general #cart-general-hub{display:block}
   <section class="cart-hub-hero" aria-label="السلة العامة">
     <div class="cart-hub-hero-inner">
       <h1 id="cart-hub-title">🛒 السلة العامة</h1>
-      <p id="cart-hub-sub">تجمع كل ما أضفته من المحلات والمعارض والمكاتب — بنفس أسلوب المفضلة العامة على المنصة.</p>
+      <p id="cart-hub-sub">تجمع كل ما أضفته من المحلات والمعارض والمكاتب.</p>
     </div>
   </section>
   <main class="cart-hub-wrap">
@@ -1272,8 +1272,8 @@ function applyGeneralCartHubLang(fr){
   var s = document.getElementById('cart-hub-sub');
   if(t) t.textContent = fr ? '🛒 Panier général' : '🛒 السلة العامة';
   if(s) s.textContent = fr
-    ? 'Regroupe tout ce que vous avez ajouté depuis les boutiques, showrooms et bureaux — comme les favoris généraux.'
-    : 'تجمع كل ما أضفته من المحلات والمعارض والمكاتب — بنفس أسلوب المفضلة العامة على المنصة.';
+    ? 'Regroupe tout ce que vous avez ajouté depuis les boutiques, showrooms et bureaux.'
+    : 'تجمع كل ما أضفته من المحلات والمعارض والمكاتب.';
   var c = document.getElementById('cart-hub-clear');
   if(c) c.textContent = fr ? 'Tout effacer' : 'مسح الكل';
   var links = document.getElementById('cart-hub-links');

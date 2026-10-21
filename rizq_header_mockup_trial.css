@@ -1141,3 +1141,7 @@ body > .rizq-help-dd-menu a,
     max-height:min(55vh,320px);
   }
 }
+
+
+/* cart popup removed — cart icon navigates to rizq_cart.html */
+#rmh-cart-panel,.rmh-cart-panel{display:none!important}
