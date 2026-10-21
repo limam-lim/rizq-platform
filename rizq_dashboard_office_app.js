@@ -1,0 +1,2256 @@
+/* Token hardening: accessToken never persisted to localStorage — use RizqDash */
+if (window.RizqDash && RizqDash.purgeSensitiveTokensFromStorage) { try { RizqDash.purgeSensitiveTokensFromStorage(); RizqDash.stripUrlToken(); } catch (ePurge) {} }
+/* extracted from rizq_dashboard_office.html — do not edit HTML for logic */
+(function(){try{if(/[?&]embed=1(?:&|$)/.test(location.search))document.documentElement.classList.add('rizq-dash-embed');}catch(e){}})();
+;
+if(window.RizqAccount)RizqAccount.bootstrapDashboard();
+;
+(function trySSC(){if(typeof renderServicesShowcase==="function")renderServicesShowcase();else setTimeout(trySSC,60);})()
+;
+(function(){try{if(typeof renderRizqPayment==='function')renderRizqPayment("bank-payment-widget");}catch(e){}})()
+;
+
+    (function tryRenderPkgs(){
+      var el=document.getElementById('packages-display');
+      if(!el){return;}
+      if(typeof renderPackagesDisplay==='function'){renderPackagesDisplay();}
+      else{setTimeout(tryRenderPkgs,80);}
+      if(typeof renderVideoPackagesDisplay==='function'){renderVideoPackagesDisplay();}
+    })();
+    
+;
+
+const params=new URLSearchParams(window.location.search);
+var SESSION_ID='';
+var SESSION_TOKEN='';
+const IS_DEMO=params.get('demo')==='1';
+(function rizqHydrateDashSession(){
+  if(IS_DEMO) return;
+  if(window.RizqAccount && typeof window.RizqAccount.recoverSessionParams === 'function'){
+    var rec = window.RizqAccount.recoverSessionParams('office');
+    if(rec){ SESSION_ID = rec.id || ''; SESSION_TOKEN = rec.token || ''; return; }
+  }
+  SESSION_ID = params.get('id') || '';
+  SESSION_TOKEN = params.get('token') || '';
+  if(SESSION_ID && !SESSION_TOKEN && window.RizqAccount && typeof window.RizqAccount.readDashToken === 'function'){
+    SESSION_TOKEN = window.RizqAccount.readDashToken(SESSION_ID);
+  }
+})();
+
+
+const DEMO_ACC={id:'demo_law',token:'DEMO',status:'approved',type:'office',
+  name:'مكتب العدالة للمحاماة',owner:'الأستاذ محمد ولد ابراهيم',
+  phone:'+222 36 11 22 33',email:'contact@aladala-demo.mr',city:'نواكشوط',
+  address:'تفرغ زينة — نواكشوط',
+  ninea:'MR-DEMO-LAW',activity:'محاماة واستشارات قانونية',
+  desc:'مكتب محاماة (بيانات تجريبية لمعاينة مشروع التخرج) — مساحة مهنية خاصة بغرفة طلبات باسم المكتب.',
+  promo_video:'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4',
+  serviceDesk:{
+    enabled:true,
+    formTitle:'طلب استشارة — مكتب العدالة للمحاماة',
+    formHint:'بياناتك سرية. يمكنك رفع بيان الدفع (صورة أو PDF) مباشرة على المنصة.',
+    docsChannel:'whatsapp'
+  },
+  trial_ends:new Date(Date.now()+8*86400000).toISOString()};
+
+const DEMO_SERVICES=[
+  {id:'DS1',name:'استشارة قانونية',price:15000,desc:'جلسة سرية 45 دقيقة',emoji:'⚖️',status:'active',date:new Date().toLocaleDateString('ar-MR-u-nu-latn')},
+  {id:'DS2',name:'صياغة عقد',price:45000,desc:'عقود مدنية وتجارية',emoji:'📜',status:'active',date:new Date().toLocaleDateString('ar-MR-u-nu-latn')},
+  {id:'DS3',name:'تمثيل أمام المحكمة',price:0,desc:'متابعة قضايا ومرافعات — حسب القضية',emoji:'🏛️',status:'active',date:new Date().toLocaleDateString('ar-MR-u-nu-latn')},
+  {id:'DS4',name:'تأسيس شركة',price:85000,desc:'النظام الأساسي + الإيداع القانوني',emoji:'🏢',status:'active',date:new Date().toLocaleDateString('ar-MR-u-nu-latn')}
+];
+
+const DEMO_REQS=[
+  {id:'DR1',name:'فاطمة منت أحمد',service:'استشارة قانونية',phone:'22244112233',msg:'أحتاج استشارة حول عقد إيجار تجاري',time:'اليوم 10:20',read:false},
+  {id:'DR2',name:'سيدي محمد',service:'تأسيس شركة',phone:'22233998877',msg:'أرغب في تأسيس SARL — الوثائق جاهزة عبر واتساب',time:'أمس',read:true},
+  {id:'DR3',name:'آمنة بنت عبدالله',service:'صياغة عقد',phone:'22236655443',msg:'عقد شراكة بين طرفين — مستعجل',time:'منذ يومين',read:true}
+];
+
+let OFFICE=null, services=[], renewalFile=null;
+const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const DAYS_FR=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+const DEF_HOURS=DAYS.map((d,i)=>({day:d,open:i!==5,from:'08:00',to:'17:00'}));
+
+function verifyAccess(){
+  if(IS_DEMO) return DEMO_ACC;
+  if(!SESSION_ID||!SESSION_TOKEN) return false;
+  const accs=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+  return accs.find(a=>a.id===SESSION_ID&&a.token===SESSION_TOKEN&&a.status==='approved'&&a.type==='office') || null;
+}
+// ── إصلاح جوهري: عند فتح المكتب رابط الداشبورد من جهازه الخاص (وليس نفس
+// متصفح الأدمن)، لا يوجد محلياً سجل لهذا الحساب — كانت الصفحة ترفض الوصول
+// رغم أن الحساب مُفعَّل فعلياً على الخادم. نحاول التحقق من الخادم قبل الرفض.
+function verifyAccessRemote(){
+  return new Promise(function(resolve){
+    if(!window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN){ resolve(null); return; }
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(SESSION_ID), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
+      .then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(data){
+        if(!data || !data.ok || !data.account || data.account.type!=='office'){ resolve(null); return; }
+        var acc = Object.assign({ token: SESSION_TOKEN, status:'approved' }, data.account);
+        try{
+          var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+          if(!accs.some(function(a){return a.id===acc.id;})) { accs.push(acc); localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs)); }
+        }catch(e){}
+        resolve(acc);
+      }).catch(function(){ resolve(null); });
+  });
+}
+function showAccessDenied(){
+  document.getElementById('access-denied').style.display='flex';
+  document.getElementById('sidebar').style.display='none';
+  document.querySelector('.main').style.display='none';
+}
+
+// ══ إصلاح جوهري (نفس علّة rizq_dashboard.html / rizq_dashboard_store.html
+// بتاريخ 2026-08-05/09) ══ SESSION_TOKEN هنا هو dashToken (من رابط
+// الداشبورد ?token=) — مختلف تماماً عن accessToken الحقيقي الذي يتطلبه
+// verifyAccountOwner() بالخادم لكل فعل كتابة حقيقي. window.REAL_ACCESS_TOKEN
+// يُحل من مصدرين: (أ) rizq_pending_accounts[].accessToken أو .backendAccessToken
+// المحفوظ محلياً، (ب) وإلا POST /api/accounts/exchange-dash-token/:id.
+
+window.REAL_ACCESS_TOKEN = null;
+function _resolveRealAccessToken(acc){
+  if (window.RizqDash && typeof RizqDash.resolveAccessToken === 'function') {
+    var dash = (typeof SESSION_TOKEN !== 'undefined' && SESSION_TOKEN) || (acc && (acc.token || acc.dashToken)) || '';
+    return RizqDash.resolveAccessToken(acc, dash).then(function(tok){
+      window.REAL_ACCESS_TOKEN = tok || null;
+      if (tok && typeof SESSION_TOKEN !== 'undefined') {
+        try {
+          var nd = sessionStorage.getItem('rizq_dash_token_' + (acc && acc.id)) || '';
+          if (nd) SESSION_TOKEN = nd;
+        } catch (e) {}
+      }
+      return window.REAL_ACCESS_TOKEN;
+    });
+  }
+  return Promise.resolve(null);
+}
+
+function showPanel(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const p=document.getElementById('panel-'+id);if(p)p.classList.add('active');
+  document.querySelectorAll('.sb-item').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
+  const t=document.getElementById('topbar-title');
+  if(t)t.textContent=(typeof _officeLang!=='undefined'&&_officeLang==='fr'?TITLES_FR[id]:TITLES[id])||'';
+  if(id==='overview')renderOverview();
+  if(id==='requests'){ _rizqMergeRequestsFromBackend(); _rizqMergeServiceRequests(); loadOfficeServiceDeskForm(); renderRequests(); }
+  if(id==='services')renderServices();
+  if(id==='hours')renderHours();
+  if(id==='subscription'){renderSubPanel();renderPackagesDisplay();renderVideoPackagesDisplay();}
+  if(id==='agents')renderAgentsOffice();
+  if(id==='tenders'){renderTenderSubStatus();renderMyTenders();}
+  if(id==='referral'){renderReferralPanel();}
+  if(id==='verifiedplus'){renderVerifiedPlusPanel();}
+}
+
+// ── برنامج الإحالة (جيب صاحبك واربح) ────────────────────────────────
+function renderReferralPanel(){
+  var linkInput = document.getElementById('referral-link-input');
+  var statsEl = document.getElementById('referral-stats');
+  if(!linkInput) return;
+  linkInput.value = SESSION_ID ? (location.origin + '/rizq_landing_v8.html?ref=' + encodeURIComponent(SESSION_ID)) : '';
+  if(!statsEl) return;
+  if(!window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN){
+    statsEl.innerHTML = '<p style="color:var(--text-muted);font-size:12px">'+_t2('الإحصائيات تظهر بعد ربط الحساب بخادم حقيقي','Les statistiques s\'affichent une fois le compte connecté à un serveur réel')+'</p>';
+    return;
+  }
+  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/mine/' + encodeURIComponent(SESSION_ID) + '/referrals', {
+    headers: { 'x-account-token': (window.REAL_ACCESS_TOKEN || SESSION_TOKEN) }
+  }).then(function(r){ return r.ok ? r.json() : null; }).then(function(data){
+    if(!data || !data.ok) return;
+    statsEl.innerHTML =
+      '<div style="margin-bottom:6px">👥 <b>'+data.count+'</b> '+_t2('صديق انضم فعلاً كمشترك مدفوع','ami(s) devenu(s) abonné(s) payant(s)')+'</div>'+
+      '<div>🎁 <b>'+data.bonusDaysTotal+'</b> '+_t2('يوماً مجانياً مكتسباً','jours gratuits gagnés')+'</div>';
+  }).catch(function(){});
+}
+
+/* ── شارة "موثّق⁺" (Verified+) — مهمة #232 ── */
+
+function renderVerifiedPlusPanel(){
+  var fr = (typeof _officeLang!=='undefined' && _officeLang==='fr');
+  var el = document.getElementById('vplus-status');
+  if(!el) return;
+  if(!window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN){
+    el.innerHTML = '<p style="font-size:12.5px;color:var(--text-muted)">'+_t2('متاح فقط لحساب حقيقي مسجَّل دخوله','Disponible uniquement sur un compte réel connecté')+'</p>';
+    return;
+  }
+  el.innerHTML = '<p style="font-size:12.5px;color:var(--text-muted)">'+_t2('جارٍ التحقق من الحالة…','Vérification en cours…')+'</p>';
+  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/mine/' + encodeURIComponent(SESSION_ID), {
+    headers: { 'x-account-token': (window.REAL_ACCESS_TOKEN || SESSION_TOKEN) }
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(data){
+      var acc = data && data.ok ? data.account : null;
+      var active = !!(acc && acc.verifiedPlus && acc.verifiedPlusExpiresAt && new Date(acc.verifiedPlusExpiresAt) > new Date());
+      if(active){
+        var endsTxt = '';
+        try{ endsTxt = new Date(acc.verifiedPlusExpiresAt).toLocaleDateString(fr?'fr-FR':'ar-MR-u-nu-latn'); }catch(e){}
+        el.innerHTML = '<div style="background:#ecfdf5;border:1.5px solid #6ee7b7;border-radius:12px;padding:14px;font-size:12.5px;color:#065f46;display:flex;align-items:center;gap:10px">'
+          + '<span style="font-size:24px">🛡️</span>'
+          + '<span>✅ '+(fr?('Votre badge « Vérifié+ » est actif jusqu\'au '+endsTxt) : ('شارة "موثّق⁺" فعّالة لديك حتى '+endsTxt))+'</span>'
+          + '</div>';
+        return;
+      }
+      var FEATS_AR = {'سنوية':['شارة "موثّق⁺" الرسمية بشعار رزق','أعلى درجة ثقة لدى الزبائن','تحقق هوية مُعزَّز من فريق رزق','صالحة لسنة كاملة']};
+      var FEATS_FR = {'سنوية':['Badge officiel « Vérifié+ » avec logo Rizq','Confiance maximale auprès des clients','Vérification d\'identité renforcée par Rizq','Valable un an complet']};
+      var FEATS = fr ? FEATS_FR : FEATS_AR;
+      var ICONS = {'سنوية':'🛡️'};
+      var lockMsg = fr
+        ? 'Obtenez le badge « Vérifié+ » — vérification d\'identité renforcée par l\'équipe Rizq.'
+        : 'احصل على شارة "موثّق⁺" — تحقق هوية مُعزَّز من فريق رزق.';
+      var cardsHtml = (typeof RizqSub !== 'undefined' && typeof RizqSub.renderPackageCardsHTML === 'function')
+        ? RizqSub.renderPackageCardsHTML(_verifiedPlusPkgList(), FEATS, ICONS, (fr?'fr':'ar'), 'verified_plus').grid
+        : '';
+      el.innerHTML = '<div style="background:#f8faff;border:1.5px solid #e0e8ff;border-radius:12px;padding:14px;font-size:12.5px;color:#1B3A6B">🛡️ ' + lockMsg + '</div>'
+        + '<div style="margin-top:14px">' + cardsHtml + '</div>';
+    }).catch(function(){
+      el.innerHTML = '<p style="font-size:12px;color:var(--text-muted)">'+_t2('تعذّر التحقق من الحالة','Impossible de vérifier le statut')+'</p>';
+    });
+}
+
+/* ══ غرفة المناقصات — مناقصاتي المنشورة + العروض المقدَّمة عليها ══ */
+
+function renderTenderSubStatus(){
+  var fr = (typeof _officeLang!=='undefined' && _officeLang==='fr');
+  var el = document.getElementById('tender-sub-status');
+  if(!el) return;
+  if(IS_DEMO || !window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN){ el.innerHTML=''; return; }
+  el.innerHTML = '<p style="font-size:12.5px;color:var(--text-muted)">'+(fr?'Vérification de l\'abonnement…':'جارٍ التحقق من الاشتراك…')+'</p>';
+  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/tenders/package/status/' + encodeURIComponent(SESSION_ID), {
+    headers: { 'x-account-token': (window.REAL_ACCESS_TOKEN || SESSION_TOKEN) }
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(data){
+      if(data && data.ok && data.subscribed){
+        var endsTxt = '';
+        try{ endsTxt = new Date((data.record && data.record.periodEnd) || '').toLocaleDateString(fr?'fr-FR':'ar-MR-u-nu-latn'); }catch(e){}
+        if(data.isTrial && !data.contactsUnlocked){
+          el.innerHTML = '<div style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px;padding:12px 14px;font-size:12.5px;color:#92400e">'
+            + '🔍 '+(fr?('Essai actif jusqu\'au '+escapeHtml(endsTxt)+' — consultation uniquement (contacts masqués, soumission verrouillée).') : ('باقتك التجريبية فعّالة حتى '+escapeHtml(endsTxt)+' — للتصفّح فقط (التواصل مخفي والعروض مقفولة).'))
+            + '</div>';
+          return;
+        }
+        el.innerHTML = '<div style="background:#ecfdf5;border:1.5px solid #6ee7b7;border-radius:12px;padding:12px 14px;font-size:12.5px;color:#065f46">'
+          + '✅ '+(fr?('Abonnement Appels d\'offres actif — contacts débloqués — jusqu\'au '+escapeHtml(endsTxt)) : ('اشتراك المناقصة فعّال — بيانات التواصل مكشوفة — حتى '+escapeHtml(endsTxt)))
+          + '</div>';
+        return;
+      }
+      var FEATS_AR = {'تجريبية':['تصفّح وتصفية المناقصات','بيانات التواصل مخفية','تقديم العروض مقفول'],'شهرية':['كشف بيانات التواصل','تقديم عروض غير محدود','نشر مناقصات'],'ربعية':['كل مزايا الشهرية','توفير 10%','أولوية ظهور العروض'],'سنوية':['كل مزايا الربعية','توفير 25%','تنبيهات SMS/واتساب']};
+      var FEATS_FR = {'تجريبية':['Consultation et filtrage','Contacts masqués','Soumission verrouillée'],'شهرية':['Contacts débloqués','Offres illimitées','Publication d\'appels d\'offres'],'ربعية':['Tous les avantages mensuels','10% d\'économie','Priorité des offres'],'سنوية':['Tous les avantages trimestriels','25% d\'économie','Alertes SMS/WhatsApp']};
+      var FEATS = fr ? FEATS_FR : FEATS_AR;
+      var ICONS = {'تجريبية':'🔍','شهرية':'📋','ربعية':'📊','سنوية':'🏆'};
+      var lockMsg = fr
+        ? 'Abonnez-vous à la formule Appels d\'offres (mensuelle ou plus) pour débloquer les contacts et soumettre des offres. L\'essai permet la consultation uniquement.'
+        : 'اشترك في باقة المناقصة (شهرية فأعلى) لكشف بيانات التواصل وتقديم العروض — الباقة التجريبية للتصفّح فقط.';
+      var cardsHtml = (typeof RizqSub !== 'undefined' && typeof RizqSub.renderPackageCardsHTML === 'function')
+        ? RizqSub.renderPackageCardsHTML(_tenderPkgList(), FEATS, ICONS, (typeof _officeLang!=='undefined'?_officeLang:'ar'), 'tender').grid
+        : '';
+      el.innerHTML = '<div style="background:#fffbeb;border:1.5px solid #fcd34d;border-radius:12px;padding:14px;font-size:12.5px;color:#92400e">🔒 ' + lockMsg + '</div>'
+        + '<div style="margin-top:14px">' + cardsHtml + '</div>';
+    }).catch(function(){
+      el.innerHTML = '<p style="font-size:12px;color:var(--text-muted)">'+(fr?'Impossible de vérifier l\'abonnement' : 'تعذّر التحقق من حالة الاشتراك')+'</p>';
+    });
+}
+
+function renderMyTenders(){
+  var fr = (typeof _officeLang!=='undefined' && _officeLang==='fr');
+  var el = document.getElementById('tenders-mine-list');
+  if(!el) return;
+  if(IS_DEMO || !window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN){
+    el.innerHTML = '<p style="font-size:12.5px;color:var(--text-muted)">'+(fr?'Disponible uniquement sur un compte réel connecté.':'متاح فقط لحساب حقيقي مسجَّل دخوله.')+'</p>';
+    return;
+  }
+  el.innerHTML = '<p style="font-size:12.5px;color:var(--text-muted)">'+(fr?'Chargement…':'جاري التحميل…')+'</p>';
+  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/tenders/mine?accountId=' + encodeURIComponent(SESSION_ID), {
+    headers: { 'x-account-token': (window.REAL_ACCESS_TOKEN || SESSION_TOKEN) }
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(data){
+      var list = (data && data.ok && Array.isArray(data.tenders)) ? data.tenders : [];
+      if(!list.length){
+        el.innerHTML = '<p style="font-size:12.5px;color:var(--text-muted)">'+(fr?'Vous n\'avez publié aucun appel d\'offres pour le moment.':'لم تنشر أي مناقصة بعد.')+'</p>';
+        return;
+      }
+      el.innerHTML = list.map(function(t){
+        var bids = Array.isArray(t.bids) ? t.bids : [];
+        var bidsHtml = bids.length
+          ? bids.map(function(b){
+              return '<div style="padding:8px 10px;background:#f7f9fc;border-radius:8px;margin-top:6px;font-size:12px">'
+                + '<strong>'+escapeHtml(b.bidderName)+'</strong> — '+Number(b.price).toLocaleString()+' MRU'
+                + (b.deliveryDays ? (' · '+(fr?b.deliveryDays+' j':b.deliveryDays+' يوم')) : '')
+                + (b.notes ? ('<br><span style="color:var(--text-muted)">'+escapeHtml(b.notes)+'</span>') : '')
+                + '</div>';
+            }).join('')
+          : '<p style="font-size:11.5px;color:#94a3b8;margin-top:4px">'+(fr?'Aucune offre pour le moment':'لا عروض بعد')+'</p>';
+        return '<div class="card" style="margin-bottom:14px">'
+          + '<div style="font-weight:800;font-size:14px;color:#16263d;display:flex;align-items:center;flex-wrap:wrap;gap:6px"><span>'+escapeHtml(t.title)+'</span>'+_tenderStatusBadgeOwner(t, fr)+'</div>'
+          + (t.status==='rejected' && t.rejectReason ? '<div style="font-size:11.5px;color:#b91c1c;margin:6px 0">'+escapeHtml(t.rejectReason)+'</div>' : '')
+          + '<div style="font-size:11.5px;color:var(--text-muted);margin:4px 0 8px">'+(fr?bids.length+' offre(s) reçue(s)':bids.length+' عرض مُقدَّم')+'</div>'
+          + bidsHtml
+          + '</div>';
+      }).join('');
+    }).catch(function(){
+      el.innerHTML = '<p style="font-size:12.5px;color:var(--text-muted)">'+(fr?'Erreur de connexion au serveur':'خطأ في الاتصال بالخادم')+'</p>';
+    });
+}
+
+
+
+// ═══════════════════════════════════════════════════════════════
+// SUBSCRIPTION LIFECYCLE UI — يستخدم RizqSub engine
+// ═══════════════════════════════════════════════════════════════
+function initSubscriptionLifecycle(accId, accType) {
+  if(!accId || typeof RizqSub === 'undefined') return;
+
+  RizqSub.runLifecycleCheck(accId, {
+
+    onActive: function(sub) {
+      // اشتراك نشط — لا شيء مرئي
+      _applyFeatureGates(sub);
+    },
+
+    onTrial: function(sub) {
+      _applyFeatureGates(sub);
+      _showSubBanner({
+        icon:'🎁', color:'#0891b2',
+        title:_t2('أنت في الفترة التجريبية المجانية','Vous êtes en période d\'essai gratuite'),
+        msg: _t2('تنتهي خلال <strong>'+sub.daysLeft+'</strong> يوم — اشترك الآن لتحتفظ بمزاياك','Elle expire dans <strong>'+sub.daysLeft+'</strong> jour(s) — abonnez-vous maintenant'),
+        cta:_t2('🚀 اشترك الآن','🚀 S\'abonner maintenant'), ctaFn:'_openRenewalPanel()'
+      });
+    },
+
+    onExpiringReminder: function(sub) {
+      _applyFeatureGates(sub);
+      _showSubBanner({
+        icon:'⚠️', color:'#d97706',
+        title:_t2('باقتك تنتهي '+(sub.daysLeft<=0?'اليوم':'غداً')+'!','Votre forfait expire '+(sub.daysLeft<=0?'aujourd\'hui':'demain')+'!'),
+        msg: _t2('جدّد باقة <strong>'+sub.pkg+'</strong> الآن حتى لا تفقد مزاياك','Renouvelez le forfait <strong>'+sub.pkg+'</strong> maintenant pour ne pas perdre vos avantages'),
+        cta:_t2('🔄 جدّد الآن','🔄 Renouveler maintenant'), ctaFn:'_openRenewalPanel()',
+        urgent: true
+      });
+    },
+
+    onExpired: function(sub) {
+      _applyFeatureGates(sub);
+      var rem  = (sub.monthlyAdsRemaining !== undefined) ? sub.monthlyAdsRemaining : 0;
+      var limit = sub.freeAdsLimit || 3;
+      _showSubBanner({
+        icon:'🔒', color:'#dc2626',
+        title:_t2('انتهت باقتك — '+sub.pkg,'Votre forfait a expiré — '+sub.pkg),
+        msg:_t2('حسابك على الخطة المجانية — <strong>'+rem+'/'+limit+'</strong> إعلانات متبقية هذا الشهر · شارة موثق ✅ محفوظة · إعلاناتك القديمة ظاهرة','Compte gratuit — <strong>'+rem+'/'+limit+'</strong> annonces restantes ce mois · Badge vérifié ✅ conservé · Vos anciennes annonces restent visibles'),
+        cta:_t2('♻️ جدّد الاشتراك','♻️ Renouveler l\'abonnement'), ctaFn:'_openRenewalPanel()',
+        persistent: true
+      });
+      _showExpiredOverlay(sub);
+    },
+
+    onNoSubscription: function(sub) {
+      _showSubBanner({
+        icon:'📦', color:'#1B3A6B',
+        title:_t2('لا يوجد اشتراك نشط','Aucun abonnement actif'),
+        msg: _t2('اختر باقة لتفعيل جميع مزايا حسابك على رزق','Choisissez un forfait pour activer tous les avantages de votre compte Rizq'),
+        cta:_t2('📦 اختر باقة','📦 Choisir un forfait'), ctaFn:'_openRenewalPanel()'
+      });
+    }
+  });
+}
+
+function _showSubBanner(opts) {
+  var old = document.getElementById('rizq-sub-banner');
+  if(old) old.remove();
+  var banner = document.createElement('div');
+  banner.id = 'rizq-sub-banner';
+  var urgent = opts.urgent ? 'animation:pulse 1.5s infinite;' : '';
+  banner.style.cssText = 'position:relative;z-index:2;width:100%;margin:0 0 16px;padding:14px 18px;border-radius:14px;background:#fff;'
+    +'box-shadow:0 2px 14px rgba(15,35,65,.1);border-right:5px solid '+opts.color+';'
+    +'display:flex;align-items:center;gap:12px;flex-wrap:wrap;'+urgent;
+  banner.innerHTML =
+    '<span style="font-size:26px;flex-shrink:0">'+opts.icon+'</span>'
+    +'<div style="flex:1">'
+    +'<div style="font-size:13px;font-weight:700;color:#1B3A6B;margin-bottom:2px">'+opts.title+'</div>'
+    +'<div style="font-size:11.5px;color:#2C3A4F;line-height:1.5">'+opts.msg+'</div>'
+    +'</div>'
+    +'<div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">'
+    +'<button onclick="'+opts.ctaFn+'" style="white-space:nowrap;padding:8px 14px;background:'+opts.color+';color:#fff;border:none;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">'+opts.cta+'</button>'
+    +(opts.persistent?'':'<button onclick="document.getElementById(\"rizq-sub-banner\").remove()" style="font-size:10px;color:#9ca3af;background:none;border:none;cursor:pointer">'+_t2('تذكيرني لاحقاً','Me rappeler plus tard')+'</button>')
+    +'</div>';
+  var slot = document.getElementById('rizq-sub-slot') || document.querySelector('.content');
+  if(slot) slot.insertBefore(banner, slot.firstChild);
+  else document.body.appendChild(banner);
+  // أضف animation pulse إذا urgent
+  if(opts.urgent && !document.getElementById('sub-pulse-style')) {
+    var st = document.createElement('style');
+    st.id = 'sub-pulse-style';
+    st.textContent = '@keyframes pulse{0%,100%{box-shadow:0 8px 32px rgba(217,119,6,.2)}50%{box-shadow:0 8px 40px rgba(217,119,6,.5)}}';
+    document.head.appendChild(st);
+  }
+}
+
+function _showExpiredOverlay(sub) {
+  // overlay خفيف على الأقسام المدفوعة
+  var paidSections = ['panel-video','panel-auto-reply','panel-vip','panel-analytics-adv','panel-products'];
+  paidSections.forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    if(el.querySelector('.rizq-expired-lock')) return;
+    var lock = document.createElement('div');
+    lock.className = 'rizq-expired-lock';
+    lock.style.cssText = 'position:absolute;inset:0;background:rgba(255,255,255,.85);backdrop-filter:blur(3px);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:inherit;gap:8px';
+    lock.innerHTML = '<div style="font-size:36px">🔒</div><div style="font-size:14px;font-weight:700;color:#1B3A6B">'+_t2('هذه الميزة تتطلب اشتراكاً','Cette fonctionnalité nécessite un abonnement')+'</div><button onclick="_openRenewalPanel()" style="margin-top:4px;padding:8px 20px;background:#1B3A6B;color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">♻️ جدّد الاشتراك</button>';
+    el.style.position = 'relative';
+    el.appendChild(lock);
+  });
+}
+
+function _applyFeatureGates(sub) {
+  // أخفِ أزرار الميزات المدفوعة إذا لم تكن في الباقة
+  // ملاحظة 27/07/2026: أُزيلت 'auto_reply_email' من هنا — كانت تستهدف
+  // عناصر DOM غير موجودة أصلاً في الصفحة (#btn-email-reply/.feat-auto-email)
+  // ولا ميزة حقيقية وراءها (انظر تعليق TIER_FEATURES في rizq_subscription_engine.js).
+  var gateMap = {
+    'auto_reply_calls' : ['#btn-auto-reply','#auto-reply-section','.feat-auto-call'],
+    'vip_manager'      : ['.feat-vip','.vip-section'],
+    'analytics'        : ['.feat-analytics','#advanced-stats'],
+    'verified_badge'   : ['.feat-verified'],
+  };
+  Object.keys(gateMap).forEach(function(feat){
+    var hasFeat = sub.features.indexOf(feat) !== -1;
+    gateMap[feat].forEach(function(sel){
+      var els = document.querySelectorAll(sel);
+      els.forEach(function(el){
+        if(!hasFeat) {
+          el.style.opacity = '0.4';
+          el.style.pointerEvents = 'none';
+          el.title = _t2('يتطلب ترقية الباقة','Mise à niveau requise');
+        } else {
+          el.style.opacity = '';
+          el.style.pointerEvents = '';
+          el.title = '';
+        }
+      });
+    });
+  });
+}
+
+function _openRenewalPanel() {
+  // انقل إلى تاب الاشتراك
+  var subItem = document.querySelector('.sb-item[onclick*="subscription"]');
+  if(subItem) { subItem.click(); return; }
+  // أو فتح modal التجديد مباشرة
+  var panel = document.getElementById('panel-subscription') || document.getElementById('renewal-section');
+  if(panel) { panel.scrollIntoView({behavior:'smooth'}); }
+}
+
+// ══ Package Activation Loader ══
+function loadActivatedPackage(acc) {
+  if(!acc || !acc.id) return acc;
+  try {
+    var acctStore = JSON.parse(localStorage.getItem('rizq_accounts') || '{}');
+    var activated = acctStore[acc.id];
+    if(activated && activated.package) {
+      // Merge package info
+      acc.plan = activated.package;
+      acc.planName = activated.package;
+      acc.pkg_status = activated.pkg_status || 'active';
+      acc.activatedAt = activated.activatedAt;
+      // Compute expiry based on package type
+      if(!acc.trial_ends || activated.pkg_status === 'active') {
+        var base = new Date(activated.activatedAt || Date.now());
+        var pkg = String(activated.package);
+        if(pkg.indexOf('سنوي')!==-1) base.setFullYear(base.getFullYear()+1);
+        else if(pkg.indexOf('ربع')!==-1) base.setMonth(base.getMonth()+3);
+        else if(pkg.indexOf('شهر')!==-1) base.setMonth(base.getMonth()+1);
+        else if(pkg.indexOf('تجريب')!==-1||pkg.indexOf('مجان')!==-1) base.setDate(base.getDate()+3);
+        else base.setMonth(base.getMonth()+1); // default monthly
+        acc.trial_ends = base.toISOString();
+      }
+      // Show activation banner if activated within last 24h
+      var activatedMs = activated.activatedAt ? Date.now()-new Date(activated.activatedAt).getTime() : Infinity;
+      if(activatedMs < 86400000) {
+        setTimeout(function(){
+          var isDia = pkg.indexOf('ماسي')!==-1;
+          var bg = isDia?'linear-gradient(135deg,#7c3aed,#a855f7)':'linear-gradient(135deg,var(--royal,#1B3A6B),#234d8f)';
+          var banner = document.createElement('div');
+          banner.style.cssText='position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:9999;padding:14px 24px;border-radius:14px;color:#fff;font-size:14px;font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,.3);text-align:center;animation:fadeUp .4s ease;background:'+bg;
+          banner.innerHTML = (isDia?'💎':'✅')+_t2(' تم تفعيل باقتك: ',' Votre forfait activé : ')+'<strong>'+pkg+'</strong>'+_t2(' — مرحباً!',' — Bienvenue !')+'<br/><span style="font-size:11px;opacity:.8;font-weight:400">يمكنك الآن الاستفادة من جميع مزايا باقتك</span>';
+          document.body.appendChild(banner);
+          setTimeout(function(){banner.remove();},6000);
+        }, 800);
+      }
+    }
+  } catch(e) { console.warn('loadActivatedPackage error:',e); }
+  // ملاحظة: حالة الباقة الفعلية (نشط/قريب الانتهاء/منتهٍ) تُحسب لحظياً عبر RizqSub.checkSubscription
+  // ويُفعّل التحقق الدوري initSubscriptionLifecycle() في init() — لا حاجة لمنطق محلي مكرر هنا
+  return acc;
+}
+
+function init(){
+  if(IS_DEMO){ _initWithAccount(DEMO_ACC); return; }
+  if(!SESSION_ID || !SESSION_TOKEN){ showAccessDenied(); return; }
+  // دائماً تحقق من الخادم — لا تثق بـ localStorage وحده
+  verifyAccessRemote().then(function(remoteAcc){
+    if(remoteAcc) _initWithAccount(remoteAcc); else showAccessDenied();
+  });
+}
+
+function _initWithAccount(acc){
+  OFFICE=loadActivatedPackage(acc);
+  // جلسة عامة موحَّدة يقرأها rizq_tenders.html — ميزة المناقصات الجديدة
+  if(!IS_DEMO){ try{ localStorage.setItem('rizq_active_session', JSON.stringify({id: acc.id, token: SESSION_TOKEN, type:'office', name: acc.name||''})); }catch(e){} }
+  if(!IS_DEMO && OFFICE && OFFICE.id) { initSubscriptionLifecycle(OFFICE.id, 'office'); }
+  if(window.RizqDash && typeof RizqDash.applySubscriptionLock==='function'){
+    RizqDash.applySubscriptionLock((OFFICE && OFFICE.id) || SESSION_ID, document.querySelector('.main-content') || document.body, { isDemo: !!IS_DEMO });
+  }
+  services=IS_DEMO?DEMO_SERVICES:JSON.parse(localStorage.getItem('office_services_'+SESSION_ID)||'[]');
+  // إصلاح جوهري: تُستدعى الآن بعد حل window.REAL_ACCESS_TOKEN بدل التوازي معه
+  if(!IS_DEMO) _resolveRealAccessToken(acc).then(function(){
+    _rizqMergeCatalogFromBackend(); _rizqMergeRequestsFromBackend();
+    if(typeof RizqAccountPayments !== 'undefined' && acc.id){
+      RizqAccountPayments.syncFromBackend(acc.id, window.REAL_ACCESS_TOKEN || SESSION_TOKEN).then(function(methods){
+        if(Array.isArray(methods) && typeof renderMyPayments === 'function') renderMyPayments();
+      });
+    }
+  });
+  document.getElementById('sb-office-name').textContent=OFFICE.name||_t2('مكتبي','Mon bureau');
+  var _wbn=document.getElementById('wb-name');if(_wbn)_wbn.textContent=acc.name||_t2('مكتب الأعمال الذكي','Mon Bureau Professionnel');
+  var _wpb=document.getElementById('wb-plan-badge');if(_wpb)_wpb.textContent=_t2('💎 باقة ','💎 Forfait ')+(acc.planName||acc.plan||_t2('تجريبي','Essai'));
+  var _wsub=document.getElementById('wb-sub');if(_wsub)_wsub.textContent=(acc.activity||acc.type||_t2('مكتب','Bureau'))+' · '+(acc.city||'موريتانيا');
+  const badge=document.getElementById('sb-type-badge');
+  if(badge) badge.textContent='🏢 '+(OFFICE.activity||_t2('مكتب افتراضي','Bureau virtuel'));
+  var wpb3=document.getElementById('wb-plan-badge');if(wpb3)wpb3.textContent=_t2('💎 باقة ','💎 Forfait ')+(OFFICE.planName||OFFICE.plan||_t2('تجريبي','Essai'));
+  updateSubBadge();
+  showPanel('overview',document.querySelector('.sb-item'));
+  renderHours();
+  if(!IS_DEMO) _rizqMergeHoursFromBackend();
+  fillProfile();
+  renderSubPanel();
+  if(typeof RizqInvoice!=='undefined') renderMyInvoices();
+  renderPackagesDisplay();
+  renderVideoPackagesDisplay();
+  if(!IS_DEMO) _rizqRenderAdsStatus(acc);
+  // req badge + notif bell (+ غرفة الطلبات)
+  if(IS_DEMO){ _rizqMergeServiceRequests(); loadOfficeServiceDeskForm(); }
+  else { _rizqMergeRequestsFromBackend(); _rizqMergeServiceRequests(); loadOfficeServiceDeskForm(); }
+  const reqs=IS_DEMO?DEMO_REQS:JSON.parse(localStorage.getItem('office_requests_'+SESSION_ID)||'[]');
+  const serviceUnread=(Array.isArray(window._rizqOfficeServiceRequests))
+    ? window._rizqOfficeServiceRequests.filter(function(r){ return r.status==='new'; }).length : 0;
+  const unread=reqs.filter(r=>!r.read).length + serviceUnread;
+  const rb=document.getElementById('req-badge');
+  if(rb&&unread>0){rb.textContent=unread;rb.style.display='';}
+  const nc=document.getElementById('notif-count');
+  if(nc&&unread>0){nc.textContent=unread;nc.style.display='flex';}
+  // Welcome banner
+  const wbn=document.getElementById('wb-name');const wbs=document.getElementById('wb-sub');
+  if(wbn)wbn.textContent=acc.name||_t2('مكتبي','Mon bureau');
+  if(wbs)wbs.textContent=(acc.activity||_t2('مكتب افتراضي','Bureau virtuel'))+' · '+(acc.city||_t2('موريتانيا','Mauritanie'))+_t2(' · باقة ',' · Forfait ')+(acc.planName||acc.plan||_t2('تجريبي','Essai'));
+  if(window.RizqAccount && typeof RizqAccount.initShareLinkInput==='function'){
+    RizqAccount.initShareLinkInput('share-link-input', acc);
+  }
+  if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
+    RizqStatusSummary.render({ items: services, itemType: 'catalog' });
+  }
+  if(!IS_DEMO && window.RizqSellerOnboarding && typeof RizqSellerOnboarding.maybeShow==='function'){
+    RizqSellerOnboarding.maybeShow({
+      account: acc,
+      accountType: 'office',
+      isDemo: IS_DEMO,
+      contentCount: services.length,
+      onShare: function(){ if(typeof openShareModal==='function') openShareModal(); }
+    });
+  }
+}
+
+function renderOverview(){
+  const reqs=IS_DEMO?DEMO_REQS:JSON.parse(localStorage.getItem('office_requests_'+SESSION_ID)||'[]');
+  const serviceReqs=(!IS_DEMO && Array.isArray(window._rizqOfficeServiceRequests)) ? window._rizqOfficeServiceRequests : [];
+  const totalReqs = reqs.length + serviceReqs.length;
+  // إصلاح: "زيارات هذا الأسبوع" كانت Math.random()*300+80 — رقم عشوائي
+  // مختلف كل مرة يُفتح فيها الداشبورد، بلا أي علاقة بزيارة حقيقية. الآن
+  // تبدأ بـ"…" ثم renderRealVisits() تملأها برقم حقيقي من الخادم.
+  document.getElementById('ov-stats').innerHTML=[
+    {icon:'👁',val:'…',id:'ov-stat-visits',label:_t2('زيارات هذا الأسبوع','Visites cette semaine'),accent:'#1B3A6B'},
+    {icon:'📋',val:services.length,label:_t2('خدمات معروضة','Services proposés'),accent:'#C9A84C'},
+    {icon:'📩',val:totalReqs,label:_t2('طلبات تواصل','Demandes de contact'),accent:'#10b981'},
+    {icon:'⭐',val:'…',id:'ov-stat-rating',label:_t2('تقييم المكتب','Note du cabinet'),accent:'#f59e0b'},
+  ].map(s=>`<div class="stat-card" style="--accent:${s.accent}"><div style="font-size:22px;margin-bottom:8px">${s.icon}</div><div class="stat-val"${s.id?` id="${s.id}"`:''}>${s.val}</div><div class="stat-label">${s.label}</div></div>`).join('');
+  // إصلاح جوهري 29/07/2026: كان تقييم "4.9" ثابتاً مزيَّفاً دائماً.
+  function _paintOfficeRating(avg, count){
+    var vEl = document.getElementById('ov-stat-rating');
+    var hNum = document.getElementById('hero-rating-num');
+    var hCnt = document.getElementById('hero-rating-count');
+    var hStars = document.getElementById('hero-rating-stars');
+    if(!count){
+      if(vEl) vEl.textContent='—';
+      if(hNum) hNum.textContent='—';
+      if(hCnt) hCnt.textContent=_t2('لا تقييمات بعد','Aucun avis');
+      if(hStars) hStars.textContent='☆☆☆☆☆';
+      return;
+    }
+    if(vEl) vEl.textContent=avg;
+    if(hNum) hNum.textContent=avg;
+    if(hCnt) hCnt.textContent=count+_t2(' تقييم',' avis');
+    if(hStars){
+      var full=Math.round(Number(avg)||0); if(full<0)full=0; if(full>5)full=5;
+      hStars.textContent='★★★★★'.slice(0,full)+'☆☆☆☆☆'.slice(0,5-full);
+    }
+  }
+  if(IS_DEMO){ _paintOfficeRating(null, 0); }
+  else if(typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE && SESSION_ID){
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '')+'/api/reviews/'+encodeURIComponent(SESSION_ID)+'/stats')
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(data){
+        if(!data || !data.count){ _paintOfficeRating(null, 0); return; }
+        _paintOfficeRating(data.average, data.count);
+      }).catch(function(){ _paintOfficeRating(null, 0); });
+  } else {
+    _paintOfficeRating(null, 0);
+  }
+  renderRealVisits();
+  renderAdvancedStats();
+
+  const mergedPreview = serviceReqs.slice(0, 3).map(function(r){
+    return {
+      name: r.buyerName,
+      service: r.service || r.templateName || '',
+      time: r.createdAt ? new Date(r.createdAt).toLocaleDateString(localStorage.getItem('rizq_lang')==='fr'?'fr-FR':'ar-MR-u-nu-latn') : '',
+      read: r.status !== 'new'
+    };
+  }).concat(reqs.slice(-3).reverse()).slice(0, 3);
+  document.getElementById('ov-requests').innerHTML=mergedPreview.length?mergedPreview.map(r=>`
+    <div style="padding:10px 0;border-bottom:1px solid rgba(27,58,107,.05);display:flex;gap:10px;align-items:flex-start">
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--royal),var(--royal-light));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;flex-shrink:0">${r.name?r.name[0].toUpperCase():_t2('ز','C')}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--navy)">${escapeHtml(r.name)}</div>
+      <div style="font-size:12px;color:var(--text-muted)">${escapeHtml(r.service||'')} · ${r.time||''}</div></div>
+      ${!r.read?'<div style="width:8px;height:8px;border-radius:50%;background:var(--royal);margin-top:6px;flex-shrink:0"></div>':''}
+    </div>`).join(''):`<p style="color:var(--text-muted);font-size:13px;padding:10px 0">${_t2('لا توجد طلبات بعد','Aucune demande pour le moment')}</p>`;
+
+  renderSubOverview();
+}
+
+// إصلاح: يجلب رقم الزيارات الحقيقي (RizqSub.fetchVisitStats → rizq_visit_tracker.js
+// على الخادم) بدل Math.random() السابق. last7 محسوبة من last30 الحقيقية.
+function renderRealVisits(){
+  var elV=document.getElementById('ov-stat-visits');
+  if(!elV) return;
+  var accId=(typeof OFFICE!=='undefined'&&OFFICE&&OFFICE.id)||'';
+  if(typeof RizqSub==='undefined' || !accId){ elV.textContent=_t2('غير متاح','N/D'); return; }
+  RizqSub.fetchVisitStats(accId).then(function(stats){
+    if(!stats){ elV.textContent=_t2('غير متاح بعد','Pas encore dispo'); return; }
+    var last7=(stats.last30||[]).slice(-7).reduce(function(s,d){return s+d.count;},0);
+    elV.textContent=last7.toLocaleString();
+  });
+}
+
+// ── إحصائيات متقدّمة (منحنى 30 يوماً + مصادر الزيارات) — ميزة حصرية للباقات
+// المدفوعة، تُقفَل تلقائياً بعنصر #advanced-stats عبر _applyFeatureGates
+// الموجودة أصلاً في هذا الملف (كانت مُعرَّفة بلا أي عنصر DOM فعلي تحكمه) ──
+function renderAdvancedStats(){
+  var accId=(typeof OFFICE!=='undefined'&&OFFICE&&OFFICE.id)||'';
+  var chartEl=document.getElementById('adv-stats-chart');
+  var srcEl=document.getElementById('adv-stats-sources');
+  var totalEl=document.getElementById('adv-stat-total'), monthEl=document.getElementById('adv-stat-month');
+  if(!chartEl) return;
+  if(typeof RizqSub==='undefined' || !accId){
+    chartEl.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px">'+_t2('الإحصائيات تحتاج ربط الحساب بخادم حقيقي','Les statistiques nécessitent un compte connecté à un serveur réel')+'</div>';
+    return;
+  }
+  RizqSub.fetchVisitStats(accId).then(function(stats){
+    if(!stats){
+      chartEl.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:12px">'+_t2('لا تتوفر بيانات كافية بعد','Pas assez de données pour le moment')+'</div>';
+      if(srcEl) srcEl.innerHTML='';
+      return;
+    }
+    if(totalEl) totalEl.textContent=stats.total.toLocaleString();
+    if(monthEl) monthEl.textContent=stats.monthTotal.toLocaleString();
+
+    var days=stats.last30||[];
+    var max=Math.max(1, Math.max.apply(null, days.map(function(d){return d.count;})));
+    chartEl.innerHTML='<div style="display:flex;align-items:flex-end;gap:2px;height:100%">'+days.map(function(d){
+      var h=Math.round((d.count/max)*100);
+      return '<div title="'+d.date+': '+d.count+'" style="flex:1;height:'+Math.max(h,2)+'%;background:linear-gradient(180deg,#C9A84C,#e8c96a);border-radius:2px 2px 0 0;min-width:2px"></div>';
+    }).join('')+'</div>';
+
+    var srcLabels={direct:_t2('مباشر','Direct'),whatsapp:'WhatsApp',facebook:'Facebook/Instagram',google:'Google',other:_t2('أخرى','Autres')};
+    var src=stats.bySource||{}; var srcTotal=Object.keys(src).reduce(function(s,k){return s+(src[k]||0);},0);
+    if(srcEl){
+      if(!srcTotal){ srcEl.innerHTML='<div style="text-align:center;padding:10px;color:var(--text-muted);font-size:12px">'+_t2('لا بيانات مصادر بعد','Pas encore de données de source')+'</div>'; }
+      else {
+        srcEl.innerHTML=Object.keys(srcLabels).map(function(k){
+          var v=src[k]||0, pct=srcTotal?Math.round((v/srcTotal)*100):0;
+          return '<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:3px"><span>'+srcLabels[k]+'</span><span style="font-weight:700">'+pct+'%</span></div><div style="height:5px;background:rgba(27,58,107,.08);border-radius:3px"><div style="height:100%;width:'+pct+'%;background:#1B3A6B;border-radius:3px"></div></div></div>';
+        }).join('');
+      }
+    }
+  });
+}
+
+function renderSubOverview(){
+  const el=document.getElementById('ov-sub');if(!el||!OFFICE)return;
+  const info=getSubInfo();
+  const daysLeft=info.daysLeft;
+  const title=info.isExpired?_t2('❌ انتهى الاشتراك','❌ Abonnement expiré'):(!info.isTrial?_t2('✅ اشتراك نشط','✅ Abonnement actif'):_t2('🎁 فترة تجريبية','🎁 Période d\'essai'));
+  el.innerHTML=`<div style="background:linear-gradient(135deg,var(--royal),var(--royal-light));border-radius:13px;padding:16px;color:#fff">
+    <div style="font-size:13px;font-weight:700;margin-bottom:3px">${title}</div>
+    <div style="font-size:11px;opacity:.7;margin-bottom:10px">${daysLeft>0?_t2(`ينتهي خلال ${daysLeft} يوم`,`Expire dans ${daysLeft} jour(s)`):_t2('انتهى الاشتراك','Abonnement expiré')}</div>
+    <div style="height:5px;background:rgba(255,255,255,.2);border-radius:3px"><div style="height:100%;width:${info.pct}%;background:var(--gold);border-radius:3px"></div></div>
+    ${daysLeft<=2?`<button class="btn btn-gold btn-sm" style="margin-top:10px" onclick="showPanel('subscription',null)">${_t2('🔄 جدّد الآن','🔄 Renouveler maintenant')}</button>`:''}
+  </div>`;
+}
+
+function _serviceReqStatusLabel(st){
+  var map = {
+    new: _t2('جديد','Nouveau'),
+    in_progress: _t2('قيد المعالجة','En cours'),
+    done: _t2('منجز','Terminé'),
+    rejected: _t2('مرفوض','Refusé')
+  };
+  return map[st] || st || '';
+}
+
+function renderRequests(){
+  const offReqs=IS_DEMO?[...DEMO_REQS]:JSON.parse(localStorage.getItem('office_requests_'+SESSION_ID)||'[]');
+  offReqs.forEach(r=>{ if(!r._fromBackend) r.read=true; });
+  if(!IS_DEMO){
+    localStorage.setItem('office_requests_'+SESSION_ID,JSON.stringify(offReqs.filter(r=>!r._fromBackend)));
+  }
+
+  const backendThreads = (!IS_DEMO && Array.isArray(window._rizqOfficeBackendThreads)) ? window._rizqOfficeBackendThreads : [];
+  const serviceReqs = (!IS_DEMO && Array.isArray(window._rizqOfficeServiceRequests)) ? window._rizqOfficeServiceRequests : [];
+  const unreadLocal = offReqs.filter(r=>!r.read).length;
+  const unreadBackend = backendThreads.reduce(function(s,t){ return s+(t.unreadCount||0); }, 0);
+  const unreadService = serviceReqs.filter(function(r){ return r.status === 'new'; }).length;
+  const unreadTotal = unreadLocal + unreadBackend + unreadService;
+
+  document.getElementById('req-badge').style.display = unreadTotal > 0 ? '' : 'none';
+  if(unreadTotal > 0) document.getElementById('req-badge').textContent = unreadTotal;
+  const nc=document.getElementById('notif-count');
+  if(nc){ if(unreadTotal>0){ nc.textContent=unreadTotal; nc.style.display='flex'; } else nc.style.display='none'; }
+
+  const el=document.getElementById('requests-list');if(!el)return;
+
+  if(!offReqs.length && !backendThreads.length && !serviceReqs.length){
+    el.innerHTML='<div style="text-align:center;padding:48px;color:var(--text-muted)"><div style="font-size:48px;margin-bottom:10px">📩</div><p>'+_t2('لا توجد طلبات بعد','Aucune demande pour le moment')+'</p></div>';
+    return;
+  }
+
+  var statusColors = { new:'#1B3A6B', in_progress:'#f59e0b', done:'#10b981', rejected:'#dc2626' };
+  var serviceHtml = serviceReqs.map(function(r){
+    var phone = r.buyerWhatsapp || r.buyerPhone || '';
+    var timeStr = r.createdAt ? new Date(r.createdAt).toLocaleString(localStorage.getItem('rizq_lang')==='fr'?'fr-FR':'ar-MR-u-nu-latn') : '';
+    var st = r.status || 'new';
+    return '<div class="req-item" style="--rc:'+(st==='new'?'var(--royal)':'rgba(27,58,107,.2)')+'">'
+      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">'
+      + '<span style="font-size:14px;font-weight:700;color:var(--navy)">'+escapeHtml(r.buyerName||_t2('زبون','Client'))+'</span>'
+      + (r.service?'<span style="font-size:11px;background:rgba(27,58,107,.08);color:var(--navy);padding:2px 8px;border-radius:10px">'+escapeHtml(r.service)+'</span>':'')
+      + (r.templateName?'<span style="font-size:10px;background:rgba(201,168,76,.15);color:#8a6a1a;padding:2px 8px;border-radius:10px">'+escapeHtml(r.templateName)+'</span>':'')
+      + '<span style="font-size:10px;font-weight:800;color:#fff;background:'+(statusColors[st]||'#64748b')+';padding:2px 8px;border-radius:10px">'+_serviceReqStatusLabel(st)+'</span>'
+      + '<span style="font-size:11px;color:#9aa5b8;margin-right:auto">'+timeStr+'</span>'
+      + '</div>'
+      + '<div class="req-meta">'+escapeHtml(r.message||'')+'</div>'
+      + '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:10px;font-size:12px">'
+      + (phone?'<a href="https://wa.me/'+String(phone).replace(/\D/g,'')+'" target="_blank" rel="noopener" style="color:#10b981;font-weight:600">📞 WhatsApp '+escapeHtml(phone)+'</a>':'')
+      + (r.buyerEmail?'<a href="mailto:'+escapeHtml(r.buyerEmail)+'" style="color:#1B3A6B;font-weight:600">✉️ '+escapeHtml(r.buyerEmail)+'</a>':'')
+      + (r.id?'<span style="color:#9aa5b8;font-family:monospace">'+escapeHtml(r.id)+'</span>':'')
+      + '</div>'
+      + (window.RizqServiceDesk && typeof RizqServiceDesk.attachmentsHtml==='function' ? RizqServiceDesk.attachmentsHtml(r) : '')
+      + '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">'
+      + '<button type="button" onclick="_rizqSetServiceReqStatus(\''+escapeHtml(r.id)+'\',\'in_progress\')" style="padding:6px 10px;border:none;border-radius:8px;background:#fef3c7;color:#92400e;font-size:11.5px;font-weight:700;cursor:pointer">'+_t2('قيد المعالجة','En cours')+'</button>'
+      + '<button type="button" onclick="_rizqSetServiceReqStatus(\''+escapeHtml(r.id)+'\',\'done\')" style="padding:6px 10px;border:none;border-radius:8px;background:#d1fae5;color:#065f46;font-size:11.5px;font-weight:700;cursor:pointer">'+_t2('منجز','Terminé')+'</button>'
+      + '<button type="button" onclick="_rizqSetServiceReqStatus(\''+escapeHtml(r.id)+'\',\'rejected\')" style="padding:6px 10px;border:none;border-radius:8px;background:#fee2e2;color:#991b1b;font-size:11.5px;font-weight:700;cursor:pointer">'+_t2('رفض','Refuser')+'</button>'
+      + '</div></div>';
+  }).join('');
+  if(window.RizqServiceDesk && typeof RizqServiceDesk.bindAttachmentButtons==='function'){
+    RizqServiceDesk.bindAttachmentButtons(el, function(){ return window.REAL_ACCESS_TOKEN || SESSION_TOKEN; });
+  }
+
+  var localHtml = offReqs.slice().reverse().map(function(r){
+    return '<div class="req-item" style="--rc:'+(r.read?'rgba(27,58,107,.2)':'var(--royal)')+'">'
+      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">'
+      + '<span style="font-size:14px;font-weight:700;color:var(--navy)">'+escapeHtml(r.name||_t2('زبون','Client'))+'</span>'
+      + (r.service?'<span style="font-size:11px;background:rgba(27,58,107,.08);color:var(--navy);padding:2px 8px;border-radius:10px">'+escapeHtml(r.service)+'</span>':'')
+      + '<span style="font-size:11px;color:#9aa5b8;margin-right:auto">'+(r.time||'')+'</span>'
+      + '</div>'
+      + '<div class="req-meta">'+escapeHtml(r.msg||'')+'</div>'
+      + (r.phone?'<div style="margin-top:8px"><a href="https://wa.me/'+r.phone.replace(/\D/g,'')+'" target="_blank" style="font-size:12px;color:#10b981;font-weight:600">📞 '+_t2('واتساب','WhatsApp')+' '+escapeHtml(r.phone)+'</a></div>':'')
+      + '</div>';
+  }).join('');
+
+  var threadsHtml = backendThreads.map(function(t){
+    var name = t.buyerName || _t2('زبون','Client');
+    var last = t.lastMessage || {};
+    var timeStr = last.createdAt ? new Date(last.createdAt).toLocaleString(typeof RizqI18n!=='undefined' && localStorage.getItem('rizq_lang')==='fr'?'fr-FR':'ar-MR-u-nu-latn') : '';
+    var tk = escapeHtml(t.threadKey);
+    return '<div class="req-item" style="--rc:'+((t.unreadCount||0)>0?'var(--royal)':'rgba(27,58,107,.2)')+'">'
+      + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">'
+      + '<span style="font-size:14px;font-weight:700;color:var(--navy)">'+escapeHtml(name)+'</span>'
+      + (t.adTitle?'<span style="font-size:11px;background:rgba(27,58,107,.08);color:var(--navy);padding:2px 8px;border-radius:10px">'+escapeHtml(t.adTitle)+'</span>':'')
+      + ((t.unreadCount||0)>0?'<span style="font-size:10px;font-weight:700;color:#fff;background:#dc2626;padding:2px 7px;border-radius:10px">'+t.unreadCount+'</span>':'')
+      + '<span style="font-size:11px;color:#9aa5b8;margin-right:auto">'+timeStr+'</span>'
+      + '</div>'
+      + '<div class="req-meta">'+escapeHtml(last.body||'')+'</div>'
+      + (t.buyerPhone?'<div style="margin-top:8px"><a href="https://wa.me/'+t.buyerPhone.replace(/\D/g,'')+'" target="_blank" style="font-size:12px;color:#10b981;font-weight:600">📞 '+_t2('واتساب','WhatsApp')+' '+escapeHtml(t.buyerPhone)+'</a></div>':'')
+      + '<div style="display:flex;gap:6px;margin-top:10px">'
+      + '<input type="text" id="office-reply-in-'+tk+'" placeholder="'+_t2('اكتب رداً…','Écrire une réponse…')+'" style="flex:1;padding:8px 10px;border:1px solid #d1d5db;border-radius:8px;font-size:12.5px;font-family:inherit">'
+      + '<button onclick="_rizqSendOfficeThreadReply(\''+tk+'\')" style="padding:8px 14px;background:#1B3A6B;color:#fff;border:none;border-radius:8px;font-size:12.5px;font-weight:700;cursor:pointer">'+_t2('إرسال','Envoyer')+'</button>'
+      + '</div></div>';
+  }).join('');
+
+  el.innerHTML = serviceHtml + localHtml + threadsHtml;
+
+  if(!IS_DEMO && typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE && SESSION_TOKEN){
+    backendThreads.forEach(function(t){
+      if((t.unreadCount||0)>0){
+        fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '')+'/api/messages/thread/'+encodeURIComponent(t.threadKey)+'/read', {
+          method:'PATCH', headers:{'x-account-token':(window.REAL_ACCESS_TOKEN || SESSION_TOKEN)}
+        }).catch(function(){});
+      }
+    });
+  }
+}
+
+function _rizqMergeRequestsFromBackend(){
+  try{
+    if(IS_DEMO || typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN) return;
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '')+'/api/messages/threads?accountId='+encodeURIComponent(SESSION_ID), {
+      headers:{'x-account-token':(window.REAL_ACCESS_TOKEN || SESSION_TOKEN)}
+    }).then(function(r){ return r.ok ? r.json() : null; }).then(function(data){
+      window._rizqOfficeBackendThreads = (data && Array.isArray(data.threads)) ? data.threads : [];
+      if(typeof renderRequests==='function') renderRequests();
+      if(typeof renderOverview==='function') renderOverview();
+    }).catch(function(){});
+  }catch(e){}
+}
+
+function _rizqMergeServiceRequests(){
+  try{
+    if(IS_DEMO){
+      window._rizqOfficeServiceRequests = [
+        {id:'SRQ-DEMO-01',buyerName:'فاطمة منت أحمد',buyerPhone:'22244112233',buyerWhatsapp:'22244112233',buyerEmail:'fatima.demo@example.mr',service:'استشارة قانونية',message:'أحتاج استشارة حول عقد إيجار تجاري',templateName:'طلب استشارة — مكتب العدالة للمحاماة',status:'new',createdAt:new Date().toISOString()},
+        {id:'SRQ-DEMO-02',buyerName:'سيدي محمد',buyerPhone:'22233998877',buyerWhatsapp:'22233998877',buyerEmail:'',service:'تأسيس شركة',message:'أرغب في تأسيس SARL — الوثائق جاهزة عبر واتساب',templateName:'طلب استشارة — مكتب العدالة للمحاماة',status:'in_progress',createdAt:new Date(Date.now()-864e5).toISOString()},
+        {id:'SRQ-DEMO-03',buyerName:'آمنة بنت عبدالله',buyerPhone:'22236655443',buyerWhatsapp:'22236655443',buyerEmail:'amina.demo@example.mr',service:'صياغة عقد',message:'عقد شراكة بين طرفين — مستعجل',templateName:'طلب استشارة — مكتب العدالة للمحاماة',status:'done',createdAt:new Date(Date.now()-2*864e5).toISOString()}
+      ];
+      return;
+    }
+    if(!SESSION_ID) return;
+    var token = window.REAL_ACCESS_TOKEN || SESSION_TOKEN;
+    if(window.RizqServiceDesk && token){
+      RizqServiceDesk.listMine(SESSION_ID, token).then(function(list){
+        window._rizqOfficeServiceRequests = Array.isArray(list) ? list : [];
+        if(typeof renderRequests==='function') renderRequests();
+        if(typeof renderOverview==='function') renderOverview();
+      });
+      return;
+    }
+    try{
+      var local = JSON.parse(localStorage.getItem('rizq_service_requests_local')||'[]');
+      window._rizqOfficeServiceRequests = local.filter(function(r){ return r && r.accountId === SESSION_ID; });
+    }catch(e2){ window._rizqOfficeServiceRequests = []; }
+  }catch(e){}
+}
+
+function _rizqSetServiceReqStatus(id, status){
+  if(!id || !status) return;
+  var token = window.REAL_ACCESS_TOKEN || SESSION_TOKEN;
+  if(window.RizqServiceDesk && token){
+    RizqServiceDesk.setStatus(id, status, token).then(function(){
+      _rizqMergeServiceRequests();
+      showToast(_t2('تم تحديث حالة الطلب','Statut mis à jour'), 'success');
+    }).catch(function(){
+      showToast(_t2('تعذّر تحديث الحالة','Échec de la mise à jour'), 'error');
+    });
+    return;
+  }
+  try{
+    var key = 'rizq_service_requests_local';
+    var list = JSON.parse(localStorage.getItem(key)||'[]');
+    list = list.map(function(r){ if(r && r.id===id) r.status = status; return r; });
+    localStorage.setItem(key, JSON.stringify(list));
+    _rizqMergeServiceRequests();
+    if(typeof renderRequests==='function') renderRequests();
+  }catch(e){}
+}
+
+function loadOfficeServiceDeskForm(){
+  var desk = { enabled: true, formTitle: '', formHint: '', docsChannel: 'whatsapp' };
+  try{
+    var saved = JSON.parse(localStorage.getItem('rizq_service_desk_'+SESSION_ID)||'null');
+    if(saved) desk = Object.assign(desk, saved);
+  }catch(e){}
+  if(OFFICE && OFFICE.serviceDesk) desk = Object.assign(desk, OFFICE.serviceDesk);
+  var t = document.getElementById('desk-form-title');
+  var h = document.getElementById('desk-form-hint');
+  var c = document.getElementById('desk-docs-channel');
+  var en = document.getElementById('desk-enabled');
+  if(t) t.value = desk.formTitle || '';
+  if(h) h.value = desk.formHint || '';
+  if(c) c.value = desk.docsChannel || 'whatsapp';
+  if(en) en.checked = desk.enabled !== false;
+}
+
+function saveOfficeServiceDesk(){
+  var desk = {
+    enabled: !!(document.getElementById('desk-enabled') && document.getElementById('desk-enabled').checked),
+    formTitle: ((document.getElementById('desk-form-title')||{}).value||'').trim(),
+    formHint: ((document.getElementById('desk-form-hint')||{}).value||'').trim(),
+    docsChannel: ((document.getElementById('desk-docs-channel')||{}).value||'whatsapp')
+  };
+  var token = window.REAL_ACCESS_TOKEN || SESSION_TOKEN;
+  var done = function(out){
+    if(OFFICE) OFFICE.serviceDesk = out || desk;
+    showToast(_t2('✅ تم حفظ هوية غرفة الطلبات','✅ Identité du bureau de demandes enregistrée'), 'success');
+  };
+  if(window.RizqServiceDesk){
+    RizqServiceDesk.saveDeskSettings(SESSION_ID, token, desk).then(done).catch(function(){ done(desk); });
+  } else {
+    try{ localStorage.setItem('rizq_service_desk_'+SESSION_ID, JSON.stringify(desk)); }catch(e){}
+    done(desk);
+  }
+}
+
+function _rizqSendOfficeThreadReply(threadKey){
+  var input = document.getElementById('office-reply-in-'+threadKey);
+  if(!input) return;
+  var body = input.value.trim();
+  if(!body) return;
+  if(IS_DEMO || !window.RIZQ_BACKEND_BASE || !SESSION_ID){
+    showToast(_t2('⚠️ متاح فقط لحساب حقيقي متصل بالخادم','⚠️ Disponible uniquement pour un compte réel connecté au serveur'),'error');
+    return;
+  }
+  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '')+'/api/messages/reply', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-account-token':(window.REAL_ACCESS_TOKEN || SESSION_TOKEN)},
+    body: JSON.stringify({ sellerAccountId: SESSION_ID, threadKey: threadKey, body: body })
+  }).then(function(r){ return r.ok ? r.json() : Promise.reject(); })
+    .then(function(){
+      showToast(_t2('✅ تم إرسال الرد','✅ Réponse envoyée'));
+      input.value='';
+      _rizqMergeRequestsFromBackend();
+    })
+    .catch(function(){ showToast(_t2('تعذّر إرسال الرد — حاول مرة أخرى','Échec de l\'envoi — réessayez'),'error'); });
+}
+
+let _svcOpen=true;
+function toggleServiceForm(){
+  _svcOpen=!_svcOpen;
+  document.getElementById('svc-form-body').style.display=_svcOpen?'block':'none';
+  var _tm=(typeof RizqI18n!=='undefined')?RizqI18n:null;
+  document.getElementById('svc-toggle-btn').textContent=_tm?(_svcOpen?_tm.t('svc-collapse','dashboard_office'):_tm.t('svc-expand','dashboard_office')):(_svcOpen?'تصغير ↑':'إضافة خدمة ↓');
+}
+
+function renderServices(){
+  const cnt=document.getElementById('svc-count');if(cnt)cnt.textContent=services.length+' '+_t2('خدمة','service(s)');
+  const el=document.getElementById('services-list');if(!el)return;
+  if(!services.length){el.innerHTML='<div style="text-align:center;padding:36px;color:var(--text-muted)"><div style="font-size:40px;margin-bottom:10px">📋</div><p>'+_t2('لا توجد خدمات — أضف خدمتك الأولى','Aucun service — ajoutez votre premier service')+'</p></div>';return;}
+  el.innerHTML=services.map((s,i)=>`
+    <div class="service-card">
+      <div class="service-icon-box">${s.emoji||'📄'}</div>
+      <div style="flex:1">
+        <div class="service-name">${escapeHtml(s.name)}</div>
+        <div class="service-price">${Number(s.price||0).toLocaleString()} MRU ${s.duration?`<span style="font-size:11px;color:var(--text-muted);font-weight:400">· ${escapeHtml(s.duration)}</span>`:''}</div>
+        <div class="service-desc">${escapeHtml(s.desc||'')}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <button class="btn btn-outline btn-sm" onclick="editService(${i})" title="${_t2('تعديل','Modifier')}">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteService(${i})" title="${_t2('حذف','Supprimer')}">🗑️</button>
+      </div>
+    </div>`).join('');
+  if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
+    RizqStatusSummary.render({ items: services, itemType: 'catalog' });
+  }
+}
+
+function saveService(){
+  // ── فحص حد عروض التأمين: الحد الشهري المجاني (منتهي) + الحد العددي
+  // الدقيق لمستوى الباقة النشطة (5 للأساسية / غير محدود للاحترافية وشركات
+  // التأمين) — تصحيح 25/07/2026: canPostNewAd() وحدها كانت تمنح "غير محدود"
+  // لأي باقة نشطة أياً كان مستواها، بعكس وعد PKG_DEFAULTS الفعلي.
+  if(typeof RizqSub !== 'undefined' && typeof SESSION_ID !== 'undefined' && SESSION_ID){
+    var _pc = RizqSub.checkPostLimit(SESSION_ID, 'office', (typeof services!=='undefined' && services)?services.length:0);
+    if(!_pc.allowed){
+      var _msg = _pc.reason==='tier_limit_reached'
+        ? _t2('⚠️ وصلت لحد '+_pc.limit+' عروض نشطة المسموح بها في باقتك الحالية. أوقِف عرضاً قديماً أو رقِّ لباقة أعلى لعرض المزيد.', '⚠️ Vous avez atteint la limite de '+_pc.limit+' offres actives de votre forfait actuel. Désactivez une ancienne offre ou passez à un forfait supérieur.')
+        : (_pc.msg || _t2('وصلت للحد الشهري (3 إعلانات). جدّد اشتراكك لنشر المزيد.','Vous avez atteint la limite mensuelle (3 annonces). Renouvelez votre abonnement pour en publier plus.'));
+      showToast(_msg,'error');
+      _openRenewalPanel(); return;
+    }
+    if(_pc.reason === 'free_monthly')
+      showToast(_t2('متبقي لك '+_pc.remaining+' إعلان(ات) هذا الشهر ☝️','Il vous reste '+_pc.remaining+' annonce(s) ce mois-ci ☝️'),'info');
+  }
+  var name  = document.getElementById('svc-name')  ? document.getElementById('svc-name').value.trim()  : '';
+  var price = document.getElementById('svc-price') ? document.getElementById('svc-price').value.trim() : '';
+  var desc  = document.getElementById('svc-desc')  ? document.getElementById('svc-desc').value.trim()  : '';
+  if(!name){showToast(_t2('يرجى إدخال اسم الخدمة','Veuillez saisir le nom du service'),'error');return;}
+
+  var adData = {
+    id: 'OFC-' + Date.now(),
+    title: name,
+    desc:  desc,
+    price: price,
+    category: 'services',
+    images: [],
+    seller: typeof accData !== 'undefined' ? (accData.name||_t2('مكتب','Bureau')) : _t2('مكتب','Bureau'),
+    seller_trust_score: 70,
+  };
+
+  function doSave(data){
+    // كان هذا المتغيّر محلياً (var services = ...) فيُظلّل المتغيّر العام services
+    // الذي تقرأ منه renderServices()/deleteService() — فتُحفظ الخدمة الجديدة في
+    // localStorage تحت مفتاح مختلف (rizq_office_services_) لا يُقرأ منه أبداً عند
+    // التحميل (الذي يقرأ office_services_ بدون بادئة)، فتختفي الخدمة فوراً ولا تظهر
+    // حتى بعد إعادة تحميل الصفحة. الإصلاح: نُحدّث المصفوفة العامة services مباشرة
+    // ونستخدم نفس مفتاح التخزين المستخدم في التحميل والحذف.
+    var _newSvc = {
+      id: data.id, name: name, price: price, desc: desc,
+      status: data._status || 'active',
+      date: new Date().toLocaleDateString('ar-MR-u-nu-latn')
+    };
+    services.unshift(_newSvc);
+    if(!IS_DEMO) localStorage.setItem('office_services_'+(typeof SESSION_ID!=='undefined'?SESSION_ID:'demo'), JSON.stringify(services));
+    if(!IS_DEMO) _rizqSyncCatalogItem(_newSvc);
+    // سجّل الإعلان في العداد الشهري عند الانتهاء
+    if(typeof RizqSub !== 'undefined' && typeof SESSION_ID !== 'undefined' && SESSION_ID){
+      var _subSt = RizqSub.checkSubscription(SESSION_ID);
+      if(_subSt.status==='expired'||_subSt.status==='no_subscription') RizqSub.recordAdPost(SESSION_ID);
+    }
+    ['svc-name','svc-price','svc-desc'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+    showToast(data._status==='pending_review'?_t2('⏳ الخدمة قيد المراجعة','⏳ Service en cours de vérification'):_t2('✅ تم إضافة الخدمة','✅ Service ajouté'));
+    if(typeof renderServices === 'function') renderServices();
+    if(typeof showPanel === 'function') showPanel('services');
+  }
+
+  if(typeof RizqAgent !== 'undefined'){
+    var feedbackEl = document.getElementById('office-mod-feedback');
+    RizqAgent.handleSubmit(adData, {
+      feedbackEl: feedbackEl,
+      onApprove: function(d){ doSave(d); },
+      onReject:  function()  {},
+      onReview:  function(r,d){ doSave(d); },
+    });
+  } else { doSave(adData); }
+}
+function clearSvcForm(){['svc-name','svc-price','svc-duration','svc-emoji','svc-desc'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});window._editSvcIdx=null;}
+function editService(i){const s=services[i];document.getElementById('svc-name').value=s.name||'';document.getElementById('svc-price').value=s.price||'';document.getElementById('svc-duration').value=s.duration||'';document.getElementById('svc-emoji').value=s.emoji||'';document.getElementById('svc-desc').value=s.desc||'';window._editSvcIdx=i;if(!_svcOpen)toggleServiceForm();}
+function deleteService(i){
+  if(!confirm(_t2('حذف الخدمة؟','Supprimer ce service ?')))return;
+  if(!IS_DEMO) _rizqDeleteCatalogItem(services[i]);
+  services.splice(i,1);
+  if(!IS_DEMO)localStorage.setItem('office_services_'+SESSION_ID,JSON.stringify(services));
+  renderServices();
+  showToast(_t2('تم الحذف','Supprimé'),'error');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// مزامنة حقيقية مع rizq-backend (/api/catalog) — إصلاح جوهري 29/07/2026
+// كانت خدمات المكتب localStorage فقط بمتصفح صاحب المكتب. فشل صامت تماماً
+// (fire-and-forget) إن لم يُنشَر الخادم بعد أو انقطعت الشبكة.
+// ══════════════════════════════════════════════════════════════════
+function _rizqSyncCatalogItem(svc){
+  try{
+    if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN) return;
+    var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
+    var body = { accountId: SESSION_ID, kind:'service', name: svc.name, price: svc.price, desc: svc.desc, status: svc.status==='pending_review'?'pending_review':(svc.status==='inactive'?'inactive':'active') };
+    if(svc._backendId){
+      fetch(base+'/api/catalog/'+encodeURIComponent(svc._backendId), {
+        method:'PATCH', headers:{'Content-Type':'application/json','x-account-token':(window.REAL_ACCESS_TOKEN || SESSION_TOKEN)}, body: JSON.stringify(body)
+      }).catch(function(){});
+    } else {
+      fetch(base+'/api/catalog', {
+        method:'POST', headers:{'Content-Type':'application/json','x-account-token':(window.REAL_ACCESS_TOKEN || SESSION_TOKEN)}, body: JSON.stringify(body)
+      }).then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(data){
+          if(data && data.item && data.item.id){
+            svc._backendId = data.item.id;
+            localStorage.setItem('office_services_'+SESSION_ID, JSON.stringify(services));
+          }
+        }).catch(function(){});
+    }
+  }catch(e){}
+}
+function _rizqDeleteCatalogItem(svc){
+  try{
+    if(!svc || !svc._backendId || typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE || !SESSION_TOKEN) return;
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '')+'/api/catalog/'+encodeURIComponent(svc._backendId), {
+      method:'DELETE', headers:{'x-account-token':(window.REAL_ACCESS_TOKEN || SESSION_TOKEN)}
+    }).catch(function(){});
+  }catch(e){}
+}
+function _rizqMergeCatalogFromBackend(){
+  try{
+    if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN) return;
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '')+'/api/catalog/mine?accountId='+encodeURIComponent(SESSION_ID)+'&kind=service', {
+      headers:{'x-account-token':(window.REAL_ACCESS_TOKEN || SESSION_TOKEN)}
+    }).then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(data){
+        if(!data || !Array.isArray(data.items) || !data.items.length) return;
+        var existingBackendIds = {};
+        services.forEach(function(s){ if(s._backendId) existingBackendIds[s._backendId]=true; });
+        var toAdd = data.items.filter(function(it){ return !existingBackendIds[it.id]; }).map(function(it){
+          return { id:'SVC-'+it.id, _backendId: it.id, name: it.name, price: it.price, desc: it.desc, status: it.status, date: it.createdAt ? new Date(it.createdAt).toLocaleDateString('ar-MR-u-nu-latn') : '' };
+        });
+        if(!toAdd.length) return;
+        services = services.concat(toAdd);
+        localStorage.setItem('office_services_'+SESSION_ID, JSON.stringify(services));
+        if(typeof renderServices === 'function') renderServices();
+      }).catch(function(){});
+  }catch(e){}
+}
+
+function _dashboardLang(){ return (window.RizqI18n && RizqI18n.getLang() === 'fr') ? 'fr' : 'ar'; }
+function renderDashboardActivities(accountType, acc){
+  if(!window.RizqMerchantActivities) return;
+  var pkgId = acc && (acc.packageId || acc.package_id) ? (acc.packageId || acc.package_id) : null;
+  var actEl = document.getElementById('p-activity');
+  var catEl = document.getElementById('p-category');
+  var selected = (acc && acc.activityId) || '';
+  if(actEl){
+    RizqMerchantActivities.renderSelect(actEl, { accountType: accountType, packageId: pkgId, lang: _dashboardLang(), selected: selected });
+    if(!selected && acc && acc.activity){
+      for(var i=0;i<actEl.options.length;i++){
+        if(actEl.options[i].text.indexOf(acc.activity)!==-1){ actEl.selectedIndex=i; selected=actEl.value; break; }
+      }
+    }
+  }
+  if(catEl && selected){
+    var legacy = RizqMerchantActivities.legacyCategoryFromActivity(selected);
+    catEl.innerHTML = '<option value="'+legacy+'">'+legacy+'</option>';
+    catEl.value = legacy;
+  }
+}
+function onDashboardActivityChange(accountType){
+  var actEl = document.getElementById('p-activity');
+  var catEl = document.getElementById('p-category');
+  if(!actEl || !catEl || !window.RizqMerchantActivities) return;
+  var legacy = RizqMerchantActivities.legacyCategoryFromActivity(actEl.value);
+  catEl.innerHTML = '<option value="'+legacy+'">'+legacy+'</option>';
+  catEl.value = legacy;
+}
+function toggleActivityOther(){ onDashboardActivityChange('office'); }
+window._pThumbData = null;
+function fillProfile(){
+  if(!OFFICE)return;
+  renderDashboardActivities('office', OFFICE);
+  ['name','phone','email','city','category','ninea','address','desc','whatsapp','facebook','tagline'].forEach(k=>{const el=document.getElementById('p-'+k);if(el)el.value=OFFICE[k]||'';});
+  const pvFill=document.getElementById('p-promo-video'); if(pvFill) pvFill.value=OFFICE.promo_video||'';
+  if(typeof previewDashPromoVideo==='function') previewDashPromoVideo();
+  updateTaglineCount();
+  window._pThumbData = OFFICE.thumb || null;
+  if(window._pThumbData){
+    const inner=document.getElementById('p-thumb-inner');
+    if(inner) inner.innerHTML = '<img src="'+window._pThumbData+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+_t2('صورة محفوظة — انقر للتغيير','Image enregistrée — cliquez pour changer')+'</p>';
+  }
+  applySbThumb();
+  const act=document.getElementById('p-activity');
+  if(act && OFFICE.activityId) act.value = OFFICE.activityId;
+  else if(act&&OFFICE.activity){
+    for(let o of act.options){ if(o.value===OFFICE.activity || o.textContent.trim()===OFFICE.activity){ o.selected=true; break; } }
+  }
+  onDashboardActivityChange('office');
+  try{ if(window.RizqLiveShowcase) RizqLiveShowcase.bindDashboard('#rzq-live-showcase-slot', OFFICE); }catch(e){}
+}
+function applySbThumb(){
+  if(!window.RizqProfilePhoto) return;
+  var photo = window._pThumbData || (OFFICE && OFFICE.thumb) || '';
+  var name = (OFFICE && OFFICE.name) || '';
+  RizqProfilePhoto.paint(document.getElementById('sb-av'), { photo: photo, name: name });
+}
+function saveProfile(){
+  const accs=JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+  const idx=accs.findIndex(a=>a.id===SESSION_ID);
+  if(idx===-1&&!IS_DEMO){showToast(_t2('خطأ','Erreur'),'error');return;}
+  const phoneRaw=(document.getElementById('p-phone')||{}).value||'';
+  const phones=(window.RizqPhone&&RizqPhone.resolveMerchantPhone(phoneRaw.trim()))||null;
+  if(!phones){showToast(_t2('رقم هاتف غير صالح — موريتاني 8 أرقام (2/3/4) أو دولي +…','Numéro invalide — MR 8 chiffres (2/3/4) ou international +…'),'error');return;}
+  const fields=['name','email','city','category','ninea','address','desc','facebook','promo_video'];
+  fields.forEach(k=>{const el=document.getElementById('p-'+k);if(el&&idx!==-1)accs[idx][k]=el.value.trim();});
+  if(idx!==-1){
+    accs[idx].phone = phones.phone || phones.whatsapp;
+    accs[idx].phoneIntl = phones.phoneIntl || '';
+    var waManual = ((document.getElementById('p-whatsapp')||{}).value||'').trim();
+    if(waManual && /^https?:\/\/(wa\.me|api\.whatsapp\.com)/i.test(waManual)){
+      accs[idx].whatsapp = waManual.slice(0, 60);
+    } else if(waManual && window.RizqPhone && RizqPhone.normalizeIntlPhone(waManual)){
+      accs[idx].whatsapp = RizqPhone.normalizeIntlPhone(waManual);
+    } else {
+      accs[idx].whatsapp = phones.whatsapp;
+    }
+    const act=document.getElementById('p-activity');
+    if(act && act.value){
+      accs[idx].activityId = act.value;
+      accs[idx].activity = window.RizqMerchantActivities ? RizqMerchantActivities.displayName(act.value, _dashboardLang()) : act.options[act.selectedIndex].text;
+      accs[idx].category = window.RizqMerchantActivities ? RizqMerchantActivities.legacyCategoryFromActivity(act.value) : accs[idx].category;
+    }
+    const tlEl=document.getElementById('p-tagline');
+    if(tlEl) accs[idx].tagline = tlEl.value.trim().slice(0,50);
+    if(window._pThumbData) accs[idx].thumb = window._pThumbData;
+    localStorage.setItem('rizq_pending_accounts',JSON.stringify(accs));
+    OFFICE=accs[idx];
+    _syncProfileToBackend(OFFICE);
+  }
+  document.getElementById('sb-office-name').textContent=document.getElementById('p-name').value||_t2('مكتبي','Mon bureau');
+  showToast(_t2('تم الحفظ ✅','Enregistré ✅'),'success');
+}
+
+/* إصلاح جوهري: saveProfile() كانت تكتب فقط إلى localStorage — أي تعديل من لوحة
+   التاجر لا يصل للخادم، فيبقى قديماً/خاطئاً في دليل المعارض وصفحة المكتب العامة
+   (المصدر: GET /api/accounts/public). الآن نُرسل الحقول عبر PATCH بعد كل حفظ. */
+function _syncProfileToBackend(acc){
+  if(!window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN) return;
+  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/mine/' + encodeURIComponent(SESSION_ID), {
+    method: 'PATCH',
+    headers: { 'Content-Type':'application/json', 'x-account-token': (window.REAL_ACCESS_TOKEN || SESSION_TOKEN) },
+    body: JSON.stringify({
+      name: acc.name||'', phone: acc.phone||'', phoneIntl: acc.phoneIntl||'', email: acc.email||'', city: acc.city||'',
+      category: acc.category||'', activityId: acc.activityId||'', activity: acc.activity||'',
+      address: acc.address||'', desc: acc.desc||'',
+      promo_video: acc.promo_video||'', whatsapp: acc.whatsapp||'', facebook: acc.facebook||'',
+      tagline: acc.tagline||'', thumb: acc.thumb||''
+    })
+  }).catch(function(){});
+}
+
+function updateTaglineCount(){
+  const el=document.getElementById('p-tagline'); const c=document.getElementById('p-tagline-count');
+  if(el&&c) c.textContent=(el.value||'').length+'/50';
+}
+function previewStripThumb(input){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const img=new Image();
+    img.onload=function(){
+      const maxW=480; const scale=Math.min(1,maxW/img.width);
+      const canvas=document.createElement('canvas');
+      canvas.width=Math.round(img.width*scale); canvas.height=Math.round(img.height*scale);
+      const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      window._pThumbData=canvas.toDataURL('image/jpeg',0.82);
+      const inner=document.getElementById('p-thumb-inner');
+      if(inner) inner.innerHTML='<img src="'+window._pThumbData+'" style="max-height:100px;border-radius:8px;object-fit:cover"/><p style="font-size:11px;color:#10b981;margin-top:6px;font-weight:600">✅ '+escapeHtml(file.name)+'</p>';
+      applySbThumb();
+    };
+    img.src=e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+// ── إصلاح جوهري 29/07/2026: جلب ساعات العمل الحقيقية من rizq-backend عند
+// التحميل — كانت محبوسة في متصفح واحد فقط.
+function _rizqMergeHoursFromBackend(){
+  try{
+    if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE || !SESSION_ID) return;
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '')+'/api/business-hours/'+encodeURIComponent(SESSION_ID))
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(data){
+        if(!data || !Array.isArray(data.hours) || !data.hours.length) return;
+        localStorage.setItem('office_hours_'+SESSION_ID, JSON.stringify(data.hours));
+        renderHours();
+      }).catch(function(){});
+  }catch(e){}
+}
+function renderHours(){
+  const saved=JSON.parse(localStorage.getItem('office_hours_'+SESSION_ID)||'null')||DEF_HOURS;
+  const el=document.getElementById('hours-table');if(!el)return;
+  const _dayFr={'الأحد':'Dimanche','الاثنين':'Lundi','الثلاثاء':'Mardi','الأربعاء':'Mercredi','الخميس':'Jeudi','الجمعة':'Vendredi','السبت':'Samedi'};
+  el.innerHTML=saved.map((h,i)=>`<div style="display:grid;grid-template-columns:110px 1fr 1fr 80px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid rgba(27,58,107,.05);font-size:13px">
+    <span style="font-weight:600;color:var(--navy)">${_t2(h.day,_dayFr[h.day]||h.day)}</span>
+    <input class="form-input" style="padding:7px 10px;font-size:12px" type="time" id="hr-f-${i}" value="${h.from}" ${!h.open?'disabled':''} />
+    <input class="form-input" style="padding:7px 10px;font-size:12px" type="time" id="hr-t-${i}" value="${h.to}" ${!h.open?'disabled':''} />
+    <label style="display:flex;align-items:center;gap:5px;cursor:pointer;font-size:12px">
+      <input type="checkbox" id="hr-o-${i}" ${h.open?'checked':''} onchange="tDay(${i})" style="width:15px;height:15px"/>${_t2('مفتوح','Ouvert')}
+    </label>
+  </div>`).join('');
+}
+function tDay(i){const o=document.getElementById('hr-o-'+i).checked;document.getElementById('hr-f-'+i).disabled=!o;document.getElementById('hr-t-'+i).disabled=!o;}
+function saveHours(){
+  const h=DAYS.map((_,i)=>({day:DAYS[i],open:document.getElementById('hr-o-'+i).checked,from:document.getElementById('hr-f-'+i).value,to:document.getElementById('hr-t-'+i).value}));
+  localStorage.setItem('office_hours_'+SESSION_ID,JSON.stringify(h));
+  try{
+    if(typeof window.RIZQ_BACKEND_BASE==='string' && window.RIZQ_BACKEND_BASE && SESSION_ID && SESSION_TOKEN){
+      fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '')+'/api/business-hours', {
+        method:'POST', headers:{'Content-Type':'application/json','x-account-token':(window.REAL_ACCESS_TOKEN || SESSION_TOKEN)},
+        body: JSON.stringify({ accountId: SESSION_ID, hours: h })
+      }).catch(function(){});
+    }
+  }catch(e){}
+  showToast(_t2('تم حفظ ساعات العمل','Horaires de travail enregistrés')+' ✅','success');
+}
+
+function getSubInfo(){
+  if(typeof RizqSub !== 'undefined' && OFFICE.id){
+    const sub = RizqSub.checkSubscription(OFFICE.id);
+    if(sub.status !== 'no_subscription'){
+      const isExpired = sub.status==='expired';
+      const isTrial = sub.status==='trial' || sub.status==='trial_expiring';
+      const isExpiringSoon = sub.status==='expiring_soon' || sub.status==='trial_expiring';
+      const totalDays = (sub.acc && sub.acc.pkg_days) ? sub.acc.pkg_days : (isTrial?3:30);
+      const pkgName = (sub.acc && (sub.acc.pkg_name || sub.acc.package || sub.acc.plan)) || '';
+      return {daysLeft:sub.daysLeft, isTrial, isExpired, isExpiringSoon, pct: Math.max(0,Math.min(100,(sub.daysLeft/Math.max(1,totalDays))*100)), pkgName};
+    }
+  }
+  const trialEnd = new Date(OFFICE.trial_ends||Date.now());
+  const now = new Date();
+  const daysLeft = Math.max(0,Math.ceil((trialEnd-now)/86400000));
+  const isTrial = !OFFICE.plan;
+  const isExpired = daysLeft===0;
+  const totalDays = isTrial ? 3 : 30;
+  return {daysLeft, isTrial, isExpired, isExpiringSoon: !isTrial && !isExpired && daysLeft<=5, pct: Math.max(0,Math.min(100,(daysLeft/totalDays)*100)), pkgName:OFFICE.plan||''};
+}
+
+function renderSubPanel(){
+  const info=getSubInfo();
+  const {daysLeft,isTrial,isExpired,isExpiringSoon}=info;
+  const isExp=isExpired;
+  const cls=isExp?'expired':isTrial?'trial':'active-plan';
+  const reminderBanner=(isExpiringSoon||isExpired)?`
+    <div class="sub-card ${isExpired?'expired':'trial'}" style="margin-top:12px;text-align:center">
+      <div style="font-size:13px;font-weight:700">${isExpired?'⛔ '+_t2('انتهى اشتراكك — جدد الآن لاستعادة كل المزايا','Votre abonnement a expiré — renouvelez maintenant pour retrouver tous les avantages'):'⚠️ '+_t2(`اشتراكك سينتهي بعد ${daysLeft} أيام — جدد الآن لتجنب توقف الخدمة`,`Votre abonnement expire dans ${daysLeft} jours — renouvelez maintenant pour éviter toute interruption`)}</div>
+      <div style="margin-top:10px">
+        <button class="btn btn-gold btn-sm" onclick="document.getElementById('packages-display').scrollIntoView({behavior:'smooth'})">🔄 ${_t2('تجديد الباقة الآن','Renouveler le forfait maintenant')}</button>
+      </div>
+    </div>`:'';
+  document.getElementById('sub-card-wrap').innerHTML=`<div class="sub-card ${cls}">
+    <div style="font-size:18px;font-weight:800;margin-bottom:4px">${isTrial?'🎁 '+_t2('فترة تجريبية',"Période d'essai"):'✅ '+_t2('اشتراك نشط','Abonnement actif')}</div>
+    <div style="font-size:12px;opacity:.75;margin-bottom:12px">${daysLeft>0?_t2(`ينتهي خلال ${daysLeft} يوم`,`Expire dans ${daysLeft} jours`):_t2('انتهى الاشتراك','Abonnement expiré')}</div>
+    ${!isExp?`<div style="height:5px;background:rgba(255,255,255,.2);border-radius:3px"><div style="height:100%;width:${info.pct}%;background:var(--gold);border-radius:3px"></div></div>`:''}
+    <button class="btn btn-gold btn-sm" style="margin-top:14px" onclick="document.getElementById('packages-display').scrollIntoView({behavior:'smooth'})">🔄 ${_t2('تجديد الاشتراك',"Renouveler l'abonnement")}</button>
+  </div>${reminderBanner}`;
+  // إصلاح جوهري: كان الزران أعلاه (وهذا التفعيل التلقائي عند انتهاء الاشتراك)
+  // يفتحان renewal-section القديم — يحفظ فقط في localStorage['rizq_renewal_
+  // requests'] بلا أي إرسال حقيقي للخادم (لا يقرأه أي طابور إدارة إطلاقاً،
+  // بعكس ما توحي به رسالة "سيتم مراجعته"). أُبطل تفعيله؛ التجديد الحقيقي
+  // الوحيد الآن هو مسار packages-display/openPayModal/submitPayment الذي
+  // يرسل فعلاً عبر RizqSub.submitSubscriptionRequest ويصل لطابور مراجعة حقيقي.
+  var _rs=document.getElementById('renewal-section');
+  if(_rs) _rs.style.display='none';
+}
+
+function renderMyInvoices(){
+  var wrap = document.getElementById('my-invoices-wrap');
+  if(!wrap) return;
+  var accounts0 = JSON.parse(localStorage.getItem('rizq_accounts')||'{}');
+  var hasServerToken = !!(accounts0[SESSION_ID] && accounts0[SESSION_ID].server_token);
+  if(typeof RizqSub === 'undefined' || typeof RizqSub.fetchInvoices !== 'function'){
+    if(typeof RizqInvoice === 'undefined'){ wrap.innerHTML=''; return; }
+    _paintInvoices(RizqInvoice.getInvoicesForAccount(SESSION_ID) || [], true);
+    return;
+  }
+  wrap.innerHTML = '<div class="card"><div class="card-header"><div class="card-title">'+_t2('🧾 فواتيري','🧾 Mes factures')+'</div></div>'
+    + '<p style="color:var(--text-muted,#6b7280);font-size:12.5px;padding:6px 0">'+_t2('جارٍ التحميل...','Chargement...')+'</p></div>';
+  RizqSub.fetchInvoices(SESSION_ID).then(function(invs){ _paintInvoices(invs||[], !hasServerToken); }).catch(function(){ _paintInvoices([], !hasServerToken); });
+}
+
+function _paintInvoices(invs, isLocalSource){
+  var wrap = document.getElementById('my-invoices-wrap');
+  if(!wrap) return;
+  if(!invs.length){
+    wrap.innerHTML = '<div class="card"><div class="card-header"><div class="card-title">'+_t2('🧾 فواتيري','🧾 Mes factures')+'</div></div>'
+      + '<p style="color:var(--text-muted,#6b7280);font-size:13px;padding:10px 0">'+_t2('لا توجد فواتير بعد','Aucune facture pour le moment')+'</p></div>';
+    return;
+  }
+  var canPrintLocal = isLocalSource && (typeof RizqInvoice !== 'undefined');
+  var rows = invs.map(function(inv){
+    var amount = inv.price>0 ? Number(inv.price).toLocaleString()+' MRU' : _t2('مجاناً','Gratuit');
+    var dateStr = '-';
+    try{ dateStr = new Date(inv.issuedAt).toLocaleDateString(); }catch(e){}
+    var printBtn = (canPrintLocal && inv.id)
+      ? '<button class="btn btn-outline btn-sm" onclick="RizqInvoice.openInvoice(\''+escapeHtml(inv.id)+'\')">🖨️ '+_t2('عرض/طباعة','Voir/Imprimer')+'</button>'
+      : '<span style="font-size:11.5px;color:var(--text-muted,#6b7280)">'+_t2('أُرسلت عبر واتساب/بريد','Envoyée par WhatsApp/e-mail')+'</span>';
+    return '<tr>'
+      + '<td style="padding:8px;font-size:12.5px">'+escapeHtml(inv.number)+'</td>'
+      + '<td style="padding:8px;font-size:12.5px">'+escapeHtml(inv.pkgName)+'</td>'
+      + '<td style="padding:8px;font-size:12.5px;font-weight:700;color:#C9A84C">'+escapeHtml(amount)+'</td>'
+      + '<td style="padding:8px;font-size:12.5px">'+escapeHtml(dateStr)+'</td>'
+      + '<td style="padding:8px;font-size:12.5px">'+printBtn+'</td>'
+      + '</tr>';
+  }).join('');
+  wrap.innerHTML = '<div class="card"><div class="card-header"><div class="card-title">'+_t2('🧾 فواتيري','🧾 Mes factures')+'</div></div>'
+    + '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">'
+    + '<thead><tr style="background:#f8faff;text-align:'+(document.documentElement.dir==='rtl'?'right':'left')+'">'
+    + '<th style="padding:8px;font-size:12px;color:var(--text-muted,#6b7280)">'+_t2('رقم الإيصال','N° reçu')+'</th>'
+    + '<th style="padding:8px;font-size:12px;color:var(--text-muted,#6b7280)">'+_t2('الباقة','Forfait')+'</th>'
+    + '<th style="padding:8px;font-size:12px;color:var(--text-muted,#6b7280)">'+_t2('المبلغ','Montant')+'</th>'
+    + '<th style="padding:8px;font-size:12px;color:var(--text-muted,#6b7280)">'+_t2('تاريخ الإصدار','Date d\'émission')+'</th>'
+    + '<th style="padding:8px;font-size:12px;color:var(--text-muted,#6b7280)"></th>'
+    + '</tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+}
+
+function handleRenewalUpload(){ /* removed — use packages payment flow */ }
+function submitRenewal(){
+  var el=document.getElementById('packages-display');
+  if(el) el.scrollIntoView({behavior:'smooth'});
+}
+
+function updateSubBadge(){
+  if(!OFFICE)return;
+  const info=getSubInfo();
+  const d=info.daysLeft;
+  const dot=document.getElementById('sb-sub-dot');const txt=document.getElementById('sb-sub-text');
+  if(info.isExpired||d===0){if(dot)dot.className='sub-dot exp';if(txt)txt.textContent=_t2('انتهى الاشتراك','Abonnement expiré');}
+  else if(d<=2){if(dot)dot.className='sub-dot warn';if(txt)txt.textContent=_t2(`ينتهي خلال ${d} يوم`,`Expire dans ${d} jours`);}
+  else{if(dot)dot.className='sub-dot';if(txt)txt.textContent=_t2('اشتراك نشط','Abonnement actif');}
+}
+
+// ── تعطيل الحساب مؤقتاً: ميزة جديدة (09/08/2026) — تُرسِل طلباً حقيقياً
+// عبر POST /api/deactivation-requests (نفس الخادم المبني لداشبورد المحل)
+// يراجعه الأدمن من لوحة "المستخدمون"؛ لا يُعطِّل الحساب فوراً بذاته.
+function deactivateAccount(){
+  if(!confirm(_t2('هل تريد تعطيل حسابك مؤقتاً؟','Voulez-vous désactiver temporairement votre compte ?'))) return;
+  if(IS_DEMO){
+    showToast(_t2('👁 وضع تجريبي — لا يُرسَل فعلياً','👁 Mode démo — non envoyé réellement'));
+    return;
+  }
+  if(!window.RIZQ_BACKEND_BASE || !SESSION_ID){
+    showToast(_t2('⚠️ متاح فقط لحساب حقيقي متصل بالخادم','⚠️ Disponible uniquement pour un compte réel connecté au serveur'),'error');
+    return;
+  }
+  var btn = document.getElementById('deactivate-account-btn');
+  var prevLabel = btn ? btn.textContent : '';
+  if(btn){ if(btn.disabled) return; btn.disabled = true; btn.textContent = _t2('...جارٍ الإرسال','Envoi...'); }
+  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/deactivation-requests', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', 'x-account-token': (window.REAL_ACCESS_TOKEN || SESSION_TOKEN) },
+    body: JSON.stringify({ accountId: SESSION_ID })
+  }).then(function(r){ return r.ok ? r.json() : Promise.reject(); })
+    .then(function(data){
+      showToast(data && data.alreadyPending
+        ? _t2('⏳ لديك طلب تعطيل معلَّق بالفعل — قيد المراجعة','⏳ Vous avez déjà une demande de désactivation en attente — en cours d\'examen')
+        : _t2('✅ تم إرسال طلب التعطيل — ستراجعه الإدارة','✅ Demande de désactivation envoyée — elle sera examinée par l\'administration'), 'success');
+    }).catch(function(){
+      showToast(_t2('⚠️ تعذّر إرسال الطلب — حاول مرة أخرى','⚠️ Échec de l\'envoi de la demande — réessayez'), 'error');
+    }).finally(function(){
+      if(btn){ btn.disabled = false; btn.textContent = prevLabel; }
+    });
+}
+
+// إصلاح: كانت تدّعي "تم تغيير كلمة المرور ✅" بلا أي نظام مصادقة حقيقي خلف
+// الكواليس — نجاح وهمي بالكامل (نفس علّة rizq_dashboard_store.html).
+function changePw(){
+  const cur=(document.getElementById('s-pw-cur')||{}).value||'';
+  const pw=document.getElementById('s-pw-new').value;
+  const c2=document.getElementById('s-pw2').value;
+  if(!cur||!pw||!c2){showToast(_t2('عبّئ جميع الحقول','Remplissez tous les champs'),'error');return;}
+  if(pw.length<8){showToast(_t2('8 أحرف على الأقل','8 caractères minimum'),'error');return;}
+  if(pw!==c2){showToast(_t2('كلمة المرور غير متطابقة','Les mots de passe ne correspondent pas'),'error');return;}
+  if(typeof IS_DEMO!=='undefined' && IS_DEMO){showToast(_t2('👁 وضع تجريبي','👁 Mode démo'));return;}
+  var tok=window.REAL_ACCESS_TOKEN||SESSION_TOKEN;
+  if(!SESSION_ID||!tok||!window.RizqAccount||typeof window.RizqAccount.changePasswordAsync!=='function'){
+    showToast(_t2('⚠️ متاح فقط لحساب حقيقي متصل بالخادم','⚠️ Compte réel requis'),'error');return;
+  }
+  window.RizqAccount.changePasswordAsync(SESSION_ID,tok,cur,pw).then(function(res){
+    if(res&&res.ok){
+      document.getElementById('s-pw-cur').value='';
+      document.getElementById('s-pw-new').value='';
+      document.getElementById('s-pw2').value='';
+      showToast(_t2('✅ تم تحديث كلمة المرور','✅ Mot de passe mis à jour'),'success');
+      return;
+    }
+    var msg=(res&&res.error)||_t2('تعذّر التحديث','Échec');
+    if(res&&res.code==='invalid_current') msg=_t2('كلمة المرور الحالية غير صحيحة','Mot de passe actuel incorrect');
+    showToast('⚠️ '+msg,'error');
+  }).catch(function(){showToast(_t2('⚠️ تعذّر الاتصال','⚠️ Connexion impossible'),'error');});
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sb-overlay').classList.toggle('open');}
+function logout(){
+  if(!confirm(_t2('هل تريد تسجيل الخروج؟','Voulez-vous vous déconnecter ?'))) return;
+  if(window.RizqAccount && typeof window.RizqAccount.clearSession === 'function'){
+    window.RizqAccount.clearSession();
+  } else {
+    try{ localStorage.removeItem('rizq_active_session'); }catch(e){}
+  }
+  window.location.href='rizq_landing_v8.html';
+}
+
+// ── ترجمات AR / FR — داشبورد المكتب ─────────────────────────
+var _officeLang = (function(){ try{ return localStorage.getItem('rizq_lang')||'ar'; }catch(e){ return 'ar'; } })();
+// _officeTranslations أُزيل 06/08/2026 — القاموس الآن مركزي في rizq_i18n_data.js["dashboard_office"]
+
+function _t2(ar, fr){
+  if(typeof RizqI18n !== 'undefined') return RizqI18n.t2(ar, fr);
+  return (_officeLang === 'fr') ? fr : ar;
+}
+function openNewServicePanel(){
+  var sb = document.querySelector('.sb-item[onclick*="services"]');
+  showPanel('services', sb);
+  _svcOpen = true;
+  var body = document.getElementById('svc-form-body');
+  if(body) body.style.display = 'block';
+  var btn = document.getElementById('svc-toggle-btn');
+  if(btn && typeof RizqI18n !== 'undefined') btn.textContent = RizqI18n.t('svc-collapse','dashboard_office');
+  else if(btn) btn.textContent = _t2('تصغير ↑','Réduire ↑');
+  var anchor = document.getElementById('panel-services');
+  if(anchor) anchor.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+document.addEventListener('rizq:langchange', function(e){
+  _officeLang = (e && e.detail && e.detail.lang) || _officeLang;
+  document.querySelectorAll('[data-t-title]').forEach(function(el){
+    var key = el.getAttribute('data-t-title');
+    if(key && typeof RizqI18n !== 'undefined') el.title = RizqI18n.t(key, 'dashboard_office');
+  });
+});
+
+function _applyOfficeLang(lang, silent){
+  _officeLang = lang;
+  var isAr = lang === 'ar';
+  // ── وُحِّد هذا القسم على محرك RizqI18n المركزي في 06/08/2026 — كان هنا
+  // قاموس ترجمة محلي مكرَّر (_officeTranslations) يكرر نفس البيانات
+  // الموجودة في rizq_i18n_data.js، وهو مصدر أخطاء متكررة (حقل يُنسى في
+  // أحدهما). الآن: RizqI18n.apply() يضبط lang/dir ويترجم كل [data-t]/
+  // [data-ph] من القاموس المركزي namespace="dashboard_office" تلقائياً.
+  if(typeof RizqI18n !== 'undefined') RizqI18n.apply(lang);
+  else { try{ localStorage.setItem('rizq_lang', lang); }catch(e){} document.documentElement.lang = lang; document.documentElement.dir = isAr ? 'rtl' : 'ltr'; }
+  // svc-toggle-btn reflects open/closed state, not just the data-t default
+  var toggleBtn = document.getElementById('svc-toggle-btn');
+  if(toggleBtn && typeof _svcOpen !== 'undefined' && typeof RizqI18n !== 'undefined'){
+    toggleBtn.textContent = _svcOpen ? RizqI18n.t('svc-collapse','dashboard_office') : RizqI18n.t('svc-expand','dashboard_office');
+  }
+  // re-apply current panel's topbar title in the new language
+  var activePanel = document.querySelector('.panel.active');
+  if(activePanel){
+    var pid = activePanel.id.replace('panel-','');
+    var t = document.getElementById('topbar-title');
+    if(t) t.textContent = (isAr ? TITLES[pid] : TITLES_FR[pid]) || t.textContent;
+  }
+  // update lang toggle button — FR|AR أصفر/أبيض حسب اللغة الحالية
+  var _ol = isAr ? 'ar' : 'fr';
+  var btn = document.getElementById('office-lang-btn');
+  var btnM = document.getElementById('office-lang-btn-mobile');
+  [btn, btnM].forEach(function(b){
+    if(!b) return;
+    if(window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn==='function'){
+      window.RizqI18n.paintPrimaryLangBtn(b, _ol);
+    } else {
+      b.classList.add('btn-lang','btn-lang-primary');
+      b.setAttribute('dir','ltr');
+      b.innerHTML='<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span>';
+      b.setAttribute('data-active-lang', _ol);
+      var frEl=b.querySelector('.lang-fr'), arEl=b.querySelector('.lang-ar');
+      if(frEl) frEl.style.color = _ol==='fr'?'#C9A84C':'#ffffff';
+      if(arEl) arEl.style.color = _ol==='ar'?'#C9A84C':'#ffffff';
+    }
+  });
+  if(!silent) showToast(isAr ? 'تم التبديل إلى العربية 🇲🇷' : 'Langue changée en Français 🇫🇷', 'info');
+
+  try{ if(typeof renderOverview==='function') renderOverview(); }catch(e){}
+  try{ if(typeof renderServicesShowcase==='function') renderServicesShowcase(); }catch(e){}
+  try{ if(typeof renderRequests==='function') renderRequests(); }catch(e){}
+  try{ if(typeof renderServices==='function') renderServices(); }catch(e){}
+  try{ if(typeof renderSubPanel==='function') renderSubPanel(); }catch(e){}
+  try{ if(typeof renderSubOverview==='function') renderSubOverview(); }catch(e){}
+  try{ if(typeof renderHours==='function') renderHours(); }catch(e){}
+  try{ if(typeof renderPackagesDisplay==='function') renderPackagesDisplay(); }catch(e){}
+  try{ if(typeof renderVideoPackagesDisplay==='function') renderVideoPackagesDisplay(); }catch(e){}
+  try{ if(typeof renderMyPayments==='function') renderMyPayments(); }catch(e){}
+  try{ if(typeof renderRizqPayment==='function') renderRizqPayment('bank-payment-widget'); }catch(e){}
+  try{ if(typeof updateSubBadge==='function') updateSubBadge(); }catch(e){}
+}
+
+function toggleLangOffice(){
+  _applyOfficeLang(_officeLang === 'ar' ? 'fr' : 'ar');
+}
+if (_officeLang === 'fr') {
+  setTimeout(function(){ _applyOfficeLang('fr', true); }, 0);
+}
+
+// ── مزامنة طرق الدفع + كتالوجات الأسعار من الخادم — الأدمن قد يعدّلها من
+// جهازه الخاص؛ بدون هذا، يبقى هذا الجهاز يعرض فقط ما كان محفوظاً محلياً.
+(function syncSharedConfigOnLoad(){
+  if(!window.RIZQ_BACKEND_BASE) return;
+  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/site-config')
+    .then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(data){
+      if(!data || !data.ok || !data.config) return;
+      if(Array.isArray(data.config.bankCodes)){
+        localStorage.setItem('rizq_bank_codes', JSON.stringify(data.config.bankCodes));
+        if(typeof RizqAccountPayments !== 'undefined') RizqAccountPayments.afterPlatformBankCodesSynced();
+      }
+      // أرقام التحويل الكاملة — لصاحب الحساب فقط
+      (function _loadPayMethodsFull(){
+        var accId = (typeof SESSION_ID!=='undefined' && SESSION_ID) || (window.USER_ACC&&USER_ACC.id) || (window.CORP_ACC&&CORP_ACC.id) || (window.STORE&&STORE.id) || (window.OFFICE&&OFFICE.id) || '';
+        var tok = window.REAL_ACCESS_TOKEN || '';
+        if(!accId || !tok || !window.RIZQ_BACKEND_BASE) return;
+        fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/pay-methods?accountId=' + encodeURIComponent(accId), {
+          headers: { 'x-account-token': tok }
+        }).then(function(r){ return r.ok ? r.json() : null; }).then(function(pm){
+          if(pm && pm.ok && Array.isArray(pm.methods)){
+            localStorage.setItem('rizq_bank_codes', JSON.stringify(pm.methods));
+            if(typeof RizqAccountPayments !== 'undefined') RizqAccountPayments.afterPlatformBankCodesSynced();
+          }
+        }).catch(function(){});
+      })();
+      if(data.config.packages && typeof data.config.packages==='object'){
+        if(Array.isArray(data.config.packages.office))  localStorage.setItem('rizq_office_packages', JSON.stringify(data.config.packages.office));
+        if(Array.isArray(data.config.packages.video))   localStorage.setItem('rizq_video_packages', JSON.stringify(data.config.packages.video));
+        if(Array.isArray(data.config.packages.general)) localStorage.setItem('rizq_packages', JSON.stringify(data.config.packages.general));
+        if(Array.isArray(data.config.packages.tender))  localStorage.setItem('rizq_tender_packages', JSON.stringify(data.config.packages.tender));
+        if(Array.isArray(data.config.packages.investment)) localStorage.setItem('rizq_investment_packages', JSON.stringify(data.config.packages.investment));
+        if(Array.isArray(data.config.packages.verified_plus)) localStorage.setItem('rizq_verified_plus_packages', JSON.stringify(data.config.packages.verified_plus));
+      }
+      if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.ensureCatalogStorageFresh==='function'){
+        try{ RizqPackagesConfig.ensureCatalogStorageFresh(true); }catch(e){}
+      }
+      if(typeof renderPackagesDisplay==='function') renderPackagesDisplay();
+      if(typeof renderVideoPackagesDisplay==='function') renderVideoPackagesDisplay();
+      if(typeof renderTenderSubStatus==='function') renderTenderSubStatus();
+    }).catch(function(){});
+})();
+init();
+
+;
+
+
+var _qrDone=false;
+function openShareModal(){
+  document.getElementById('share-modal').classList.add('open');
+  if(!_qrDone&&window.QRCode){
+    var c=document.getElementById('qr-container');
+    if(c){c.innerHTML='';var lnk=document.getElementById('share-link-input').value||location.href;
+      try{new QRCode(c,{text:lnk,width:140,height:140,colorDark:'#1B3A6B',colorLight:'#fff'});}catch(e){}
+      _qrDone=true;}
+  }
+}
+function closeShareModal(e){if(!e||e.target===document.getElementById('share-modal'))document.getElementById('share-modal').classList.remove('open');}
+function copyShareLink(){
+  var i=document.getElementById('share-link-input');if(!i)return;
+  function _fallback(){ try{ i.select(); document.execCommand('copy'); showToast(_t2('✅ تم نسخ الرابط','✅ Lien copié'),'success'); }catch(e){} }
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(i.value).then(function(){showToast(_t2('✅ تم نسخ الرابط','✅ Lien copié'),'success');}).catch(_fallback);
+  } else { _fallback(); }
+}
+function shareWhatsAppLink(){var i=document.getElementById('share-link-input');var name=(OFFICE&&OFFICE.name)||_t2('مكتبنا','notre bureau');window.open('https://wa.me/?text='+encodeURIComponent(_t2('تفضّل بزيارة ','Visitez ')+name+_t2(' على منصة رزق:\n',' sur la plateforme Rizq :\n')+(i&&i.value||location.href)),'_blank');}
+function printQRCode(){var qr=document.getElementById('qr-container');if(!qr)return;var img=qr.querySelector('img')||qr.querySelector('canvas');if(!img){showToast(_t2('انتظر تحميل QR','Attendez le chargement du QR'),'error');return;}var src=img.src||(img.toDataURL&&img.toDataURL());var name=(OFFICE&&OFFICE.name)||_t2('مكتبنا','notre bureau');var isFr=_officeLang==='fr';var qrTitle=_t2('داشبورد المكتب','Tableau de bord bureau');var qrScan=_t2('امسح QR لزيارة الصفحة','Scannez le QR pour visiter la page');var qrBrand=_t2('منصة رزق · rizq.mr','Plateforme Rizq · rizq.mr');var w=window.open('','_blank');w.document.write('<html dir="'+(isFr?'ltr':'rtl')+'" lang="'+(isFr?'fr':'ar')+'"><head><title>'+qrTitle+' · v1781382349</title></head><body><!-- RIZQ-BUILD:202606131951 --><h2>'+name+'</h2><img src="'+src+'" width="200" height="200"><p>'+qrScan+'</p><p style="color:#C9A84C;font-weight:700">'+qrBrand+'</p></body></html>');w.print();}
+
+
+;
+
+function renderPackagesDisplay(){
+  var pkgs=[];
+  if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
+    try{ pkgs=RizqPackagesConfig.getCatalog('office', (typeof _officeLang!=='undefined'?_officeLang:'ar')).filter(function(p){return p.active!==false;}); }catch(e){}
+  }
+  if(!pkgs.length){ try{ pkgs=JSON.parse(localStorage.getItem('rizq_office_packages')||'[]').filter(function(p){return p.active!==false;}); }catch(e){ pkgs=[]; } }
+  if(!pkgs.length && window.RizqPackagesConfig && RizqPackagesConfig.CATALOGS && RizqPackagesConfig.CATALOGS.office){
+    pkgs=JSON.parse(JSON.stringify(RizqPackagesConfig.CATALOGS.office));
+  }
+  var el=document.getElementById('packages-display'); if(!el) return;
+
+  var FEATS_AR={
+    'تجريبية':['عرض حتى 3 خدمات نشطة','صفحة المكتب','طلبات تواصل'],
+    'شهرية':['شارة مكتب موثوق','نظام حجز المواعيد','فيديو تعريفي مشمول'],
+    'ربعية':['توفير 14%','عرض خدمات غير محدود','مدير حساب مخصص'],
+    'سنوية':['توفير 33%','فيديو تعريفي مشمول + 1 إضافي مجاناً','أولوية الدعم'],
+    'الماسية الأساسية للمكاتب':['موظف استقبال واستفسارات 24/7 (نصي)','تنظيم طلبات الخدمات والمواعيد','2,000 محادثة نصية شهرياً','ويدجت الموقع + واتساب'],
+    'الماسية Pro للمكاتب':['موظف استقبال آلي مخصص (نصي + صوتي)','رد آلي على الاتصالات','إدارة المواعيد والاستشارات مع نموذج طلبات متقدم','3,500 محادثة نصية + 200 دقيقة صوتية شهرياً']
+  };
+  var FEATS_FR={
+    'تجريبية':['Jusqu\'à 3 services actifs','Page du bureau','Demandes de contact'],
+    'شهرية':['Badge bureau vérifié','Système de prise de rendez-vous','Vidéo de présentation incluse'],
+    'ربعية':['Économisez 14%','Services illimités','Gestionnaire de compte dédié'],
+    'سنوية':['Économisez 33%','Vidéo incluse + 1 gratuite supplémentaire','Support prioritaire'],
+    'الماسية الأساسية للمكاتب':['Agent d\'accueil et réponses 24h/24 (texte)','Organisation des demandes de services et rendez-vous','2 000 conversations texte / mois','Widget site + WhatsApp'],
+    'الماسية Pro للمكاتب':['Agent d\'accueil automatique dédié (texte + voix)','Réponse automatique aux appels','Gestion des rendez-vous et consultations avec formulaire avancé','3 500 conversations texte + 200 min voix / mois']
+  };
+  var FEATS=(typeof _officeLang!=='undefined'&&_officeLang==='fr')?FEATS_FR:FEATS_AR;
+  var ICONS={'تجريبية':'🎁','شهرية':'📅','ربعية':'🚀','سنوية':'👑','الماسية الأساسية للمكاتب':'💎','الماسية Pro للمكاتب':'💎','ماسية':'💎','الماسية 💎 (النائب الذكي الشامل)':'💎'};
+
+  var list=pkgs;
+  if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.withDiamond==='function'){
+    list=RizqPackagesConfig.withDiamond(list, (typeof _officeLang!=='undefined'?_officeLang:'ar'), 'office');
+  }
+
+  var r=RizqSub.renderPackageCardsHTML(list,FEATS,ICONS,(typeof _officeLang!=='undefined'?_officeLang:'ar'));
+  el.innerHTML=r.grid;
+  var rp=document.getElementById('renewal-packages');
+  if(rp)rp.innerHTML=r.renewal;
+}
+
+// ── Rizq ADS — باقات إعلان الفيديو (نفس محرك RizqSub، فئة 'video') ──
+function renderVideoPackagesDisplay(){
+  var el=document.getElementById('rizq-ads-packages-display'); if(!el) return;
+  var lang=(typeof _officeLang!=='undefined'?_officeLang:'ar');
+  var pkgs=[];
+  if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
+    try{ pkgs=RizqPackagesConfig.getCatalog('video', lang).filter(function(p){return p.active!==false;}); }catch(e){}
+  }
+  if(!pkgs.length){ try{ pkgs=JSON.parse(localStorage.getItem('rizq_video_packages')||'[]').filter(function(p){return p.active!==false;}); }catch(e){ pkgs=[]; } }
+  if(!pkgs.length && window.RizqPackagesConfig && RizqPackagesConfig.CATALOGS && RizqPackagesConfig.CATALOGS.video){
+    pkgs=JSON.parse(JSON.stringify(RizqPackagesConfig.CATALOGS.video));
+  }
+  var list=pkgs;
+  var FEATS_AR={'أساسي فيديو':['حتى 3 فيديوهات إعلانية ترويجية شهرياً','ظهور في قسم الإعلانات بالصفحة الرئيسية','إحصائيات أداء أساسية آلية'],'احترافي فيديو':['حتى 10 فيديوهات إعلانية ترويجية شهرياً','أولوية الترتيب في نتائج البحث','شارة «محتوى مميّز برزق» الموثّقة'],'أعمال ومعارض':['فيديوهات وعروض غير محدودة','ظهور مميز في القسم الرئيسي بالصفحة الرئيسية','تقارير تحليل أداء آلية مفصّلة','دعم VIP ذو أولوية + شارة VIP موثّقة'],'أساسي':['حتى 3 فيديوهات إعلانية ترويجية شهرياً','ظهور في قسم الإعلانات بالصفحة الرئيسية','إحصائيات أداء أساسية آلية'],'احترافي':['حتى 10 فيديوهات إعلانية ترويجية شهرياً','أولوية الترتيب في نتائج البحث','شارة «محتوى مميّز برزق» الموثّقة']};
+  var FEATS_FR={'أساسي فيديو':['Jusqu\'à 3 vidéos promotionnelles / mois','Section publicitaire page d\'accueil','Statistiques de performance de base automatisées'],'احترافي فيديو':['Jusqu\'à 10 vidéos promotionnelles / mois','Priorité dans les résultats de recherche','Badge « Contenu vedette Rizq » vérifié'],'أعمال ومعارض':['Vidéos et vitrines illimitées','Placement premium section principale','Rapports d\'analyse automatisés détaillés','Support VIP prioritaire + badge VIP vérifié'],'أساسي':['Jusqu\'à 3 vidéos promotionnelles / mois','Section publicitaire page d\'accueil','Statistiques de performance de base automatisées'],'احترافي':['Jusqu\'à 10 vidéos promotionnelles / mois','Priorité dans les résultats de recherche','Badge « Contenu vedette Rizq » vérifié']};
+  var FEATS=(lang==='fr')?FEATS_FR:FEATS_AR;
+  var ICONS={'أساسي فيديو':'🎬','احترافي فيديو':'🥇','أعمال ومعارض':'💎','أساسي':'🎬','احترافي':'🥇'};
+  var r=RizqSub.renderPackageCardsHTML(list,FEATS,ICONS,lang,'video');
+  el.innerHTML=r.grid;
+}
+
+// ── حالة إعلان الفيديو الحقيقية (Rizq ADS) — مهمة #238 (نفس منطق store) ──
+function _rizqRenderAdsStatus(acc){
+  var mount=document.getElementById('rizq-ads-status-mount');
+  if(!mount || !window.RIZQ_BACKEND_BASE || !acc || !acc.id) return;
+  var lang=(typeof _officeLang!=='undefined'?_officeLang:'ar');
+  var fr=(lang==='fr');
+  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'')+'/api/site-config').then(function(r){return r.ok?r.json():null;}).then(function(data){
+    var va = data && data.config && data.config.videoAds;
+    if(!va) return;
+    var inHero = (va.hero||[]).find(function(a){return a.accountId===acc.id;});
+    var inPopup = (va.popup||[]).find(function(a){return a.accountId===acc.id;});
+    if(!inHero && !inPopup) return;
+    var spots=[];
+    if(inHero) spots.push(_t2('🏠 الواجهة الرئيسية (Hero)','🏠 Page d\'accueil (Hero)'));
+    if(inPopup) spots.push(_t2('📌 الشريط العلوي (Popup)','📌 Bandeau supérieur (Popup)'));
+    var active = (inHero && inHero.active!==false) || (inPopup && inPopup.active!==false);
+    mount.innerHTML = '<div style="background:'+(active?'#ecfdf5':'#fff7ed')+';border:1.5px solid '+(active?'#6ee7b7':'#fdba74')+';border-radius:12px;padding:14px 16px;font-size:12.5px;color:'+(active?'#065f46':'#9a3412')+';display:flex;align-items:center;gap:10px">'
+      + '<span style="font-size:22px">'+(active?'🟢':'🟡')+'</span>'
+      + '<span>'+(active
+          ? ('✅ '+_t2('فيديوك الإعلاني نشط الآن في: ','Votre vidéo publicitaire est active sur : ')+spots.join(' + '))
+          : _t2('⏸️ فيديوك مضاف لكنه موقوف مؤقتاً من الإدارة','⏸️ Votre vidéo est ajoutée mais suspendue par l\'administration'))+'</span>'
+      + '</div>';
+  }).catch(function(){});
+}
+
+// ══ PAYMENT MODAL ══
+var _payPkg = null;
+var _payFile = null;
+
+function openPayModal(pkgName, pkgPrice, category){
+  _payPkg = {name: pkgName, price: pkgPrice, category: category || 'package'};
+  _payFile = null;
+  document.getElementById('pay-pkg-name').textContent = pkgName;
+  document.getElementById('pay-amount').textContent = pkgPrice > 0 ? Number(pkgPrice).toLocaleString() + ' MRU' : _t2('مجاناً','Gratuit');
+  document.getElementById('pay-receipt-name').style.display = 'none';
+  document.getElementById('pay-receipt-file').value = '';
+  var vidWrap = document.getElementById('pay-video-url-wrap');
+  if(vidWrap){ vidWrap.style.display = (_payPkg.category === 'video') ? 'block' : 'none'; document.getElementById('pay-video-url').value=''; }
+
+  // Load payment methods, grouped by type (bank transfer / mobile number / payment code)
+  var codes = [];
+  try { codes = JSON.parse(localStorage.getItem('rizq_bank_codes')||'[]').filter(function(b){return b.active !== false;}); } catch(e){}
+  var groups = {bank:[], mobile:[], code:[]};
+  codes.forEach(function(b){ var t = (b.type && groups[b.type]) ? b.type : 'bank'; groups[t].push(b); });
+  var PM_META = {
+    bank:   {icon:'🏦', label:_t2('تحويل بنكي','Virement bancaire')},
+    mobile: {icon:'📱', label:_t2('رقم الهاتف','Numéro de téléphone')},
+    code:   {icon:'🔑', label:_t2('رمز دفع','Code de paiement')}
+  };
+  var el = document.getElementById('pay-banks');
+  var types = ['bank','mobile','code'].filter(function(t){ return groups[t].length; });
+  if(!types.length){
+    el.innerHTML = '<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:12px;font-size:12.5px;color:#92400e;text-align:center">⚠️ '+_t2('لا توجد طرق دفع متاحة حالياً — تواصل مع الدعم','Aucun moyen de paiement disponible actuellement — contactez le support')+'</div>';
+  } else {
+    var tabsHtml = '', panelsHtml = '';
+    types.forEach(function(t,i){
+      var m = PM_META[t];
+      var on = i===0;
+      tabsHtml += '<button class="pm-tab" data-pmtab="'+t+'" onclick="switchPayTab(this,\''+t+'\')" style="flex:1;padding:9px 4px;border:1.5px solid '+(on?'#1B3A6B':'#e0e8ff')+';background:'+(on?'#1B3A6B':'#fff')+';color:'+(on?'#fff':'#1B3A6B')+';border-radius:10px;cursor:pointer;font-size:11.5px;font-weight:700;font-family:inherit;transition:all .2s;line-height:1.5">'+m.icon+'<br>'+m.label+'</button>';
+      panelsHtml += '<div class="pm-panel" data-pmpanel="'+t+'" style="display:'+(on?'block':'none')+'">' +
+        groups[t].map(function(b){
+          return '<div style="background:#f8f9ff;border:1.5px solid #e0e8ff;border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">' +
+            '<div><div style="font-size:13px;font-weight:700;color:#1B3A6B">' + escapeHtml(b.bank) + '</div>' +
+            (b.instruction ? '<div style="font-size:11px;color:#777;margin-top:2px">' + escapeHtml(b.instruction) + '</div>' : '') + '</div>' +
+            '<div style="display:flex;align-items:center;gap:8px">' +
+            '<span style="font-family:monospace;font-size:14px;font-weight:700;color:#0f2347;background:#e0e8ff;padding:5px 10px;border-radius:7px;letter-spacing:.5px;direction:ltr">' + escapeHtml(b.code) + '</span>' +
+            '<button onclick="payModalCopy(this,\'' + String(b.code).replace(/'/g,"&#39;") + '\',\'' + String(b.bank).replace(/'/g,"&#39;") + '\',document.getElementById(\'pay-amount\').textContent)" style="background:linear-gradient(135deg,#C9A84C,#e8c96a);border:none;padding:6px 12px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;color:#0f2347;white-space:nowrap">📋 '+_t2('نسخ','Copier')+'</button>' +
+            '</div></div>';
+        }).join('') +
+      '</div>';
+    });
+    el.innerHTML = '<div style="display:flex;gap:8px;margin-bottom:12px">' + tabsHtml + '</div>' + panelsHtml;
+  }
+
+  var m = document.getElementById('pay-modal');
+  if(typeof RizqSub !== 'undefined' && typeof RizqSub.configurePayModalFreeMode === 'function'){
+    RizqSub.configurePayModalFreeMode(pkgPrice, (typeof _officeLang !== 'undefined' ? _officeLang : 'ar'));
+  }
+  m.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+
+function switchPayTab(btn, type){
+  var modal = btn.closest('#pay-modal') || document.getElementById('pay-modal');
+  var tabs = modal.querySelectorAll('.pm-tab');
+  var panels = modal.querySelectorAll('.pm-panel');
+  tabs.forEach(function(t){
+    var on = t.getAttribute('data-pmtab') === type;
+    t.style.background = on ? '#1B3A6B' : '#fff';
+    t.style.color = on ? '#fff' : '#1B3A6B';
+    t.style.borderColor = on ? '#1B3A6B' : '#e0e8ff';
+  });
+  panels.forEach(function(p){
+    p.style.display = (p.getAttribute('data-pmpanel') === type) ? 'block' : 'none';
+  });
+}
+
+function payModalCopy(btn, code, bankName, amount){
+  var parts = [];
+  if(bankName) parts.push(_t2('البنك:','Banque :') + ' ' + bankName);
+  parts.push(_t2('الرمز:','Code :') + ' ' + code);
+  if(amount) parts.push(_t2('المبلغ:','Montant :') + ' ' + amount);
+  var copyText = parts.join(' | ');
+  navigator.clipboard.writeText(copyText).then(function(){
+    var o = btn.innerHTML;
+    btn.innerHTML = '✅ '+_t2('تم النسخ','Copié');
+    btn.style.background = 'linear-gradient(135deg,#059669,#10b981)';
+    btn.style.color = '#fff';
+    setTimeout(function(){ btn.innerHTML=o; btn.style.background='linear-gradient(135deg,#C9A84C,#e8c96a)'; btn.style.color='#0f2347'; }, 2000);
+  }).catch(function(){
+    var ta=document.createElement('textarea'); ta.value=copyText||code; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    btn.innerHTML='✅'; setTimeout(function(){btn.innerHTML='📋 '+_t2('نسخ الرمز','Copier le code');},2000);
+  });
+}
+
+function handlePayReceipt(inp){
+  if(!inp.files||!inp.files[0]) return;
+  _payFile = inp.files[0];
+  var el = document.getElementById('pay-receipt-name');
+  el.textContent = '✅ ' + _payFile.name;
+  el.style.display = 'block';
+  document.getElementById('pay-upload-zone').style.borderColor = '#059669';
+}
+
+function submitPayment(){
+  if(!_payPkg) return;
+  if(_payPkg.price > 0 && !_payFile){
+    alert(_t2('يرجى رفع صورة وصل الدفع أولاً','Veuillez d\'abord téléverser une photo du reçu de paiement'));
+    return;
+  }
+  var isVideo = _payPkg.category === 'video';
+  var videoUrl = '';
+  if(isVideo){
+    videoUrl = (document.getElementById('pay-video-url')||{}).value?.trim() || '';
+    if(!videoUrl){
+      alert(_t2('يرجى إدخال رابط الفيديو الإعلاني','Veuillez entrer le lien de la vidéo publicitaire'));
+      return;
+    }
+  }
+  // إصلاح: لم يكن الزر يُعطَّل أثناء الإرسال — نقر متكرر سريع كان يرسل نفس
+  // طلب الاشتراك عدة مرات (نفس علّة rizq_dashboard_store.html).
+  var submitBtn = document.getElementById('pay-submit-btn');
+  var prevLabel = submitBtn ? submitBtn.textContent : '';
+  if(submitBtn){ if(submitBtn.disabled) return; submitBtn.disabled = true; submitBtn.textContent = _t2('...جارٍ الإرسال','Envoi...'); }
+  // النقطة الموحّدة في RizqSub: تقرأ صورة الوصل فعلياً (لا اسم الملف فقط)
+  // وتشغّل فحص احتيال إحصائي أولي — مصدر واحد يستخدمه store/office/corp بلا تكرار
+  RizqSub.submitSubscriptionRequest({
+    file: _payFile,
+    pkgName: _payPkg.name,
+    price: _payPkg.price,
+    accountName: typeof STORE !== 'undefined' ? STORE.name : (typeof OFFICE !== 'undefined' ? OFFICE.name : _t2('مشترك','Abonné')),
+    accountId: typeof SESSION_ID !== 'undefined' ? SESSION_ID : '',
+    accessToken: window.REAL_ACCESS_TOKEN || '',
+    category: _payPkg.category,
+    videoUrl: isVideo ? videoUrl : null
+  }).then(function(){
+    closePayModal();
+    showToast(isVideo
+      ? '✅ '+_t2('تم إرسال طلب Rizq ADS — يُفحص المحتوى ثم نوافق أو نرفض قبل النشر في الرئيسية','Votre demande Rizq ADS a été envoyée — le contenu sera contrôlé, puis approuvé ou refusé avant publication')
+      : '✅ '+_t2('تم إرسال طلبك — سيتم مراجعته وتفعيل باقتك خلال 24 ساعة','Votre demande a été envoyée — elle sera examinée et votre forfait activé dans les 24 heures'), 'success');
+  }).catch(function(err){
+    showToast((err && err.msg) || _t2('تعذّر إرسال الطلب — حاول مرة أخرى','Échec de l\'envoi de la demande — réessayez'), 'error');
+  }).finally(function(){
+    if(submitBtn){ submitBtn.disabled = false; submitBtn.textContent = prevLabel; }
+  });
+}
+
+// Close on backdrop click
+document.getElementById('pay-modal') && document.getElementById('pay-modal').addEventListener('click', function(e){
+  if(e.target === this) closePayModal();
+});
+
+// ══ MY PAYMENT METHODS ══
+function getMyStoreKey(){ var acc=(typeof STORE!=='undefined'&&STORE)||(typeof OFFICE_ACC!=='undefined'&&OFFICE_ACC)||(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{}; return 'rizq_my_payments_'+(acc.id||'demo'); }
+
+var DEMO_PAYMENTS=[
+  {type:'bankily',bank:'Bankily',code:'36112233',note:'اذكر اسمك بعد التحويل',addedAt:new Date().toISOString()},
+  {type:'bank',bank:'BCI',code:'MR13 0001 2200 3344',note:'تحويل — أتعاب المهنة',addedAt:new Date().toISOString()}
+];
+function getMyPayments(){
+  var accId = (typeof OFFICE_ACC !== 'undefined' && OFFICE_ACC && OFFICE_ACC.id) || SESSION_ID || 'demo';
+  if(typeof RizqAccountPayments !== 'undefined') return RizqAccountPayments.getLocal(accId, IS_DEMO, DEMO_PAYMENTS);
+  if(IS_DEMO) return DEMO_PAYMENTS;
+  try{ return JSON.parse(localStorage.getItem(getMyStoreKey())||'[]'); }catch(e){ return []; }
+}
+function saveMyPayments(arr){
+  var accId = (typeof OFFICE_ACC !== 'undefined' && OFFICE_ACC && OFFICE_ACC.id) || SESSION_ID || 'demo';
+  if(typeof RizqAccountPayments !== 'undefined'){
+    return RizqAccountPayments.persist(accId, arr, window.REAL_ACCESS_TOKEN || SESSION_TOKEN, IS_DEMO).then(function(saved){
+      if(Array.isArray(saved)) localStorage.setItem(getMyStoreKey(), JSON.stringify(saved));
+    });
+  }
+  localStorage.setItem(getMyStoreKey(), JSON.stringify(arr));
+  return Promise.resolve();
+}
+
+function renderMyPayments(){
+  var el = document.getElementById('my-payment-list');
+  if(!el) return;
+  var methods = getMyPayments();
+  if(!methods.length){
+    el.innerHTML = '<div style="text-align:center;padding:32px;color:#9aa7bd;font-size:13px">'+_t2('لا توجد طرق دفع بعد — اضغط "+ إضافة طريقة دفع" للبدء','Aucun moyen de paiement pour le moment — cliquez sur "+ Ajouter un moyen de paiement" pour commencer')+'</div>';
+    return;
+  }
+  var typeLabels = {bank:'🏦 '+_t2('تحويل بنكي','Virement bancaire'),bankily:'📱 '+_t2('بنكيلي','Bankily'),sedad:'📱 '+_t2('سداد','Sedad'),bimbam:'📱 '+_t2('بيماه/BIMBAM','Bimbam/BIMBAM'),mobile:'📱 '+_t2('تطبيق دفع آخر','Autre application de paiement'),cash:'💵 '+_t2('عند الاستلام','À la livraison'),instore:'🏪 '+_t2('في المحل','En magasin'),custom:'✏️ '+_t2('مخصص','Personnalisé')};
+  el.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px">' +
+    methods.map(function(m,i){
+      var lbl = typeLabels[m.type] || m.type;
+      var showCode = m.type==='bank'||m.type==='mobile'||m.type==='custom';
+      return '<div style="background:#f8faff;border:1.5px solid #e0e8ff;border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
+        '<div style="flex:1">' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
+            '<span style="font-size:13px;font-weight:700;color:#1B3A6B">'+escapeHtml(m.bank||lbl)+'</span>' +
+            '<span style="background:#e0e8ff;color:#1B3A6B;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700">'+lbl+'</span>' +
+          '</div>' +
+          (showCode && m.code ? '<div style="font-family:monospace;font-size:14px;font-weight:700;color:#0f2347;background:#e8f0fe;display:inline-block;padding:4px 10px;border-radius:7px;margin-bottom:4px">'+escapeHtml(m.code)+'</div>' : '') +
+          (m.note ? '<div style="font-size:11.5px;color:#2C3A4F">'+escapeHtml(m.note)+'</div>' : '') +
+        '</div>' +
+        '<div style="display:flex;gap:6px">' +
+          '<button data-idx="'+i+'" onclick="editMyPayment(this)" style="background:#e8f0fe;border:none;padding:6px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;color:#1B3A6B">✏️</button>' +
+          '<button data-idx="'+i+'" onclick="deleteMyPayment(this)" style="background:#fee2e2;border:none;padding:6px 10px;border-radius:7px;cursor:pointer;font-size:12px">🗑️</button>' +
+        '</div>' +
+      '</div>';
+    }).join('') + '</div>';
+}
+
+function showAddMyPayModal(){
+  document.getElementById('my-pay-modal-title').textContent = (typeof _officeLang!=='undefined'&&_officeLang==='fr') ? 'Ajouter un moyen de paiement' : 'إضافة طريقة دفع';
+  document.getElementById('mypay-bank').value='';
+  document.getElementById('mypay-code').value='';
+  document.getElementById('mypay-note').value='';
+  document.getElementById('mypay-type').value='bank';
+  document.getElementById('mypay-edit-idx').value='';
+  document.getElementById('my-pay-modal').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+
+function closeMyPayModal(){
+  document.getElementById('my-pay-modal').style.display='none';
+  document.body.style.overflow='';
+}
+
+function editMyPayment(btn){
+  var idx = parseInt(btn.getAttribute('data-idx'));
+  var methods = getMyPayments();
+  var m = methods[idx];
+  if(!m) return;
+  document.getElementById('my-pay-modal-title').textContent = (typeof _officeLang!=='undefined'&&_officeLang==='fr') ? 'Modifier le moyen de paiement' : 'تعديل طريقة الدفع';
+  document.getElementById('mypay-type').value = m.type||'bank';
+  document.getElementById('mypay-bank').value = m.bank||'';
+  document.getElementById('mypay-code').value = m.code||'';
+  document.getElementById('mypay-note').value = m.note||'';
+  document.getElementById('mypay-edit-idx').value = idx;
+  document.getElementById('my-pay-modal').style.display='flex';
+  document.body.style.overflow='hidden';
+}
+
+function deleteMyPayment(btn){
+  var idx = parseInt(btn.getAttribute('data-idx'));
+  if(!confirm(_t2('حذف طريقة الدفع هذه؟','Supprimer ce moyen de paiement ?'))) return;
+  var methods = getMyPayments();
+  methods.splice(idx,1);
+  saveMyPayments(methods);
+  renderMyPayments();
+  showToast(_t2('تم الحذف','Supprimé'),'success');
+}
+
+function saveMyPayment(){
+  var type = document.getElementById('mypay-type').value;
+  var bank = document.getElementById('mypay-bank').value.trim();
+  var code = document.getElementById('mypay-code').value.trim();
+  var note = document.getElementById('mypay-note').value.trim();
+  if(!bank && type!=='cash' && type!=='instore'){ alert(_t2('يرجى إدخال اسم البنك/الخدمة','Veuillez saisir le nom de la banque/du service')); return; }
+  var entry = {type:type, bank:bank||type, code:code, note:note, addedAt: new Date().toISOString()};
+  var methods = getMyPayments();
+  var editIdx = document.getElementById('mypay-edit-idx').value;
+  if(editIdx!=='') methods[parseInt(editIdx)] = entry;
+  else methods.push(entry);
+  saveMyPayments(methods).then(function(){
+    closeMyPayModal();
+    renderMyPayments();
+    showToast('✅ '+_t2('تم الحفظ','Enregistré'),'success');
+  });
+}
+
+// Render on panel open
+
+  // ══ RIZQ PAYMENT SECTION ══
+  function renderRizqPayment(targetId){
+    var el = document.getElementById(targetId);
+    if(!el) return;
+    var codes = [];
+    try{ codes = (JSON.parse(localStorage.getItem('rizq_bank_codes')||'[]')).filter(function(c){return c.active!==false;}); }catch(e){}
+    
+    if(!codes.length){
+      el.innerHTML = '<div style="background:linear-gradient(135deg,#1B3A6B,#0f2347);border-radius:16px;padding:24px;text-align:center;color:rgba(255,255,255,.5);font-size:13px">'+_t2('لم يتم إضافة طرق دفع بعد — تواصل مع فريق','Aucun moyen de paiement ajouté pour le moment — contactez l\'équipe')+' <span style="color:#e8c96a;font-weight:700">رزق</span> '+_t2('عبر واتساب','via WhatsApp')+'</div>';
+      return;
+    }
+
+    var cards = codes.map(function(b){
+      var icon = b.bank.includes('بنكيلي')||b.bank.toLowerCase().includes('bankily') ? '📱' :
+                 b.bank.includes('سداد')||b.bank.toLowerCase().includes('sedad') ? '💳' :
+                 b.bank.includes('بيماه')||b.bank.toLowerCase().includes('bimbam') ? '📲' : '🏦';
+      return '<div style="background:rgba(255,255,255,.06);border:1px solid rgba(201,168,76,.25);border-radius:14px;padding:18px;margin-bottom:12px">'
+        +'<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">'
+          +'<div style="display:flex;align-items:center;gap:10px">'
+            +'<div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#C9A84C,#e8c96a);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">'+icon+'</div>'
+            +'<div>'
+              +'<div style="font-size:14px;font-weight:800;color:#e8c96a">'+escapeHtml(b.bank)+'</div>'
+              +(b.instruction?'<div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px">'+escapeHtml(b.instruction)+'</div>':'')
+            +'</div>'
+          +'</div>'
+          +'<div style="display:flex;align-items:center;gap:8px">'
+            +'<div style="font-family:monospace;font-size:16px;font-weight:900;color:#fff;background:rgba(0,0,0,.3);padding:8px 14px;border-radius:10px;letter-spacing:1px;direction:ltr">'+escapeHtml(b.code)+'</div>'
+            +'<button onclick="rzqCopyCode(this,\''+escapeHtml(b.code)+'\')" style="background:linear-gradient(135deg,#C9A84C,#e8c96a);border:none;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:700;color:#0f2347;white-space:nowrap;transition:all .2s">📋 '+_t2('نسخ','Copier')+'</button>'
+          +'</div>'
+        +'</div>'
+      +'</div>';
+    }).join('');
+
+    el.innerHTML = '<div style="background:linear-gradient(135deg,#1B3A6B,#0f2347);border-radius:18px;overflow:hidden">'
+      +'<div style="padding:20px 22px 14px;border-bottom:1px solid rgba(201,168,76,.2)">'
+        +'<div style="display:flex;align-items:center;gap:10px">'
+          +'<div style="width:36px;height:36px;background:linear-gradient(135deg,#C9A84C,#e8c96a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px">💰</div>'
+          +'<div>'
+            +'<div style="font-size:15px;font-weight:900;color:#fff">'+_t2('كيف تدفع اشتراكك لـ','Comment payer votre abonnement à')+' <span style="color:#e8c96a">رزق</span>؟</div>'
+            +'<div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:1px">'+_t2('اختر طريقة الدفع أدناه وانسخ الرمز','Choisissez un moyen de paiement ci-dessous et copiez le code')+'</div>'
+          +'</div>'
+        +'</div>'
+      +'</div>'
+      +'<div style="padding:18px 22px">'
+        +cards
+        +'<div style="background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);border-radius:12px;padding:14px 16px;margin-top:4px">'
+          +'<div style="font-size:12px;font-weight:700;color:#e8c96a;margin-bottom:8px">📋 '+_t2('خطوات الدفع','Étapes de paiement')+'</div>'
+          +'<div style="font-size:11.5px;color:rgba(255,255,255,.7);line-height:1.9">'
+            +'<div>1️⃣ '+_t2('افتح تطبيق البنك أو بيماه على هاتفك','Ouvrez l\'application bancaire ou Bimbam sur votre téléphone')+'</div>'
+            +'<div>2️⃣ '+_t2('اختر','Choisissez')+' <strong style="color:#e8c96a">'+_t2('دفع / تحويل','Payer / Transférer')+'</strong> '+_t2('وأدخل الرمز أعلاه','et saisissez le code ci-dessus')+'</div>'
+            +(function(){ var wa=(typeof _rizqSupportWhatsapp==='function'?_rizqSupportWhatsapp():''); return wa ? ('<div>3️⃣ '+_t2('أرسل لنا صورة التأكيد على واتساب:','Envoyez-nous une capture de confirmation sur WhatsApp :')+' <strong style="color:#e8c96a;direction:ltr">'+escapeHtml(wa)+'</strong></div>') : ('<div>3️⃣ '+_t2('أرسل صورة التأكيد لفريق رزق عبر قنوات الدعم الرسمية','Envoyez la capture à l\'équipe Rizq via les canaux de support officiels')+'</div>'); })()
+            +'<div>4️⃣ '+_t2('سيتم تفعيل اشتراكك خلال ساعات','Votre abonnement sera activé dans les heures qui suivent')+'</div>'
+          +'</div>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }
+
+  function rzqCopyCode(btn, code){
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(code).then(function(){
+        var orig=btn.textContent; btn.textContent=_t2('✅ تم النسخ!','✅ Copié!');
+        btn.style.background='linear-gradient(135deg,#22c55e,#4ade80)';
+        setTimeout(function(){btn.textContent=orig;btn.style.background='linear-gradient(135deg,#C9A84C,#e8c96a)';},2500);
+      });
+    } else {
+      var ta=document.createElement('textarea'); ta.value=code;
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta);
+      var orig=btn.textContent; btn.textContent=_t2('✅ تم!','✅ OK!');
+      setTimeout(function(){btn.textContent=orig;},2000);
+    }
+  }
+
+
+  function previewMyPage(){
+    var acc=(typeof OFFICE!=='undefined'&&OFFICE)||{};
+    var id=acc.id||'demo';
+    var base=location.href.replace(/[^\/]+$/,'');
+    var url=base+'rizq_office.html?id='+id;
+    window.open(url,'_blank');
+  }
+  // ── وكيل كلود: تفعيل/إيقاف (مكتب) ──────────────────────
+  function _rizqSupportWhatsapp(){
+  try{
+    var cfg=JSON.parse(localStorage.getItem('rizq_site_config')||'{}');
+    var w=String(cfg.whatsapp||cfg.phone||'').trim();
+    if(w && !/X{2,}|XX\s*XX/i.test(w)) return w;
+  }catch(e){}
+  return '';
+}
+function _rizqTwilioForwardNum(){
+  try{
+    var ch=JSON.parse(localStorage.getItem('rizq_channels_config')||'{}');
+    var n=String((ch.phone&&ch.phone.number)||ch.twilioNumber||'').trim();
+    if(n && !/X{2,}|XX\s*XX/i.test(n)) return n;
+  }catch(e){}
+  return '';
+}
+var RIZQ_TWILIO_NUM_OFFICE = (typeof _rizqTwilioForwardNum==='function'?_rizqTwilioForwardNum():'');
+  function renderAgentsOffice(){
+    var acc=(typeof OFFICE!=='undefined'&&OFFICE)||{};
+    var plan=acc.plan||'free';
+    var isDiamond = (typeof RizqSub !== 'undefined' && acc.id && RizqSub.hasFeature(acc.id, 'ai_agent_full'))
+      || plan==='diamond' || acc.diamond || /ماس|diamond|diamant/i.test([plan, acc.planName, acc.package].filter(Boolean).join(' '));
+    var badge=document.getElementById('auto-reply-badge');
+    var content=document.getElementById('auto-reply-content');
+    if(!badge||!content) return;
+    if(isDiamond){
+      badge.textContent=_t2('✅ مفعّل','✅ Activé');
+      badge.style.cssText='background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px';
+      var phone=acc.phone||'';
+      var toggleKey='rizq_agent_active_'+phone;
+      var active=localStorage.getItem(toggleKey)!=='false';
+      content.innerHTML='<p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">'+_t2('وكيل ذكي يرد على المكالمات وواتساب بشخصية مكتبك — حصرياً للباقة الماسية.','Agent IA qui répond aux appels et WhatsApp avec l\'identité de votre bureau — exclusif au forfait Diamant.')+'</p>'+
+        '<div id="agent-toggle-card" style="background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);border-radius:14px;padding:18px;color:#fff">'+
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">'+
+          '<div><div style="font-size:14px;font-weight:700;color:#fbbf24">🤖 '+_t2('وكيل رزق الذكي','Agent intelligent Rizq')+'</div>'+
+          '<div style="font-size:11.5px;color:#94a3b8;margin-top:3px">'+_t2('يرد على مكالماتك وواتساب بشخصية مكتبك','Répond à vos appels et WhatsApp avec l\'identité de votre bureau')+'</div></div>'+
+          '<label class="rizq-toggle-switch"><input type="checkbox" id="agent-toggle-chk" '+(active?'checked':'')+' onchange="toggleRizqAgentOffice(this.checked)"><span class="rizq-toggle-slider"></span></label>'+
+        '</div>'+
+        '<div style="background:rgba(255,255,255,.07);border-radius:10px;padding:11px;font-size:11.5px;line-height:1.8">'+
+          (RIZQ_TWILIO_NUM_OFFICE?('<div>📞 <strong>'+_t2('رقم تحويل المكالمات:','Numéro de renvoi:')+' </strong><code style="color:#fbbf24">'+escapeHtml(RIZQ_TWILIO_NUM_OFFICE)+'</code></div>'):('<div style="color:#94a3b8">📞 '+_t2('رقم التحويل يُضبط من لوحة الإدارة عند التفعيل','Le numéro de renvoi est configuré depuis le panneau admin à l\'activation')+'</div>'))+
+          '<div style="margin-top:6px;color:#94a3b8">'+_t2('حوّل مكالماتك عند عدم الرد — الوكيل يستقبل باسمك.','Renvoyez vos appels en cas de non-réponse — l\'agent répond en votre nom.')+'</div>'+
+          '<div style="margin-top:6px">📱 '+_t2('رقمك:','Votre numéro:')+' <strong style="color:#fbbf24">'+(phone||'—')+'</strong></div>'+
+        '</div>'+
+        '<div id="agent-toggle-status" style="margin-top:10px;font-size:11px;text-align:center;color:'+(active?'#4ade80':'#f87171')+'">'+
+          (active?_t2('● الوكيل مفعّل','● Agent actif'):_t2('○ الوكيل موقوف','○ Agent désactivé'))+
+        '</div>'+_renderOfficeChannelToggles()+'</div>'+
+        '<div id="agent-knowledge-upload"></div>'+
+        '<div id="agent-chat-test"></div>'+
+        '';
+      window._officeAgentPhone=phone;
+      window._officeAgentToggleKey=toggleKey;
+      if(typeof RizqDashboardAgentKnowledge!=='undefined'){
+        RizqDashboardAgentKnowledge.renderKnowledgePanel({ mountId:'agent-knowledge-upload', accountId: acc.id || SESSION_ID || '' });
+      }
+      if(typeof RizqDashboardAgentChat!=='undefined'){
+        RizqDashboardAgentChat.renderAgentChatPanel({ mountId:'agent-chat-test', accountId: acc.id || '' });
+      }
+    } else {
+      badge.textContent=_t2('🔒 ماسية فقط','🔒 Diamant uniquement');
+      badge.style.cssText='background:#f3f4f6;color:#6b7280;font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px';
+      content.innerHTML='<div style="text-align:center;padding:28px"><div style="font-size:40px;margin-bottom:12px">🔒</div>'+
+        '<p style="font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:6px">'+_t2('ميزة حصرية للباقة الماسية','Fonctionnalité exclusive au forfait Diamant')+'</p>'+
+        '<button onclick="showPanel(\'subscription\',null)" class="btn btn-gold">'+_t2('📦 الترقية للماسية','📦 Passer au forfait Diamant')+'</button></div>';
+    }
+  }
+  function _renderOfficeChannelToggles(){
+    var acc=(typeof OFFICE!=='undefined'&&OFFICE)||{};
+    var def={widget_enabled:true,whatsapp_enabled:true,calls_enabled:true};
+    try{ var raw=localStorage.getItem('rizq_channel_flags_'+(SESSION_ID||'')); if(raw) def=Object.assign(def,JSON.parse(raw)); }catch(e){}
+    if(acc.widget_enabled!=null) def.widget_enabled=!!acc.widget_enabled;
+    if(acc.whatsapp_enabled!=null) def.whatsapp_enabled=!!acc.whatsapp_enabled;
+    if(acc.calls_enabled!=null) def.calls_enabled=!!acc.calls_enabled;
+    function row(key,ar,fr){
+      return '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:8px 10px;background:rgba(255,255,255,.06);border-radius:8px"><span style="font-size:12px">'+_t2(ar,fr)+'</span><label class="rizq-toggle-switch"><input type="checkbox" '+(def[key]?'checked':'')+' onchange="toggleAccountChannel(\''+key+'\',this.checked)"><span class="rizq-toggle-slider"></span></label></div>';
+    }
+    return '<div style="margin-top:12px;font-size:11px;color:#94a3b8;font-weight:700">'+_t2('قنوات الربط','Canaux')+'</div>'+row('widget_enabled','ويدجت الموقع','Widget du site')+row('whatsapp_enabled','واتساب','WhatsApp')+row('calls_enabled','المكالمات','Appels');
+  }
+  function toggleAccountChannel(key,on){
+    var flags={widget_enabled:true,whatsapp_enabled:true,calls_enabled:true};
+    try{ flags=Object.assign(flags,JSON.parse(localStorage.getItem('rizq_channel_flags_'+(SESSION_ID||''))||'{}')); }catch(e){}
+    flags[key]=!!on;
+    try{ localStorage.setItem('rizq_channel_flags_'+(SESSION_ID||''), JSON.stringify(flags)); }catch(e){}
+    if(typeof OFFICE!=='undefined' && OFFICE) OFFICE[key]=!!on;
+    var base=(window.RIZQ_BACKEND_BASE||'').replace(/\/$/,'');
+    if(!base||!SESSION_ID){ showToast(_t2('✅ تم حفظ حالة القناة','✅ État du canal enregistré')); return; }
+    var body={}; body[key]=!!on;
+    fetch(base+'/api/accounts/mine/'+encodeURIComponent(SESSION_ID),{method:'PATCH',headers:{'Content-Type':'application/json','x-account-token':window.REAL_ACCESS_TOKEN||SESSION_TOKEN||''},body:JSON.stringify(body)})
+      .then(function(r){return r.json();}).then(function(){ showToast(_t2('✅ تم تحديث حالة الحساب','✅ Compte mis à jour')); })
+      .catch(function(){ showToast(_t2('✅ حُفظ محلياً','✅ Enregistré localement')); });
+  }
+  function toggleRizqAgentOffice(active){
+    var phone=window._officeAgentPhone||'';
+    if(!phone){showToast(_t2('⚠️ لا يوجد رقم هاتف مسجّل','⚠️ Aucun numéro enregistré'),'warn');return;}
+    try{localStorage.setItem(window._officeAgentToggleKey,active?'true':'false');}catch(e){}
+    // إصلاح: كان يقرأ window.RIZQ_BACKEND_URL غير المُعرَّف إطلاقاً في أي مكان
+    // بالمشروع (يفشل بصمت دائماً)، وسرّاً ثابتاً بالكود بدل الإعداد الحقيقي.
+    // الآن يستخدم نفس مصدر الحقيقة الوحيد (RizqSub.getAgentConfig) الذي يضبطه
+    // محمد مرة واحدة من تبويب "وكيل الباقات" بلوحة الأدمن.
+    var _cfg=(typeof RizqSub!=='undefined')?RizqSub.getAgentConfig():{};
+    if(!_cfg.backendUrl){showToast(_t2('⚠️ لم يُضبط رابط الخادم الخلفي بعد من لوحة الأدمن','⚠️ URL du serveur backend non configurée depuis l\'admin'),'warn');return;}
+    fetch(_cfg.backendUrl.replace(/\/$/,'')+'/api/agent/toggle',{method:'POST',headers:{'Content-Type':'application/json','x-account-token':window.REAL_ACCESS_TOKEN||''},body:JSON.stringify({subscriberPhone:phone,active:active,accountId:SESSION_ID})})
+      .then(function(r){return r.json();}).then(function(){
+        var el=document.getElementById('agent-toggle-status');
+        if(el){el.style.color=active?'#4ade80':'#f87171';el.textContent=active?_t2('● الوكيل مفعّل','● Agent actif'):_t2('○ الوكيل موقوف','○ Agent désactivé');}
+        showToast(active?_t2('✅ الوكيل مفعّل','✅ Agent activé'):_t2('⏹️ الوكيل موقوف','⏹️ Agent désactivé'));
+      }).catch(function(){
+        var el=document.getElementById('agent-toggle-status');
+        if(el){el.style.color=active?'#4ade80':'#f87171';el.textContent=active?_t2('● مفعّل محلياً','● Activé localement'):_t2('○ موقوف محلياً','○ Désactivé localement');}
+      });
+  }
+
+  function renderServicesShowcase(){
+    var el=document.getElementById('services-showcase'); if(!el) return;
+    var acc=(typeof STORE!=='undefined'&&STORE)||(typeof CORP_ACC!=='undefined'&&CORP_ACC)||(typeof OFFICE!=='undefined'&&OFFICE)||{};
+    var accId=acc.id||'';
+    var ACC_TYPE='office';
+    // إصلاح: الاعتماد الحقيقي على محرك الباقات RizqSub (نفس المصدر الذي يُفعِّل
+    // الميزات فعلياً عند الدفع) بدل مقارنة acc.plan بأسماء وهمية (gold/silver/pro)
+    // لا وجود لها في نظام الباقات الفعلي — كانت تجعل كل الخدمات المدفوعة تظهر
+    // مقفلة دوماً بلا علاقة بالباقة الحقيقية للمشترك.
+    var feats = (typeof RizqSub!=='undefined') ? (accId ? RizqSub.checkSubscription(accId).features : RizqSub.FREE_FEATURES) : [];
+    function has(f){ return !f || feats.indexOf(f)!==-1; }
+    function reqPkg(f){ return (f && typeof RizqSub!=='undefined') ? RizqSub.getMinPackageForFeature(ACC_TYPE, f) : null; }
+
+    var services=[
+      {icon:'📦',label:_t2('نشر المنتجات/الخدمات','Publier produits/services'),feature:null,tip:_t2('انشر منتجاتك وخدماتك أمام آلاف المشترين','Publiez vos produits et services devant des milliers d\'acheteurs')},
+      {icon:'💬',label:_t2('التواصل المباشر','Communication directe'),feature:null,tip:_t2('استقبل رسائل واستفسارات الزبائن مباشرة','Recevez messages et demandes des clients directement')},
+      {icon:'📤',label:_t2('مشاركة الصفحة','Partage de la page'),feature:null,tip:_t2('شارك رابط صفحتك على وسائل التواصل','Partagez le lien de votre page sur les réseaux sociaux')},
+      {icon:'📊',label:_t2('إحصائيات الزيارات','Statistiques de visites'),feature:'analytics',tip:_t2('تابع عدد من زار صفحتك وتفاعل معها','Suivez le nombre de visiteurs et leur interaction')},
+      {icon:'🥇',label:_t2('صدارة النتائج','Premier dans les résultats'),feature:'priority_listing',tip:_t2('ظهور متقدم في نتائج البحث','Apparition prioritaire dans les résultats de recherche')},
+      {icon:'🤖',label:_t2('وكيل ذكي','Agent intelligent'),feature:'ai_agent_full',tip:_t2('رد تلقائي ذكي على الاستفسارات 24/7','Réponse automatique intelligente aux demandes 24/7')},
+      {icon:'📞',label:_t2('رد تلقائي مكالمات','Réponse automatique aux appels'),feature:'auto_reply_calls',tip:_t2('لا تفوتك مكالمة — الذكاء الاصطناعي يرد عنك','Ne ratez aucun appel — l\'IA répond pour vous')},
+      {icon:'💎',label:_t2('مدير حساب VIP','Gestionnaire de compte VIP'),feature:'vip_manager',tip:_t2('دعم شخصي من فريق رزق على مدار الساعة','Support personnalisé de l\'équipe Rizq 24h/24')},
+    ];
+
+    el.innerHTML=services.map(function(s){
+      var avail=has(s.feature);
+      // إصلاح: بدل شارة "ترقية" عامة لا تحدد أي باقة، نعرض اسم أقل باقة حقيقية
+      // تمنح هذه الخدمة تحديداً (مصدرها RizqSub.getMinPackageForFeature) — لا لبس.
+      var need=avail?null:reqPkg(s.feature);
+      var lockTxt = '🔒 '+(need ? (_t2('يتطلب: ','Nécessite : ')+need) : _t2('ترقية','Mise à niveau'));
+      return '<div onclick="'+(avail?'':'showPanel(\'subscription\',null)')+'" style="background:#fff;border:2px solid '+(avail?'rgba(27,58,107,.18)':'rgba(201,168,76,.35)')+';border-radius:14px;padding:16px 10px 12px;text-align:center;position:relative;cursor:'+(avail?'default':'pointer')+';box-shadow:0 2px 8px rgba(27,58,107,.06);transition:box-shadow .2s,transform .2s" onmouseover="this.style.boxShadow=\'0 6px 18px rgba(27,58,107,.13)\';this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.boxShadow=\'0 2px 8px rgba(27,58,107,.06)\';this.style.transform=\'none\'">'
+        +(avail?''
+          :'<div style="position:absolute;top:-1px;right:-1px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:9.5px;font-weight:900;padding:3px 9px;border-radius:0 12px 0 10px;letter-spacing:.2px;white-space:nowrap">'+lockTxt+'</div>')
+        +'<div style="font-size:30px;margin-bottom:8px;line-height:1">'+s.icon+'</div>'
+        +'<div style="font-size:12px;font-weight:800;color:#1B3A6B;margin-bottom:5px;line-height:1.3">'+s.label+'</div>'
+        +'<div style="font-size:10.5px;color:#2C3A4F;line-height:1.45">'+s.tip+'</div>'
+        +(avail?'<div style="margin-top:10px;display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 8px rgba(16,185,129,.6)"></div>':'')
+      +'</div>';
+    }).join('');
+  }
+
+
+// Auto-navigate from URL hash / نية الاشتراك من زر الصفحة الرئيسية
+window.addEventListener('load', function(){
+  var h = location.hash.replace('#','');
+  try{
+    if(!h && sessionStorage.getItem('rizq_open_panel') === 'subscription'){
+      h = 'subscription';
+      sessionStorage.removeItem('rizq_open_panel');
+      try{ history.replaceState(null, '', location.pathname + location.search + '#subscription'); }catch(eH){}
+    }
+  }catch(eIntent){}
+  if(h){ var el = document.querySelector('.sb-item[onclick*="'+h+'"]'); if(el){ el.click(); } }
+});
+
+;
+
+/* معاينة الفيديو التعريفي — نفس سلوك داشبورد المحل */
+function _mountDashVideoPreview(hostId, url, titleAr, titleFr){
+  var host = document.getElementById(hostId);
+  if(!host) return;
+  var link = String(url || '').trim();
+  if(!link || !window.RizqIntroVideo){
+    host.style.display = 'none';
+    host.innerHTML = '';
+    return;
+  }
+  var fr = false;
+  try { fr = (localStorage.getItem('rizq_lang') || 'ar') === 'fr'; } catch (e) {}
+  host.innerHTML = '';
+  var ok = RizqIntroVideo.mount(host, link, {
+    accountType: 'office',
+    poster: (RizqIntroVideo.demoDashboardPoster && RizqIntroVideo.demoDashboardPoster('office')) || '',
+    title: fr ? titleFr : titleAr,
+    linkLabel: fr ? 'Ouvrir la source ↗' : 'فتح المصدر ↗',
+    playLabel: fr ? "Lire l’aperçu" : 'تشغيل المعاينة',
+    mutedLabel: fr ? 'Activer le son' : 'تفعيل الصوت',
+    unmutedLabel: fr ? 'Son activé' : 'الصوت مفعّل'
+  });
+  host.style.display = ok ? 'block' : 'none';
+  if(!ok) host.innerHTML = '<div style="padding:12px;color:#fca5a5;font-size:12px;font-weight:700">'
+    + (fr ? 'Lien non pris en charge — utilisez YouTube ou Facebook.' : 'رابط غير مدعوم — استخدم YouTube أو Facebook.')
+    + '</div>';
+}
+function previewDashPromoVideo(){
+  var el = document.getElementById('p-promo-video');
+  _mountDashVideoPreview('p-promo-video-preview', el && el.value, '🎬 معاينة الفيديو التعريفي', '🎬 Aperçu vidéo de présentation');
+}
+/* fillProfile قد يعمل قبل تعريف هذه الدوال (سكربت سابق) — أعد المعاينة الآن */
+try { if(typeof previewDashPromoVideo === 'function') previewDashPromoVideo(); } catch(ePv){}

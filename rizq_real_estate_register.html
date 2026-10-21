@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet"/>
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_account_route.js"></script>
+<script src="rizq_dashboard_shared.js?v=3"></script>
 <script src="rizq_merchant_activities.js"></script>
 <script src="rizq_phone_utils.js"></script>
 <style>
@@ -239,7 +240,7 @@ input:focus,select:focus,textarea:focus{border-color:rgba(201,168,76,.75)}
       email: acc.email,
       status: acc.status || 'approved',
       token: token,
-      backendAccessToken: acc.accessToken || '',
+      /* accessToken kept in memory via RizqDash */
       city: acc.city || '',
       estateSubType: acc.estateSubType || '',
       licenseNumber: acc.licenseNumber || '',
@@ -254,6 +255,9 @@ input:focus,select:focus,textarea:focus{border-color:rgba(201,168,76,.75)}
     } catch (e) {}
     if (window.RizqAccount && typeof RizqAccount.setActiveSession === 'function') {
       RizqAccount.setActiveSession(rec);
+    }
+    if (acc.accessToken && window.RizqDash && RizqDash.rememberAccessToken) {
+      RizqDash.rememberAccessToken(rec.id, acc.accessToken);
     }
     var url = (window.RizqAccount && RizqAccount.buildDashboardUrl)
       ? RizqAccount.buildDashboardUrl(rec)
@@ -346,7 +350,6 @@ input:focus,select:focus,textarea:focus{border-color:rgba(201,168,76,.75)}
           email: email,
           status: d.status,
           dashToken: d.dashToken,
-          accessToken: d.accessToken,
           city: city,
           estateSubType: selectedSubType(),
           licenseNumber: payload.licenseNumber,

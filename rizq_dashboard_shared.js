@@ -186,23 +186,87 @@
     });
   }
 
-  /**
-   * يحل accessToken للكتابة عبر exchange-dash-token.
-   * لا يعتمد على بقاء التوكن في URL — ويحدّث sessionStorage فقط لـ dashToken.
-   */
-  function resolveAccessToken(acc, sessionToken) {
-    global.REAL_ACCESS_TOKEN = null;
+  function accessMemKey(accountId) {
+    return 'rizq_access_mem_' + String(accountId || '');
+  }
+
+  /** يزيل accessToken / backendAccessToken من localStorage (W4). */
+  function purgeSensitiveTokensFromStorage() {
+    var changed = false;
     try {
       var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
-      var rec = accs.find(function (a) { return a && a.id === acc.id; });
-      if (rec && (rec.backendAccessToken || rec.accessToken)) {
-        global.REAL_ACCESS_TOKEN = rec.backendAccessToken || rec.accessToken;
-        return Promise.resolve(global.REAL_ACCESS_TOKEN);
+      if (Array.isArray(accs)) {
+        accs.forEach(function (a) {
+          if (!a || typeof a !== 'object') return;
+          if (Object.prototype.hasOwnProperty.call(a, 'accessToken')) {
+            delete a.accessToken;
+            changed = true;
+          }
+          if (Object.prototype.hasOwnProperty.call(a, 'backendAccessToken')) {
+            delete a.backendAccessToken;
+            changed = true;
+          }
+          if (Object.prototype.hasOwnProperty.call(a, 'password')) {
+            delete a.password;
+            changed = true;
+          }
+        });
+        if (changed) localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
       }
     } catch (e) {}
+    try {
+      ['rizq_active_session', 'rizq_individual_session', 'rizq_corp_session', 'rizq_dashboard_session', 'rizq_session'].forEach(function (k) {
+        var raw = localStorage.getItem(k);
+        if (!raw) return;
+        try {
+          var o = JSON.parse(raw);
+          if (o && typeof o === 'object') {
+            var dirty = false;
+            if (o.accessToken) { delete o.accessToken; dirty = true; }
+            if (o.backendAccessToken) { delete o.backendAccessToken; dirty = true; }
+            if (dirty) localStorage.setItem(k, JSON.stringify(o));
+          }
+        } catch (e2) {}
+      });
+    } catch (e3) {}
+    return changed;
+  }
+
+  function rememberAccessToken(accountId, token) {
+    global.REAL_ACCESS_TOKEN = token || null;
+    if (!accountId || !token) return;
+    try { sessionStorage.setItem(accessMemKey(accountId), token); } catch (e) {}
+  }
+
+  function readEphemeralAccessToken(accountId) {
+    if (global.REAL_ACCESS_TOKEN) return global.REAL_ACCESS_TOKEN;
+    if (!accountId) return '';
+    try { return sessionStorage.getItem(accessMemKey(accountId)) || ''; } catch (e) { return ''; }
+  }
+
+  /**
+   * يحل accessToken للكتابة عبر exchange-dash-token.
+   * التخزين: ذاكرة الصفحة + sessionStorage فقط — ممنوع localStorage.
+   */
+  function resolveAccessToken(acc, sessionToken) {
+    purgeSensitiveTokensFromStorage();
+    stripUrlToken();
+    global.REAL_ACCESS_TOKEN = null;
+    if (!acc || !acc.id) return Promise.resolve(null);
+
+    var cached = readEphemeralAccessToken(acc.id);
+    if (cached) {
+      global.REAL_ACCESS_TOKEN = cached;
+      return Promise.resolve(cached);
+    }
+
     var base = backendBase();
     var dash = sessionToken || (acc && acc.token) || '';
-    if (!base || !acc || !acc.id || !dash) return Promise.resolve(null);
+    try {
+      if (!dash) dash = sessionStorage.getItem('rizq_dash_token_' + acc.id) || '';
+    } catch (eD) {}
+    if (!base || !dash) return Promise.resolve(null);
+
     return fetch(base + '/api/accounts/exchange-dash-token/' + encodeURIComponent(acc.id), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-dash-token': dash },
@@ -211,11 +275,9 @@
       .then(function (res) { return res.ok ? res.json() : null; })
       .then(function (data) {
         if (!data || !data.ok || !data.accessToken) return null;
-        global.REAL_ACCESS_TOKEN = data.accessToken;
+        rememberAccessToken(acc.id, data.accessToken);
         if (data.dashToken) {
-          try {
-            sessionStorage.setItem('rizq_dash_token_' + acc.id, data.dashToken);
-          } catch (eS) {}
+          try { sessionStorage.setItem('rizq_dash_token_' + acc.id, data.dashToken); } catch (eS) {}
           if (global.RizqAccount && global.RizqAccount.storeDashToken) {
             try { global.RizqAccount.storeDashToken(acc.id, data.dashToken); } catch (eT) {}
           }
@@ -223,15 +285,17 @@
             var accs2 = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
             var rec2 = accs2.find(function (a) { return a && a.id === acc.id; });
             if (rec2) {
-              rec2.backendAccessToken = data.accessToken;
+              delete rec2.backendAccessToken;
+              delete rec2.accessToken;
               rec2.token = data.dashToken;
               rec2.dashToken = data.dashToken;
-              /* لا نخزّن accessToken كنص دائم منفصل إن أمكن — نُبقي المفتاح الحالي للتوافق */
               localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs2));
             }
             var act = JSON.parse(localStorage.getItem('rizq_active_session') || 'null');
             if (act && act.id === acc.id) {
               act.token = data.dashToken;
+              delete act.accessToken;
+              delete act.backendAccessToken;
               localStorage.setItem('rizq_active_session', JSON.stringify(act));
             }
           } catch (eU) {}
@@ -239,6 +303,15 @@
         return global.REAL_ACCESS_TOKEN;
       })
       .catch(function () { return null; });
+  }
+
+  /** نقطة دخول موحّدة للوحات — تطهير توكنات + خطافات اختيارية */
+  function init(opts) {
+    opts = opts || {};
+    purgeSensitiveTokensFromStorage();
+    stripUrlToken();
+    if (opts.expectedType) return bootstrapDashboard(opts);
+    return null;
   }
 
   function showAccessDenied(opts) {
@@ -257,6 +330,7 @@
    */
   function bootstrapDashboard(opts) {
     opts = opts || {};
+    purgeSensitiveTokensFromStorage();
     var expectedType = opts.expectedType || 'individual';
     var sess = resolveSession(expectedType);
     var ctx = {
@@ -331,9 +405,13 @@
     verifyAccessLocal: verifyAccessLocal,
     verifyAccessRemote: verifyAccessRemote,
     resolveAccessToken: resolveAccessToken,
+    purgeSensitiveTokensFromStorage: purgeSensitiveTokensFromStorage,
+    rememberAccessToken: rememberAccessToken,
+    readEphemeralAccessToken: readEphemeralAccessToken,
     showAccessDenied: showAccessDenied,
     bootstrapDashboard: bootstrapDashboard,
-    applySubscriptionLock: applySubscriptionLock
+    applySubscriptionLock: applySubscriptionLock,
+    init: init
   };
 
   global.RizqDash = api;
