@@ -75,7 +75,7 @@
 <body data-t-ns="favorites">
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_auth_gate.js?v=23.1" defer></script>
-<script src="rizq_ux_polish.js?v=23.2" defer></script>
+<script src="rizq_ux_polish.js?v=23.3" defer></script>
 <script src="rizq_header.js?v=31.1"></script>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 
@@ -133,7 +133,12 @@
     var countEl = document.getElementById('fav-count');
     var clearBtn = document.getElementById('fav-clear');
     if(!listEl) return;
-    /* مثل السلة العامة: اعرض المحفوظ محلياً دون مسح عند الزيارة */
+    /* مثل السلة العامة: احصد مفضّلات المحل/العقار/المعرض ثم اعرض الكل */
+    try{
+      if(window.RizqUx && typeof RizqUx.harvestLocalWishlists === 'function'){
+        RizqUx.harvestLocalWishlists({ silent: true });
+      }
+    }catch(eH){}
     var items = (window.RizqUx && typeof RizqUx.collectUnifiedFavorites === 'function')
       ? RizqUx.collectUnifiedFavorites()
       : [];

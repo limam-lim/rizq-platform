@@ -477,6 +477,8 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_mr_payment_catalog.js?v=1.1" defer></script>
   <script src="rizq_account_payments.js?v=28.3" defer></script>
   <script src="rizq_contact_gate.js" defer></script>
+  <script src="rizq_auth_gate.js?v=23.1" defer></script>
+  <script src="rizq_ux_polish.js?v=23.3" defer></script>
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_i18n_data.js" defer></script>
   <script src="rizq_i18n.js" defer></script>
@@ -522,8 +524,8 @@ main, .page-content.active, .main-content, .results-area,
   <div class="store-lux-inner">
     <div class="store-lux-logo" id="lux-store-logo">🏪</div>
     <div style="flex:1;min-width:180px">
-      <div class="store-lux-name"><span id="lux-store-name">متجر النور</span></div>
-      <p class="store-lux-tag" id="lux-store-tag">سلة طلباتك — صورة المحل واسمه كما في الواجهة</p>
+      <div class="store-lux-name"><span id="lux-store-name">السلة العامة</span></div>
+      <p class="store-lux-tag" id="lux-store-tag">تجمع كل ما أضفته من المحلات والمعارض — نفس أسلوب المفضلة العامة</p>
       <div class="store-lux-meta">
         <span class="store-lux-chip" id="lux-count-chip">0 منتج</span>
         <a class="store-lux-chip" id="lux-back-store" href="rizq_store.html">↩ واجهة المحل</a>
@@ -900,14 +902,20 @@ function autofillDeliveryFromAccount() {
   try{
     var params = new URLSearchParams(location.search);
     var storeId = params.get('id') || params.get('store') || params.get('showroom') || params.get('corp') || '';
-    if(!storeId){
-      try{
-        var c = JSON.parse(localStorage.getItem('rizq_cart') || '[]');
-        if(c[0]) storeId = c[0].storeId || c[0].accountId || '';
-      }catch(e){}
-    }
     var fr = false;
     try{ fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr'; }catch(e2){}
+    /* بلا ?id= → السلة العامة تجمع كل التجّار */
+    if(!storeId){
+      applyCartStoreBrand({
+        name: fr ? 'Panier général' : 'السلة العامة',
+        tagline: fr
+          ? 'Tout ce que vous avez ajouté depuis les boutiques et showrooms'
+          : 'تجمع كل ما أضفته من المحلات والمعارض — مثل المفضلة العامة',
+        thumb: ''
+      }, '', fr);
+      window._rizqCartGeneral = true;
+      return;
+    }
     var acc = null;
     if(storeId && storeId !== 'demo_store' && storeId !== 'demo_showroom' && storeId !== 'demo-corp-001'){
       try{
@@ -920,15 +928,13 @@ function autofillDeliveryFromAccount() {
         }).catch(function(){});
       }
     }
-    if(!acc && (storeId === 'demo_store' || storeId === 'demo_showroom' || storeId === 'demo-corp-001' || !storeId)){
+    if(!acc && (storeId === 'demo_store' || storeId === 'demo_showroom' || storeId === 'demo-corp-001')){
       var demoShowroom = storeId === 'demo_showroom' || storeId === 'demo-corp-001'
         || (params.get('module') === 'showroom');
       if(demoShowroom){
         acc = { name: fr ? 'Showroom Al-Riyada' : 'معرض الريادة', tagline: fr ? 'Panier showroom' : 'سلة المعرض', type: 'corp' };
-        if(!storeId) storeId = 'demo-corp-001';
       } else {
         acc = { name: fr ? 'Boutique Al-Nour' : 'متجر النور', tagline: fr ? 'Panier premium' : 'سلة طلباتك', type: 'store' };
-        if(!storeId) storeId = 'demo_store';
       }
     }
     applyCartStoreBrand(acc || {}, storeId, fr);
@@ -953,13 +959,18 @@ function _cartIsShowroomContext(acc, storeId){
 }
 
 function applyCartStoreBrand(acc, storeId, fr){
-  var isShowroom = _cartIsShowroomContext(acc, storeId);
-  var name = (acc && acc.name) || (isShowroom
-    ? (fr ? 'Showroom Al-Riyada' : 'معرض الريادة')
-    : (fr ? 'Boutique Al-Nour' : 'متجر النور'));
-  var tag = (acc && (acc.tagline || acc.desc)) || (isShowroom
-    ? (fr ? 'Votre panier showroom — articles de ce showroom uniquement' : 'سلة المعرض — فقط ما أضفته من هذا المعرض')
-    : (fr ? 'Votre panier — articles de ce magasin uniquement' : 'سلة المحل — فقط ما أضفته من هذا المحل'));
+  var isGeneral = !storeId;
+  var isShowroom = !isGeneral && _cartIsShowroomContext(acc, storeId);
+  var name = (acc && acc.name) || (isGeneral
+    ? (fr ? 'Panier général' : 'السلة العامة')
+    : (isShowroom
+      ? (fr ? 'Showroom Al-Riyada' : 'معرض الريادة')
+      : (fr ? 'Boutique Al-Nour' : 'متجر النور')));
+  var tag = (acc && (acc.tagline || acc.desc)) || (isGeneral
+    ? (fr ? 'All items you added from boutiques and showrooms' : 'تجمع كل ما أضفته من المحلات والمعارض')
+    : (isShowroom
+      ? (fr ? 'Votre panier showroom — articles de ce showroom uniquement' : 'سلة المعرض — فقط ما أضفته من هذا المعرض')
+      : (fr ? 'Votre panier — articles de ce magasin uniquement' : 'سلة المحل — فقط ما أضفته من هذا المحل')));
   var luxName = document.getElementById('lux-store-name');
   var luxTag = document.getElementById('lux-store-tag');
   var luxLogo = document.getElementById('lux-store-logo');
@@ -969,6 +980,17 @@ function applyCartStoreBrand(acc, storeId, fr){
   var toProd = document.getElementById('lux-to-products');
   if(luxName) luxName.textContent = name;
   if(luxTag) luxTag.textContent = tag;
+  if(isGeneral){
+    if(luxLogo) luxLogo.textContent = '🛒';
+    if(bcLink){ bcLink.textContent = fr ? 'Accueil' : 'الرئيسية'; bcLink.href = 'rizq_landing_v8.html'; }
+    if(bcProd){ bcProd.textContent = fr ? 'Favoris' : 'المفضلة'; bcProd.href = 'rizq_favorites.html'; }
+    if(back){ back.textContent = fr ? '↩ Accueil' : '↩ الرئيسية'; back.href = 'rizq_landing_v8.html'; }
+    if(toProd){ toProd.textContent = fr ? '♡ Favoris' : '♡ المفضلة'; toProd.href = 'rizq_favorites.html'; }
+    window._rizqCartStoreName = name;
+    window._rizqCartIsShowroom = false;
+    window._rizqCartGeneral = true;
+    return;
+  }
   if(window.RizqStoreCommerce) RizqStoreCommerce.setLogo(luxLogo, acc && acc.thumb, isShowroom ? '🏛️' : '🏪');
   else if(luxLogo && acc && acc.thumb){
     var t = String(acc.thumb).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
@@ -998,6 +1020,7 @@ function applyCartStoreBrand(acc, storeId, fr){
   if(window.RizqStoreCommerce) RizqStoreCommerce.wireStoreLinks(storeId);
   window._rizqCartStoreName = name;
   window._rizqCartIsShowroom = !!isShowroom;
+  window._rizqCartGeneral = false;
 }
 
 // ========= CART STATE — مرتبطة فعلياً بـ rizq_products.html عبر localStorage['rizq_cart'] =========

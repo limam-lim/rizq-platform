@@ -87,8 +87,138 @@
     } catch (e) {}
   }
 
+  /**
+   * اجمع مفضّلات المحل/المعرض/العقار المحلية داخل المفضلة العامة
+   * (حتى لو فشلت المزامنة وقت الإضافة أو مُسحت قائمة الإعلانات)
+   */
+  function harvestLocalWishlists(opts) {
+    opts = opts || {};
+    var ids = wishlistIds();
+    var seen = {};
+    ids.forEach(function (id) { seen[String(id)] = true; });
+    var meta = wishlistMetaMap();
+    var metaChanged = false;
+    var changed = false;
+
+    function rememberMeta(gid, entry) {
+      if (!gid || !entry) return;
+      if (meta[gid] && meta[gid].title) return;
+      meta[gid] = {
+        type: entry.type || parseWishlistId(gid).type,
+        title: entry.title || entry.name || '',
+        price: entry.price || '',
+        emoji: entry.emoji || '',
+        href: entry.href || '',
+        sourceId: entry.sourceId || parseWishlistId(gid).sourceId || '',
+        sourceName: entry.sourceName || '',
+        updatedAt: new Date().toISOString()
+      };
+      metaChanged = true;
+    }
+
+    function pushId(gid, entry) {
+      gid = String(gid || '');
+      if (!gid) return;
+      rememberMeta(gid, entry);
+      if (seen[gid]) return;
+      ids.push(gid);
+      seen[gid] = true;
+      changed = true;
+    }
+
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        if (!key) continue;
+        if (key === 'rizq_wishlist' || key === 'rizq_wishlist_meta') continue;
+
+        if (key.indexOf('rizq_wishlist_estate_') === 0) {
+          var agencyId = key.slice('rizq_wishlist_estate_'.length) || 'estate';
+          var estateList = [];
+          try { estateList = JSON.parse(localStorage.getItem(key) || '[]'); } catch (eE) { estateList = []; }
+          if (!Array.isArray(estateList)) continue;
+          estateList.forEach(function (p) {
+            if (!p) return;
+            var pid = String(p.id || '');
+            if (!pid) return;
+            var egid = 'estate:' + agencyId + ':' + pid;
+            pushId(egid, {
+              type: 'estate',
+              title: p.title || pid,
+              price: p.price || '',
+              emoji: '🏠',
+              sourceId: agencyId,
+              sourceName: p.sourceName || '',
+              href: 'rizq_estate.html?id=' + encodeURIComponent(agencyId) + '&open=' + encodeURIComponent(pid)
+            });
+          });
+          continue;
+        }
+
+        if (key.indexOf('rizq_wishlist_') === 0) {
+          var storeId = key.slice('rizq_wishlist_'.length);
+          if (!storeId || storeId === 'meta') continue;
+          var storeList = [];
+          try { storeList = JSON.parse(localStorage.getItem(key) || '[]'); } catch (eS) { storeList = []; }
+          if (!Array.isArray(storeList)) continue;
+          storeList.forEach(function (p) {
+            if (!p) return;
+            var sid = String(p.id || '');
+            if (!sid) return;
+            var sgid = 'store:' + storeId + ':' + sid;
+            pushId(sgid, {
+              type: 'store',
+              title: p.name || p.title || sid,
+              price: p.price || '',
+              emoji: p.emoji || '🛍️',
+              sourceId: storeId,
+              sourceName: p.sourceName || '',
+              href: 'rizq_store.html?id=' + encodeURIComponent(storeId)
+            });
+          });
+        }
+      }
+
+      var srList = [];
+      try { srList = JSON.parse(localStorage.getItem('rizq_showroom_wishlist') || '[]'); } catch (eR) { srList = []; }
+      if (Array.isArray(srList)) {
+        srList.forEach(function (p) {
+          if (!p) return;
+          var raw = (typeof p === 'object') ? p : { id: p };
+          var rid = String(raw.id || '');
+          if (!rid) return;
+          var showroomId = String(raw.showroomId || 'showroom');
+          var rgid = 'showroom:' + showroomId + ':' + rid;
+          pushId(rgid, {
+            type: 'showroom',
+            title: raw.name || raw.title || rid,
+            price: raw.price || '',
+            emoji: raw.emoji || '🏛️',
+            sourceId: showroomId,
+            sourceName: raw.sourceName || '',
+            href: 'rizq_showroom.html?id=' + encodeURIComponent(showroomId)
+          });
+        });
+      }
+    } catch (eHarv) {}
+
+    if (metaChanged) {
+      try { localStorage.setItem('rizq_wishlist_meta', JSON.stringify(meta)); } catch (eM) {}
+    }
+    if (changed) {
+      try { localStorage.setItem('rizq_wishlist', JSON.stringify(ids)); } catch (eW) {}
+      if (!opts.silent) {
+        try {
+          document.dispatchEvent(new CustomEvent('rizq_wishlist', { detail: { ids: ids, count: ids.length, harvested: true } }));
+        } catch (eD) {}
+      }
+    }
+    return ids;
+  }
+
   /** مفضلة موحّدة: إعلانات + محل + معرض + عقار (+ مكتب إن وُجد) */
   function collectUnifiedFavorites() {
+    harvestLocalWishlists({ silent: true });
     var ids = wishlistIds();
     var meta = wishlistMetaMap();
     var typeLabel = {
@@ -149,17 +279,23 @@
 
   function clearGuestWishlist() {
     try {
-      var raw = localStorage.getItem('rizq_wishlist');
-      var hadMeta = false;
+      /* لا تمسح مفضّلات المحل/المعرض/العقار — فقط إعلانات الضيوف غير الموثّقة */
+      var prev = wishlistIds();
+      var keep = prev.filter(isTypedWishlistId);
+      var meta = wishlistMetaMap();
+      var nextMeta = {};
+      keep.forEach(function (id) {
+        if (meta[id]) nextMeta[id] = meta[id];
+      });
+      if (keep.length === prev.length) {
+        /* لا شيء لمسحه */
+        try { localStorage.setItem('rizq_wishlist_meta', JSON.stringify(nextMeta)); } catch (eKeepMeta) {}
+        return false;
+      }
+      localStorage.setItem('rizq_wishlist', JSON.stringify(keep));
+      try { localStorage.setItem('rizq_wishlist_meta', JSON.stringify(nextMeta)); } catch (eMeta) {}
       try {
-        var mm = localStorage.getItem('rizq_wishlist_meta');
-        hadMeta = !!(mm && mm !== '{}' && mm !== 'null');
-      } catch (eM) {}
-      if ((!raw || raw === '[]') && !hadMeta) return false;
-      localStorage.setItem('rizq_wishlist', '[]');
-      try { localStorage.setItem('rizq_wishlist_meta', '{}'); } catch (eMeta) {}
-      try {
-        document.dispatchEvent(new CustomEvent('rizq_wishlist', { detail: { ids: [], clearedGuest: true, count: 0 } }));
+        document.dispatchEvent(new CustomEvent('rizq_wishlist', { detail: { ids: keep, clearedGuest: true, count: keep.length } }));
       } catch (e) {}
       return true;
     } catch (e2) {
@@ -309,14 +445,19 @@
   }
 
   function updateFavBadges() {
-    // مثل السلة العامة: أظهر العدد من التخزين المحلي (الإضافة ما زالت محمية عند المصدر)
+    // اجمع مفضّلات المحل/العقار/المعرض المحلية ثم اعرض العدد العام
+    try { harvestLocalWishlists({ silent: true }); } catch (eH) {}
     var n = wishlistIds().length;
     var heart = n > 0 ? '♥' : '♡';
+    var label = n > 99 ? '99+' : String(n);
     var wlBlock = document.getElementById('wishlist-block');
     if (wlBlock) wlBlock.classList.toggle('has-favs', n > 0);
     document.querySelectorAll('[data-rizq-fav-count]').forEach(function (el) {
-      el.textContent = n > 99 ? '99+' : String(n);
+      el.textContent = label;
       el.hidden = n < 1;
+      if (n > 0) {
+        try { el.removeAttribute('hidden'); } catch (eF) {}
+      }
       el.classList.toggle('is-empty', n < 1);
     });
     document.querySelectorAll('[data-rizq-fav-heart], .rizq-hdr-fav-ico').forEach(function (el) {
@@ -324,7 +465,9 @@
     });
     document.querySelectorAll('[data-rizq-fav-wrap]').forEach(function (el) {
       el.classList.toggle('has-favs', n > 0);
-      var lbl = n > 0 ? t('المفضلة (' + n + ')', 'Favoris (' + n + ')') : t('المفضلة', 'Favoris');
+      var lbl = n > 0
+        ? t('المفضلة العامة (' + label + ')', 'Favoris généraux (' + label + ')')
+        : t('المفضلة العامة', 'Favoris généraux');
       el.setAttribute('aria-label', lbl);
       el.setAttribute('title', lbl);
     });
@@ -391,6 +534,14 @@
     }
   }
 
+  /** إجمالي السلة العامة — كل ما أضافه الزائر من كل المحلات/المعارض */
+  function cartCountAll() {
+    return cartItems().reduce(function (s, c) {
+      return s + (Number(c.qty) || 1);
+    }, 0);
+  }
+
+  /** عدّاد مقيّد ببائع الصفحة (شريحة المحل/المعرض فقط) */
   function cartCount() {
     var items = cartItems();
     var sid = pageSellerScopeId();
@@ -407,28 +558,45 @@
     }, 0);
   }
 
-  function updateCartBadges() {
-    var n = cartCount();
-    document.querySelectorAll('[data-rizq-cart-count], #nav-cart-count, #sr-cart-count').forEach(function (el) {
-      el.textContent = n > 99 ? '99+' : String(n);
-      if (el.hasAttribute('hidden')) el.hidden = n < 1;
+  function _paintCartCountEls(selector, n) {
+    var label = n > 99 ? '99+' : String(n);
+    document.querySelectorAll(selector).forEach(function (el) {
+      el.textContent = label;
+      el.hidden = n < 1;
+      if (n > 0) {
+        try { el.removeAttribute('hidden'); } catch (eH) {}
+      }
       el.classList.toggle('is-empty', n < 1);
     });
+  }
+
+  function updateCartBadges() {
+    var nAll = cartCountAll();
+    var nScoped = cartCount();
+    /* شارة الهيدر / السلة العامة = المجموع الكامل */
+    _paintCartCountEls('#rizq-hdr-cart [data-rizq-cart-count], [data-rizq-cart-wrap] > [data-rizq-cart-count], #nav-cart-count', nAll);
     document.querySelectorAll('[data-rizq-cart-wrap], #rizq-hdr-cart').forEach(function (el) {
-      el.classList.toggle('has-items', n > 0);
-      el.setAttribute('aria-label', t('السلة (' + n + ')', 'Panier (' + n + ')'));
+      el.classList.toggle('has-items', nAll > 0);
+      el.setAttribute('aria-label', t('السلة العامة (' + nAll + ')', 'Panier général (' + nAll + ')'));
+      el.setAttribute('title', t('السلة العامة (' + nAll + ')', 'Panier général (' + nAll + ')'));
     });
+    /* شريحة المحل/المعرض المحلية = مقيّدة بالبائع الحالي إن وُجد */
+    _paintCartCountEls('#ab-cart-count, #sr-cart-count, [data-rizq-seller-cart-count]', nScoped);
   }
 
   function updateStoreWishBadge(count) {
     if (count == null) return;
     var n = Number(count) || 0;
+    var label = n > 99 ? '99+' : String(n);
     document.querySelectorAll('[data-rizq-store-wish-count], #nav-wish-count, #ab-wish-count').forEach(function (el) {
-      el.textContent = n > 99 ? '99+' : String(n);
-      if (el.hasAttribute('hidden')) el.hidden = n < 1;
+      el.textContent = label;
+      el.hidden = n < 1;
+      if (n > 0) {
+        try { el.removeAttribute('hidden'); } catch (eH) {}
+      }
       el.classList.toggle('is-empty', n < 1);
     });
-    document.querySelectorAll('#rizq-hdr-store-wish').forEach(function (el) {
+    document.querySelectorAll('.sss-wish, #rizq-hdr-store-wish').forEach(function (el) {
       el.classList.toggle('has-favs', n > 0);
     });
   }
@@ -1044,12 +1212,19 @@
 
   function boot() {
     injectFavStyles();
+    try { harvestLocalWishlists({ silent: true }); } catch (eBoot) {}
     updateFavBadges();
     updateCartBadges();
-    document.addEventListener('rizq_wishlist', updateFavBadges);
+    document.addEventListener('rizq_wishlist', function (ev) {
+      if (ev && ev.detail && ev.detail.harvested) return;
+      updateFavBadges();
+    });
     document.addEventListener('rizq_cart', updateCartBadges);
     window.addEventListener('storage', function (e) {
-      if (e.key === 'rizq_wishlist') updateFavBadges();
+      if (!e.key) return;
+      if (e.key === 'rizq_wishlist' || e.key === 'rizq_wishlist_meta' || e.key.indexOf('rizq_wishlist_') === 0 || e.key === 'rizq_showroom_wishlist') {
+        updateFavBadges();
+      }
       if (e.key === 'rizq_cart') updateCartBadges();
     });
     document.addEventListener('rizq:langchange', function () {
@@ -1082,6 +1257,7 @@
     wishlistHas: wishlistHas,
     wishlistToggle: wishlistToggle,
     syncTypedFavorite: syncTypedFavorite,
+    harvestLocalWishlists: harvestLocalWishlists,
     collectUnifiedFavorites: collectUnifiedFavorites,
     parseWishlistId: parseWishlistId,
     isTypedWishlistId: isTypedWishlistId,
@@ -1096,6 +1272,7 @@
     toastFav: toastFav,
     updateFavBadges: updateFavBadges,
     cartCount: cartCount,
+    cartCountAll: cartCountAll,
     updateCartBadges: updateCartBadges,
     updateStoreWishBadge: updateStoreWishBadge,
     updateCommerceBadges: updateCommerceBadges,
