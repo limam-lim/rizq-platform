@@ -825,6 +825,9 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
 }
 .est-wish-chip.has-favs{border-color:rgba(201,168,76,.45)}
 .est-wish-chip.has-favs .est-wish-ico{color:#e84040}
+.est-listings-wish-row{
+  display:flex;justify-content:center;margin:0 0 14px;
+}
 .est-pd-wish{
   min-height:44px;padding:0 16px;border-radius:12px;
   border:1.5px solid rgba(27,58,107,.15);background:#fff;
@@ -1027,6 +1030,13 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
           <div class="tag">معروضات الوكالة</div>
           <h2>عقارات للبيع والكراء</h2>
           <p>شقق وفلل وأراضي ومحلات — افتح أي عرض بزر «عرض التفاصيل» للاطلاع على الوصف والتواصل مع الوكالة.</p>
+        </div>
+        <div class="est-listings-wish-row">
+          <button type="button" class="est-wish-chip" id="est-listings-wish" onclick="toggleEstateWishPanel()" title="المفضلة" aria-label="المفضلة">
+            <span class="est-wish-ico" aria-hidden="true">♡</span>
+            <span data-t="est-wish-label">المفضلة</span>
+            <span class="est-wish-count">0</span>
+          </button>
         </div>
         <div class="est-search-panel" id="est-search-panel">
           <form class="est-search" id="est-search" role="search" aria-label="بحث العقارات">
@@ -2198,14 +2208,14 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
       modalWish.classList.toggle('is-on', !!mon);
       modalWish.textContent = (mon ? '❤ ' : '♡ ') + (fr ? 'Favoris' : 'المفضلة');
     }
-    var countEl = document.getElementById('est-wish-count');
-    if(countEl) countEl.textContent = String(list.length);
-    var chip = document.getElementById('est-top-wish');
-    if(chip){
+    document.querySelectorAll('.est-wish-count').forEach(function(countEl){
+      countEl.textContent = String(list.length);
+    });
+    document.querySelectorAll('.est-wish-chip').forEach(function(chip){
       chip.classList.toggle('has-favs', list.length > 0);
       var ico = chip.querySelector('.est-wish-ico');
       if(ico) ico.textContent = list.length ? '❤' : '♡';
-    }
+    });
     var panel = document.getElementById('est-wish-panel-list');
     if(panel){
       if(!list.length){
@@ -2987,12 +2997,12 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
     tx('#est-top-call', '📞 اتصال', '📞 Appel');
     tx('#est-top-wa', '💬 واتساب', '💬 WhatsApp');
     tx('[data-t="est-wish-label"]', 'المفضلة', 'Favoris');
-    var wishChip = document.getElementById('est-top-wish');
-    if(wishChip){
+    document.querySelectorAll('.est-wish-chip').forEach(function(wishChip){
       wishChip.setAttribute('title', fr ? 'Favoris' : 'المفضلة');
       wishChip.setAttribute('aria-label', fr ? 'Favoris' : 'المفضلة');
-    }
+    });
     tx('#est-wish-panel-title', '❤ المفضلة', '❤ Favoris');
+    renderEstateWishUI();
     tx('#est-bar-call', '📞 اتصال', '📞 Appel');
     tx('#est-bar-wa', '💬 واتساب', '💬 WhatsApp');
     tx('#est-bar-email', '✉️ إيميل', '✉️ E-mail');
