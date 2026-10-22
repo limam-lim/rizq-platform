@@ -141,6 +141,59 @@
     return mapped;
   }
 
+  function trackContactClick(targetAccountId, adId, type) {
+    try {
+      if (/[?&]demo=1(?:&|$)/.test(String((global.location && global.location.search) || ''))) {
+        return;
+      }
+    } catch (eDemo) {}
+    var base = getBackendBase();
+    if (!base || !targetAccountId) return;
+    var creds = getViewerCredentials();
+    if (creds && creds.accountId && String(creds.accountId) === String(targetAccountId)) return;
+    var payload = JSON.stringify({
+      targetAccountId: String(targetAccountId).slice(0, 40),
+      adId: adId ? String(adId).slice(0, 80) : '',
+      type: String(type || '').toLowerCase(),
+    });
+    var url = base + '/api/contact-click';
+    var headers = { 'Content-Type': 'application/json' };
+    if (creds) {
+      headers['x-account-id'] = creds.accountId;
+      headers['x-account-token'] = creds.accessToken;
+    }
+    try {
+      if (navigator.sendBeacon) {
+        var blob = new Blob([payload], { type: 'application/json' });
+        if (navigator.sendBeacon(url, blob)) return;
+      }
+    } catch (eBeacon) {}
+    try {
+      fetch(url, { method: 'POST', headers: headers, body: payload, keepalive: true, credentials: 'omit' }).catch(function () {});
+    } catch (eFetch) {}
+  }
+
+  function bindContactClickDelegation(root) {
+    var scope = root || document;
+    if (!scope || scope.__rizqContactClickBound) return;
+    scope.__rizqContactClickBound = true;
+    scope.addEventListener('click', function (ev) {
+      var el = ev.target && ev.target.closest ? ev.target.closest('[data-rizq-contact]') : null;
+      if (!el) return;
+      var type = el.getAttribute('data-rizq-contact');
+      var accountId = el.getAttribute('data-account') || '';
+      var adId = el.getAttribute('data-ad') || '';
+      if (!type || !accountId) return;
+      trackContactClick(accountId, adId, type);
+    }, true);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () { bindContactClickDelegation(document); });
+  } else {
+    bindContactClickDelegation(document);
+  }
+
   global.RizqContactGate = {
     getViewerCredentials: getViewerCredentials,
     authHeaders: authHeaders,
@@ -148,5 +201,8 @@
     reportContactAttempt: reportContactAttempt,
     onMaskedContactClick: onMaskedContactClick,
     applySellerContactToAd: applySellerContactToAd,
+    trackContactClick: trackContactClick,
+    bindContactClickDelegation: bindContactClickDelegation,
   };
+  global.trackContactClick = trackContactClick;
 })(typeof window !== 'undefined' ? window : globalThis);

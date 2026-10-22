@@ -685,6 +685,7 @@ function renderOverview(){
   }
   renderRealVisits();
   renderAdvancedStats();
+  if(typeof renderContactStats==='function') renderContactStats();
 
   // Recent messages
   const recentMsgs = msgs.slice(-3).reverse();
@@ -735,6 +736,52 @@ function renderRealVisits(){
 // ── إحصائيات متقدّمة (منحنى 30 يوماً + مصادر الزيارات) — ميزة حصرية للباقات
 // المدفوعة، تُقفَل تلقائياً بعنصر #advanced-stats عبر _applyFeatureGates
 // الموجودة أصلاً في هذا الملف (كانت مُعرَّفة بلا أي عنصر DOM فعلي تحكمه) ──
+function renderContactStats(){
+  var accId=(typeof STORE!=='undefined'&&STORE&&STORE.id)||'';
+  var monthEl=document.getElementById('contact-stat-month');
+  var chartEl=document.getElementById('contact-stats-chart');
+  var topEl=document.getElementById('contact-top-ads');
+  var convEl=document.getElementById('contact-conversion-lbl');
+  if(!monthEl || typeof RizqSub==='undefined' || !accId || typeof RizqSub.fetchContactStats!=='function') return;
+  Promise.all([
+    RizqSub.fetchContactStats(accId),
+    typeof RizqSub.fetchVisitStats==='function' ? RizqSub.fetchVisitStats(accId) : Promise.resolve(null)
+  ]).then(function(pair){
+    var stats=pair[0], visits=pair[1];
+    if(!stats){
+      monthEl.textContent=_t2('غير متاح بعد','Pas encore');
+      return;
+    }
+    monthEl.textContent=(stats.monthTotal||0).toLocaleString();
+    var bt=stats.byType||{};
+    var callEl=document.getElementById('contact-stat-call');
+    var waEl=document.getElementById('contact-stat-wa');
+    var emEl=document.getElementById('contact-stat-email');
+    if(callEl) callEl.textContent=_t2('اتصال','Appels')+' '+(bt.call||0);
+    if(waEl) waEl.textContent='واتساب '+(bt.whatsapp||0);
+    if(emEl) emEl.textContent=_t2('إيميل','E-mail')+' '+(bt.email||0);
+    var days=stats.last30||[];
+    var max=Math.max(1, Math.max.apply(null, days.map(function(d){return d.count;})));
+    if(chartEl){
+      chartEl.innerHTML='<div style="display:flex;align-items:flex-end;gap:2px;height:100%">'+days.map(function(d){
+        var h=Math.round((d.count/max)*100);
+        return '<div title="'+d.date+': '+d.count+'" style="flex:1;height:'+Math.max(h,2)+'%;background:linear-gradient(180deg,#1B3A6B,#3d6bb3);border-radius:2px 2px 0 0;min-width:2px"></div>';
+      }).join('')+'</div>';
+    }
+    if(topEl){
+      var tops=stats.topAds||[];
+      topEl.innerHTML=tops.length
+        ? tops.map(function(a,i){ return '<div style="margin-bottom:4px">'+(i+1)+'. '+String(a.adId||'')+' — '+(a.total||0)+'</div>'; }).join('')
+        : _t2('لا بيانات بعد','Pas encore de données');
+    }
+    if(convEl){
+      var vMonth=visits && visits.monthTotal ? visits.monthTotal : 0;
+      var rate=vMonth>0 ? Math.round(((stats.monthTotal||0)/vMonth)*1000)/10 : 0;
+      convEl.textContent=_t2('نسبة التحويل','Taux de conversion')+': '+rate+'%';
+    }
+  });
+}
+
 function renderAdvancedStats(){
   var accId=(typeof STORE!=='undefined'&&STORE&&STORE.id)||'';
   var chartEl=document.getElementById('adv-stats-chart');
