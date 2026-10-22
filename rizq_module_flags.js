@@ -110,7 +110,7 @@
     if (nameEl) nameEl.placeholder = t('الاسم', 'Nom');
     if (input) input.placeholder = t('الهاتف (+222 ...)', 'Téléphone (+222 ...)');
     if (actEl) actEl.placeholder = t('نوع النشاط', 'Type d\'activité');
-    if (submit) submit.textContent = '✅ ' + t('سجّل اهتمامك', 'Enregistrer mon intérêt');
+    if (submit) submit.textContent = t('احجز إشعارك الآن', 'Réservez votre alerte');
     if (cancel) cancel.textContent = t('إغلاق', 'Fermer');
   }
 
@@ -241,12 +241,20 @@
     strip.removeAttribute('aria-hidden');
     var isFr = lang() === 'fr';
     var html = '<div class="cs-strip">'
-      + '<div class="cs-strip-title">' + t('🔜 قريباً على رزق — أخبرنا بما يهمّك', '🔜 Bientôt sur Rizq — dites-nous ce qui vous intéresse') + '</div>'
+      + '<div class="cs-strip-kicker">' + t('قريباً جداً', 'Très bientôt') + '</div>'
+      + '<div class="cs-strip-title">' + t('أبواب تُجهَّز الآن — كن أول من يدخل', 'Des portes s’ouvrent bientôt — soyez le premier') + '</div>'
+      + '<p class="cs-strip-sub">' + t(
+        'سجّل اهتمامك بهدوء… نُعلمك فور التفعيل قبل الجميع.',
+        'Inscrivez votre intérêt en silence… nous vous préviendrons avant tout le monde.'
+      ) + '</p>'
       + closed.map(function (s) {
-        return '<div class="cs-item"><span class="cs-item-label">' + s.icon + ' ' + t(s.ar, s.fr) + '</span>'
-          + '<span class="cs-item-soon">' + t('قريباً', 'Bientôt') + '</span>'
+        return '<div class="cs-item">'
+          + '<div class="cs-item-top">'
+          +   '<span class="cs-item-label">' + s.icon + ' ' + t(s.ar, s.fr) + '</span>'
+          +   '<span class="cs-item-soon">' + t('قريباً', 'Bientôt') + '</span>'
+          + '</div>'
           + '<button type="button" class="cs-item-btn" data-cs-key="' + s.key + '" data-cs-label="' + t(s.ar, s.fr).replace(/"/g, '&quot;') + '">'
-          + t('أعلمني عند التفعيل', 'Prévenez-moi') + '</button></div>';
+          + t('احجز إشعارك الآن', 'Réservez votre alerte') + '</button></div>';
       }).join('')
       + '</div>';
     strip.innerHTML = html;
