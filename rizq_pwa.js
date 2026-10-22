@@ -6,7 +6,7 @@
   'use strict';
 
   var ASSET_V = '31.3';
-  var MOCK_HDR_V = '5.46';
+  var MOCK_HDR_V = '5.47';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -218,6 +218,16 @@
       document.head.appendChild(theme);
     }
     theme.content = '#0d1b2a';
+    /* edge-to-edge Android: expose safe-area insets so bottom dock covers system nav */
+    try {
+      var vp = document.querySelector('meta[name="viewport"]');
+      if (vp) {
+        var c = vp.getAttribute('content') || '';
+        if (!/viewport-fit\s*=\s*cover/i.test(c)) {
+          vp.setAttribute('content', c.replace(/\s*$/, '') + (c ? ', ' : '') + 'viewport-fit=cover');
+        }
+      }
+    } catch (eVp) {}
   } catch (e) { /* keep page usable */ }
 
   function isPhoneViewport() {

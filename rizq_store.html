@@ -10,17 +10,17 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <link rel="stylesheet" href="rizq-theme.css?v=23.0"/>
+  <link rel="stylesheet" href="rizq-theme.css?v=23.1"/>
   <link rel="preload" as="image" href="rizq-assets/demo-heroes/store-boutique-promo.jpg"/>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: https:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://www.facebook.com https://facebook.com"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=31.6"/>
+<link rel="stylesheet" href="rizq_header.css?v=31.7"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
 <link rel="stylesheet" href="rizq_product_detail.css?v=28.6"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.4"/>
@@ -642,7 +642,7 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   grid-template-columns:1.08fr 0.92fr;
   gap:12px;
   margin:0;
-  align-items:stretch;
+  align-items:start;
   width:100%;
   min-width:0;
   box-sizing:border-box;
@@ -661,7 +661,7 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   box-shadow:none;
   border:1px solid rgba(27,58,107,.08);
   background:#fff;
-  height:100%;
+  height:auto;
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
@@ -709,7 +709,7 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   border:1px solid rgba(27,58,107,.08);
   border-radius:14px;
   box-shadow:none;
-  height:100%;
+  height:auto;
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
@@ -936,12 +936,31 @@ footer{
     grid-template-areas:none;
     display:flex;
     flex-direction:column;
+    align-items:stretch;
     gap:18px;
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
   }
   .content-grid > aside#info-section,
   .content-grid > .store-main-col,
   #store-under-band{display:contents}
   .content-grid > aside#info-section{position:static;width:100%;max-width:100%}
+  .content-grid .card,
+  .content-grid .info-card,
+  .content-grid #store-service-desk,
+  .content-grid #reviews-section,
+  .content-grid #about-section,
+  .content-grid #store-location-card,
+  .content-grid #hours-card-el,
+  .content-grid #store-delivery-card{
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
+  .fixed-rizq-logo,
+  .fixed-disc-pill,
+  #rizq-rlogo-edge{display:none!important;visibility:hidden!important;pointer-events:none!important}
   .content-grid > .store-main-col > main{
     order:1;
     padding:14px;border-radius:16px;width:100%;max-width:100%;overflow:visible

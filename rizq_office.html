@@ -11,12 +11,13 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=31.6"/>
+<link rel="stylesheet" href="rizq-theme.css?v=23.1"/>
+<link rel="stylesheet" href="rizq_header.css?v=31.7"/>
 <link rel="stylesheet" href="rizq_close_band.css?v=1"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.4"/>
 <link rel="preload" href="rizq_header.js?v=26.6" as="script"/>
@@ -425,7 +426,8 @@ body.rizq-empty-office .rating-inline{display:none!important}
   grid-template-columns:1.08fr 0.92fr;
   gap:12px;
   margin:0 0 20px;
-  align-items:stretch;
+  /* لا تمدّد بطاقة التقييمات الفارغة بارتفاع غرفة الطلبات */
+  align-items:start;
   width:100%;
   min-width:0;
   box-sizing:border-box;
@@ -439,16 +441,17 @@ body.rizq-empty-office .rating-inline{display:none!important}
 }
 #office-service-desk.office-desk-hz{
   margin:0;
-  padding:12px 12px 10px;
+  padding:12px 12px 14px;
   border-radius:14px;
   box-shadow:none;
   border:1px solid rgba(14,116,144,.14);
   background:#fff;
-  height:100%;
+  height:auto;
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
   min-width:0;
+  overflow:visible;
 }
 .office-desk-eyebrow{
   font-size:9.5px;letter-spacing:1.2px;font-weight:900;color:#C9A84C;margin-bottom:4px
@@ -479,8 +482,23 @@ body.rizq-empty-office .rating-inline{display:none!important}
 .office-desk-span2{grid-column:1/-1}
 .office-desk-actions{
   grid-column:1/-1;display:grid;
-  grid-template-columns:minmax(0,1.2fr) minmax(140px,175px) minmax(130px,160px);
-  align-items:stretch;gap:10px;margin-top:4px
+  grid-template-columns:minmax(180px,1.2fr) minmax(140px,175px) minmax(130px,160px);
+  align-items:start;gap:10px;margin-top:4px
+}
+/* خيارات «كيف ستتم الخدمة» صف كامل — كانت تسرق عمود الشبكة وتسحق رفع المستند لشريط عمودي */
+.office-desk-actions #office-fulfill-req{
+  grid-column:1/-1;
+  order:20;
+  min-width:0;
+  width:100%;
+  box-sizing:border-box;
+}
+.office-desk-actions #rf-doc-upload{
+  min-width:0;
+  width:100%;
+  max-width:100%;
+  height:auto!important;
+  overflow:visible;
 }
 .office-desk-note{margin:0;min-width:0}
 #office-service-desk.office-desk-hz #req-submit-btn{
@@ -496,7 +514,7 @@ body.rizq-empty-office .rating-inline{display:none!important}
   border:1px solid rgba(14,116,144,.14);
   border-radius:14px;
   box-shadow:none;
-  height:100%;
+  height:auto;
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
@@ -512,6 +530,7 @@ body.rizq-empty-office .rating-inline{display:none!important}
   #req-form.office-desk-form{grid-template-columns:1fr}
   .office-desk-span2{grid-column:auto}
   .office-desk-actions{grid-template-columns:1fr}
+  .office-desk-actions #office-fulfill-req{grid-column:auto;order:0}
   #office-service-desk.office-desk-hz #req-submit-btn,
   #office-service-desk.office-desk-hz #req-prf-btn{width:100%}
 }
@@ -700,11 +719,34 @@ html[dir="ltr"] #hours-card-el .hours-row{direction:ltr!important}
     grid-template-areas:none;
     display:flex;
     flex-direction:column;
+    align-items:stretch;
     gap:16px;
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
   }
   .main-wrap > aside#info-section,
   .main-wrap > .office-main,
   #office-under-band{display:contents}
+  .main-wrap > .card,
+  .main-wrap .card,
+  .main-wrap .info-card,
+  .main-wrap .side-card,
+  .main-wrap .about-card,
+  .main-wrap .promo-card,
+  .main-wrap #office-service-desk,
+  .main-wrap #reviews-section,
+  .main-wrap #svc-section,
+  .main-wrap #about-section,
+  .main-wrap #trust-section,
+  .main-wrap #location-card,
+  .main-wrap #office-pay-card,
+  .main-wrap #office-promo-card,
+  .main-wrap #hours-card-el{
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
   .sidebar-sticky{position:static}
   #svc-section{order:1}
   #about-section{order:2}
@@ -717,6 +759,14 @@ html[dir="ltr"] #hours-card-el .hours-row{direction:ltr!important}
   .hero-inner{grid-template-columns:1fr}
   .hero-card{border-radius:16px;margin-top:24px}
   .stats-strip-inner{grid-template-columns:repeat(2,1fr)}
+  .fixed-rizq-logo,
+  .fixed-disc-pill,
+  #rizq-rlogo-edge{display:none!important;visibility:hidden!important;pointer-events:none!important}
+  .sticky-cta{
+    padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));
+    bottom:calc(var(--rizq-mock-nav-h,0px) + var(--rizq-thumb-dock-h,0px));
+  }
+  body.rizq-mockup-hdr-trial .sticky-cta{display:none!important}
 }
 @media(max-width:500px){.trust-grid{grid-template-columns:1fr}.about-stats{grid-template-columns:repeat(2,1fr)}}
 
