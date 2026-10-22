@@ -59,6 +59,22 @@ body.rizq-mockup-hdr-trial.rizq-page-light .est-tab:not(.is-active),
 body.rizq-mockup-hdr-trial.rizq-page-light .est-deal button:not(.is-on){
   color:#2f3c4d!important;
 }
+/* إخفاء الشريط القديم فوراً — لا يعتمد على body class حتى لا يظهر عند Ctrl+F5 */
+html.rizq-app-nav #nav,
+html.rizq-app-nav #rizq-desk-nav,
+html.rizq-app-nav #rizq-thumb-dock,
+html.rizq-app-nav .rizq-thumb-dock,
+html.rizq-app-nav #rizq-search-theater,
+html.rizq-app-nav #rizq-search-pill,
+html.rizq-app-nav .nav-sticky-tools,
+html.rizq-app-nav .hero-browse-panel,
+html.rizq-app-nav .hero-stage-intent,
+html.rizq-app-nav .mobile-bottom-nav,
+html.rizq-app-nav #mobile-bottom-nav,
+html.rizq-app-nav #section-jump-bar,
+html.rizq-app-nav .section-jump-bar,
+html.rizq-app-nav #rizq-announce-ticker,
+html.rizq-app-nav .rizq-splash,
 body.rizq-mockup-hdr-trial #nav,
 body.rizq-mockup-hdr-trial #rizq-desk-nav,
 body.rizq-mockup-hdr-trial #rizq-thumb-dock,
@@ -76,6 +92,8 @@ body.rizq-mockup-hdr-trial .rmh-util,
 body.rizq-mockup-hdr-trial .est-top,
 body.rizq-mockup-hdr-trial > nav:not(#rizq-desk-nav):not(#rizq-thumb-dock):not(.rmh-nav):not(.rizq-thumb-dock){
   display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
 }
 /* أقوى من قواعد rizq-phone-thumb-dock — الشريط الموحّد rmh يكفي */
 html.rizq-app-nav.rizq-phone-thumb-dock body.rizq-mockup-hdr-trial #rizq-thumb-dock,

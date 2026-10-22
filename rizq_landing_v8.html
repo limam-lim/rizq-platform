@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=30.9"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=31.0"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.4"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
@@ -42,22 +42,37 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=31.6"/>
+<link rel="stylesheet" href="rizq_header.css?v=31.8"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.48"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
-/* شريط موحّد على كل العروض — لا نُفعّل وضع الهبوط ثنائي الصف */
+/* شريط موحّد على كل العروض — الشريط القديم متوقف نهائياً */
 </script>
 <style id="rizq-mobile-header-critical">
+/* الشريط القديم لا يُعرض أبداً — حتى قبل اكتمال تحميل mockup CSS */
+html.rizq-app-nav #nav,
+html.rizq-app-nav #rizq-desk-nav,
+html.rizq-app-nav #rizq-thumb-dock,
+html.rizq-app-nav .rizq-thumb-dock,
+html.rizq-app-nav #section-jump-bar,
+html.rizq-app-nav #mobile-bottom-nav,
+html.rizq-app-nav .mobile-bottom-nav,
+html.rizq-app-nav #rizq-search-theater,
+html.rizq-app-nav #rizq-search-pill,
+html.rizq-app-nav .nav-sticky-tools{
+  display:none!important;visibility:hidden!important;pointer-events:none!important;
+  height:0!important;max-height:0!important;overflow:hidden!important;opacity:0!important;
+}
 @media(max-width:768px),(orientation:landscape) and (max-height:500px){
-  /* هاتف: ثانوي أعلى + شريط إبهام سفلي */
-  html.rizq-app-nav{--rizq-header-h:98px;--rizq-thumb-dock-h:72px}
+  /* هاتف: مساحة الهيدر الموحّد فقط (لا شريط قديم) */
+  html.rizq-app-nav{--rizq-header-h:128px;--rizq-mock-nav-h:72px;--rizq-thumb-dock-h:0px}
   html.rizq-app-nav body{
-    padding-top:var(--rizq-header-h,98px)!important;
-    padding-bottom:calc(var(--rizq-thumb-dock-h,72px) + env(safe-area-inset-bottom,0px))!important;
+    padding-top:var(--rizq-mock-hdr-h,var(--rizq-header-h,128px))!important;
+    padding-bottom:calc(var(--rizq-mock-nav-h,72px) + max(env(safe-area-inset-bottom,0px),20px))!important;
   }
   html.rizq-app-nav #nav,html.rizq-app-nav #rizq-desk-nav{
-    display:grid!important;visibility:visible!important;height:var(--rizq-header-h,98px)!important;
-    position:fixed!important;top:0;left:0;right:0;z-index:10000!important;
+    display:none!important;visibility:hidden!important;height:0!important;
+    pointer-events:none!important;
   }
   /* هاتف: لا نفرض ارتفاع شاشة كاملة — يقلّص الفراغ تحت رزق قبل الشريط السفلي */
   html.rizq-app-nav .hero{
@@ -4863,8 +4878,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <script src="rizq_announcements.js"></script>
     <script src="rizq_civic_ticker.js"></script>
 <script src="rizq_backend_config.js"></script>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.46"/>
-<script src="rizq_header_mockup_trial.js?v=5.46" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.48" defer></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
@@ -5041,8 +5055,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </nav>
 </header>
 
-<!-- ══ NAVBAR (مخفي أثناء التجربة) ══ -->
-<nav id="nav">
+<!-- ══ NAVBAR القديم — متوقف نهائياً (الهيدر الموحّد أعلاه هو الوحيد) ══ -->
+<nav id="nav" hidden aria-hidden="true" style="display:none!important">
   <div class="nav-start">
     <button class="btn-lang btn-lang-primary rizq-toolbar-lang" id="nav-lang-btn" data-rizq-toolbar="lang" type="button" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
     <button type="button" class="nav-account-btn rizq-toolbar-account" id="nav-account-btn" data-rizq-toolbar="account" onclick="goToAccount()" aria-label="حسابي">
@@ -5104,8 +5118,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </a>
 </nav>
 
-<!-- ── مسرح البحث (نموذج ج): قرص تحت الهيدر ينسدل كمنبثق أثناء التصفح ── -->
-<div id="rizq-search-theater" class="rizq-search-theater" aria-hidden="true">
+<!-- ── مسرح البحث القديم (متوقف — البحث في الهيدر الموحّد) ── -->
+<div id="rizq-search-theater" class="rizq-search-theater" hidden aria-hidden="true" style="display:none!important">
   <div class="rizq-search-backdrop" id="rizq-search-backdrop" data-rizq-close-search tabindex="-1"></div>
   <button type="button" class="rizq-search-pill" id="rizq-search-pill" data-rizq-open-search aria-haspopup="dialog" aria-controls="rizq-search-panel" aria-expanded="false">
     <span class="rizq-search-pill-ico" aria-hidden="true">⌕</span>
@@ -5149,8 +5163,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
 <button type="button" id="back-to-top" aria-label="العودة للأعلى" title="العودة للأعلى">↑</button>
 
-<!-- ── Mobile bottom navigation ── -->
-<nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="تنقل سفلي">
+<!-- ── Mobile bottom navigation (متوقف — الشريط الموحّد السفلي يكفي) ── -->
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="تنقل سفلي" hidden aria-hidden="true" style="display:none!important">
   <div class="mobile-bottom-nav-inner">
     <a href="rizq_landing_v8.html" id="mbn-home" class="active"><span class="mbn-icon">🧭</span><span class="mbn-label">الرئيسية</span></a>
     <a href="#categories" id="mbn-cats" data-jump="#categories"><span class="mbn-icon">📂</span><span class="mbn-label">الأقسام</span></a>

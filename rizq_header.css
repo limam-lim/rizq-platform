@@ -9,6 +9,37 @@
   --rizq-almazdi-bright:#E8C96A;
 }
 
+/*
+ * إيقاف نهائي للشريط القديم / أقسام الإبهام / القفز السريع / التنقل السفلي القديم.
+ * الهيدر الموحّد (#rizq-mock-hdr + .rmh-nav) هو الواجهة الوحيدة قبل الإطلاق.
+ * هذه القواعد لا تنتظر class على body — تُطبَّق فور تحميل CSS فلا يظهر القديم عند Ctrl+F5.
+ */
+html.rizq-app-nav #nav,
+html.rizq-app-nav #rizq-desk-nav,
+html.rizq-app-nav #rizq-thumb-dock,
+html.rizq-app-nav .rizq-thumb-dock,
+html.rizq-app-nav #section-jump-bar,
+html.rizq-app-nav .section-jump-bar,
+html.rizq-app-nav #mobile-bottom-nav,
+html.rizq-app-nav .mobile-bottom-nav,
+html.rizq-app-nav #rizq-search-theater,
+html.rizq-app-nav #rizq-search-pill,
+html.rizq-app-nav .nav-sticky-tools,
+html.rizq-app-nav #nav-sticky-tools,
+html.rizq-app-nav .hero-browse-panel,
+html.rizq-app-nav .hero-stage-intent,
+html.rizq-app-nav #rizq-app-header,
+html.rizq-app-nav .rizq-splash{
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+  height:0 !important;
+  max-height:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  opacity:0 !important;
+}
+
 /* أرقام الهاتف والحسابات: لاتينية وLTR — علامة + دائماً من اليسار */
 a[href^="tel:"],
 a[href^="TEL:"],
