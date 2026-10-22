@@ -29,7 +29,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=31.0"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=29.4"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=29.5"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.3"/>
 <script>
@@ -634,7 +634,9 @@ html.rizq-has-announce .section-jump-bar{
   #virtual-offices .rizq-feat-card.rizq-feat-card--row .rizq-feat-ico-span{
     width:28px!important;height:28px!important;min-width:28px!important;font-size:12px!important;border-radius:7px!important;
   }
-  #virtual-offices .rizq-feat-row.rizq-feat-row-4{gap:6px!important;max-width:100%!important;margin:0 auto 16px!important}
+  #virtual-offices .rizq-feat-row.rizq-feat-row-4{
+    gap:8px!important;max-width:100%!important;margin:0 auto 16px!important;padding:0!important;
+  }
 }
 .rizq-feat-card::before{display:none!important;content:none!important}
 .rizq-feat-card:hover{
@@ -693,11 +695,11 @@ html[dir="ltr"] .rizq-feat-card.rizq-feat-card--row{text-align:left}
   #virtual-tenders .rizq-feat-row.rizq-feat-row-3,
   #virtual-investments .rizq-feat-row.rizq-feat-row-3{
     grid-template-columns:repeat(3,minmax(0,1fr))!important;
-    gap:5px!important;
+    gap:6px!important;
     max-width:100%!important;
     width:100%!important;
     margin:0 auto 14px!important;
-    padding:0 2px!important;
+    padding:0!important;
   }
   .rizq-feat-row.rizq-feat-row-3 .rizq-feat-card,
   .rizq-trio .rizq-feat-card{
@@ -1844,10 +1846,23 @@ body.rizq-vstrip-lb-on{overflow:hidden}
   .hero-after-promo-tail,
   .hero-after-promo-tail > .hero-vid-cta-bar{
     width:100%!important;max-width:100%!important;
+    box-sizing:border-box!important;
   }
-  .rizq-vid-strip{margin:6px auto 0;padding:6px 0 2px;border-radius:0;background:transparent;box-shadow:none;border:none}
+  /* هوامش جانبية + بطاقات أصغر قليلاً — لا تلامس حافة الهاتف */
+  .rizq-vid-strip{
+    margin:6px auto 0;
+    padding:6px var(--rizq-strip-inset,14px) 2px!important;
+    border-radius:0;background:transparent;box-shadow:none;border:none;
+  }
+  .rizq-vid-strip-head{padding:0 2px;margin-bottom:6px}
+  .rizq-vid-strip-track{
+    padding:2px 0 8px!important;
+    scroll-padding-inline:0;
+    gap:8px;
+  }
   .rizq-vid-strip-hint{display:none}
-  .rizq-vcard{flex-basis:min(210px,58vw)}
+  .rizq-vcard{flex-basis:min(168px,48vw);max-width:min(168px,48vw)}
+  .rizq-vcard-thumb{border-radius:14px}
   .rizq-vcard-thumb .rizq-vcard-contacts,
   .rizq-vcard-thumb .rzq-adx-actions{bottom:10px;padding:5px 8px;gap:8px}
   .rizq-vcard-thumb .rizq-vcard-tel,
@@ -3233,8 +3248,8 @@ html[dir="ltr"] .listings-section .section-desc{
   .hero-cta-wrap{margin:14px auto 0;width:100%;max-width:none;padding:14px 12px 16px;border-radius:14px}
   .hero-spaces-trust{font-size:12.5px;line-height:1.6}
   .hero-cta-primary{width:100%;max-width:none;padding:14px 16px;white-space:normal}
-  /* هاتف: الأشرطة من حافة الشاشة (بدون هامش سطح المكتب 1سم) + تصغير خفيف */
-  :root{--rizq-strip-inset:0px}
+  /* هاتف: هامش داخلي حتى لا تلامس البطاقات/الفيديوهات حافة الشاشة */
+  :root{--rizq-strip-inset:14px}
   .hero > #hero-listings.hero-promo-strip{
     margin:4px 0 0!important;padding:6px 0 16px!important;width:100%!important;
   }
@@ -4876,7 +4891,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 })();
 </script>
     <script src="rizq_announcements.js"></script>
-    <script src="rizq_marquee_kit.js?v=1.2"></script>
+    <script src="rizq_marquee_kit.js?v=1.3"></script>
     <script src="rizq_civic_ticker.js?v=1.3"></script>
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_header_mockup_trial.js?v=5.49" defer></script>
