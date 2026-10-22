@@ -1,13 +1,36 @@
 /**
- * rizq_marquee_kit.js — تحكم موحّد للأشرطة المتحركة بلا أزرار ظاهرة
+ * rizq_marquee_kit.js — تحكم موحّد لكل الأشرطة المتحركة بلا أزرار ظاهرة
  * - مرور المؤشر: إيقاف
  * - عجلة / سحب: إرجاع أو تقديم لمشاهدة ما فات
  * - حركة سريعة أو عجلة أثناء التشغيل: تسريع مؤقت
+ * يُطبَّق تلقائياً على كل أشرطة rAF + اكتشاف + شريط فيديو التمرير
  */
 (function (global) {
   'use strict';
 
   var STYLE_ID = 'rizq-marquee-kit-css';
+  var WRAP_SEL = [
+    '.cards-track-wrap',
+    '.ticker-wrap',
+    '.price-ticker-wrap',
+    '.rizq-styles-track-wrap',
+    '.rizq-styles-rail-wrap',
+    '.rizq-srm-rail-wrap',
+    '.rzq-disc-strip',
+    '.rizq-vid-strip',
+    '#rizq-styles-rail',
+    '#rizq-srm-rail',
+    '#rizq-est-rail'
+  ].join(',');
+
+  var INNER_SEL = [
+    '.cards-track',
+    '.ticker-inner',
+    '.price-ticker-inner',
+    '.rizq-styles-rail',
+    '.rzq-disc-track',
+    '.rizq-vid-strip-track'
+  ].join(',');
 
   function injectCSS() {
     if (document.getElementById(STYLE_ID)) return;
@@ -16,27 +39,16 @@
     s.textContent = [
       '.ticker-wrap,.price-ticker-wrap,.cards-track-wrap,',
       '.rizq-styles-rail-wrap,.rizq-srm-rail-wrap,.rizq-styles-track-wrap,',
-      '.rzq-disc-strip{position:relative}',
-      '.ticker-wrap.is-mq-hover-paused,',
-      '.price-ticker-wrap.is-mq-hover-paused,',
-      '.cards-track-wrap.is-mq-hover-paused,',
-      '.rizq-styles-rail-wrap.is-mq-hover-paused,',
-      '.rizq-srm-rail-wrap.is-mq-hover-paused,',
-      '.rizq-styles-track-wrap.is-mq-hover-paused,',
-      '.rzq-disc-strip.is-mq-hover-paused{cursor:grab}',
-      '.ticker-wrap.is-mq-hover-paused:active,',
-      '.price-ticker-wrap.is-mq-hover-paused:active,',
-      '.cards-track-wrap.is-mq-hover-paused:active,',
-      '.rzq-disc-strip.is-mq-hover-paused:active{cursor:grabbing}'
+      '.rzq-disc-strip,.rizq-vid-strip{position:relative}',
+      '.is-mq-hover-paused{cursor:grab}',
+      '.is-mq-hover-paused:active{cursor:grabbing}'
     ].join('');
     (document.head || document.documentElement).appendChild(s);
   }
 
   function findWrap(el) {
     if (!el) return null;
-    return el.closest(
-      '.cards-track-wrap, .ticker-wrap, .price-ticker-wrap, .rizq-styles-track-wrap, .rizq-styles-rail-wrap, .rizq-srm-rail-wrap, .rzq-disc-strip'
-    ) || el.parentElement;
+    return el.closest(WRAP_SEL) || el.parentElement;
   }
 
   function markHover(wrap, on) {
@@ -116,7 +128,6 @@
         if (typeof global._rzqEnsureMarqueeLoop === 'function') global._rzqEnsureMarqueeLoop();
       }, { passive: true });
 
-      /* عجلة: إيقاف → إزاحة؛ تشغيل → تسريع + اتجاه */
       wrap.addEventListener('wheel', function (ev) {
         var dx = Math.abs(ev.deltaX) > Math.abs(ev.deltaY) ? ev.deltaX : ev.deltaY;
         if (!dx || state.half <= 1) return;
@@ -126,12 +137,11 @@
           if (state.pos >= state.half) state.pos -= state.half;
           if (state.pos < 0) state.pos += state.half;
           if (typeof state.apply === 'function') state.apply();
-        } else if (typeof api.speedUp === 'function') {
+        } else {
           api.speedUp();
         }
       }, { passive: true });
 
-      /* سحب أثناء الإيقاف لإرجاع الشريط */
       wrap.addEventListener('pointerdown', function (ev) {
         if (!(state.hoverPaused || state.userPaused || state.paused)) return;
         if (ev.pointerType === 'mouse' && ev.button !== 0) return;
@@ -170,7 +180,10 @@
 
     var api = {
       reverse: function () { ctl.dir = ctl.dir < 0 ? 1 : -1; },
-      togglePause: function () { ctl.userPaused = !ctl.userPaused; markHover(strip, ctl.hoverPaused); },
+      togglePause: function () {
+        ctl.userPaused = !ctl.userPaused;
+        markHover(strip, ctl.hoverPaused || ctl.userPaused);
+      },
       speedUp: function () {
         ctl.userPaused = false;
         ctl.hoverPaused = false;
@@ -197,10 +210,114 @@
     return api;
   }
 
+  /**
+   * أشرطة التمرير (فيديو وغيرها) — عجلة/سحب للإزاحة؛ تمرير تلقائي فقط إن data-mq-auto="1"
+   */
+  function enhanceScrollTrack(track) {
+    if (!track || track._kitScrollBound) return track;
+    track._kitScrollBound = true;
+    injectCSS();
+    var wrap = findWrap(track) || track;
+    var hover = false;
+    var dragX = null;
+    var wantAuto = track.getAttribute('data-mq-auto') === '1'
+      || (wrap && wrap.getAttribute && wrap.getAttribute('data-mq-auto') === '1');
+    var autoDir = 1;
+    var autoPx = 36;
+    var lastTs = 0;
+
+    function step(ts) {
+      if (!track.isConnected || !wantAuto) return;
+      if (!lastTs) lastTs = ts;
+      var dt = Math.min(48, ts - lastTs);
+      lastTs = ts;
+      if (!hover && !document.hidden && track.scrollWidth > track.clientWidth + 8) {
+        track.scrollLeft += autoDir * autoPx * (dt / 1000);
+        var max = track.scrollWidth - track.clientWidth;
+        if (track.scrollLeft >= max - 1) autoDir = -1;
+        if (track.scrollLeft <= 1) autoDir = 1;
+      }
+      requestAnimationFrame(step);
+    }
+
+    wrap.addEventListener('pointerenter', function () {
+      hover = true;
+      markHover(wrap, true);
+    }, { passive: true });
+    wrap.addEventListener('pointerleave', function () {
+      hover = false;
+      dragX = null;
+      markHover(wrap, false);
+    }, { passive: true });
+    wrap.addEventListener('wheel', function (ev) {
+      var dx = Math.abs(ev.deltaX) > Math.abs(ev.deltaY) ? ev.deltaX : ev.deltaY;
+      if (!dx) return;
+      track.scrollLeft += dx * (hover ? 1 : 1.6);
+      autoDir = dx > 0 ? 1 : -1;
+      if (!hover && wantAuto) {
+        autoPx = Math.min(140, 36 + Math.abs(dx));
+        clearTimeout(wrap._mqFastT);
+        wrap._mqFastT = setTimeout(function () { autoPx = 36; }, 1400);
+      }
+    }, { passive: true });
+    wrap.addEventListener('pointerdown', function (ev) {
+      if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+      dragX = ev.clientX;
+    }, { passive: true });
+    wrap.addEventListener('pointerup', function () { dragX = null; }, { passive: true });
+    wrap.addEventListener('pointercancel', function () { dragX = null; }, { passive: true });
+    wrap.addEventListener('pointermove', function (ev) {
+      if (dragX == null) return;
+      var dx = ev.clientX - dragX;
+      dragX = ev.clientX;
+      if (dx) {
+        track.scrollLeft -= dx;
+        autoDir = dx < 0 ? 1 : -1;
+      }
+    }, { passive: true });
+
+    if (wantAuto) requestAnimationFrame(step);
+    return track;
+  }
+
   function enhanceAllRaf() {
     var list = global._rzqMarquees;
     if (!Array.isArray(list)) return;
     list.forEach(function (st) { enhanceRafState(st); });
+  }
+
+  function enhanceAllDisc() {
+    try {
+      document.querySelectorAll('.rzq-disc-strip').forEach(function (strip) {
+        if (strip._kitBound) return;
+        if (strip._rzqScrollBound && strip._kitCtl) {
+          enhanceDiscStrip(strip, strip._kitCtl);
+          return;
+        }
+        /* إن وُجدت حالة داخلية من initAutoScroll عبر ctl مخزّن */
+        if (strip._kitApi) return;
+      });
+    } catch (e) {}
+  }
+
+  function enhanceAllScroll() {
+    try {
+      document.querySelectorAll('.rizq-vid-strip-track').forEach(enhanceScrollTrack);
+    } catch (e) {}
+  }
+
+  function enhanceEverything() {
+    injectCSS();
+    patchTickOnce();
+    enhanceAllRaf();
+    enhanceAllDisc();
+    enhanceAllScroll();
+    /* اربط أي شريط rAF ظهر بعد التحميل */
+    try {
+      document.querySelectorAll(INNER_SEL).forEach(function (el) {
+        if (el._rzqMarquee) enhanceRafState(el._rzqMarquee);
+      });
+    } catch (e2) {}
   }
 
   function patchTickOnce() {
@@ -240,24 +357,32 @@
     };
   }
 
+  function observeDom() {
+    if (typeof MutationObserver === 'undefined' || !document.documentElement) return;
+    var mo = new MutationObserver(function () {
+      enhanceEverything();
+    });
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
   global.RizqMarqueeKit = {
     enhanceRafState: enhanceRafState,
     enhanceDiscStrip: enhanceDiscStrip,
+    enhanceScrollTrack: enhanceScrollTrack,
     enhanceAllRaf: enhanceAllRaf,
+    enhanceEverything: enhanceEverything,
     injectCSS: injectCSS
   };
 
   function boot() {
-    injectCSS();
-    patchTickOnce();
-    enhanceAllRaf();
+    enhanceEverything();
+    observeDom();
     var n = 0;
     var t = setInterval(function () {
-      patchTickOnce();
-      enhanceAllRaf();
+      enhanceEverything();
       n++;
-      if (n > 20) clearInterval(t);
-    }, 500);
+      if (n > 40) clearInterval(t);
+    }, 400);
   }
 
   if (document.readyState === 'loading') {

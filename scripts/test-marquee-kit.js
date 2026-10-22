@@ -13,10 +13,13 @@ assert.ok(landing.includes('rizq_marquee_kit.js'), 'landing loads marquee kit');
 assert.ok(landing.includes('RizqMarqueeKit.enhanceRafState'), 'landing enhances raf marquees');
 assert.ok(landing.includes('RizqMarqueeKit.enhanceDiscStrip'), 'landing enhances discovery strips');
 assert.ok(landing.includes('hoverPaused'), 'landing respects hoverPaused');
+assert.ok(landing.includes('data-mq-auto'), 'video strip opts into auto marquee');
 assert.ok(!kitSrc.includes('rzq-mq-ctrls'), 'no visible control buttons');
 assert.ok(!kitSrc.includes('createElement(\'button\')'), 'kit does not create buttons');
 assert.ok(kitSrc.includes('pointerenter'), 'hover pause via pointerenter');
 assert.ok(kitSrc.includes('wheel'), 'wheel scrub/speed');
+assert.ok(kitSrc.includes('enhanceScrollTrack'), 'scroll strips covered');
+assert.ok(kitSrc.includes('enhanceEverything'), 'auto-scan all strips');
 assert.ok(!kitSrc.includes('rizq-emergency-strip'), 'emergency strip not in kit');
 
 const els = new Map();
