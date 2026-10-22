@@ -705,9 +705,13 @@ body.rizq-lang-fr #rizq-mock-hdr #rmh-lang-btn .lang-fr{
   display:inline-flex;align-items:center;justify-content:center;
 }
 .rmh-nav a.rmh-post-nav:hover,
-.rmh-nav a.rmh-post-nav.is-active{
+.rmh-nav a.rmh-post-nav.is-active,
+.rmh-nav a.rmh-post-nav:focus{
   color:#fff!important;
   border-bottom-color:#E8C96A!important;
+  background:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;
   filter:none;
 }
 .rmh-nav a.rmh-post-nav:hover .rmh-post-plus{
@@ -927,7 +931,7 @@ body > .rizq-help-dd-menu a,
   -webkit-user-select:none!important;
 }
 
-/* تابلت — بدون قائمة الأقسام داخل البحث (كالنموذج) */
+/* تابلت — أظهر تذييل الأقسام داخل شريط البحث دون تحريك موقعه */
 @media(max-width:1024px){
   body.rizq-mockup-hdr-trial{--rizq-mock-hdr-h: 200px}
   .rmh-util{padding:4px 14px;font-size:10.5px}
@@ -936,7 +940,14 @@ body > .rizq-help-dd-menu a,
     padding:9px 14px;gap:10px;
   }
   .rmh-search{max-width:380px}
-  .rmh-search-cat{display:none}
+  .rmh-search-cat{
+    display:block!important;
+    min-width:88px;max-width:112px;
+    padding:0 8px;padding-inline-start:18px;
+    font-size:11.5px;font-weight:800;
+    background-position:left 8px center;
+    flex-shrink:0;
+  }
   .rmh-nav a.rmh-post-nav{min-width:68px;padding:8px 8px 10px;font-size:11px}
   .rmh-nav a{min-width:68px;padding:8px 8px 10px;font-size:11px}
   .rmh-nav a[data-rmh="showrooms"]{min-width:92px;font-size:10.5px}
@@ -958,23 +969,28 @@ body > .rizq-help-dd-menu a,
   html.rizq-app-nav:has(#rizq-desk-nav) body.rizq-mockup-hdr-trial{
     padding-top:var(--rizq-mock-hdr-h,212px)!important;
   }
-  /* أعمدة متساوية يمين/يسار حتى يقع البحث في منتصف الشاشة هندسياً */
+  /* أعمدة متساوية يمين/يسار — وسط أوسع قليلاً لاستيعاب تذييل الأقسام */
   #rizq-mock-hdr .rmh-main{
-    grid-template-columns:minmax(0,1fr) minmax(0,290px) minmax(0,1fr);
+    grid-template-columns:minmax(0,1fr) minmax(0,340px) minmax(0,1fr);
     gap:10px 14px;
     padding:9px 16px;
     align-items:center;
   }
   #rizq-mock-hdr .rmh-brand{justify-self:start!important;min-width:0}
   #rizq-mock-hdr .rmh-tools{justify-self:end!important;min-width:0}
-  /* البحث: أصغر + سحب طفيف يميناً نحو الشعار */
+  /* البحث: نفس الموضع + متّسع قليلاً لتذييل الأقسام */
   #rizq-mock-hdr .rmh-search{
-    max-width:290px!important;
+    max-width:340px!important;
     width:100%!important;
     min-width:0!important;
     justify-self:center!important;
     margin-inline:0!important;
     transform:translateX(22px)!important;
+  }
+  #rizq-mock-hdr .rmh-search-cat{
+    display:block!important;
+    min-width:92px;max-width:118px;
+    font-size:12px;
   }
   /* شعار أصغر خطاً — نفس التصميم */
   #rizq-mock-hdr .rmh-brand .logo-ar,
@@ -1045,15 +1061,14 @@ body > .rizq-help-dd-menu a,
   }
   /*
    * هاتف — صفّان:
-   * 1) شعار الشركة (+ علامة الاختصار R) في وسط الشاشة
-   * 2) بحث بعرض كامل
-   * الجوانب: أيقونات الاختصار مع شارات الإشعار فقط (سلة/مفضلة/حساب/مساعدة)
+   * 1) شعار في الوسط | شارات الإشعار يمين (RTL start)
+   * 2) بحث بعرض كامل مع تذييل الأقسام — بلا تحريك لموقع الشريط
    */
   .rmh-main{
     display:grid;
     grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
     grid-template-areas:
-      "edge brand tools"
+      "tools brand edge"
       "search search search";
     gap:6px 8px;
     padding:8px 10px 7px;
@@ -1066,9 +1081,10 @@ body > .rizq-help-dd-menu a,
     justify-self:center!important;
     min-width:0;
   }
+  /* الإشعار/الأدوات على يمين الشاشة (عمود البداية في RTL) */
   .rmh-tools{
     grid-area:tools;
-    justify-self:end;
+    justify-self:start;
     gap:4px;
     align-items:center;
     display:flex;
@@ -1087,7 +1103,15 @@ body > .rizq-help-dd-menu a,
     margin-inline:0!important;
     transform:none!important;
   }
-  .rmh-search-cat{display:none!important}
+  /* تذييل الأقسام ظاهر داخل البحث — مضغوط */
+  .rmh-search-cat{
+    display:block!important;
+    min-width:72px;max-width:96px;
+    padding:0 6px;padding-inline-start:16px;
+    font-size:10.5px;font-weight:800;
+    background-position:left 6px center;
+    flex-shrink:0;
+  }
   /* امحِ زر البحث — الإرسال بـ Enter */
   #rizq-mock-hdr .rmh-search-btn,
   .rmh-search-btn{display:none!important}
