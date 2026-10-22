@@ -230,8 +230,22 @@
             <div class="form-group"><label class="form-label">المدينة</label><input class="form-input" id="pf-city" placeholder="نواكشوط"/></div>
             <div class="form-group"><label class="form-label">الحي / المنطقة</label><input class="form-input" id="pf-zone" placeholder="تفرغ زينة"/></div>
             <div class="form-group" style="grid-column:1/-1"><label class="form-label">الوصف</label><textarea class="form-input" id="pf-desc" maxlength="2000"></textarea></div>
-            <div class="form-group" style="grid-column:1/-1"><label class="form-label">صور (روابط مفصولة بفاصلة)</label><input class="form-input" id="pf-photos" placeholder="https://..."/></div>
-            <div class="form-group" style="grid-column:1/-1"><label class="form-label">مخطط / جولة فيديو</label><input class="form-input" id="pf-media" placeholder="رابط مخطط أو فيديو"/></div>
+            <div class="form-group" style="grid-column:1/-1">
+              <label class="form-label">صور العقار (حتى 6)</label>
+              <p style="font-size:11px;color:var(--text-muted);margin:0 0 8px">JPG / PNG / WebP — حتى 1.5MB لكل صورة. الصورة الأولى غلاف البطاقة.</p>
+              <div id="pf-photos-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
+              <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('pf-photos-input').click()">📷 رفع صور</button>
+              <input type="file" id="pf-photos-input" accept="image/jpeg,image/png,image/webp" multiple style="display:none" onchange="handlePropPhotosInput(this)"/>
+              <input type="hidden" id="pf-photos"/>
+            </div>
+            <div class="form-group" style="grid-column:1/-1">
+              <label class="form-label">مخطط / طابق (صورة اختيارية)</label>
+              <div id="pf-floorplan-preview" style="margin-bottom:8px"></div>
+              <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('pf-floorplan-input').click()">🗺️ رفع مخطط</button>
+              <input type="file" id="pf-floorplan-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handlePropFloorplanInput(this)"/>
+              <input type="hidden" id="pf-floorplan"/>
+            </div>
+            <div class="form-group" style="grid-column:1/-1"><label class="form-label">جولة فيديو (رابط YouTube / Facebook)</label><input class="form-input" id="pf-media" placeholder="https://youtu.be/..."/></div>
             <div class="form-group" style="grid-column:1/-1"><label class="form-label">إحداثيات الخريطة (lat,lng)</label><input class="form-input" id="pf-map" placeholder="18.09,-15.97"/></div>
           </div>
           <div class="amen-chips">
@@ -335,9 +349,21 @@
     <div class="panel" id="panel-photos">
       <div class="card">
         <div class="card-header"><div class="card-title">📸 معرض الوكالة</div></div>
-        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px">أضف روابط صور الغلاف والمعرض لصفحتك العامة.</p>
-        <div class="form-group"><label class="form-label">صورة الغلاف</label><input class="form-input" id="ph-cover" placeholder="https://..."/></div>
-        <div class="form-group"><label class="form-label">صور المعرض (مفصولة بفاصلة)</label><textarea class="form-input" id="ph-gallery" placeholder="https://a.jpg, https://b.jpg"></textarea></div>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px">ارفع صورة الغلاف وصور المعرض لصفحتك العامة (JPG / PNG / WebP — حتى 1.5MB).</p>
+        <div class="form-group">
+          <label class="form-label">صورة الغلاف</label>
+          <div id="ph-cover-preview" style="margin-bottom:8px"></div>
+          <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('ph-cover-input').click()">🖼️ رفع الغلاف</button>
+          <input type="file" id="ph-cover-input" accept="image/jpeg,image/png,image/webp" style="display:none" onchange="handleAgencyCoverInput(this)"/>
+          <input type="hidden" id="ph-cover"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">صور المعرض (حتى 8)</label>
+          <div id="ph-gallery-preview" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px"></div>
+          <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('ph-gallery-input').click()">📷 إضافة صور</button>
+          <input type="file" id="ph-gallery-input" accept="image/jpeg,image/png,image/webp" multiple style="display:none" onchange="handleAgencyGalleryInput(this)"/>
+          <input type="hidden" id="ph-gallery"/>
+        </div>
         <button class="btn btn-primary" type="button" onclick="savePhotos()">💾 حفظ المعرض</button>
       </div>
     </div>
@@ -348,7 +374,7 @@
         <div class="card-header"><div class="card-title">💳 اشتراكي وحدود النشر</div></div>
         <div id="sub-current" style="margin-bottom:18px;font-weight:700;line-height:1.8;color:var(--text-muted)"></div>
         <div class="card-title" style="margin-bottom:12px">باقات سوق العقارات</div>
-        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px">الباقات مبنية وجاهزة — الأسعار تُحدَّث لاحقاً من لوحة الإدارة.</p>
+        <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px">اختر باقة وادفع ثم ارفع وصل الدفع — الأسعار قابلة للتعديل من لوحة السوبر أدمن.</p>
         <div class="pkg-grid" id="pkg-grid"></div>
       </div>
     </div>
@@ -457,7 +483,47 @@
   </div>
 </div>
 
+<!-- ══ PAYMENT / RECEIPT MODAL (باقة عقارات) ══ -->
+<div id="pay-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px">
+  <div style="background:#fff;border-radius:20px;max-width:480px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(0,0,0,.3)">
+    <div style="background:linear-gradient(135deg,#1B3A6B,#234d8f);padding:20px 24px;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:13px;color:rgba(255,255,255,.7);margin-bottom:4px">الاشتراك في باقة عقارات</div>
+        <div id="pay-pkg-name" style="font-size:18px;font-weight:800;color:#e8c96a"></div>
+      </div>
+      <button type="button" onclick="closePayModal()" style="background:rgba(255,255,255,.12);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center">×</button>
+    </div>
+    <div style="padding:22px 24px">
+      <div style="background:#f0f4ff;border-radius:12px;padding:14px 16px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:13px;color:#2C3A4F">المبلغ المطلوب</span>
+        <span id="pay-amount" style="font-size:22px;font-weight:800;color:#1B3A6B"></span>
+      </div>
+      <div id="pay-price-unset-block" style="display:none;background:#fff7ed;border:1px solid #fdba74;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:#9a3412;font-weight:700;line-height:1.65"></div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;color:#1B3A6B;margin-bottom:10px">خطوات الدفع:</div>
+        <div style="display:flex;flex-direction:column;gap:8px;font-size:12.5px;color:#4a5568">
+          <div>1) اختر البنك المناسب وانسخ الرمز</div>
+          <div>2) افتح تطبيق بنكك → دفع/بيماه → أدخل الرمز والمبلغ</div>
+          <div>3) ارفع صورة الوصل هنا — تفعيل الباقة بعد مراجعة الإدارة / المراقب المالي / الوكيل</div>
+        </div>
+      </div>
+      <div id="pay-banks" style="margin-bottom:18px"></div>
+      <div style="border:2px dashed rgba(27,58,107,.2);border-radius:12px;padding:16px;text-align:center;cursor:pointer" onclick="document.getElementById('pay-receipt-file').click()" id="pay-upload-zone">
+        <div style="font-size:28px;margin-bottom:6px">🧾</div>
+        <div style="font-size:13px;font-weight:600;color:#1B3A6B">انقر لرفع صورة الوصل</div>
+        <div style="font-size:11px;color:#9aa7bd;margin-top:3px">JPG / PNG / PDF — حد 1.5MB</div>
+        <input type="file" id="pay-receipt-file" accept="image/*,.pdf" style="display:none" onchange="handlePayReceipt(this)"/>
+      </div>
+      <div id="pay-receipt-name" style="display:none;margin-top:8px;font-size:12px;color:#059669;font-weight:600;text-align:center"></div>
+      <button type="button" id="pay-submit-btn" onclick="submitPayment()" style="margin-top:14px;width:100%;padding:13px;background:linear-gradient(135deg,#C9A84C,#e8c96a);border:none;border-radius:12px;font-weight:800;font-size:14px;color:#0f2347;cursor:pointer">
+        📤 إرسال طلب الاشتراك
+      </button>
+      <p id="pay-footer-note" style="font-size:11px;color:#9aa7bd;text-align:center;margin-top:10px">سيتم مراجعة الوصل وتفعيل الباقة خلال 24 ساعة أو أقل</p>
+    </div>
+  </div>
+</div>
+
 <script src="rizq_dashboard_ui.js?v=1"></script>
-<script src="rizq_dashboard_estate_app.js?v=2"></script>
+<script src="rizq_dashboard_estate_app.js?v=5"></script>
 </body>
 </html>

@@ -35,6 +35,7 @@ const { normalizeAccountActivityFields, loadCatalog } = require('./services/merc
 const { refreshCurrencyRates, sanitizeCurrencyList, mergeCurrencyConfig } = require('./services/currencyRates');
 const { parseKnowledgeFile, formatDynamicKnowledgeForPrompt } = require('./services/dynamicKnowledge');
 const { recordUsage, setupQuotaGuardAPI } = require('../rizq_quota_guard_agent');
+const { storeReceipt } = require('./services/receiptStorage');
 
 const app = express();
 app.disable('x-powered-by');
@@ -2399,11 +2400,22 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
     console.warn('[sub-requests] catalog lookup:', catErr.message);
   }
   if (!catalogPkg) {
-    return res.status(400).json({ ok: false, error: 'باقة غير معروفة في الكتالوج — السعر يُحدَّد من الخادم فقط', code: 'UNKNOWN_PKG' });
+    return res.status(400).json({
+      ok: false,
+      error: 'UNKNOWN_PKG',
+      message: 'باقة غير معروفة في الكتالوج — السعر يُحدَّد من الخادم فقط',
+    });
   }
-  const serverPrice = catalogPkg.price != null ? Number(catalogPkg.price) || 0 : null;
-  if (serverPrice == null) {
-    return res.status(400).json({ ok: false, error: 'باقة بلا سعر في الكتالوج', code: 'UNKNOWN_PKG' });
+  // P0: null/undefined/NaN ليست مجانية — لا نحوّلها إلى 0
+  const serverPrice = catalogPkg.price != null && catalogPkg.price !== '' && Number.isFinite(Number(catalogPkg.price))
+    ? Number(catalogPkg.price)
+    : null;
+  if (serverPrice == null || catalogPkg.pricePending) {
+    return res.status(400).json({
+      ok: false,
+      error: 'price_unset',
+      message: 'سعر الباقة غير مضبوط — حدّده السوبر أدمن من لوحة إدارة الباقات أولاً',
+    });
   }
   const list = readSubRequests();
   const clientId = typeof b.id === 'string' && /^sub_\d{10,20}$/.test(b.id) ? b.id : null;
