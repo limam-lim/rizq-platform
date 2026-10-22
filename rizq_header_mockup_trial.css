@@ -1069,16 +1069,15 @@ body > .rizq-help-dd-menu a,
     box-shadow:0 6px 18px rgba(2,6,14,.28);
   }
   /*
-   * هاتف:
-   * أقصى اليمين (RTL start) = إشعار السلة
-   * الوسط = الشعار
-   * اليسار = حساب / مفضلة / مساعدة
+   * هاتف — نفس ترتيب الكمبيوتر/التابلت:
+   * يمين = الشعار | يسار = إشعار السلة + بقية الأيقونات معاً (السلة يمين المجموعة)
+   * البحث صف كامل تحتها فقط (فرق الهاتف)
    */
   .rmh-main{
     display:grid;
-    grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+    grid-template-columns:auto minmax(0,1fr) auto;
     grid-template-areas:
-      "notif brand tools"
+      "brand . side"
       "search search search";
     gap:6px 8px;
     padding:8px 10px 7px;
@@ -1086,29 +1085,31 @@ body > .rizq-help-dd-menu a,
   }
   #rizq-mock-hdr .rmh-side-end,
   .rmh-side-end{
-    display:contents!important;
+    display:flex!important;
+    grid-area:side;
+    justify-self:end!important;
+    align-items:center;
+    gap:4px;
+    flex-direction:row;
+    min-width:0;
   }
   #rizq-mock-hdr .rmh-brand.logo,
   #rizq-mock-hdr .rmh-brand,
   .rmh-brand{
     grid-area:brand;
-    justify-self:center!important;
+    justify-self:start!important;
     min-width:0;
   }
-  /* أقصى اليمين — مكان الإشارة الحمراء */
   #rizq-mock-hdr .rmh-notif,
   .rmh-notif{
-    grid-area:notif;
-    justify-self:start;
-    display:flex;align-items:center;
+    display:flex;align-items:center;flex-shrink:0;
   }
   #rizq-mock-hdr .rmh-tools,
   .rmh-tools{
-    grid-area:tools;
-    justify-self:end;
-    gap:4px;
-    align-items:center;
     display:flex;
+    align-items:center;
+    gap:4px;
+    flex-shrink:0;
   }
   .rmh-search,
   #rizq-mock-hdr .rmh-search{
