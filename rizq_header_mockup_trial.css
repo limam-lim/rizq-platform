@@ -514,7 +514,20 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
   font-weight:700!important;margin-top:0!important;padding:0!important;
   direction:ltr!important;unicode-bidi:isolate!important;white-space:nowrap!important;
 }
-.rmh-tools{justify-self:end}
+/* كمبيوتر/تابلت: الإشعار + الأدوات معاً على طرف الشريط */
+.rmh-side-end{
+  justify-self:end;
+  display:flex;align-items:center;gap:6px;
+  flex-direction:row;
+  min-width:0;
+}
+.rmh-notif{
+  display:flex;align-items:center;gap:4px;flex-shrink:0;
+}
+.rmh-tools{
+  display:flex;align-items:center;gap:7px;flex-shrink:0;
+  direction:ltr;
+}
 
 .rmh-search{
   grid-column:2;
@@ -578,10 +591,6 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
 }
 .rmh-search-btn:hover{background:#1B3A6B}
 
-.rmh-tools{
-  display:flex;align-items:center;gap:7px;flex-shrink:0;
-  direction:ltr;
-}
 /* زر المساعدة والدعم — سماعة + قائمة منسدلة */
 #rizq-mock-hdr .rmh-help-dd{
   position:relative;display:inline-flex;align-items:center;z-index:35;
@@ -977,7 +986,7 @@ body > .rizq-help-dd-menu a,
     align-items:center;
   }
   #rizq-mock-hdr .rmh-brand{justify-self:start!important;min-width:0}
-  #rizq-mock-hdr .rmh-tools{justify-self:end!important;min-width:0}
+  #rizq-mock-hdr .rmh-side-end{justify-self:end!important;min-width:0}
   /* البحث: نفس الموضع + متّسع قليلاً لتذييل الأقسام */
   #rizq-mock-hdr .rmh-search{
     max-width:340px!important;
@@ -1061,18 +1070,23 @@ body > .rizq-help-dd-menu a,
   }
   /*
    * هاتف — صفّان:
-   * 1) شعار في الوسط | شارات الإشعار يمين (RTL start)
-   * 2) بحث بعرض كامل مع تذييل الأقسام — بلا تحريك لموقع الشريط
+   * 1) إشعار (سلة) يمين | شعار وسط | مفضلة/حساب/مساعدة يسار
+   * 2) بحث بعرض كامل مع تذييل الأقسام
    */
   .rmh-main{
     display:grid;
     grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
     grid-template-areas:
-      "tools brand edge"
+      "notif brand tools"
       "search search search";
     gap:6px 8px;
     padding:8px 10px 7px;
     align-items:center;
+  }
+  /* فكّ الغلاف حتى يقع الإشعار يمين والأزرار يسار */
+  #rizq-mock-hdr .rmh-side-end,
+  .rmh-side-end{
+    display:contents!important;
   }
   #rizq-mock-hdr .rmh-brand.logo,
   #rizq-mock-hdr .rmh-brand,
@@ -1081,10 +1095,18 @@ body > .rizq-help-dd-menu a,
     justify-self:center!important;
     min-width:0;
   }
-  /* الإشعار/الأدوات على يمين الشاشة (عمود البداية في RTL) */
+  /* يمين الشاشة في RTL = العمود الأول */
+  #rizq-mock-hdr .rmh-notif,
+  .rmh-notif{
+    grid-area:notif;
+    justify-self:start;
+    display:flex;align-items:center;gap:4px;
+  }
+  /* يسار الشاشة — مفضلة وغيرها */
+  #rizq-mock-hdr .rmh-tools,
   .rmh-tools{
     grid-area:tools;
-    justify-self:start;
+    justify-self:end;
     gap:4px;
     align-items:center;
     display:flex;
