@@ -5493,7 +5493,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <!-- ══ RVID — قسم الفيديو الإعلاني الثابت (يُملأ ويُفعَّل عبر JS من /api/site-config) ══ -->
 <section class="rvid-section" id="rvid-section">
   <div class="rvid-section-inner">
-    <video id="rvid-section-video" controls playsinline></video>
+    <video id="rvid-section-video" controls muted playsinline loop></video>
     <div>
       <div class="rvid-section-title" id="rvid-section-title"></div>
       <div class="rvid-section-sub" id="rvid-section-sub"></div>
@@ -5534,6 +5534,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="section-header fade-in">
       <p class="section-tag">محلات <span>رزق</span></p>
       <h2 data-t="vs-title">افتح محلك على <span>رزق</span> بواجهة كاملة لعملائك</h2>
+      <p class="section-desc" data-t="vs-own-site" style="font-weight:700;color:var(--royal);margin-top:-4px">موقعك الخاص على الإنترنت — بدون تكلفة موقع</p>
       <p class="section-desc" data-t="vs-desc">
         واجهتك باسمك: منتجاتك وثقة زبائنك في مكان يليق بمحلك.
       </p>
@@ -6448,7 +6449,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
       <div style="background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.2);border-radius:11px;padding:12px;margin-bottom:14px">
         <p data-t-fr="📋 Photo de la carte d'identité" style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:6px">📋 صورة البطاقة الوطنية</p>
-        <p data-t-fr="Requise pour vérifier votre identité — une seule face suffit" style="font-size:10px;color:var(--text-muted);margin-bottom:8px">مطلوبة للتحقق — تُحذف نهائياً بعد التوثيق. يُحتفظ برقم NNI فقط.</p>
+        <p class="rizq-id-privacy-notice" data-t="id-privacy-notice" style="font-size:13px;font-weight:800;color:#0D1B2A;background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.45);border-radius:10px;padding:10px 12px;margin:0 0 10px;line-height:1.55;display:flex;align-items:flex-start;gap:8px"><span aria-hidden="true">🔒</span><span>صورة بطاقتك تُحذف نهائياً بعد التوثيق — نحتفظ برقمها فقط</span></p>
         <div id="uz-st" onclick="document.getElementById('f-st').click()" style="border:2px dashed rgba(201,168,76,.3);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .3s" onmouseover="this.style.borderColor='rgba(201,168,76,.7)'" onmouseout="this.style.borderColor='rgba(201,168,76,.3)'">
           <div style="font-size:26px;margin-bottom:4px">🪪</div>
           <p data-t-fr="Cliquez pour télécharger la photo" style="color:var(--text-soft);font-size:12px;font-weight:600">انقر لرفع صورة البطاقة</p>
@@ -10455,7 +10456,7 @@ const LANG = {
     'hbiz-browse-sub': 'عقارات، سيارات، ذهب… ابدأ من هنا خلال ثوانٍ',
     'promo-strip-sub': 'أحدث الإعلانات على رزق — عروض تخطف الأنظار',
     'hero-tagline': 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي — كل شيء في مكان واحد',
-    'hbiz-stores-hint': 'بيع أقوى كل يوم',
+    'hbiz-stores-hint': 'بيع أقوى كل يوم', 'vs-own-site': 'موقعك الخاص على الإنترنت — بدون تكلفة موقع', 'id-privacy-notice': '🔒 صورة بطاقتك تُحذف نهائياً بعد التوثيق — نحتفظ برقمها فقط',
     'hbiz-offices-hint': 'عملاء يبحثون عنك',
     'hbiz-showrooms-hint': 'عرض يلفت الأنظار',
     'hbiz-estate-hint': 'عقارك يصل للجادّين',
@@ -10620,7 +10621,7 @@ const LANG = {
     'hbiz-browse-sub': 'Immobilier, voitures, or… commencez en quelques secondes',
     'promo-strip-sub': 'Dernières annonces sur Rizq — offres qui impressionnent',
     'hero-tagline': 'Boutique virtuelle · Bureau pro · Pub institutionnelle — tout en un seul endroit',
-    'hbiz-stores-hint': 'Vendez plus fort chaque jour',
+    'hbiz-stores-hint': 'Vendez plus fort chaque jour', 'vs-own-site': 'Votre site sur internet — sans coût de site', 'id-privacy-notice': '🔒 La photo de votre pièce est définitivement supprimée après vérification — seul le numéro est conservé',
     'hbiz-offices-hint': 'Des clients vous cherchent',
     'hbiz-showrooms-hint': 'Une vitrine qui attire',
     'hbiz-estate-hint': 'Votre bien atteint les acheteurs sérieux',
