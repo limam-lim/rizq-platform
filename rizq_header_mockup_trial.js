@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.57';
+    link.href = 'rizq_header_mockup_trial.css?v=5.58';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -792,10 +792,20 @@
       if (!__rmhMoreHome) __rmhMoreHome = menu.parentNode;
       document.body.appendChild(menu);
     }
+    try { btn.scrollIntoView({ inline: 'nearest', block: 'nearest' }); } catch (err) { /* ignore */ }
     var br = btn.getBoundingClientRect();
     var menuW = Math.max(176, Math.round(menu.offsetWidth || 176));
-    var left = Math.round(br.left + br.width / 2 - menuW / 2);
-    left = Math.max(8, Math.min(left, window.innerWidth - menuW - 8));
+    var vw = window.innerWidth || document.documentElement.clientWidth || 0;
+    var left;
+    /* الصق بجانب الزر: يسار الشاشة (المزيد) → محاذاة يسار الزر؛ يمين → يمين الزر؛ وإلا توسيط */
+    if (br.left <= 28 || br.left + br.width / 2 < menuW / 2 + 8) {
+      left = Math.round(br.left);
+    } else if (br.right >= vw - 28) {
+      left = Math.round(br.right - menuW);
+    } else {
+      left = Math.round(br.left + br.width / 2 - menuW / 2);
+    }
+    left = Math.max(8, Math.min(left, vw - menuW - 8));
     var top;
     if (isPhone()) {
       var mh = Math.min(menu.offsetHeight || 220, window.innerHeight * 0.55);

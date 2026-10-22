@@ -1008,6 +1008,48 @@ body > .rizq-help-dd-menu a,
     width:38px!important;height:38px!important;
     min-width:38px!important;min-height:38px!important;
   }
+  /* أبواب الشريط — تتّسع كاملة دون قصّ الرئيسية/المزيد */
+  #rizq-mock-hdr nav.rmh-nav,
+  nav.rmh-nav{
+    margin:6px 8px 10px!important;
+    padding:3px 4px!important;
+    max-width:calc(100% - 16px)!important;
+    gap:0!important;
+    justify-content:space-between!important;
+    overflow-x:hidden!important;
+  }
+  #rizq-mock-hdr .rmh-nav a,
+  #rizq-mock-hdr .rmh-nav a.rmh-post-nav,
+  #rizq-mock-hdr .rmh-more-btn,
+  .rmh-nav a,
+  .rmh-nav a.rmh-post-nav,
+  .rmh-more-btn{
+    flex:1 1 0!important;
+    min-width:0!important;
+    max-width:none!important;
+    padding:6px 2px 8px!important;
+    font-size:10px!important;
+    gap:2px!important;
+  }
+  #rizq-mock-hdr .rmh-nav a[data-rmh="showrooms"],
+  .rmh-nav a[data-rmh="showrooms"]{
+    font-size:9px!important;
+    white-space:normal!important;
+    line-height:1.15!important;
+    text-align:center;
+  }
+  #rizq-mock-hdr .rmh-nav a .rmh-nav-ico,
+  #rizq-mock-hdr .rmh-more-btn .rmh-nav-ico,
+  .rmh-nav a .rmh-nav-ico,
+  .rmh-more-btn .rmh-nav-ico{
+    width:18px!important;height:18px!important;
+  }
+  #rizq-mock-hdr .rmh-nav a .rmh-nav-ico svg,
+  #rizq-mock-hdr .rmh-more-btn .rmh-nav-ico svg,
+  .rmh-nav a .rmh-nav-ico svg,
+  .rmh-more-btn .rmh-nav-ico svg{
+    width:18px!important;height:18px!important;
+  }
   /* كبسولة رزق + شارة السوق — أنزلها لتكون في رؤية واضحة تحت الهيدر */
   html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-content,
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) body.rizq-mockup-hdr-trial .hero-content,
