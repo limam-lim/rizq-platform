@@ -43,7 +43,7 @@
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.52"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.53"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — الشريط القديم متوقف نهائياً */
@@ -1102,6 +1102,49 @@ body.rizq-lang-ar .hero-stage{
   max-width:min(960px,86vw);
 }
 .hero-spaces{position:relative;z-index:2}
+/* نافذة نماذج الأعمال — من شريط «نماذج» */
+.rizq-models-modal{
+  position:fixed;inset:0;z-index:100050;
+  display:none;align-items:center;justify-content:center;
+  padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));
+  box-sizing:border-box;
+}
+.rizq-models-modal.is-open{display:flex}
+.rizq-models-modal[hidden]{display:none!important}
+.rizq-models-backdrop{
+  position:absolute;inset:0;
+  background:rgba(8,15,30,.72);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
+.rizq-models-panel{
+  position:relative;z-index:1;width:min(920px,100%);
+  max-height:min(90vh,880px);overflow:auto;
+  background:linear-gradient(165deg,#f7f5f0 0%,#eef1f7 45%,#f4f6fa 100%);
+  border:1px solid rgba(201,168,76,.42);
+  border-radius:20px;
+  box-shadow:0 28px 80px rgba(2,6,14,.45),inset 0 1px 0 rgba(255,255,255,.65);
+  padding:28px 22px 26px;
+  box-sizing:border-box;
+}
+.rizq-models-panel .hero-spaces{margin:0}
+.rizq-models-close{
+  position:absolute;top:12px;inset-inline-start:12px;z-index:2;
+  width:36px;height:36px;border-radius:10px;cursor:pointer;
+  border:1px solid rgba(201,168,76,.45);
+  background:linear-gradient(160deg,#0D1B2A,#1B3A6B);
+  color:#C9A84C;font-size:22px;line-height:1;font-weight:700;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:background .2s,color .2s,transform .2s;
+}
+.rizq-models-close:hover{
+  background:linear-gradient(135deg,#C9A84C,#e8c96a);
+  color:#0D1B2A;transform:rotate(90deg);
+}
+body.rizq-models-open{overflow:hidden}
+@media(max-width:640px){
+  .rizq-models-panel{padding:22px 12px 18px;border-radius:16px;max-height:92vh}
+  .rizq-models-close{top:8px;inset-inline-start:8px;width:32px;height:32px;font-size:18px}
+}
 .hero-spaces-head{text-align:center;margin:0 auto 14px;max-width:34em}
 .hero-spaces-kicker{
   display:inline-block;margin:0 0 10px;padding:6px 16px;border-radius:10px;
@@ -4995,7 +5038,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <script src="rizq_marquee_kit.js?v=1.3"></script>
     <script src="rizq_civic_ticker.js?v=1.3"></script>
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_header_mockup_trial.js?v=5.52" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.53" defer></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
@@ -5112,35 +5155,39 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
       </button>
     </form>
-    <div class="rmh-tools">
-      <button type="button" class="rmh-lang btn-lang btn-lang-primary" id="rmh-lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
-      <button type="button" class="rmh-ico" onclick="typeof goToAccount==='function'&&goToAccount()" aria-label="حسابي">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19c1.6-3.2 4-4.8 6.5-4.8S16.9 15.8 18.5 19"/></svg>
-      </button>
-      <a class="rmh-ico rmh-cart-link" id="rmh-cart-btn" href="rizq_cart.html" data-rizq-cart-wrap aria-label="السلة العامة" title="السلة العامة">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 5h2l1.5 10h11L20 8H7"/><circle cx="9.5" cy="19" r="1.3"/><circle cx="16.5" cy="19" r="1.3"/></svg>
-        <span class="rmh-cart-badge" id="rmh-cart-badge" data-rizq-cart-count hidden>0</span>
-      </a>
-      <a class="rmh-ico rmh-fav-link" href="rizq_favorites.html" data-rizq-fav-wrap aria-label="المفضلة العامة" title="المفضلة العامة">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 20s-6.5-4.2-8.5-8A4.6 4.6 0 0 1 12 7.2 4.6 4.6 0 0 1 20.5 12c-2 3.8-8.5 8-8.5 8z"/></svg>
-        <span class="rmh-cart-badge rmh-fav-badge" id="rmh-fav-badge" data-rizq-fav-count hidden>0</span>
-      </a>
-      <div class="rizq-help-dd rmh-help-dd" id="rmh-help-wrap" data-rizq-toolbar="help">
-        <button type="button" class="rizq-help-dd-btn rmh-ico" id="rmh-help-btn" aria-haspopup="true" aria-expanded="false" aria-controls="rmh-help-menu" aria-label="المساعدة والدعم" title="المساعدة والدعم">
-          <span class="rizq-help-dd-chev" aria-hidden="true">▾</span>
-          <span class="rizq-help-dd-ico" aria-hidden="true">
-            <svg class="rizq-help-svg" viewBox="0 0 24 24" width="18" height="18" focusable="false"><path fill="currentColor" d="M12 3a8 8 0 0 0-8 8v2.2a2.2 2.2 0 0 0 2.2 2.2H7.5a1.3 1.3 0 0 0 1.3-1.3V12a1.3 1.3 0 0 0-1.3-1.3H6.1A5.9 5.9 0 0 1 12 5a5.9 5.9 0 0 1 5.9 5.7h-1.4A1.3 1.3 0 0 0 15.2 12v2.1a1.3 1.3 0 0 0 1.3 1.3h1.3A2.2 2.2 0 0 0 20 13.2V11a8 8 0 0 0-8-8zm-1.2 14.6c0-.5.4-.9.9-.9h.6c2.1 0 3.4 1 3.4 2.5v.4c0 .4-.3.7-.7.7h-5c-.7 0-1.2-.5-1.2-1.2v-1.5z"/></svg>
-          </span>
+    <div class="rmh-side-end">
+      <div class="rmh-notif" id="rmh-notif" aria-label="الإشعارات">
+        <a class="rmh-ico rmh-cart-link" id="rmh-cart-btn" href="rizq_cart.html" data-rizq-cart-wrap aria-label="السلة العامة" title="السلة العامة">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 5h2l1.5 10h11L20 8H7"/><circle cx="9.5" cy="19" r="1.3"/><circle cx="16.5" cy="19" r="1.3"/></svg>
+          <span class="rmh-cart-badge" id="rmh-cart-badge" data-rizq-cart-count hidden>0</span>
+        </a>
+      </div>
+      <div class="rmh-tools">
+        <button type="button" class="rmh-lang btn-lang btn-lang-primary" id="rmh-lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
+        <button type="button" class="rmh-ico" onclick="typeof goToAccount==='function'&&goToAccount()" aria-label="حسابي">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19c1.6-3.2 4-4.8 6.5-4.8S16.9 15.8 18.5 19"/></svg>
         </button>
-        <div class="rizq-help-dd-menu" id="rmh-help-menu" role="menu" hidden>
-          <a class="rizq-help-dd-item" role="menuitem" href="rizq_legal.html#s10">
-            <span class="rizq-help-dd-item-ico" aria-hidden="true"><svg class="rizq-help-svg" viewBox="0 0 24 24" width="18" height="18" focusable="false"><path fill="currentColor" d="M12 3c4.7 0 8.5 3.1 8.5 7s-3.8 7-8.5 7c-.7 0-1.4-.1-2.1-.2L6 19.2c-.4.2-.8-.2-.6-.6l1.1-3.1C4.7 14.5 3.5 12.4 3.5 10c0-3.9 3.8-7 8.5-7zm-3.2 6.2a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm3.2 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm3.2 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg></span>
-            <span class="rizq-help-dd-item-lbl" data-rizq-help-lbl="contact">اتصل بنا</span>
-          </a>
-          <a class="rizq-help-dd-item" role="menuitem" href="rizq_help.html">
-            <span class="rizq-help-dd-item-ico" aria-hidden="true"><svg class="rizq-help-svg" viewBox="0 0 24 24" width="18" height="18" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 1 0 .01 20.01A10 10 0 0 0 12 2zm0 4.2a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zM10.8 11h2.4v6.2h-2.4V11z"/></svg></span>
-            <span class="rizq-help-dd-item-lbl" data-rizq-help-lbl="help">مركز المساعدة</span>
-          </a>
+        <a class="rmh-ico rmh-fav-link" href="rizq_favorites.html" data-rizq-fav-wrap aria-label="المفضلة العامة" title="المفضلة العامة">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 20s-6.5-4.2-8.5-8A4.6 4.6 0 0 1 12 7.2 4.6 4.6 0 0 1 20.5 12c-2 3.8-8.5 8-8.5 8z"/></svg>
+          <span class="rmh-cart-badge rmh-fav-badge" id="rmh-fav-badge" data-rizq-fav-count hidden>0</span>
+        </a>
+        <div class="rizq-help-dd rmh-help-dd" id="rmh-help-wrap" data-rizq-toolbar="help">
+          <button type="button" class="rizq-help-dd-btn rmh-ico" id="rmh-help-btn" aria-haspopup="true" aria-expanded="false" aria-controls="rmh-help-menu" aria-label="المساعدة والدعم" title="المساعدة والدعم">
+            <span class="rizq-help-dd-chev" aria-hidden="true">▾</span>
+            <span class="rizq-help-dd-ico" aria-hidden="true">
+              <svg class="rizq-help-svg" viewBox="0 0 24 24" width="18" height="18" focusable="false"><path fill="currentColor" d="M12 3a8 8 0 0 0-8 8v2.2a2.2 2.2 0 0 0 2.2 2.2H7.5a1.3 1.3 0 0 0 1.3-1.3V12a1.3 1.3 0 0 0-1.3-1.3H6.1A5.9 5.9 0 0 1 12 5a5.9 5.9 0 0 1 5.9 5.7h-1.4A1.3 1.3 0 0 0 15.2 12v2.1a1.3 1.3 0 0 0 1.3 1.3h1.3A2.2 2.2 0 0 0 20 13.2V11a8 8 0 0 0-8-8zm-1.2 14.6c0-.5.4-.9.9-.9h.6c2.1 0 3.4 1 3.4 2.5v.4c0 .4-.3.7-.7.7h-5c-.7 0-1.2-.5-1.2-1.2v-1.5z"/></svg>
+            </span>
+          </button>
+          <div class="rizq-help-dd-menu" id="rmh-help-menu" role="menu" hidden>
+            <a class="rizq-help-dd-item" role="menuitem" href="rizq_legal.html#s10">
+              <span class="rizq-help-dd-item-ico" aria-hidden="true"><svg class="rizq-help-svg" viewBox="0 0 24 24" width="18" height="18" focusable="false"><path fill="currentColor" d="M12 3c4.7 0 8.5 3.1 8.5 7s-3.8 7-8.5 7c-.7 0-1.4-.1-2.1-.2L6 19.2c-.4.2-.8-.2-.6-.6l1.1-3.1C4.7 14.5 3.5 12.4 3.5 10c0-3.9 3.8-7 8.5-7zm-3.2 6.2a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm3.2 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm3.2 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"/></svg></span>
+              <span class="rizq-help-dd-item-lbl" data-rizq-help-lbl="contact">اتصل بنا</span>
+            </a>
+            <a class="rizq-help-dd-item" role="menuitem" href="rizq_help.html">
+              <span class="rizq-help-dd-item-ico" aria-hidden="true"><svg class="rizq-help-svg" viewBox="0 0 24 24" width="18" height="18" focusable="false"><path fill="currentColor" d="M12 2a10 10 0 1 0 .01 20.01A10 10 0 0 0 12 2zm0 4.2a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zM10.8 11h2.4v6.2h-2.4V11z"/></svg></span>
+              <span class="rizq-help-dd-item-lbl" data-rizq-help-lbl="help">مركز المساعدة</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -5155,6 +5202,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <a href="#virtual-offices" data-rmh="offices"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="16" height="11" rx="1"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M4 13h16"/></svg></span>المكاتب</a>
     <a href="rizq_tenders_directory.html" data-rmh="tenders"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 4h8a2 2 0 0 1 2 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h6"/></svg></span>المناقصات</a>
     <a href="rizq_investments_directory.html" data-rmh="investments"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 18V6M4 18h16"/><path d="M7 14l4-4 3 3 5-6"/></svg></span>الاستثمارات</a>
+    <a href="#models" data-rmh="models"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg></span>نماذج</a>
     <div class="rmh-more-wrap" data-rmh="more">
       <button type="button" class="rmh-more-btn" id="rmh-more-btn" aria-haspopup="true" aria-expanded="false" aria-controls="rmh-more-menu">
         <span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/></svg></span>
@@ -5421,65 +5469,71 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
 </section>
 
-<!-- ══ بعد الإبهار: فضاءات الأعمال + تحويل + Rizq ADS ══ -->
+<!-- ══ نماذج الأعمال — نافذة منبثقة من شريط «نماذج» (لم تعد في تدفق الصفحة) ══ -->
+<div id="rizq-models-modal" class="rizq-models-modal" role="dialog" aria-modal="true" aria-labelledby="hero-spaces-title" hidden>
+  <div class="rizq-models-backdrop" data-models-close tabindex="-1" aria-hidden="true"></div>
+  <div class="rizq-models-panel" role="document">
+    <button type="button" class="rizq-models-close" data-models-close aria-label="إغلاق">×</button>
+    <section class="hero-spaces" id="models" aria-labelledby="hero-spaces-title">
+      <div class="hero-spaces-head">
+        <p class="hero-spaces-kicker"><span data-t="hbiz-kicker">منصة موريتانية للأعمال</span><span class="hero-kicker-place" data-t="hero-one-place"> — كل شيء في مكان واحد</span></p>
+        <h2 class="hero-spaces-title" id="hero-spaces-title" data-t="hbiz-pick">شاهد النماذج على رزق</h2>
+        <p class="hero-spaces-sub" data-t="hbiz-pick-sub">من محلك إلى استثمارك — حضورك المهني يبدأ من هنا</p>
+      </div>
+      <nav class="hero-biz-nav" aria-label="بوابات النماذج الجاهزة">
+        <a href="rizq_store.html?demo=1" class="hero-biz-btn hero-biz-gold" data-space-portal="store" data-rizq-module="store" aria-label="نموذج محل">
+          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏪</span></span>
+          <span class="hero-biz-text">
+            <span class="hero-biz-label" data-t="hbiz-stores">المحلات</span>
+            <span class="hero-biz-hint" data-t="hbiz-stores-hint">بيع أقوى كل يوم</span>
+          </span>
+        </a>
+        <a href="rizq_showroom.html?demo=1" class="hero-biz-btn hero-biz-diamond" data-space-portal="showroom" data-rizq-module="corp" aria-label="نموذج معرض">
+          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏬</span></span>
+          <span class="hero-biz-text">
+            <span class="hero-biz-label" data-t="hbiz-showrooms">المعارض والمصانع</span>
+            <span class="hero-biz-hint" data-t="hbiz-showrooms-hint">عرض يلفت الأنظار</span>
+          </span>
+        </a>
+        <a href="rizq_estate.html?demo=1" class="hero-biz-btn hero-biz-estate" data-space-portal="estate" data-rizq-module="estate" aria-label="وكالة العقارات — نموذج سوق العقارات">
+          <span class="hero-biz-badge" data-t="hbiz-estate-badge">جديد</span>
+          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏠</span></span>
+          <span class="hero-biz-text">
+            <span class="hero-biz-label" data-t="hbiz-estate">سوق العقارات</span>
+            <span class="hero-biz-hint" data-t="hbiz-estate-hint">عقارك يصل للجادّين</span>
+          </span>
+        </a>
+        <a href="rizq_office.html?demo=1" class="hero-biz-btn hero-biz-royal" data-space-portal="office" data-rizq-module="office" aria-label="نموذج مكتب">
+          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">💼</span></span>
+          <span class="hero-biz-text">
+            <span class="hero-biz-label" data-t="hbiz-offices">المكاتب</span>
+            <span class="hero-biz-hint" data-t="hbiz-offices-hint">عملاء يبحثون عنك</span>
+          </span>
+        </a>
+        <a href="rizq_tenders.html?demo=1" class="hero-biz-btn hero-biz-tender" data-space-portal="tenders" data-rizq-module="tenders" aria-label="نموذج غرفة المناقصات">
+          <span class="hero-biz-badge" data-t="hbiz-tender-badge">جديد</span>
+          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📑</span></span>
+          <span class="hero-biz-text">
+            <span class="hero-biz-label" data-t="hbiz-tenders">المناقصات</span>
+            <span class="hero-biz-hint" data-t="hbiz-tenders-hint">فرص أعمال حقيقية</span>
+          </span>
+        </a>
+        <a href="rizq_investments.html?demo=1" class="hero-biz-btn hero-biz-invest" data-space-portal="investments" data-rizq-module="investments" aria-label="نموذج غرفة الاستثمارات">
+          <span class="hero-biz-badge" data-t="hbiz-inv-badge">جديد</span>
+          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📈</span></span>
+          <span class="hero-biz-text">
+            <span class="hero-biz-label" data-t="hbiz-investments">الاستثمارات</span>
+            <span class="hero-biz-hint" data-t="hbiz-investments-hint">شراكات تنمو معك</span>
+          </span>
+        </a>
+      </nav>
+    </section>
+  </div>
+</div>
+
+<!-- ══ بعد الإبهار: تحويل + Rizq ADS (النماذج عبر شريط «نماذج») ══ -->
 <section class="hero-after-promo" aria-label="فضاءات الأعمال على رزق">
   <div class="hero-after-promo-inner">
-      <!-- فضاءات الأعمال — بعد نية البحث وشريط العروض -->
-      <section class="hero-spaces" aria-labelledby="hero-spaces-title">
-        <div class="hero-spaces-head">
-          <p class="hero-spaces-kicker"><span data-t="hbiz-kicker">منصة موريتانية للأعمال</span><span class="hero-kicker-place" data-t="hero-one-place"> — كل شيء في مكان واحد</span></p>
-          <h2 class="hero-spaces-title" id="hero-spaces-title" data-t="hbiz-pick">شاهد النماذج على رزق</h2>
-          <p class="hero-spaces-sub" data-t="hbiz-pick-sub">من محلك إلى استثمارك — حضورك المهني يبدأ من هنا</p>
-        </div>
-        <!-- بوابات النماذج: معاينة واجهات جاهزة ببيانات ترويجية (الكبسولة تبقى للتصفّح) -->
-        <nav class="hero-biz-nav" aria-label="بوابات النماذج الجاهزة">
-          <a href="rizq_store.html?demo=1" class="hero-biz-btn hero-biz-gold" data-space-portal="store" data-rizq-module="store" aria-label="نموذج محل">
-            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏪</span></span>
-            <span class="hero-biz-text">
-              <span class="hero-biz-label" data-t="hbiz-stores">المحلات</span>
-              <span class="hero-biz-hint" data-t="hbiz-stores-hint">بيع أقوى كل يوم</span>
-            </span>
-          </a>
-          <a href="rizq_showroom.html?demo=1" class="hero-biz-btn hero-biz-diamond" data-space-portal="showroom" data-rizq-module="corp" aria-label="نموذج معرض">
-            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏬</span></span>
-            <span class="hero-biz-text">
-              <span class="hero-biz-label" data-t="hbiz-showrooms">المعارض والمصانع</span>
-              <span class="hero-biz-hint" data-t="hbiz-showrooms-hint">عرض يلفت الأنظار</span>
-            </span>
-          </a>
-          <a href="rizq_estate.html?demo=1" class="hero-biz-btn hero-biz-estate" data-space-portal="estate" data-rizq-module="estate" aria-label="وكالة العقارات — نموذج سوق العقارات">
-            <span class="hero-biz-badge" data-t="hbiz-estate-badge">جديد</span>
-            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏠</span></span>
-            <span class="hero-biz-text">
-              <span class="hero-biz-label" data-t="hbiz-estate">سوق العقارات</span>
-              <span class="hero-biz-hint" data-t="hbiz-estate-hint">عقارك يصل للجادّين</span>
-            </span>
-          </a>
-          <a href="rizq_office.html?demo=1" class="hero-biz-btn hero-biz-royal" data-space-portal="office" data-rizq-module="office" aria-label="نموذج مكتب">
-            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">💼</span></span>
-            <span class="hero-biz-text">
-              <span class="hero-biz-label" data-t="hbiz-offices">المكاتب</span>
-              <span class="hero-biz-hint" data-t="hbiz-offices-hint">عملاء يبحثون عنك</span>
-            </span>
-          </a>
-          <a href="rizq_tenders.html?demo=1" class="hero-biz-btn hero-biz-tender" data-space-portal="tenders" data-rizq-module="tenders" aria-label="نموذج غرفة المناقصات">
-            <span class="hero-biz-badge" data-t="hbiz-tender-badge">جديد</span>
-            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📑</span></span>
-            <span class="hero-biz-text">
-              <span class="hero-biz-label" data-t="hbiz-tenders">المناقصات</span>
-              <span class="hero-biz-hint" data-t="hbiz-tenders-hint">فرص أعمال حقيقية</span>
-            </span>
-          </a>
-          <a href="rizq_investments.html?demo=1" class="hero-biz-btn hero-biz-invest" data-space-portal="investments" data-rizq-module="investments" aria-label="نموذج غرفة الاستثمارات">
-            <span class="hero-biz-badge" data-t="hbiz-inv-badge">جديد</span>
-            <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📈</span></span>
-            <span class="hero-biz-text">
-              <span class="hero-biz-label" data-t="hbiz-investments">الاستثمارات</span>
-              <span class="hero-biz-hint" data-t="hbiz-investments-hint">شراكات تنمو معك</span>
-            </span>
-          </a>
-        </nav>
-      </section>
       <!-- ترويج Rizq ADS — مباشرة فوق شاشة الإعلان الحصري -->
       <div class="hero-cta-wrap" role="region" aria-label="Rizq ADS">
         <p class="hero-spaces-trust" data-t="hbiz-trust">Rizq ADS: مساحة واحدة في الرئيسية · أمام كل زائر · حضور يليق بعلامتك</p>

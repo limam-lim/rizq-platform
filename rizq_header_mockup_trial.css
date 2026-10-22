@@ -514,8 +514,16 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
   font-weight:700!important;margin-top:0!important;padding:0!important;
   direction:ltr!important;unicode-bidi:isolate!important;white-space:nowrap!important;
 }
-.rmh-tools{
+/* سطح المكتب/تابلت: إشعار + أدوات في طرف واحد */
+.rmh-side-end{
   justify-self:end;
+  display:flex;align-items:center;gap:6px;
+  flex-direction:row;min-width:0;
+}
+.rmh-notif{
+  display:flex;align-items:center;gap:4px;flex-shrink:0;
+}
+.rmh-tools{
   display:flex;align-items:center;gap:7px;flex-shrink:0;
   direction:ltr;
 }
@@ -759,6 +767,7 @@ body.rizq-mockup-hdr-trial #virtual-offices{
 }
 .rmh-nav a[data-rmh="showrooms"]{min-width:108px;font-size:11.5px}
 .rmh-nav a[data-rmh="estate"]{min-width:78px}
+.rmh-nav a[data-rmh="models"]{min-width:72px}
 .rmh-nav a .rmh-nav-ico{
   display:inline-flex;align-items:center;justify-content:center;
   width:22px;height:22px;line-height:1;opacity:.92;
@@ -977,7 +986,7 @@ body > .rizq-help-dd-menu a,
     align-items:center;
   }
   #rizq-mock-hdr .rmh-brand{justify-self:start!important;min-width:0}
-  #rizq-mock-hdr .rmh-tools{justify-self:end!important;min-width:0}
+  #rizq-mock-hdr .rmh-side-end{justify-self:end!important;min-width:0}
   /* البحث: نفس الموضع + متّسع قليلاً لتذييل الأقسام */
   #rizq-mock-hdr .rmh-search{
     max-width:340px!important;
@@ -1060,19 +1069,24 @@ body > .rizq-help-dd-menu a,
     box-shadow:0 6px 18px rgba(2,6,14,.28);
   }
   /*
-   * هاتف — كما قبل برومبت كلود:
-   * 1) شعار في الوسط | كل الأيقونات على الجانب
-   * 2) بحث بعرض كامل مع تذييل الأقسام
+   * هاتف:
+   * أقصى اليمين (RTL start) = إشعار السلة
+   * الوسط = الشعار
+   * اليسار = حساب / مفضلة / مساعدة
    */
   .rmh-main{
     display:grid;
     grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
     grid-template-areas:
-      "edge brand tools"
+      "notif brand tools"
       "search search search";
     gap:6px 8px;
     padding:8px 10px 7px;
     align-items:center;
+  }
+  #rizq-mock-hdr .rmh-side-end,
+  .rmh-side-end{
+    display:contents!important;
   }
   #rizq-mock-hdr .rmh-brand.logo,
   #rizq-mock-hdr .rmh-brand,
@@ -1081,6 +1095,14 @@ body > .rizq-help-dd-menu a,
     justify-self:center!important;
     min-width:0;
   }
+  /* أقصى اليمين — مكان الإشارة الحمراء */
+  #rizq-mock-hdr .rmh-notif,
+  .rmh-notif{
+    grid-area:notif;
+    justify-self:start;
+    display:flex;align-items:center;
+  }
+  #rizq-mock-hdr .rmh-tools,
   .rmh-tools{
     grid-area:tools;
     justify-self:end;
