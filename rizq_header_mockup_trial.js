@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.58';
+    link.href = 'rizq_header_mockup_trial.css?v=5.59';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -806,12 +806,13 @@
       left = Math.round(br.left + br.width / 2 - menuW / 2);
     }
     left = Math.max(8, Math.min(left, vw - menuW - 8));
-    var top;
-    if (isPhone()) {
-      var mh = Math.min(menu.offsetHeight || 220, window.innerHeight * 0.55);
-      top = Math.max(8, Math.round(br.top - mh - 8));
-    } else {
-      top = Math.round(br.bottom + 6);
+    /* دائماً تحت الزر أولاً (المزيد على الهاتف في الشريط العلوي) —
+       ولا نفتح للأعلى إلا إن لم يبقَ مكان كافٍ أسفل (شريط سفلي) */
+    var vh = window.innerHeight || document.documentElement.clientHeight || 0;
+    var menuH = Math.min(menu.offsetHeight || 240, Math.round(vh * 0.55));
+    var top = Math.round(br.bottom + 6);
+    if (top + menuH > vh - 8 && br.top > menuH + 16) {
+      top = Math.max(8, Math.round(br.top - menuH - 8));
     }
     menu.classList.add('is-positioned');
     menu.style.setProperty('position', 'fixed', 'important');
