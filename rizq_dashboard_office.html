@@ -21,7 +21,10 @@
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
 <script src="rizq_packages_config.js?v=16.3"></script>
-<script src="rizq_merchant_activities.js?v=1"></script>
+<script src="rizq_merchant_activities.js?v=2.2"></script>
+<script src="rizq_categories_config.js?v=1.0"></script>
+<script src="rizq_dyn_filters.js?v=1.0"></script>
+<script src="rizq_listing_context.js?v=1.0"></script>
 <script src="rizq_disclaimer.js"></script>
 <script src="rizq_subscription_engine.js"></script>
 <script src="rizq_subscription_permissions.js"></script>
@@ -296,6 +299,18 @@
             <div class="form-group"><label class="form-label" data-t="svc-emoji-label">الأيقونة (emoji)</label><input class="form-input" id="svc-emoji" placeholder="📄" maxlength="4"/></div>
           </div>
           <div class="form-group"><label class="form-label" data-t="svc-desc-label">وصف الخدمة</label><textarea class="form-input" id="svc-desc" placeholder="اشرح الخدمة بإيجاز..." data-ph="svc-desc-ph"></textarea></div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">قسم السوق (مربوط بنشاطك)</label>
+              <select class="form-input" id="svc-category-id" aria-label="category_id"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">النوع / الفرع *</label>
+              <select class="form-input" id="svc-subcategory-id" aria-label="sub_category_id"></select>
+            </div>
+          </div>
+          <div id="svc-attrs-mount" style="margin-top:10px;display:none"></div>
+          <div id="svc-listing-ctx-hint"></div>
           <div style="display:flex;gap:8px;justify-content:flex-end">
             <button class="btn btn-outline btn-sm" onclick="clearSvcForm()" data-t="svc-clear">🔄 مسح</button>
             <button class="btn btn-primary" onclick="saveService()" data-t="svc-save">💾 حفظ الخدمة</button>

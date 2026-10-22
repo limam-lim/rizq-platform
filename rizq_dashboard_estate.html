@@ -17,6 +17,9 @@
   <script src="rizq_phone_utils.js?v=1.0"></script>
   <script src="rizq_packages_config.js?v=17.0"></script>
   <script src="rizq_merchant_activities.js?v=2.2"></script>
+  <script src="rizq_categories_config.js?v=1.0"></script>
+  <script src="rizq_dyn_filters.js?v=1.0"></script>
+  <script src="rizq_listing_context.js?v=1.0"></script>
   <script src="rizq_disclaimer.js"></script>
   <script src="rizq_subscription_engine.js"></script>
   <script src="rizq_subscription_permissions.js"></script>
@@ -206,6 +209,16 @@
               </select>
             </div>
             <div class="form-group" style="grid-column:1/-1"><label class="form-label">العنوان *</label><input class="form-input" id="pf-title" required maxlength="160" placeholder="شقة فاخرة — تفرغ زينة"/></div>
+            <div class="form-group">
+              <label class="form-label">قسم السوق</label>
+              <select class="form-input" id="pf-category-id" aria-label="category_id"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">النوع / الفرع *</label>
+              <select class="form-input" id="pf-subcategory-id" aria-label="sub_category_id"></select>
+            </div>
+            <div class="form-group" style="grid-column:1/-1;display:none" id="pf-attrs-mount"></div>
+            <div class="form-group" style="grid-column:1/-1" id="pf-listing-ctx-hint"></div>
             <div class="form-group"><label class="form-label">السعر (MRU) *</label><input class="form-input" id="pf-price" required placeholder="150000"/></div>
             <div class="form-group"><label class="form-label">المساحة م²</label><input class="form-input" id="pf-area" type="number" min="0" value="120"/></div>
             <div class="form-group"><label class="form-label">غرف</label><input class="form-input" id="pf-rooms" type="number" min="0" value="3"/></div>

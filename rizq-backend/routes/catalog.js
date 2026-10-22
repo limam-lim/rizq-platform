@@ -40,8 +40,10 @@ function mountCatalogRoutes(app, deps) {
     const token = req.header('x-account-token') || '';
     const acc = verifyAccountOwner(b.accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
-    if (!b.name || !String(b.name).trim()) return res.status(400).json({ error: 'الاسم مطلوب' });
+    if (!(b.name || b.title) || !String(b.name || b.title).trim()) return res.status(400).json({ error: 'الاسم مطلوب' });
     if (!['product', 'service'].includes(b.kind)) return res.status(400).json({ error: "kind يجب أن يكون 'product' أو 'service'" });
+    // Normalize title → name for estate / legacy clients
+    if (!b.name && b.title) b.name = b.title;
     const ent = getEntitlements(b.accountId, acc.type);
     const activeCount = readCatalog().filter((it) => it.accountId === b.accountId && it.status === 'active').length;
     const imageCount = Array.isArray(b.images) ? b.images.length : (b.image ? 1 : 0);
@@ -51,6 +53,33 @@ function mountCatalogRoutes(app, deps) {
     } catch (gateErr) {
       return res.status(gateErr.status || 403).json({ ok: false, error: gateErr.message, code: gateErr.code, details: gateErr.details });
     }
+    // Contextual binding: force server-side account identity (never trust client type alone)
+    const accountType = String(acc.type || b.accountType || '').slice(0, 24);
+    const activityId = String(acc.activityId || b.activityId || '').slice(0, 64);
+    let categoryId = String(b.categoryId || b.category || b.categoryKey || '').trim().slice(0, 80);
+    let subcat = String(b.subCategoryId || b.subcat || b.sub_category_id || '').trim().slice(0, 120);
+    // If merchant has a registered activity, derive/validate marketplace category from it
+    try {
+      const { loadCatalog: loadMerchantCatalog } = require('../services/merchantActivities');
+      const MA = loadMerchantCatalog();
+      if (activityId && typeof MA.marketplaceSpecForActivity === 'function') {
+        const spec = MA.marketplaceSpecForActivity(activityId);
+        if (spec && spec.categoryId) {
+          if (!categoryId) categoryId = String(spec.categoryId).slice(0, 80);
+          else if (categoryId !== spec.categoryId) {
+            // Soft-enforce: replace mismatched client category with activity-bound one
+            categoryId = String(spec.categoryId).slice(0, 80);
+          }
+          if (!subcat && spec.preferredSubcat) subcat = String(spec.preferredSubcat).slice(0, 120);
+          if (subcat && Array.isArray(spec.allowedSubcats) && spec.allowedSubcats.length
+            && spec.allowedSubcats.indexOf(subcat) === -1) {
+            // Keep preferred if client sent an out-of-scope subcat
+            subcat = String(spec.preferredSubcat || '').slice(0, 120);
+          }
+        }
+      }
+    } catch (eMap) { /* merchant activities optional */ }
+
     const list = readCatalog();
     const id = genCatalogId();
     // images: مصفوفة (حتى 6) — الحقل الجديد للمعرض. image: الصورة الأولى
@@ -63,14 +92,33 @@ function mountCatalogRoutes(app, deps) {
       const single = await saveCatalogImage(id, b.image);
       catImages = single ? [single] : [];
     }
+    const attrs = (b.attrs && typeof b.attrs === 'object' && !Array.isArray(b.attrs))
+      ? Object.keys(b.attrs).slice(0, 40).reduce(function (out, k) {
+        const key = String(k || '').trim().slice(0, 48);
+        if (!key) return out;
+        out[key] = String(b.attrs[k]).slice(0, 200);
+        return out;
+      }, {})
+      : {};
+    const metaIn = (b.meta && typeof b.meta === 'object' && !Array.isArray(b.meta)) ? b.meta : {};
+    const sellerBadges = (b.sellerContext && b.sellerContext.badges) || {};
     const rec = {
       id,
       accountId: b.accountId,
+      storeId: String(b.storeId || b.accountId).slice(0, 60),
+      accountType,
+      activityId,
       kind: b.kind,
-      name: String(b.name).slice(0, 200),
+      // Accept title alias (estate dashboards) → name
+      name: String(b.name || b.title || '').slice(0, 200),
       nameFr: String(b.nameFr || '').slice(0, 200),
       price: String(b.price || '').slice(0, 40),
-      cat: String(b.cat || '').slice(0, 80),
+      cat: String(b.cat || subcat || categoryId || '').slice(0, 80),
+      categoryId,
+      category: categoryId,
+      categoryKey: categoryId,
+      subCategoryId: subcat,
+      subcat,
       topicId: String(b.topicId || '').slice(0, 48),
       brandId: String(b.brandId || '').slice(0, 48),
       brandName: String(b.brandName || '').slice(0, 80),
@@ -80,6 +128,25 @@ function mountCatalogRoutes(app, deps) {
       modelNameFr: String(b.modelNameFr || '').slice(0, 80),
       desc: String(b.desc || '').slice(0, 3000),
       descFr: String(b.descFr || '').slice(0, 3000),
+      duration: String(b.duration || '').slice(0, 80),
+      cover: String(b.cover || '').slice(0, 500000),
+      thumb: String(b.thumb || '').slice(0, 500000),
+      attrs,
+      meta: Object.assign({}, metaIn, {
+        listingSource: 'dashboard_catalog',
+        estate: !!(metaIn.estate || accountType === 'estate'),
+      }),
+      sellerContext: {
+        storeId: String(b.storeId || b.accountId).slice(0, 60),
+        storeName: String((b.sellerContext && b.sellerContext.storeName) || acc.name || '').slice(0, 120),
+        accountType,
+        badges: {
+          verified: !!(sellerBadges.verified || acc.verified || acc.nniVerified),
+          verifiedPlus: !!(sellerBadges.verifiedPlus || acc.verifiedPlus),
+          trusted: !!(sellerBadges.trusted || acc.trusted),
+        },
+      },
+      listingSource: 'dashboard_catalog',
       stock: String(b.stock || '').slice(0, 20),
       variants: String(b.variants || '').slice(0, 300),
       sizeStock: (function () {
@@ -114,12 +181,20 @@ function mountCatalogRoutes(app, deps) {
     }
   });
 
-  /** GET /api/catalog?accountId=...&kind=... — عرض عام (فقط status active) لصفحات المتجر/المكتب/الشركة */
+  /** GET /api/catalog?accountId=...&kind=...&categoryId=...&subcat=... — عرض عام (active فقط) */
   app.get('/api/catalog', (req, res) => {
     const q = req.query || {};
     let list = readCatalog().filter((it) => it.status === 'active');
     if (q.accountId) list = list.filter((it) => it.accountId === q.accountId);
     if (q.kind) list = list.filter((it) => it.kind === q.kind);
+    if (q.categoryId || q.category) {
+      const cid = String(q.categoryId || q.category);
+      list = list.filter((it) => (it.categoryId || it.category || it.categoryKey || '') === cid);
+    }
+    if (q.subcat || q.subCategoryId) {
+      const sc = String(q.subcat || q.subCategoryId);
+      list = list.filter((it) => (it.subcat || it.subCategoryId || '') === sc);
+    }
     list = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     res.json({ ok: true, items: list });
   });
@@ -159,12 +234,46 @@ function mountCatalogRoutes(app, deps) {
     const isOwner = !!(item.accountId && verifyAccountOwner(item.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
     const b = req.body || {};
-    const editable = ['name', 'nameFr', 'price', 'cat', 'topicId', 'desc', 'descFr', 'stock', 'variants', 'sku', 'unit', 'emoji', 'brandId', 'brandName', 'brandNameFr', 'modelId', 'modelName', 'modelNameFr'];
+    const editable = ['name', 'nameFr', 'price', 'cat', 'topicId', 'desc', 'descFr', 'stock', 'variants', 'sku', 'unit', 'emoji', 'brandId', 'brandName', 'brandNameFr', 'modelId', 'modelName', 'modelNameFr', 'duration', 'cover', 'thumb', 'categoryId', 'category', 'categoryKey', 'subCategoryId', 'subcat', 'activityId'];
     editable.forEach((k) => {
       if (typeof b[k] !== 'string') return;
-      const max = (k === 'desc' || k === 'descFr') ? 3000 : (k === 'variants' ? 300 : (k === 'sku' ? 64 : (k === 'unit' ? 40 : (k === 'topicId' ? 48 : (k === 'cat' ? 80 : 200)))));
+      const max = (k === 'desc' || k === 'descFr') ? 3000
+        : (k === 'cover' || k === 'thumb') ? 500000
+        : (k === 'variants' ? 300 : (k === 'sku' ? 64 : (k === 'unit' ? 40 : (k === 'topicId' ? 48 : (k === 'cat' || k === 'categoryId' || k === 'category' || k === 'categoryKey' ? 80 : (k === 'subcat' || k === 'subCategoryId' ? 120 : 200))))));
       item[k] = b[k].slice(0, max);
     });
+    if (typeof b.title === 'string' && b.title.trim() && !b.name) {
+      item.name = String(b.title).slice(0, 200);
+    }
+    // Keep category aliases in sync
+    if (b.categoryId || b.category || b.categoryKey) {
+      const cid = String(b.categoryId || b.category || b.categoryKey).slice(0, 80);
+      item.categoryId = cid;
+      item.category = cid;
+      item.categoryKey = cid;
+    }
+    if (b.subCategoryId || b.subcat) {
+      const sc = String(b.subCategoryId || b.subcat).slice(0, 120);
+      item.subCategoryId = sc;
+      item.subcat = sc;
+    }
+    if (b.attrs && typeof b.attrs === 'object' && !Array.isArray(b.attrs)) {
+      item.attrs = Object.keys(b.attrs).slice(0, 40).reduce(function (out, k) {
+        const key = String(k || '').trim().slice(0, 48);
+        if (!key) return out;
+        out[key] = String(b.attrs[k]).slice(0, 200);
+        return out;
+      }, {});
+    }
+    if (b.meta && typeof b.meta === 'object' && !Array.isArray(b.meta)) {
+      item.meta = Object.assign({}, item.meta || {}, b.meta, { listingSource: 'dashboard_catalog' });
+    }
+    item.listingSource = 'dashboard_catalog';
+    item.storeId = item.storeId || item.accountId;
+    if (!item.accountType && isOwner) {
+      const ownerAcc = verifyAccountOwner(item.accountId, token);
+      if (ownerAcc && ownerAcc.type) item.accountType = String(ownerAcc.type).slice(0, 24);
+    }
     if (b.sizeStock === null) {
       item.sizeStock = null;
     } else if (b.sizeStock && typeof b.sizeStock === 'object' && !Array.isArray(b.sizeStock)) {

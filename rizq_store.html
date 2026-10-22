@@ -2715,13 +2715,16 @@ function rizqShare(title, url) {
           : '';
         var displayName = (isFr() && p.nameF) ? p.nameF : (p.name || '');
         var safeName = esc(displayName).replace(/'/g, "\\'");
-        var safeCat = esc(p.cat||'').replace(/'/g, "\\'");
+        var shelfCat = p.subcat || p.subCategoryId || p.cat || '';
+        var mktCat = p.categoryId || p.category || p.categoryKey || '';
+        var safeCat = esc(shelfCat).replace(/'/g, "\\'");
         var idJs = JSON.stringify(String(pid));
         var nameJs = JSON.stringify(String(displayName || ''));
         var priceJs = JSON.stringify(String(priceTxt || ''));
         var emojiJs = JSON.stringify(String(p.emoji || '📦'));
         var wishLbl = isFr() ? 'Favoris' : 'المفضلة';
-        return '<div class="product-card" data-cat="'+esc(p.cat||'')+'" data-topic="'+esc(topicKey)+'" onclick="openQuickView(\''+pid+'\',\''+safeName+'\',\''+priceTxt+'\',\''+(p.emoji||'📦')+'\',\''+safeCat+'\')">'
+        var subBadge = shelfCat ? ('<div style="font-size:11px;color:#64748b;margin:2px 0 6px">'+esc(shelfCat)+'</div>') : '';
+        return '<div class="product-card" data-cat="'+esc(shelfCat)+'" data-category-id="'+esc(mktCat)+'" data-subcat="'+esc(p.subcat||p.subCategoryId||'')+'" data-topic="'+esc(topicKey)+'" data-account-type="store" onclick="openQuickView(\''+pid+'\',\''+safeName+'\',\''+priceTxt+'\',\''+(p.emoji||'📦')+'\',\''+safeCat+'\')">'
           + '<div class="product-img">'+media+tagHtml
           + '<button type="button" class="wish-btn" data-wish-id="'+esc(pid)+'" title="'+esc(wishLbl)+'" aria-label="'+esc(wishLbl)+'" aria-pressed="false"'
           // JSON.stringify يُنتج "..." — لذلك onclick بعلامات مفردة حتى لا يُقطع الـ attribute
@@ -2729,6 +2732,7 @@ function rizqShare(title, url) {
           + '</div>'
           + '<div class="product-info">'
           + '<div class="product-name">'+esc(displayName)+'</div>'
+          + subBadge
           + '<div class="product-price">'+priceTxt+'</div>'
           + '<button type="button" class="add-cart-btn" onclick="event.stopPropagation();addToCartStore(\''+pid+'\')"><span aria-hidden="true">🛒</span> '+(isFr()?'Ajouter au panier':'أضف إلى السلة')+'</button>'
           + '</div></div>';

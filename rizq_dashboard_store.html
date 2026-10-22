@@ -21,7 +21,10 @@
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
 <script src="rizq_packages_config.js?v=16.3"></script>
-<script src="rizq_merchant_activities.js?v=2.1"></script>
+<script src="rizq_merchant_activities.js?v=2.2"></script>
+<script src="rizq_categories_config.js?v=1.0"></script>
+<script src="rizq_dyn_filters.js?v=1.0"></script>
+<script src="rizq_listing_context.js?v=1.0"></script>
 <script src="rizq_brands_catalog.js?v=9"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
@@ -339,6 +342,18 @@
             </select>
             <p style="font-size:11px;color:var(--text-muted);margin-top:6px" data-t="prod-cat-hint">إن لم تجد الموضوع المناسب، أضفه أعلاه أولاً ثم اختره هنا.</p>
           </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">قسم السوق (مربوط بنشاطك)</label>
+              <select class="form-input" id="prod-category-id" aria-label="category_id"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">النوع / الفرع *</label>
+              <select class="form-input" id="prod-subcategory-id" aria-label="sub_category_id"></select>
+            </div>
+          </div>
+          <div id="prod-attrs-mount" style="margin-top:10px;display:none"></div>
+          <div id="prod-listing-ctx-hint"></div>
           <div class="form-grid">
             <div class="form-group">
               <label class="form-label" data-t="prod-brand-label">الماركة</label>

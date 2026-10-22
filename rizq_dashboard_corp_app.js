@@ -1251,15 +1251,32 @@ function _rizqSyncCatalogItem(prod){
   try{
     if(!window.RIZQ_BACKEND_BASE || !CORP_ACC || !CORP_ACC.id || !CORP_ACC.token) return;
     var base = window.RIZQ_BACKEND_BASE.replace(/\/$/,'');
+    var ctx = (typeof RizqListingContext !== 'undefined')
+      ? RizqListingContext.sellerContext(CORP_ACC, { accountType: 'corp', accountId: CORP_ACC.id })
+      : { store_id: CORP_ACC.id, account_id: CORP_ACC.id, account_type: 'corp', activity_id: '', badges: {} };
     var payload = {
-      accountId: CORP_ACC.id, kind:'product',
-      name: prod.name, price: prod.price, cat: prod.cat, desc: prod.desc,
+      accountId: CORP_ACC.id, storeId: CORP_ACC.id, kind:'product',
+      name: prod.name, price: prod.price,
+      cat: prod.cat, categoryId: prod.categoryId || prod.cat || '', category: prod.categoryId || prod.cat || '',
+      subCategoryId: prod.subcat || '', subcat: prod.subcat || '',
+      attrs: prod.attrs || {},
+      accountType: 'corp', activityId: prod.activityId || (CORP_ACC.activityId || ''),
+      listingSource: 'dashboard_catalog',
+      sellerContext: { storeName: CORP_ACC.name || '', badges: ctx.badges || {} },
+      brandId: prod.brandId || '', brandName: prod.brandName || '', brandNameFr: prod.brandNameFr || '',
+      modelId: prod.modelId || '', modelName: prod.modelName || '', modelNameFr: prod.modelNameFr || '',
+      desc: prod.desc,
       stock: prod.stock, variants: prod.variants, sizeStock: prod.sizeStock || null,
       // إصلاح 2026-08-04: كانت تُرسَل أول صورة فقط (image) رغم أن واجهة
       // الرفع هنا تدعم حتى 8 صور أصلاً — الخادم الآن يقبل images[] كاملة.
       images: prod.images || [],
       emoji: prod.emoji, status: prod.status, sold: prod.sold
     };
+    if(typeof RizqListingContext !== 'undefined'){
+      payload = RizqListingContext.enrichPayload(payload, ctx, {
+        categoryId: prod.categoryId || prod.cat, subcat: prod.subcat, attrs: prod.attrs || {}
+      });
+    }
     if(!prod._backendId){
       fetch(base+'/api/catalog', {
         method:'POST', headers:{'Content-Type':'application/json','x-account-token':(window.REAL_ACCESS_TOKEN || CORP_ACC.token)},
@@ -1671,6 +1688,19 @@ function saveProduct(){
       modelNameFr = RizqBrands.modelName(_cm, true);
     }
   }
+  var _listingForm = (typeof RizqListingContext !== 'undefined')
+    ? RizqListingContext.collectForm({
+        categorySelect: 'pr-cat',
+        subcatSelect: 'pr-subcategory-id',
+        attrsMount: 'pr-attrs-mount',
+        context: RizqListingContext.sellerContext(CORP_ACC, { accountType:'corp', accountId: CORP_ACC && CORP_ACC.id }),
+      })
+    : { categoryId: cat, subcat: '', attrs: {} };
+  cat = _listingForm.categoryId || cat;
+  if(!_listingForm.subcat){
+    showToast(_t2('اختر النوع / الفرع للمنتج','Choisissez le sous-type du produit'),'error');
+    return;
+  }
   if(!name || !price){ showToast(_t2('يرجى إدخال اسم المنتج والسعر','Veuillez saisir le nom du produit et le prix'),'error'); return; }
   if(video) video = video.replace(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/,'https://www.youtube.com/embed/$1');
   var editIdx = (typeof window._editingProdIdx === 'number') ? window._editingProdIdx : null;
@@ -1681,6 +1711,7 @@ function saveProduct(){
     desc:     desc,
     price:    price,
     category: cat,
+    subcat: _listingForm.subcat,
     brandId: brandId, brandName: brandName, brandNameFr: brandNameFr,
     modelId: modelId, modelName: modelName, modelNameFr: modelNameFr,
     images:   _pendingImgs.slice(),
@@ -1692,11 +1723,14 @@ function saveProduct(){
     var prods = getProds();
     var status = data._status || 'active';
     var _savedProd;
+    var _emoji = (document.getElementById('pr-emoji')||{}).value || '📦';
     if(editIdx!==null && prods[editIdx]){
       var old = prods[editIdx];
       prods[editIdx] = {
         id:old.id, _backendId: old._backendId||null, name:name, price:price, cat:cat, desc:desc,
-        emoji:cat||'📦', images:(data.images&&data.images.length)?data.images:old.images, video:video,
+        categoryId: cat, subCategoryId: _listingForm.subcat, subcat: _listingForm.subcat, attrs: _listingForm.attrs || {},
+        accountType: 'corp', storeId: CORP_ACC && CORP_ACC.id, activityId: CORP_ACC && CORP_ACC.activityId, listingSource: 'dashboard_catalog',
+        emoji:_emoji, images:(data.images&&data.images.length)?data.images:old.images, video:video,
         stock:stock, sold:sold, variants:variants, sizeStock:sizeStock,
         brandId:brandId, brandName:brandName, brandNameFr:brandNameFr,
         modelId:modelId, modelName:modelName, modelNameFr:modelNameFr,
@@ -1706,7 +1740,9 @@ function saveProduct(){
     } else {
       _savedProd = {
         id:data.id, _backendId:null, name:name, price:price, cat:cat, desc:desc,
-        emoji:cat||'📦', images:data.images, video:video,
+        categoryId: cat, subCategoryId: _listingForm.subcat, subcat: _listingForm.subcat, attrs: _listingForm.attrs || {},
+        accountType: 'corp', storeId: CORP_ACC && CORP_ACC.id, activityId: CORP_ACC && CORP_ACC.activityId, listingSource: 'dashboard_catalog',
+        emoji:_emoji, images:data.images, video:video,
         stock:stock, sold:sold, variants:variants, sizeStock:sizeStock,
         brandId:brandId, brandName:brandName, brandNameFr:brandNameFr,
         modelId:modelId, modelName:modelName, modelNameFr:modelNameFr,
@@ -1734,6 +1770,7 @@ function saveProduct(){
         RizqBrands.fillModelSelect(document.getElementById('pr-model'), '', false, '');
       }
     }catch(eClrB){}
+    try{ mountCorpListingContext(); }catch(eClrCtx){}
     window._editingProdIdx = null;
     var saveBtn = document.getElementById('prod-save-btn');
     if(saveBtn) saveBtn.textContent = _t2('💾 نشر المنتج','💾 Publier le produit');
@@ -1762,13 +1799,30 @@ function onCorpBrandChange(){
   }
 }
 
+function mountCorpListingContext(opts){
+  opts = opts || {};
+  if(typeof RizqListingContext === 'undefined') return;
+  var hint = document.getElementById('pr-listing-ctx-hint');
+  if(hint) hint.innerHTML = RizqListingContext.syncHintHtml((typeof _corpLang!=='undefined' && _corpLang==='fr')?'fr':'ar');
+  RizqListingContext.mountSelectors({
+    categorySelect: 'pr-cat',
+    subcatSelect: 'pr-subcategory-id',
+    attrsMount: 'pr-attrs-mount',
+    context: RizqListingContext.sellerContext(CORP_ACC, { accountType:'corp', accountId: CORP_ACC && CORP_ACC.id }),
+    lockCategory: true,
+    selectedSubcat: opts.selectedSubcat || '',
+    attrs: opts.attrs || {},
+    lang: (typeof _corpLang!=='undefined' && _corpLang==='fr')?'fr':'ar',
+  });
+}
+
 function editProd(i){
   var prods = getProds();
   var p = prods[i]; if(!p) return;
   window._editingProdIdx = i;
   document.getElementById('pr-name').value = p.name||'';
   document.getElementById('pr-price').value = p.price||'';
-  if(document.getElementById('pr-cat')) document.getElementById('pr-cat').value = p.cat||'';
+  if(document.getElementById('pr-cat')) document.getElementById('pr-cat').value = p.categoryId || p.cat||'';
   document.getElementById('pr-desc').value = p.desc||'';
   document.getElementById('pr-video').value = p.video||'';
   document.getElementById('pr-stock').value = p.stock||'';
@@ -1788,6 +1842,7 @@ function editProd(i){
   var saveBtn = document.getElementById('prod-save-btn');
   if(saveBtn) saveBtn.textContent = _t2('💾 حفظ التعديلات','💾 Enregistrer les modifications');
   showPanel('products');
+  mountCorpListingContext({ selectedSubcat: p.subcat || p.subCategoryId || '', attrs: p.attrs || {} });
   var formCard = document.getElementById('prod-form-body');
   if(formCard && formCard.scrollIntoView) formCard.scrollIntoView({behavior:'smooth'});
 }
@@ -1798,6 +1853,7 @@ document.addEventListener('DOMContentLoaded', function(){
       RizqBrands.fillModelSelect(document.getElementById('pr-model'), '', false, '');
     }
   }catch(eInitB){}
+  try{ mountCorpListingContext(); }catch(eCtx){}
 });
 
 function renderProducts(){
