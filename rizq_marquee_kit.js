@@ -213,6 +213,18 @@
   /**
    * أشرطة التمرير (فيديو وغيرها) — عجلة/سحب للإزاحة؛ تمرير تلقائي فقط إن data-mq-auto="1"
    */
+  function isTouchUi() {
+    try {
+      return !!(
+        window.matchMedia('(hover: none)').matches ||
+        window.matchMedia('(pointer: coarse)').matches ||
+        window.matchMedia('(max-width: 768px)').matches
+      );
+    } catch (e) {
+      return 'ontouchstart' in global;
+    }
+  }
+
   function enhanceScrollTrack(track) {
     if (!track || track._kitScrollBound) return track;
     track._kitScrollBound = true;
@@ -220,8 +232,12 @@
     var wrap = findWrap(track) || track;
     var hover = false;
     var dragX = null;
-    var wantAuto = track.getAttribute('data-mq-auto') === '1'
-      || (wrap && wrap.getAttribute && wrap.getAttribute('data-mq-auto') === '1');
+    var touching = false;
+    /* هاتف/لمس: بلا تمرير تلقائي — كان يصارع scroll-snap فيرتجف ويلامس الحواف */
+    var wantAuto = !isTouchUi() && (
+      track.getAttribute('data-mq-auto') === '1'
+      || (wrap && wrap.getAttribute && wrap.getAttribute('data-mq-auto') === '1')
+    );
     var autoDir = 1;
     var autoPx = 36;
     var lastTs = 0;
@@ -231,7 +247,7 @@
       if (!lastTs) lastTs = ts;
       var dt = Math.min(48, ts - lastTs);
       lastTs = ts;
-      if (!hover && !document.hidden && track.scrollWidth > track.clientWidth + 8) {
+      if (!hover && !touching && !document.hidden && track.scrollWidth > track.clientWidth + 8) {
         track.scrollLeft += autoDir * autoPx * (dt / 1000);
         var max = track.scrollWidth - track.clientWidth;
         if (track.scrollLeft >= max - 1) autoDir = -1;
@@ -262,10 +278,11 @@
     }, { passive: true });
     wrap.addEventListener('pointerdown', function (ev) {
       if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+      touching = true;
       dragX = ev.clientX;
     }, { passive: true });
-    wrap.addEventListener('pointerup', function () { dragX = null; }, { passive: true });
-    wrap.addEventListener('pointercancel', function () { dragX = null; }, { passive: true });
+    wrap.addEventListener('pointerup', function () { dragX = null; touching = false; }, { passive: true });
+    wrap.addEventListener('pointercancel', function () { dragX = null; touching = false; }, { passive: true });
     wrap.addEventListener('pointermove', function (ev) {
       if (dragX == null) return;
       var dx = ev.clientX - dragX;
