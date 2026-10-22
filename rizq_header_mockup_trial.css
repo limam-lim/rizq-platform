@@ -1021,12 +1021,13 @@ body > .rizq-help-dd-menu a,
 
 /*
  * هاتف:
- * صف واحد: شعار (خط أصغر) | كبسولة بحث مصغّرة | مفضلة+مساعدة (أصغر) — بلا زر بحث
+ * صف علوي: شعار + علامة الاختصار في الوسط | أيقونات+إشعارات على الجانب
+ * صف بحث بعرض كامل — بلا زر بحث (الإرسال بـ Enter)
  * شريط الأقسام نصفين: نصف تحت الشعار، نصف ثابت أسفل الشاشة
  */
 @media(max-width:768px){
   body.rizq-mockup-hdr-trial{
-    --rizq-mock-hdr-h: 128px;
+    --rizq-mock-hdr-h: 148px;
     --rizq-mock-nav-h: 72px;
   }
   html.rizq-app-nav:has(#nav) body.rizq-mockup-hdr-trial,
@@ -1042,31 +1043,47 @@ body > .rizq-help-dd-menu a,
     bottom:auto!important;
     box-shadow:0 6px 18px rgba(2,6,14,.28);
   }
-  /* صف واحد: شعار | بحث وسط | أدوات */
+  /*
+   * هاتف — صفّان:
+   * 1) شعار الشركة (+ علامة الاختصار R) في وسط الشاشة
+   * 2) بحث بعرض كامل
+   * الجوانب: أيقونات الاختصار مع شارات الإشعار فقط (سلة/مفضلة/حساب/مساعدة)
+   */
   .rmh-main{
     display:grid;
-    grid-template-columns:auto minmax(0,1fr) auto;
-    grid-template-areas:"brand search tools";
+    grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+    grid-template-areas:
+      "edge brand tools"
+      "search search search";
     gap:6px 8px;
-    padding:7px 10px 6px;
+    padding:8px 10px 7px;
     align-items:center;
   }
-  .rmh-brand{grid-area:brand;justify-self:start;min-width:0}
+  #rizq-mock-hdr .rmh-brand.logo,
+  #rizq-mock-hdr .rmh-brand,
+  .rmh-brand{
+    grid-area:brand;
+    justify-self:center!important;
+    min-width:0;
+  }
   .rmh-tools{
-    grid-area:tools;justify-self:end;gap:4px;
+    grid-area:tools;
+    justify-self:end;
+    gap:4px;
     align-items:center;
+    display:flex;
   }
   .rmh-search,
   #rizq-mock-hdr .rmh-search{
     grid-area:search;
-    grid-column:auto!important;
+    grid-column:1 / -1!important;
     justify-self:stretch!important;
     width:100%!important;
     max-width:none!important;
     min-width:0!important;
-    min-height:32px!important;
-    height:32px;
-    border-radius:9px!important;
+    min-height:34px!important;
+    height:34px;
+    border-radius:10px!important;
     margin-inline:0!important;
     transform:none!important;
   }

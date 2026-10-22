@@ -6,7 +6,7 @@
   'use strict';
 
   var ASSET_V = '31.8';
-  var MOCK_HDR_V = '5.48';
+  var MOCK_HDR_V = '5.49';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
