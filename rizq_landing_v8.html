@@ -5530,9 +5530,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <section id="rizq-styles" class="rizq-styles-section" aria-labelledby="rizq-styles-title">
   <div class="rizq-styles-inner">
     <div class="section-header fade-in">
-      <p class="section-tag">أناقة <span>رزق</span></p>
+      <p class="section-tag" data-t="sty-tag">أفكار الأنماط</p>
       <h2 id="rizq-styles-title" class="section-title" data-t="sty-title">إطلالات تليق بك على <span>رزق</span></h2>
-      <p class="section-desc" data-t="sty-desc">موضة وإكسسوارات مختارة تلهم إطلالتك القادمة من قلب السوق.</p>
+      <p class="section-desc" data-t="sty-desc">موضة وإكسسوارات من محلات الملابس على المنصة — رجال، نساء، أولاد وبنات.</p>
     </div>
     <div class="rizq-styles-toolbar">
       <button type="button" class="rizq-styles-reshuffle" id="rizq-styles-reshuffle" onclick="buildStyleIdeas(true)" data-t="sty-reshuffle" aria-label="اقتراحات جديدة">🔀 اقتراحات جديدة</button>
@@ -7491,7 +7491,225 @@ function _styDetectGender(a){
   /* بلا جنس صريح: لا نُسقطه في كل التبويبات (كان يسبب خلط رجال↔نساء↔أولاد) */
   return 'neutral';
 }
+/** هل نشاط/اسم المحل يخص الموضة والملابس؟ */
+function _styIsFashionStoreAcc(acc){
+  if(!acc) return false;
+  var typ = String(acc.type || 'store').toLowerCase();
+  if(typ && typ !== 'store' && typ !== 'shop' && typ !== 'boutique') return false;
+  var blob = [acc.name, acc.nameF, acc.activity, acc.category, acc.cat, acc.tagline, acc.desc, acc.businessType]
+    .filter(Boolean).join(' ');
+  if(/سيارة|عقارات|مكتب|مناقصة|إلكترون|بقالة|مواد غذائية|صيدلية|auto|immobilier|bureau|épicerie|pharmacie/i.test(blob)
+    && !/أزياء|ملابس|موضة|fashion|mode|vêtement/i.test(blob)){
+    return false;
+  }
+  if(/أزياء|ملابس|موضة|دراعة|ملحفة|أحذية|إكسسوار|عطور|أطفال|خياط|بوتيك|fashion|mode|vêtement|boutique|habillement|chaussure|parfum|enfant|kids|couture/i.test(blob)){
+    return true;
+  }
+  /* بلا نشاط واضح — يُقبل إن وُجدت منتجات أزياء لاحقاً */
+  return !acc.activity && !acc.category && !acc.cat;
+}
+function _styStoreGenderHint(acc){
+  if(!acc) return '';
+  var blob = [acc.name, acc.activity, acc.category, acc.cat, acc.tagline, acc.desc].join(' ');
+  if(/أولاد|بنات|أطفال|رضع|enfant|kids|child|garçon|fille/i.test(blob)) return 'kids';
+  if(/نساء|نسائي|سيدات|femme|women|lady|melhfa|ملحفة/i.test(blob)) return 'women';
+  if(/رجال|رجالي|homme|men|daraa|دراعة/i.test(blob)) return 'men';
+  return '';
+}
+function _styFormatStorePrice(n){
+  var num = Number(n);
+  if(!isFinite(num) || num <= 0) return '';
+  try { return num.toLocaleString('fr-FR') + ' MRU'; }
+  catch(e){ return String(Math.round(num)) + ' MRU'; }
+}
+function _styNormalizeStoreProduct(p, store){
+  if(!p) return null;
+  var storeId = String((store && (store.id || store.storeId)) || 'store');
+  var storeName = String((store && (store.name || store.title)) || storeId);
+  var storeNameF = String((store && (store.nameF || store.nameFr || storeName)) || storeName);
+  var pid = String(p.id != null ? p.id : '');
+  if(!pid) return null;
+  var priceNum = Number(p.price);
+  if(!isFinite(priceNum)) priceNum = 0;
+  var priceStr = _styFormatStorePrice(priceNum);
+  var imgs = [];
+  if(Array.isArray(p.images)) imgs = p.images.filter(Boolean).slice(0, 4);
+  else if(Array.isArray(p.imgDataArr)) imgs = p.imgDataArr.filter(Boolean).slice(0, 4);
+  else if(p.imgData) imgs = [p.imgData];
+  else if(p.image) imgs = [p.image];
+  var item = {
+    id: 'store:' + storeId + ':' + pid,
+    productId: pid,
+    storeId: storeId,
+    storeName: storeName,
+    title: String(p.name || p.title || pid),
+    titleFR: String(p.nameF || p.nameFr || p.titleFR || p.name || pid),
+    emoji: p.emoji || '🛍️',
+    cat: p.cat || 'أزياء',
+    catKey: 'أزياء',
+    subcat: p.subcat || p.cat || '',
+    price: priceStr,
+    priceFR: priceStr,
+    priceNum: priceNum,
+    images: imgs,
+    bg: p.bg || 'linear-gradient(145deg,#0f2347,#1B3A6B)',
+    gender: p.gender || '',
+    href: 'rizq_store.html?id=' + encodeURIComponent(storeId),
+    source: 'store',
+    module: 'store',
+    seller: storeName,
+    sellerFR: storeNameF,
+    tags: [p.cat, storeName].filter(Boolean),
+    fromStore: true
+  };
+  var storeHint = _styStoreGenderHint(store);
+  if(!item.gender || !RIZQ_STYLE_GENDERS[item.gender]){
+    var detected = _styDetectGender(item);
+    if(detected && detected !== 'neutral' && detected !== 'both' && detected !== 'kids'){
+      item.gender = detected;
+    } else if(storeHint === 'women') {
+      item.gender = 'women';
+    } else if(storeHint === 'men') {
+      item.gender = 'men';
+    } else if(storeHint === 'kids') {
+      var kidsG = _styDetectGender(Object.assign({}, item, { subcat: 'ملابس أطفال ورضع', cat: 'أطفال' }));
+      item.gender = (kidsG === 'boys' || kidsG === 'girls') ? kidsG : 'kids';
+    } else {
+      item.gender = detected === 'kids' ? 'kids' : (detected || 'neutral');
+    }
+  }
+  return item;
+}
+/** كتالوجات محلات أزياء تجريبية — عندما لا توجد محلات موضة مسجّلة بعد */
+function _styDemoFashionStores(){
+  return [
+    {
+      id: 'demo_fashion_men',
+      name: 'محل الأناقة الرجالية',
+      nameF: 'Boutique Élégance Homme',
+      type: 'store',
+      activity: 'ملابس رجالية',
+      products: [
+        { id: 'M1', name: 'دراعة رجالية فاخرة', nameF: 'Daraa homme premium', price: 45000, cat: 'أزياء', emoji: '👔', gender: 'men' },
+        { id: 'M2', name: 'قميص قطني رجالي', nameF: 'Chemise coton homme', price: 12000, cat: 'أزياء', emoji: '👔', gender: 'men' },
+        { id: 'M3', name: 'ساعة رجالية كلاسيكية', nameF: 'Montre homme', price: 28000, cat: 'إكسسوارات', emoji: '⌚', gender: 'men' },
+        { id: 'M4', name: 'حذاء رسمي رجالي', nameF: 'Chaussures formal', price: 32000, cat: 'أحذية', emoji: '👞', gender: 'men' },
+        { id: 'M5', name: 'صندل رجالي جلد', nameF: 'Sandale homme cuir', price: 6500, cat: 'أحذية', emoji: '🩴', gender: 'men' },
+        { id: 'M6', name: 'سبحة كهرمان', nameF: 'Chapelet ambre', price: 18000, cat: 'إكسسوارات', emoji: '📿', gender: 'men' },
+        { id: 'M7', name: 'تيشيرت قطن رجالي', nameF: 'T-shirt homme', price: 5000, cat: 'أزياء', emoji: '👕', gender: 'men' },
+        { id: 'M8', name: 'معطف خفيف رجالي', nameF: 'Manteau léger', price: 40000, cat: 'أزياء', emoji: '🧥', gender: 'men' }
+      ]
+    },
+    {
+      id: 'demo_fashion_women',
+      name: 'بوتيك لمسة نسائية',
+      nameF: 'Boutique Touche Femme',
+      type: 'store',
+      activity: 'ملابس نسائية',
+      products: [
+        { id: 'W1', name: 'ملحفة حريرية فاخرة', nameF: 'Melhfa soie', price: 38000, cat: 'أزياء', emoji: '🧕', gender: 'women' },
+        { id: 'W2', name: 'فستان سهرة', nameF: 'Robe de soirée', price: 55000, cat: 'أزياء', emoji: '👗', gender: 'women' },
+        { id: 'W3', name: 'حقيبة نسائية أنيقة', nameF: 'Sac femme', price: 9800, cat: 'إكسسوارات', emoji: '👜', gender: 'women' },
+        { id: 'W4', name: 'عطر نسائي', nameF: 'Parfum femme', price: 21000, cat: 'عطور', emoji: '🌸', gender: 'women' },
+        { id: 'W5', name: 'صندل صيفي نسائي', nameF: 'Sandales femme', price: 8000, cat: 'أحذية', emoji: '👠', gender: 'women' },
+        { id: 'W6', name: 'أسورة ذهب مظهر', nameF: 'Bracelet doré', price: 15000, cat: 'إكسسوارات', emoji: '💍', gender: 'women' },
+        { id: 'W7', name: 'نظارة شمسية نسائية', nameF: 'Lunettes femme', price: 9000, cat: 'إكسسوارات', emoji: '🕶️', gender: 'women' },
+        { id: 'W8', name: 'ملحفة نقش تقليدي', nameF: 'Melhfa traditionnelle', price: 42000, cat: 'أزياء', emoji: '🧕', gender: 'women' }
+      ]
+    },
+    {
+      id: 'demo_fashion_kids',
+      name: 'عالم الأطفال للملابس',
+      nameF: 'Monde Enfants Mode',
+      type: 'store',
+      activity: 'ملابس أطفال',
+      products: [
+        { id: 'B1', name: 'طقم أولاد يومي', nameF: 'Ensemble garçon', price: 8500, cat: 'أطفال', emoji: '👦', gender: 'boys', subcat: 'ملابس أطفال ورضع' },
+        { id: 'B2', name: 'حذاء رياضي أولاد', nameF: 'Baskets garçon', price: 5200, cat: 'أطفال', emoji: '👟', gender: 'boys', subcat: 'ملابس أطفال ورضع' },
+        { id: 'B3', name: 'حقيبة مدرسية أولاد', nameF: 'Cartable garçon', price: 4800, cat: 'أطفال', emoji: '🎒', gender: 'boys', subcat: 'ملابس أطفال ورضع' },
+        { id: 'B4', name: 'كاب أولاد صيفي', nameF: 'Casquette garçon', price: 1900, cat: 'أطفال', emoji: '🧢', gender: 'boys', subcat: 'ملابس أطفال ورضع' },
+        { id: 'G1', name: 'فستان يومي بنات', nameF: 'Robe fille', price: 7800, cat: 'أطفال', emoji: '👧', gender: 'girls', subcat: 'ملابس أطفال ورضع' },
+        { id: 'G2', name: 'حذاء أنيق بنات', nameF: 'Chaussures fille', price: 4600, cat: 'أطفال', emoji: '👟', gender: 'girls', subcat: 'ملابس أطفال ورضع' },
+        { id: 'G3', name: 'طقم فيونكات بنات', nameF: 'Accessoires fille', price: 2400, cat: 'أطفال', emoji: '🎀', gender: 'girls', subcat: 'ملابس أطفال ورضع' },
+        { id: 'G4', name: 'قبعة صيفية بنات', nameF: 'Chapeau fille', price: 2100, cat: 'أطفال', emoji: '👒', gender: 'girls', subcat: 'ملابس أطفال ورضع' }
+      ]
+    }
+  ];
+}
+function _styReadStoreAccounts(){
+  var map = {};
+  try {
+    var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+    (accs || []).forEach(function(a){
+      if(!a || !a.id) return;
+      var typ = String(a.type || '').toLowerCase();
+      if(typ && typ !== 'store' && typ !== 'shop' && typ !== 'boutique') return;
+      map[String(a.id)] = a;
+    });
+  } catch(eA){}
+  return map;
+}
+function _styCollectStoreStyleItems(){
+  var seen = {};
+  var out = [];
+  var accounts = _styReadStoreAccounts();
+  var storeIdsTouched = {};
+
+  function pushProduct(p, store){
+    var item = _styNormalizeStoreProduct(p, store);
+    if(!item || !_styIsStyleCat(item)) return;
+    if(seen[item.id]) return;
+    seen[item.id] = 1;
+    out.push(item);
+  }
+
+  /* 1) منتجات المحلات الحقيقية من localStorage */
+  try {
+    for(var i = 0; i < localStorage.length; i++){
+      var key = localStorage.key(i);
+      if(!key || key.indexOf('store_products_') !== 0) continue;
+      var sid = key.slice('store_products_'.length);
+      if(!sid) continue;
+      var list = [];
+      try { list = JSON.parse(localStorage.getItem(key) || '[]'); } catch(eP){ list = []; }
+      if(!Array.isArray(list) || !list.length) continue;
+      var acc = accounts[sid] || { id: sid, name: sid, type: 'store' };
+      /* اقبل المحل إن كان موضة بالنشاط أو إن منتجاته أزياء */
+      var fashionAcc = _styIsFashionStoreAcc(acc);
+      var styleProds = list.filter(function(p){
+        return p && _styIsStyleCat({ title: p.name, cat: p.cat, catKey: p.cat, tags: [p.cat] });
+      });
+      if(!fashionAcc && !styleProds.length) continue;
+      storeIdsTouched[sid] = 1;
+      (fashionAcc ? list : styleProds).forEach(function(p){ pushProduct(p, acc); });
+    }
+  } catch(eScan){}
+
+  /* 2) حسابات موضة بلا مفتاح منتجات بعد — لا شيء تُضاف */
+  Object.keys(accounts).forEach(function(sid){
+    if(storeIdsTouched[sid]) return;
+    if(!_styIsFashionStoreAcc(accounts[sid])) return;
+    /* يبقى فارغاً حتى يرفع التاجر منتجات */
+  });
+
+  /* 3) إن لم تكفِ المنتجات — كتالوجات محلات أزياء تجريبية */
+  if(out.length < 9){
+    _styDemoFashionStores().forEach(function(demo){
+      if(storeIdsTouched[demo.id]) return;
+      (demo.products || []).forEach(function(p){ pushProduct(p, demo); });
+    });
+  }
+  return out;
+}
+/**
+ * مصدر الإطلالات = منتجات محلات الموضة (لا إعلانات فردية).
+ * الإعلان قطعة واحدة؛ المحل يوفّر تشكيلة رجال/نساء/أطفال لإطلالة متكاملة.
+ */
 function _styPool(){
+  return _styCollectStoreStyleItems();
+}
+/** مجمع إعلانات للمنصات الأخرى (نماذج المعارض/العقارات) — منفصل عن إطلالات المحلات */
+function _styAdsPool(){
   var seen = {};
   var out = [];
   function add(list){
@@ -7549,13 +7767,21 @@ function _styPickCompanions(primary, pool, gender, n){
   }
   return picks;
 }
-/** مرافقو الإطلالة: منتجات مختلفة النوع (ساعة/حذاء/حقيبة…) لا نسخ من نفس القطعة */
+/** مرافقو الإطلالة: منتجات مختلفة النوع (ساعة/حذاء/حقيبة…) — يُفضَّل نفس المحل */
 function _styPickLookCompanions(primary, pool, gender, n){
   n = n || 2;
   /* المرافقون من نفس الجنس فقط — لا looseGender الذي كان يخلط الأقسام */
   var stylePool = (pool || []).filter(function(a){
     return _styIsStyleCat(a) && (!gender || _styMatchGender(a, gender));
   });
+  var sameStoreId = primary && primary.storeId ? String(primary.storeId) : '';
+  if(sameStoreId){
+    var sameStore = stylePool.filter(function(a){ return String(a.storeId || '') === sameStoreId; });
+    if(sameStore.length >= n) stylePool = sameStore.concat(stylePool.filter(function(a){
+      return String(a.storeId || '') !== sameStoreId;
+    }));
+    else if(sameStore.length) stylePool = sameStore.concat(stylePool);
+  }
   var primaryKind = typeof _styAdKind === 'function' ? _styAdKind(primary) : '';
   var used = {};
   if(primary && primary.id != null) used[String(primary.id)] = 1;
@@ -7614,12 +7840,22 @@ function rizqOpenStyleItem(ev, adId){
   if(adId == null || adId === '') return false;
   var ad = _styFindAdById(adId);
   if(!ad){
-    if(String(adId).indexOf('store-') !== 0){
-      window.location.href = 'rizq_browse.html?id=' + encodeURIComponent(adId);
+    /* معرّف محل: store:storeId:productId */
+    var m = String(adId).match(/^store:([^:]+):/);
+    if(m){
+      window.location.href = 'rizq_store.html?id=' + encodeURIComponent(m[1]);
+      return false;
     }
     return false;
   }
-  if(ad.href && (ad.fromView || String(ad.id).indexOf('store-') === 0)){
+  /* منتجات المحلات → صفحة المحل */
+  if(ad.fromStore || ad.source === 'store' || String(ad.id).indexOf('store:') === 0){
+    var storeHref = ad.href || (ad.storeId ? ('rizq_store.html?id=' + encodeURIComponent(ad.storeId)) : '');
+    var safeStore = _rizqSafeNavHref(storeHref);
+    if(safeStore) window.location.href = safeStore;
+    return false;
+  }
+  if(ad.href && ad.fromView){
     var safeHref = _rizqSafeNavHref(ad.href);
     if(safeHref) window.location.href = safeHref;
     return false;
@@ -7725,9 +7961,13 @@ function _styBrandChipForLook(items, fr, catKey){
 /** وصف قصير واضح للبطاقة — بدون قصّ منتصف الكلمات */
 function _styClearMeta(items, fr){
   items = Array.isArray(items) ? items.filter(Boolean) : [];
-  if(!items.length) return fr ? 'Sélection Rizq' : 'اختيار رزق';
-  var prices = [];
+  if(!items.length) return fr ? 'Sélection boutiques' : 'من المحلات';
+  var storeName = '';
   var i, d, p;
+  for(i = 0; i < items.length; i++){
+    if(items[i].storeName){ storeName = String(items[i].storeName); break; }
+  }
+  var prices = [];
   for(i = 0; i < items.length; i++){
     d = (typeof trAd === 'function') ? trAd(items[i]) : items[i];
     p = d && (d.price || items[i].price);
@@ -7735,15 +7975,13 @@ function _styClearMeta(items, fr){
   }
   var n = items.length;
   var countLbl = fr
-    ? (n + ' offre' + (n > 1 ? 's' : ''))
-    : (n + ' عروض');
-  if(prices.length){
-    return countLbl + (fr ? ' · dès ' : ' · تبدأ من ') + prices[0];
-  }
-  d = (typeof trAd === 'function') ? trAd(items[0]) : items[0];
-  var title = String((d && (d.title || items[0].title)) || '').trim();
-  if(title.length > 48) title = title.slice(0, 45).trim() + '…';
-  return title || countLbl;
+    ? (n + ' article' + (n > 1 ? 's' : ''))
+    : (n + ' منتجات');
+  var parts = [];
+  if(storeName) parts.push(storeName);
+  parts.push(countLbl);
+  if(prices.length) parts.push((fr ? 'dès ' : 'من ') + prices[0]);
+  return parts.join(' · ');
 }
 function _styBuildCardHtml(opts){
   opts = opts || {};
@@ -7868,6 +8106,11 @@ function rizqFeedStyleSeed(item){
   if(!title) return;
   /* لا بذور من سيارات/شاحنات/إلكترونيات — أزياء وملابس وإكسسوارات فقط */
   if(!_styIsStyleCat(item)) return;
+  /* الإطلالات من المحلات — تجاهل بذور الإعلانات الفردية */
+  var isStore = !!(item.fromStore || item.source === 'store' || item.storeId
+    || String(item.id || '').indexOf('store:') === 0
+    || /rizq_store\.html/i.test(String(item.href || '')));
+  if(!isStore) return;
   var gender = (typeof _styDetectGender === 'function')
     ? _styDetectGender(Object.assign({}, item, { title: title }))
     : 'neutral';
@@ -7878,8 +8121,13 @@ function rizqFeedStyleSeed(item){
   var images = [];
   if(Array.isArray(item.images)) images = item.images.filter(Boolean).slice(0, 6);
   else if(item.image) images = [item.image];
+  var storeId = String(item.storeId || '');
+  if(!storeId){
+    var idm = String(item.id || '').match(/^store:([^:]+):/);
+    if(idm) storeId = idm[1];
+  }
   var seed = {
-    id: String(item.id != null ? item.id : ('seed-' + Date.now())),
+    id: String(item.id != null ? item.id : ('store:' + (storeId || 'store') + ':seed-' + Date.now())),
     title: title,
     titleFR: String(item.titleFR || item.nameF || title),
     emoji: item.emoji || '✨',
@@ -7888,9 +8136,13 @@ function rizqFeedStyleSeed(item){
     subcat: item.subcat || '',
     images: images,
     gender: gender,
-    href: item.href || (item.id != null ? ('rizq_browse.html?id=' + encodeURIComponent(item.id)) : 'rizq_browse.html'),
+    storeId: storeId,
+    storeName: item.storeName || '',
+    href: item.href || (storeId ? ('rizq_store.html?id=' + encodeURIComponent(storeId)) : 'rizq_directory.html?type=store'),
     bg: item.bg || 'linear-gradient(145deg,#e8eef8,#f5f8fc)',
     fromView: true,
+    fromStore: true,
+    source: 'store',
     ts: Date.now()
   };
   var list = _styLoadSeeds().filter(function(s){ return String(s.id) !== String(seed.id); });
@@ -8034,7 +8286,9 @@ function buildStyleIdeas(reshuffle){
   var gendered = pool.filter(function(a){ return _styMatchGender(a, gender); });
   var seeds = _styLoadSeeds().filter(function(s){
     if(!_styIsStyleCat(s)) return false;
-    return _styMatchGender(s, gender);
+    if(!_styMatchGender(s, gender)) return false;
+    /* بذور من المحلات فقط — لا إعلانات فردية */
+    return !!(s.fromStore || s.source === 'store' || s.storeId || String(s.id || '').indexOf('store:') === 0);
   });
   /* سلسلة كاملة مثل النماذج — كل القوالب في شريط أفقي */
   var tplList = _styShuffle(templates);
@@ -8074,7 +8328,9 @@ function buildStyleIdeas(reshuffle){
         seedTiles += _styTileHtml(seedItems[si], (templates[0] && templates[0].emoji && templates[0].emoji[si]) || seedItems[si].emoji, seedItems[si].bg);
       }
       var genderBadge0 = _styGenderBadge(gender, fr);
-      var seedHref = seed.href || ('rizq_browse.html?id=' + encodeURIComponent(seed.id));
+      var seedHref = seed.href
+        || (seed.storeId ? ('rizq_store.html?id=' + encodeURIComponent(seed.storeId)) : '')
+        || 'rizq_directory.html?type=store';
       cards.push(_styBuildCardHtml({
         gender: gender,
         seed: true,
@@ -8083,7 +8339,7 @@ function buildStyleIdeas(reshuffle){
         brandHtml: _styBrandChipForLook(seedItems, fr, 'أزياء'),
         badge: genderBadge0,
         name: seedName,
-        meta: fr ? 'Inspiré par votre consultation' : 'مستوحى من مشاهدتك',
+        meta: fr ? 'Inspiré par une boutique visitée' : 'مستوحى من محل زرته',
         cta: cta,
         href: seedHref,
         primaryId: seed.id
@@ -8123,14 +8379,15 @@ function buildStyleIdeas(reshuffle){
     if(items.length < 3) return; /* لا بطاقة ناقصة ولا خلط أجناس */
     var name = fr ? tpl.fr : tpl.ar;
     var href;
-    if(primary && primary.id){
-      href = 'rizq_browse.html?id=' + encodeURIComponent(primary.id);
-    } else if(tpl.browseSub){
-      href = 'rizq_browse.html?cat=' + encodeURIComponent('أزياء') + '&sub=' + encodeURIComponent(tpl.browseSub);
-    } else if((tpl.cats||[])[0]){
-      href = 'rizq_browse.html?cat=' + encodeURIComponent(tpl.cats[0]);
+    if(primary && primary.href){
+      href = primary.href;
+    } else if(primary && primary.storeId){
+      href = 'rizq_store.html?id=' + encodeURIComponent(primary.storeId);
+    } else if(primary && primary.id && String(primary.id).indexOf('store:') === 0){
+      var sm = String(primary.id).match(/^store:([^:]+):/);
+      href = sm ? ('rizq_store.html?id=' + encodeURIComponent(sm[1])) : 'rizq_directory.html?type=store';
     } else {
-      href = 'rizq_browse.html';
+      href = 'rizq_directory.html?type=store';
     }
     var genderBadge = _styGenderBadge(gender, fr);
     var tiles = '';
@@ -8187,7 +8444,8 @@ function buildStyleIdeas(reshuffle){
     var dEx = (typeof trAd === 'function') ? trAd(adEx) : adEx;
     var nameEx = String((dEx && (dEx.title || adEx.title)) || (fr ? 'Look Rizq' : 'إطلالة رزق'));
     if(nameEx.length > 52) nameEx = nameEx.slice(0, 49).trim() + '…';
-    var hrefEx = 'rizq_browse.html?id=' + encodeURIComponent(adEx.id);
+    var hrefEx = adEx.href
+      || (adEx.storeId ? ('rizq_store.html?id=' + encodeURIComponent(adEx.storeId)) : 'rizq_directory.html?type=store');
     cards.push(_styBuildCardHtml({
       gender: gender,
       tilesHtml: tilesEx,
@@ -8205,8 +8463,10 @@ function buildStyleIdeas(reshuffle){
     rail.classList.add('is-empty');
     var emptyGender = _styGenderBadge(gender, fr);
     rail.innerHTML = '<div class="rizq-styles-empty">'+(fr
-      ? ('Pas encore assez d\'annonces « '+emptyGender+' » pour suggérer des looks. Parcourez la mode ou revenez bientôt.')
-      : ('لا توجد إعلانات كافية لقسم « '+emptyGender+' » لاقتراح إطلالات. تصفّح الأزياء أو عد لاحقاً.'))+'</div>';
+      ? ('Pas encore assez de produits « '+emptyGender+' » dans les boutiques mode. Parcourez les magasins ou revenez bientôt.')
+      : ('لا توجد منتجات كافية لقسم « '+emptyGender+' » في محلات الموضة. تصفّح المحلات أو عد لاحقاً.'))
+      + '<div style="margin-top:12px"><a class="rizq-style-cta" href="rizq_directory.html?type=store">'
+      + (fr ? 'Voir les boutiques' : 'عرض المحلات') + '</a></div></div>';
     return;
   }
   rail.classList.remove('is-empty');
@@ -8441,7 +8701,7 @@ function buildShowroomModels(reshuffle){
   var meta = _srmCatMeta(cat);
   var templates = _srmTemplatesFor(cat);
   /* دائماً أدرج FEATURED showcase حتى بعد hydrateLiveAds الذي يفرّغ ADS */
-  var pool = (typeof _styPool === 'function' ? _styPool() : []).filter(function(a){ return _srmIsModelCat(a, cat); });
+  var pool = (typeof _styAdsPool === 'function' ? _styAdsPool() : (typeof _styPool === 'function' ? _styPool() : [])).filter(function(a){ return _srmIsModelCat(a, cat); });
   var tplList = (typeof _styShuffle === 'function' ? _styShuffle(templates) : templates.slice());
   var usedPrimary = {};
   var cards = [];
@@ -10177,8 +10437,9 @@ const LANG = {
     'ft-sig': '<span>بتوقيع</span><span style="color:var(--gold)">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong>',
     's-cats-tag': 'كل الأقسام',
     's-price-tag': 'خطط الأسعار',
+    'sty-tag': 'أفكار الأنماط',
     'sty-title': 'إطلالات تليق بك على <span>رزق</span>',
-    'sty-desc': 'موضة وإكسسوارات مختارة تلهم إطلالتك القادمة من قلب السوق.',
+    'sty-desc': 'موضة وإكسسوارات من محلات الملابس على المنصة — رجال، نساء، أولاد وبنات.',
     'sty-reshuffle': '🔀 إطلالات جديدة',
     'sty-men': 'رجال',
     'sty-women': 'نساء',
@@ -10341,8 +10602,9 @@ const LANG = {
     'ft-sig': '<span>Signé par</span><span style="color:var(--gold)">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong>',
     's-cats-tag': 'Toutes les catégories',
     's-price-tag': 'Offres tarifaires',
+    'sty-tag': 'Idées de style',
     'sty-title': 'Des looks dignes de vous sur <span>Rizq</span>',
-    'sty-desc': 'Mode et accessoires sélectionnés pour inspirer votre prochain look depuis le cœur du marché.',
+    'sty-desc': 'Mode et accessoires issus des boutiques vêtements sur Rizq — hommes, femmes, garçons et filles.',
     'sty-reshuffle': '🔀 Nouveaux looks',
     'sty-men': 'Hommes',
     'sty-women': 'Femmes',
