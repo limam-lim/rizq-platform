@@ -54,6 +54,13 @@
     production: !isLocal,
     demoDashboardAllowed: !!isLocal,
   });
+  /* يُحدَّث من /api/site-config.launch بعد التحميل */
+  window.RIZQ_LAUNCH = window.RIZQ_LAUNCH || {
+    freeUntil: null,
+    freePeriodActive: false,
+    openSections: null,
+    foundingDiscountPercent: 40,
+  };
   if (!isLocal) window.__RIZQ_ALLOW_DEMO_DASH = false;
 
   /* كاش طلبات عامة مشتركة — يمنع تكرار /api/site-config و /api/accounts/public عند فتح المحل/المكتب */
@@ -76,6 +83,13 @@
     var init = opts.cache === 'no-store' ? { cache: 'no-store' } : undefined;
     _siteConfigPromise = fetch(base + '/api/site-config', init)
       .then(function (r) { return r && r.ok ? r.json() : null; })
+      .then(function (data) {
+        try {
+          var launch = data && data.config && data.config.launch;
+          if (launch) window.RIZQ_LAUNCH = Object.assign({}, window.RIZQ_LAUNCH || {}, launch);
+        } catch (eLaunch) {}
+        return data;
+      })
       .catch(function () { return null; });
     return _siteConfigPromise;
   };

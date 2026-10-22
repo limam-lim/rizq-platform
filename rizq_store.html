@@ -1379,6 +1379,7 @@ footer{
             <span class="badge" id="badge-verified-lbl" data-t="badge-verified" style="display:none;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.25);color:#16a34a">✅ محل موثّق</span>
             <span class="badge rizq-feat-badge" id="premium-badge-lbl" data-t="badge-premium" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#16263d;border:none;font-weight:900;box-shadow:0 4px 14px rgba(201,168,76,.4)">🏅 محل مميّز</span>
             <span class="badge" id="verified-plus-badge-lbl" style="display:none;background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border:1px solid rgba(201,168,76,.5);gap:5px;align-items:center"><svg viewBox="0 0 40 40" width="13" height="13" style="display:inline-block;vertical-align:-2px" aria-hidden="true"><text x="15" y="17" text-anchor="middle" font-family="Georgia,serif" font-size="15" font-weight="900" fill="#C9A84C">R</text><text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">ر</text></svg> موثّق⁺</span>
+            <span class="badge" id="founding-partner-badge-lbl" style="display:none;background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0D1B2A;border:1px solid rgba(13,27,42,.15);font-weight:800">👑 شريك مؤسس</span>
           </div>
         </div>
       </div>
@@ -2149,6 +2150,12 @@ function rizqShare(title, url) {
     }
 
     // ── شارتا "موثّق"/"مميّز" الحقيقيتان — بعد تحميل السكربتات المؤجّلة ──
+    function applyFoundingPartnerBadge(acc){
+      var el = document.getElementById('founding-partner-badge-lbl');
+      if(!el) return;
+      var on = !!(acc && acc.foundingPartner);
+      el.style.display = on ? 'inline-flex' : 'none';
+    }
     function applyRealStoreBadges(){
       var id = resolveStoreAccount();
       var verifiedEl = document.getElementById('badge-verified-lbl');
@@ -3021,6 +3028,7 @@ function rizqShare(title, url) {
                   var pe=document.getElementById('premium-badge-lbl'); if(pe) pe.style.display=b.premium?'':'none';
                   var vpe=document.getElementById('verified-plus-badge-lbl'); if(vpe) vpe.style.display=b.verifiedPlus?'inline-flex':'none';
                 }
+                if(typeof applyFoundingPartnerBadge==='function') applyFoundingPartnerBadge(acc);
                 window._rizqStoreAccountId = id;
                 if(acc.serviceDesk) window._rizqStoreServiceDesk = acc.serviceDesk;
                 if(Array.isArray(acc.paymentMethods)) window._rizqStorePaymentMethods = acc.paymentMethods;

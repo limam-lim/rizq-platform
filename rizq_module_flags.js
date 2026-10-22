@@ -29,7 +29,7 @@
   ];
 
   function defaultFlags() {
-    return { individual: true, store: true, office: true, corp: true, tenders: true, investments: true, videoAds: true };
+    return { individual: true, store: true, office: true, corp: true, estate: true, tenders: true, investments: true, videoAds: true };
   }
 
   function lang() {
@@ -97,16 +97,20 @@
   function refreshComingSoonModalLang() {
     var desc = document.getElementById('cs-modal-desc');
     var input = document.getElementById('cs-modal-input');
+    var nameEl = document.getElementById('cs-modal-name');
+    var actEl = document.getElementById('cs-modal-activity');
     var submit = document.getElementById('cs-modal-submit');
     var cancel = document.getElementById('cs-modal-cancel');
     if (desc) {
       desc.textContent = t(
-        'هذا القسم قيد الإطلاق — أدخل رقم هاتفك أو بريدك لنعلمك فور التفعيل.',
-        'Cette section arrive bientôt — laissez votre contact pour être prévenu.'
+        'هذا القسم قيد الإطلاق — سجّل اسمك وهاتفك ونوع نشاطك لنعلمك فور التفعيل.',
+        'Cette section arrive bientôt — indiquez nom, téléphone et activité pour être prévenu.'
       );
     }
-    if (input) input.placeholder = t('+222 ... أو example@email.com', '+222 ... ou example@email.com');
-    if (submit) submit.textContent = '✅ ' + t('أعلمني', 'Prévenez-moi');
+    if (nameEl) nameEl.placeholder = t('الاسم', 'Nom');
+    if (input) input.placeholder = t('الهاتف (+222 ...)', 'Téléphone (+222 ...)');
+    if (actEl) actEl.placeholder = t('نوع النشاط', 'Type d\'activité');
+    if (submit) submit.textContent = '✅ ' + t('سجّل اهتمامك', 'Enregistrer mon intérêt');
     if (cancel) cancel.textContent = t('إغلاق', 'Fermer');
   }
 
@@ -121,7 +125,9 @@
     modal.innerHTML = '<div class="cs-modal-box">'
       + '<div class="cs-modal-title" id="cs-modal-title"></div>'
       + '<div class="cs-modal-desc" id="cs-modal-desc"></div>'
-      + '<input type="text" id="cs-modal-input" class="cs-modal-input">'
+      + '<input type="text" id="cs-modal-name" class="cs-modal-input" autocomplete="name">'
+      + '<input type="tel" id="cs-modal-input" class="cs-modal-input" autocomplete="tel">'
+      + '<input type="text" id="cs-modal-activity" class="cs-modal-input">'
       + '<button type="button" class="cs-modal-submit" id="cs-modal-submit"></button>'
       + '<button type="button" class="cs-modal-cancel" id="cs-modal-cancel"></button>'
       + '</div>';
@@ -160,9 +166,17 @@
 
   function submitComingSoonInterest() {
     var input = document.getElementById('cs-modal-input');
+    var nameEl = document.getElementById('cs-modal-name');
+    var actEl = document.getElementById('cs-modal-activity');
     var contact = input ? input.value.trim() : '';
+    var name = nameEl ? nameEl.value.trim() : '';
+    var activityType = actEl ? actEl.value.trim() : '';
     if (!contact || contact.length < 6) {
-      alert(t('الرجاء إدخال رقم هاتف أو بريد إلكتروني صالح', 'Veuillez saisir un téléphone ou e-mail valide'));
+      alert(t('الرجاء إدخال رقم هاتف صالح', 'Veuillez saisir un téléphone valide'));
+      return;
+    }
+    if (!name) {
+      alert(t('الرجاء إدخال الاسم', 'Veuillez saisir le nom'));
       return;
     }
     if (!global.RIZQ_BACKEND_BASE) {
@@ -173,7 +187,13 @@
     fetch(global.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/section-interest', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ section: _csSelectedSection, contact: contact })
+      body: JSON.stringify({
+        section: _csSelectedSection,
+        contact: contact,
+        phone: contact,
+        name: name,
+        activityType: activityType
+      })
     }).then(function (res) { return res.ok ? res.json() : null; })
       .then(function (data) {
         closeComingSoonModal();
@@ -261,42 +281,57 @@
     return flags[key] === false;
   }
 
-  function applyHeroAndSectionHides(flags) {
+  function applyComingSoonBadges(flags) {
     tagModuleLinks();
-    Object.keys(HREF_MODULE).forEach(function (file) {
-      var key = HREF_MODULE[file];
-      if (!isModuleClosed(flags, key)) return;
-      document.querySelectorAll('[data-rizq-module="' + key + '"], a[href="' + file + '"]').forEach(function (el) {
-        var link = el.tagName === 'A' ? el : el.querySelector('a[href]');
-        var target = el.classList && el.classList.contains('hero-biz-btn') ? el : (link || el);
-        if (target.classList && target.classList.contains('hero-biz-btn')) {
-          target.style.display = 'none';
+    document.querySelectorAll('.hero-biz-btn[data-rizq-module]').forEach(function (btn) {
+      var key = btn.getAttribute('data-rizq-module');
+      var closed = isModuleClosed(flags, key);
+      var badge = btn.querySelector('.hero-biz-badge[data-rizq-soon="1"]');
+      if (closed) {
+        btn.style.display = '';
+        btn.classList.add('rizq-module-soon');
+        if (!badge) {
+          badge = document.createElement('span');
+          badge.className = 'hero-biz-badge';
+          badge.setAttribute('data-rizq-soon', '1');
+          badge.setAttribute('data-t', 'hbiz-soon-badge');
+          btn.insertBefore(badge, btn.firstChild);
         }
-      });
+        badge.textContent = t('قريباً', 'Bientôt');
+        badge.style.display = '';
+      } else {
+        btn.classList.remove('rizq-module-soon');
+        if (badge) badge.remove();
+      }
     });
-    var SECTION_MAP = { store: 'virtual-stores', office: 'virtual-offices', corp: 'virtual-showrooms', tenders: 'virtual-tenders', investments: 'virtual-investments' };
-    Object.keys(SECTION_MAP).forEach(function (key) {
-      if (flags[key] !== false) return;
-      var sec = document.getElementById(SECTION_MAP[key]);
-      if (sec) sec.style.display = 'none';
+    /* استبدال أزرار الاشتراك/التسجيل في الأقسام المغلقة بـ «سجّل اهتمامك» */
+    document.querySelectorAll('[data-rizq-subscribe],[data-rizq-register-section]').forEach(function (el) {
+      var key = el.getAttribute('data-rizq-subscribe') || el.getAttribute('data-rizq-register-section');
+      if (!key || !isModuleClosed(flags, key)) return;
+      if (el.getAttribute('data-rizq-interest-bound') === '1') return;
+      el.setAttribute('data-rizq-interest-bound', '1');
+      el.setAttribute('data-rizq-interest-section', key);
+      var lbl = el.querySelector('.rizq-hdr-lbl, span, strong') || el;
+      try {
+        if (el.tagName === 'A' || el.tagName === 'BUTTON') {
+          el.addEventListener('click', function (ev) {
+            if (!isModuleClosed(_lastFlags || flags, key)) return;
+            ev.preventDefault();
+            ev.stopPropagation();
+            openComingSoonModal(key, sectionLabel(key));
+          }, true);
+        }
+      } catch (eBind) {}
+      if (el.tagName === 'A' || el.tagName === 'BUTTON') {
+        el.textContent = t('سجّل اهتمامك', 'Enregistrez votre intérêt');
+      }
     });
-    if (flags.store === false && flags.office === false && flags.corp === false) {
-      document.querySelectorAll('.hero-biz-nav').forEach(function (el) { el.style.display = 'none'; });
-    }
-    if (flags.individual === false) {
-      var tp = document.getElementById('type-private');
-      if (tp) tp.style.display = 'none';
-    }
-    ['store', 'office', 'corp'].forEach(function (k) {
-      if (flags[k] !== false) return;
-      var id = k === 'store' ? 'biz-store' : k === 'office' ? 'biz-office' : 'biz-corp';
-      var el = document.getElementById(id);
-      if (el) el.style.display = 'none';
-    });
-    if (flags.store === false && flags.office === false && flags.corp === false) {
-      var tc = document.getElementById('type-company');
-      if (tc) tc.style.display = 'none';
-    }
+  }
+
+  function applyHeroAndSectionHides(flags) {
+    /* الأقسام المغلقة تبقى ظاهرة بنفس التصميم — شارة «قريباً» فقط */
+    applyComingSoonBadges(flags);
+    /* نماذج demo=?1 تبقى تعمل كما هي — لا نحجب الصفحات */
   }
 
   function guardCurrentPage() {
@@ -314,20 +349,37 @@
     if (global.RizqDynamicNav && typeof global.RizqDynamicNav.apply === 'function') {
       global.RizqDynamicNav.apply(flags);
     } else {
-      var NAV_HREF = { store: 'rizq_store.html', office: 'rizq_office.html', corp: 'rizq_showroom.html', tenders: 'rizq_tenders.html', investments: 'rizq_investments.html' };
-      Object.keys(NAV_HREF).forEach(function (key) {
-        if (key === 'store') return;
-        if (flags[key] !== false) return;
-        document.querySelectorAll('a[href="' + NAV_HREF[key] + '"]').forEach(function (a) {
-          var li = a.closest('li');
-          if (li) li.style.display = 'none'; else a.style.display = 'none';
-        });
-      });
+      /* لا نخفي روابط الأقسام المغلقة — تبقى ظاهرة مع شارة قريباً */
     }
     applyHeroAndSectionHides(flags);
     renderComingSoonStrip(flags);
     guardCurrentPage(flags);
     bindModuleGuard(flags);
+  }
+
+  function renderLaunchFreeBanner(launch) {
+    var id = 'rizq-launch-free-banner';
+    var existing = document.getElementById(id);
+    var active = launch && launch.freePeriodActive && launch.freeUntil;
+    if (!active) {
+      if (existing) existing.remove();
+      return;
+    }
+    var until = String(launch.freeUntil);
+    var msg = t(
+      'مجاناً بالكامل حتى ' + until + ' — سجّل الآن واحصل على شارة شريك مؤسس وخصم دائم',
+      'Entièrement gratuit jusqu\'au ' + until + ' — inscrivez-vous et obtenez le badge Partenaire fondateur + remise durable'
+    );
+    if (!existing) {
+      existing = document.createElement('div');
+      existing.id = id;
+      existing.setAttribute('role', 'status');
+      existing.style.cssText = 'position:relative;z-index:40;width:100%;box-sizing:border-box;padding:8px 14px;text-align:center;font-size:13px;font-weight:800;line-height:1.45;color:#0D1B2A;background:linear-gradient(90deg,#E8C96A,#C9A84C,#E8C96A);border-bottom:1px solid rgba(13,27,42,.12);';
+      var host = document.body;
+      if (host.firstChild) host.insertBefore(existing, host.firstChild);
+      else host.appendChild(existing);
+    }
+    existing.textContent = msg;
   }
 
   function fetchAndApply() {
@@ -338,8 +390,10 @@
     fetch(global.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/site-config')
       .then(function (res) { return res.ok ? res.json() : null; })
       .then(function (data) {
-        var flags = (data && data.ok && data.config && data.config.moduleFlags) || defaultFlags();
+        var cfg = data && data.ok && data.config ? data.config : null;
+        var flags = (cfg && cfg.moduleFlags) || defaultFlags();
         apply(flags);
+        renderLaunchFreeBanner(cfg && cfg.launch);
       })
       .catch(function () {
         apply(defaultFlags());

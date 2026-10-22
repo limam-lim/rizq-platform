@@ -561,6 +561,16 @@
           ? Number(priceOverride)
           : (pdef && pdef.price != null && pdef.price !== '' ? Number(pdef.price) : null);
         var accInfo = accounts[accId] || {};
+        /* خصم الشريك المؤسس بعد انتهاء الفترة المجانية */
+        try {
+          if (finalPrice != null && Number(finalPrice) > 0 && accInfo.foundingPartner) {
+            var pct = Number(accInfo.foundingDiscountPercent);
+            if (!Number.isFinite(pct) || pct < 0) pct = 40;
+            if (pct > 0 && pct <= 90) {
+              finalPrice = Math.round(Number(finalPrice) * (100 - pct) / 100);
+            }
+          }
+        } catch (eFounding) {}
         global.RizqInvoice.generateInvoice({
           accountId   : accId,
           accountName : accInfo.name || accId,
@@ -1223,6 +1233,23 @@
     }catch(e){ return Promise.resolve(null); }
   }
 
+  function fetchContactStats(accId) {
+    try{
+      var cfg = getAgentConfig();
+      var accounts = getAccounts();
+      var token = accounts[accId] && accounts[accId].server_token;
+      if(!cfg.backendUrl || !token) return Promise.resolve(null);
+      return fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/contact-click/stats', {
+        headers: {
+          'x-account-id': accId,
+          'x-account-token': token
+        }
+      }).then(function(res){ return res.ok ? res.json() : null; }).then(function(data){
+        return (data && data.ok && data.stats) ? data.stats : null;
+      }).catch(function(){ return null; });
+    }catch(e){ return Promise.resolve(null); }
+  }
+
   // ═══════════════════════════════════════════════════════════════════
   // فحوص احتيال إحصائية على وصل الدفع — بدون أي خادم أو مفتاح API
   // لا تثبت "تزويراً" بشكل قاطع؛ فقط ترفع علامات للمراجعة البشرية النهائية
@@ -1511,6 +1538,7 @@
     getPackageCount      : getPackageCount,
     fetchInvoices        : fetchInvoices,
     fetchVisitStats      : fetchVisitStats,
+    fetchContactStats    : fetchContactStats,
     // ── الوصل: فحص احتيال إحصائي + إرسال موحّد ──
     analyzeReceipt       : analyzeReceipt,
     submitSubscriptionRequest: submitSubscriptionRequest,
