@@ -5,8 +5,8 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '31.3';
-  var MOCK_HDR_V = '5.40';
+  var ASSET_V = '31.8';
+  var MOCK_HDR_V = '5.48';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -94,6 +94,13 @@
     } catch (eBoot) {}
     if (!/dashboard|admin\.html|chat_widget/i.test(location.pathname || '')) {
       document.documentElement.classList.add('rizq-app-nav');
+      /* طبّق إخفاء الشريط القديم فوراً قبل paint إن تأخّر CSS */
+      if (!document.getElementById('rizq-legacy-nav-kill')) {
+        var kill = document.createElement('style');
+        kill.id = 'rizq-legacy-nav-kill';
+        kill.textContent = 'html.rizq-app-nav #nav,html.rizq-app-nav #rizq-desk-nav,html.rizq-app-nav #rizq-thumb-dock,html.rizq-app-nav .rizq-thumb-dock,html.rizq-app-nav #section-jump-bar,html.rizq-app-nav #mobile-bottom-nav,html.rizq-app-nav .mobile-bottom-nav,html.rizq-app-nav #rizq-search-theater,html.rizq-app-nav #rizq-search-pill,html.rizq-app-nav .nav-sticky-tools{display:none!important;visibility:hidden!important;pointer-events:none!important;height:0!important;overflow:hidden!important;opacity:0!important}';
+        (document.head || document.documentElement).appendChild(kill);
+      }
     }
     if (!document.querySelector('link[href*="fonts.googleapis.com"][href*="Cairo"]')) {
       var fontLink = document.createElement('link');
@@ -218,6 +225,16 @@
       document.head.appendChild(theme);
     }
     theme.content = '#0d1b2a';
+    /* edge-to-edge Android: expose safe-area insets so bottom dock covers system nav */
+    try {
+      var vp = document.querySelector('meta[name="viewport"]');
+      if (vp) {
+        var c = vp.getAttribute('content') || '';
+        if (!/viewport-fit\s*=\s*cover/i.test(c)) {
+          vp.setAttribute('content', c.replace(/\s*$/, '') + (c ? ', ' : '') + 'viewport-fit=cover');
+        }
+      }
+    } catch (eVp) {}
   } catch (e) { /* keep page usable */ }
 
   function isPhoneViewport() {

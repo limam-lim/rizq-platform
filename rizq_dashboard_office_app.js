@@ -136,7 +136,7 @@ function showPanel(id,el){
   if(t)t.textContent=(typeof _officeLang!=='undefined'&&_officeLang==='fr'?TITLES_FR[id]:TITLES[id])||'';
   if(id==='overview')renderOverview();
   if(id==='requests'){ _rizqMergeRequestsFromBackend(); _rizqMergeServiceRequests(); loadOfficeServiceDeskForm(); renderRequests(); }
-  if(id==='services')renderServices();
+  if(id==='services'){ renderServices(); try{ mountOfficeListingContext(); }catch(eSvcCtx){} }
   if(id==='hours')renderHours();
   if(id==='subscription'){renderSubPanel();renderPackagesDisplay();renderVideoPackagesDisplay();}
   if(id==='agents')renderAgentsOffice();
@@ -936,13 +936,74 @@ function toggleServiceForm(){
   document.getElementById('svc-toggle-btn').textContent=_tm?(_svcOpen?_tm.t('svc-collapse','dashboard_office'):_tm.t('svc-expand','dashboard_office')):(_svcOpen?'تصغير ↑':'إضافة خدمة ↓');
 }
 
+var _svcCoverDraft = null;
+var _svcThumbDraft = null;
+var MAX_SVC_PHOTO_BYTES = 1.5 * 1024 * 1024;
+
+function _readSvcImage(file, maxW, cb){
+  if(!file || !/^image\//.test(file.type||'')){
+    showToast(_t2('اختر ملف صورة صالح (JPG / PNG / WebP)','Choisissez une image valide (JPG / PNG / WebP)'),'error');
+    return;
+  }
+  if(file.size > MAX_SVC_PHOTO_BYTES){
+    showToast(_t2('حجم الصورة كبير (الحد 1.5MB)','Image trop volumineuse (max 1,5 Mo)'),'error');
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(){
+    var img = new Image();
+    img.onload = function(){
+      try{
+        var w = img.width, h = img.height;
+        if(w > maxW){ h = Math.round(h * maxW / w); w = maxW; }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        cb(canvas.toDataURL('image/jpeg', 0.82));
+      }catch(e){ cb(reader.result); }
+    };
+    img.onerror = function(){ cb(reader.result); };
+    img.src = reader.result;
+  };
+  reader.onerror = function(){ showToast(_t2('تعذّر قراءة الصورة','Impossible de lire l\'image'),'error'); };
+  reader.readAsDataURL(file);
+}
+function renderSvcCoverPreview(){
+  var wrap = document.getElementById('svc-cover-preview');
+  if(!wrap) return;
+  if(!_svcCoverDraft){ wrap.innerHTML = ''; return; }
+  wrap.innerHTML = '<img src="'+_svcCoverDraft+'" alt="" style="max-height:110px;width:100%;object-fit:cover;border-radius:10px;border:1px solid rgba(27,58,107,.12)"/>';
+}
+function renderSvcThumbPreview(){
+  var wrap = document.getElementById('svc-thumb-preview');
+  if(!wrap) return;
+  if(!_svcThumbDraft){ wrap.innerHTML = ''; return; }
+  wrap.innerHTML = '<img src="'+_svcThumbDraft+'" alt="" style="max-height:88px;width:88px;object-fit:cover;border-radius:10px;border:1px solid rgba(27,58,107,.12)"/>';
+}
+function handleSvcCoverInput(inp){
+  var file = inp && inp.files && inp.files[0];
+  if(inp) inp.value = '';
+  if(!file) return;
+  _readSvcImage(file, 1200, function(dataUrl){ _svcCoverDraft = dataUrl; renderSvcCoverPreview(); });
+}
+function handleSvcThumbInput(inp){
+  var file = inp && inp.files && inp.files[0];
+  if(inp) inp.value = '';
+  if(!file) return;
+  _readSvcImage(file, 480, function(dataUrl){ _svcThumbDraft = dataUrl; renderSvcThumbPreview(); });
+}
+
 function renderServices(){
   const cnt=document.getElementById('svc-count');if(cnt)cnt.textContent=services.length+' '+_t2('خدمة','service(s)');
   const el=document.getElementById('services-list');if(!el)return;
   if(!services.length){el.innerHTML='<div style="text-align:center;padding:36px;color:var(--text-muted)"><div style="font-size:40px;margin-bottom:10px">📋</div><p>'+_t2('لا توجد خدمات — أضف خدمتك الأولى','Aucun service — ajoutez votre premier service')+'</p></div>';return;}
-  el.innerHTML=services.map((s,i)=>`
+  el.innerHTML=services.map((s,i)=>{
+    var media = (s.thumb || s.cover)
+      ? '<img src="'+(s.thumb||s.cover)+'" alt="" style="width:56px;height:56px;border-radius:10px;object-fit:cover;flex-shrink:0;border:1px solid rgba(27,58,107,.12)"/>'
+      : '<div class="service-icon-box">'+(s.emoji||'📄')+'</div>';
+    return `
     <div class="service-card">
-      <div class="service-icon-box">${s.emoji||'📄'}</div>
+      ${media}
       <div style="flex:1">
         <div class="service-name">${escapeHtml(s.name)}</div>
         <div class="service-price">${Number(s.price||0).toLocaleString()} MRU ${s.duration?`<span style="font-size:11px;color:var(--text-muted);font-weight:400">· ${escapeHtml(s.duration)}</span>`:''}</div>
@@ -952,7 +1013,8 @@ function renderServices(){
         <button class="btn btn-outline btn-sm" onclick="editService(${i})" title="${_t2('تعديل','Modifier')}">✏️</button>
         <button class="btn btn-danger btn-sm" onclick="deleteService(${i})" title="${_t2('حذف','Supprimer')}">🗑️</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
     RizqStatusSummary.render({ items: services, itemType: 'catalog' });
   }
@@ -978,15 +1040,39 @@ function saveService(){
   var name  = document.getElementById('svc-name')  ? document.getElementById('svc-name').value.trim()  : '';
   var price = document.getElementById('svc-price') ? document.getElementById('svc-price').value.trim() : '';
   var desc  = document.getElementById('svc-desc')  ? document.getElementById('svc-desc').value.trim()  : '';
+  var duration = document.getElementById('svc-duration') ? document.getElementById('svc-duration').value.trim() : '';
+  var emoji = document.getElementById('svc-emoji') ? document.getElementById('svc-emoji').value.trim() : '';
   if(!name){showToast(_t2('يرجى إدخال اسم الخدمة','Veuillez saisir le nom du service'),'error');return;}
+  var _listingForm = (typeof RizqListingContext !== 'undefined')
+    ? RizqListingContext.collectForm({
+        categorySelect: 'svc-category-id',
+        subcatSelect: 'svc-subcategory-id',
+        attrsMount: 'svc-attrs-mount',
+        context: RizqListingContext.sellerContext(typeof OFFICE!=='undefined'?OFFICE:{id:SESSION_ID,type:'office'}, { accountType:'office', accountId:SESSION_ID }),
+      })
+    : { categoryId:'', subcat:'', attrs:{} };
+  if(!_listingForm.subcat){
+    showToast(_t2('اختر النوع / الفرع للخدمة','Choisissez le sous-type du service'),'error');
+    return;
+  }
+
+  var editIdx = (typeof window._editSvcIdx === 'number') ? window._editSvcIdx : null;
+  var existing = (editIdx != null && services[editIdx]) ? services[editIdx] : null;
+  var svcImages = [];
+  if(_svcCoverDraft) svcImages.push(_svcCoverDraft);
+  else if(_svcThumbDraft) svcImages.push(_svcThumbDraft);
+  else if(existing && Array.isArray(existing.images)) svcImages = existing.images.slice();
 
   var adData = {
-    id: 'OFC-' + Date.now(),
+    id: (existing && existing.id) || ('OFC-' + Date.now()),
     title: name,
     desc:  desc,
     price: price,
-    category: 'services',
-    images: [],
+    category: _listingForm.categoryId || 'خدمات',
+    subcat: _listingForm.subcat,
+    images: svcImages,
+    cover: _svcCoverDraft || (existing && existing.cover) || '',
+    thumb: _svcThumbDraft || (existing && existing.thumb) || '',
     seller: typeof accData !== 'undefined' ? (accData.name||_t2('مكتب','Bureau')) : _t2('مكتب','Bureau'),
     seller_trust_score: 70,
   };
@@ -1000,19 +1086,40 @@ function saveService(){
     // ونستخدم نفس مفتاح التخزين المستخدم في التحميل والحذف.
     var _newSvc = {
       id: data.id, name: name, price: price, desc: desc,
-      status: data._status || 'active',
-      date: new Date().toLocaleDateString('ar-MR-u-nu-latn')
+      duration: document.getElementById('svc-duration') ? document.getElementById('svc-duration').value.trim() : (duration || ''),
+      emoji: (document.getElementById('svc-emoji') ? document.getElementById('svc-emoji').value.trim() : '') || emoji || '📄',
+      categoryId: _listingForm.categoryId || '',
+      category: _listingForm.categoryId || '',
+      subCategoryId: _listingForm.subcat || '',
+      subcat: _listingForm.subcat || '',
+      attrs: _listingForm.attrs || {},
+      accountType: 'office',
+      storeId: SESSION_ID,
+      activityId: (typeof OFFICE!=='undefined' && OFFICE && OFFICE.activityId) || '',
+      listingSource: 'dashboard_catalog',
+      cover: data.cover || _svcCoverDraft || (existing && existing.cover) || '',
+      thumb: data.thumb || _svcThumbDraft || (existing && existing.thumb) || '',
+      images: Array.isArray(data.images) ? data.images.slice() : svcImages.slice(),
+      status: data._status || (existing && existing.status) || 'active',
+      date: (existing && existing.date) || new Date().toLocaleDateString('ar-MR-u-nu-latn')
     };
-    services.unshift(_newSvc);
+    var editIdx = (typeof window._editSvcIdx === 'number') ? window._editSvcIdx : null;
+    if(editIdx != null && services[editIdx]){
+      _newSvc.id = services[editIdx].id || _newSvc.id;
+      _newSvc._backendId = services[editIdx]._backendId || null;
+      services[editIdx] = _newSvc;
+    } else {
+      services.unshift(_newSvc);
+    }
     if(!IS_DEMO) localStorage.setItem('office_services_'+(typeof SESSION_ID!=='undefined'?SESSION_ID:'demo'), JSON.stringify(services));
     if(!IS_DEMO) _rizqSyncCatalogItem(_newSvc);
-    // سجّل الإعلان في العداد الشهري عند الانتهاء
-    if(typeof RizqSub !== 'undefined' && typeof SESSION_ID !== 'undefined' && SESSION_ID){
+    // سجّل الإعلان في العداد الشهري عند الانتهاء (إضافة جديدة فقط)
+    if(editIdx == null && typeof RizqSub !== 'undefined' && typeof SESSION_ID !== 'undefined' && SESSION_ID){
       var _subSt = RizqSub.checkSubscription(SESSION_ID);
       if(_subSt.status==='expired'||_subSt.status==='no_subscription') RizqSub.recordAdPost(SESSION_ID);
     }
-    ['svc-name','svc-price','svc-desc'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
-    showToast(data._status==='pending_review'?_t2('⏳ الخدمة قيد المراجعة','⏳ Service en cours de vérification'):_t2('✅ تم إضافة الخدمة','✅ Service ajouté'));
+    clearSvcForm();
+    showToast(data._status==='pending_review'?_t2('⏳ الخدمة قيد المراجعة','⏳ Service en cours de vérification'):(editIdx!=null?_t2('✅ تم تحديث الخدمة','✅ Service mis à jour'):_t2('✅ تم إضافة الخدمة','✅ Service ajouté')));
     if(typeof renderServices === 'function') renderServices();
     if(typeof showPanel === 'function') showPanel('services');
   }
@@ -1027,8 +1134,47 @@ function saveService(){
     });
   } else { doSave(adData); }
 }
-function clearSvcForm(){['svc-name','svc-price','svc-duration','svc-emoji','svc-desc'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});window._editSvcIdx=null;}
-function editService(i){const s=services[i];document.getElementById('svc-name').value=s.name||'';document.getElementById('svc-price').value=s.price||'';document.getElementById('svc-duration').value=s.duration||'';document.getElementById('svc-emoji').value=s.emoji||'';document.getElementById('svc-desc').value=s.desc||'';window._editSvcIdx=i;if(!_svcOpen)toggleServiceForm();}
+function mountOfficeListingContext(opts){
+  opts = opts || {};
+  if(typeof RizqListingContext === 'undefined') return;
+  var acc = (typeof OFFICE!=='undefined' && OFFICE) ? OFFICE : { id: SESSION_ID, type: 'office' };
+  var hint = document.getElementById('svc-listing-ctx-hint');
+  if(hint) hint.innerHTML = RizqListingContext.syncHintHtml((typeof _officeLang!=='undefined' && _officeLang==='fr')?'fr':'ar');
+  RizqListingContext.mountSelectors({
+    categorySelect: 'svc-category-id',
+    subcatSelect: 'svc-subcategory-id',
+    attrsMount: 'svc-attrs-mount',
+    context: RizqListingContext.sellerContext(acc, { accountType:'office', accountId: SESSION_ID }),
+    lockCategory: true,
+    selectedSubcat: opts.selectedSubcat || '',
+    attrs: opts.attrs || {},
+    lang: (typeof _officeLang!=='undefined' && _officeLang==='fr')?'fr':'ar',
+  });
+}
+function clearSvcForm(){
+  ['svc-name','svc-price','svc-duration','svc-emoji','svc-desc'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  _svcCoverDraft = null; _svcThumbDraft = null;
+  renderSvcCoverPreview(); renderSvcThumbPreview();
+  var ci=document.getElementById('svc-cover-input'); if(ci) ci.value='';
+  var ti=document.getElementById('svc-thumb-input'); if(ti) ti.value='';
+  window._editSvcIdx=null;
+  mountOfficeListingContext();
+}
+function editService(i){
+  const s=services[i];
+  document.getElementById('svc-name').value=s.name||'';
+  document.getElementById('svc-price').value=s.price||'';
+  document.getElementById('svc-duration').value=s.duration||'';
+  document.getElementById('svc-emoji').value=s.emoji||'';
+  document.getElementById('svc-desc').value=s.desc||'';
+  _svcCoverDraft = s.cover || '';
+  _svcThumbDraft = s.thumb || '';
+  renderSvcCoverPreview();
+  renderSvcThumbPreview();
+  window._editSvcIdx=i;
+  if(!_svcOpen)toggleServiceForm();
+  mountOfficeListingContext({ selectedSubcat: s.subcat||s.subCategoryId||'', attrs: s.attrs||{} });
+}
 function deleteService(i){
   if(!confirm(_t2('حذف الخدمة؟','Supprimer ce service ?')))return;
   if(!IS_DEMO) _rizqDeleteCatalogItem(services[i]);
@@ -1047,7 +1193,33 @@ function _rizqSyncCatalogItem(svc){
   try{
     if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN) return;
     var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
-    var body = { accountId: SESSION_ID, kind:'service', name: svc.name, price: svc.price, desc: svc.desc, status: svc.status==='pending_review'?'pending_review':(svc.status==='inactive'?'inactive':'active') };
+    var ctx = (typeof RizqListingContext !== 'undefined')
+      ? RizqListingContext.sellerContext((typeof OFFICE!=='undefined'?OFFICE:null), { accountType:'office', accountId: SESSION_ID })
+      : { store_id: SESSION_ID, account_id: SESSION_ID, account_type: 'office', activity_id: '', badges: {} };
+    var imgs = [];
+    if(svc.cover) imgs.push(svc.cover);
+    if(svc.thumb && svc.thumb !== svc.cover) imgs.push(svc.thumb);
+    if(Array.isArray(svc.images)){
+      svc.images.forEach(function(im){ if(im && imgs.indexOf(im) < 0) imgs.push(im); });
+    }
+    var body = {
+      accountId: SESSION_ID, storeId: SESSION_ID, kind:'service',
+      name: svc.name, price: svc.price, desc: svc.desc,
+      duration: svc.duration || '', emoji: svc.emoji || '',
+      categoryId: svc.categoryId || '', category: svc.categoryId || '',
+      subCategoryId: svc.subcat || '', subcat: svc.subcat || '',
+      attrs: svc.attrs || {}, cat: svc.subcat || svc.categoryId || '',
+      accountType: 'office', activityId: svc.activityId || ctx.activity_id || '',
+      listingSource: 'dashboard_catalog',
+      sellerContext: { storeName: ctx.store_name || (OFFICE && OFFICE.name) || '', badges: ctx.badges || {} },
+      cover: svc.cover || '', thumb: svc.thumb || '',
+      images: imgs.slice(0, 6),
+      image: imgs[0] || svc.thumb || svc.cover || '',
+      status: svc.status==='pending_review'?'pending_review':(svc.status==='inactive'?'inactive':'active')
+    };
+    if(typeof RizqListingContext !== 'undefined'){
+      body = RizqListingContext.enrichPayload(body, ctx, { categoryId: svc.categoryId, subcat: svc.subcat, attrs: svc.attrs || {} });
+    }
     if(svc._backendId){
       fetch(base+'/api/catalog/'+encodeURIComponent(svc._backendId), {
         method:'PATCH', headers:{'Content-Type':'application/json','x-account-token':(window.REAL_ACCESS_TOKEN || SESSION_TOKEN)}, body: JSON.stringify(body)
@@ -1531,6 +1703,7 @@ function _applyOfficeLang(lang, silent){
   try{ if(typeof renderServicesShowcase==='function') renderServicesShowcase(); }catch(e){}
   try{ if(typeof renderRequests==='function') renderRequests(); }catch(e){}
   try{ if(typeof renderServices==='function') renderServices(); }catch(e){}
+  try{ if(typeof mountOfficeListingContext==='function') mountOfficeListingContext(); }catch(e){}
   try{ if(typeof renderSubPanel==='function') renderSubPanel(); }catch(e){}
   try{ if(typeof renderSubOverview==='function') renderSubOverview(); }catch(e){}
   try{ if(typeof renderHours==='function') renderHours(); }catch(e){}
@@ -1714,7 +1887,16 @@ function openPayModal(pkgName, pkgPrice, category){
   _payPkg = {name: pkgName, price: pkgPrice, category: category || 'package'};
   _payFile = null;
   document.getElementById('pay-pkg-name').textContent = pkgName;
-  document.getElementById('pay-amount').textContent = pkgPrice > 0 ? Number(pkgPrice).toLocaleString() + ' MRU' : _t2('مجاناً','Gratuit');
+  var amtEl = document.getElementById('pay-amount');
+  if(amtEl){
+    if(typeof RizqSub !== 'undefined' && RizqSub.isPriceUnset && RizqSub.isPriceUnset(pkgPrice)){
+      amtEl.textContent = '—';
+    } else if(typeof RizqSub !== 'undefined' && RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(pkgPrice)){
+      amtEl.textContent = _t2('مجاناً','Gratuit');
+    } else {
+      amtEl.textContent = Number(pkgPrice).toLocaleString() + ' MRU';
+    }
+  }
   document.getElementById('pay-receipt-name').style.display = 'none';
   document.getElementById('pay-receipt-file').value = '';
   var vidWrap = document.getElementById('pay-video-url-wrap');
@@ -1809,7 +1991,16 @@ function handlePayReceipt(inp){
 
 function submitPayment(){
   if(!_payPkg) return;
-  if(_payPkg.price > 0 && !_payFile){
+  if(typeof RizqSub === 'undefined' || typeof RizqSub.submitSubscriptionRequest !== 'function'){
+    showToast(_t2('محرك الاشتراك غير محمّل','Moteur d\'abonnement non chargé'),'error');
+    return;
+  }
+  if(RizqSub.isPriceUnset && RizqSub.isPriceUnset(_payPkg.price)){
+    showToast(_t2('السعر غير مضبوط — حدّده السوبر أدمن من لوحة الباقات أولاً','Prix non défini — le Super Admin doit le fixer d\'abord'),'error');
+    return;
+  }
+  var isFree = RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(_payPkg.price);
+  if(!isFree && Number(_payPkg.price) > 0 && !_payFile){
     alert(_t2('يرجى رفع صورة وصل الدفع أولاً','Veuillez d\'abord téléverser une photo du reçu de paiement'));
     return;
   }
@@ -2178,31 +2369,39 @@ var RIZQ_TWILIO_NUM_OFFICE = (typeof _rizqTwilioForwardNum==='function'?_rizqTwi
     function reqPkg(f){ return (f && typeof RizqSub!=='undefined') ? RizqSub.getMinPackageForFeature(ACC_TYPE, f) : null; }
 
     var services=[
-      {icon:'📦',label:_t2('نشر المنتجات/الخدمات','Publier produits/services'),feature:null,tip:_t2('انشر منتجاتك وخدماتك أمام آلاف المشترين','Publiez vos produits et services devant des milliers d\'acheteurs')},
-      {icon:'💬',label:_t2('التواصل المباشر','Communication directe'),feature:null,tip:_t2('استقبل رسائل واستفسارات الزبائن مباشرة','Recevez messages et demandes des clients directement')},
-      {icon:'📤',label:_t2('مشاركة الصفحة','Partage de la page'),feature:null,tip:_t2('شارك رابط صفحتك على وسائل التواصل','Partagez le lien de votre page sur les réseaux sociaux')},
-      {icon:'📊',label:_t2('إحصائيات الزيارات','Statistiques de visites'),feature:'analytics',tip:_t2('تابع عدد من زار صفحتك وتفاعل معها','Suivez le nombre de visiteurs et leur interaction')},
-      {icon:'🥇',label:_t2('صدارة النتائج','Premier dans les résultats'),feature:'priority_listing',tip:_t2('ظهور متقدم في نتائج البحث','Apparition prioritaire dans les résultats de recherche')},
-      {icon:'🤖',label:_t2('وكيل ذكي','Agent intelligent'),feature:'ai_agent_full',tip:_t2('رد تلقائي ذكي على الاستفسارات 24/7','Réponse automatique intelligente aux demandes 24/7')},
-      {icon:'📞',label:_t2('رد تلقائي مكالمات','Réponse automatique aux appels'),feature:'auto_reply_calls',tip:_t2('لا تفوتك مكالمة — الذكاء الاصطناعي يرد عنك','Ne ratez aucun appel — l\'IA répond pour vous')},
-      {icon:'💎',label:_t2('مدير حساب VIP','Gestionnaire de compte VIP'),feature:'vip_manager',tip:_t2('دعم شخصي من فريق رزق على مدار الساعة','Support personnalisé de l\'équipe Rizq 24h/24')},
+      {icon:'🧾',label:_t2('خدماتي','Mes services'),feature:null,action:'services',tip:_t2('حزم الخدمات والأسعار','Packages de services')},
+      {icon:'🕐',label:_t2('ساعات العمل','Horaires'),feature:null,action:'hours',tip:_t2('جدول الفتح والإغلاق','Ouverture / fermeture')},
+      {icon:'💬',label:_t2('الرسائل','Messages'),feature:null,action:'messages',tip:_t2('استفسارات الزبائن','Demandes clients')},
+      {icon:'📩',label:_t2('الطلبات','Demandes'),feature:null,action:'requests',tip:_t2('حجوزات واستفسارات','Réservations et demandes')},
+      {icon:'📸',label:_t2('معرض الصور','Galerie'),feature:null,action:'photos',tip:_t2('وسائط ملف المكتب','Médias du profil')},
+      {icon:'📤',label:_t2('مشاركة الصفحة','Partage'),feature:null,action:'share',tip:_t2('شارك رابط مكتبك','Partagez le lien du cabinet')},
+      {icon:'📊',label:_t2('إحصائيات الزيارات','Statistiques'),feature:'analytics',action:'overview',tip:_t2('تابع زيارات صفحتك','Suivez les visites')},
+      {icon:'🥇',label:_t2('صدارة النتائج','Premier résultats'),feature:'priority_listing',action:'subscription',tip:_t2('ظهور متقدم في البحث','Apparition prioritaire')},
+      {icon:'🤖',label:_t2('الوكيل الذكي','Agent intelligent'),feature:'ai_agent_full',action:'agents',tip:_t2('استوديو تدريب الردود','Studio d\'entraînement IA')},
+      {icon:'📞',label:_t2('رد تلقائي مكالمات','Réponse auto appels'),feature:'auto_reply_calls',action:'agents',tip:_t2('الذكاء الاصطناعي يرد عنك','L\'IA répond pour vous')},
+      {icon:'💳',label:_t2('اشتراكي','Mon abonnement'),feature:null,action:'subscription',tip:_t2('الباقة والترقية','Forfait et upgrade')},
+      {icon:'💎',label:_t2('مدير حساب VIP','Gestionnaire VIP'),feature:'vip_manager',action:'subscription',tip:_t2('دعم شخصي من فريق رزق','Support personnalisé Rizq')},
     ];
 
     el.innerHTML=services.map(function(s){
       var avail=has(s.feature);
-      // إصلاح: بدل شارة "ترقية" عامة لا تحدد أي باقة، نعرض اسم أقل باقة حقيقية
-      // تمنح هذه الخدمة تحديداً (مصدرها RizqSub.getMinPackageForFeature) — لا لبس.
       var need=avail?null:reqPkg(s.feature);
+      if(window.RizqDashUI && typeof RizqDashUI.buildSvcTile==='function'){
+        return RizqDashUI.buildSvcTile({
+          icon:s.icon, label:s.label, tip:s.tip, feature:s.feature,
+          avail:avail, needPkg:need, action:avail?s.action:(s.action||'subscription')
+        });
+      }
       var lockTxt = '🔒 '+(need ? (_t2('يتطلب: ','Nécessite : ')+need) : _t2('ترقية','Mise à niveau'));
-      return '<div onclick="'+(avail?'':'showPanel(\'subscription\',null)')+'" style="background:#fff;border:2px solid '+(avail?'rgba(27,58,107,.18)':'rgba(201,168,76,.35)')+';border-radius:14px;padding:16px 10px 12px;text-align:center;position:relative;cursor:'+(avail?'default':'pointer')+';box-shadow:0 2px 8px rgba(27,58,107,.06);transition:box-shadow .2s,transform .2s" onmouseover="this.style.boxShadow=\'0 6px 18px rgba(27,58,107,.13)\';this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.boxShadow=\'0 2px 8px rgba(27,58,107,.06)\';this.style.transform=\'none\'">'
-        +(avail?''
-          :'<div style="position:absolute;top:-1px;right:-1px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:9.5px;font-weight:900;padding:3px 9px;border-radius:0 12px 0 10px;letter-spacing:.2px;white-space:nowrap">'+lockTxt+'</div>')
-        +'<div style="font-size:30px;margin-bottom:8px;line-height:1">'+s.icon+'</div>'
-        +'<div style="font-size:12px;font-weight:800;color:#1B3A6B;margin-bottom:5px;line-height:1.3">'+s.label+'</div>'
-        +'<div style="font-size:10.5px;color:#2C3A4F;line-height:1.45">'+s.tip+'</div>'
-        +(avail?'<div style="margin-top:10px;display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 8px rgba(16,185,129,.6)"></div>':'')
+      return '<div class="svc-tile'+(avail?'':' is-locked')+'" onclick="'+(avail?(s.action==='share'?'openShareModal()':"showPanel('"+s.action+"',null)"):'showPanel(\'subscription\',null)')+'" style="cursor:pointer">'
+        +'<div class="svc-tile__badge '+(avail?'ok':'lock')+'">'+(avail?_t2('متاح','Disponible'):lockTxt)+'</div>'
+        +'<div class="svc-tile__icon">'+s.icon+'</div>'
+        +'<div class="svc-tile__label">'+s.label+'</div>'
+        +'<div class="svc-tile__tip">'+s.tip+'</div>'
+        +(avail?'<div class="svc-tile__dot"></div>':'')
       +'</div>';
     }).join('');
+    try{ if(window.RizqDashUI&&RizqDashUI.refreshPackageWidget) RizqDashUI.refreshPackageWidget(); }catch(eSC){}
   }
 
 

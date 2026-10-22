@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-rizq-strip="22.1">
+<html lang="ar" dir="rtl" data-rizq-strip="22.6">
 <head>
   <meta charset="UTF-8"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=30.9"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=31.0"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.4"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
@@ -42,22 +42,37 @@
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=31.6"/>
+<link rel="stylesheet" href="rizq_header.css?v=31.8"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.48"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
-/* شريط موحّد على كل العروض — لا نُفعّل وضع الهبوط ثنائي الصف */
+/* شريط موحّد على كل العروض — الشريط القديم متوقف نهائياً */
 </script>
 <style id="rizq-mobile-header-critical">
+/* الشريط القديم لا يُعرض أبداً — حتى قبل اكتمال تحميل mockup CSS */
+html.rizq-app-nav #nav,
+html.rizq-app-nav #rizq-desk-nav,
+html.rizq-app-nav #rizq-thumb-dock,
+html.rizq-app-nav .rizq-thumb-dock,
+html.rizq-app-nav #section-jump-bar,
+html.rizq-app-nav #mobile-bottom-nav,
+html.rizq-app-nav .mobile-bottom-nav,
+html.rizq-app-nav #rizq-search-theater,
+html.rizq-app-nav #rizq-search-pill,
+html.rizq-app-nav .nav-sticky-tools{
+  display:none!important;visibility:hidden!important;pointer-events:none!important;
+  height:0!important;max-height:0!important;overflow:hidden!important;opacity:0!important;
+}
 @media(max-width:768px),(orientation:landscape) and (max-height:500px){
-  /* هاتف: ثانوي أعلى + شريط إبهام سفلي */
-  html.rizq-app-nav{--rizq-header-h:98px;--rizq-thumb-dock-h:72px}
+  /* هاتف: مساحة الهيدر الموحّد فقط (لا شريط قديم) */
+  html.rizq-app-nav{--rizq-header-h:128px;--rizq-mock-nav-h:72px;--rizq-thumb-dock-h:0px}
   html.rizq-app-nav body{
-    padding-top:var(--rizq-header-h,98px)!important;
-    padding-bottom:calc(var(--rizq-thumb-dock-h,72px) + env(safe-area-inset-bottom,0px))!important;
+    padding-top:var(--rizq-mock-hdr-h,var(--rizq-header-h,128px))!important;
+    padding-bottom:calc(var(--rizq-mock-nav-h,72px) + max(env(safe-area-inset-bottom,0px),20px))!important;
   }
   html.rizq-app-nav #nav,html.rizq-app-nav #rizq-desk-nav{
-    display:grid!important;visibility:visible!important;height:var(--rizq-header-h,98px)!important;
-    position:fixed!important;top:0;left:0;right:0;z-index:10000!important;
+    display:none!important;visibility:hidden!important;height:0!important;
+    pointer-events:none!important;
   }
   /* هاتف: لا نفرض ارتفاع شاشة كاملة — يقلّص الفراغ تحت رزق قبل الشريط السفلي */
   html.rizq-app-nav .hero{
@@ -4861,10 +4876,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 })();
 </script>
     <script src="rizq_announcements.js"></script>
-    <script src="rizq_civic_ticker.js"></script>
+    <script src="rizq_marquee_kit.js?v=1.2"></script>
+    <script src="rizq_civic_ticker.js?v=1.3"></script>
 <script src="rizq_backend_config.js"></script>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.42"/>
-<script src="rizq_header_mockup_trial.js?v=5.42" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.48" defer></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
@@ -4986,19 +5001,13 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <button type="button" class="rmh-ico" onclick="typeof goToAccount==='function'&&goToAccount()" aria-label="حسابي">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19c1.6-3.2 4-4.8 6.5-4.8S16.9 15.8 18.5 19"/></svg>
       </button>
-      <div class="rmh-cart-wrap" id="rmh-cart-wrap">
-        <button type="button" class="rmh-ico" id="rmh-cart-btn" aria-haspopup="true" aria-expanded="false" aria-controls="rmh-cart-panel" aria-label="السلة">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 5h2l1.5 10h11L20 8H7"/><circle cx="9.5" cy="19" r="1.3"/><circle cx="16.5" cy="19" r="1.3"/></svg>
-          <span class="rmh-cart-badge" id="rmh-cart-badge" hidden>0</span>
-        </button>
-        <div class="rmh-cart-panel" id="rmh-cart-panel" role="dialog" aria-label="ملخص السلة">
-          <h4>سلتك — لم تُكمَل بعد</h4>
-          <div id="rmh-cart-body"><p class="rmh-cart-empty">السلة فارغة</p></div>
-          <a class="rmh-cart-open-full" href="rizq_cart.html">فتح السلة بالتفاصيل</a>
-        </div>
-      </div>
-      <a class="rmh-ico" href="#wishlist-block" aria-label="المفضلة">
+      <a class="rmh-ico rmh-cart-link" id="rmh-cart-btn" href="rizq_cart.html" data-rizq-cart-wrap aria-label="السلة العامة" title="السلة العامة">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 5h2l1.5 10h11L20 8H7"/><circle cx="9.5" cy="19" r="1.3"/><circle cx="16.5" cy="19" r="1.3"/></svg>
+        <span class="rmh-cart-badge" id="rmh-cart-badge" data-rizq-cart-count hidden>0</span>
+      </a>
+      <a class="rmh-ico rmh-fav-link" href="rizq_favorites.html" data-rizq-fav-wrap aria-label="المفضلة العامة" title="المفضلة العامة">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 20s-6.5-4.2-8.5-8A4.6 4.6 0 0 1 12 7.2 4.6 4.6 0 0 1 20.5 12c-2 3.8-8.5 8-8.5 8z"/></svg>
+        <span class="rmh-cart-badge rmh-fav-badge" id="rmh-fav-badge" data-rizq-fav-count hidden>0</span>
       </a>
       <div class="rizq-help-dd rmh-help-dd" id="rmh-help-wrap" data-rizq-toolbar="help">
         <button type="button" class="rizq-help-dd-btn rmh-ico" id="rmh-help-btn" aria-haspopup="true" aria-expanded="false" aria-controls="rmh-help-menu" aria-label="المساعدة والدعم" title="المساعدة والدعم">
@@ -5047,8 +5056,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </nav>
 </header>
 
-<!-- ══ NAVBAR (مخفي أثناء التجربة) ══ -->
-<nav id="nav">
+<!-- ══ NAVBAR القديم — متوقف نهائياً (الهيدر الموحّد أعلاه هو الوحيد) ══ -->
+<nav id="nav" hidden aria-hidden="true" style="display:none!important">
   <div class="nav-start">
     <button class="btn-lang btn-lang-primary rizq-toolbar-lang" id="nav-lang-btn" data-rizq-toolbar="lang" type="button" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
     <button type="button" class="nav-account-btn rizq-toolbar-account" id="nav-account-btn" data-rizq-toolbar="account" onclick="goToAccount()" aria-label="حسابي">
@@ -5060,7 +5069,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <span class="nav-search-launch-ico" aria-hidden="true">⌕</span>
       <span class="nav-search-launch-lbl" data-t="nav-search-lbl">بحث</span>
     </button>
-    <a href="#wishlist-block" class="nav-account-btn nav-fav-btn" id="nav-fav-btn" data-rizq-fav-wrap data-t-nav-fav="المفضلة" data-t-nav-fav-fr="Favoris" aria-label="المفضلة" title="المفضلة" style="text-decoration:none">
+    <a href="rizq_favorites.html" class="nav-account-btn nav-fav-btn" id="nav-fav-btn" data-rizq-fav-wrap data-t-nav-fav="المفضلة" data-t-nav-fav-fr="Favoris" aria-label="المفضلة" title="المفضلة" style="text-decoration:none">
       <span class="nav-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span>
       <span class="nav-fav-lbl" data-t="nav-fav-lbl">المفضلة</span>
       <span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span>
@@ -5110,8 +5119,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </a>
 </nav>
 
-<!-- ── مسرح البحث (نموذج ج): قرص تحت الهيدر ينسدل كمنبثق أثناء التصفح ── -->
-<div id="rizq-search-theater" class="rizq-search-theater" aria-hidden="true">
+<!-- ── مسرح البحث القديم (متوقف — البحث في الهيدر الموحّد) ── -->
+<div id="rizq-search-theater" class="rizq-search-theater" hidden aria-hidden="true" style="display:none!important">
   <div class="rizq-search-backdrop" id="rizq-search-backdrop" data-rizq-close-search tabindex="-1"></div>
   <button type="button" class="rizq-search-pill" id="rizq-search-pill" data-rizq-open-search aria-haspopup="dialog" aria-controls="rizq-search-panel" aria-expanded="false">
     <span class="rizq-search-pill-ico" aria-hidden="true">⌕</span>
@@ -5155,8 +5164,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
 <button type="button" id="back-to-top" aria-label="العودة للأعلى" title="العودة للأعلى">↑</button>
 
-<!-- ── Mobile bottom navigation ── -->
-<nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="تنقل سفلي">
+<!-- ── Mobile bottom navigation (متوقف — الشريط الموحّد السفلي يكفي) ── -->
+<nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="تنقل سفلي" hidden aria-hidden="true" style="display:none!important">
   <div class="mobile-bottom-nav-inner">
     <a href="rizq_landing_v8.html" id="mbn-home" class="active"><span class="mbn-icon">🧭</span><span class="mbn-label">الرئيسية</span></a>
     <a href="#categories" id="mbn-cats" data-jump="#categories"><span class="mbn-icon">📂</span><span class="mbn-label">الأقسام</span></a>
@@ -5416,7 +5425,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </div>
     </div>
     <p class="rizq-vid-strip-hint" data-t="vstrip-hint">مرّر الماوس للتشغيل</p>
-    <div class="rizq-vid-strip-track" id="rizq-vid-strip-track" tabindex="0"></div>
+    <div class="rizq-vid-strip-track" id="rizq-vid-strip-track" tabindex="0" data-mq-auto="1"></div>
   </section>
 
   <div class="hero-after-promo-tail">
@@ -5536,9 +5545,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <section id="rizq-styles" class="rizq-styles-section" aria-labelledby="rizq-styles-title">
   <div class="rizq-styles-inner">
     <div class="section-header fade-in">
-      <p class="section-tag">أناقة <span>رزق</span></p>
+      <p class="section-tag" data-t="sty-tag">أفكار الأنماط</p>
       <h2 id="rizq-styles-title" class="section-title" data-t="sty-title">إطلالات تليق بك على <span>رزق</span></h2>
-      <p class="section-desc" data-t="sty-desc">موضة وإكسسوارات مختارة تلهم إطلالتك القادمة من قلب السوق.</p>
+      <p class="section-desc" data-t="sty-desc">موضة وإكسسوارات من محلات الملابس على المنصة — رجال، نساء، أولاد وبنات.</p>
     </div>
     <div class="rizq-styles-toolbar">
       <button type="button" class="rizq-styles-reshuffle" id="rizq-styles-reshuffle" onclick="buildStyleIdeas(true)" data-t="sty-reshuffle" aria-label="اقتراحات جديدة">🔀 اقتراحات جديدة</button>
@@ -6920,6 +6929,11 @@ var _rzqMarquees = [];
 var _rzqMarqueeRaf = 0;
 var _rzqMarqueeLast = 0;
 var _rzqMarqueeIo = null;
+try{
+  window._rzqMarquees = _rzqMarquees;
+  window._rzqMarqueeTick = _rzqMarqueeTick;
+  window._rzqEnsureMarqueeLoop = _rzqEnsureMarqueeLoop;
+}catch(eGlob){}
 function _rzqIsRtl(){
   return (document.documentElement.getAttribute('dir') || 'rtl') !== 'ltr';
 }
@@ -6940,7 +6954,7 @@ function _rzqMarqueeAnyActive(){
   if(document.hidden) return false;
   for(var i = 0; i < _rzqMarquees.length; i++){
     var s = _rzqMarquees[i];
-    if(s && s.el && s.el.isConnected && !s.paused && !s.offscreen && s.half > 1) return true;
+    if(s && s.el && s.el.isConnected && !s.paused && !s.hoverPaused && !s.userPaused && !s.offscreen && s.half > 1) return true;
   }
   return false;
 }
@@ -6952,8 +6966,9 @@ function _rzqMarqueeTick(now){
     for(var i = 0; i < _rzqMarquees.length; i++){
       var state = _rzqMarquees[i];
       if(!state || !state.el || !state.el.isConnected) continue;
-      if(state.paused || state.offscreen || state.half <= 1) continue;
-      state.pos += state.pxPerSec * dt;
+      if(state.paused || state.hoverPaused || state.userPaused || state.offscreen || state.half <= 1) continue;
+      var spd = Math.abs(Number(state.pxPerSec) || 0) * (state.dir < 0 ? -1 : 1);
+      state.pos += spd * dt;
       if(state.pos >= state.half) state.pos -= state.half;
       if(state.pos < 0) state.pos += state.half;
       state.apply();
@@ -6969,8 +6984,16 @@ function _rzqMarqueeTick(now){
 function _rzqEnsureMarqueeLoop(){
   if(_rzqMarqueeRaf || !_rzqMarqueeAnyActive()) return;
   _rzqMarqueeLast = 0;
-  _rzqMarqueeRaf = requestAnimationFrame(_rzqMarqueeTick);
+  var tickFn = (typeof window !== 'undefined' && typeof window._rzqMarqueeTick === 'function')
+    ? window._rzqMarqueeTick
+    : _rzqMarqueeTick;
+  _rzqMarqueeRaf = requestAnimationFrame(tickFn);
 }
+try{
+  window._rzqMarquees = _rzqMarquees;
+  window._rzqMarqueeTick = _rzqMarqueeTick;
+  window._rzqEnsureMarqueeLoop = _rzqEnsureMarqueeLoop;
+}catch(eGlob2){}
 function _rzqEnsureMarqueeIo(){
   if(_rzqMarqueeIo || typeof IntersectionObserver === 'undefined') return _rzqMarqueeIo;
   _rzqMarqueeIo = new IntersectionObserver(function(entries){
@@ -7015,8 +7038,8 @@ function _rzqBindMarqueePointerBoost(state){
     decayTimer = setTimeout(resetBoost, 900);
   }
   function onPointerSample(ev){
-    /* لا نمنع التسريع عند offscreen — إذا حرّك المستخدم المؤشر فوق الشريط فهو ظاهر له */
-    if(state.paused) return;
+    /* أثناء الإيقاف (مرور المؤشر) لا تسريع — العجلة/السحب للإرجاع فقط */
+    if(state.paused || state.hoverPaused || state.userPaused) return;
     var t = (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
     if(lastX != null){
       var dx = ev.clientX - lastX;
@@ -7038,7 +7061,7 @@ function _rzqBindMarqueePointerBoost(state){
   wrap.addEventListener('pointerup', function(){ lastX = null; }, {passive:true});
   wrap.addEventListener('touchend', function(){ lastX = null; }, {passive:true});
   wrap.addEventListener('wheel', function(ev){
-    if(state.paused) return;
+    if(state.paused || state.hoverPaused || state.userPaused) return;
     var dx = Math.abs(ev.deltaX) > Math.abs(ev.deltaY) ? ev.deltaX : ev.deltaY;
     if(!dx) return;
     applyBoost(Math.min(220, Math.abs(dx) * 2.4));
@@ -7055,6 +7078,11 @@ function bindRafMarquee(el, opts){
     }
     el._rzqMarquee.remeasure();
     _rzqBindMarqueePointerBoost(el._rzqMarquee);
+    try{
+      if(window.RizqMarqueeKit && typeof RizqMarqueeKit.enhanceRafState === 'function'){
+        RizqMarqueeKit.enhanceRafState(el._rzqMarquee);
+      }
+    }catch(eKit){}
     _rzqEnsureMarqueeLoop();
     return el._rzqMarquee;
   }
@@ -7070,7 +7098,7 @@ function bindRafMarquee(el, opts){
     raf: 1,
     rtl: _rzqIsRtl(),
     applyPlayState: function(){
-      var stop = !!(state.paused || state.offscreen || document.hidden || state.half <= 1);
+      var stop = !!(state.paused || state.hoverPaused || state.userPaused || state.offscreen || document.hidden || state.half <= 1);
       el.classList.toggle('is-mq-paused', stop);
       if(!stop) _rzqEnsureMarqueeLoop();
     },
@@ -7123,6 +7151,7 @@ function bindRafMarquee(el, opts){
   };
   el._rzqMarquee = state;
   _rzqMarquees.push(state);
+  try{ window._rzqMarquees = _rzqMarquees; }catch(eW){}
   var io = _rzqEnsureMarqueeIo();
   if(io){
     try{
@@ -7131,6 +7160,11 @@ function bindRafMarquee(el, opts){
     }catch(eIo){ try{ io.observe(el); }catch(e2){} }
   }
   _rzqBindMarqueePointerBoost(state);
+  try{
+    if(window.RizqMarqueeKit && typeof RizqMarqueeKit.enhanceRafState === 'function'){
+      RizqMarqueeKit.enhanceRafState(state);
+    }
+  }catch(eKit2){}
   state.remeasure();
   _rzqEnsureMarqueeLoop();
   return state;
@@ -7154,6 +7188,7 @@ function syncAllMarquees(){
     bindRafMarquee(cfg.el, {pxPerSec: cfg.px});
     if(cfg.el._rzqMarquee) cfg.el._rzqMarquee.remeasure();
   });
+  try{ if(window.RizqMarqueeKit) RizqMarqueeKit.enhanceAllRaf(); }catch(eKit3){}
   _rzqEnsureMarqueeLoop();
 }
 function liveListingsLabelHtml(fr){
@@ -7497,7 +7532,225 @@ function _styDetectGender(a){
   /* بلا جنس صريح: لا نُسقطه في كل التبويبات (كان يسبب خلط رجال↔نساء↔أولاد) */
   return 'neutral';
 }
+/** هل نشاط/اسم المحل يخص الموضة والملابس؟ */
+function _styIsFashionStoreAcc(acc){
+  if(!acc) return false;
+  var typ = String(acc.type || 'store').toLowerCase();
+  if(typ && typ !== 'store' && typ !== 'shop' && typ !== 'boutique') return false;
+  var blob = [acc.name, acc.nameF, acc.activity, acc.category, acc.cat, acc.tagline, acc.desc, acc.businessType]
+    .filter(Boolean).join(' ');
+  if(/سيارة|عقارات|مكتب|مناقصة|إلكترون|بقالة|مواد غذائية|صيدلية|auto|immobilier|bureau|épicerie|pharmacie/i.test(blob)
+    && !/أزياء|ملابس|موضة|fashion|mode|vêtement/i.test(blob)){
+    return false;
+  }
+  if(/أزياء|ملابس|موضة|دراعة|ملحفة|أحذية|إكسسوار|عطور|أطفال|خياط|بوتيك|fashion|mode|vêtement|boutique|habillement|chaussure|parfum|enfant|kids|couture/i.test(blob)){
+    return true;
+  }
+  /* بلا نشاط واضح — يُقبل إن وُجدت منتجات أزياء لاحقاً */
+  return !acc.activity && !acc.category && !acc.cat;
+}
+function _styStoreGenderHint(acc){
+  if(!acc) return '';
+  var blob = [acc.name, acc.activity, acc.category, acc.cat, acc.tagline, acc.desc].join(' ');
+  if(/أولاد|بنات|أطفال|رضع|enfant|kids|child|garçon|fille/i.test(blob)) return 'kids';
+  if(/نساء|نسائي|سيدات|femme|women|lady|melhfa|ملحفة/i.test(blob)) return 'women';
+  if(/رجال|رجالي|homme|men|daraa|دراعة/i.test(blob)) return 'men';
+  return '';
+}
+function _styFormatStorePrice(n){
+  var num = Number(n);
+  if(!isFinite(num) || num <= 0) return '';
+  try { return num.toLocaleString('fr-FR') + ' MRU'; }
+  catch(e){ return String(Math.round(num)) + ' MRU'; }
+}
+function _styNormalizeStoreProduct(p, store){
+  if(!p) return null;
+  var storeId = String((store && (store.id || store.storeId)) || 'store');
+  var storeName = String((store && (store.name || store.title)) || storeId);
+  var storeNameF = String((store && (store.nameF || store.nameFr || storeName)) || storeName);
+  var pid = String(p.id != null ? p.id : '');
+  if(!pid) return null;
+  var priceNum = Number(p.price);
+  if(!isFinite(priceNum)) priceNum = 0;
+  var priceStr = _styFormatStorePrice(priceNum);
+  var imgs = [];
+  if(Array.isArray(p.images)) imgs = p.images.filter(Boolean).slice(0, 4);
+  else if(Array.isArray(p.imgDataArr)) imgs = p.imgDataArr.filter(Boolean).slice(0, 4);
+  else if(p.imgData) imgs = [p.imgData];
+  else if(p.image) imgs = [p.image];
+  var item = {
+    id: 'store:' + storeId + ':' + pid,
+    productId: pid,
+    storeId: storeId,
+    storeName: storeName,
+    title: String(p.name || p.title || pid),
+    titleFR: String(p.nameF || p.nameFr || p.titleFR || p.name || pid),
+    emoji: p.emoji || '🛍️',
+    cat: p.cat || 'أزياء',
+    catKey: 'أزياء',
+    subcat: p.subcat || p.cat || '',
+    price: priceStr,
+    priceFR: priceStr,
+    priceNum: priceNum,
+    images: imgs,
+    bg: p.bg || 'linear-gradient(145deg,#0f2347,#1B3A6B)',
+    gender: p.gender || '',
+    href: 'rizq_store.html?id=' + encodeURIComponent(storeId),
+    source: 'store',
+    module: 'store',
+    seller: storeName,
+    sellerFR: storeNameF,
+    tags: [p.cat, storeName].filter(Boolean),
+    fromStore: true
+  };
+  var storeHint = _styStoreGenderHint(store);
+  if(!item.gender || !RIZQ_STYLE_GENDERS[item.gender]){
+    var detected = _styDetectGender(item);
+    if(detected && detected !== 'neutral' && detected !== 'both' && detected !== 'kids'){
+      item.gender = detected;
+    } else if(storeHint === 'women') {
+      item.gender = 'women';
+    } else if(storeHint === 'men') {
+      item.gender = 'men';
+    } else if(storeHint === 'kids') {
+      var kidsG = _styDetectGender(Object.assign({}, item, { subcat: 'ملابس أطفال ورضع', cat: 'أطفال' }));
+      item.gender = (kidsG === 'boys' || kidsG === 'girls') ? kidsG : 'kids';
+    } else {
+      item.gender = detected === 'kids' ? 'kids' : (detected || 'neutral');
+    }
+  }
+  return item;
+}
+/** كتالوجات محلات أزياء تجريبية — عندما لا توجد محلات موضة مسجّلة بعد */
+function _styDemoFashionStores(){
+  return [
+    {
+      id: 'demo_fashion_men',
+      name: 'محل الأناقة الرجالية',
+      nameF: 'Boutique Élégance Homme',
+      type: 'store',
+      activity: 'ملابس رجالية',
+      products: [
+        { id: 'M1', name: 'دراعة رجالية فاخرة', nameF: 'Daraa homme premium', price: 45000, cat: 'أزياء', emoji: '👔', gender: 'men' },
+        { id: 'M2', name: 'قميص قطني رجالي', nameF: 'Chemise coton homme', price: 12000, cat: 'أزياء', emoji: '👔', gender: 'men' },
+        { id: 'M3', name: 'ساعة رجالية كلاسيكية', nameF: 'Montre homme', price: 28000, cat: 'إكسسوارات', emoji: '⌚', gender: 'men' },
+        { id: 'M4', name: 'حذاء رسمي رجالي', nameF: 'Chaussures formal', price: 32000, cat: 'أحذية', emoji: '👞', gender: 'men' },
+        { id: 'M5', name: 'صندل رجالي جلد', nameF: 'Sandale homme cuir', price: 6500, cat: 'أحذية', emoji: '🩴', gender: 'men' },
+        { id: 'M6', name: 'سبحة كهرمان', nameF: 'Chapelet ambre', price: 18000, cat: 'إكسسوارات', emoji: '📿', gender: 'men' },
+        { id: 'M7', name: 'تيشيرت قطن رجالي', nameF: 'T-shirt homme', price: 5000, cat: 'أزياء', emoji: '👕', gender: 'men' },
+        { id: 'M8', name: 'معطف خفيف رجالي', nameF: 'Manteau léger', price: 40000, cat: 'أزياء', emoji: '🧥', gender: 'men' }
+      ]
+    },
+    {
+      id: 'demo_fashion_women',
+      name: 'بوتيك لمسة نسائية',
+      nameF: 'Boutique Touche Femme',
+      type: 'store',
+      activity: 'ملابس نسائية',
+      products: [
+        { id: 'W1', name: 'ملحفة حريرية فاخرة', nameF: 'Melhfa soie', price: 38000, cat: 'أزياء', emoji: '🧕', gender: 'women' },
+        { id: 'W2', name: 'فستان سهرة', nameF: 'Robe de soirée', price: 55000, cat: 'أزياء', emoji: '👗', gender: 'women' },
+        { id: 'W3', name: 'حقيبة نسائية أنيقة', nameF: 'Sac femme', price: 9800, cat: 'إكسسوارات', emoji: '👜', gender: 'women' },
+        { id: 'W4', name: 'عطر نسائي', nameF: 'Parfum femme', price: 21000, cat: 'عطور', emoji: '🌸', gender: 'women' },
+        { id: 'W5', name: 'صندل صيفي نسائي', nameF: 'Sandales femme', price: 8000, cat: 'أحذية', emoji: '👠', gender: 'women' },
+        { id: 'W6', name: 'أسورة ذهب مظهر', nameF: 'Bracelet doré', price: 15000, cat: 'إكسسوارات', emoji: '💍', gender: 'women' },
+        { id: 'W7', name: 'نظارة شمسية نسائية', nameF: 'Lunettes femme', price: 9000, cat: 'إكسسوارات', emoji: '🕶️', gender: 'women' },
+        { id: 'W8', name: 'ملحفة نقش تقليدي', nameF: 'Melhfa traditionnelle', price: 42000, cat: 'أزياء', emoji: '🧕', gender: 'women' }
+      ]
+    },
+    {
+      id: 'demo_fashion_kids',
+      name: 'عالم الأطفال للملابس',
+      nameF: 'Monde Enfants Mode',
+      type: 'store',
+      activity: 'ملابس أطفال',
+      products: [
+        { id: 'B1', name: 'طقم أولاد يومي', nameF: 'Ensemble garçon', price: 8500, cat: 'أطفال', emoji: '👦', gender: 'boys', subcat: 'ملابس أطفال ورضع' },
+        { id: 'B2', name: 'حذاء رياضي أولاد', nameF: 'Baskets garçon', price: 5200, cat: 'أطفال', emoji: '👟', gender: 'boys', subcat: 'ملابس أطفال ورضع' },
+        { id: 'B3', name: 'حقيبة مدرسية أولاد', nameF: 'Cartable garçon', price: 4800, cat: 'أطفال', emoji: '🎒', gender: 'boys', subcat: 'ملابس أطفال ورضع' },
+        { id: 'B4', name: 'كاب أولاد صيفي', nameF: 'Casquette garçon', price: 1900, cat: 'أطفال', emoji: '🧢', gender: 'boys', subcat: 'ملابس أطفال ورضع' },
+        { id: 'G1', name: 'فستان يومي بنات', nameF: 'Robe fille', price: 7800, cat: 'أطفال', emoji: '👧', gender: 'girls', subcat: 'ملابس أطفال ورضع' },
+        { id: 'G2', name: 'حذاء أنيق بنات', nameF: 'Chaussures fille', price: 4600, cat: 'أطفال', emoji: '👟', gender: 'girls', subcat: 'ملابس أطفال ورضع' },
+        { id: 'G3', name: 'طقم فيونكات بنات', nameF: 'Accessoires fille', price: 2400, cat: 'أطفال', emoji: '🎀', gender: 'girls', subcat: 'ملابس أطفال ورضع' },
+        { id: 'G4', name: 'قبعة صيفية بنات', nameF: 'Chapeau fille', price: 2100, cat: 'أطفال', emoji: '👒', gender: 'girls', subcat: 'ملابس أطفال ورضع' }
+      ]
+    }
+  ];
+}
+function _styReadStoreAccounts(){
+  var map = {};
+  try {
+    var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+    (accs || []).forEach(function(a){
+      if(!a || !a.id) return;
+      var typ = String(a.type || '').toLowerCase();
+      if(typ && typ !== 'store' && typ !== 'shop' && typ !== 'boutique') return;
+      map[String(a.id)] = a;
+    });
+  } catch(eA){}
+  return map;
+}
+function _styCollectStoreStyleItems(){
+  var seen = {};
+  var out = [];
+  var accounts = _styReadStoreAccounts();
+  var storeIdsTouched = {};
+
+  function pushProduct(p, store){
+    var item = _styNormalizeStoreProduct(p, store);
+    if(!item || !_styIsStyleCat(item)) return;
+    if(seen[item.id]) return;
+    seen[item.id] = 1;
+    out.push(item);
+  }
+
+  /* 1) منتجات المحلات الحقيقية من localStorage */
+  try {
+    for(var i = 0; i < localStorage.length; i++){
+      var key = localStorage.key(i);
+      if(!key || key.indexOf('store_products_') !== 0) continue;
+      var sid = key.slice('store_products_'.length);
+      if(!sid) continue;
+      var list = [];
+      try { list = JSON.parse(localStorage.getItem(key) || '[]'); } catch(eP){ list = []; }
+      if(!Array.isArray(list) || !list.length) continue;
+      var acc = accounts[sid] || { id: sid, name: sid, type: 'store' };
+      /* اقبل المحل إن كان موضة بالنشاط أو إن منتجاته أزياء */
+      var fashionAcc = _styIsFashionStoreAcc(acc);
+      var styleProds = list.filter(function(p){
+        return p && _styIsStyleCat({ title: p.name, cat: p.cat, catKey: p.cat, tags: [p.cat] });
+      });
+      if(!fashionAcc && !styleProds.length) continue;
+      storeIdsTouched[sid] = 1;
+      (fashionAcc ? list : styleProds).forEach(function(p){ pushProduct(p, acc); });
+    }
+  } catch(eScan){}
+
+  /* 2) حسابات موضة بلا مفتاح منتجات بعد — لا شيء تُضاف */
+  Object.keys(accounts).forEach(function(sid){
+    if(storeIdsTouched[sid]) return;
+    if(!_styIsFashionStoreAcc(accounts[sid])) return;
+    /* يبقى فارغاً حتى يرفع التاجر منتجات */
+  });
+
+  /* 3) إن لم تكفِ المنتجات — كتالوجات محلات أزياء تجريبية */
+  if(out.length < 9){
+    _styDemoFashionStores().forEach(function(demo){
+      if(storeIdsTouched[demo.id]) return;
+      (demo.products || []).forEach(function(p){ pushProduct(p, demo); });
+    });
+  }
+  return out;
+}
+/**
+ * مصدر الإطلالات = منتجات محلات الموضة (لا إعلانات فردية).
+ * الإعلان قطعة واحدة؛ المحل يوفّر تشكيلة رجال/نساء/أطفال لإطلالة متكاملة.
+ */
 function _styPool(){
+  return _styCollectStoreStyleItems();
+}
+/** مجمع إعلانات للمنصات الأخرى (نماذج المعارض/العقارات) — منفصل عن إطلالات المحلات */
+function _styAdsPool(){
   var seen = {};
   var out = [];
   function add(list){
@@ -7555,13 +7808,21 @@ function _styPickCompanions(primary, pool, gender, n){
   }
   return picks;
 }
-/** مرافقو الإطلالة: منتجات مختلفة النوع (ساعة/حذاء/حقيبة…) لا نسخ من نفس القطعة */
+/** مرافقو الإطلالة: منتجات مختلفة النوع (ساعة/حذاء/حقيبة…) — يُفضَّل نفس المحل */
 function _styPickLookCompanions(primary, pool, gender, n){
   n = n || 2;
   /* المرافقون من نفس الجنس فقط — لا looseGender الذي كان يخلط الأقسام */
   var stylePool = (pool || []).filter(function(a){
     return _styIsStyleCat(a) && (!gender || _styMatchGender(a, gender));
   });
+  var sameStoreId = primary && primary.storeId ? String(primary.storeId) : '';
+  if(sameStoreId){
+    var sameStore = stylePool.filter(function(a){ return String(a.storeId || '') === sameStoreId; });
+    if(sameStore.length >= n) stylePool = sameStore.concat(stylePool.filter(function(a){
+      return String(a.storeId || '') !== sameStoreId;
+    }));
+    else if(sameStore.length) stylePool = sameStore.concat(stylePool);
+  }
   var primaryKind = typeof _styAdKind === 'function' ? _styAdKind(primary) : '';
   var used = {};
   if(primary && primary.id != null) used[String(primary.id)] = 1;
@@ -7620,12 +7881,22 @@ function rizqOpenStyleItem(ev, adId){
   if(adId == null || adId === '') return false;
   var ad = _styFindAdById(adId);
   if(!ad){
-    if(String(adId).indexOf('store-') !== 0){
-      window.location.href = 'rizq_browse.html?id=' + encodeURIComponent(adId);
+    /* معرّف محل: store:storeId:productId */
+    var m = String(adId).match(/^store:([^:]+):/);
+    if(m){
+      window.location.href = 'rizq_store.html?id=' + encodeURIComponent(m[1]);
+      return false;
     }
     return false;
   }
-  if(ad.href && (ad.fromView || String(ad.id).indexOf('store-') === 0)){
+  /* منتجات المحلات → صفحة المحل */
+  if(ad.fromStore || ad.source === 'store' || String(ad.id).indexOf('store:') === 0){
+    var storeHref = ad.href || (ad.storeId ? ('rizq_store.html?id=' + encodeURIComponent(ad.storeId)) : '');
+    var safeStore = _rizqSafeNavHref(storeHref);
+    if(safeStore) window.location.href = safeStore;
+    return false;
+  }
+  if(ad.href && ad.fromView){
     var safeHref = _rizqSafeNavHref(ad.href);
     if(safeHref) window.location.href = safeHref;
     return false;
@@ -7731,9 +8002,13 @@ function _styBrandChipForLook(items, fr, catKey){
 /** وصف قصير واضح للبطاقة — بدون قصّ منتصف الكلمات */
 function _styClearMeta(items, fr){
   items = Array.isArray(items) ? items.filter(Boolean) : [];
-  if(!items.length) return fr ? 'Sélection Rizq' : 'اختيار رزق';
-  var prices = [];
+  if(!items.length) return fr ? 'Sélection boutiques' : 'من المحلات';
+  var storeName = '';
   var i, d, p;
+  for(i = 0; i < items.length; i++){
+    if(items[i].storeName){ storeName = String(items[i].storeName); break; }
+  }
+  var prices = [];
   for(i = 0; i < items.length; i++){
     d = (typeof trAd === 'function') ? trAd(items[i]) : items[i];
     p = d && (d.price || items[i].price);
@@ -7741,15 +8016,13 @@ function _styClearMeta(items, fr){
   }
   var n = items.length;
   var countLbl = fr
-    ? (n + ' offre' + (n > 1 ? 's' : ''))
-    : (n + ' عروض');
-  if(prices.length){
-    return countLbl + (fr ? ' · dès ' : ' · تبدأ من ') + prices[0];
-  }
-  d = (typeof trAd === 'function') ? trAd(items[0]) : items[0];
-  var title = String((d && (d.title || items[0].title)) || '').trim();
-  if(title.length > 48) title = title.slice(0, 45).trim() + '…';
-  return title || countLbl;
+    ? (n + ' article' + (n > 1 ? 's' : ''))
+    : (n + ' منتجات');
+  var parts = [];
+  if(storeName) parts.push(storeName);
+  parts.push(countLbl);
+  if(prices.length) parts.push((fr ? 'dès ' : 'من ') + prices[0]);
+  return parts.join(' · ');
 }
 function _styBuildCardHtml(opts){
   opts = opts || {};
@@ -7874,6 +8147,11 @@ function rizqFeedStyleSeed(item){
   if(!title) return;
   /* لا بذور من سيارات/شاحنات/إلكترونيات — أزياء وملابس وإكسسوارات فقط */
   if(!_styIsStyleCat(item)) return;
+  /* الإطلالات من المحلات — تجاهل بذور الإعلانات الفردية */
+  var isStore = !!(item.fromStore || item.source === 'store' || item.storeId
+    || String(item.id || '').indexOf('store:') === 0
+    || /rizq_store\.html/i.test(String(item.href || '')));
+  if(!isStore) return;
   var gender = (typeof _styDetectGender === 'function')
     ? _styDetectGender(Object.assign({}, item, { title: title }))
     : 'neutral';
@@ -7884,8 +8162,13 @@ function rizqFeedStyleSeed(item){
   var images = [];
   if(Array.isArray(item.images)) images = item.images.filter(Boolean).slice(0, 6);
   else if(item.image) images = [item.image];
+  var storeId = String(item.storeId || '');
+  if(!storeId){
+    var idm = String(item.id || '').match(/^store:([^:]+):/);
+    if(idm) storeId = idm[1];
+  }
   var seed = {
-    id: String(item.id != null ? item.id : ('seed-' + Date.now())),
+    id: String(item.id != null ? item.id : ('store:' + (storeId || 'store') + ':seed-' + Date.now())),
     title: title,
     titleFR: String(item.titleFR || item.nameF || title),
     emoji: item.emoji || '✨',
@@ -7894,9 +8177,13 @@ function rizqFeedStyleSeed(item){
     subcat: item.subcat || '',
     images: images,
     gender: gender,
-    href: item.href || (item.id != null ? ('rizq_browse.html?id=' + encodeURIComponent(item.id)) : 'rizq_browse.html'),
+    storeId: storeId,
+    storeName: item.storeName || '',
+    href: item.href || (storeId ? ('rizq_store.html?id=' + encodeURIComponent(storeId)) : 'rizq_directory.html?type=store'),
     bg: item.bg || 'linear-gradient(145deg,#e8eef8,#f5f8fc)',
     fromView: true,
+    fromStore: true,
+    source: 'store',
     ts: Date.now()
   };
   var list = _styLoadSeeds().filter(function(s){ return String(s.id) !== String(seed.id); });
@@ -8040,7 +8327,9 @@ function buildStyleIdeas(reshuffle){
   var gendered = pool.filter(function(a){ return _styMatchGender(a, gender); });
   var seeds = _styLoadSeeds().filter(function(s){
     if(!_styIsStyleCat(s)) return false;
-    return _styMatchGender(s, gender);
+    if(!_styMatchGender(s, gender)) return false;
+    /* بذور من المحلات فقط — لا إعلانات فردية */
+    return !!(s.fromStore || s.source === 'store' || s.storeId || String(s.id || '').indexOf('store:') === 0);
   });
   /* سلسلة كاملة مثل النماذج — كل القوالب في شريط أفقي */
   var tplList = _styShuffle(templates);
@@ -8080,7 +8369,9 @@ function buildStyleIdeas(reshuffle){
         seedTiles += _styTileHtml(seedItems[si], (templates[0] && templates[0].emoji && templates[0].emoji[si]) || seedItems[si].emoji, seedItems[si].bg);
       }
       var genderBadge0 = _styGenderBadge(gender, fr);
-      var seedHref = seed.href || ('rizq_browse.html?id=' + encodeURIComponent(seed.id));
+      var seedHref = seed.href
+        || (seed.storeId ? ('rizq_store.html?id=' + encodeURIComponent(seed.storeId)) : '')
+        || 'rizq_directory.html?type=store';
       cards.push(_styBuildCardHtml({
         gender: gender,
         seed: true,
@@ -8089,7 +8380,7 @@ function buildStyleIdeas(reshuffle){
         brandHtml: _styBrandChipForLook(seedItems, fr, 'أزياء'),
         badge: genderBadge0,
         name: seedName,
-        meta: fr ? 'Inspiré par votre consultation' : 'مستوحى من مشاهدتك',
+        meta: fr ? 'Inspiré par une boutique visitée' : 'مستوحى من محل زرته',
         cta: cta,
         href: seedHref,
         primaryId: seed.id
@@ -8129,14 +8420,15 @@ function buildStyleIdeas(reshuffle){
     if(items.length < 3) return; /* لا بطاقة ناقصة ولا خلط أجناس */
     var name = fr ? tpl.fr : tpl.ar;
     var href;
-    if(primary && primary.id){
-      href = 'rizq_browse.html?id=' + encodeURIComponent(primary.id);
-    } else if(tpl.browseSub){
-      href = 'rizq_browse.html?cat=' + encodeURIComponent('أزياء') + '&sub=' + encodeURIComponent(tpl.browseSub);
-    } else if((tpl.cats||[])[0]){
-      href = 'rizq_browse.html?cat=' + encodeURIComponent(tpl.cats[0]);
+    if(primary && primary.href){
+      href = primary.href;
+    } else if(primary && primary.storeId){
+      href = 'rizq_store.html?id=' + encodeURIComponent(primary.storeId);
+    } else if(primary && primary.id && String(primary.id).indexOf('store:') === 0){
+      var sm = String(primary.id).match(/^store:([^:]+):/);
+      href = sm ? ('rizq_store.html?id=' + encodeURIComponent(sm[1])) : 'rizq_directory.html?type=store';
     } else {
-      href = 'rizq_browse.html';
+      href = 'rizq_directory.html?type=store';
     }
     var genderBadge = _styGenderBadge(gender, fr);
     var tiles = '';
@@ -8193,7 +8485,8 @@ function buildStyleIdeas(reshuffle){
     var dEx = (typeof trAd === 'function') ? trAd(adEx) : adEx;
     var nameEx = String((dEx && (dEx.title || adEx.title)) || (fr ? 'Look Rizq' : 'إطلالة رزق'));
     if(nameEx.length > 52) nameEx = nameEx.slice(0, 49).trim() + '…';
-    var hrefEx = 'rizq_browse.html?id=' + encodeURIComponent(adEx.id);
+    var hrefEx = adEx.href
+      || (adEx.storeId ? ('rizq_store.html?id=' + encodeURIComponent(adEx.storeId)) : 'rizq_directory.html?type=store');
     cards.push(_styBuildCardHtml({
       gender: gender,
       tilesHtml: tilesEx,
@@ -8211,8 +8504,10 @@ function buildStyleIdeas(reshuffle){
     rail.classList.add('is-empty');
     var emptyGender = _styGenderBadge(gender, fr);
     rail.innerHTML = '<div class="rizq-styles-empty">'+(fr
-      ? ('Pas encore assez d\'annonces « '+emptyGender+' » pour suggérer des looks. Parcourez la mode ou revenez bientôt.')
-      : ('لا توجد إعلانات كافية لقسم « '+emptyGender+' » لاقتراح إطلالات. تصفّح الأزياء أو عد لاحقاً.'))+'</div>';
+      ? ('Pas encore assez de produits « '+emptyGender+' » dans les boutiques mode. Parcourez les magasins ou revenez bientôt.')
+      : ('لا توجد منتجات كافية لقسم « '+emptyGender+' » في محلات الموضة. تصفّح المحلات أو عد لاحقاً.'))
+      + '<div style="margin-top:12px"><a class="rizq-style-cta" href="rizq_directory.html?type=store">'
+      + (fr ? 'Voir les boutiques' : 'عرض المحلات') + '</a></div></div>';
     return;
   }
   rail.classList.remove('is-empty');
@@ -8447,7 +8742,7 @@ function buildShowroomModels(reshuffle){
   var meta = _srmCatMeta(cat);
   var templates = _srmTemplatesFor(cat);
   /* دائماً أدرج FEATURED showcase حتى بعد hydrateLiveAds الذي يفرّغ ADS */
-  var pool = (typeof _styPool === 'function' ? _styPool() : []).filter(function(a){ return _srmIsModelCat(a, cat); });
+  var pool = (typeof _styAdsPool === 'function' ? _styAdsPool() : (typeof _styPool === 'function' ? _styPool() : [])).filter(function(a){ return _srmIsModelCat(a, cat); });
   var tplList = (typeof _styShuffle === 'function' ? _styShuffle(templates) : templates.slice());
   var usedPrimary = {};
   var cards = [];
@@ -10183,8 +10478,9 @@ const LANG = {
     'ft-sig': '<span>بتوقيع</span><span style="color:var(--gold)">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong>',
     's-cats-tag': 'كل الأقسام',
     's-price-tag': 'خطط الأسعار',
+    'sty-tag': 'أفكار الأنماط',
     'sty-title': 'إطلالات تليق بك على <span>رزق</span>',
-    'sty-desc': 'موضة وإكسسوارات مختارة تلهم إطلالتك القادمة من قلب السوق.',
+    'sty-desc': 'موضة وإكسسوارات من محلات الملابس على المنصة — رجال، نساء، أولاد وبنات.',
     'sty-reshuffle': '🔀 إطلالات جديدة',
     'sty-men': 'رجال',
     'sty-women': 'نساء',
@@ -10347,8 +10643,9 @@ const LANG = {
     'ft-sig': '<span>Signé par</span><span style="color:var(--gold)">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong>',
     's-cats-tag': 'Toutes les catégories',
     's-price-tag': 'Offres tarifaires',
+    'sty-tag': 'Idées de style',
     'sty-title': 'Des looks dignes de vous sur <span>Rizq</span>',
-    'sty-desc': 'Mode et accessoires sélectionnés pour inspirer votre prochain look depuis le cœur du marché.',
+    'sty-desc': 'Mode et accessoires issus des boutiques vêtements sur Rizq — hommes, femmes, garçons et filles.',
     'sty-reshuffle': '🔀 Nouveaux looks',
     'sty-men': 'Hommes',
     'sty-women': 'Femmes',
@@ -15609,6 +15906,19 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       var lastX = null;
       var lastT = 0;
       var lastTs = 0;
+      var dir = 1;
+      var userPaused = false;
+      var hoverPaused = false;
+      var ctl = {
+        get boostPx(){ return boostPx; },
+        set boostPx(v){ boostPx = v; },
+        get dir(){ return dir; },
+        set dir(v){ dir = v < 0 ? -1 : 1; },
+        get userPaused(){ return userPaused; },
+        set userPaused(v){ userPaused = !!v; },
+        get hoverPaused(){ return hoverPaused; },
+        set hoverPaused(v){ hoverPaused = !!v; }
+      };
       function isRtl(){ return document.documentElement.getAttribute('dir') !== 'ltr'; }
       function loopSpan(){
         var n = parseInt(track.getAttribute('data-loop-copies') || '2', 10) || 2;
@@ -15635,8 +15945,9 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         if(lastX != null){
           var dx = clientX - lastX;
           var dt = Math.max(8, t - lastT);
-          applyBoost(Math.abs(dx) / dt * 1000 * 0.42);
+          if(!(userPaused || hoverPaused)) applyBoost(Math.abs(dx) / dt * 1000 * 0.42);
           if(drag){
+            if(dx) dir = dx < 0 ? -1 : 1;
             /* سحب يدوي يزيح الشريط فوراً */
             pos += isRtl() ? dx : -dx;
             apply();
@@ -15653,7 +15964,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       strip.addEventListener('pointerleave', function(){ if(!dragging) lastX = null; }, {passive:true});
       strip.addEventListener('pointermove', function(ev){
         if(ev.pointerType === 'mouse' && ev.buttons === 0){
-          samplePointer(ev.clientX, false);
+          if(!(userPaused || hoverPaused)) samplePointer(ev.clientX, false);
           return;
         }
         if(ev.buttons || ev.pointerType === 'touch' || ev.pointerType === 'pen'){
@@ -15670,8 +15981,14 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       strip.addEventListener('wheel', function(ev){
         var dx = Math.abs(ev.deltaX) > Math.abs(ev.deltaY) ? ev.deltaX : ev.deltaY;
         if(!dx) return;
+        dir = dx > 0 ? 1 : -1;
+        if(userPaused || hoverPaused){
+          pos += (isRtl() ? -dx : dx) * 0.35;
+          apply();
+          return;
+        }
         applyBoost(Math.min(220, Math.abs(dx) * 2.4));
-        pos += isRtl() ? -dx * 0.35 : dx * 0.35;
+        pos += (isRtl() ? -dx : dx) * 0.35;
         apply();
       }, {passive:true});
       function step(ts){
@@ -15679,9 +15996,11 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         var dt = Math.min(48, ts - lastTs);
         lastTs = ts;
         var span = loopSpan();
-        if(!dragging && span > 1){
-          pos += (basePx + boostPx) * (dt / 1000);
+        var paused = !!(userPaused || hoverPaused);
+        if(!dragging && !paused && span > 1){
+          pos += (basePx + boostPx) * (dt / 1000) * (dir < 0 ? -1 : 1);
           if(pos >= span) pos -= span;
+          if(pos < 0) pos += span;
           apply();
         }
         requestAnimationFrame(step);
@@ -15690,6 +16009,12 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         pos = 0;
         apply();
       } catch (e0) {}
+      try{
+        strip._kitCtl = ctl;
+        if(window.RizqMarqueeKit && typeof RizqMarqueeKit.enhanceDiscStrip === 'function'){
+          RizqMarqueeKit.enhanceDiscStrip(strip, ctl);
+        }
+      }catch(eKitD){}
       requestAnimationFrame(step);
     }
 

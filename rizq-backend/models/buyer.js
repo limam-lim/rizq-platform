@@ -111,7 +111,8 @@ function registerOrLogin(payload) {
     err.code = 'WHATSAPP_REQUIRED';
     throw err;
   }
-  if (!passHash) {
+  /* كلمة المرور اختيارية بعد OTP (Guest Gate) — إن وُجدت يجب ≥6 */
+  if (password && !passHash) {
     const err = new Error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
     err.status = 400;
     err.code = 'WEAK_PASSWORD';
@@ -132,11 +133,19 @@ function registerOrLogin(payload) {
       err.code = 'PHONE_IN_USE';
       throw err;
     }
-    db.prepare(`
-      UPDATE buyers SET name = ?, email = ?, email_lc = ?, phone = ?, phone_intl = ?, whatsapp = ?,
-        pass_hash = ?, token = ?, last_login_at = ?
-      WHERE id = ?
-    `).run(cleanName, cleanEmail, cleanEmail, primaryPhone, intl, wa, passHash, token, now, row.id);
+    if (passHash) {
+      db.prepare(`
+        UPDATE buyers SET name = ?, email = ?, email_lc = ?, phone = ?, phone_intl = ?, whatsapp = ?,
+          pass_hash = ?, token = ?, last_login_at = ?
+        WHERE id = ?
+      `).run(cleanName, cleanEmail, cleanEmail, primaryPhone, intl, wa, passHash, token, now, row.id);
+    } else {
+      db.prepare(`
+        UPDATE buyers SET name = ?, email = ?, email_lc = ?, phone = ?, phone_intl = ?, whatsapp = ?,
+          token = ?, last_login_at = ?
+        WHERE id = ?
+      `).run(cleanName, cleanEmail, cleanEmail, primaryPhone, intl, wa, token, now, row.id);
+    }
     row = findById(row.id);
     return { buyer: publicBuyer(row), token, created: false };
   }

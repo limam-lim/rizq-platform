@@ -59,6 +59,22 @@ body.rizq-mockup-hdr-trial.rizq-page-light .est-tab:not(.is-active),
 body.rizq-mockup-hdr-trial.rizq-page-light .est-deal button:not(.is-on){
   color:#2f3c4d!important;
 }
+/* إخفاء الشريط القديم فوراً — لا يعتمد على body class حتى لا يظهر عند Ctrl+F5 */
+html.rizq-app-nav #nav,
+html.rizq-app-nav #rizq-desk-nav,
+html.rizq-app-nav #rizq-thumb-dock,
+html.rizq-app-nav .rizq-thumb-dock,
+html.rizq-app-nav #rizq-search-theater,
+html.rizq-app-nav #rizq-search-pill,
+html.rizq-app-nav .nav-sticky-tools,
+html.rizq-app-nav .hero-browse-panel,
+html.rizq-app-nav .hero-stage-intent,
+html.rizq-app-nav .mobile-bottom-nav,
+html.rizq-app-nav #mobile-bottom-nav,
+html.rizq-app-nav #section-jump-bar,
+html.rizq-app-nav .section-jump-bar,
+html.rizq-app-nav #rizq-announce-ticker,
+html.rizq-app-nav .rizq-splash,
 body.rizq-mockup-hdr-trial #nav,
 body.rizq-mockup-hdr-trial #rizq-desk-nav,
 body.rizq-mockup-hdr-trial #rizq-thumb-dock,
@@ -76,6 +92,21 @@ body.rizq-mockup-hdr-trial .rmh-util,
 body.rizq-mockup-hdr-trial .est-top,
 body.rizq-mockup-hdr-trial > nav:not(#rizq-desk-nav):not(#rizq-thumb-dock):not(.rmh-nav):not(.rizq-thumb-dock){
   display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+}
+/* أقوى من قواعد rizq-phone-thumb-dock — الشريط الموحّد rmh يكفي */
+html.rizq-app-nav.rizq-phone-thumb-dock body.rizq-mockup-hdr-trial #rizq-thumb-dock,
+html.rizq-app-nav.rizq-phone-thumb-dock body.rizq-mockup-hdr-trial #rizq-thumb-dock:not([hidden]),
+html.rizq-app-nav body.rizq-mockup-hdr-trial #rizq-thumb-dock,
+html.rizq-app-nav body.rizq-mockup-hdr-trial .rizq-thumb-dock{
+  display:none!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
+  height:0!important;
+  min-height:0!important;
+  padding:0!important;
+  overflow:hidden!important;
 }
 /* شريط الخدمة العامة (طوارئ من الأدمن) — يظهر ويتحرك داخل الهيدر */
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-empty{
@@ -996,7 +1027,7 @@ body > .rizq-help-dd-menu a,
 @media(max-width:768px){
   body.rizq-mockup-hdr-trial{
     --rizq-mock-hdr-h: 128px;
-    --rizq-mock-nav-h: 64px;
+    --rizq-mock-nav-h: 72px;
   }
   html.rizq-app-nav:has(#nav) body.rizq-mockup-hdr-trial,
   html.rizq-app-nav:has(#rizq-desk-nav) body.rizq-mockup-hdr-trial,
@@ -1004,7 +1035,7 @@ body > .rizq-help-dd-menu a,
   html.rizq-app-nav body.rizq-mockup-hdr-trial,
   html.rizq-app-nav.rizq-phone-thumb-dock body.rizq-mockup-hdr-trial{
     padding-top:var(--rizq-mock-hdr-h)!important;
-    padding-bottom:calc(var(--rizq-mock-nav-h) + env(safe-area-inset-bottom,0px))!important;
+    padding-bottom:calc(var(--rizq-mock-nav-h) + max(env(safe-area-inset-bottom,0px),20px))!important;
   }
   .rmh-util{display:none}
   #rizq-mock-hdr{
@@ -1118,14 +1149,33 @@ body > .rizq-help-dd-menu a,
     width:100%!important;
     max-width:100%!important;
     margin:0!important;
-    padding:3px 4px calc(3px + env(safe-area-inset-bottom,0px))!important;
+    /* غطِّ أزرار نظام أندرويد خلف الشريط */
+    padding:6px 4px calc(6px + max(env(safe-area-inset-bottom,0px),20px))!important;
     border-radius:14px 14px 0 0!important;
     border-left:0!important;
     border-right:0!important;
     border-bottom:0!important;
-    background:rgba(10,22,40,.98)!important;
+    background:#070e1a!important;
     box-shadow:0 -8px 24px rgba(0,0,0,.35)!important;
     justify-content:space-around!important;
+    isolation:isolate;
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+  }
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top)::after,
+  nav.rmh-nav:not(.rmh-nav-top)::after{
+    content:""!important;
+    position:absolute!important;
+    left:0!important;right:0!important;bottom:0!important;
+    height:max(env(safe-area-inset-bottom,0px),20px)!important;
+    background:#070e1a!important;
+    pointer-events:none!important;
+    z-index:0!important;
+  }
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > *,
+  nav.rmh-nav:not(.rmh-nav-top) > *{
+    position:relative!important;
+    z-index:1!important;
   }
   .rmh-nav a.rmh-post-nav{min-width:52px;font-size:9.5px;padding:4px 4px 6px}
   .rmh-nav a{min-width:52px;font-size:9.5px;padding:4px 4px 6px}
@@ -1141,3 +1191,7 @@ body > .rizq-help-dd-menu a,
     max-height:min(55vh,320px);
   }
 }
+
+
+/* cart popup removed — cart icon navigates to rizq_cart.html */
+#rmh-cart-panel,.rmh-cart-panel{display:none!important}

@@ -624,17 +624,17 @@ html[dir="ltr"] .rizq-hdr-more-menu {
   left: auto !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
   transition: opacity 0.3s ease, visibility 0.3s ease;
   z-index: 999999 !important;
 }
 
 .fixed-rizq-logo.rzq-rlogo-visible {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
 }
 
 #rizq-rlogo-edge {

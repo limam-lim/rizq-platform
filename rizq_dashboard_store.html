@@ -14,12 +14,17 @@
 <meta name="color-scheme" content="light">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap" rel="stylesheet"/>
+
 <title>داشبورد المحل — منصة <span style="color:#e8c96a;font-weight:900">رزق</span></title>
 
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
 <script src="rizq_packages_config.js?v=16.3"></script>
-<script src="rizq_merchant_activities.js?v=2.1"></script>
+<script src="rizq_merchant_activities.js?v=2.2"></script>
+<script src="rizq_categories_config.js?v=1.0"></script>
+<script src="rizq_dyn_filters.js?v=1.0"></script>
+<script src="rizq_listing_context.js?v=1.0"></script>
 <script src="rizq_brands_catalog.js?v=9"></script>
 <script src="rizq_dashboard_agent_chat.js"></script>
 <script src="rizq_dashboard_agent_knowledge.js"></script>
@@ -50,6 +55,7 @@
 
 <script src="rizq_pwa.js" defer></script>
 <link rel="stylesheet" href="rizq_dashboard_store.css?v=1"/>
+<link rel="stylesheet" href="rizq_dashboard_premium.css?v=1"/>
 </head>
 <body data-t-ns="dashboard_store" class="rizq-dash"><!-- RIZQ-BUILD:202606131951 -->
 
@@ -110,15 +116,15 @@
     <div class="sb-item" onclick="showPanel('hours',this)"><span class="sb-icon">🕐</span><span data-t="sb-hours">ساعات العمل</span></div>
     <div class="sb-item" onclick="showPanel('photos',this)"><span class="sb-icon">📸</span><span data-t="sb-photos">صور المحل</span></div>
 
+    <div class="sb-section" data-t="sb-sec-ai">ذكاء اصطناعي</div>
+    <div class="sb-item" onclick="showPanel('agents',this)"><span class="sb-icon">🤖</span><span data-t="sb-agents">الوكيل الذكي</span></div>
+
     <div class="sb-section" data-t="sb-sec-account">الحساب</div>
     <div class="sb-item" onclick="showPanel('subscription',this)"><span class="sb-icon">💳</span><span data-t="sb-subscription">اشتراكي</span></div>
     <div class="sb-item" onclick="showPanel('referral',this)"><span class="sb-icon">🎁</span><span data-t="sb-referral">إحالة الأصدقاء</span></div>
     <div class="sb-item" onclick="showPanel('verifiedplus',this)"><span class="sb-icon">🛡️</span><span data-t="sb-verifiedplus">شارة موثّق⁺</span></div>
     <div class="sb-item" onclick="showPanel('mypayments',this)"><span class="sb-icon">🏦</span><span data-t="sb-mypayments">طرق الدفع</span></div>
     <div class="sb-item" onclick="showPanel('settings',this)"><span class="sb-icon">⚙️</span><span data-t="sb-settings">الإعدادات</span></div>
-
-    <div class="sb-section" data-t="sb-sec-ai">ذكاء اصطناعي</div>
-    <div class="sb-item" onclick="showPanel('agents',this)"><span class="sb-icon">🤖</span><span data-t="sb-agents">الوكلاء الذكيون</span></div>
   </nav>
 
   <div class="sb-footer">
@@ -336,6 +342,18 @@
             </select>
             <p style="font-size:11px;color:var(--text-muted);margin-top:6px" data-t="prod-cat-hint">إن لم تجد الموضوع المناسب، أضفه أعلاه أولاً ثم اختره هنا.</p>
           </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">قسم السوق (مربوط بنشاطك)</label>
+              <select class="form-input" id="prod-category-id" aria-label="category_id"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">النوع / الفرع *</label>
+              <select class="form-input" id="prod-subcategory-id" aria-label="sub_category_id"></select>
+            </div>
+          </div>
+          <div id="prod-attrs-mount" style="margin-top:10px;display:none"></div>
+          <div id="prod-listing-ctx-hint"></div>
           <div class="form-grid">
             <div class="form-group">
               <label class="form-label" data-t="prod-brand-label">الماركة</label>
@@ -873,6 +891,7 @@
       </div>
       <!-- Bank Codes -->
       <div id="pay-banks" style="margin-bottom:18px"></div>
+      <div id="pay-price-unset-block" style="display:none;background:#fff7ed;border:1px solid #fdba74;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:#9a3412;font-weight:700;line-height:1.65"></div>
       <!-- Upload Receipt -->
       <div style="border:2px dashed rgba(27,58,107,.2);border-radius:12px;padding:16px;text-align:center;cursor:pointer;transition:border-color .2s" onclick="document.getElementById('pay-receipt-file').click()" onmouseover="this.style.borderColor='rgba(27,58,107,.4)'" onmouseout="this.style.borderColor='rgba(27,58,107,.2)'" id="pay-upload-zone">
         <div style="font-size:28px;margin-bottom:6px">🧾</div>
@@ -917,6 +936,7 @@
     <text x="27" y="27" text-anchor="middle" font-family="Georgia,serif" font-size="9" font-weight="700" fill="#C9A84C">&#x631;</text>
   </svg>
 </a>
+<script src="rizq_dashboard_ui.js?v=1"></script>
 <script src="rizq_dashboard_store_app.js?v=2"></script>
 </body>
 </html>

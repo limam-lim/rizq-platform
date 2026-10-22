@@ -3198,6 +3198,15 @@ const PKG_DEFAULTS = {
     {id:'cp-diam-std', name:'الماسية الأساسية للشركات', price:6000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_standard', audioAccess:false, quotaMessages:4000, quotaMinutes:0, maxCatalogItems:Infinity, features:['نائب ذكي نصي للشركة (موقع + واتساب)','4,000 محادثة نصية شهرياً','لوحة متابعة وتحليل الأداء لحظياً','هوية مخصصة باسم شركتك'], active:true},
     {id:'cp-diam-pro', name:'الماسية Pro للشركات', price:15000, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_pro', audioAccess:true, quotaMessages:7000, quotaMinutes:600, maxCatalogItems:Infinity, features:['نائب ذكي تفاعلي للشركة (نصي + صوتي)','7,000 محادثة نصية + 600 دقيقة صوتية شهرياً','ويدجت الموقع + واتساب + مكالمات تفاعلية','تكامل API / ERP','لوحة متابعة وتحليل الأداء لحظياً'], active:true},
   ],
+  /* سوق العقارات — أسعار افتراضية؛ غيّرها من هنا كسوبر أدمن ثم احفظ */
+  estate: [
+    {id:'es-trial', name:'تجريبية عقارات', price:0,     period:'مجاناً — 10 أيام', durationDays:10,  maxCatalogItems:3, features:['حتى 3 عقارات نشطة','صفحة الوكالة العامة','استقبال طلبات المعاينة','ساعات عمل'], active:true},
+    {id:'es-month', name:'شهرية عقارات',   price:4000,  period:'MRU / شهر',        durationDays:30,  maxCatalogItems:25, features:['حتى 25 عقاراً نشطاً','شارة وكالة موثوقة','خريطة ومواصفات كاملة','طرق دفع + إحالة'], active:true},
+    {id:'es-quart', name:'ربعية عقارات',   price:10500, period:'MRU / 3 أشهر',     durationDays:90,  maxCatalogItems:80, features:['حتى 80 عقاراً','أولوية في نتائج البحث','إحصائيات زيارات','دعم بالأولوية'], active:true},
+    {id:'es-year',  name:'سنوية عقارات',   price:32000, period:'MRU / 12 شهر',     durationDays:365, maxCatalogItems:200, features:['حتى 200 عقار','فيديو تعريفي','تقارير سنوية','دعم VIP'], active:true},
+    {id:'es-diam-std', name:'الماسية الأساسية للعقارات', price:4500, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_standard', audioAccess:false, quotaMessages:2000, quotaMinutes:0, maxCatalogItems:Infinity, features:['عقارات غير محدودة','نائب ذكي نصي للوكالة (موقع + واتساب)','2,000 محادثة نصية شهرياً','أولوية ظهور'], active:true},
+    {id:'es-diam-pro', name:'الماسية Pro للعقارات', price:8500, period:'MRU / شهر', durationDays:30, diamondTier:'diamond_pro', audioAccess:true, quotaMessages:4000, quotaMinutes:300, maxCatalogItems:Infinity, features:['كل مزايا الماسية الأساسية','نائب ذكي نصي + صوتي','4,000 محادثة + 300 دقيقة صوتية','دعم مؤسسي'], active:true},
+  ],
   video: [
     {id:'vid-single',   name:'إعلان فيديو واحد', price:1500,  period:'MRU / إعلان · 10 أيام', durationDays:10, maxVideosPerMonth:1, payPerAd:true, features:['فيديو إعلاني واحد لمدة 10 أيام','ظهور في قسم الإعلانات بالصفحة الرئيسية','دفع لكل إعلان — بلا اشتراك شهري'], active:true},
     {id:'vid-basic',    name:'أساسي فيديو',      price:5000,  period:'MRU / شهر', durationDays:30, maxVideosPerMonth:3, features:['حتى 3 فيديوهات إعلانية ترويجية شهرياً (عرض منتجات متعددة)','ظهور في قسم الإعلانات بالصفحة الرئيسية','إحصائيات أداء أساسية آلية'], active:true},
@@ -3245,6 +3254,7 @@ const PKG_CATS = [
   {key:'store',         label:'المحلات',              icon:'🏬', ls:'rizq_store_packages',      hint:'متاجر ومنتجات'},
   {key:'office',        label:'المكاتب',              icon:'💼', ls:'rizq_office_packages',     hint:'مكاتب وخدمات'},
   {key:'corp',          label:'الشركات والمعارض',     icon:'🏢', ls:'rizq_corp_packages',       hint:'شركات ومعارض'},
+  {key:'estate',        label:'سوق العقارات',          icon:'🏠', ls:'rizq_estate_packages',     hint:'وكالات عقارية — الأسعار تحت تحكمك'},
   {key:'tender',        label:'غرفة المناقصات',       icon:'📋', ls:'rizq_tender_packages',     hint:'باقات المناقصة'},
   {key:'investment',    label:'غرفة الاستثمارات',     icon:'📈', ls:'rizq_investment_packages', hint:'باقات الاستثمار — الأسعار تحت تحكمك'},
   {key:'video',         label:'إعلانات الفيديو',      icon:'🎬', ls:'rizq_video_packages',      hint:'فيديو إعلاني'},
@@ -3352,6 +3362,11 @@ function renderPackages(){
           <div class="form-group"><label class="form-label">${t('pkg-period-label','المدة / الوصف')}</label><input class="form-input pkg-period-input" value="${_pe(p.period||'')}"/></div>
           <div class="form-group"><label class="form-label">${t('pkg-duration-label','عدد الأيام')}</label><input class="form-input pkg-duration-input" type="number" value="${Number(p.durationDays)||30}" dir="ltr"/></div>
         </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div class="form-group"><label class="form-label">${t('pkg-bg-label','لون الخلفية')}</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input pkg-bg-input" type="text" value="${_pe(p.bgColor||'')}" placeholder="#0a1628" dir="ltr" style="flex:1"/><input type="color" class="pkg-bg-picker" value="${_pe((p.bgColor&&/^#[0-9a-fA-F]{6}$/.test(p.bgColor))?p.bgColor:'#0a1628')}" oninput="var i=this.closest('.form-group').querySelector('.pkg-bg-input');if(i)i.value=this.value" title="${_pe(t('pkg-bg-pick','اختر لون الخلفية'))}"/></div></div>
+          <div class="form-group"><label class="form-label">${t('pkg-text-label','لون النص')}</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input pkg-text-input" type="text" value="${_pe(p.textColor||'')}" placeholder="#ffffff" dir="ltr" style="flex:1"/><input type="color" class="pkg-text-picker" value="${_pe((p.textColor&&/^#[0-9a-fA-F]{6}$/.test(p.textColor))?p.textColor:'#ffffff')}" oninput="var i=this.closest('.form-group').querySelector('.pkg-text-input');if(i)i.value=this.value" title="${_pe(t('pkg-text-pick','اختر لون النص'))}"/></div></div>
+          <div class="form-group"><label class="form-label">${t('pkg-accent-label','لون التمييز')}</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input pkg-accent-input" type="text" value="${_pe(p.accentColor||'')}" placeholder="#C9A84C" dir="ltr" style="flex:1"/><input type="color" class="pkg-accent-picker" value="${_pe((p.accentColor&&/^#[0-9a-fA-F]{6}$/.test(p.accentColor))?p.accentColor:'#C9A84C')}" oninput="var i=this.closest('.form-group').querySelector('.pkg-accent-input');if(i)i.value=this.value" title="${_pe(t('pkg-accent-pick','اختر لون التمييز'))}"/></div></div>
+        </div>
         <div class="form-group"><label class="form-label">${t('pkg-feats-label','المميزات (كل ميزة في سطر)')}</label><textarea class="form-input pkg-feats-input" rows="3" style="resize:vertical">${_pe((p.features||[]).join('\n'))}</textarea></div>
         <button class="btn-sm btn-outline" onclick="deletePackage(${i})">${t('pkg-delete-btn','🗑 حذف الباقة')}</button>
       </div>
@@ -3362,7 +3377,7 @@ function renderPackages(){
 function addPkg(){
   const t = (k,fb)=> window.RizqI18n ? RizqI18n.t(k,'admin') : fb;
   const pkgs = loadPkgCategory(currentPkgCat);
-  pkgs.push({id:'pkg'+Date.now(), name:t('pkg-new-name','باقة جديدة'), price:0, period:t('pkg-new-period','MRU / شهر'), durationDays:30, features:[t('pkg-new-feat1','ميزة 1'),t('pkg-new-feat2','ميزة 2')], active:true});
+  pkgs.push({id:'pkg'+Date.now(), name:t('pkg-new-name','باقة جديدة'), price:0, period:t('pkg-new-period','MRU / شهر'), durationDays:30, features:[t('pkg-new-feat1','ميزة 1'),t('pkg-new-feat2','ميزة 2')], bgColor:'', textColor:'', accentColor:'', active:true});
   localStorage.setItem(pkgCatInfo(currentPkgCat).ls, JSON.stringify(pkgs));
   _syncPkgCatToBackend(currentPkgCat, pkgs);
   renderPackages();
@@ -3392,6 +3407,9 @@ function savePkgCategory(){
     pkgs[i].period = card.querySelector('.pkg-period-input').value.trim();
     pkgs[i].durationDays = +card.querySelector('.pkg-duration-input').value || 30;
     pkgs[i].features = card.querySelector('.pkg-feats-input').value.split('\n').map(f=>f.trim()).filter(Boolean);
+    pkgs[i].bgColor = (card.querySelector('.pkg-bg-input')||{}).value.trim() || '';
+    pkgs[i].textColor = (card.querySelector('.pkg-text-input')||{}).value.trim() || '';
+    pkgs[i].accentColor = (card.querySelector('.pkg-accent-input')||{}).value.trim() || '';
     pkgs[i].active = card.querySelector('.toggle-sw').classList.contains('on');
   });
   localStorage.setItem(pkgCatInfo(currentPkgCat).ls, JSON.stringify(pkgs));

@@ -1,0 +1,773 @@
+/**
+ * rizq_dashboard_premium.css — مساحة المشترك الخاصة (Private Digital Space)
+ * Unified premium layer for all rizq_dashboard*.html
+ * Load AFTER page-specific CSS so tokens + button rhythm win.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@500;600;700;800;900&display=swap');
+
+/* ── Design tokens (Rizq Navy / Gold / Soft Slate) ─────────── */
+.rizq-dash,
+body.rizq-dash,
+html:has(body.rizq-dash) {
+  --rizq-navy: #0a192f;
+  --rizq-navy-mid: #0f2347;
+  --rizq-royal: #1b3a6b;
+  --rizq-royal-light: #234d8f;
+  --rizq-gold: #c9a84c;
+  --rizq-gold-light: #e8c96a;
+  --rizq-gold-dk: #a07820;
+  --rizq-slate: #eef2f7;
+  --rizq-slate-soft: #f5f7fb;
+  --rizq-ink: #1a2535;
+  --rizq-muted: #2c3a4f;
+  --rizq-border: rgba(27, 58, 107, 0.12);
+  --rizq-glow: rgba(201, 168, 76, 0.35);
+  --rizq-radius: 12px;
+  --rizq-radius-lg: 16px;
+  --rizq-btn-h: 40px;
+  --rizq-btn-h-sm: 34px;
+  --rizq-btn-h-lg: 46px;
+  --rizq-btn-px: 18px;
+  --rizq-btn-px-sm: 14px;
+  --rizq-brand-accent: var(--rizq-gold);
+  --navy: var(--rizq-royal);
+  --royal: var(--rizq-royal);
+  --royal-light: var(--rizq-royal-light);
+  --royal-dark: var(--rizq-navy-mid);
+  --gold: var(--rizq-gold);
+  --gold-light: var(--rizq-gold-light);
+  --gold-dk: var(--rizq-gold-dk);
+}
+
+body.rizq-dash,
+.rizq-dash {
+  font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif !important;
+  background:
+    radial-gradient(1200px 500px at 100% -10%, rgba(201, 168, 76, 0.08), transparent 55%),
+    radial-gradient(900px 420px at 0% 0%, rgba(27, 58, 107, 0.07), transparent 50%),
+    linear-gradient(180deg, var(--rizq-slate-soft) 0%, var(--rizq-slate) 100%) !important;
+  color: var(--rizq-ink);
+}
+
+/* ── Unified button rhythm (تناسق الأزرار وقياساتهم) ───────── */
+.rizq-dash .btn,
+.rizq-dash button.btn,
+.rizq-dash .topbar-btn,
+.rizq-dash .btn-new-ad,
+.rizq-dash .share-btn,
+.rizq-dash .btn-photo-pick {
+  min-height: var(--rizq-btn-h);
+  height: auto;
+  padding: 0 var(--rizq-btn-px) !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  font-family: inherit !important;
+  line-height: 1.2;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease, color 0.2s ease !important;
+  box-sizing: border-box;
+  white-space: nowrap;
+}
+
+.rizq-dash .btn-sm,
+.rizq-dash .topbar-btn,
+.rizq-dash .topbar .btn-sm,
+.rizq-dash .topbar-controls .btn,
+.rizq-dash .topbar-actions .btn,
+.rizq-dash .topbar-ctas .btn {
+  min-height: var(--rizq-btn-h-sm);
+  padding: 0 var(--rizq-btn-px-sm) !important;
+  font-size: 12.5px !important;
+  border-radius: 9px !important;
+}
+
+.rizq-dash .btn-lg,
+.rizq-dash .btn-primary.btn-lg {
+  min-height: var(--rizq-btn-h-lg);
+  padding: 0 22px !important;
+  font-size: 14px !important;
+  border-radius: 12px !important;
+}
+
+.rizq-dash .btn-gold,
+.rizq-dash .topbar-btn.gold,
+.rizq-dash .btn-new-ad {
+  background: linear-gradient(135deg, var(--rizq-gold), var(--rizq-gold-light)) !important;
+  color: var(--rizq-navy-mid) !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(201, 168, 76, 0.28);
+}
+
+.rizq-dash .btn-gold:hover,
+.rizq-dash .topbar-btn.gold:hover,
+.rizq-dash .btn-new-ad:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(201, 168, 76, 0.45);
+}
+
+.rizq-dash .btn-primary {
+  background: var(--rizq-royal) !important;
+  color: #fff !important;
+}
+
+.rizq-dash .btn-primary:hover {
+  background: var(--rizq-royal-light) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(27, 58, 107, 0.25);
+}
+
+.rizq-dash .btn-outline,
+.rizq-dash .topbar-btn:not(.gold) {
+  background: #fff !important;
+  color: var(--rizq-royal) !important;
+  border: 1.5px solid var(--rizq-border) !important;
+}
+
+.rizq-dash .topbar .btn-outline,
+.rizq-dash .topbar .topbar-btn:not(.gold) {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #fff !important;
+}
+
+.rizq-dash .btn-outline:hover,
+.rizq-dash .topbar-btn:not(.gold):hover {
+  border-color: var(--rizq-brand-accent) !important;
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+  transform: translateY(-2px);
+}
+
+.rizq-dash .btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.3);
+}
+
+/* Hero / welcome banner CTAs — same rhythm as .btn */
+.rizq-dash .welcome-banner button,
+.rizq-dash #hero-banner button,
+.rizq-dash [id^="hero-"] button,
+.rizq-dash .card-title + button,
+.rizq-dash #services-showcase ~ * .btn,
+.rizq-dash .rizq-pkg-widget__actions .btn {
+  min-height: var(--rizq-btn-h-sm);
+  padding-inline: var(--rizq-btn-px-sm) !important;
+  border-radius: 9px !important;
+  font-size: 12.5px !important;
+  font-weight: 800 !important;
+  font-family: inherit !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.rizq-dash .welcome-banner button:hover,
+.rizq-dash #hero-banner button:hover {
+  transform: translateY(-2px);
+}
+
+/* Icon / bell buttons keep square rhythm */
+.rizq-dash .notif-bell,
+.rizq-dash .btn-icon {
+  width: 38px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  padding: 0 !important;
+  cursor: pointer !important;
+}
+
+/* ── Cursor pointer on EVERY interactive surface ───────────── */
+.rizq-dash button,
+.rizq-dash a,
+.rizq-dash label,
+.rizq-dash summary,
+.rizq-dash [onclick],
+.rizq-dash [role="button"],
+.rizq-dash .sb-item,
+.rizq-dash .nav-item,
+.rizq-dash .qa-card,
+.rizq-dash .stat-card,
+.rizq-dash .product-card,
+.rizq-dash .prop-card,
+.rizq-dash .upload-zone,
+.rizq-dash .svc-tile,
+.rizq-dash .pkg-widget,
+.rizq-dash .preview-bar__cta,
+.rizq-dash .hours-mode-btn,
+.rizq-dash .pm-tab,
+.rizq-dash .share-btn,
+.rizq-dash .sb-logout,
+.rizq-dash input[type="checkbox"],
+.rizq-dash input[type="radio"],
+.rizq-dash input[type="file"],
+.rizq-dash select {
+  cursor: pointer !important;
+}
+
+.rizq-dash input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]),
+.rizq-dash textarea {
+  cursor: text !important;
+}
+
+.rizq-dash button:disabled,
+.rizq-dash .btn:disabled,
+.rizq-dash [aria-disabled="true"] {
+  cursor: not-allowed !important;
+  opacity: 0.55;
+  transform: none !important;
+}
+
+/* ── Micro-interactions / hover lift ───────────────────────── */
+.rizq-dash .qa-card,
+.rizq-dash .svc-tile,
+.rizq-dash .stat-card,
+.rizq-dash .product-card,
+.rizq-dash .prop-card,
+.rizq-dash .upload-zone {
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease !important;
+}
+
+.rizq-dash .qa-card:hover,
+.rizq-dash .svc-tile:hover,
+.rizq-dash .stat-card:hover,
+.rizq-dash .product-card:hover,
+.rizq-dash .prop-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 28px rgba(10, 25, 47, 0.12);
+  border-color: rgba(201, 168, 76, 0.45);
+}
+
+.rizq-dash .upload-zone:hover {
+  border-color: var(--rizq-gold) !important;
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
+  transform: translateY(-1px);
+}
+
+.rizq-dash .sb-item:hover,
+.rizq-dash .nav-item:hover {
+  transform: translateX(-2px);
+}
+
+html[dir="ltr"] .rizq-dash .sb-item:hover,
+html[dir="ltr"] .rizq-dash .nav-item:hover {
+  transform: translateX(2px);
+}
+
+/* ── Live Storefront Preview Bar ───────────────────────────── */
+.rizq-preview-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: linear-gradient(120deg, var(--rizq-navy) 0%, var(--rizq-royal) 55%, #163a72 100%);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+  box-shadow: 0 8px 24px rgba(10, 25, 47, 0.18);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.rizq-preview-bar::before {
+  content: '';
+  position: absolute;
+  inset-inline-end: -40px;
+  top: -40px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: rgba(201, 168, 76, 0.12);
+  pointer-events: none;
+}
+
+.rizq-preview-bar__live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  background: rgba(16, 185, 129, 0.18);
+  color: #6ee7b7;
+  border: 1px solid rgba(110, 231, 183, 0.35);
+  padding: 4px 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.rizq-preview-bar__live::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+  animation: rizqLivePulse 1.6s ease infinite;
+}
+
+@keyframes rizqLivePulse {
+  0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55); }
+  70% { box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+}
+
+.rizq-preview-bar__meta {
+  flex: 1;
+  min-width: 160px;
+}
+
+.rizq-preview-bar__title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.35;
+}
+
+.rizq-preview-bar__sub {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.62);
+  margin-top: 2px;
+}
+
+.rizq-preview-bar__accent {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+  background: var(--rizq-brand-accent, var(--rizq-gold));
+  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+}
+
+.rizq-preview-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rizq-preview-bar__cta {
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 9px;
+  border: none;
+  font-size: 12.5px;
+  font-weight: 800;
+  font-family: inherit;
+  background: linear-gradient(135deg, var(--rizq-gold), var(--rizq-gold-light));
+  color: var(--rizq-navy-mid);
+  box-shadow: 0 4px 12px rgba(201, 168, 76, 0.3);
+}
+
+.rizq-preview-bar__cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(201, 168, 76, 0.45);
+}
+
+.rizq-preview-bar__ghost {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.rizq-preview-bar__ghost:hover {
+  background: rgba(255, 255, 255, 0.16);
+  transform: translateY(-1px);
+}
+
+/* ── Package status widget ─────────────────────────────────── */
+.rizq-pkg-widget {
+  background: #fff;
+  border: 1px solid var(--rizq-border);
+  border-radius: var(--rizq-radius-lg);
+  padding: 16px 18px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 18px rgba(10, 25, 47, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.rizq-pkg-widget::before {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--rizq-gold), var(--rizq-royal));
+}
+
+.rizq-pkg-widget__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.rizq-pkg-widget__title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--rizq-royal);
+}
+
+.rizq-pkg-widget__plan {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(201, 168, 76, 0.18), rgba(201, 168, 76, 0.08));
+  color: var(--rizq-gold-dk);
+  border: 1px solid rgba(201, 168, 76, 0.35);
+}
+
+.rizq-pkg-widget__meter {
+  height: 8px;
+  border-radius: 99px;
+  background: rgba(27, 58, 107, 0.08);
+  overflow: hidden;
+  margin: 8px 0 6px;
+}
+
+.rizq-pkg-widget__fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--rizq-royal), var(--rizq-gold));
+  transition: width 0.7s ease;
+}
+
+.rizq-pkg-widget__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--rizq-muted);
+  font-weight: 600;
+}
+
+.rizq-pkg-widget__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+/* ── Actionable service tiles ──────────────────────────────── */
+#services-showcase {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.rizq-dash .svc-tile {
+  background: #fff;
+  border: 2px solid rgba(27, 58, 107, 0.12);
+  border-radius: 14px;
+  padding: 16px 10px 12px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(27, 58, 107, 0.06);
+  user-select: none;
+}
+
+.rizq-dash .svc-tile.is-locked {
+  border-color: rgba(201, 168, 76, 0.4);
+  background: linear-gradient(180deg, #fffef9, #fff);
+}
+
+.rizq-dash .svc-tile__icon {
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.rizq-dash .svc-tile__label {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--rizq-royal);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.rizq-dash .svc-tile__tip {
+  font-size: 10.5px;
+  color: var(--rizq-muted);
+  line-height: 1.45;
+}
+
+.rizq-dash .svc-tile__badge {
+  position: absolute;
+  top: -1px;
+  inset-inline-end: -1px;
+  font-size: 9.5px;
+  font-weight: 900;
+  padding: 3px 9px;
+  border-radius: 0 12px 0 10px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+html[dir="ltr"] .rizq-dash .svc-tile__badge {
+  border-radius: 12px 0 10px 0;
+}
+
+.rizq-dash .svc-tile__badge.ok {
+  background: rgba(16, 185, 129, 0.14);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.rizq-dash .svc-tile__badge.lock {
+  background: linear-gradient(135deg, var(--rizq-gold), var(--rizq-gold-light));
+  color: var(--rizq-navy-mid);
+}
+
+.rizq-dash .svc-tile__badge.diamond {
+  background: linear-gradient(135deg, #1b3a6b, #4c1d95);
+  color: #e8c96a;
+}
+
+.rizq-dash .svc-tile__dot {
+  margin-top: 10px;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+}
+
+/* ── Hours panel: Open / Closed / 24h ──────────────────────── */
+.rizq-hours-toolbar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.rizq-dash .hours-mode-btn {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--rizq-border);
+  background: #fff;
+  color: var(--rizq-royal);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+}
+
+.rizq-dash .hours-mode-btn.is-active,
+.rizq-dash .hours-mode-btn:hover {
+  border-color: var(--rizq-gold);
+  background: rgba(201, 168, 76, 0.12);
+  color: var(--rizq-gold-dk);
+}
+
+.rizq-dash .hours-row {
+  display: grid;
+  grid-template-columns: minmax(90px, 120px) 1fr 1fr minmax(160px, auto);
+  gap: 10px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(27, 58, 107, 0.06);
+}
+
+.rizq-dash .hours-day-modes {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.rizq-dash .hours-chip {
+  min-height: 28px;
+  padding: 0 8px;
+  border-radius: 7px;
+  border: 1px solid var(--rizq-border);
+  background: #f8faff;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--rizq-muted);
+}
+
+.rizq-dash .hours-chip.is-on {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #047857;
+}
+
+.rizq-dash .hours-chip.is-off {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #b91c1c;
+}
+
+.rizq-dash .hours-chip.is-24 {
+  background: rgba(27, 58, 107, 0.1);
+  border-color: rgba(27, 58, 107, 0.3);
+  color: var(--rizq-royal);
+}
+
+/* ── Rich media upload polish ──────────────────────────────── */
+.rizq-dash .upload-zone,
+.rizq-dash .rizq-dropzone {
+  border: 2px dashed rgba(27, 58, 107, 0.22) !important;
+  border-radius: 14px !important;
+  padding: 22px !important;
+  background: linear-gradient(180deg, #fafcff, #f3f6fb) !important;
+  text-align: center;
+}
+
+.rizq-dash .upload-zone.is-dragover,
+.rizq-dash .rizq-dropzone.is-dragover {
+  border-color: var(--rizq-gold) !important;
+  background: rgba(201, 168, 76, 0.08) !important;
+  box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.12);
+}
+
+.rizq-dash .rizq-dropzone__hint {
+  font-size: 11px;
+  color: var(--rizq-muted);
+  margin-top: 6px;
+}
+
+/* ── Brand accent (white-label) ────────────────────────────── */
+.rizq-dash[data-brand-accent] .btn-gold,
+.rizq-dash[data-brand-accent] .topbar-btn.gold,
+.rizq-dash[data-brand-accent] .svc-tile__badge.lock,
+.rizq-dash[data-brand-accent] .rizq-preview-bar__cta {
+  background: linear-gradient(135deg, var(--rizq-brand-accent), color-mix(in srgb, var(--rizq-brand-accent) 70%, white)) !important;
+}
+
+.rizq-dash .brand-accent-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px var(--rizq-border);
+}
+
+.rizq-dash .brand-customize-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(27, 58, 107, 0.04);
+  border: 1px solid var(--rizq-border);
+  margin-bottom: 14px;
+}
+
+/* ── Map picker trigger ────────────────────────────────────── */
+.rizq-dash .map-picker-btn {
+  min-height: var(--rizq-btn-h-sm);
+  padding: 0 14px;
+  border-radius: 9px;
+  border: 1.5px solid var(--rizq-border);
+  background: #fff;
+  color: var(--rizq-royal);
+  font-size: 12.5px;
+  font-weight: 700;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rizq-dash .map-picker-btn:hover {
+  border-color: var(--rizq-gold);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(27, 58, 107, 0.12);
+}
+
+.rizq-dash .map-picker-coords {
+  font-size: 11.5px;
+  color: var(--rizq-muted);
+  font-family: ui-monospace, monospace;
+  direction: ltr;
+}
+
+/* ── Topbar / sidebar polish ───────────────────────────────── */
+.rizq-dash .topbar {
+  border-bottom: 1px solid rgba(201, 168, 76, 0.18) !important;
+}
+
+.rizq-dash .sidebar,
+.rizq-dash aside.sidebar {
+  background: linear-gradient(180deg, var(--rizq-navy) 0%, var(--rizq-navy-mid) 100%) !important;
+}
+
+/* ── Cards soft elevation ──────────────────────────────────── */
+.rizq-dash .card {
+  border-radius: var(--rizq-radius-lg) !important;
+  border-color: var(--rizq-border) !important;
+  box-shadow: 0 4px 18px rgba(10, 25, 47, 0.05) !important;
+}
+
+/* ── Mobile ────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .rizq-preview-bar {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .rizq-preview-bar__actions {
+    width: 100%;
+  }
+
+  .rizq-preview-bar__cta,
+  .rizq-preview-bar__ghost {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .rizq-dash .hours-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .rizq-dash .hours-day {
+    grid-column: 1 / -1;
+  }
+
+  .rizq-dash .hours-day-modes {
+    grid-column: 1 / -1;
+  }
+
+  .rizq-dash .topbar-controls .btn,
+  .rizq-dash .topbar-actions .btn {
+    min-height: 32px;
+    font-size: 11.5px !important;
+  }
+
+  #services-showcase {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rizq-dash *,
+  .rizq-dash *::before,
+  .rizq-dash *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

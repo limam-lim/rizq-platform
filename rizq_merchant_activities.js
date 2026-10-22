@@ -359,6 +359,146 @@
     return map[a.sectorId] || 'أخرى';
   }
 
+  /**
+   * ربط نشاط التاجر → مفتاح قسم السوق العام (RizqCategories.key) + فرع مفضّل.
+   * يُستخدم في داشبوردات المحل/المكتب/العقار/الشركة لربط الكتالوج بالأقسام والمعايير.
+   */
+  var SECTOR_TO_CATEGORY_ID = {
+    electronics: 'إلكترونيات',
+    auto_parts: 'سيارات',
+    showroom: 'سيارات',
+    automotive: 'سيارات',
+    fashion: 'أزياء',
+    home: 'أثاث',
+    construction: 'بناء',
+    jewelry: 'ذهب',
+    food: 'أغذية',
+    equipment: 'مكائن-صناعية',
+    agriculture: 'ماشية',
+    pro_retail: 'صحة',
+    services_retail: 'خدمات',
+    realty_retail: 'عقارات',
+    realestate: 'عقارات',
+    agency: 'عقارات',
+    development: 'عقارات',
+    owner: 'عقارات',
+    management: 'عقارات',
+    legal: 'خدمات',
+    admin: 'خدمات',
+    consular: 'خدمات',
+    insurance: 'تأمين',
+    engineering: 'خدمات',
+    consulting: 'خدمات',
+    health: 'صحة',
+    education: 'تعليم',
+    media: 'خدمات',
+    travel: 'رحلات',
+    it: 'خدمات',
+    general_office: 'خدمات',
+    industrial: 'مكائن-صناعية',
+    hospitality: 'رحلات',
+    logistics: 'شاحنات',
+    enterprise_services: 'خدمات',
+    import_export: 'تجارة',
+    ind_vehicles: 'سيارات',
+    ind_tech: 'إلكترونيات',
+    ind_home: 'أثاث',
+    ind_fashion: 'أزياء',
+    ind_realty: 'عقارات',
+    ind_pro: 'خدمات',
+    ind_services: 'خدمات',
+    ind_agri: 'ماشية',
+  };
+
+  var ACTIVITY_PREFERRED_SUBCAT = {
+    st_phones: 'هواتف ذكية',
+    st_computers: 'لابتوب وحاسوب',
+    st_tv_audio: 'شاشات وتلفزيون',
+    st_appliances: 'ثلاجات ومجمدات',
+    st_accessories: 'شواحن وإكسسوارات',
+    st_gaming: 'ألعاب فيديو',
+    st_solar_tech: 'ألواح شمسية',
+    st_phone_repair: 'صيانة وإصلاح',
+    st_spare_parts: 'قطع غيار',
+    st_tires: 'إطارات وبطاريات',
+    st_motorcycles: 'دراجات نارية',
+    st_cars_new: 'سيارات للبيع',
+    st_cars_used: 'سيارات للبيع',
+    st_furniture: 'أثاث صالون',
+    st_decor: 'إضاءة وديكور',
+    st_curtains: 'ستائر وسجاد',
+    st_kitchen: 'أثاث مطبخ',
+    st_cement: 'أسمنت وحديد',
+    st_tiles: 'طوب وسيراميك',
+    st_plumbing: 'سباكة وكهرباء',
+    st_paint: 'دهانات وعزل مائي',
+    st_tools: 'أدوات بناء',
+    st_wood: 'أخشاب وأبواب',
+    st_clothing: 'ملابس رجالية',
+    st_menswear: 'ملابس رجالية',
+    st_womenswear: 'ملابس نسائية وأطفال',
+    st_kidswear: 'ملابس أطفال ورضع',
+    st_shoes: 'أحذية وحقائب',
+    st_traditional: 'دراعة رجالية',
+    st_perfume: 'عطور ومستحضرات',
+    st_gold_retail: 'ذهب عيار 21',
+    st_jewelry: 'طقم مجوهرات كامل',
+    st_grocery: 'بقالة وتموين',
+    st_restaurant: 'مطاعم وكافيهات',
+    st_pharmacy: 'صيدليات ومستودعات أدوية',
+    st_machinery: 'معدات ورش ومصانع صغيرة',
+    of_law: 'قانون واستشارات',
+    of_notary: 'قانون واستشارات',
+    of_insurance_auto: 'تأمين سيارات خاصة',
+    of_clinic: 'عيادات ومراكز طبية',
+    of_web_dev: 'تصميم وبرمجة',
+    of_realestate_agency: 'شقق للبيع',
+    of_property_mgmt: 'شقق للكراء',
+    es_agency: 'شقق للبيع',
+    es_developer: 'عقارات قيد الإنشاء',
+    es_owner: 'منازل وفيلات',
+    es_mgmt: 'شقق للكراء',
+    cp_auto_showroom: 'سيارات للبيع',
+    cp_industrial: 'معدات ورش ومصانع صغيرة',
+    cp_hotel: 'حجز فنادق',
+  };
+
+  function marketplaceSpecForActivity(activityId) {
+    var a = findById(activityId);
+    var sectorId = a ? a.sectorId : '';
+    var categoryId = (a && SECTOR_TO_CATEGORY_ID[a.sectorId])
+      || SECTOR_TO_CATEGORY_ID[String(activityId || '')]
+      || null;
+    if (!categoryId) {
+      var legacy = legacyCategoryFromActivity(activityId);
+      if (legacy === 'زراعة') categoryId = 'ماشية';
+      else if (legacy === 'مهن') categoryId = 'صحة';
+      else if (legacy === 'معدات') categoryId = 'مكائن-صناعية';
+      else if (legacy && legacy !== 'أخرى') categoryId = legacy;
+    }
+    if (!categoryId) categoryId = 'خدمات';
+    var preferredSubcat = ACTIVITY_PREFERRED_SUBCAT[activityId] || '';
+    var allowedSubcats = null;
+    try {
+      var RC = (typeof globalThis !== 'undefined' && globalThis.RizqCategories)
+        || (typeof window !== 'undefined' && window.RizqCategories)
+        || null;
+      if (RC && typeof RC.getByKey === 'function') {
+        var cat = RC.getByKey(categoryId);
+        if (cat && Array.isArray(cat.subcats)) allowedSubcats = cat.subcats.slice();
+      }
+    } catch (eCat) { /* optional — RizqCategories may load later */ }
+    return {
+      activityId: activityId || '',
+      sectorId: sectorId || '',
+      categoryId: categoryId,
+      categoryKey: categoryId,
+      preferredSubcat: preferredSubcat,
+      allowedSubcats: allowedSubcats,
+      subCategoryId: preferredSubcat || '',
+    };
+  }
+
   /** إعدادات مخزون مقترحة حسب النشاط (واجهة الداشبورد) */
   function inventoryPresetForActivity(activityId) {
     var a = findById(activityId);
@@ -670,6 +810,8 @@
     findById: findById,
     isAllowed: isAllowed,
     legacyCategoryFromActivity: legacyCategoryFromActivity,
+    marketplaceSpecForActivity: marketplaceSpecForActivity,
+    SECTOR_TO_CATEGORY_ID: SECTOR_TO_CATEGORY_ID,
     inventoryPresetForActivity: inventoryPresetForActivity,
     legacyCategoryLabel: legacyCategoryLabel,
     listDirectoryFilterCategories: listDirectoryFilterCategories,

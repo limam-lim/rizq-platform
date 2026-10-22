@@ -1,4 +1,4 @@
-/* rizq_dashboard_estate_app.js — لوحة عقارات بهوية منصة رزق (بدون وكيل ذكي) */
+/* rizq_dashboard_estate_app.js — لوحة عقارات بهوية منصة رزق (+ وكيل ذكي موحّد) */
 if (window.RizqDash && RizqDash.purgeSensitiveTokensFromStorage) {
   try { RizqDash.purgeSensitiveTokensFromStorage(); RizqDash.stripUrlToken(); } catch (e0) {}
 }
@@ -12,6 +12,13 @@ var PROPS = [];
 var INQS = [];
 var HOURS = {};
 var STORE_KEY = '';
+var _payPkg = null;
+var _payFile = null;
+var _propPhotosDraft = [];
+var _agencyGalleryDraft = [];
+var MAX_LISTING_PHOTO_BYTES = 1.5 * 1024 * 1024;
+var MAX_PROP_PHOTOS = 6;
+var MAX_AGENCY_GALLERY = 8;
 
 function _estIsFr() {
   try {
@@ -36,7 +43,8 @@ var PANEL_TITLES = {
   referral: _t2('🎁 إحالة الأصدقاء', '🎁 Parrainage'),
   verifiedplus: _t2('🛡️ شارة موثّق⁺', '🛡️ Badge Vérifié⁺'),
   mypayments: _t2('🏦 طرق الدفع', '🏦 Paiements'),
-  settings: _t2('⚙️ الإعدادات', '⚙️ Paramètres')
+  settings: _t2('⚙️ الإعدادات', '⚙️ Paramètres'),
+  agents: _t2('🤖 الوكيل الذكي', '🤖 Agent intelligent')
 };
 var DAYS = [
   { id: 'sat', ar: _t2('السبت', 'Sam') }, { id: 'sun', ar: _t2('الأحد', 'Dim') }, { id: 'mon', ar: _t2('الإثنين', 'Lun') },
@@ -76,7 +84,8 @@ function applyEstateLangShell() {
     referral: PANEL_TITLES.referral,
     verifiedplus: PANEL_TITLES.verifiedplus,
     mypayments: PANEL_TITLES.mypayments,
-    settings: PANEL_TITLES.settings
+    settings: PANEL_TITLES.settings,
+    agents: PANEL_TITLES.agents
   };
   document.querySelectorAll('.sb-item[onclick]').forEach(function (el) {
     var m = String(el.getAttribute('onclick') || '').match(/showPanel\('([^']+)'/);
@@ -121,7 +130,17 @@ function showPanel(id, el) {
   if (id === 'subscription') renderPackages();
   if (id === 'referral') renderReferral();
   if (id === 'verifiedplus') renderVerifiedPlus();
-  if (id === 'mypayments') renderPayments();
+  if (id === 'mypayments') {
+    renderPayments();
+    if (typeof renderMyPayments === 'function') renderMyPayments();
+    try {
+      if (window.RizqMrPaymentCatalog) {
+        if (typeof RizqMrPaymentCatalog.renderReference === 'function') RizqMrPaymentCatalog.renderReference('#mr-pay-catalog-ref');
+        if (typeof RizqMrPaymentCatalog.enhanceField === 'function') RizqMrPaymentCatalog.enhanceField('#mypay-bank');
+      }
+    } catch (ePay) {}
+  }
+  if (id === 'agents') renderAgents();
   if (id === 'tenders') renderTenders();
   if (window.innerWidth < 900) {
     var sb = document.getElementById('sidebar');
@@ -281,20 +300,31 @@ function renderServicesShowcase() {
   var root = document.getElementById('services-showcase');
   if (!root) return;
   var tiles = [
-    { title: 'عقاراتي', panel: 'properties', ok: true },
-    { title: 'طلبات معاينة', panel: 'requests', ok: true },
-    { title: 'مناقصات', panel: 'tenders', ok: true },
-    { title: 'إحالة', panel: 'referral', ok: true },
-    { title: 'موثّق⁺', panel: 'verifiedplus', ok: true },
-    { title: 'طرق دفع', panel: 'mypayments', ok: true },
-    { title: 'ساعات عمل', panel: 'hours', ok: true },
-    { title: 'معرض صور', panel: 'photos', ok: true }
+    { icon: '🏠', title: 'عقاراتي', tip: 'إدارة العقارات والمواصفات', panel: 'properties', ok: true },
+    { icon: '📩', title: 'طلبات معاينة', tip: 'استفسارات المشترين والمستأجرين', panel: 'requests', ok: true },
+    { icon: '📋', title: 'مناقصات', tip: 'مناقصات وفرص عقارية', panel: 'tenders', ok: true },
+    { icon: '🕐', title: 'ساعات عمل', tip: 'جدول الفتح والإغلاق', panel: 'hours', ok: true },
+    { icon: '📸', title: 'معرض صور', tip: 'صور وخطط أرضية', panel: 'photos', ok: true },
+    { icon: '🎁', title: 'إحالة', tip: 'دعوة الأصدقاء', panel: 'referral', ok: true },
+    { icon: '🛡️', title: 'موثّق⁺', tip: 'شارة الثقة', panel: 'verifiedplus', ok: true },
+    { icon: '🤖', title: 'الوكيل الذكي', tip: 'ردود تلقائية واستوديو تدريب', panel: 'agents', ok: true },
+    { icon: '🏦', title: 'طرق دفع', tip: 'حسابات التحويل', panel: 'mypayments', ok: true },
+    { icon: '💳', title: 'اشتراكي', tip: 'الباقة وحدود العقارات', panel: 'subscription', ok: true }
   ];
   root.innerHTML = tiles.map(function (t) {
-    return '<div onclick="showPanel(\'' + t.panel + '\',null)" style="background:#fff;border:2px solid rgba(27,58,107,.12);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer">' +
-      '<div style="font-size:13px;font-weight:800;color:#1B3A6B">' + escapeHtml(t.title) + '</div>' +
-      '<div style="font-size:11px;color:#16a34a;margin-top:6px;font-weight:700">متاح</div></div>';
+    if (window.RizqDashUI && typeof RizqDashUI.buildSvcTile === 'function') {
+      return RizqDashUI.buildSvcTile({
+        icon: t.icon, label: t.title, tip: t.tip, avail: !!t.ok, action: t.panel
+      });
+    }
+    return '<div class="svc-tile" onclick="showPanel(\'' + t.panel + '\',null)">' +
+      '<div class="svc-tile__badge ok">متاح</div>' +
+      '<div class="svc-tile__icon">' + t.icon + '</div>' +
+      '<div class="svc-tile__label">' + escapeHtml(t.title) + '</div>' +
+      '<div class="svc-tile__tip">' + escapeHtml(t.tip) + '</div>' +
+      '<div class="svc-tile__dot"></div></div>';
   }).join('');
+  try { if (window.RizqDashUI && RizqDashUI.refreshPackageWidget) RizqDashUI.refreshPackageWidget(); } catch (eSC) {}
 }
 
 function renderRequests() {
@@ -378,7 +408,11 @@ function openPropForm(existing) {
   document.getElementById('pf-city').value = (existing && existing.city) || (ACCOUNT && ACCOUNT.city) || '';
   document.getElementById('pf-zone').value = (existing && existing.zone) || '';
   document.getElementById('pf-desc').value = (existing && existing.desc) || '';
-  document.getElementById('pf-photos').value = (existing && existing.photos) ? existing.photos.join(', ') : '';
+  _propPhotosDraft = (existing && Array.isArray(existing.photos)) ? existing.photos.slice() : [];
+  renderPropPhotosPreview();
+  var fp = document.getElementById('pf-floorplan');
+  if (fp) fp.value = (existing && existing.floorplan) || '';
+  renderFloorplanPreview();
   document.getElementById('pf-media').value = (existing && existing.media) || '';
   document.getElementById('pf-map').value = (existing && existing.map) || '';
   var am = (existing && existing.amenities) || [];
@@ -389,15 +423,67 @@ function closePropForm() {
   if (card) card.style.display = 'none';
 }
 
+function _estatePreferredSubcat(type, deal) {
+  var sale = deal === 'sale';
+  var rent = deal === 'rent' || deal === 'daily';
+  if (type === 'apartment') return sale ? 'شقق للبيع' : (deal === 'daily' ? 'إيجار يومي / سياحي' : 'شقق للكراء');
+  if (type === 'villa' || type === 'house') return sale ? 'منازل وفيلات' : 'منازل للكراء';
+  if (type === 'land') return 'أراضي';
+  if (type === 'commercial') return sale ? 'محلات تجارية' : 'محلات للكراء';
+  return sale ? 'شقق للبيع' : 'شقق للكراء';
+}
+function mountEstateListingContext(opts) {
+  opts = opts || {};
+  if (typeof RizqListingContext === 'undefined') return;
+  var hint = document.getElementById('pf-listing-ctx-hint');
+  if (hint) hint.innerHTML = RizqListingContext.syncHintHtml((typeof _estIsFr === 'function' && _estIsFr()) ? 'fr' : 'ar');
+  var preferred = opts.selectedSubcat || '';
+  if (!preferred) {
+    var tEl = document.getElementById('pf-type');
+    var dEl = document.getElementById('pf-deal');
+    preferred = _estatePreferredSubcat(tEl ? tEl.value : 'apartment', dEl ? dEl.value : 'sale');
+  }
+  RizqListingContext.mountSelectors({
+    categorySelect: 'pf-category-id',
+    subcatSelect: 'pf-subcategory-id',
+    attrsMount: 'pf-attrs-mount',
+    context: RizqListingContext.sellerContext(ACCOUNT || {}, { accountType: 'estate', accountId: (ACCOUNT && ACCOUNT.id) || SESSION_ID }),
+    lockCategory: true,
+    selectedSubcat: preferred,
+    attrs: opts.attrs || {},
+    lang: (typeof _estIsFr === 'function' && _estIsFr()) ? 'fr' : 'ar',
+  });
+}
 function bindPropForm() {
   var form = document.getElementById('prop-form');
   if (!form) return;
+  var typeEl = document.getElementById('pf-type');
+  var dealEl = document.getElementById('pf-deal');
+  function syncEstateSubcat() {
+    try { mountEstateListingContext(); } catch (eM) {}
+  }
+  if (typeEl && !typeEl._rizqCtxBound) { typeEl.addEventListener('change', syncEstateSubcat); typeEl._rizqCtxBound = true; }
+  if (dealEl && !dealEl._rizqCtxBound) { dealEl.addEventListener('change', syncEstateSubcat); dealEl._rizqCtxBound = true; }
+  try { mountEstateListingContext(); } catch (e0) {}
   form.addEventListener('submit', function (e) {
     e.preventDefault();
     var id = document.getElementById('pf-id').value || ('est_' + Date.now());
-    var photos = document.getElementById('pf-photos').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    var photos = _propPhotosDraft.slice(0, MAX_PROP_PHOTOS);
+    var floorplanEl = document.getElementById('pf-floorplan');
     var amenities = [];
     document.querySelectorAll('.pf-amen:checked').forEach(function (c) { amenities.push(c.value); });
+    var listingForm = (typeof RizqListingContext !== 'undefined')
+      ? RizqListingContext.collectForm({
+          categorySelect: 'pf-category-id',
+          subcatSelect: 'pf-subcategory-id',
+          attrsMount: 'pf-attrs-mount',
+          context: RizqListingContext.sellerContext(ACCOUNT || {}, { accountType: 'estate', accountId: (ACCOUNT && ACCOUNT.id) || SESSION_ID }),
+        })
+      : { categoryId: 'عقارات', subcat: '', attrs: {} };
+    if (!listingForm.subcat) {
+      toast('اختر النوع / الفرع للعقار', 'error');
+      return;
+    }
     var row = {
       id: id,
       type: document.getElementById('pf-type').value,
@@ -413,9 +499,18 @@ function bindPropForm() {
       zone: document.getElementById('pf-zone').value.trim(),
       desc: document.getElementById('pf-desc').value.trim(),
       photos: photos,
+      floorplan: floorplanEl ? floorplanEl.value : '',
       media: document.getElementById('pf-media').value.trim(),
       map: document.getElementById('pf-map').value.trim(),
       amenities: amenities,
+      categoryId: listingForm.categoryId || 'عقارات',
+      subCategoryId: listingForm.subcat,
+      subcat: listingForm.subcat,
+      attrs: listingForm.attrs || {},
+      accountType: 'estate',
+      storeId: (ACCOUNT && ACCOUNT.id) || SESSION_ID,
+      activityId: (ACCOUNT && ACCOUNT.activityId) || '',
+      listingSource: 'dashboard_catalog',
       status: 'active',
       views: 0,
       updatedAt: new Date().toISOString()
@@ -440,34 +535,58 @@ function bindPropForm() {
 function syncPropToCatalog(row) {
   if (!CTX || !CTX.accessToken || !window.RIZQ_BACKEND_BASE || !ACCOUNT || IS_DEMO) return;
   var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
+  var ctx = (typeof RizqListingContext !== 'undefined')
+    ? RizqListingContext.sellerContext(ACCOUNT, { accountType: 'estate', accountId: ACCOUNT.id })
+    : { store_id: ACCOUNT.id, account_id: ACCOUNT.id, account_type: 'estate', activity_id: ACCOUNT.activityId || '', badges: {} };
+  var body = {
+    accountId: ACCOUNT.id,
+    storeId: ACCOUNT.id,
+    kind: 'product',
+    name: row.title,
+    title: row.title,
+    price: row.price,
+    desc: row.desc,
+    categoryId: row.categoryId || 'عقارات',
+    category: row.categoryId || 'عقارات',
+    subCategoryId: row.subcat || '',
+    subcat: row.subcat || '',
+    cat: row.subcat || row.categoryId || 'عقارات',
+    attrs: Object.assign({}, row.attrs || {}, {
+      area: row.area, rooms: row.rooms, baths: row.baths, floor: row.floor, finish: row.finish
+    }),
+    accountType: 'estate',
+    activityId: row.activityId || ACCOUNT.activityId || '',
+    listingSource: 'dashboard_catalog',
+    sellerContext: { storeName: ACCOUNT.name || '', badges: ctx.badges || {} },
+    city: row.city,
+    meta: {
+      estate: true,
+      propertyType: row.type,
+      deal: row.deal,
+      area: row.area,
+      rooms: row.rooms,
+      baths: row.baths,
+      floor: row.floor,
+      finish: row.finish,
+      zone: row.zone,
+      amenities: row.amenities,
+      map: row.map,
+      media: row.media,
+      localId: row.id
+    },
+    images: row.photos
+  };
+  if (typeof RizqListingContext !== 'undefined') {
+    body = RizqListingContext.enrichPayload(body, ctx, {
+      categoryId: row.categoryId || 'عقارات',
+      subcat: row.subcat || '',
+      attrs: body.attrs
+    });
+  }
   fetch(base + '/api/catalog', {
     method: 'POST',
     headers: Object.assign({ 'Content-Type': 'application/json' }, RizqDash.authHeaders(CTX.accessToken)),
-    body: JSON.stringify({
-      accountId: ACCOUNT.id,
-      kind: 'product',
-      title: row.title,
-      price: row.price,
-      desc: row.desc,
-      category: 'عقارات',
-      city: row.city,
-      meta: {
-        estate: true,
-        propertyType: row.type,
-        deal: row.deal,
-        area: row.area,
-        rooms: row.rooms,
-        baths: row.baths,
-        floor: row.floor,
-        finish: row.finish,
-        zone: row.zone,
-        amenities: row.amenities,
-        map: row.map,
-        media: row.media,
-        localId: row.id
-      },
-      images: row.photos
-    })
+    body: JSON.stringify(body)
   }).catch(function () {});
 }
 
@@ -511,8 +630,11 @@ function fillProfile() {
   document.getElementById('p-whatsapp').value = ACCOUNT.whatsapp || ACCOUNT.phone || '';
   document.getElementById('p-desc').value = ACCOUNT.desc || '';
   document.getElementById('p-video').value = ACCOUNT.promo_video || '';
-  document.getElementById('ph-cover').value = ACCOUNT.cover || '';
-  document.getElementById('ph-gallery').value = Array.isArray(ACCOUNT.gallery) ? ACCOUNT.gallery.join(', ') : (ACCOUNT.gallery || '');
+  var coverEl = document.getElementById('ph-cover');
+  if (coverEl) coverEl.value = ACCOUNT.cover || '';
+  _agencyGalleryDraft = Array.isArray(ACCOUNT.gallery) ? ACCOUNT.gallery.slice() : [];
+  renderAgencyCoverPreview();
+  renderAgencyGalleryPreview();
 }
 
 function saveProfile() {
@@ -544,8 +666,9 @@ function saveProfile() {
 
 function savePhotos() {
   if (!ACCOUNT) return;
-  ACCOUNT.cover = document.getElementById('ph-cover').value.trim();
-  ACCOUNT.gallery = document.getElementById('ph-gallery').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+  var coverEl = document.getElementById('ph-cover');
+  ACCOUNT.cover = coverEl ? coverEl.value.trim() : (ACCOUNT.cover || '');
+  ACCOUNT.gallery = _agencyGalleryDraft.slice(0, MAX_AGENCY_GALLERY);
   persistAccountLocal();
   patchAccountRemote({ cover: ACCOUNT.cover, gallery: ACCOUNT.gallery });
   toast('تم حفظ المعرض', 'ok');
@@ -576,8 +699,11 @@ function patchAccountRemote(body) {
 }
 
 function fmtPrice(p) {
-  if (p == null || p === '' || Number.isNaN(Number(p))) {
-    return '<span class="price-pending">السعر قريباً</span>';
+  if (window.RizqSub && RizqSub.isPriceUnset && RizqSub.isPriceUnset(p)) {
+    return '<span class="price-pending">السعر بانتظار تحديد الإدارة</span>';
+  }
+  if (window.RizqSub && RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(p)) {
+    return '<strong style="font-size:18px;color:#059669">مجاناً</strong>';
   }
   return '<strong style="font-size:18px;color:#1B3A6B">' + Number(p).toLocaleString('ar-MR') + '</strong> <span style="font-size:12px;color:#64748b">MRU</span>';
 }
@@ -586,12 +712,13 @@ function renderPackages() {
   var st = subStatus();
   var lim = listingLimit();
   var cur = document.getElementById('sub-current');
+  var limLabel = (lim.limit === Infinity) ? 'غير محدود' : (lim.limit != null ? lim.limit : 3);
   if (cur) {
     cur.innerHTML = 'الحالة: ' + escapeHtml(st.status || '—') +
       ' · الباقة: ' + escapeHtml(st.pkg || st.package || '—') +
       (st.daysLeft != null ? ' · الأيام: ' + st.daysLeft : '') +
-      '<br>حد العقارات النشطة: ' + (lim.limit === Infinity ? 'غير محدود' : lim.limit) +
-      ' · المستخدم: ' + lim.used;
+      '<br>حد العقارات النشطة: ' + limLabel +
+      ' · المستخدم: ' + (lim.used != null ? lim.used : PROPS.length);
   }
   var grid = document.getElementById('pkg-grid');
   if (!grid) return;
@@ -606,17 +733,28 @@ function renderPackages() {
     return;
   }
   grid.innerHTML = list.map(function (pkg) {
-    var name = (window.RizqPackagesConfig && RizqPackagesConfig.packageDisplayName)
-      ? RizqPackagesConfig.packageDisplayName(pkg.id, 'ar')
+    var name = (window.RizqPackagesConfig && RizqPackagesConfig.localizedName)
+      ? RizqPackagesConfig.localizedName(pkg, 'ar')
       : (pkg.name_ar || pkg.name || pkg.id);
     var feats = pkg.features || [];
-    return '<div class="pkg-card' + (pkg.highlight ? ' highlight' : '') + '">' +
-      '<h3>' + escapeHtml(name) + '</h3>' +
+    var maxItems = pkg.maxCatalogItems === Infinity ? '∞' : (pkg.maxCatalogItems != null ? pkg.maxCatalogItems : '—');
+    var bg = String(pkg.bgColor || pkg.backgroundColor || '').trim();
+    var tx = String(pkg.textColor || pkg.color || '').trim();
+    var ac = String(pkg.accentColor || '').trim();
+    var cardStyle = '';
+    if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(bg)) cardStyle += 'background:' + bg + ';';
+    if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(tx)) cardStyle += 'color:' + tx + ';';
+    if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(ac)) cardStyle += 'border-color:' + ac + ';';
+    return '<div class="pkg-card' + (pkg.highlight ? ' highlight' : '') + '"' +
+      (cardStyle ? ' style="' + cardStyle + '"' : '') + '>' +
+      '<h3' + (tx ? ' style="color:inherit"' : '') + '>' + escapeHtml(name) + '</h3>' +
       '<div style="margin:8px 0 4px">' + fmtPrice(pkg.pricePending ? null : pkg.price) + '</div>' +
-      '<div style="font-size:12px;color:#64748b;font-weight:700">' + (pkg.durationDays || 30) + ' يوماً · حتى ' +
-      (pkg.maxCatalogItems === Infinity ? '∞' : (pkg.maxCatalogItems || '—')) + ' عقار</div>' +
+      '<div style="font-size:12px;opacity:.75;font-weight:700">' + (pkg.durationDays || 30) + ' يوماً · حتى ' +
+      maxItems + ' عقار</div>' +
       '<ul>' + feats.map(function (f) { return '<li>' + escapeHtml(f) + '</li>'; }).join('') + '</ul>' +
-      '<button type="button" class="btn btn-gold btn-sm" style="margin-top:12px;width:100%" data-pkg="' + escapeAttr(pkg.id) + '">طلب تفعيل</button>' +
+      '<button type="button" class="btn btn-gold btn-sm" style="margin-top:12px;width:100%' +
+      (ac ? ';background:' + ac + ';border-color:' + ac : '') +
+      '" data-pkg="' + escapeAttr(pkg.id) + '">اشترك / ارفع الوصل</button>' +
       '</div>';
   }).join('');
   grid.querySelectorAll('[data-pkg]').forEach(function (btn) {
@@ -631,26 +769,20 @@ function requestPackage(pkgId) {
     toast('في الوضع التجريبي — سجّل حساباً حقيقياً لطلب الباقة', 'ok');
     return;
   }
-  if (!window.RIZQ_BACKEND_BASE) {
-    toast('الخادم غير متصل', 'error');
+  var pkg = null;
+  try {
+    var list = (window.RizqPackagesConfig && RizqPackagesConfig.getCatalog)
+      ? (RizqPackagesConfig.getCatalog('estate', 'ar') || []) : [];
+    pkg = list.filter(function (p) { return p && p.id === pkgId; })[0] || null;
+  } catch (e) {}
+  if (!pkg) {
+    toast('الباقة غير موجودة', 'error');
     return;
   }
-  var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
-  var tok = (CTX && CTX.accessToken) || window.REAL_ACCESS_TOKEN || '';
-  fetch(base + '/api/sub-requests', {
-    method: 'POST',
-    headers: Object.assign({ 'Content-Type': 'application/json' }, tok ? { 'x-account-token': tok } : {}),
-    body: JSON.stringify({
-      accountId: ACCOUNT.id,
-      category: 'estate',
-      packageId: pkgId,
-      note: 'طلب باقة عقارات من لوحة التحكم'
-    })
-  }).then(function (r) { return r.json().catch(function () { return null; }); })
-    .then(function (d) {
-      if (d && (d.ok || d.id)) toast('تم إرسال طلب الباقة للإدارة', 'ok');
-      else toast((d && d.error) || 'تعذّر إرسال الطلب — تواصل مع الإدارة', 'error');
-    }).catch(function () { toast('خطأ شبكة', 'error'); });
+  var name = (window.RizqPackagesConfig && RizqPackagesConfig.localizedName)
+    ? RizqPackagesConfig.localizedName(pkg, 'ar')
+    : (pkg.name_ar || pkg.name || pkg.id);
+  openPayModal(name, pkg.price, 'package', pkgId);
 }
 
 function renderReferral() {
@@ -671,24 +803,182 @@ function renderVerifiedPlus() {
     : '<div style="padding:12px;border-radius:12px;background:#fff7ed;color:#9a3412;font-weight:700;line-height:1.7">غير مفعّلة بعد. اطلب التفعيل من الإدارة عبر طلب موثّق⁺ في المنصة.</div>';
 }
 
+function getMyPayKey() {
+  return 'rizq_my_payments_' + ((ACCOUNT && ACCOUNT.id) || SESSION_ID || 'demo');
+}
+var DEMO_PAYMENTS = [];
+function getMyPayments() {
+  var accId = (ACCOUNT && ACCOUNT.id) || SESSION_ID || 'demo';
+  if (typeof RizqAccountPayments !== 'undefined') {
+    return RizqAccountPayments.getLocal(accId, IS_DEMO, DEMO_PAYMENTS);
+  }
+  if (IS_DEMO) return DEMO_PAYMENTS.slice();
+  try { return JSON.parse(localStorage.getItem(getMyPayKey()) || '[]'); } catch (e) { return []; }
+}
+function saveMyPayments(arr) {
+  var accId = (ACCOUNT && ACCOUNT.id) || SESSION_ID || 'demo';
+  if (typeof RizqAccountPayments !== 'undefined') {
+    return RizqAccountPayments.persist(accId, arr, window.REAL_ACCESS_TOKEN || SESSION_TOKEN, IS_DEMO).then(function (saved) {
+      if (Array.isArray(saved)) localStorage.setItem(getMyPayKey(), JSON.stringify(saved));
+    });
+  }
+  localStorage.setItem(getMyPayKey(), JSON.stringify(arr || []));
+  return Promise.resolve();
+}
 function renderPayments() {
-  var root = document.getElementById('mypayments-root');
-  if (!root) return;
-  if (typeof RizqAccountPayments !== 'undefined' && ACCOUNT && !IS_DEMO) {
-    root.innerHTML = '<div id="estate-pay-mount"></div>';
-    try {
-      if (typeof RizqAccountPayments.render === 'function') {
-        RizqAccountPayments.render('estate-pay-mount', ACCOUNT.id, (CTX && CTX.accessToken) || window.REAL_ACCESS_TOKEN);
-      } else if (typeof RizqAccountPayments.mount === 'function') {
-        RizqAccountPayments.mount(root, ACCOUNT.id);
-      } else {
-        root.innerHTML = '<p style="font-size:12.5px;color:var(--text-muted)">أضف Bankily / Masrivi / تحويل بنكي من إعدادات الدفع في المنصة. ستظهر هنا بعد الربط.</p>';
-      }
-    } catch (e) {
-      root.innerHTML = '<p style="font-size:12.5px;color:var(--text-muted)">وحدة طرق الدفع جاهزة للربط مع حسابك.</p>';
+  /* واجهة موحّدة عبر #my-payment-list + كتالوج موريتانيا — لا مزيد من النص البديل */
+  if (typeof renderMyPayments === 'function') renderMyPayments();
+  try {
+    if (window.RizqMrPaymentCatalog && typeof RizqMrPaymentCatalog.renderReference === 'function') {
+      RizqMrPaymentCatalog.renderReference('#mr-pay-catalog-ref');
+    }
+  } catch (e) {}
+}
+function renderMyPayments() {
+  var el = document.getElementById('my-payment-list');
+  if (!el) return;
+  var methods = getMyPayments();
+  if (!methods.length) {
+    el.innerHTML = '<div style="text-align:center;padding:32px;color:#9aa7bd;font-size:13px">' +
+      _t2('لا توجد طرق دفع بعد — اضغط "+ إضافة طريقة دفع" للبدء', 'Aucun moyen de paiement — cliquez sur "+ Ajouter"') + '</div>';
+    return;
+  }
+  var typeLabels = {
+    bank: _t2('🏦 تحويل بنكي', '🏦 Virement'), bankily: '📱 Bankily', sedad: '📱 Sedad',
+    bimbam: '📱 BIMBAM', mobile: _t2('📱 تطبيق آخر', '📱 Autre app'), cash: _t2('💵 نقداً', '💵 Espèces'),
+    instore: _t2('🏪 في الوكالة', '🏪 En agence'), custom: _t2('✏️ مخصص', '✏️ Perso')
+  };
+  el.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px">' + methods.map(function (m, i) {
+    var lbl = typeLabels[m.type] || m.type;
+    var bits = [];
+    if (m.code) bits.push('🔢 ' + escapeHtml(m.code));
+    if (m.phone) bits.push('📞 ' + escapeHtml(m.phone));
+    if (m.account) bits.push('🏦 ' + escapeHtml(m.account));
+    return '<div style="background:#f8faff;border:1.5px solid #e0e8ff;border-radius:12px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">' +
+      '<div style="flex:1"><div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
+      '<span style="font-size:13px;font-weight:700;color:#1B3A6B">' + escapeHtml(m.bank || lbl) + '</span>' +
+      '<span style="background:#e0e8ff;color:#1B3A6B;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:700">' + lbl + '</span></div>' +
+      (bits.length ? '<div style="font-family:monospace;font-size:12.5px;font-weight:700;color:#0f2347;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px">' +
+        bits.map(function (b) { return '<span style="background:#e8f0fe;padding:4px 10px;border-radius:7px">' + b + '</span>'; }).join('') + '</div>' : '') +
+      (m.note ? '<div style="font-size:11.5px;color:#2C3A4F">' + escapeHtml(m.note) + '</div>' : '') +
+      '</div><div style="display:flex;gap:6px">' +
+      '<button type="button" data-idx="' + i + '" onclick="editMyPayment(this)" style="background:#e8f0fe;border:none;padding:6px 10px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;color:#1B3A6B">✏️</button>' +
+      '<button type="button" data-idx="' + i + '" onclick="deleteMyPayment(this)" style="background:#fee2e2;border:none;padding:6px 10px;border-radius:7px;cursor:pointer;font-size:12px">🗑️</button>' +
+      '</div></div>';
+  }).join('') + '</div>';
+}
+function showAddMyPayModal() {
+  var title = document.getElementById('my-pay-modal-title');
+  if (title) title.textContent = _t2('إضافة طريقة دفع', 'Ajouter un moyen de paiement');
+  ['mypay-bank', 'mypay-code', 'mypay-phone', 'mypay-account', 'mypay-note'].forEach(function (id) {
+    var el = document.getElementById(id); if (el) el.value = '';
+  });
+  var typ = document.getElementById('mypay-type'); if (typ) typ.value = 'bank';
+  var idx = document.getElementById('mypay-edit-idx'); if (idx) idx.value = '';
+  var modal = document.getElementById('my-pay-modal');
+  if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+  try {
+    if (window.RizqMrPaymentCatalog && typeof RizqMrPaymentCatalog.enhanceField === 'function') {
+      RizqMrPaymentCatalog.enhanceField('#mypay-bank');
+    }
+  } catch (e) {}
+}
+function closeMyPayModal() {
+  var modal = document.getElementById('my-pay-modal');
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+}
+function editMyPayment(btn) {
+  var i = parseInt(btn.getAttribute('data-idx'), 10);
+  var m = getMyPayments()[i];
+  if (!m) return;
+  var title = document.getElementById('my-pay-modal-title');
+  if (title) title.textContent = _t2('تعديل طريقة الدفع', 'Modifier le moyen de paiement');
+  var typ = document.getElementById('mypay-type'); if (typ) typ.value = m.type || 'bank';
+  var bank = document.getElementById('mypay-bank'); if (bank) bank.value = m.bank || '';
+  var code = document.getElementById('mypay-code'); if (code) code.value = m.code || '';
+  var phone = document.getElementById('mypay-phone'); if (phone) phone.value = m.phone || '';
+  var account = document.getElementById('mypay-account'); if (account) account.value = m.account || '';
+  var note = document.getElementById('mypay-note'); if (note) note.value = m.note || '';
+  var idx = document.getElementById('mypay-edit-idx'); if (idx) idx.value = String(i);
+  var modal = document.getElementById('my-pay-modal');
+  if (modal) { modal.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+}
+function deleteMyPayment(btn) {
+  if (!confirm(_t2('حذف طريقة الدفع هذه؟', 'Supprimer ce moyen de paiement ?'))) return;
+  var i = parseInt(btn.getAttribute('data-idx'), 10);
+  var methods = getMyPayments();
+  methods.splice(i, 1);
+  saveMyPayments(methods).then(function () {
+    renderMyPayments();
+    toast(_t2('تم الحذف', 'Supprimé'), 'ok');
+  });
+}
+function saveMyPayment() {
+  var type = (document.getElementById('mypay-type') || {}).value || 'bank';
+  var bank = ((document.getElementById('mypay-bank') || {}).value || '').trim();
+  var code = ((document.getElementById('mypay-code') || {}).value || '').trim();
+  var phone = ((document.getElementById('mypay-phone') || {}).value || '').trim();
+  var account = ((document.getElementById('mypay-account') || {}).value || '').trim();
+  var note = ((document.getElementById('mypay-note') || {}).value || '').trim();
+  if (!bank && type !== 'cash' && type !== 'instore') {
+    alert(_t2('يرجى إدخال اسم البنك/الخدمة', 'Veuillez saisir le nom de la banque / du service'));
+    return;
+  }
+  if (type !== 'cash' && type !== 'instore' && !code && !phone && !account) {
+    alert(_t2('أدخل على الأقل: رمز أو هاتف أو رقم حساب', 'Saisissez au moins : code, téléphone ou n° de compte'));
+    return;
+  }
+  var entry = { type: type, bank: bank || type, code: code, phone: phone, account: account, note: note, addedAt: new Date().toISOString() };
+  var methods = getMyPayments();
+  var editIdx = (document.getElementById('mypay-edit-idx') || {}).value;
+  if (editIdx !== '' && editIdx != null) methods[parseInt(editIdx, 10)] = entry;
+  else methods.push(entry);
+  saveMyPayments(methods).then(function () {
+    closeMyPayModal();
+    renderMyPayments();
+    toast(_t2('✅ تم الحفظ', '✅ Enregistré'), 'ok');
+  });
+}
+
+function renderAgents() {
+  var badge = document.getElementById('auto-reply-badge');
+  var content = document.getElementById('auto-reply-content');
+  if (!badge || !content) return;
+  var accId = (ACCOUNT && ACCOUNT.id) || SESSION_ID || '';
+  var isDiamond = false;
+  try {
+    if (typeof RizqSub !== 'undefined' && accId && RizqSub.hasFeature(accId, 'ai_agent_full')) isDiamond = true;
+    else if (ACCOUNT && (ACCOUNT.plan === 'diamond' || ACCOUNT.diamond || /ماس|diamond/i.test(String(ACCOUNT.package || ACCOUNT.planName || ACCOUNT.plan || '')))) isDiamond = true;
+  } catch (e) {}
+  if (IS_DEMO) isDiamond = true;
+  if (isDiamond) {
+    badge.textContent = _t2('✅ مفعّل', '✅ Activé');
+    badge.style.cssText = 'background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px';
+    content.innerHTML =
+      '<p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;line-height:1.7">' +
+      _t2('الوكيل يرد على استفسارات الزوار حول عقاراتك ومواعيدك — درّبه ببياناتك ثم اختبره هنا.',
+        'L\'agent répond aux questions sur vos biens et disponibilités — entraînez-le puis testez ici.') +
+      '</p>' +
+      '<div id="agent-knowledge-upload"></div><div id="agent-chat-test" style="margin-top:12px"></div>';
+    if (typeof RizqDashboardAgentKnowledge !== 'undefined') {
+      RizqDashboardAgentKnowledge.renderKnowledgePanel({ mountId: 'agent-knowledge-upload', accountId: accId });
+    }
+    if (typeof RizqDashboardAgentChat !== 'undefined') {
+      RizqDashboardAgentChat.renderAgentChatPanel({ mountId: 'agent-chat-test', accountId: accId });
     }
   } else {
-    root.innerHTML = '<p style="font-size:12.5px;color:var(--text-muted)">طرق الدفع (Bankily، Masrivi، نقداً، تحويل بنكي) تُدار من نفس محرك المنصة بعد تسجيل الدخول الحقيقي.</p>';
+    badge.textContent = _t2('🔒 ماسية فقط', '🔒 Diamant uniquement');
+    badge.style.cssText = 'background:#f3f4f6;color:#6b7280;font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px';
+    content.innerHTML =
+      '<div style="text-align:center;padding:28px"><div style="font-size:40px;margin-bottom:12px">🔒</div>' +
+      '<p style="font-size:13.5px;font-weight:700;color:var(--navy);margin-bottom:6px">' +
+      _t2('ميزة حصرية للباقة الماسية', 'Fonctionnalité exclusive au forfait Diamant') + '</p>' +
+      '<p style="font-size:12.5px;color:var(--text-muted);max-width:300px;margin:0 auto 16px">' +
+      _t2('الوكيل يظهر لكل أنواع الحسابات في القائمة — التفعيل الكامل يتطلب باقة ماسية.',
+        'L\'agent apparaît pour tous les comptes — l\'activation complète nécessite le forfait Diamant.') + '</p>' +
+      '<button type="button" class="btn btn-gold" onclick="showPanel(\'subscription\',null)">' +
+      _t2('📦 ترقية الباقة', '📦 Améliorer le forfait') + '</button></div>';
   }
 }
 
@@ -709,6 +999,243 @@ function renderAll() {
   renderHours();
   fillProfile();
 }
+
+/* ── Media helpers (file → compressed data URL) ───────────────────── */
+function _readImageAsDataUrl(file, maxBytes, cb) {
+  if (!file || !/^image\//.test(file.type || '')) {
+    toast('اختر ملف صورة صالح (JPG / PNG / WebP)', 'error');
+    return;
+  }
+  if (file.size > maxBytes) {
+    toast('حجم الصورة كبير (الحد 1.5MB) — صغّرها وأعد المحاولة', 'error');
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function () {
+    var src = reader.result;
+    var img = new Image();
+    img.onload = function () {
+      try {
+        var maxW = 1600;
+        var w = img.width, h = img.height;
+        if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        cb(canvas.toDataURL('image/jpeg', 0.82));
+      } catch (e) { cb(src); }
+    };
+    img.onerror = function () { cb(src); };
+    img.src = src;
+  };
+  reader.onerror = function () { toast('تعذّر قراءة الصورة', 'error'); };
+  reader.readAsDataURL(file);
+}
+
+function renderPropPhotosPreview() {
+  var wrap = document.getElementById('pf-photos-preview');
+  var hidden = document.getElementById('pf-photos');
+  if (hidden) hidden.value = _propPhotosDraft.join(',');
+  if (!wrap) return;
+  if (!_propPhotosDraft.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = _propPhotosDraft.map(function (src, i) {
+    return '<div style="position:relative;width:72px;height:72px;border-radius:10px;overflow:hidden;border:1px solid rgba(27,58,107,.15)">' +
+      '<img src="' + src + '" alt="" style="width:100%;height:100%;object-fit:cover"/>' +
+      '<button type="button" onclick="removePropPhoto(' + i + ')" style="position:absolute;top:2px;left:2px;background:#ef4444;color:#fff;border:none;border-radius:6px;width:20px;height:20px;cursor:pointer;font-size:11px">×</button></div>';
+  }).join('');
+}
+function removePropPhoto(i) {
+  _propPhotosDraft.splice(i, 1);
+  renderPropPhotosPreview();
+}
+function handlePropPhotosInput(inp) {
+  var files = inp && inp.files ? Array.prototype.slice.call(inp.files) : [];
+  inp.value = '';
+  files.forEach(function (file) {
+    if (_propPhotosDraft.length >= MAX_PROP_PHOTOS) {
+      toast('وصلت للحد الأقصى: ' + MAX_PROP_PHOTOS + ' صور', 'error');
+      return;
+    }
+    _readImageAsDataUrl(file, MAX_LISTING_PHOTO_BYTES, function (dataUrl) {
+      if (_propPhotosDraft.length >= MAX_PROP_PHOTOS) return;
+      _propPhotosDraft.push(dataUrl);
+      renderPropPhotosPreview();
+    });
+  });
+}
+function renderFloorplanPreview() {
+  var wrap = document.getElementById('pf-floorplan-preview');
+  var el = document.getElementById('pf-floorplan');
+  if (!wrap || !el) return;
+  if (!el.value) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = '<img src="' + el.value + '" alt="" style="max-height:120px;border-radius:10px;border:1px solid rgba(27,58,107,.12)"/>';
+}
+function handlePropFloorplanInput(inp) {
+  var file = inp && inp.files && inp.files[0];
+  inp.value = '';
+  if (!file) return;
+  _readImageAsDataUrl(file, MAX_LISTING_PHOTO_BYTES, function (dataUrl) {
+    var el = document.getElementById('pf-floorplan');
+    if (el) el.value = dataUrl;
+    renderFloorplanPreview();
+  });
+}
+function renderAgencyCoverPreview() {
+  var wrap = document.getElementById('ph-cover-preview');
+  var el = document.getElementById('ph-cover');
+  if (!wrap || !el) return;
+  if (!el.value) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = '<img src="' + el.value + '" alt="" style="max-height:140px;width:100%;object-fit:cover;border-radius:12px;border:1px solid rgba(27,58,107,.12)"/>';
+}
+function handleAgencyCoverInput(inp) {
+  var file = inp && inp.files && inp.files[0];
+  inp.value = '';
+  if (!file) return;
+  _readImageAsDataUrl(file, MAX_LISTING_PHOTO_BYTES, function (dataUrl) {
+    var el = document.getElementById('ph-cover');
+    if (el) el.value = dataUrl;
+    renderAgencyCoverPreview();
+  });
+}
+function renderAgencyGalleryPreview() {
+  var wrap = document.getElementById('ph-gallery-preview');
+  if (!wrap) return;
+  if (!_agencyGalleryDraft.length) { wrap.innerHTML = ''; return; }
+  wrap.innerHTML = _agencyGalleryDraft.map(function (src, i) {
+    return '<div style="position:relative;width:72px;height:72px;border-radius:10px;overflow:hidden;border:1px solid rgba(27,58,107,.15)">' +
+      '<img src="' + src + '" alt="" style="width:100%;height:100%;object-fit:cover"/>' +
+      '<button type="button" onclick="removeAgencyGalleryPhoto(' + i + ')" style="position:absolute;top:2px;left:2px;background:#ef4444;color:#fff;border:none;border-radius:6px;width:20px;height:20px;cursor:pointer;font-size:11px">×</button></div>';
+  }).join('');
+}
+function removeAgencyGalleryPhoto(i) {
+  _agencyGalleryDraft.splice(i, 1);
+  renderAgencyGalleryPreview();
+}
+function handleAgencyGalleryInput(inp) {
+  var files = inp && inp.files ? Array.prototype.slice.call(inp.files) : [];
+  inp.value = '';
+  files.forEach(function (file) {
+    if (_agencyGalleryDraft.length >= MAX_AGENCY_GALLERY) {
+      toast('وصلت للحد الأقصى: ' + MAX_AGENCY_GALLERY + ' صور', 'error');
+      return;
+    }
+    _readImageAsDataUrl(file, MAX_LISTING_PHOTO_BYTES, function (dataUrl) {
+      if (_agencyGalleryDraft.length >= MAX_AGENCY_GALLERY) return;
+      _agencyGalleryDraft.push(dataUrl);
+      renderAgencyGalleryPreview();
+    });
+  });
+}
+
+/* ── Payment receipt modal ────────────────────────────────────────── */
+function openPayModal(pkgName, pkgPrice, category, pkgId) {
+  _payPkg = { name: pkgName, price: pkgPrice, category: category || 'package', id: pkgId || '' };
+  _payFile = null;
+  var nameEl = document.getElementById('pay-pkg-name');
+  var amtEl = document.getElementById('pay-amount');
+  var recName = document.getElementById('pay-receipt-name');
+  var recFile = document.getElementById('pay-receipt-file');
+  var zone = document.getElementById('pay-upload-zone');
+  if (nameEl) nameEl.textContent = pkgName || '';
+  if (amtEl) {
+    if (window.RizqSub && RizqSub.isPriceUnset && RizqSub.isPriceUnset(pkgPrice)) {
+      amtEl.textContent = '—';
+    } else if (window.RizqSub && RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(pkgPrice)) {
+      amtEl.textContent = 'مجاناً';
+    } else {
+      amtEl.textContent = Number(pkgPrice).toLocaleString('ar-MR') + ' MRU';
+    }
+  }
+  if (recName) { recName.style.display = 'none'; recName.textContent = ''; }
+  if (recFile) recFile.value = '';
+  if (zone) zone.style.borderColor = 'rgba(27,58,107,.2)';
+
+  var codes = [];
+  try { codes = JSON.parse(localStorage.getItem('rizq_bank_codes') || '[]').filter(function (b) { return b.active !== false; }); } catch (e) {}
+  var el = document.getElementById('pay-banks');
+  if (el) {
+    if (!codes.length) {
+      el.innerHTML = '<div style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:12px;font-size:12.5px;color:#92400e;text-align:center">⚠️ لا توجد طرق دفع ظاهرة — تواصل مع الدعم أو راجع إعدادات الأدمن</div>';
+    } else {
+      el.innerHTML = codes.map(function (b) {
+        return '<div style="background:#f8f9ff;border:1.5px solid #e0e8ff;border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">' +
+          '<div><div style="font-size:13px;font-weight:700;color:#1B3A6B">' + escapeHtml(b.bank) + '</div>' +
+          (b.instruction ? '<div style="font-size:11px;color:#777;margin-top:2px">' + escapeHtml(b.instruction) + '</div>' : '') + '</div>' +
+          '<span style="font-family:monospace;font-size:14px;font-weight:700;color:#0f2347;background:#e0e8ff;padding:5px 10px;border-radius:7px;direction:ltr">' + escapeHtml(b.code) + '</span></div>';
+      }).join('');
+    }
+  }
+
+  if (typeof RizqSub !== 'undefined' && typeof RizqSub.configurePayModalFreeMode === 'function') {
+    RizqSub.configurePayModalFreeMode(pkgPrice, _estIsFr() ? 'fr' : 'ar');
+  }
+  var m = document.getElementById('pay-modal');
+  if (m) { m.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+}
+function closePayModal() {
+  var m = document.getElementById('pay-modal');
+  if (m) m.style.display = 'none';
+  document.body.style.overflow = '';
+  _payPkg = null;
+  _payFile = null;
+}
+function handlePayReceipt(inp) {
+  if (!inp.files || !inp.files[0]) return;
+  var f = inp.files[0];
+  if (f.size > MAX_LISTING_PHOTO_BYTES) {
+    toast('حجم الوصل كبير (الحد 1.5MB)', 'error');
+    inp.value = '';
+    return;
+  }
+  _payFile = f;
+  var el = document.getElementById('pay-receipt-name');
+  if (el) { el.textContent = '✅ ' + f.name; el.style.display = 'block'; }
+  var zone = document.getElementById('pay-upload-zone');
+  if (zone) zone.style.borderColor = '#059669';
+}
+function submitPayment() {
+  if (!_payPkg) return;
+  if (typeof RizqSub === 'undefined' || typeof RizqSub.submitSubscriptionRequest !== 'function') {
+    toast('محرك الاشتراك غير محمّل', 'error');
+    return;
+  }
+  if (RizqSub.isPriceUnset && RizqSub.isPriceUnset(_payPkg.price)) {
+    toast('السعر غير مضبوط — حدّده السوبر أدمن من لوحة الباقات أولاً', 'error');
+    return;
+  }
+  var isFree = RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(_payPkg.price);
+  if (!isFree && Number(_payPkg.price) > 0 && !_payFile) {
+    toast('يرجى رفع صورة وصل الدفع أولاً', 'error');
+    return;
+  }
+  var submitBtn = document.getElementById('pay-submit-btn');
+  var prevLabel = submitBtn ? submitBtn.textContent : '';
+  if (submitBtn) {
+    if (submitBtn.disabled) return;
+    submitBtn.disabled = true;
+    submitBtn.textContent = '...جارٍ الإرسال';
+  }
+  RizqSub.submitSubscriptionRequest({
+    file: _payFile,
+    pkgName: _payPkg.name,
+    price: _payPkg.price,
+    accountName: (ACCOUNT && ACCOUNT.name) || 'وكالة عقارية',
+    accountId: (ACCOUNT && ACCOUNT.id) || SESSION_ID || '',
+    accessToken: (CTX && CTX.accessToken) || window.REAL_ACCESS_TOKEN || '',
+    category: 'package'
+  }).then(function () {
+    closePayModal();
+    toast('تم إرسال الطلب — مراجعة الإدارة / المالية / الوكيل خلال 24 ساعة', 'ok');
+    renderPackages();
+  }).catch(function (err) {
+    toast((err && err.msg) || 'تعذّر إرسال الطلب', 'error');
+  }).finally(function () {
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = prevLabel; }
+  });
+}
+document.getElementById('pay-modal') && document.getElementById('pay-modal').addEventListener('click', function (e) {
+  if (e.target === this) closePayModal();
+});
 
 function boot() {
   bindPropForm();

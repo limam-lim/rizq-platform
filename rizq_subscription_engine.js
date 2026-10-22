@@ -370,7 +370,7 @@
 
   // ── قوائم الباقات الست — مصدر الحقيقة الوحيد (تُدار من لوحة التحكم) ──
   // أي إضافة فئة جديدة مستقبلاً تكفي بإضافتها هنا فقط (نقطة واحدة، بلا تكرار)
-  var PKG_LISTS = ['rizq_packages','rizq_video_packages','rizq_individual_packages','rizq_office_packages','rizq_store_packages','rizq_corp_packages','rizq_tender_packages','rizq_investment_packages'];
+  var PKG_LISTS = ['rizq_packages','rizq_video_packages','rizq_individual_packages','rizq_office_packages','rizq_store_packages','rizq_corp_packages','rizq_estate_packages','rizq_tender_packages','rizq_investment_packages'];
 
   // ── البحث عن تعريف الباقة الكامل عبر كل الفئات (بالاسم) ─────────
   // يُرجع: { price, durationDays, active, list, siblings } أو null إن لم توجد
@@ -383,7 +383,12 @@
         var arr = JSON.parse(raw);
         if(!Array.isArray(arr)) continue;
         var found = arr.find(function(p){ return p && String(p.name||'').replace('💎 ','').trim()===name; });
-        if(found) return { id: found.id || null, price:Number(found.price)||0, durationDays:found.durationDays, active:found.active!==false, list:PKG_LISTS[i], siblings:arr };
+        if(found) {
+          var rawPrice = found.price;
+          var parsedPrice = (rawPrice == null || rawPrice === '') ? null : Number(rawPrice);
+          if (parsedPrice != null && !isFinite(parsedPrice)) parsedPrice = null;
+          return { id: found.id || null, price: parsedPrice, durationDays:found.durationDays, active:found.active!==false, list:PKG_LISTS[i], siblings:arr };
+        }
       }catch(e){}
     }
     return null;
@@ -551,7 +556,10 @@
     if(!isTrial && global.RizqInvoice && typeof global.RizqInvoice.generateInvoice === 'function'){
       try{
         var pdef = _findPackageDef(pkgName);
-        var finalPrice = (priceOverride!=null && priceOverride!=='') ? Number(priceOverride) : (pdef ? pdef.price : 0);
+        // لا نحوّل السعر الفارغ إلى 0 — 0 صريح فقط يعني مجاني
+        var finalPrice = (priceOverride!=null && priceOverride!=='')
+          ? Number(priceOverride)
+          : (pdef && pdef.price != null && pdef.price !== '' ? Number(pdef.price) : null);
         var accInfo = accounts[accId] || {};
         global.RizqInvoice.generateInvoice({
           accountId   : accId,
@@ -591,7 +599,12 @@
             accountEmail: _accInfo2.email || '',
             accountType : _accInfo2.type || '',
             pkgName     : pkgName,
-            price       : (priceOverride!=null && priceOverride!=='') ? Number(priceOverride) : ((_findPackageDef(pkgName)||{}).price || 0),
+            price       : (function(){
+              if (priceOverride!=null && priceOverride!=='') return Number(priceOverride);
+              var def = _findPackageDef(pkgName) || {};
+              if (def.price != null && def.price !== '') return Number(def.price);
+              return null;
+            })(),
             days        : days,
             periodStart : now.toISOString(),
             periodEnd   : ends.toISOString(),
@@ -1048,7 +1061,8 @@
       if (typeof global.RizqPackagesConfig !== 'undefined' && typeof global.RizqPackagesConfig.enrichForDisplay === 'function') {
         p = global.RizqPackagesConfig.enrichForDisplay(p, lang);
       }
-      var isFree=p.price===0||p.price==='0';
+      var priceUnset=isPriceUnset(p.price);
+      var isFree=!priceUnset&&isExplicitFreePrice(p.price);
       var isYear=p.name==='سنوية'||p.name==='Annuelle'||Number(p.durationDays)>=360||/-year$/.test(String(p.id||''));
       var isTrial=isFree||p.name==='تجريبية'||p.name==='Essai'||/trial|تجرب/.test(String(p.id||p.name||''));
       var isDiamondPkg=!!(p.diamond||p.isDiamond||String(p.name||'').indexOf('ماسي')!==-1||/diamant|diamond/i.test(String(p.name||''))||/diam/.test(String(p.id||'')));
@@ -1237,8 +1251,10 @@
       flags.push({ level: 'medium', msg: 'المبلغ (' + reqData.price + ') لا يطابق سعر الباقة الرسمي (' + reqData.expectedPrice + ')' });
     }
 
-    // 3) لا يوجد وصل أصلاً لباقة مدفوعة
-    if (Number(reqData.price) > 0 && !reqData.receiptImage) {
+    // 3) لا يوجد وصل أصلاً لباقة مدفوعة (سعر صريح > 0 فقط — null ليس مجانياً)
+    if (isPriceUnset(reqData.price)) {
+      flags.push({ level: 'high', msg: 'سعر الباقة غير مضبوط — يُرفض التفعيل حتى يحدد السوبر أدمن السعر' });
+    } else if (Number(reqData.price) > 0 && !reqData.receiptImage) {
       flags.push({ level: 'high', msg: 'باقة مدفوعة بلا صورة وصل' });
     }
 
@@ -1274,6 +1290,18 @@
     // opts: { file, pkgName, price, accountName, accountId, category, videoUrl }
     // category: 'package' (افتراضي — باقة عادية) أو 'video' (باقة Rizq ADS —
     // فيديو إعلاني يُفعَّل في الموضع المميز بالرئيسية بعد موافقة الأدمن)
+    // P0: null/undefined/NaN ليست مجانية — رفض صريح حتى يضبط السوبر أدمن السعر.
+    if (isPriceUnset(opts && opts.price)) {
+      return Promise.reject({
+        code: 'price_unset',
+        msg: (typeof global.RizqI18n !== 'undefined' && global.RizqI18n.t2)
+          ? global.RizqI18n.t2(
+              'سعر الباقة غير مضبوط — حدّده السوبر أدمن من لوحة إدارة الباقات أولاً',
+              'Prix du forfait non défini — le Super Admin doit fixer le prix d\'abord'
+            )
+          : 'سعر الباقة غير مضبوط — حدّده السوبر أدمن من لوحة إدارة الباقات أولاً'
+      });
+    }
     var base = {
       id: 'sub_' + Date.now(),
       pkg: opts.pkgName,
@@ -1356,29 +1384,64 @@
     } catch (e) {}
   }
 
-  /** إخفاء طرق الدفع/رفع الوصل عند تفعيل باقة مجانية (مثل tnd-trial) */
+  /** مجاني فقط بسعر صريح 0 — null/undefined/NaN ليست مجانية (ثغرة تفعيل بلا دفع). */
+  function isExplicitFreePrice(pkgPrice) {
+    if (global.RizqPackagesConfig && typeof global.RizqPackagesConfig.isExplicitFreePrice === 'function') {
+      return !!global.RizqPackagesConfig.isExplicitFreePrice(pkgPrice);
+    }
+    return pkgPrice === 0 || pkgPrice === '0';
+  }
+
+  function isPriceUnset(pkgPrice) {
+    if (global.RizqPackagesConfig && typeof global.RizqPackagesConfig.isPriceUnset === 'function') {
+      return !!global.RizqPackagesConfig.isPriceUnset(pkgPrice);
+    }
+    if (pkgPrice === 0 || pkgPrice === '0') return false;
+    if (pkgPrice == null || pkgPrice === '') return true;
+    var n = Number(pkgPrice);
+    return !isFinite(n);
+  }
+
+  /** إخفاء طرق الدفع/رفع الوصل عند تفعيل باقة مجانية صريحة (مثل tnd-trial بسعر 0) */
   function configurePayModalFreeMode(pkgPrice, lang) {
-    var isFree = Number(pkgPrice) === 0;
+    var unset = isPriceUnset(pkgPrice);
+    var isFree = !unset && isExplicitFreePrice(pkgPrice);
     var t2 = function(ar, fr){ return (lang === 'fr') ? fr : ar; };
     var banks = typeof document !== 'undefined' ? document.getElementById('pay-banks') : null;
     var upload = typeof document !== 'undefined' ? document.getElementById('pay-upload-zone') : null;
     var submit = typeof document !== 'undefined' ? document.getElementById('pay-submit-btn') : null;
     var footer = typeof document !== 'undefined' ? document.getElementById('pay-footer-note') : null;
-    if (banks) banks.style.display = isFree ? 'none' : '';
-    if (upload) upload.style.display = isFree ? 'none' : '';
+    var block = typeof document !== 'undefined' ? document.getElementById('pay-price-unset-block') : null;
+    if (banks) banks.style.display = (isFree || unset) ? 'none' : '';
+    if (upload) upload.style.display = (isFree || unset) ? 'none' : '';
+    if (block) {
+      block.style.display = unset ? 'block' : 'none';
+      block.textContent = t2(
+        '⚠️ سعر هذه الباقة غير مضبوط بعد. لا يمكن التفعيل حتى يحدّد السوبر أدمن السعر من لوحة إدارة الباقات.',
+        '⚠️ Le prix de ce forfait n\'est pas encore défini. Activation impossible tant que le Super Admin n\'a pas fixé le prix.'
+      );
+    }
     if (submit) {
       if (!submit.dataset.defaultLabel) {
         submit.dataset.defaultLabel = (typeof global.RizqI18n !== 'undefined' && global.RizqI18n.t)
           ? global.RizqI18n.t('pay-submit-btn', 'dashboard')
           : t2('📤 إرسال طلب الاشتراك', '📤 Envoyer la demande d\'abonnement');
       }
-      submit.textContent = isFree
-        ? ((typeof global.RizqI18n !== 'undefined' && global.RizqI18n.t)
-            ? global.RizqI18n.t('pay-activate-trial', 'dashboard')
-            : t2('✓ تفعيل التجربة', '✓ Activer l\'essai'))
-        : submit.dataset.defaultLabel;
+      if (unset) {
+        submit.disabled = true;
+        submit.setAttribute('aria-disabled', 'true');
+        submit.textContent = t2('⛔ بانتظار تحديد السعر من الإدارة', '⛔ En attente du prix admin');
+      } else {
+        submit.disabled = false;
+        submit.removeAttribute('aria-disabled');
+        submit.textContent = isFree
+          ? ((typeof global.RizqI18n !== 'undefined' && global.RizqI18n.t)
+              ? global.RizqI18n.t('pay-activate-trial', 'dashboard')
+              : t2('✓ تفعيل التجربة', '✓ Activer l\'essai'))
+          : submit.dataset.defaultLabel;
+      }
     }
-    if (footer) footer.style.display = isFree ? 'none' : '';
+    if (footer) footer.style.display = (isFree || unset) ? 'none' : '';
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -1452,6 +1515,8 @@
     analyzeReceipt       : analyzeReceipt,
     submitSubscriptionRequest: submitSubscriptionRequest,
     configurePayModalFreeMode: configurePayModalFreeMode,
+    isExplicitFreePrice  : isExplicitFreePrice,
+    isPriceUnset         : isPriceUnset,
     verifyReceiptWithAI  : verifyReceiptWithAI,
     PLAN_MATRIX          : PLAN_MATRIX,
     resolvePlanType      : resolvePlanType,

@@ -1060,6 +1060,27 @@ function toggleAddForm(){
   body.style.display = _formOpen ? 'block' : 'none';
   btn.textContent = _formOpen ? _t2('تصغير ↑','Réduire ↑') : _t2('إضافة منتج ↓','Ajouter un produit ↓');
 }
+function _storeListingAccount(){
+  return STORE || (typeof accData !== 'undefined' ? accData : null) || { id: SESSION_ID, type: 'store' };
+}
+function mountStoreListingContext(opts){
+  opts = opts || {};
+  if(typeof RizqListingContext === 'undefined') return null;
+  var acc = _storeListingAccount();
+  var hint = document.getElementById('prod-listing-ctx-hint');
+  if(hint) hint.innerHTML = RizqListingContext.syncHintHtml(_storeDashLang());
+  return RizqListingContext.mountSelectors({
+    categorySelect: 'prod-category-id',
+    subcatSelect: 'prod-subcategory-id',
+    attrsMount: 'prod-attrs-mount',
+    context: RizqListingContext.sellerContext(acc, { accountType: 'store', accountId: SESSION_ID }),
+    lockCategory: true,
+    selectedSubcat: opts.selectedSubcat || '',
+    attrs: opts.attrs || {},
+    lang: _storeDashLang(),
+  });
+}
+
 function openAddProduct(){
   if(window._rizqDashReadOnly){
     alert(_t2('انتهت الفترة المجانية. يرجى الاشتراك في إحدى الباقات لتتمكن من إضافة إعلانات جديدة وتفعيل زر الاتصال للزبائن','La période d’essai est terminée. Veuillez souscrire à une offre pour publier de nouvelles annonces et activer le bouton d’appel pour vos clients.'));
@@ -1075,6 +1096,7 @@ function openAddProduct(){
   if(btn) btn.textContent = _t2('تصغير ↑','Réduire ↑');
   var anchor = document.getElementById('panel-products');
   if(anchor) anchor.scrollIntoView({ behavior:'smooth', block:'start' });
+  mountStoreListingContext();
 }
 
 function clearProductForm(){
@@ -1097,6 +1119,7 @@ function clearProductForm(){
   window.__rzqProdSizeStock = {};
   if(typeof rebuildProdSizeStockUI==='function') rebuildProdSizeStockUI({});
   if(typeof applyStoreInventoryPresets==='function') applyStoreInventoryPresets();
+  mountStoreListingContext();
 }
 
 // معرض صور المنتج (حتى 6 صور) — يحل محل الصورة الواحدة السابقة لدعم
@@ -1147,9 +1170,18 @@ function _rizqSyncCatalogItem(prod){
   try{
     if(typeof window.RIZQ_BACKEND_BASE !== 'string' || !window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN) return;
     var base = window.RIZQ_BACKEND_BASE.replace(/\/$/, '');
+    var ctx = (typeof RizqListingContext !== 'undefined')
+      ? RizqListingContext.sellerContext(_storeListingAccount(), { accountType: 'store', accountId: SESSION_ID })
+      : { store_id: SESSION_ID, account_id: SESSION_ID, account_type: 'store', activity_id: '', badges: {} };
     var body = {
-      accountId: SESSION_ID, kind:'product', name: prod.name, price: prod.price, cat: prod.cat,
+      accountId: SESSION_ID, storeId: SESSION_ID, kind:'product', name: prod.name, price: prod.price, cat: prod.cat,
       topicId: prod.topicId || '',
+      categoryId: prod.categoryId || '', category: prod.categoryId || '',
+      subCategoryId: prod.subcat || '', subcat: prod.subcat || '',
+      attrs: prod.attrs || {},
+      accountType: 'store', activityId: prod.activityId || ctx.activity_id || '',
+      listingSource: 'dashboard_catalog',
+      sellerContext: { storeName: ctx.store_name || (STORE && STORE.name) || '', badges: ctx.badges || {} },
       brandId: prod.brandId || '', brandName: prod.brandName || '', brandNameFr: prod.brandNameFr || '',
       modelId: prod.modelId || '', modelName: prod.modelName || '', modelNameFr: prod.modelNameFr || '',
       desc: prod.desc, stock: prod.stock, variants: prod.variants, sizeStock: prod.sizeStock || null,
@@ -1157,6 +1189,11 @@ function _rizqSyncCatalogItem(prod){
       status: prod.status==='pending_review' ? 'pending_review' : (prod.status==='inactive'?'inactive':'active'),
       images: (prod.imgDataArr && prod.imgDataArr.length) ? prod.imgDataArr : (prod.imgData ? [prod.imgData] : [])
     };
+    if(typeof RizqListingContext !== 'undefined'){
+      body = RizqListingContext.enrichPayload(body, ctx, {
+        categoryId: prod.categoryId, subcat: prod.subcat, attrs: prod.attrs || {}
+      });
+    }
     if(prod._backendId){
       fetch(base+'/api/catalog/'+encodeURIComponent(prod._backendId), {
         method:'PATCH', headers:{'Content-Type':'application/json','x-account-token':(window.REAL_ACCESS_TOKEN || SESSION_TOKEN)}, body: JSON.stringify(body)
@@ -1355,12 +1392,25 @@ function saveProduct(){
   const name = document.getElementById('prod-name').value.trim();
   const price = document.getElementById('prod-price').value;
   if(!name||!price){showToast(_t2('يرجى إدخال الاسم والسعر','Veuillez saisir le nom et le prix'),'error');return;}
+  var _listingForm = (typeof RizqListingContext !== 'undefined')
+    ? RizqListingContext.collectForm({
+        categorySelect: 'prod-category-id',
+        subcatSelect: 'prod-subcategory-id',
+        attrsMount: 'prod-attrs-mount',
+        context: RizqListingContext.sellerContext(_storeListingAccount(), { accountType: 'store', accountId: SESSION_ID }),
+      })
+    : { categoryId: '', subcat: '', attrs: {} };
+  if(!_listingForm.subcat){
+    showToast(_t2('اختر النوع / الفرع للمنتج (مثل هواتف ذكية)','Choisissez le sous-type du produit'),'error');
+    return;
+  }
   const adData = {
     id: 'STR-' + Date.now(),
     title: name,
     desc: document.getElementById('prod-desc') ? document.getElementById('prod-desc').value.trim() : '',
     price: price,
-    category: 'store',
+    category: _listingForm.categoryId || 'store',
+    subcat: _listingForm.subcat,
     images: [],
     seller: typeof accData !== 'undefined' ? (accData.name||_t2('محل','Boutique')) : _t2('محل','Boutique'),
     seller_trust_score: 70,
@@ -1393,6 +1443,15 @@ function saveProduct(){
       name, price,
       topicId: topic ? topic.id : (topicId || (_editing && _editing.topicId) || ''),
       cat: catName || (topic ? topic.nameAr : ''),
+      categoryId: _listingForm.categoryId || '',
+      category: _listingForm.categoryId || '',
+      subCategoryId: _listingForm.subcat || '',
+      subcat: _listingForm.subcat || '',
+      attrs: _listingForm.attrs || {},
+      accountType: 'store',
+      storeId: SESSION_ID,
+      activityId: (_storeListingAccount() && _storeListingAccount().activityId) || '',
+      listingSource: 'dashboard_catalog',
       desc: document.getElementById('prod-desc') ? document.getElementById('prod-desc').value.trim() : '',
       stock: document.getElementById('prod-stock') ? document.getElementById('prod-stock').value : '',
       variants: document.getElementById('prod-variants') ? document.getElementById('prod-variants').value.trim() : '',
@@ -1489,6 +1548,7 @@ function editProduct(i){
   if(typeof rebuildProdSizeStockUI==='function') rebuildProdSizeStockUI(window.__rzqProdSizeStock);
   if(typeof applyStoreInventoryPresets==='function') applyStoreInventoryPresets();
   openAddProduct();
+  mountStoreListingContext({ selectedSubcat: p.subcat || p.subCategoryId || '', attrs: p.attrs || {} });
 }
 
 function deleteProduct(i){
@@ -2755,7 +2815,16 @@ function openPayModal(pkgName, pkgPrice, category){
   _payPkg = {name: pkgName, price: pkgPrice, category: category || 'package'};
   _payFile = null;
   document.getElementById('pay-pkg-name').textContent = pkgName;
-  document.getElementById('pay-amount').textContent = pkgPrice > 0 ? Number(pkgPrice).toLocaleString() + ' MRU' : _t2('مجاناً','Gratuit');
+  var amtEl = document.getElementById('pay-amount');
+  if(amtEl){
+    if(typeof RizqSub !== 'undefined' && RizqSub.isPriceUnset && RizqSub.isPriceUnset(pkgPrice)){
+      amtEl.textContent = '—';
+    } else if(typeof RizqSub !== 'undefined' && RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(pkgPrice)){
+      amtEl.textContent = _t2('مجاناً','Gratuit');
+    } else {
+      amtEl.textContent = Number(pkgPrice).toLocaleString() + ' MRU';
+    }
+  }
   document.getElementById('pay-receipt-name').style.display = 'none';
   document.getElementById('pay-receipt-file').value = '';
   var vidWrap = document.getElementById('pay-video-url-wrap');
@@ -2850,7 +2919,16 @@ function handlePayReceipt(inp){
 
 function submitPayment(){
   if(!_payPkg) return;
-  if(_payPkg.price > 0 && !_payFile){
+  if(typeof RizqSub === 'undefined' || typeof RizqSub.submitSubscriptionRequest !== 'function'){
+    showToast(_t2('محرك الاشتراك غير محمّل','Moteur d\'abonnement non chargé'),'error');
+    return;
+  }
+  if(RizqSub.isPriceUnset && RizqSub.isPriceUnset(_payPkg.price)){
+    showToast(_t2('السعر غير مضبوط — حدّده السوبر أدمن من لوحة الباقات أولاً','Prix non défini — le Super Admin doit le fixer d\'abord'),'error');
+    return;
+  }
+  var isFree = RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(_payPkg.price);
+  if(!isFree && Number(_payPkg.price) > 0 && !_payFile){
     alert(_storeLang==='ar'?'يرجى رفع صورة وصل الدفع أولاً':'Veuillez d\'abord télécharger le reçu de paiement');
     return;
   }
@@ -3119,31 +3197,39 @@ function saveMyPayment(){
     function reqPkg(f){ return (f && typeof RizqSub!=='undefined') ? RizqSub.getMinPackageForFeature(ACC_TYPE, f) : null; }
 
     var services=[
-      {icon:'📦',label:_t2('نشر المنتجات/الخدمات','Publier produits/services'),feature:null,tip:_t2('انشر منتجاتك وخدماتك أمام آلاف المشترين','Publiez vos produits et services devant des milliers d\'acheteurs')},
-      {icon:'💬',label:_t2('التواصل المباشر','Communication directe'),feature:null,tip:_t2('استقبل رسائل واستفسارات الزبائن مباشرة','Recevez messages et demandes des clients directement')},
-      {icon:'📤',label:_t2('مشاركة الصفحة','Partage de la page'),feature:null,tip:_t2('شارك رابط صفحتك على وسائل التواصل','Partagez le lien de votre page sur les réseaux sociaux')},
-      {icon:'📊',label:_t2('إحصائيات الزيارات','Statistiques de visites'),feature:'analytics',tip:_t2('تابع عدد من زار صفحتك وتفاعل معها','Suivez le nombre de visiteurs et leurs interactions')},
-      {icon:'🥇',label:_t2('صدارة النتائج','Mise en avant dans les résultats'),feature:'priority_listing',tip:_t2('ظهور متقدم في نتائج البحث','Apparition prioritaire dans les résultats de recherche')},
-      {icon:'🤖',label:_t2('وكيل ذكي','Agent intelligent'),feature:'ai_agent_full',tip:_t2('رد تلقائي ذكي على الاستفسارات 24/7','Réponse automatique intelligente aux demandes 24/7')},
-      {icon:'📞',label:_t2('رد تلقائي مكالمات','Réponse automatique aux appels'),feature:'auto_reply_calls',tip:_t2('لا تفوتك مكالمة — الذكاء الاصطناعي يرد عنك','Ne manquez aucun appel — l\'IA répond pour vous')},
-      {icon:'💎',label:_t2('مدير حساب VIP','Gestionnaire de compte VIP'),feature:'vip_manager',tip:_t2('دعم شخصي من فريق رزق على مدار الساعة','Support personnel de l\'équipe Rizq 24h/24')},
+      {icon:'📦',label:_t2('منتجاتي','Mes produits'),feature:null,action:'products',tip:_t2('إدارة الكتالوج والمخزون','Gérer catalogue et stock')},
+      {icon:'🕐',label:_t2('ساعات العمل','Horaires'),feature:null,action:'hours',tip:_t2('جدول الفتح والإغلاق لكل يوم','Ouverture / fermeture par jour')},
+      {icon:'💬',label:_t2('الرسائل','Messages'),feature:null,action:'messages',tip:_t2('استقبل رسائل الزبائن مباشرة','Recevez les messages clients')},
+      {icon:'📩',label:_t2('الطلبات','Demandes'),feature:null,action:'requests',tip:_t2('طلبات التواصل والطلبات','Demandes de contact')},
+      {icon:'📸',label:_t2('صور المحل','Photos boutique'),feature:null,action:'photos',tip:_t2('معرض صور واجهتك العامة','Galerie de votre vitrine')},
+      {icon:'📤',label:_t2('مشاركة الصفحة','Partage'),feature:null,action:'share',tip:_t2('شارك رابط صفحتك','Partagez le lien de votre page')},
+      {icon:'📊',label:_t2('إحصائيات الزيارات','Statistiques'),feature:'analytics',action:'overview',tip:_t2('تابع زيارات صفحتك','Suivez les visites')},
+      {icon:'🥇',label:_t2('صدارة النتائج','Mise en avant'),feature:'priority_listing',action:'subscription',tip:_t2('ظهور متقدم في البحث','Apparition prioritaire')},
+      {icon:'🤖',label:_t2('الوكيل الذكي','Agent intelligent'),feature:'ai_agent_full',action:'agents',tip:_t2('تدريب الردود التلقائية 24/7','Studio IA 24/7')},
+      {icon:'📞',label:_t2('رد تلقائي مكالمات','Réponse auto appels'),feature:'auto_reply_calls',action:'agents',tip:_t2('الذكاء الاصطناعي يرد عنك','L\'IA répond pour vous')},
+      {icon:'💳',label:_t2('اشتراكي','Mon abonnement'),feature:null,action:'subscription',tip:_t2('الباقة والحدود والترقية','Forfait, quotas et upgrade')},
+      {icon:'💎',label:_t2('مدير حساب VIP','Gestionnaire VIP'),feature:'vip_manager',action:'subscription',tip:_t2('دعم شخصي من فريق رزق','Support personnel Rizq')},
     ];
 
     el.innerHTML=services.map(function(s){
       var avail=has(s.feature);
-      // إصلاح: بدل شارة "ترقية" عامة لا تحدد أي باقة، نعرض اسم أقل باقة حقيقية
-      // تمنح هذه الخدمة تحديداً (مصدرها RizqSub.getMinPackageForFeature) — لا لبس.
       var need=avail?null:reqPkg(s.feature);
+      if(window.RizqDashUI && typeof RizqDashUI.buildSvcTile==='function'){
+        return RizqDashUI.buildSvcTile({
+          icon:s.icon, label:s.label, tip:s.tip, feature:s.feature,
+          avail:avail, needPkg:need, action:avail?s.action:(s.action||'subscription')
+        });
+      }
       var lockTxt = '🔒 '+(need ? (_t2('يتطلب: ','Nécessite : ')+need) : _t2('ترقية','Mise à niveau'));
-      return '<div onclick="'+(avail?'':'showPanel(\'subscription\',null)')+'" style="background:#fff;border:2px solid '+(avail?'rgba(27,58,107,.18)':'rgba(201,168,76,.35)')+';border-radius:14px;padding:16px 10px 12px;text-align:center;position:relative;cursor:'+(avail?'default':'pointer')+';box-shadow:0 2px 8px rgba(27,58,107,.06);transition:box-shadow .2s,transform .2s" onmouseover="this.style.boxShadow=\'0 6px 18px rgba(27,58,107,.13)\';this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.boxShadow=\'0 2px 8px rgba(27,58,107,.06)\';this.style.transform=\'none\'">'
-        +(avail?''
-          :'<div style="position:absolute;top:-1px;right:-1px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:9.5px;font-weight:900;padding:3px 9px;border-radius:0 12px 0 10px;letter-spacing:.2px;white-space:nowrap">'+lockTxt+'</div>')
-        +'<div style="font-size:30px;margin-bottom:8px;line-height:1">'+s.icon+'</div>'
-        +'<div style="font-size:12px;font-weight:800;color:#1B3A6B;margin-bottom:5px;line-height:1.3">'+s.label+'</div>'
-        +'<div style="font-size:10.5px;color:#2C3A4F;line-height:1.45">'+s.tip+'</div>'
-        +(avail?'<div style="margin-top:10px;display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 8px rgba(16,185,129,.6)"></div>':'')
+      return '<div class="svc-tile'+(avail?'':' is-locked')+'" onclick="'+(avail?(s.action==='share'?'openShareModal()':"showPanel('"+s.action+"',null)"):'showPanel(\'subscription\',null)')+'" style="cursor:pointer">'
+        +'<div class="svc-tile__badge '+(avail?'ok':'lock')+'">'+(avail?_t2('متاح','Disponible'):lockTxt)+'</div>'
+        +'<div class="svc-tile__icon">'+s.icon+'</div>'
+        +'<div class="svc-tile__label">'+s.label+'</div>'
+        +'<div class="svc-tile__tip">'+s.tip+'</div>'
+        +(avail?'<div class="svc-tile__dot"></div>':'')
       +'</div>';
     }).join('');
+    try{ if(window.RizqDashUI){ RizqDashUI.refreshPackageWidget&&RizqDashUI.refreshPackageWidget(); } }catch(eSC){}
   }
 
 

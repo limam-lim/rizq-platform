@@ -310,41 +310,37 @@
     }
   }
 
-  function commerceToolbarHtml() {
-    var inner = '';
-    if (!isCommercePage()) {
-      inner = '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_landing_v8.html#wishlist-block" aria-label="' + t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '"><span class="rizq-hdr-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span><span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
-    } else {
-      // صفحات المحل: سلة (+ مفضلة المحل) — لا تُفرَّغ الأداة مبكراً
-      if (isStorePage()) {
-        // مفضلة منتجات المحل (لوحة wish-panel المحلية) — ليست مفضلة إعلانات المنصّة
-        inner +=
-          '<button type="button" class="rizq-hdr-store-wish" id="rizq-hdr-store-wish" onclick="if(typeof toggleWishPanel===\'function\')toggleWishPanel()" aria-label="' +
-          t2('مفضلة المحل', 'Favoris boutique') +
-          '" title="' +
-          t2('مفضلة المحل', 'Favoris boutique') +
-          '">❤<span class="rizq-hdr-fav-count" data-rizq-store-wish-count hidden>0</span></button>';
-      } else {
-        inner +=
-          '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_landing_v8.html#wishlist-block" aria-label="' +
-          t2('المفضلة', 'Favoris') +
-          '" title="' +
-          t2('المفضلة', 'Favoris') +
-          '"><span class="rizq-hdr-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span><span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
-      }
-      inner +=
-        '<a class="rizq-hdr-cart" id="rizq-hdr-cart" data-rizq-cart-wrap href="rizq_cart.html" aria-label="' +
-        t2('السلة', 'Panier') +
-        '" title="' +
-        t2('السلة', 'Panier') +
-        '">' +
-        '<span class="rizq-hdr-cart-ico" aria-hidden="true">' +
-        '<svg viewBox="0 0 24 24" width="18" height="18" focusable="false">' +
-        '<path fill="currentColor" d="M7.2 18.4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm9.6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM4.1 4h1.7c.5 0 .9.3 1 .8l.3 1.4h12.4c.6 0 1 .5.9 1.1l-1.1 6.2a1.8 1.8 0 0 1-1.8 1.5H8.6a1.8 1.8 0 0 1-1.8-1.5L5.4 5.6H4.1c-.5 0-.9-.4-.9-.9S3.6 4 4.1 4zm4.5 11.5h8.1l.9-5.1H7.5l1.1 5.1z"/>' +
-        '</svg></span>' +
-        '<span class="rizq-hdr-cart-lbl">' + t2('السلة', 'Panier') + '</span>' +
-        '<span class="rizq-hdr-fav-count" data-rizq-cart-count hidden>0</span></a>';
+  function isShowroomPage() {
+    try {
+      var path = String(location.pathname || location.href || '').toLowerCase();
+      if (path.indexOf('rizq_showroom') >= 0) return true;
+      return !!(document.body && document.body.getAttribute('data-t-ns') === 'showroom');
+    } catch (e) {
+      return false;
     }
+  }
+
+  function commerceToolbarHtml() {
+    /* مفضلة عامة (مثل السلة العامة) + سلة على صفحات التجارة */
+    var inner =
+      '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_favorites.html" aria-label="' +
+      t2('المفضلة', 'Favoris') +
+      '" title="' +
+      t2('المفضلة', 'Favoris') +
+      '"><span class="rizq-hdr-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span><span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
+    /* السلة العامة دائماً — تجمع كل ما أضافه الزائر؛ شريحة المحل المحلية تبقى منفصلة */
+    inner +=
+      '<a class="rizq-hdr-cart" id="rizq-hdr-cart" data-rizq-cart-wrap href="rizq_cart.html" aria-label="' +
+      t2('السلة العامة', 'Panier général') +
+      '" title="' +
+      t2('السلة العامة', 'Panier général') +
+      '">' +
+      '<span class="rizq-hdr-cart-ico" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" focusable="false">' +
+      '<path fill="currentColor" d="M7.2 18.4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm9.6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM4.1 4h1.7c.5 0 .9.3 1 .8l.3 1.4h12.4c.6 0 1 .5.9 1.1l-1.1 6.2a1.8 1.8 0 0 1-1.8 1.5H8.6a1.8 1.8 0 0 1-1.8-1.5L5.4 5.6H4.1c-.5 0-.9-.4-.9-.9S3.6 4 4.1 4zm4.5 11.5h8.1l.9-5.1H7.5l1.1 5.1z"/>' +
+      '</svg></span>' +
+      '<span class="rizq-hdr-cart-lbl">' + t2('السلة', 'Panier') + '</span>' +
+      '<span class="rizq-hdr-fav-count" data-rizq-cart-count hidden>0</span></a>';
     if (!inner) return '';
     return '<span class="rizq-toolbar-tools rizq-hdr-tools" data-rizq-toolbar="tools" role="group" aria-label="' + t2('أدوات', 'Outils') + '">' + inner + '</span>';
   }
@@ -1047,7 +1043,7 @@
   }
 
   function deskFavHtml() {
-    // على المحل/المنتجات/السلة: أدوات التجارة (مفضلة المحل + السلة)
+    // مفضلة عامة (+ سلة على صفحات التجارة) — نفس أسلوب الواجهة
     var commerce = commerceToolbarHtml();
     if (commerce) {
       return commerce.replace(
@@ -1056,7 +1052,7 @@
       );
     }
     return '<span class="rizq-toolbar-tools nav-toolbar-tools" data-rizq-toolbar="tools" role="group" aria-label="' + t2('أدوات', 'Outils') + '">' +
-      '<a href="rizq_landing_v8.html#wishlist-block" class="nav-account-btn nav-fav-btn" id="rizq-desk-fav" data-rizq-fav-wrap aria-label="' +
+      '<a href="rizq_favorites.html" class="nav-account-btn nav-fav-btn" id="rizq-desk-fav" data-rizq-fav-wrap aria-label="' +
       t2('المفضلة', 'Favoris') + '" title="' + t2('المفضلة', 'Favoris') + '" style="text-decoration:none">' +
       '<span class="nav-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span>' +
       '<span class="nav-fav-lbl" data-hdr="fav">' + t2('المفضلة', 'Favoris') + '</span>' +
@@ -1509,8 +1505,20 @@
     return hdr;
   }
 
-  /** هاتف: شريط سفلي = رئيسية + إعلانات + نشر + محلات + معارض */
+  /** الشريط السفلي القديم متوقف — الهيدر الموحّد (.rmh-nav) هو الوحيد */
+  function removeThumbDock() {
+    document.documentElement.classList.remove('rizq-phone-thumb-dock');
+    var dock = document.getElementById('rizq-thumb-dock');
+    if (dock && dock.parentNode) dock.parentNode.removeChild(dock);
+    document.querySelectorAll('.rizq-thumb-dock').forEach(function (el) {
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+    });
+  }
+
+  /** هاتف: شريط سفلي القديم — لا يُنشأ بعد الآن */
   function syncPhoneThumbDock() {
+    removeThumbDock();
+    return;
     var phone = isPhoneNavSplit();
     document.documentElement.classList.toggle('rizq-phone-thumb-dock', !!phone);
     var dock = document.getElementById('rizq-thumb-dock');
@@ -1778,27 +1786,24 @@
   }
 
   function injectUnifiedStrip() {
-    /* شريط زجاجي واحد (#nav على الهبوط / #rizq-desk-nav على الباقي) — كل العروض */
+    /* الشريط الزجاجي القديم متوقف نهائياً — الواجهة = هيدر النموذج الموحّد فقط */
     removeHeader();
+    removeDeskNav();
+    removeThumbDock();
     if (document.body) document.body.classList.remove('landing-ux-mobile');
-    document.documentElement.classList.remove('rizq-landing-mobile');
-    if (isLanding()) {
-      removeDeskNav();
-      if (isMobileNav()) {
-        bindLandingMobileMore();
-        dockLandingPhoneMore();
-      }
-    } else if (!isDashPage()) {
-      if (!document.getElementById('rizq-desk-nav')) {
-        document.body.insertAdjacentHTML('afterbegin', deskNavHtml());
-      }
-      document.documentElement.classList.add('has-rizq-desk-nav');
-      bindDeskNav();
-      applyNativeSearchStripNav();
-    } else {
-      removeDeskNav();
-    }
+    document.documentElement.classList.remove('rizq-landing-mobile', 'has-rizq-desk-nav', 'rizq-phone-thumb-dock');
+    /* إخفاء أي بقايا HTML قديمة إن وُجدت في الصفحة */
+    ['nav', 'section-jump-bar', 'mobile-bottom-nav', 'rizq-search-theater', 'rizq-search-pill'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.setAttribute('hidden', '');
+      el.setAttribute('aria-hidden', 'true');
+      el.style.cssText = 'display:none!important;visibility:hidden!important;pointer-events:none!important;height:0!important';
+    });
     if (!isDashPage()) {
+      if (isLanding() && isMobileNav()) {
+        bindLandingMobileMore();
+      }
       ensureMediatorPill();
       ensureHelpDropdown();
       ensureLangListener();
@@ -1806,7 +1811,6 @@
       initRLogoSidebar();
       enhanceModel3NavLinks();
     }
-    applyNativeSearchStripNav();
     if (window.RizqModuleFlags && typeof window.RizqModuleFlags.reapply === 'function') {
       window.RizqModuleFlags.reapply();
     } else {
@@ -1831,12 +1835,12 @@
       if (!document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) {
         var l = document.createElement('link');
         l.rel = 'stylesheet';
-        l.href = 'rizq_header_mockup_trial.css?v=5.40';
+        l.href = 'rizq_header_mockup_trial.css?v=5.48';
         (document.head || document.documentElement).appendChild(l);
       }
       if (!document.querySelector('script[src*="rizq_header_mockup_trial.js"]')) {
         var s = document.createElement('script');
-        s.src = 'rizq_header_mockup_trial.js?v=5.40';
+        s.src = 'rizq_header_mockup_trial.js?v=5.48';
         s.defer = true;
         (document.head || document.documentElement).appendChild(s);
       }

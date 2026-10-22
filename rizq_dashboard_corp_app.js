@@ -1251,15 +1251,32 @@ function _rizqSyncCatalogItem(prod){
   try{
     if(!window.RIZQ_BACKEND_BASE || !CORP_ACC || !CORP_ACC.id || !CORP_ACC.token) return;
     var base = window.RIZQ_BACKEND_BASE.replace(/\/$/,'');
+    var ctx = (typeof RizqListingContext !== 'undefined')
+      ? RizqListingContext.sellerContext(CORP_ACC, { accountType: 'corp', accountId: CORP_ACC.id })
+      : { store_id: CORP_ACC.id, account_id: CORP_ACC.id, account_type: 'corp', activity_id: '', badges: {} };
     var payload = {
-      accountId: CORP_ACC.id, kind:'product',
-      name: prod.name, price: prod.price, cat: prod.cat, desc: prod.desc,
+      accountId: CORP_ACC.id, storeId: CORP_ACC.id, kind:'product',
+      name: prod.name, price: prod.price,
+      cat: prod.cat, categoryId: prod.categoryId || prod.cat || '', category: prod.categoryId || prod.cat || '',
+      subCategoryId: prod.subcat || '', subcat: prod.subcat || '',
+      attrs: prod.attrs || {},
+      accountType: 'corp', activityId: prod.activityId || (CORP_ACC.activityId || ''),
+      listingSource: 'dashboard_catalog',
+      sellerContext: { storeName: CORP_ACC.name || '', badges: ctx.badges || {} },
+      brandId: prod.brandId || '', brandName: prod.brandName || '', brandNameFr: prod.brandNameFr || '',
+      modelId: prod.modelId || '', modelName: prod.modelName || '', modelNameFr: prod.modelNameFr || '',
+      desc: prod.desc,
       stock: prod.stock, variants: prod.variants, sizeStock: prod.sizeStock || null,
       // إصلاح 2026-08-04: كانت تُرسَل أول صورة فقط (image) رغم أن واجهة
       // الرفع هنا تدعم حتى 8 صور أصلاً — الخادم الآن يقبل images[] كاملة.
       images: prod.images || [],
       emoji: prod.emoji, status: prod.status, sold: prod.sold
     };
+    if(typeof RizqListingContext !== 'undefined'){
+      payload = RizqListingContext.enrichPayload(payload, ctx, {
+        categoryId: prod.categoryId || prod.cat, subcat: prod.subcat, attrs: prod.attrs || {}
+      });
+    }
     if(!prod._backendId){
       fetch(base+'/api/catalog', {
         method:'POST', headers:{'Content-Type':'application/json','x-account-token':(window.REAL_ACCESS_TOKEN || CORP_ACC.token)},
@@ -1671,6 +1688,19 @@ function saveProduct(){
       modelNameFr = RizqBrands.modelName(_cm, true);
     }
   }
+  var _listingForm = (typeof RizqListingContext !== 'undefined')
+    ? RizqListingContext.collectForm({
+        categorySelect: 'pr-cat',
+        subcatSelect: 'pr-subcategory-id',
+        attrsMount: 'pr-attrs-mount',
+        context: RizqListingContext.sellerContext(CORP_ACC, { accountType:'corp', accountId: CORP_ACC && CORP_ACC.id }),
+      })
+    : { categoryId: cat, subcat: '', attrs: {} };
+  cat = _listingForm.categoryId || cat;
+  if(!_listingForm.subcat){
+    showToast(_t2('اختر النوع / الفرع للمنتج','Choisissez le sous-type du produit'),'error');
+    return;
+  }
   if(!name || !price){ showToast(_t2('يرجى إدخال اسم المنتج والسعر','Veuillez saisir le nom du produit et le prix'),'error'); return; }
   if(video) video = video.replace(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/,'https://www.youtube.com/embed/$1');
   var editIdx = (typeof window._editingProdIdx === 'number') ? window._editingProdIdx : null;
@@ -1681,6 +1711,7 @@ function saveProduct(){
     desc:     desc,
     price:    price,
     category: cat,
+    subcat: _listingForm.subcat,
     brandId: brandId, brandName: brandName, brandNameFr: brandNameFr,
     modelId: modelId, modelName: modelName, modelNameFr: modelNameFr,
     images:   _pendingImgs.slice(),
@@ -1692,11 +1723,14 @@ function saveProduct(){
     var prods = getProds();
     var status = data._status || 'active';
     var _savedProd;
+    var _emoji = (document.getElementById('pr-emoji')||{}).value || '📦';
     if(editIdx!==null && prods[editIdx]){
       var old = prods[editIdx];
       prods[editIdx] = {
         id:old.id, _backendId: old._backendId||null, name:name, price:price, cat:cat, desc:desc,
-        emoji:cat||'📦', images:(data.images&&data.images.length)?data.images:old.images, video:video,
+        categoryId: cat, subCategoryId: _listingForm.subcat, subcat: _listingForm.subcat, attrs: _listingForm.attrs || {},
+        accountType: 'corp', storeId: CORP_ACC && CORP_ACC.id, activityId: CORP_ACC && CORP_ACC.activityId, listingSource: 'dashboard_catalog',
+        emoji:_emoji, images:(data.images&&data.images.length)?data.images:old.images, video:video,
         stock:stock, sold:sold, variants:variants, sizeStock:sizeStock,
         brandId:brandId, brandName:brandName, brandNameFr:brandNameFr,
         modelId:modelId, modelName:modelName, modelNameFr:modelNameFr,
@@ -1706,7 +1740,9 @@ function saveProduct(){
     } else {
       _savedProd = {
         id:data.id, _backendId:null, name:name, price:price, cat:cat, desc:desc,
-        emoji:cat||'📦', images:data.images, video:video,
+        categoryId: cat, subCategoryId: _listingForm.subcat, subcat: _listingForm.subcat, attrs: _listingForm.attrs || {},
+        accountType: 'corp', storeId: CORP_ACC && CORP_ACC.id, activityId: CORP_ACC && CORP_ACC.activityId, listingSource: 'dashboard_catalog',
+        emoji:_emoji, images:data.images, video:video,
         stock:stock, sold:sold, variants:variants, sizeStock:sizeStock,
         brandId:brandId, brandName:brandName, brandNameFr:brandNameFr,
         modelId:modelId, modelName:modelName, modelNameFr:modelNameFr,
@@ -1734,6 +1770,7 @@ function saveProduct(){
         RizqBrands.fillModelSelect(document.getElementById('pr-model'), '', false, '');
       }
     }catch(eClrB){}
+    try{ mountCorpListingContext(); }catch(eClrCtx){}
     window._editingProdIdx = null;
     var saveBtn = document.getElementById('prod-save-btn');
     if(saveBtn) saveBtn.textContent = _t2('💾 نشر المنتج','💾 Publier le produit');
@@ -1762,13 +1799,30 @@ function onCorpBrandChange(){
   }
 }
 
+function mountCorpListingContext(opts){
+  opts = opts || {};
+  if(typeof RizqListingContext === 'undefined') return;
+  var hint = document.getElementById('pr-listing-ctx-hint');
+  if(hint) hint.innerHTML = RizqListingContext.syncHintHtml((typeof _corpLang!=='undefined' && _corpLang==='fr')?'fr':'ar');
+  RizqListingContext.mountSelectors({
+    categorySelect: 'pr-cat',
+    subcatSelect: 'pr-subcategory-id',
+    attrsMount: 'pr-attrs-mount',
+    context: RizqListingContext.sellerContext(CORP_ACC, { accountType:'corp', accountId: CORP_ACC && CORP_ACC.id }),
+    lockCategory: true,
+    selectedSubcat: opts.selectedSubcat || '',
+    attrs: opts.attrs || {},
+    lang: (typeof _corpLang!=='undefined' && _corpLang==='fr')?'fr':'ar',
+  });
+}
+
 function editProd(i){
   var prods = getProds();
   var p = prods[i]; if(!p) return;
   window._editingProdIdx = i;
   document.getElementById('pr-name').value = p.name||'';
   document.getElementById('pr-price').value = p.price||'';
-  if(document.getElementById('pr-cat')) document.getElementById('pr-cat').value = p.cat||'';
+  if(document.getElementById('pr-cat')) document.getElementById('pr-cat').value = p.categoryId || p.cat||'';
   document.getElementById('pr-desc').value = p.desc||'';
   document.getElementById('pr-video').value = p.video||'';
   document.getElementById('pr-stock').value = p.stock||'';
@@ -1788,6 +1842,7 @@ function editProd(i){
   var saveBtn = document.getElementById('prod-save-btn');
   if(saveBtn) saveBtn.textContent = _t2('💾 حفظ التعديلات','💾 Enregistrer les modifications');
   showPanel('products');
+  mountCorpListingContext({ selectedSubcat: p.subcat || p.subCategoryId || '', attrs: p.attrs || {} });
   var formCard = document.getElementById('prod-form-body');
   if(formCard && formCard.scrollIntoView) formCard.scrollIntoView({behavior:'smooth'});
 }
@@ -1798,6 +1853,7 @@ document.addEventListener('DOMContentLoaded', function(){
       RizqBrands.fillModelSelect(document.getElementById('pr-model'), '', false, '');
     }
   }catch(eInitB){}
+  try{ mountCorpListingContext(); }catch(eCtx){}
 });
 
 function renderProducts(){
@@ -1940,7 +1996,16 @@ function openPayModal(pkgName, pkgPrice, category){
   _payPkg = {name: pkgName, price: pkgPrice, category: category || 'package'};
   _payFile = null;
   document.getElementById('pay-pkg-name').textContent = pkgName;
-  document.getElementById('pay-amount').textContent = pkgPrice > 0 ? Number(pkgPrice).toLocaleString() + ' MRU' : _t2('مجاناً','Gratuit');
+  var amtEl = document.getElementById('pay-amount');
+  if(amtEl){
+    if(typeof RizqSub !== 'undefined' && RizqSub.isPriceUnset && RizqSub.isPriceUnset(pkgPrice)){
+      amtEl.textContent = '—';
+    } else if(typeof RizqSub !== 'undefined' && RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(pkgPrice)){
+      amtEl.textContent = _t2('مجاناً','Gratuit');
+    } else {
+      amtEl.textContent = Number(pkgPrice).toLocaleString() + ' MRU';
+    }
+  }
   document.getElementById('pay-receipt-name').style.display = 'none';
   document.getElementById('pay-receipt-file').value = '';
   var vidWrap = document.getElementById('pay-video-url-wrap');
@@ -2035,7 +2100,16 @@ function handlePayReceipt(inp){
 
 function submitPayment(){
   if(!_payPkg) return;
-  if(_payPkg.price > 0 && !_payFile){
+  if(typeof RizqSub === 'undefined' || typeof RizqSub.submitSubscriptionRequest !== 'function'){
+    showToast(_t2('محرك الاشتراك غير محمّل','Moteur d\'abonnement non chargé'),'error');
+    return;
+  }
+  if(RizqSub.isPriceUnset && RizqSub.isPriceUnset(_payPkg.price)){
+    showToast(_t2('السعر غير مضبوط — حدّده السوبر أدمن من لوحة الباقات أولاً','Prix non défini — le Super Admin doit le fixer d\'abord'),'error');
+    return;
+  }
+  var isFree = RizqSub.isExplicitFreePrice && RizqSub.isExplicitFreePrice(_payPkg.price);
+  if(!isFree && Number(_payPkg.price) > 0 && !_payFile){
     alert(_corpLang==='ar'?'يرجى رفع صورة وصل الدفع أولاً':'Veuillez d\'abord télécharger le reçu de paiement');
     return;
   }
@@ -3217,30 +3291,36 @@ var RIZQ_TWILIO_NUM_CORP = (typeof _rizqTwilioForwardNum==='function'?_rizqTwili
     var ACC_TYPE='corp';
 
     var services=[
-      {id:'products',icon:'📦',label:_t2('نشر المنتجات/الخدمات','Publier produits/services'),feature:null,panel:'products',tip:_t2('انشر منتجاتك وخدماتك أمام آلاف المشترين','Publiez vos produits et services devant des milliers d\'acheteurs')},
-      {id:'inquiries',icon:'💬',label:_t2('التواصل المباشر','Communication directe'),feature:null,panel:'inquiries',tip:_t2('استقبل رسائل واستفسارات الزبائن مباشرة','Recevez les messages et demandes des clients directement')},
-      {id:'share',icon:'📤',label:_t2('مشاركة الصفحة','Partager la page'),feature:null,action:'share',tip:_t2('شارك رابط صفحتك على وسائل التواصل','Partagez le lien de votre page sur les réseaux sociaux')},
-      {id:'analytics',icon:'📊',label:_t2('إحصائيات الزيارات','Statistiques de visites'),feature:'analytics',panel:'analytics',tip:_t2('تابع عدد من زار صفحتك وتفاعل معها','Suivez le nombre de visiteurs de votre page et leurs interactions')},
-      {id:'priority',icon:'🥇',label:_t2('صدارة النتائج','Tête des résultats'),feature:'priority_listing',panel:'products',tip:_t2('ظهور متقدم في نتائج البحث','Apparition prioritaire dans les résultats de recherche')},
-      {id:'ai_agent',icon:'🤖',label:_t2('وكيل ذكي','Agent intelligent'),feature:'ai_agent_full',panel:'agents',tip:_t2('رد تلقائي ذكي على الاستفسارات 24/7','Réponse automatique intelligente aux demandes 24/7')},
-      {id:'auto_calls',icon:'📞',label:_t2('رد تلقائي مكالمات','Réponse auto aux appels'),feature:'auto_reply_calls',panel:'agents',tip:_t2('لا تفوتك مكالمة — الذكاء الاصطناعي يرد عنك','Ne manquez aucun appel — l\'IA répond pour vous')},
-      {id:'vip',icon:'💎',label:_t2('مدير حساب VIP','Gestionnaire de compte VIP'),feature:'vip_manager',panel:'subscription',tip:_t2('دعم شخصي من فريق رزق على مدار الساعة','Support personnalisé de l\'équipe Rizq 24h/24')},
+      {id:'products',icon:'📦',label:_t2('منتجاتي','Mes produits'),feature:null,panel:'products',tip:_t2('الكتالوج والمخزون','Catalogue et stock')},
+      {id:'profile',icon:'🏭',label:_t2('ملف الشركة','Profil entreprise'),feature:null,panel:'profile',tip:_t2('الهوية والوسائط','Identité et médias')},
+      {id:'inquiries',icon:'💬',label:_t2('التواصل المباشر','Communication'),feature:null,panel:'inquiries',tip:_t2('رسائل واستفسارات','Messages et demandes')},
+      {id:'share',icon:'📤',label:_t2('مشاركة الصفحة','Partager'),feature:null,action:'share',tip:_t2('شارك رابط صفحتك','Partagez le lien')},
+      {id:'team',icon:'👥',label:_t2('فريق العمل','Équipe'),feature:null,panel:'team',tip:_t2('إدارة المستخدمين','Gestion multi-utilisateurs')},
+      {id:'analytics',icon:'📊',label:_t2('تحليلات متقدمة','Analytique'),feature:'analytics',panel:'analytics',tip:_t2('إحصائيات الزيارات','Statistiques de visites')},
+      {id:'settings',icon:'⚙️',label:_t2('الإعدادات والتكامل','Réglages & API'),feature:null,panel:'settings',tip:_t2('إعدادات الحساب والربط','Compte et intégrations')},
+      {id:'priority',icon:'🥇',label:_t2('صدارة النتائج','Tête des résultats'),feature:'priority_listing',panel:'products',tip:_t2('ظهور متقدم في البحث','Apparition prioritaire')},
+      {id:'ai_agent',icon:'🤖',label:_t2('الوكيل الذكي','Agent intelligent'),feature:'ai_agent_full',panel:'agents',tip:_t2('استوديو تدريب الردود','Studio IA')},
+      {id:'auto_calls',icon:'📞',label:_t2('رد تلقائي مكالمات','Réponse auto appels'),feature:'auto_reply_calls',panel:'agents',tip:_t2('الذكاء الاصطناعي يرد عنك','L\'IA répond pour vous')},
+      {id:'subscription',icon:'💳',label:_t2('اشتراكي','Abonnement'),feature:null,panel:'subscription',tip:_t2('الباقة والترقية','Forfait et upgrade')},
+      {id:'vip',icon:'💎',label:_t2('مدير حساب VIP','Gestionnaire VIP'),feature:'vip_manager',panel:'subscription',tip:_t2('دعم شخصي من فريق رزق','Support personnalisé Rizq')},
     ];
     window._CORP_SERVICES_REGISTRY = services;
 
     el.innerHTML=services.map(function(s){
       var avail=_corpHasFeature(s.feature);
       var need=avail?null:_corpRequiredPkg(s.feature);
-      var lockTxt = '🔒 '+(need ? (_t2('يتطلب: ','Nécessite : ')+_trPkgName(need)) : _t2('ترقية','Mettre à niveau'));
-      return '<div role="button" tabindex="0" onclick="handleServiceCardClick(\''+s.id+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();handleServiceCardClick(\''+s.id+'\');}" style="background:#fff;border:2px solid '+(avail?'rgba(27,58,107,.18)':'rgba(201,168,76,.35)')+';border-radius:14px;padding:16px 10px 12px;text-align:center;position:relative;cursor:pointer;box-shadow:0 2px 8px rgba(27,58,107,.06);transition:box-shadow .2s,transform .2s" onmouseover="this.style.boxShadow=\'0 6px 18px rgba(27,58,107,.13)\';this.style.transform=\'translateY(-2px)\'" onmouseout="this.style.boxShadow=\'0 2px 8px rgba(27,58,107,.06)\';this.style.transform=\'none\'">'
-        +(avail?''
-          :'<div style="position:absolute;top:-1px;right:-1px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0f2347;font-size:9.5px;font-weight:900;padding:3px 9px;border-radius:0 12px 0 10px;letter-spacing:.2px;white-space:nowrap">'+lockTxt+'</div>')
-        +'<div style="font-size:30px;margin-bottom:8px;line-height:1">'+s.icon+'</div>'
-        +'<div style="font-size:12px;font-weight:800;color:#1B3A6B;margin-bottom:5px;line-height:1.3">'+s.label+'</div>'
-        +'<div style="font-size:10.5px;color:#2C3A4F;line-height:1.45">'+s.tip+'</div>'
-        +(avail?'<div style="margin-top:10px;display:inline-block;width:8px;height:8px;border-radius:50%;background:#10b981;box-shadow:0 0 8px rgba(16,185,129,.6)"></div>':'')
+      var badge = (window.RizqDashUI && RizqDashUI.statusBadge)
+        ? RizqDashUI.statusBadge(avail, s.feature, need ? _trPkgName(need) : null)
+        : { cls: avail ? 'ok' : 'lock', text: avail ? _t2('متاح','Disponible') : ('🔒 '+(need ? (_t2('يتطلب: ','Nécessite : ')+_trPkgName(need)) : _t2('ترقية','Mettre à niveau'))) };
+      return '<div class="svc-tile'+(avail?'':' is-locked')+'" role="button" tabindex="0" onclick="handleServiceCardClick(\''+s.id+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();handleServiceCardClick(\''+s.id+'\');}">'
+        +'<div class="svc-tile__badge '+badge.cls+'">'+badge.text+'</div>'
+        +'<div class="svc-tile__icon">'+s.icon+'</div>'
+        +'<div class="svc-tile__label">'+s.label+'</div>'
+        +'<div class="svc-tile__tip">'+s.tip+'</div>'
+        +(avail?'<div class="svc-tile__dot"></div>':'')
       +'</div>';
     }).join('');
+    try{ if(window.RizqDashUI&&RizqDashUI.refreshPackageWidget) RizqDashUI.refreshPackageWidget(); }catch(eSC){}
   }
 
 
