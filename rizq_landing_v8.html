@@ -772,14 +772,6 @@ html[dir="ltr"] .rizq-feat-card.rizq-feat-card--row{text-align:left}
 }
 .hero-title-card::after{display:none!important;content:none!important}
 
-.hero-brand-slogan{
-  position:relative;z-index:1;margin:10px 0 0;padding:0 6px;
-  font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;
-  font-size:clamp(18px,2.6vw,26px);font-weight:800;line-height:1.35;
-  color:#E8C96A;letter-spacing:.2px;text-align:center;
-  text-shadow:0 2px 12px rgba(0,0,0,.35);
-}
-
 .hero-headline{
   font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;
   font-size:clamp(52px,7.8vw,78px);font-weight:900;color:var(--gold);
@@ -5245,7 +5237,6 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="hero-brand-row">
       <div class="hero-title-card">
         <h1 class="hero-headline" id="hero-hl">رزق</h1>
-        <p class="hero-brand-slogan" id="hero-brand-slogan" data-t="hero-brand-slogan">من هنا يبدأ رزقك</p>
       </div>
       <div class="hero-eyebrow">
         <div class="pulse"></div>
@@ -10367,7 +10358,7 @@ const LANG = {
     'f-all':'الكل','f-re':'عقارات','f-car':'سيارات','f-live':'ماشية','f-elec':'إلكترونيات','f-truck':'شاحنات','f-srv':'خدمات','f-fashion':'موضة',
     'nav-cats': 'الأقسام', 'nav-ads': 'الإعلانات', 'nav-prices': 'الأسعار', 'nav-about': 'من نحن',
     'nav-account': 'حسابي', 'nav-post': 'نشر', 'nav-packs': 'الباقات', 'nav-assistant': '✨ رزق ذكي', 'nav-investments': 'الاستثمارات', 'nav-home': 'الرئيسية', 'nav-fav-lbl': 'المفضلة',
-    'hero-pill-sell': 'بيع', 'hero-pill-buy': 'اشتر', 'hero-pill-feat': 'تميّز', 'hero-brand-slogan': 'من هنا يبدأ رزقك',
+    'hero-pill-sell': 'بيع', 'hero-pill-buy': 'اشتر', 'hero-pill-feat': 'تميّز',
     'hero-ai-smart': '✨ رزق ذكي — مساعدك على المنصة',
     'about-intro': '<strong style="color:var(--royal);font-size:1.05em">رزق</strong> — سوق موريتانيا الإلكتروني للإعلانات والأعمال. من الإعلان الفردي إلى المحلات والمعارض والمكاتب، وصولاً إلى غرفة المناقصات وغرفة الاستثمارات — فضاء ثقة طوّرته <strong style="color:var(--royal)"><a href="rizq_about.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">ADMINIA SARL</a></strong> ليجمع البائع والمشتري في كل الولايات. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ما تحتاجه… في مكان واحد، بأمان ووضوح.</em>',
     'nav-stores': 'المحلات', 'nav-offices': 'المكاتب', 'nav-showrooms': 'المعارض والمصانع', 'nav-tenders': 'المناقصات', 'nav-more': 'المزيد ▾', 'nav-legal-dd': 'المادة القانونية', 'nav-legal-mobile': '⚖️ الإشعار القانوني', 'nav-packages': 'الباقات',
@@ -10532,7 +10523,7 @@ const LANG = {
   fr: {
     'nav-cats': 'Catégories', 'nav-ads': 'Annonces', 'nav-prices': 'Tarifs', 'nav-about': 'À propos',
     'nav-account': 'Compte', 'nav-post': 'Publier', 'nav-packs': 'Forfaits', 'nav-assistant': '✨ Rizq IA', 'nav-investments': 'Investissements', 'nav-home': 'Accueil', 'nav-fav-lbl': 'Favoris',
-    'hero-pill-sell': 'Vendre', 'hero-pill-buy': 'Acheter', 'hero-pill-feat': 'Briller', 'hero-brand-slogan': 'C\'est ici que commence votre Rizq',
+    'hero-pill-sell': 'Vendre', 'hero-pill-buy': 'Acheter', 'hero-pill-feat': 'Briller',
     'hero-ai-smart': '✨ Rizq IA — votre assistant',
     'about-intro': '<strong style="color:var(--royal);font-size:1.05em">Rizq</strong> — le marché électronique mauritanien des annonces et des affaires. De l\'annonce individuelle aux boutiques, showrooms et bureaux, jusqu\'à la salle des appels d\'offres et la salle des investissements — un espace de confiance développé par <strong style="color:var(--royal)"><a href="rizq_about.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">ADMINIA SARL</a></strong> qui réunit vendeurs et acheteurs dans toutes les wilayas. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">Tout ce qu\'il vous faut… au même endroit, en sécurité et en clarté.</em>',
     'nav-stores': 'Boutiques', 'nav-offices': 'Bureaux', 'nav-showrooms': 'Showrooms & usines', 'nav-tenders': 'A-doffres', 'nav-more': 'Plus ▾', 'nav-legal-dd': 'Mentions légales', 'nav-legal-mobile': '⚖️ Avis légal', 'nav-packages': 'Forfaits',
@@ -11008,11 +10999,6 @@ function applyLandingLang(toAr) {
     hl.style.direction = isAr ? 'rtl' : 'ltr';
     hl.style.unicodeBidi = 'isolate';
   }
-  const brandSlogan = document.getElementById('hero-brand-slogan');
-  if (brandSlogan) {
-    brandSlogan.textContent = isAr ? 'من هنا يبدأ رزقك' : 'C\'est ici que commence votre Rizq';
-  }
-
   document.querySelectorAll('.logo-ar').forEach(function(el) {
     el.textContent = 'رزق';
     el.style.direction = 'rtl';

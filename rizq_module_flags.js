@@ -357,32 +357,12 @@
     bindModuleGuard(flags);
   }
 
-  function renderLaunchFreeBanner(launch) {
-    var id = 'rizq-launch-free-banner';
-    var existing = document.getElementById(id);
-    var active = launch && launch.freePeriodActive && launch.freeUntil;
-    if (!active) {
-      if (existing) existing.remove();
-      return;
-    }
-    var until = String(launch.freeUntil);
-    var msg = t(
-      'مجاناً بالكامل حتى ' + until + ' — سجّل الآن واحصل على شارة شريك مؤسس وخصم دائم',
-      'Entièrement gratuit jusqu\'au ' + until + ' — inscrivez-vous et obtenez le badge Partenaire fondateur + remise durable'
-    );
-    if (!existing) {
-      existing = document.createElement('div');
-      existing.id = id;
-      existing.setAttribute('role', 'status');
-      existing.style.cssText = 'position:relative;z-index:40;width:100%;box-sizing:border-box;padding:8px 14px;text-align:center;font-size:13px;font-weight:800;line-height:1.45;color:#0D1B2A;background:linear-gradient(90deg,#E8C96A,#C9A84C,#E8C96A);border-bottom:1px solid rgba(13,27,42,.12);';
-      var host = document.body;
-      if (host.firstChild) host.insertBefore(existing, host.firstChild);
-      else host.appendChild(existing);
-    }
-    existing.textContent = msg;
-  }
-
   function fetchAndApply() {
+    /* شريط الإطلاق الأصفر أُزيل نهائياً بطلب Limam */
+    try {
+      var stale = document.getElementById('rizq-launch-free-banner');
+      if (stale) stale.remove();
+    } catch (eBanner) {}
     if (!global.RIZQ_BACKEND_BASE) {
       apply(defaultFlags());
       return;
@@ -393,7 +373,6 @@
         var cfg = data && data.ok && data.config ? data.config : null;
         var flags = (cfg && cfg.moduleFlags) || defaultFlags();
         apply(flags);
-        renderLaunchFreeBanner(cfg && cfg.launch);
       })
       .catch(function () {
         apply(defaultFlags());
