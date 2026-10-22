@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.56';
+    link.href = 'rizq_header_mockup_trial.css?v=5.57';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -75,16 +75,14 @@
       '<button class="rmh-search-btn" type="submit" aria-label="بحث">' +
       '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>' +
       '</button></form>' +
-      '<div class="rmh-side-end">' +
-      '<div class="rmh-notif" id="rmh-notif" aria-label="الإشعارات">' +
-      '<a class="rmh-ico rmh-cart-link" id="rmh-cart-btn" href="rizq_cart.html" data-rizq-cart-wrap aria-label="السلة العامة" title="السلة العامة">' +
-      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 5h2l1.5 10h11L20 8H7"/><circle cx="9.5" cy="19" r="1.3"/><circle cx="16.5" cy="19" r="1.3"/></svg>' +
-      '<span class="rmh-cart-badge" id="rmh-cart-badge" data-rizq-cart-count hidden>0</span></a></div>' +
       '<div class="rmh-tools">' +
       '<button type="button" class="rmh-lang btn-lang btn-lang-primary" id="rmh-lang-btn" dir="ltr" aria-label="FR | AR">' +
       '<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>' +
       '<button type="button" class="rmh-ico" onclick="typeof goToAccount===\'function\'&&goToAccount()" aria-label="حسابي">' +
       '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19c1.6-3.2 4-4.8 6.5-4.8S16.9 15.8 18.5 19"/></svg></button>' +
+      '<a class="rmh-ico rmh-cart-link" id="rmh-cart-btn" href="rizq_cart.html" data-rizq-cart-wrap aria-label="السلة العامة" title="السلة العامة">' +
+      '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 5h2l1.5 10h11L20 8H7"/><circle cx="9.5" cy="19" r="1.3"/><circle cx="16.5" cy="19" r="1.3"/></svg>' +
+      '<span class="rmh-cart-badge" id="rmh-cart-badge" data-rizq-cart-count hidden>0</span></a>' +
       '<a class="rmh-ico rmh-fav-link" href="rizq_favorites.html" data-rizq-fav-wrap aria-label="المفضلة العامة" title="المفضلة العامة">' +
       '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 20s-6.5-4.2-8.5-8A4.6 4.6 0 0 1 12 7.2 4.6 4.6 0 0 1 20.5 12c-2 3.8-8.5 8-8.5 8z"/></svg>' +
       '<span class="rmh-cart-badge rmh-fav-badge" id="rmh-fav-badge" data-rizq-fav-count hidden>0</span></a>' +
@@ -95,7 +93,7 @@
       '<div class="rizq-help-dd-menu" id="rmh-help-menu" role="menu" hidden>' +
       '<a class="rizq-help-dd-item" role="menuitem" href="rizq_legal.html#s10"><span class="rizq-help-dd-item-lbl">اتصل بنا</span></a>' +
       '<a class="rizq-help-dd-item" role="menuitem" href="rizq_help.html"><span class="rizq-help-dd-item-lbl">مركز المساعدة</span></a>' +
-      '</div></div></div></div></div>' +
+      '</div></div></div></div>' +
       '<nav class="rmh-nav" aria-label="أقسام رزق">' +
       '<a href="' + h.home + '" data-rmh="home"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7.2 14.2 12 12 16.8 9.8 12Z"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg></span>الرئيسية</a>' +
       '<a href="' + h.ads + '" data-rmh="ads"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10v4h2l5 3V7L6 10H4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 7a7 7 0 0 1 0 10"/></svg></span>الإعلانات</a>' +

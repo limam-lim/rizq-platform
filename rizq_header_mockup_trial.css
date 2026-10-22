@@ -514,16 +514,8 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
   font-weight:700!important;margin-top:0!important;padding:0!important;
   direction:ltr!important;unicode-bidi:isolate!important;white-space:nowrap!important;
 }
-/* سطح المكتب/تابلت: إشعار + أدوات في طرف واحد */
-.rmh-side-end{
-  justify-self:end;
-  display:flex;align-items:center;gap:6px;
-  flex-direction:row;min-width:0;
-}
-.rmh-notif{
-  display:flex;align-items:center;gap:4px;flex-shrink:0;
-}
 .rmh-tools{
+  justify-self:end;
   display:flex;align-items:center;gap:7px;flex-shrink:0;
   direction:ltr;
 }
@@ -986,7 +978,7 @@ body > .rizq-help-dd-menu a,
     align-items:center;
   }
   #rizq-mock-hdr .rmh-brand{justify-self:start!important;min-width:0}
-  #rizq-mock-hdr .rmh-side-end{justify-self:end!important;min-width:0}
+  #rizq-mock-hdr .rmh-tools{justify-self:end!important;min-width:0}
   /* البحث: نفس الموضع + متّسع قليلاً لتذييل الأقسام */
   #rizq-mock-hdr .rmh-search{
     max-width:340px!important;
@@ -1070,28 +1062,19 @@ body > .rizq-help-dd-menu a,
   }
   /*
    * هاتف — نفس ترتيب الكمبيوتر/التابلت:
-   * يمين = الشعار | يسار = إشعار السلة + بقية الأيقونات معاً (السلة يمين المجموعة)
+   * يمين = الشعار | يسار = الأدوات (حساب → سلة → مفضلة → مساعدة)
+   * السلة مباشرة على يسار المفضلة كما سابقاً
    * البحث صف كامل تحتها فقط (فرق الهاتف)
    */
   .rmh-main{
     display:grid;
     grid-template-columns:auto minmax(0,1fr) auto;
     grid-template-areas:
-      "brand . side"
+      "brand . tools"
       "search search search";
     gap:6px 8px;
     padding:8px 10px 7px;
     align-items:center;
-  }
-  #rizq-mock-hdr .rmh-side-end,
-  .rmh-side-end{
-    display:flex!important;
-    grid-area:side;
-    justify-self:end!important;
-    align-items:center;
-    gap:4px;
-    flex-direction:row;
-    min-width:0;
   }
   #rizq-mock-hdr .rmh-brand.logo,
   #rizq-mock-hdr .rmh-brand,
@@ -1100,16 +1083,13 @@ body > .rizq-help-dd-menu a,
     justify-self:start!important;
     min-width:0;
   }
-  #rizq-mock-hdr .rmh-notif,
-  .rmh-notif{
-    display:flex;align-items:center;flex-shrink:0;
-  }
   #rizq-mock-hdr .rmh-tools,
   .rmh-tools{
-    display:flex;
-    align-items:center;
+    grid-area:tools;
+    justify-self:end!important;
     gap:4px;
-    flex-shrink:0;
+    align-items:center;
+    display:flex;
   }
   .rmh-search,
   #rizq-mock-hdr .rmh-search{
