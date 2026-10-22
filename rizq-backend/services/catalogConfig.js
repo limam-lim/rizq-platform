@@ -102,14 +102,21 @@ function findCatalogPackage(ref) {
   if (!ref) return null;
   const id = typeof ref === 'string' ? ref : String(ref.id || ref.packageId || '');
   const name = typeof ref === 'object' ? String(ref.pkgName || ref.name || '').trim() : '';
+  const category = typeof ref === 'object' ? String(ref.category || ref._catalog || '').trim() : '';
   const all = getAllCatalogPackages();
+  const inCat = category
+    ? all.filter((p) => String(p._catalog || '') === category)
+    : all;
+  const pool = inCat.length ? inCat : all;
   if (id) {
-    const hit = all.find((p) => String(p.id) === id);
+    const hit = pool.find((p) => String(p.id) === id)
+      || all.find((p) => String(p.id) === id);
     if (hit) return hit;
   }
   if (name) {
     const norm = name.replace(/💎\s*/g, '').trim();
-    const hit = all.find((p) => String(p.name || '').replace(/💎\s*/g, '').trim() === norm);
+    const hit = pool.find((p) => String(p.name || '').replace(/💎\s*/g, '').trim() === norm)
+      || all.find((p) => String(p.name || '').replace(/💎\s*/g, '').trim() === norm);
     if (hit) return hit;
   }
   return null;

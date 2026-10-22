@@ -197,6 +197,14 @@
     return html + '</div>';
   }
 
+  function safeCssColor(v) {
+    var s = String(v || '').trim();
+    if (!s) return '';
+    if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(s)) return s;
+    if (/^(rgb|rgba|hsl|hsla)\(/i.test(s) && s.length <= 60) return s;
+    return '';
+  }
+
   function renderCard(p, opts) {
     opts = opts || {};
     var lang = opts.lang || getLang();
@@ -235,6 +243,21 @@
             : trial
               ? 'border:1.5px solid rgba(16,185,129,.4);color:#15803d;background:rgba(16,185,129,.08)'
               : 'border:none;color:#fff;background:linear-gradient(135deg,#1B3A6B,#234d8f);box-shadow:0 4px 14px rgba(27,58,107,.35)';
+    }
+    /* ألوان الأدمن تتقدّم على القوالب الافتراضية */
+    var customBg = safeCssColor(p.bgColor || p.backgroundColor);
+    var customText = safeCssColor(p.textColor || p.color);
+    var customAccent = safeCssColor(p.accentColor);
+    if (customBg) bg = customBg;
+    if (customText) {
+      nameCol = customText;
+      featCol = customText;
+      periodCol = customText;
+    }
+    if (customAccent) {
+      priceCol = customAccent;
+      border = '2px solid ' + customAccent;
+      btnStyle = 'border:none;color:#0f2347;background:' + customAccent + ';box-shadow:0 4px 14px rgba(0,0,0,.18)';
     }
     var priceTxt = trial ? t2('مجاناً', 'Gratuit') : Number(p.price).toLocaleString();
     var feats = (lang === 'fr' && Array.isArray(p.features_fr) && p.features_fr.length)

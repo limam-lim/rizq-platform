@@ -1347,9 +1347,17 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     // يُحفَظ إطلاقاً في site-config.json (يُتجاهَل بصمت هنا)، فلا يظهر أبداً
     // لجهاز أدمن آخر يفتح نفس اللوحة، خلافاً لكل الفئات الأخرى المُصلَحة هنا
     // فعلياً. أضيفت 'tender' + 'verified_plus' (فئة "موثّق⁺" الجديدة).
-    const PKG_CAT_KEYS = ['general', 'individual', 'office', 'store', 'corp', 'estate', 'video', 'tender', 'verified_plus'];
+    const PKG_CAT_KEYS = ['general', 'individual', 'office', 'store', 'corp', 'estate', 'video', 'tender', 'investment', 'verified_plus'];
     const existingPkgs = (current.packages && typeof current.packages === 'object') ? current.packages : {};
     const mergedPkgs = Object.assign({}, existingPkgs);
+    const HEX_RE = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
+    function sanitizePkgColor(v) {
+      const s = String(v || '').trim();
+      if (!s) return '';
+      if (HEX_RE.test(s)) return s.slice(0, 9);
+      if (/^(rgb|rgba|hsl|hsla)\(/i.test(s) && s.length <= 60) return s;
+      return '';
+    }
     PKG_CAT_KEYS.forEach((key) => {
       if (!Array.isArray(body.packages[key])) return;
       mergedPkgs[key] = body.packages[key].slice(0, 30).map((p) => ({
@@ -1367,6 +1375,9 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
         quotaMessages: Math.max(0, Math.min(100000, Number(p.quotaMessages) || 0)),
         quotaMinutes: Math.max(0, Math.min(100000, Number(p.quotaMinutes) || 0)),
         aiModel: String(p.aiModel || '').slice(0, 80),
+        bgColor: sanitizePkgColor(p.bgColor || p.backgroundColor),
+        textColor: sanitizePkgColor(p.textColor || p.color),
+        accentColor: sanitizePkgColor(p.accentColor),
       }));
     });
     next.packages = mergedPkgs;
@@ -2369,10 +2380,31 @@ const subRequestsLimiter = rateLimit({
  */
 app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
   const b = req.body || {};
-  if (!b.pkg || !b.accountId) return res.status(400).json({ error: 'pkg و accountId مطلوبان' });
+  const pkgRef = b.pkg || b.packageId || b.pkgId || b.pkgName;
+  if (!pkgRef || !b.accountId) return res.status(400).json({ error: 'pkg و accountId مطلوبان' });
   const token = req.header('x-account-token') || '';
   const owner = verifyAccountOwner(String(b.accountId).slice(0, 60), token);
   if (!owner) return res.status(401).json({ ok: false, error: 'unauthorized' });
+  /* سعر الخادم هو المرجع — لا نثق بسعر العميل للمعاملات */
+  let catalogPkg = null;
+  try {
+    const { findCatalogPackage } = require('./services/catalogConfig');
+    catalogPkg = findCatalogPackage({
+      pkgName: pkgRef,
+      name: pkgRef,
+      id: pkgRef,
+      category: b.category,
+    }) || findCatalogPackage(pkgRef);
+  } catch (catErr) {
+    console.warn('[sub-requests] catalog lookup:', catErr.message);
+  }
+  if (!catalogPkg) {
+    return res.status(400).json({ ok: false, error: 'باقة غير معروفة في الكتالوج — السعر يُحدَّد من الخادم فقط', code: 'UNKNOWN_PKG' });
+  }
+  const serverPrice = catalogPkg.price != null ? Number(catalogPkg.price) || 0 : null;
+  if (serverPrice == null) {
+    return res.status(400).json({ ok: false, error: 'باقة بلا سعر في الكتالوج', code: 'UNKNOWN_PKG' });
+  }
   const list = readSubRequests();
   const clientId = typeof b.id === 'string' && /^sub_\d{10,20}$/.test(b.id) ? b.id : null;
   const id = clientId && !list.some((r) => r.id === clientId)
@@ -2387,11 +2419,13 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
     receiptPath = stored.relativePath;
     receiptMeta = { mime: stored.mime, bytes: stored.bytes };
   }
+  const authoritativePrice = serverPrice;
   const rec = {
     id,
-    pkg: String(b.pkg).slice(0, 60),
-    price: Number(b.price) || 0,
-    expectedPrice: Number(b.expectedPrice) || Number(b.price) || 0,
+    pkg: String((catalogPkg && (catalogPkg.name || catalogPkg.id)) || pkgRef).slice(0, 60),
+    packageId: String((catalogPkg && catalogPkg.id) || pkgRef).slice(0, 60),
+    price: authoritativePrice,
+    expectedPrice: authoritativePrice,
     submittedAt: b.submittedAt || new Date().toISOString(),
     status: 'pending',
     account: String(b.account || '').slice(0, 120),

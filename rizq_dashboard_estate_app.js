@@ -633,13 +633,23 @@ function renderPackages() {
       ? RizqPackagesConfig.packageDisplayName(pkg.id, 'ar')
       : (pkg.name_ar || pkg.name || pkg.id);
     var feats = pkg.features || [];
-    return '<div class="pkg-card' + (pkg.highlight ? ' highlight' : '') + '">' +
-      '<h3>' + escapeHtml(name) + '</h3>' +
+    var bg = String(pkg.bgColor || pkg.backgroundColor || '').trim();
+    var tx = String(pkg.textColor || pkg.color || '').trim();
+    var ac = String(pkg.accentColor || '').trim();
+    var cardStyle = '';
+    if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(bg)) cardStyle += 'background:' + bg + ';';
+    if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(tx)) cardStyle += 'color:' + tx + ';';
+    if (/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(ac)) cardStyle += 'border-color:' + ac + ';';
+    return '<div class="pkg-card' + (pkg.highlight ? ' highlight' : '') + '"' +
+      (cardStyle ? ' style="' + cardStyle + '"' : '') + '>' +
+      '<h3' + (tx ? ' style="color:inherit"' : '') + '>' + escapeHtml(name) + '</h3>' +
       '<div style="margin:8px 0 4px">' + fmtPrice(pkg.pricePending ? null : pkg.price) + '</div>' +
-      '<div style="font-size:12px;color:#64748b;font-weight:700">' + (pkg.durationDays || 30) + ' يوماً · حتى ' +
+      '<div style="font-size:12px;opacity:.75;font-weight:700">' + (pkg.durationDays || 30) + ' يوماً · حتى ' +
       (pkg.maxCatalogItems === Infinity ? '∞' : (pkg.maxCatalogItems || '—')) + ' عقار</div>' +
       '<ul>' + feats.map(function (f) { return '<li>' + escapeHtml(f) + '</li>'; }).join('') + '</ul>' +
-      '<button type="button" class="btn btn-gold btn-sm" style="margin-top:12px;width:100%" data-pkg="' + escapeAttr(pkg.id) + '">طلب تفعيل</button>' +
+      '<button type="button" class="btn btn-gold btn-sm" style="margin-top:12px;width:100%' +
+      (ac ? ';background:' + ac + ';border-color:' + ac : '') +
+      '" data-pkg="' + escapeAttr(pkg.id) + '">طلب تفعيل</button>' +
       '</div>';
   }).join('');
   grid.querySelectorAll('[data-pkg]').forEach(function (btn) {
@@ -666,6 +676,7 @@ function requestPackage(pkgId) {
     body: JSON.stringify({
       accountId: ACCOUNT.id,
       category: 'estate',
+      pkg: pkgId,
       packageId: pkgId,
       note: 'طلب باقة عقارات من لوحة التحكم'
     })

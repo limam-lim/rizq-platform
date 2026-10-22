@@ -1096,6 +1096,9 @@ function _mergeLive(defaults, live) {
       period: livePkg.period || base.period || '',
       cta: livePkg.cta || base.cta || '',
       cta_fr: livePkg.cta_fr || base.cta_fr || '',
+      bgColor: livePkg.bgColor || livePkg.backgroundColor || base.bgColor || '',
+      textColor: livePkg.textColor || livePkg.color || base.textColor || '',
+      accentColor: livePkg.accentColor || base.accentColor || '',
       active: livePkg.active !== false
     });
   });

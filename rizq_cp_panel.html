@@ -3352,6 +3352,11 @@ function renderPackages(){
           <div class="form-group"><label class="form-label">${t('pkg-period-label','المدة / الوصف')}</label><input class="form-input pkg-period-input" value="${_pe(p.period||'')}"/></div>
           <div class="form-group"><label class="form-label">${t('pkg-duration-label','عدد الأيام')}</label><input class="form-input pkg-duration-input" type="number" value="${Number(p.durationDays)||30}" dir="ltr"/></div>
         </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+          <div class="form-group"><label class="form-label">${t('pkg-bg-label','لون الخلفية')}</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input pkg-bg-input" type="text" value="${_pe(p.bgColor||'')}" placeholder="#0a1628" dir="ltr" style="flex:1"/><input type="color" class="pkg-bg-picker" value="${_pe((p.bgColor&&/^#[0-9a-fA-F]{6}$/.test(p.bgColor))?p.bgColor:'#0a1628')}" oninput="var i=this.closest('.form-group').querySelector('.pkg-bg-input');if(i)i.value=this.value" title="${_pe(t('pkg-bg-pick','اختر لون الخلفية'))}"/></div></div>
+          <div class="form-group"><label class="form-label">${t('pkg-text-label','لون النص')}</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input pkg-text-input" type="text" value="${_pe(p.textColor||'')}" placeholder="#ffffff" dir="ltr" style="flex:1"/><input type="color" class="pkg-text-picker" value="${_pe((p.textColor&&/^#[0-9a-fA-F]{6}$/.test(p.textColor))?p.textColor:'#ffffff')}" oninput="var i=this.closest('.form-group').querySelector('.pkg-text-input');if(i)i.value=this.value" title="${_pe(t('pkg-text-pick','اختر لون النص'))}"/></div></div>
+          <div class="form-group"><label class="form-label">${t('pkg-accent-label','لون التمييز')}</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input pkg-accent-input" type="text" value="${_pe(p.accentColor||'')}" placeholder="#C9A84C" dir="ltr" style="flex:1"/><input type="color" class="pkg-accent-picker" value="${_pe((p.accentColor&&/^#[0-9a-fA-F]{6}$/.test(p.accentColor))?p.accentColor:'#C9A84C')}" oninput="var i=this.closest('.form-group').querySelector('.pkg-accent-input');if(i)i.value=this.value" title="${_pe(t('pkg-accent-pick','اختر لون التمييز'))}"/></div></div>
+        </div>
         <div class="form-group"><label class="form-label">${t('pkg-feats-label','المميزات (كل ميزة في سطر)')}</label><textarea class="form-input pkg-feats-input" rows="3" style="resize:vertical">${_pe((p.features||[]).join('\n'))}</textarea></div>
         <button class="btn-sm btn-outline" onclick="deletePackage(${i})">${t('pkg-delete-btn','🗑 حذف الباقة')}</button>
       </div>
@@ -3362,7 +3367,7 @@ function renderPackages(){
 function addPkg(){
   const t = (k,fb)=> window.RizqI18n ? RizqI18n.t(k,'admin') : fb;
   const pkgs = loadPkgCategory(currentPkgCat);
-  pkgs.push({id:'pkg'+Date.now(), name:t('pkg-new-name','باقة جديدة'), price:0, period:t('pkg-new-period','MRU / شهر'), durationDays:30, features:[t('pkg-new-feat1','ميزة 1'),t('pkg-new-feat2','ميزة 2')], active:true});
+  pkgs.push({id:'pkg'+Date.now(), name:t('pkg-new-name','باقة جديدة'), price:0, period:t('pkg-new-period','MRU / شهر'), durationDays:30, features:[t('pkg-new-feat1','ميزة 1'),t('pkg-new-feat2','ميزة 2')], bgColor:'', textColor:'', accentColor:'', active:true});
   localStorage.setItem(pkgCatInfo(currentPkgCat).ls, JSON.stringify(pkgs));
   _syncPkgCatToBackend(currentPkgCat, pkgs);
   renderPackages();
@@ -3392,6 +3397,9 @@ function savePkgCategory(){
     pkgs[i].period = card.querySelector('.pkg-period-input').value.trim();
     pkgs[i].durationDays = +card.querySelector('.pkg-duration-input').value || 30;
     pkgs[i].features = card.querySelector('.pkg-feats-input').value.split('\n').map(f=>f.trim()).filter(Boolean);
+    pkgs[i].bgColor = (card.querySelector('.pkg-bg-input')||{}).value.trim() || '';
+    pkgs[i].textColor = (card.querySelector('.pkg-text-input')||{}).value.trim() || '';
+    pkgs[i].accentColor = (card.querySelector('.pkg-accent-input')||{}).value.trim() || '';
     pkgs[i].active = card.querySelector('.toggle-sw').classList.contains('on');
   });
   localStorage.setItem(pkgCatInfo(currentPkgCat).ls, JSON.stringify(pkgs));
