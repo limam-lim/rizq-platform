@@ -817,6 +817,53 @@
     updateNav();
     root.hidden = false;
     root.style.display = '';
+
+    /* تلميح الجوال: اضغط للتشغيل — سطح المكتب يبقى «مرّر الماوس» */
+    (function syncStripHint() {
+      var hint = root.querySelector('.rizq-vid-strip-hint');
+      if (!hint) return;
+      function apply() {
+        var tap = false;
+        try { tap = window.matchMedia('(hover: none), (max-width: 699px)').matches; } catch (eHint) {}
+        var key = tap ? (hint.getAttribute('data-t-mobile') || 'vstrip-hint-tap') : (hint.getAttribute('data-t') || 'vstrip-hint');
+        var ar = { 'vstrip-hint': 'مرّر الماوس للتشغيل', 'vstrip-hint-tap': 'اضغط للتشغيل' };
+        var fr = { 'vstrip-hint': 'Survolez pour lire', 'vstrip-hint-tap': 'Appuyez pour lire' };
+        hint.textContent = isFr ? (fr[key] || fr['vstrip-hint']) : (ar[key] || ar['vstrip-hint']);
+      }
+      apply();
+      window.addEventListener('resize', apply);
+    })();
+
+    /* جوال/لمس: تشغيل تلقائي عند الظهور (50%) وإيقاف عند الخروج — سطح المكتب يعتمد على hover */
+    (function bindStripVisibilityPlay() {
+      var finePointer = false;
+      try { finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches; } catch (eFp) {}
+      if (finePointer || typeof IntersectionObserver === 'undefined') return;
+      var cards = track.querySelectorAll('.rizq-vcard');
+      if (!cards.length) return;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          var card = entry.target;
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            playStripVideo(card);
+          } else {
+            stopStripVideo(card);
+          }
+        });
+      }, { threshold: [0, 0.5, 1] });
+      cards.forEach(function (card) {
+        var v = card.querySelector('video');
+        if (v) {
+          v.muted = true;
+          v.setAttribute('muted', '');
+          v.setAttribute('playsinline', '');
+          v.loop = true;
+          v.setAttribute('loop', '');
+        }
+        io.observe(card);
+      });
+    })();
+
     return true;
   }
 

@@ -14,11 +14,11 @@
 
 <meta name="description" content="رزق — سوق موريتانيا الإلكتروني. بيع واشترِ بأمان: عقارات، سيارات، ذهب، ماشية، إلكترونيات وأكثر."/>
 <meta name="theme-color" content="#0d1b2a"/>
-<link rel="canonical" href="https://rizq.mr/rizq_landing_v8.html"/>
+<link rel="canonical" href="https://rizq.mr/"/>
 <meta property="og:title" content="رزق | Rizq — سوق موريتانيا الإلكتروني"/>
-<meta property="og:description" content="رزق — سوق موريتانيا الإلكتروني"/>
+<meta property="og:description" content="رزق — سوق موريتانيا الإلكتروني. بيع واشترِ بأمان: عقارات، سيارات، ذهب، ماشية، إلكترونيات وأكثر."/>
 <meta property="og:type" content="website"/>
-<meta property="og:url" content="https://rizq.mr/rizq_landing_v8.html"/>
+<meta property="og:url" content="https://rizq.mr/"/>
 <meta property="og:image" content="https://rizq.mr/rizq-mark-512.png"/>
 <meta property="og:locale" content="ar_MR"/>
 <meta name="twitter:card" content="summary_large_image"/>
@@ -209,18 +209,22 @@ nav.scrolled{
 .nav-center a:active,.nav-center .nav-link-btn:active,.nav-post-plus:active{transform:scale(0.98)}
 .nav-post-plus{color:#C9A84C!important;background:transparent!important;border:none!important}
 #nav .rizq-nav-post > a,
-#rizq-desk-nav .rizq-nav-post > a{
-  color:#E8C96A!important;
-  border:1px solid rgba(201,168,76,.45)!important;
+#rizq-desk-nav .rizq-nav-post > a,
+a.rmh-post-nav{
+  color:#0D1B2A!important;
+  border:1px solid #C9A84C!important;
   border-radius:12px!important;
-  background:linear-gradient(135deg,rgba(201,168,76,.16),rgba(201,168,76,.06))!important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+  background:linear-gradient(135deg,#E8C96A 0%,#C9A84C 55%,#b89840 100%)!important;
+  box-shadow:0 4px 14px rgba(201,168,76,.35),inset 0 1px 0 rgba(255,255,255,.35);
+  font-weight:800!important;
 }
 #nav .rizq-nav-post > a:hover,
-#rizq-desk-nav .rizq-nav-post > a:hover{
-  border-color:rgba(232,201,106,.75)!important;
-  background:linear-gradient(135deg,rgba(201,168,76,.28),rgba(201,168,76,.12))!important;
-  color:#fff!important;
+#rizq-desk-nav .rizq-nav-post > a:hover,
+a.rmh-post-nav:hover{
+  border-color:#E8C96A!important;
+  background:linear-gradient(135deg,#f0d78a 0%,#C9A84C 50%,#a8893a 100%)!important;
+  color:#0D1B2A!important;
+  box-shadow:0 6px 18px rgba(201,168,76,.45);
 }
 .nav-center a[style*="gold"]{color:var(--gold)!important;background:rgba(201,168,76,.10);border:1px solid rgba(201,168,76,.25)}
 .nav-center a[style*="gold"]:hover{background:rgba(201,168,76,.20);border-color:rgba(201,168,76,.5)}
@@ -767,6 +771,15 @@ html[dir="ltr"] .rizq-feat-card.rizq-feat-card--row{text-align:left}
   background-size:18px 18px;
 }
 .hero-title-card::after{display:none!important;content:none!important}
+
+.hero-brand-slogan{
+  position:relative;z-index:1;margin:10px 0 0;padding:0 6px;
+  font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;
+  font-size:clamp(18px,2.6vw,26px);font-weight:800;line-height:1.35;
+  color:#E8C96A;letter-spacing:.2px;text-align:center;
+  text-shadow:0 2px 12px rgba(0,0,0,.35);
+}
+
 .hero-headline{
   font-family:'Cairo','Alexandria','Segoe UI','Arial',sans-serif;
   font-size:clamp(52px,7.8vw,78px);font-weight:900;color:var(--gold);
@@ -1860,7 +1873,7 @@ body.rizq-vstrip-lb-on{overflow:hidden}
     scroll-padding-inline:0;
     gap:8px;
   }
-  .rizq-vid-strip-hint{display:none}
+  .rizq-vid-strip-hint{display:block;margin:0 2px 6px;font-size:12px;font-weight:700;color:#5b6b85}
   .rizq-vcard{flex-basis:min(168px,48vw);max-width:min(168px,48vw)}
   .rizq-vcard-thumb{border-radius:14px}
   .rizq-vcard-thumb .rizq-vcard-contacts,
@@ -5048,7 +5061,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <a href="#hero" data-rmh="home" class="is-active" aria-current="true"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7.2 14.2 12 12 16.8 9.8 12Z"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg></span>الرئيسية</a>
     <a href="#listings" data-rmh="ads"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10v4h2l5 3V7L6 10H4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 7a7 7 0 0 1 0 10"/></svg></span>الإعلانات</a>
     <a href="#virtual-stores" data-rmh="stores"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10 6 5h12l2 5"/><path d="M4 10v9h16v-9"/><path d="M9 19v-5h6v5"/></svg></span>المحلات</a>
-    <a href="#virtual-showrooms" data-rmh="showrooms"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="7" width="16" height="12" rx="1"/><path d="M8 7V5h8v2M8 11h.01M12 11h.01M16 11h.01M8 15h8"/></svg></span>المعارض و المصانع</a>
+    <a href="#virtual-showrooms" data-rmh="showrooms"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="7" width="16" height="12" rx="1"/><path d="M8 7V5h8v2M8 11h.01M12 11h.01M16 11h.01M8 15h8"/></svg></span>المعارض والمصانع</a>
     <a href="#virtual-estate" data-rmh="estate"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V10l8-6 8 6v10"/><path d="M10 20v-6h4v6"/></svg></span>سوق العقارات</a>
     <a class="rmh-post-nav" href="rizq_post.html" data-rmh="post"><span class="rmh-nav-ico rmh-post-plus" aria-hidden="true">+</span><span class="rmh-post-lbl">انشر إعلان</span></a>
     <a href="#virtual-offices" data-rmh="offices"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="16" height="11" rx="1"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M4 13h16"/></svg></span>المكاتب</a>
@@ -5100,7 +5113,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <li data-nav-order="1" data-nav-tier="home"><a href="rizq_landing_v8.html" data-hdr="home"><span class="rizq-hdr-ico" aria-hidden="true">🧭</span><span class="rizq-hdr-lbl" data-hdr="home" data-t="nav-home">الرئيسية</span></a></li>
     <li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2" data-nav-tier="thumb"><a href="#listings" data-hdr="ads"><span class="rizq-hdr-ico" aria-hidden="true">📢</span><span class="rizq-hdr-lbl" data-hdr="ads">الإعلانات</span></a></li>
     <li class="rizq-nav-module" data-rizq-module="store" data-nav-order="3" data-nav-tier="thumb"><a href="#rzq-disc-store" data-hdr="stores"><span class="rizq-hdr-ico" aria-hidden="true">🏪</span><span class="rizq-hdr-lbl" data-hdr="stores" data-t="nav-stores">المحلات</span></a></li>
-    <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="4" data-nav-tier="thumb"><a href="#rzq-disc-corp" data-hdr="showrooms"><span class="rizq-hdr-ico" aria-hidden="true">🏬</span><span class="rizq-hdr-lbl" data-hdr="showrooms" data-t="nav-showrooms">المعارض و المصانع</span></a></li>
+    <li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="4" data-nav-tier="thumb"><a href="#rzq-disc-corp" data-hdr="showrooms"><span class="rizq-hdr-ico" aria-hidden="true">🏬</span><span class="rizq-hdr-lbl" data-hdr="showrooms" data-t="nav-showrooms">المعارض والمصانع</span></a></li>
     <li class="rizq-nav-post nav-phone-post-li" data-nav-order="5" data-nav-tier="thumb"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post" aria-label="نشر"><span class="rizq-hdr-ico" aria-hidden="true">➕</span><span class="rizq-hdr-lbl" data-hdr="post" data-t="nav-post">نشر</span></a></li>
     <li class="rizq-nav-module" data-rizq-module="office" data-nav-order="6" data-nav-tier="secondary"><a href="#rzq-disc-office" data-hdr="offices"><span class="rizq-hdr-ico" aria-hidden="true">🏢</span><span class="rizq-hdr-lbl" data-hdr="offices" data-t="nav-offices">المكاتب</span></a></li>
     <li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="7" data-nav-tier="secondary"><a href="rizq_tenders_directory.html" data-hdr="tenders"><span class="rizq-hdr-ico" aria-hidden="true">📑</span><span class="rizq-hdr-lbl" data-hdr="tenders" data-t="nav-tenders">المناقصات</span></a></li>
@@ -5170,7 +5183,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <nav class="section-jump-bar" id="section-jump-bar" aria-label="قفز سريع" aria-hidden="true" hidden>
   <a href="#listings" data-jump="#listings">الإعلانات</a>
   <a href="#rzq-disc-store" data-jump="#rzq-disc-store">المحلات</a>
-  <a href="#rzq-disc-corp" data-jump="#rzq-disc-corp">المعارض و المصانع</a>
+  <a href="#rzq-disc-corp" data-jump="#rzq-disc-corp">المعارض والمصانع</a>
   <a href="rizq_post.html" data-jump="post" class="jump-post">+ نشر</a>
   <a href="#rzq-disc-office" data-jump="#rzq-disc-office">المكاتب</a>
   <a href="rizq_tenders_directory.html" data-jump="rizq_tenders_directory.html">المناقصات</a>
@@ -5232,6 +5245,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="hero-brand-row">
       <div class="hero-title-card">
         <h1 class="hero-headline" id="hero-hl">رزق</h1>
+        <p class="hero-brand-slogan" id="hero-brand-slogan" data-t="hero-brand-slogan">من هنا يبدأ رزقك</p>
       </div>
       <div class="hero-eyebrow">
         <div class="pulse"></div>
@@ -5248,7 +5262,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <span class="hero-pill-sep" aria-hidden="true">·</span>
         <a class="hero-pill" href="rizq_browse.html" data-t="hero-pill-buy" data-pill="buy" aria-label="اشتر — تصفّح الإعلانات">اشتر</a>
         <span class="hero-pill-sep" aria-hidden="true">·</span>
-        <a class="hero-pill" href="rizq_post.html" data-t="hero-pill-feat" data-pill="feat" aria-label="تميّز — طوّر حضورك على رزق">تميّز</a>
+        <a class="hero-pill" href="rizq_ads_info.html" data-t="hero-pill-feat" data-pill="feat" aria-label="تميّز — طوّر حضورك على رزق">تميّز</a>
       </div>
       <p class="hero-tagline" id="hero-tagline"><span class="hero-tagline-lead" data-t="hero-tagline-lead">متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي</span><span class="hero-tagline-place" data-t="hero-one-place"> — كل شيء في مكان واحد</span></p>
     </div>
@@ -5342,7 +5356,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           <a href="rizq_showroom.html?demo=1" class="hero-biz-btn hero-biz-diamond" data-space-portal="showroom" data-rizq-module="corp" aria-label="نموذج معرض">
             <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏬</span></span>
             <span class="hero-biz-text">
-              <span class="hero-biz-label" data-t="hbiz-showrooms">المعارض و المصانع</span>
+              <span class="hero-biz-label" data-t="hbiz-showrooms">المعارض والمصانع</span>
               <span class="hero-biz-hint" data-t="hbiz-showrooms-hint">عرض يلفت الأنظار</span>
             </span>
           </a>
@@ -5439,7 +5453,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         </div>
       </div>
     </div>
-    <p class="rizq-vid-strip-hint" data-t="vstrip-hint">مرّر الماوس للتشغيل</p>
+    <p class="rizq-vid-strip-hint" data-t="vstrip-hint" data-t-mobile="vstrip-hint-tap">مرّر الماوس للتشغيل</p>
     <div class="rizq-vid-strip-track" id="rizq-vid-strip-track" tabindex="0" data-mq-auto="1"></div>
   </section>
 
@@ -5457,15 +5471,15 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           <span class="h-stat-lbl" data-t="stat-ads">إعلان نشط</span>
         </div>
         <div class="h-stat" data-stat="cats">
-          <span class="h-stat-num" data-target="0">0</span>
+          <span class="h-stat-num" data-target="22">22</span>
           <span class="h-stat-lbl" data-t="stat-cats">قسماً رئيسياً</span>
         </div>
         <div class="h-stat" data-stat="subs">
-          <span class="h-stat-num" data-target="0" data-suffix="+">0</span>
+          <span class="h-stat-num" data-target="268" data-suffix="+">268+</span>
           <span class="h-stat-lbl" data-t="stat-subs">فرعاً متخصصاً</span>
         </div>
         <div class="h-stat" data-stat="wilayas">
-          <span class="h-stat-num" data-target="15">0</span>
+          <span class="h-stat-num" data-target="15">15</span>
           <span class="h-stat-lbl" data-t="stat-wilayas">ولاية موريتانية</span>
         </div>
         <div class="h-stat h-stat-free" data-stat="free" hidden>
@@ -5627,7 +5641,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <div class="fade-in rzq-disc-wrap">
       <div id="rzq-disc-corp"></div>
       <div class="rizq-dual-cta">
-        <a class="landing-ads-browse-full" href="rizq_directory.html?type=corp" data-t="browse-showrooms">عرض كل المعارض و المصانع ←</a>
+        <a class="landing-ads-browse-full" href="rizq_directory.html?type=corp" data-t="browse-showrooms">عرض كل المعارض والمصانع ←</a>
         <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=corp" onclick="return goSubscribePackage('corp')"
            class="rizq-dual-cta-own" data-t="vsh-btn1">امتلك واجهة كتالوج معرضك الإلكتروني</a>
       </div>
@@ -5905,7 +5919,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
         <span class="pulse-live-badge"><span class="live-dot" aria-hidden="true"></span><span id="pulse-live-lbl">مباشر</span></span>
       </div>
       <h2 class="pulse-brand-title" id="pulse-brand-title">نبضة السوق <span>اليوم</span></h2>
-      <p class="pulse-brand-sub" id="pulse-brand-sub">أسعار المواد الغذائية الاساسية · المحروقات · العملات — بوضوح قبل أن تشتري أو تبيع</p>
+      <p class="pulse-brand-sub" id="pulse-brand-sub">أسعار المواد الغذائية الأساسية · المحروقات · العملات — بوضوح قبل أن تشتري أو تبيع</p>
       <p class="pulse-brand-en" id="pulse-brand-en">Rizq Market Pulse</p>
     </div>
   </div>
@@ -5920,7 +5934,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <div class="price-ticker-inner" id="price-ticker"></div>
     </div>
     <div class="prices-meta">
-      <span class="prices-updated"><span class="live-dot"></span>&nbsp;<span data-t="prices-live">مباشر · آخر تحديث:</span> <b id="prices-updated-date">—</b></span>
+      <span class="prices-updated"><span class="live-dot"></span>&nbsp;<span data-t="prices-live">مباشر · آخر تحديث:</span> <b id="prices-updated-date">—</b><script>(function(){try{var el=document.getElementById('prices-updated-date');if(!el)return;var ar=(document.documentElement.lang||'ar').indexOf('fr')!==0;el.textContent=new Date().toLocaleDateString(ar?'ar-MR-u-nu-latn':'fr-FR',{day:'numeric',month:'long',year:'numeric'});}catch(e){}})();</script></span>
     </div>
     <div class="prices-tabs">
       <button class="price-tab active" data-cat="food" data-t="prices-tab-food" onclick="switchPriceTab('food',this)">🍚 مواد غذائية</button>
@@ -10352,10 +10366,10 @@ const LANG = {
     'f-all':'الكل','f-re':'عقارات','f-car':'سيارات','f-live':'ماشية','f-elec':'إلكترونيات','f-truck':'شاحنات','f-srv':'خدمات','f-fashion':'موضة',
     'nav-cats': 'الأقسام', 'nav-ads': 'الإعلانات', 'nav-prices': 'الأسعار', 'nav-about': 'من نحن',
     'nav-account': 'حسابي', 'nav-post': 'نشر', 'nav-packs': 'الباقات', 'nav-assistant': '✨ رزق ذكي', 'nav-investments': 'الاستثمارات', 'nav-home': 'الرئيسية', 'nav-fav-lbl': 'المفضلة',
-    'hero-pill-sell': 'بيع', 'hero-pill-buy': 'اشتر', 'hero-pill-feat': 'تميّز',
+    'hero-pill-sell': 'بيع', 'hero-pill-buy': 'اشتر', 'hero-pill-feat': 'تميّز', 'hero-brand-slogan': 'من هنا يبدأ رزقك',
     'hero-ai-smart': '✨ رزق ذكي — مساعدك على المنصة',
     'about-intro': '<strong style="color:var(--royal);font-size:1.05em">رزق</strong> — سوق موريتانيا الإلكتروني للإعلانات والأعمال. من الإعلان الفردي إلى المحلات والمعارض والمكاتب، وصولاً إلى غرفة المناقصات وغرفة الاستثمارات — فضاء ثقة طوّرته <strong style="color:var(--royal)"><a href="rizq_about.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">ADMINIA SARL</a></strong> ليجمع البائع والمشتري في كل الولايات. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">كل ما تحتاجه… في مكان واحد، بأمان ووضوح.</em>',
-    'nav-stores': 'المحلات', 'nav-offices': 'المكاتب', 'nav-showrooms': 'المعارض و المصانع', 'nav-tenders': 'المناقصات', 'nav-more': 'المزيد ▾', 'nav-legal-dd': 'المادة القانونية', 'nav-legal-mobile': '⚖️ الإشعار القانوني', 'nav-packages': 'الباقات',
+    'nav-stores': 'المحلات', 'nav-offices': 'المكاتب', 'nav-showrooms': 'المعارض والمصانع', 'nav-tenders': 'المناقصات', 'nav-more': 'المزيد ▾', 'nav-legal-dd': 'المادة القانونية', 'nav-legal-mobile': '⚖️ الإشعار القانوني', 'nav-packages': 'الباقات',
     'dd-stores': 'المحلات', 'dd-offices': 'المكاتب', 'dd-rizqads': 'Rizq ADS', 'dd-ads': 'الإعلانات', 'dd-tenders': 'المناقصات', 'dd-packs': 'الباقات', 'dd-legal': 'المادة القانونية', 'dd-about': 'من نحن', 'dd-why': 'لماذا رزق', 'dd-company': 'الشركة المالكة',
     'vsh-title': 'معرضك على <span>رزق</span>: كتالوج فاخر ومشترون جادّون',
     'vsh-desc': 'سيارات وإلكترونيات وأثاث ومعدات تصل لمشترين جادّين يبحثون الآن.',
@@ -10386,7 +10400,7 @@ const LANG = {
     'cta-badge1': 'انضم الآن', 'cta-badge2': 'أفراد · محلات · معارض · مكاتب · مناقصات', 'cta-btn3': '🏢 افتح محلك أو معرضك',
     'cta-btn4': '📑 المناقصات',
     'cta-hubs-label': 'اختر مساحتك على رزق',
-    'cta-hub-stores': 'المحلات', 'cta-hub-offices': 'المكاتب', 'cta-hub-showrooms': 'المعارض و المصانع', 'cta-hub-tenders': 'المناقصات', 'cta-hub-investments': 'الاستثمارات',
+    'cta-hub-stores': 'المحلات', 'cta-hub-offices': 'المكاتب', 'cta-hub-showrooms': 'المعارض والمصانع', 'cta-hub-tenders': 'المناقصات', 'cta-hub-investments': 'الاستثمارات',
     'cta-hub-hint-stores': 'بيع وتسوّق يومي', 'cta-hub-hint-offices': 'خدمات مهنية', 'cta-hub-hint-showrooms': 'عروض راقية', 'cta-hub-hint-tenders': 'فرص أعمال', 'cta-hub-hint-investments': 'نمو مدروس',
     'cta-chip1': '✓ التسجيل مجاني', 'cta-chip2': '✓ مناقصات واستثمارات متاحة', 'cta-chip3': '✓ ثقة وأمان من أول خطوة',
     'cta-trust1': 'ثقة', 'cta-trust2': 'أمان', 'cta-trust3': 'شفافية',
@@ -10427,7 +10441,7 @@ const LANG = {
     'search-theater-close': 'إغلاق',
     'hbiz-stores': 'المحلات',
     'hbiz-offices': 'المكاتب',
-    'hbiz-showrooms': 'المعارض و المصانع',
+    'hbiz-showrooms': 'المعارض والمصانع',
     'hbiz-estate': 'سوق العقارات',
     'hbiz-tenders': 'المناقصات',
     'hbiz-investments': 'الاستثمارات',
@@ -10454,7 +10468,7 @@ const LANG = {
     'hbiz-cta': 'احجز مساحتك الإعلانية الآن — إعلانك حيث يبدأ الجميع',
     'vstrip-title': 'اكتشف العروض الجديدة بالفيديو',
     'vstrip-tier': 'شريط الفيديو',
-    'vstrip-hint': 'مرّر الماوس للتشغيل',
+    'vstrip-hint': 'مرّر الماوس للتشغيل', 'vstrip-hint-tap': 'اضغط للتشغيل',
     'stat-ads': 'إعلان نشط', 'stat-cats': 'قسماً رئيسياً', 'stat-subs': 'فرعاً متخصصاً', 'stat-wilayas': 'ولاية موريتانية', 'stat-free': 'النشر الأساسي',
     's-cats-title': 'كل ما تحتاجه في <span>مكان واحد</span>',
     's-cats-desc': 'من الدراعة إلى السيارة — كل ما يبحث عنه الموريتاني في مكان واحد',
@@ -10464,7 +10478,7 @@ const LANG = {
     'view-all': 'عرض الكل في نافذة ←',
     'browse-full': 'عرض كل الإعلانات ←',
     'browse-stores': 'عرض كل المحلات ←',
-    'browse-showrooms': 'عرض كل المعارض و المصانع ←',
+    'browse-showrooms': 'عرض كل المعارض والمصانع ←',
     'browse-offices': 'عرض كل المكاتب ←',
     'f-fashion': 'موضة',
     's-why-title': 'لماذا يثق الناس بـ<span>رزق؟</span>',
@@ -10517,7 +10531,7 @@ const LANG = {
   fr: {
     'nav-cats': 'Catégories', 'nav-ads': 'Annonces', 'nav-prices': 'Tarifs', 'nav-about': 'À propos',
     'nav-account': 'Compte', 'nav-post': 'Publier', 'nav-packs': 'Forfaits', 'nav-assistant': '✨ Rizq IA', 'nav-investments': 'Investissements', 'nav-home': 'Accueil', 'nav-fav-lbl': 'Favoris',
-    'hero-pill-sell': 'Vendre', 'hero-pill-buy': 'Acheter', 'hero-pill-feat': 'Briller',
+    'hero-pill-sell': 'Vendre', 'hero-pill-buy': 'Acheter', 'hero-pill-feat': 'Briller', 'hero-brand-slogan': 'C\'est ici que commence votre Rizq',
     'hero-ai-smart': '✨ Rizq IA — votre assistant',
     'about-intro': '<strong style="color:var(--royal);font-size:1.05em">Rizq</strong> — le marché électronique mauritanien des annonces et des affaires. De l\'annonce individuelle aux boutiques, showrooms et bureaux, jusqu\'à la salle des appels d\'offres et la salle des investissements — un espace de confiance développé par <strong style="color:var(--royal)"><a href="rizq_about.html" style="color:inherit;text-decoration:underline;text-underline-offset:3px">ADMINIA SARL</a></strong> qui réunit vendeurs et acheteurs dans toutes les wilayas. <em style="color:var(--gold-dk);font-style:normal;font-weight:700">Tout ce qu\'il vous faut… au même endroit, en sécurité et en clarté.</em>',
     'nav-stores': 'Boutiques', 'nav-offices': 'Bureaux', 'nav-showrooms': 'Showrooms & usines', 'nav-tenders': 'A-doffres', 'nav-more': 'Plus ▾', 'nav-legal-dd': 'Mentions légales', 'nav-legal-mobile': '⚖️ Avis légal', 'nav-packages': 'Forfaits',
@@ -10619,7 +10633,7 @@ const LANG = {
     'hbiz-cta': 'Réservez votre espace pub maintenant — votre annonce là où tout commence',
     'vstrip-title': 'Découvrez les nouvelles offres en vidéo',
     'vstrip-tier': 'Bandeau vidéo',
-    'vstrip-hint': 'Survolez pour lire',
+    'vstrip-hint': 'Survolez pour lire', 'vstrip-hint-tap': 'Appuyez pour lire',
     'stat-ads': 'annonces actives', 'stat-cats': 'catégories', 'stat-subs': 'sous-catégories', 'stat-wilayas': 'wilayas', 'stat-free': 'Publication de base',
     's-cats-title': 'Tout ce dont vous avez besoin en <span>un seul endroit</span>',
     's-cats-desc': 'De la daraa à la voiture — tout ce que cherche le Mauritanien, au même endroit',
@@ -10964,7 +10978,7 @@ function applyLandingLang(toAr) {
   if (jumpBar) jumpBar.setAttribute('aria-label', isAr ? 'قفز سريع' : 'Navigation rapide');
   if (jumpBar) {
     var jumpMap = isAr
-      ? {'#listings':'الإعلانات','#rzq-disc-store':'المحلات','#rzq-disc-corp':'المعارض و المصانع','post':'+ نشر','#rzq-disc-office':'المكاتب','rizq_tenders_directory.html':'المناقصات','rizq_investments_directory.html':'الاستثمارات'}
+      ? {'#listings':'الإعلانات','#rzq-disc-store':'المحلات','#rzq-disc-corp':'المعارض والمصانع','post':'+ نشر','#rzq-disc-office':'المكاتب','rizq_tenders_directory.html':'المناقصات','rizq_investments_directory.html':'الاستثمارات'}
       : {'#listings':'Annonces','#rzq-disc-store':'Boutiques','#rzq-disc-corp':'Showrooms & usines','post':'+ Publier','#rzq-disc-office':'Bureaux','rizq_tenders_directory.html':'A-doffres','rizq_investments_directory.html':'Investissements'};
     jumpBar.querySelectorAll('a[data-jump]').forEach(function(a){
       var k = a.getAttribute('data-jump');
@@ -10992,6 +11006,10 @@ function applyLandingLang(toAr) {
     hl.textContent = isAr ? 'رزق' : 'Rizq';
     hl.style.direction = isAr ? 'rtl' : 'ltr';
     hl.style.unicodeBidi = 'isolate';
+  }
+  const brandSlogan = document.getElementById('hero-brand-slogan');
+  if (brandSlogan) {
+    brandSlogan.textContent = isAr ? 'من هنا يبدأ رزقك' : 'C\'est ici que commence votre Rizq';
   }
 
   document.querySelectorAll('.logo-ar').forEach(function(el) {
@@ -11080,7 +11098,7 @@ function applyLandingLang(toAr) {
   if(pulseTitle) pulseTitle.innerHTML = isAr ? 'نبضة السوق <span>اليوم</span>' : 'Le Pouls du Marché <span>aujourd\'hui</span>';
   const pulseSub = document.getElementById('pulse-brand-sub');
   if(pulseSub) pulseSub.textContent = isAr
-    ? 'أسعار المواد الغذائية الاساسية · المحروقات · العملات — بوضوح قبل أن تشتري أو تبيع'
+    ? 'أسعار المواد الغذائية الأساسية · المحروقات · العملات — بوضوح قبل أن تشتري أو تبيع'
     : 'Produits alimentaires de base · carburants · devises — clairement avant d\'acheter ou de vendre';
   const pulseEn = document.getElementById('pulse-brand-en');
   if(pulseEn) pulseEn.textContent = 'Rizq Market Pulse';
@@ -15485,6 +15503,25 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_landing_ux.js?v=24.1"></script>
 <script src="rizq_disclaimer.js"></script>
 
+
+
+<script>
+/* إشعار قانوني: لا يُفتح تلقائياً — فقط من الزر/الفوتر/التسجيل */
+(function(){
+  function ensureDiscClosed(){
+    try{
+      var ov=document.getElementById('discOverlay');
+      if(!ov) return;
+      ov.classList.remove('open');
+      ov.style.display='none';
+      ov.style.pointerEvents='none';
+    }catch(e){}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', ensureDiscClosed);
+  else ensureDiscClosed();
+  window.addEventListener('load', ensureDiscClosed);
+})();
+</script>
 
 <!-- DISCLAIMER MODAL -->
 <div class="disc-overlay" id="discOverlay" onclick="if(event.target===this)closeDisc()">
