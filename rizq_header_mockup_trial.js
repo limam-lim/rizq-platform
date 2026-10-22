@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.53';
+    link.href = 'rizq_header_mockup_trial.css?v=5.54';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -679,11 +679,13 @@
       /* حتى بدون نافذة: روابط نماذج تنتقل للرئيسية#models */
     } else {
       modal.setAttribute('data-rmh-models-bound', '1');
-      modal.querySelectorAll('[data-models-close]').forEach(function (el) {
-        el.addEventListener('click', function (e) {
+      modal.addEventListener('click', function (e) {
+        var t = e.target;
+        if (!t) return;
+        if (t === modal || (t.getAttribute && t.getAttribute('data-models-close') != null)) {
           e.preventDefault();
           closeModelsModal();
-        });
+        }
       });
     }
     document.querySelectorAll('.rmh-nav a[data-rmh="models"]').forEach(function (a) {
