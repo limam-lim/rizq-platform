@@ -740,6 +740,12 @@ nav.rmh-nav{
   box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 4px 14px rgba(0,0,0,.18)!important;
   direction:rtl;
 }
+html[dir="ltr"] #rizq-mock-hdr nav.rmh-nav,
+html[dir="ltr"] nav.rmh-nav,
+body.rizq-lang-fr #rizq-mock-hdr nav.rmh-nav,
+body.rizq-lang-fr nav.rmh-nav{
+  direction:ltr!important;
+}
 .rmh-nav::-webkit-scrollbar{display:none}
 /* أقسام الصفحة — هامش تمرير تحت الهيدر الثابت */
 body.rizq-mockup-hdr-trial #hero,
@@ -796,6 +802,12 @@ body.rizq-mockup-hdr-trial #virtual-offices{
   box-shadow:0 16px 40px rgba(0,0,0,.55);direction:rtl;text-align:right;
   display:none;flex-direction:column;gap:2px;
   max-height:min(70vh,360px);overflow-y:auto;
+}
+html[dir="ltr"] .rmh-more-menu,
+html[dir="ltr"] body > .rmh-more-menu,
+body.rizq-lang-fr .rmh-more-menu,
+body.rizq-lang-fr body > .rmh-more-menu{
+  direction:ltr!important;text-align:left!important;
 }
 .rmh-more-wrap.open .rmh-more-menu,
 .rmh-more-menu.is-positioned{display:flex}

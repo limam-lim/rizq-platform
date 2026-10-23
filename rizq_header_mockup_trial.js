@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.65';
+    link.href = 'rizq_header_mockup_trial.css?v=5.66';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -441,35 +441,39 @@
       estate: ['سوق العقارات', 'Marché immobilier'],
       offices: ['المكاتب', 'Bureaux'],
       tenders: ['المناقصات', 'Appels d\'offres'],
-      investments: ['الاستثمارات', 'Investissements']
+      investments: ['الاستثمارات', 'Investissements'],
+      models: ['نماذج', 'Modèles']
     };
     Object.keys(nav).forEach(function (key) {
-      var a = hdr.querySelector('.rmh-nav a[data-rmh="' + key + '"]');
-      if (!a) return;
-      var ico = a.querySelector('.rmh-nav-ico');
       var label = tMock(nav[key][0], nav[key][1]);
-      a.setAttribute('aria-label', label);
-      var textNode = null;
-      for (var i = 0; i < a.childNodes.length; i++) {
-        if (a.childNodes[i].nodeType === 3) {
-          textNode = a.childNodes[i];
-          break;
+      hdr.querySelectorAll('.rmh-nav a[data-rmh="' + key + '"]').forEach(function (a) {
+        var ico = a.querySelector('.rmh-nav-ico');
+        a.setAttribute('aria-label', label);
+        var textNode = null;
+        for (var i = 0; i < a.childNodes.length; i++) {
+          if (a.childNodes[i].nodeType === 3 && String(a.childNodes[i].textContent || '').trim() !== '') {
+            textNode = a.childNodes[i];
+            break;
+          }
         }
-      }
-      if (textNode) textNode.textContent = label;
-      else if (ico) ico.insertAdjacentText('afterend', label);
-      else a.appendChild(document.createTextNode(label));
+        if (textNode) textNode.textContent = label;
+        else if (ico) ico.insertAdjacentText('afterend', label);
+        else a.appendChild(document.createTextNode(label));
+      });
     });
 
-    var postLbl = hdr.querySelector('.rmh-post-lbl');
-    if (postLbl) postLbl.textContent = tMock('انشر إعلان', 'Publier');
-    var postA = hdr.querySelector('a[data-rmh="post"]');
-    if (postA) postA.setAttribute('aria-label', tMock('انشر إعلان', 'Publier une annonce'));
+    var postLblList = hdr.querySelectorAll('.rmh-post-lbl');
+    postLblList.forEach(function (postLbl) { postLbl.textContent = tMock('انشر إعلان', 'Publier'); });
+    hdr.querySelectorAll('a[data-rmh="post"]').forEach(function (postA) {
+      postA.setAttribute('aria-label', tMock('انشر إعلان', 'Publier une annonce'));
+    });
 
-    var moreLbl = hdr.querySelector('.rmh-more-lbl');
-    if (moreLbl) moreLbl.textContent = tMock('المزيد', 'Plus');
-    var moreBtn = document.getElementById('rmh-more-btn');
-    if (moreBtn) moreBtn.setAttribute('aria-label', tMock('المزيد', 'Plus'));
+    hdr.querySelectorAll('.rmh-more-lbl').forEach(function (moreLbl) {
+      moreLbl.textContent = tMock('المزيد', 'Plus');
+    });
+    document.querySelectorAll('#rmh-more-btn, .rmh-more-btn').forEach(function (moreBtn) {
+      moreBtn.setAttribute('aria-label', tMock('المزيد', 'Plus'));
+    });
 
     var moreItems = [
       ['الأقسام', 'Catégories'],
@@ -525,10 +529,18 @@
     closeCart();
 
     hdr.setAttribute('aria-label', tMock('شريط رزق', 'Barre Rizq'));
-    var navEl = hdr.querySelector('nav.rmh-nav');
-    if (navEl) navEl.setAttribute('aria-label', tMock('أقسام رزق', 'Rubriques Rizq'));
+    hdr.querySelectorAll('nav.rmh-nav').forEach(function (navEl) {
+      navEl.setAttribute('dir', wantDir);
+      navEl.setAttribute('aria-label', tMock('أقسام رزق', 'Rubriques Rizq'));
+    });
     var topNav = document.getElementById('rmh-nav-top');
-    if (topNav) topNav.setAttribute('aria-label', tMock('أقسام رزق — أعلى', 'Rubriques Rizq — haut'));
+    if (topNav) {
+      topNav.setAttribute('dir', wantDir);
+      topNav.setAttribute('aria-label', tMock('أقسام رزق — أعلى', 'Rubriques Rizq — haut'));
+    }
+    document.querySelectorAll('.rmh-more-menu').forEach(function (menu) {
+      menu.setAttribute('dir', wantDir);
+    });
 
     try { refreshBadge(); } catch (eCart) {}
     try { ensureHeroTagline(); } catch (eHero) {}
