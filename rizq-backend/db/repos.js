@@ -131,6 +131,11 @@ const visits = createCollection('visits', {
   onBackup: mapBackup,
 });
 
+const contactClicks = createCollection('contact_clicks', {
+  backupFile: 'contact-clicks.json',
+  onBackup: mapBackup,
+});
+
 const businessHours = createCollection('business_hours', {
   backupFile: 'business-hours.json',
   onBackup: mapBackup,
@@ -266,6 +271,14 @@ function getVisitStats(accountId) {
 
 function setVisitStats(accountId, stats) {
   return visits.upsert(String(accountId), stats);
+}
+
+function getContactStats(accountId) {
+  return contactClicks.get(String(accountId || '')) || null;
+}
+
+function setContactStats(accountId, stats) {
+  return contactClicks.upsert(String(accountId), stats);
 }
 
 function getAdBoost(adId) {
@@ -410,6 +423,7 @@ function migrateAllSecondaryStores() {
 
   agentStatus.migrateFromMap(p('agent-status.json'));
   visits.migrateFromMap(p('visits.json'));
+  contactClicks.migrateFromMap(p('contact-clicks.json'));
   businessHours.migrateFromMap(p('business-hours.json'));
   corpTeam.migrateFromArray(p('team.json'), 'id');
   sectionInterest.migrateFromArray(p('section-interest.json'), 'id');
@@ -501,6 +515,7 @@ module.exports = {
   investmentEvents,
   agentStatus,
   visits,
+  contactClicks,
   businessHours,
   corpTeam,
   sectionInterest,
@@ -530,6 +545,8 @@ module.exports = {
   setHoursFor,
   getVisitStats,
   setVisitStats,
+  getContactStats,
+  setContactStats,
   getAdBoost,
   setAdBoost,
   removeAdBoost,

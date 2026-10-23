@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.49';
+    link.href = 'rizq_header_mockup_trial.css?v=5.68';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -51,6 +51,7 @@
       offices: L ? '#virtual-offices' : 'rizq_landing_v8.html#virtual-offices',
       tenders: 'rizq_tenders_directory.html',
       investments: 'rizq_investments_directory.html',
+      models: L ? '#models' : 'rizq_landing_v8.html#models',
       cats: L ? '#categories' : 'rizq_browse.html'
     };
   }
@@ -103,6 +104,7 @@
       '<a href="' + h.offices + '" data-rmh="offices"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="16" height="11" rx="1"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M4 13h16"/></svg></span>المكاتب</a>' +
       '<a href="' + h.tenders + '" data-rmh="tenders"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 4h8a2 2 0 0 1 2 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h6"/></svg></span>المناقصات</a>' +
       '<a href="' + h.investments + '" data-rmh="investments"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 18V6M4 18h16"/><path d="M7 14l4-4 3 3 5-6"/></svg></span>الاستثمارات</a>' +
+      '<a href="' + h.models + '" data-rmh="models"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg></span>نماذج</a>' +
       '<div class="rmh-more-wrap" data-rmh="more">' +
       '<button type="button" class="rmh-more-btn" id="rmh-more-btn" aria-haspopup="true" aria-expanded="false" aria-controls="rmh-more-menu">' +
       '<span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/></svg></span>' +
@@ -439,35 +441,39 @@
       estate: ['سوق العقارات', 'Marché immobilier'],
       offices: ['المكاتب', 'Bureaux'],
       tenders: ['المناقصات', 'Appels d\'offres'],
-      investments: ['الاستثمارات', 'Investissements']
+      investments: ['الاستثمارات', 'Investissements'],
+      models: ['نماذج', 'Modèles']
     };
     Object.keys(nav).forEach(function (key) {
-      var a = hdr.querySelector('.rmh-nav a[data-rmh="' + key + '"]');
-      if (!a) return;
-      var ico = a.querySelector('.rmh-nav-ico');
       var label = tMock(nav[key][0], nav[key][1]);
-      a.setAttribute('aria-label', label);
-      var textNode = null;
-      for (var i = 0; i < a.childNodes.length; i++) {
-        if (a.childNodes[i].nodeType === 3) {
-          textNode = a.childNodes[i];
-          break;
+      hdr.querySelectorAll('.rmh-nav a[data-rmh="' + key + '"]').forEach(function (a) {
+        var ico = a.querySelector('.rmh-nav-ico');
+        a.setAttribute('aria-label', label);
+        var textNode = null;
+        for (var i = 0; i < a.childNodes.length; i++) {
+          if (a.childNodes[i].nodeType === 3 && String(a.childNodes[i].textContent || '').trim() !== '') {
+            textNode = a.childNodes[i];
+            break;
+          }
         }
-      }
-      if (textNode) textNode.textContent = label;
-      else if (ico) ico.insertAdjacentText('afterend', label);
-      else a.appendChild(document.createTextNode(label));
+        if (textNode) textNode.textContent = label;
+        else if (ico) ico.insertAdjacentText('afterend', label);
+        else a.appendChild(document.createTextNode(label));
+      });
     });
 
-    var postLbl = hdr.querySelector('.rmh-post-lbl');
-    if (postLbl) postLbl.textContent = tMock('انشر إعلان', 'Publier');
-    var postA = hdr.querySelector('a[data-rmh="post"]');
-    if (postA) postA.setAttribute('aria-label', tMock('انشر إعلان', 'Publier une annonce'));
+    var postLblList = hdr.querySelectorAll('.rmh-post-lbl');
+    postLblList.forEach(function (postLbl) { postLbl.textContent = tMock('انشر إعلان', 'Publier'); });
+    hdr.querySelectorAll('a[data-rmh="post"]').forEach(function (postA) {
+      postA.setAttribute('aria-label', tMock('انشر إعلان', 'Publier une annonce'));
+    });
 
-    var moreLbl = hdr.querySelector('.rmh-more-lbl');
-    if (moreLbl) moreLbl.textContent = tMock('المزيد', 'Plus');
-    var moreBtn = document.getElementById('rmh-more-btn');
-    if (moreBtn) moreBtn.setAttribute('aria-label', tMock('المزيد', 'Plus'));
+    hdr.querySelectorAll('.rmh-more-lbl').forEach(function (moreLbl) {
+      moreLbl.textContent = tMock('المزيد', 'Plus');
+    });
+    document.querySelectorAll('#rmh-more-btn, .rmh-more-btn').forEach(function (moreBtn) {
+      moreBtn.setAttribute('aria-label', tMock('المزيد', 'Plus'));
+    });
 
     var moreItems = [
       ['الأقسام', 'Catégories'],
@@ -523,10 +529,18 @@
     closeCart();
 
     hdr.setAttribute('aria-label', tMock('شريط رزق', 'Barre Rizq'));
-    var navEl = hdr.querySelector('nav.rmh-nav');
-    if (navEl) navEl.setAttribute('aria-label', tMock('أقسام رزق', 'Rubriques Rizq'));
+    hdr.querySelectorAll('nav.rmh-nav').forEach(function (navEl) {
+      navEl.setAttribute('dir', wantDir);
+      navEl.setAttribute('aria-label', tMock('أقسام رزق', 'Rubriques Rizq'));
+    });
     var topNav = document.getElementById('rmh-nav-top');
-    if (topNav) topNav.setAttribute('aria-label', tMock('أقسام رزق — أعلى', 'Rubriques Rizq — haut'));
+    if (topNav) {
+      topNav.setAttribute('dir', wantDir);
+      topNav.setAttribute('aria-label', tMock('أقسام رزق — أعلى', 'Rubriques Rizq — haut'));
+    }
+    document.querySelectorAll('.rmh-more-menu').forEach(function (menu) {
+      menu.setAttribute('dir', wantDir);
+    });
 
     try { refreshBadge(); } catch (eCart) {}
     try { ensureHeroTagline(); } catch (eHero) {}
@@ -624,6 +638,87 @@
     }
   }
 
+  var __rmhModelsFocus = null;
+
+  function modelsModalEl() {
+    return document.getElementById('rizq-models-modal');
+  }
+
+  function closeModelsModal() {
+    var modal = modelsModalEl();
+    if (!modal || modal.hidden) return;
+    modal.hidden = true;
+    modal.classList.remove('is-open');
+    document.body.classList.remove('rizq-models-open');
+    try {
+      if ((location.hash || '') === '#models') {
+        history.replaceState(null, '', location.pathname + location.search);
+      }
+    } catch (errH) { /* ignore */ }
+    if (__rmhModelsFocus && typeof __rmhModelsFocus.focus === 'function') {
+      try { __rmhModelsFocus.focus(); } catch (errF) {}
+    }
+    __rmhModelsFocus = null;
+  }
+
+  function openModelsModal() {
+    var modal = modelsModalEl();
+    if (!modal) {
+      if (!isLanding()) {
+        try { location.href = 'rizq_landing_v8.html#models'; } catch (errNav) {}
+      }
+      return;
+    }
+    closeCart();
+    closeMore();
+    closeHelp();
+    __rmhModelsFocus = document.activeElement;
+    modal.hidden = false;
+    modal.classList.add('is-open');
+    document.body.classList.add('rizq-models-open');
+    try { history.replaceState(null, '', '#models'); } catch (errH2) {}
+    var closeBtn = modal.querySelector('.rizq-models-close');
+    if (closeBtn) {
+      try { closeBtn.focus(); } catch (errFocus) {}
+    }
+  }
+
+  function wireModelsModal() {
+    var modal = modelsModalEl();
+    if (!modal || modal.getAttribute('data-rmh-models-bound') === '1') {
+      /* حتى بدون نافذة: روابط نماذج تنتقل للرئيسية#models */
+    } else {
+      modal.setAttribute('data-rmh-models-bound', '1');
+      modal.addEventListener('click', function (e) {
+        var t = e.target;
+        if (!t) return;
+        if (t === modal || (t.getAttribute && t.getAttribute('data-models-close') != null)) {
+          e.preventDefault();
+          closeModelsModal();
+        }
+      });
+    }
+    document.querySelectorAll('.rmh-nav a[data-rmh="models"]').forEach(function (a) {
+      if (a.getAttribute('data-rmh-models-nav') === '1') return;
+      a.setAttribute('data-rmh-models-nav', '1');
+      a.addEventListener('click', function (e) {
+        e.preventDefault();
+        closeCart();
+        closeMore();
+        closeHelp();
+        openModelsModal();
+      });
+    });
+    if (document.documentElement.getAttribute('data-rmh-models-esc') === '1') return;
+    document.documentElement.setAttribute('data-rmh-models-esc', '1');
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeModelsModal();
+    });
+    if ((location.hash || '') === '#models') {
+      setTimeout(openModelsModal, 80);
+    }
+  }
+
   function wireNavActive() {
     document.querySelectorAll('.rmh-nav a[data-rmh]').forEach(function (a) {
       a.addEventListener('click', function (e) {
@@ -633,6 +728,7 @@
         closeHelp();
         var key = a.getAttribute('data-rmh');
         var href = a.getAttribute('href') || '';
+        if (key === 'models') return;
         if (SPY_KEYS.indexOf(key) === -1) return;
         if (href.charAt(0) !== '#') return;
         e.preventDefault();
@@ -701,6 +797,7 @@
 
   function placeMoreMenu() {
     var btn = document.getElementById('rmh-more-btn');
+    var wrap = document.querySelector('.rmh-more-wrap');
     var menu = document.getElementById('rmh-more-menu');
     if (!btn || !menu) return;
     /* خارج .rmh-nav (overflow) حتى تُقبل النقرات على العناصر */
@@ -708,16 +805,23 @@
       if (!__rmhMoreHome) __rmhMoreHome = menu.parentNode;
       document.body.appendChild(menu);
     }
-    var br = btn.getBoundingClientRect();
-    var menuW = Math.max(176, Math.round(menu.offsetWidth || 176));
-    var left = Math.round(br.left + br.width / 2 - menuW / 2);
-    left = Math.max(8, Math.min(left, window.innerWidth - menuW - 8));
-    var top;
-    if (isPhone()) {
-      var mh = Math.min(menu.offsetHeight || 220, window.innerHeight * 0.55);
-      top = Math.max(8, Math.round(br.top - mh - 8));
-    } else {
-      top = Math.round(br.bottom + 6);
+    var br = (wrap || btn).getBoundingClientRect();
+    var btnR = btn.getBoundingClientRect();
+    var menuW = Math.max(168, Math.round(menu.offsetWidth || 176));
+    var vw = window.innerWidth || document.documentElement.clientWidth || 0;
+    var vh = window.innerHeight || document.documentElement.clientHeight || 0;
+    /*
+     * ابدأ القائمة من الحافة اليسرى لزر المزيد مباشرةً (drop-down كلاسيكي)
+     * حتى لا تنزاح يميناً تحت «نماذج» ولا تُترك معلّقة يسار الزر.
+     */
+    var left = Math.round(btnR.left);
+    if (left < 8) left = 8;
+    if (left + menuW > vw - 8) left = Math.max(8, vw - 8 - menuW);
+    /* دائماً تحت الزر؛ للأعلى فقط إن لم يبقَ مكان أسفل (شريط سفلي) */
+    var menuH = Math.min(menu.offsetHeight || 240, Math.round(vh * 0.55));
+    var top = Math.round(br.bottom + 6);
+    if (top + menuH > vh - 8 && br.top > menuH + 16) {
+      top = Math.max(8, Math.round(br.top - menuH - 8));
     }
     menu.classList.add('is-positioned');
     menu.style.setProperty('position', 'fixed', 'important');
@@ -727,6 +831,7 @@
     menu.style.setProperty('transform', 'none', 'important');
     menu.style.setProperty('z-index', '10080', 'important');
     menu.style.setProperty('display', 'flex', 'important');
+    menu.style.setProperty('transform-origin', 'top left', 'important');
   }
 
   function openMore() {
@@ -910,7 +1015,7 @@
      أسفل قرب الإبهام: الرئيسية·الإعلانات·المحلات·المعارض·سوق العقارات
      أعلى: المكاتب·الاستثمارات·نشر·المناقصات·المزيد */
   var RMH_NAV_BOTTOM_ORDER = ['home', 'ads', 'stores', 'showrooms', 'estate'];
-  var RMH_NAV_TOP_ORDER = ['offices', 'investments', 'post', 'tenders', 'more'];
+  var RMH_NAV_TOP_ORDER = ['offices', 'investments', 'post', 'tenders', 'models', 'more'];
   var __rmhNavSlots = null;
 
   function captureNavSlots(bottomNav) {
@@ -1060,6 +1165,7 @@
     wireHelp();
     wireMore();
     wireNavActive();
+    wireModelsModal();
     ensureHeroTagline();
     syncMockHdrHeight();
     setTimeout(function () {

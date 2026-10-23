@@ -118,10 +118,16 @@ const ADS_REQUESTS_FILE = path.join(DATA_DIR, 'ads-requests.json');
 // والمحلات فقط، بينما تبقى بقية الأقسام (مكاتب/شركات/مناقصات/فيديوهات
 // إعلانية) مبنية وجاهزة لكن مخفية خلف علم تفعيل، تُفتح لاحقاً من لوحة
 // الأدمن بضغطة زر بلا أي تعديل كود أو إعادة نشر. ──
+const launchMode = require('./config/launchMode');
 const DEFAULT_MODULE_FLAGS = { individual: true, store: true, office: true, corp: true, estate: true, tenders: true, investments: true, videoAds: true };
 function getModuleFlags() {
   const cfg = repos.getSiteConfig();
-  return Object.assign({}, DEFAULT_MODULE_FLAGS, cfg.moduleFlags || {});
+  const envOpen = launchMode.getEnvOpenSectionFlags();
+  /* إن وُجد RIZQ_OPEN_SECTIONS فهو مصدر الحقيقة للأقسام المفتوحة عند الإطلاق */
+  const base = envOpen
+    ? Object.assign({}, DEFAULT_MODULE_FLAGS, envOpen)
+    : Object.assign({}, DEFAULT_MODULE_FLAGS);
+  return Object.assign({}, base, envOpen ? {} : (cfg.moduleFlags || {}), envOpen || {});
 }
 
 const DEFAULT_PLATFORM_FLAGS = {
@@ -1177,8 +1183,10 @@ app.get('/api/site-config', (req, res) => {
   // Short cache so admin package/announcement edits reach visitors quickly.
   res.set('Cache-Control', 'public, max-age=10');
   const raw = repos.getSiteConfig() || {};
+  const moduleFlags = getModuleFlags();
   const publicCfg = {
-    moduleFlags: getModuleFlags(),
+    moduleFlags,
+    launch: launchMode.publicLaunchConfig(moduleFlags),
     platformFlags: getPlatformFlags(),
     sectionRules: getSectionRules(),
     otp: getPublicOtpConfig(),
@@ -2137,6 +2145,11 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     // activateVerifiedPlusForRequest في rizq_admin.html) أو منحاً يدوياً.
     verifiedPlus: false,
     verifiedPlusExpiresAt: null,
+    /* شريك مؤسس — محلات وعقارات المسجّلة قبل نهاية الفترة المجانية */
+    foundingPartner: launchMode.shouldMarkFoundingPartner(reqType),
+    foundingDiscountPercent: launchMode.shouldMarkFoundingPartner(reqType)
+      ? launchMode.getFoundingDiscountPercent()
+      : undefined,
     passHash: passHash || undefined,
     status: autoApproved ? 'approved' : 'pending',
     approvedAt: autoApproved ? new Date().toISOString() : null,
@@ -2786,6 +2799,26 @@ function _getMainAccountById(id) {
   return list.find((a) => a.id === id) || null;
 }
 setupVisitTrackingAPI(app, trackVisitLimiter, getAccountRecord, _getMainAccountById);
+
+const { setupContactTrackingAPI } = require('./rizq_contact_tracker');
+const trackContactLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'عدد كبير جداً من الطلبات — حاول مرة أخرى بعد قليل' },
+});
+function _findAdOwnerAccountId(adId) {
+  try {
+    const ads = typeof readAds === 'function' ? readAds() : [];
+    const ad = (ads || []).find((a) => a && String(a.id) === String(adId));
+    return ad && (ad.accountId || ad.sellerId || ad.ownerId) || null;
+  } catch (e) {
+    return null;
+  }
+}
+setupContactTrackingAPI(app, trackContactLimiter, getAccountRecord, _getMainAccountById, _findAdOwnerAccountId);
+
 const LIFECYCLE_SCAN_INTERVAL_MS = 60 * 60 * 1000; // كل ساعة
 const _lifecycleHelpers = { readAccounts, writeAccounts };
 setInterval(() => {
@@ -2932,7 +2965,7 @@ function writeInterest(list) {
   const rows = Array.isArray(list) ? list : [];
   repos.sectionInterest.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
 }
-const INTEREST_SECTIONS = ['office', 'corp', 'tenders', 'videoAds'];
+const INTEREST_SECTIONS = ['office', 'corp', 'tenders', 'investments', 'videoAds', 'store', 'estate', 'individual'];
 
 const interestLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -2944,13 +2977,16 @@ const interestLimiter = rateLimit({
 
 /**
  * POST /api/section-interest
- * عام — يسجّل اهتمام زائر بقسم مغلق. body: { section, contact }
- * contact: رقم هاتف أو بريد إلكتروني (نص حر، تحقق بسيط فقط — ليس حساباً).
+ * عام — يسجّل اهتمام زائر بقسم مغلق.
+ * body: { section, contact?, name?, phone?, activityType? }
  */
 app.post('/api/section-interest', interestLimiter, (req, res) => {
   const b = req.body || {};
   const section = String(b.section || '').trim();
-  const contact = String(b.contact || '').trim().slice(0, 120);
+  const name = String(b.name || '').trim().slice(0, 80);
+  const phone = String(b.phone || '').trim().slice(0, 40);
+  const activityType = String(b.activityType || b.activity || '').trim().slice(0, 80);
+  const contact = String(b.contact || phone || '').trim().slice(0, 120);
   if (!INTEREST_SECTIONS.includes(section)) {
     return res.status(400).json({ error: 'قسم غير صالح' });
   }
@@ -2962,6 +2998,9 @@ app.post('/api/section-interest', interestLimiter, (req, res) => {
     id: 'int_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
     section,
     contact,
+    name: name || undefined,
+    phone: phone || undefined,
+    activityType: activityType || undefined,
     createdAt: new Date().toISOString(),
   });
   writeInterest(list);

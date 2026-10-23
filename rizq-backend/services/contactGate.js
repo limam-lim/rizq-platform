@@ -37,11 +37,54 @@ function getSellerContactEligibility(targetAccountId, accountTypeHint) {
     return { canExpose: false, reason: 'no_account', isTrial: false, isExpired: false, subscriptionStatus: 'no_subscription' };
   }
   const rec = getAccountRecord(targetAccountId);
-  const type = (rec && rec.accountType) || accountTypeHint || 'individual';
+  const type = (rec && (rec.accountType || rec.type)) || accountTypeHint || 'individual';
   const ent = getEntitlements(targetAccountId, type, rec || undefined);
   const status = ent.subscriptionStatus || 'no_subscription';
+  const accStatus = String((rec && rec.status) || '').toLowerCase();
+  const suspended = !!(rec && (rec.suspended || status === 'suspended' || accStatus === 'suspended'));
 
-  if (status === 'expired' || status === 'suspended') {
+  if (suspended || status === 'suspended') {
+    return { canExpose: false, reason: 'suspended', isTrial: false, isExpired: true, subscriptionStatus: 'suspended' };
+  }
+
+  /* الإعلانات الفردية: أرقام ظاهرة دائماً (الإبراز فقط مدفوع) */
+  if (String(type).toLowerCase() === 'individual') {
+    if (accStatus === 'rejected') {
+      return { canExpose: false, reason: 'rejected', isTrial: false, isExpired: false, subscriptionStatus: status };
+    }
+    return {
+      canExpose: true,
+      reason: 'individual_always',
+      isTrial: !!ent.isTrial,
+      isExpired: false,
+      subscriptionStatus: status,
+    };
+  }
+
+  /* فترة الإطلاق المجانية: حساب موثّق أو قيد المراجعة في الأقسام المفتوحة يُعامل كباقة فعّالة */
+  try {
+    const launchMode = require('../config/launchMode');
+    if (launchMode.isLaunchFreePeriodActive()) {
+      const envOpen = launchMode.getEnvOpenSectionFlags();
+      const cfg = repos.getSiteConfig() || {};
+      const flags = Object.assign(
+        { individual: true, store: true, office: true, corp: true, estate: true, tenders: true, investments: true, videoAds: true },
+        envOpen || cfg.moduleFlags || {}
+      );
+      const open = launchMode.isOpenModule(flags, type);
+      if (open && (accStatus === 'approved' || accStatus === 'pending' || accStatus === 'pending_review' || !accStatus)) {
+        return {
+          canExpose: true,
+          reason: 'launch_free_period',
+          isTrial: true,
+          isExpired: false,
+          subscriptionStatus: status === 'no_subscription' ? 'trial' : status,
+        };
+      }
+    }
+  } catch (eLaunch) { /* ignore */ }
+
+  if (status === 'expired') {
     return { canExpose: false, reason: status, isTrial: false, isExpired: true, subscriptionStatus: status };
   }
   if (status === 'no_subscription' || status === 'pending') {
@@ -204,6 +247,7 @@ const ACCOUNT_PUBLIC_SAFE = [
   'id', 'type', 'name', 'city', 'address', 'promo_video', 'promo_video_extra', 'category',
   'activityId', 'activity', 'storeTopics',
   'facebook', 'thumb', 'cover', 'tagline', 'status', 'approvedAt', 'createdAt',
+  'foundingPartner', 'foundingDiscountPercent',
 ];
 
 function toPublicAccountGated(acc, gate) {

@@ -150,6 +150,11 @@
       return;
     }
     var msg = lang === 'fr' ? 'Bonjour, j\'ai vu votre annonce sur Rizq' : 'مرحباً، رأيت إعلانك على رزق';
+    var adId = btn.getAttribute('data-ad') || '';
+    if (global.trackContactClick && accountId) global.trackContactClick(accountId, adId, 'whatsapp');
+    else if (global.RizqContactGate && global.RizqContactGate.trackContactClick && accountId) {
+      global.RizqContactGate.trackContactClick(accountId, adId, 'whatsapp');
+    }
     global.open('https://wa.me/' + phone.replace(/[^\d]/g, '') + '?text=' + encodeURIComponent(msg), '_blank');
   }
 
@@ -165,6 +170,11 @@
         global.alert(lang === 'fr' ? 'Coordonnées masquées — abonnement requis' : 'بيانات التواصل مخفية — يلزم اشتراك');
       }
       return;
+    }
+    var adId = btn.getAttribute('data-ad') || '';
+    if (global.trackContactClick && accountId) global.trackContactClick(accountId, adId, 'call');
+    else if (global.RizqContactGate && global.RizqContactGate.trackContactClick && accountId) {
+      global.RizqContactGate.trackContactClick(accountId, adId, 'call');
     }
     global.location.href = 'tel:' + phone;
   }
