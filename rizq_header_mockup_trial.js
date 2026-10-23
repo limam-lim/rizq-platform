@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.59';
+    link.href = 'rizq_header_mockup_trial.css?v=5.62';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -785,6 +785,7 @@
 
   function placeMoreMenu() {
     var btn = document.getElementById('rmh-more-btn');
+    var wrap = document.querySelector('.rmh-more-wrap');
     var menu = document.getElementById('rmh-more-menu');
     if (!btn || !menu) return;
     /* خارج .rmh-nav (overflow) حتى تُقبل النقرات على العناصر */
@@ -792,23 +793,19 @@
       if (!__rmhMoreHome) __rmhMoreHome = menu.parentNode;
       document.body.appendChild(menu);
     }
-    try { btn.scrollIntoView({ inline: 'nearest', block: 'nearest' }); } catch (err) { /* ignore */ }
-    var br = btn.getBoundingClientRect();
-    var menuW = Math.max(176, Math.round(menu.offsetWidth || 176));
+    var br = (wrap || btn).getBoundingClientRect();
+    var btnR = btn.getBoundingClientRect();
+    var menuW = Math.max(168, Math.round(menu.offsetWidth || 176));
     var vw = window.innerWidth || document.documentElement.clientWidth || 0;
-    var left;
-    /* الصق بجانب الزر: يسار الشاشة (المزيد) → محاذاة يسار الزر؛ يمين → يمين الزر؛ وإلا توسيط */
-    if (br.left <= 28 || br.left + br.width / 2 < menuW / 2 + 8) {
-      left = Math.round(br.left);
-    } else if (br.right >= vw - 28) {
-      left = Math.round(br.right - menuW);
-    } else {
-      left = Math.round(br.left + br.width / 2 - menuW / 2);
-    }
-    left = Math.max(8, Math.min(left, vw - menuW - 8));
-    /* دائماً تحت الزر أولاً (المزيد على الهاتف في الشريط العلوي) —
-       ولا نفتح للأعلى إلا إن لم يبقَ مكان كافٍ أسفل (شريط سفلي) */
     var vh = window.innerHeight || document.documentElement.clientHeight || 0;
+    /*
+     * ابدأ القائمة من الحافة اليسرى لزر المزيد مباشرةً (drop-down كلاسيكي)
+     * حتى لا تنزاح يميناً تحت «نماذج» ولا تُترك معلّقة يسار الزر.
+     */
+    var left = Math.round(btnR.left);
+    if (left < 8) left = 8;
+    if (left + menuW > vw - 8) left = Math.max(8, vw - 8 - menuW);
+    /* دائماً تحت الزر؛ للأعلى فقط إن لم يبقَ مكان أسفل (شريط سفلي) */
     var menuH = Math.min(menu.offsetHeight || 240, Math.round(vh * 0.55));
     var top = Math.round(br.bottom + 6);
     if (top + menuH > vh - 8 && br.top > menuH + 16) {
@@ -822,6 +819,7 @@
     menu.style.setProperty('transform', 'none', 'important');
     menu.style.setProperty('z-index', '10080', 'important');
     menu.style.setProperty('display', 'flex', 'important');
+    menu.style.setProperty('transform-origin', 'top left', 'important');
   }
 
   function openMore() {
