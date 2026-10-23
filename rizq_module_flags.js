@@ -241,12 +241,15 @@
     strip.removeAttribute('aria-hidden');
     var isFr = lang() === 'fr';
     var html = '<div class="cs-strip">'
-      + '<div class="cs-strip-kicker">' + t('قريباً جداً', 'Très bientôt') + '</div>'
-      + '<div class="cs-strip-title">' + t('أبواب تُجهَّز الآن — كن أول من يدخل', 'Des portes s’ouvrent bientôt — soyez le premier') + '</div>'
-      + '<p class="cs-strip-sub">' + t(
+      + '<header class="cs-strip-head">'
+      +   '<div class="cs-strip-kicker">' + t('قريباً جداً', 'Très bientôt') + '</div>'
+      +   '<div class="cs-strip-title">' + t('أبواب تُجهَّز الآن — كن أول من يدخل', 'Des portes s’ouvrent bientôt — soyez le premier') + '</div>'
+      +   '<p class="cs-strip-sub">' + t(
         'سجّل اهتمامك بهدوء… نُعلمك فور التفعيل قبل الجميع.',
         'Inscrivez votre intérêt en silence… nous vous préviendrons avant tout le monde.'
       ) + '</p>'
+      + '</header>'
+      + '<div class="cs-strip-grid">'
       + closed.map(function (s) {
         return '<div class="cs-item">'
           + '<div class="cs-item-top">'
@@ -256,7 +259,7 @@
           + '<button type="button" class="cs-item-btn" data-cs-key="' + s.key + '" data-cs-label="' + t(s.ar, s.fr).replace(/"/g, '&quot;') + '">'
           + t('احجز إشعارك الآن', 'Réservez votre alerte') + '</button></div>';
       }).join('')
-      + '</div>';
+      + '</div></div>';
     strip.innerHTML = html;
     strip.style.display = 'block';
     strip.setAttribute('dir', isFr ? 'ltr' : 'rtl');

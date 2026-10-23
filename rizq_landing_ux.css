@@ -616,8 +616,8 @@ body{
   .hero-listings-section{padding-bottom:40px!important}
   html body footer.rizq-footer,
   html body footer{
-    padding-top:36px!important;
-    padding-bottom:28px!important;
+    padding-top:32px!important;
+    padding-bottom:18px!important;
   }
   .footer-grid{
     gap:22px 28px!important;
@@ -952,12 +952,16 @@ html[dir="ltr"] .ad-badge{left:10px;right:auto}
 #hero-listings .cards-track-wrap::before,
 #hero-listings .cards-track-wrap::after{display:none!important;content:none!important}
 
-/* Footer premium spacing */
+/* Footer premium spacing — tight bottom so page doesn’t end with a dark void */
 html body footer,
 html body footer.rizq-footer{
-  padding-top:48px!important;
-  padding-bottom:36px!important;
+  padding-top:40px!important;
+  padding-bottom:20px!important;
   border-top:1px solid rgba(201,168,76,.18);
+}
+html body footer .footer-bottom{
+  padding-top:16px!important;
+  padding-bottom:8px!important;
 }
 html body footer .footer-col-title{
   color:#e8c96a!important;

@@ -1099,7 +1099,8 @@ body > .rizq-help-dd-menu a,
   html.rizq-app-nav body.rizq-mockup-hdr-trial,
   html.rizq-app-nav.rizq-phone-thumb-dock body.rizq-mockup-hdr-trial{
     padding-top:var(--rizq-mock-hdr-h)!important;
-    padding-bottom:calc(var(--rizq-mock-nav-h) + max(env(safe-area-inset-bottom,0px),20px))!important;
+    /* safe-area داخل الشريط السفلي نفسه — تجنّب فراغ أسود مضاعف تحت الفوتر */
+    padding-bottom:var(--rizq-mock-nav-h)!important;
   }
   .rmh-util{display:none}
   #rizq-mock-hdr{
