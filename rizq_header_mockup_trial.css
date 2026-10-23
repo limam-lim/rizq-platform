@@ -681,7 +681,7 @@ body.rizq-lang-fr #rizq-mock-hdr #rmh-lang-btn .lang-fr{
 }
 .rmh-cart-badge[hidden],
 .rmh-cart-badge.is-empty{display:none!important}
-/* نشر — مربع أصفر شفاف (إطار فقط) حول + والنص */
+/* نشر — مربع أصفر شفاف (إطار فقط) بزوايا دائرية خفيفة */
 .rmh-nav a.rmh-post-nav{
   color:rgba(255,255,255,.92)!important;
   background:transparent!important;
@@ -692,7 +692,7 @@ body.rizq-lang-fr #rizq-mock-hdr #rmh-lang-btn .lang-fr{
   padding:7px 10px 8px;
   margin:2px 4px;
   border:1.5px solid #E8C96A!important;
-  border-radius:8px;
+  border-radius:6px!important;
   border-bottom:1.5px solid #E8C96A!important;
   font:700 12px 'Cairo',sans-serif;
   flex-direction:column;
