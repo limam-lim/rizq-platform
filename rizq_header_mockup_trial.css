@@ -723,17 +723,20 @@ body.rizq-lang-fr #rizq-mock-hdr #rmh-lang-btn .lang-fr{
 }
 .rmh-post-lbl{display:inline;color:inherit}
 
-/* شريط الأقسام — داخل كبسولة كما السابق */
+/* شريط الأقسام — كبسولة بعرض كامل، أبواب موزّعة بلا فراغ شاسع */
 #rizq-mock-hdr nav.rmh-nav,
 nav.rmh-nav{
   position:static!important;
   top:auto!important;left:auto!important;right:auto!important;
   height:auto!important;z-index:2!important;
-  display:flex!important;align-items:stretch;justify-content:center;
-  gap:2px;overflow-x:auto;overflow-y:visible;scrollbar-width:none;
+  display:flex!important;align-items:stretch;
+  justify-content:space-between!important;
+  gap:0;overflow-x:hidden;overflow-y:visible;scrollbar-width:none;
+  width:auto!important;
   margin:6px 16px 10px!important;
-  padding:4px 8px!important;
+  padding:4px 6px!important;
   max-width:calc(100% - 32px);
+  box-sizing:border-box;
   background:rgba(255,255,255,.045)!important;
   border:1px solid rgba(201,168,76,.32)!important;
   border-radius:14px!important;
@@ -756,9 +759,17 @@ body.rizq-mockup-hdr-trial #virtual-estate,
 body.rizq-mockup-hdr-trial #virtual-offices{
   scroll-margin-top:calc(var(--rizq-mock-hdr-h,188px) + 12px);
 }
-.rmh-nav a{
-  flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:4px;min-width:78px;padding:9px 12px 11px;text-decoration:none;
+#rizq-mock-hdr .rmh-nav a,
+#rizq-mock-hdr .rmh-nav a.rmh-post-nav,
+#rizq-mock-hdr .rmh-more-btn,
+.rmh-nav a,
+.rmh-nav a.rmh-post-nav,
+.rmh-more-btn{
+  flex:1 1 0!important;
+  min-width:0!important;
+  max-width:none!important;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;padding:9px 4px 11px;text-decoration:none;
   color:rgba(255,255,255,.78);font:700 12px 'Cairo',sans-serif;
   border-bottom:3px solid transparent;
   transition:color .2s ease,border-bottom-color .2s ease,opacity .2s ease;
@@ -767,9 +778,9 @@ body.rizq-mockup-hdr-trial #virtual-offices{
   -webkit-user-select:none;
   white-space:nowrap;
 }
-.rmh-nav a[data-rmh="showrooms"]{min-width:108px;font-size:11.5px}
-.rmh-nav a[data-rmh="estate"]{min-width:78px}
-.rmh-nav a[data-rmh="models"]{min-width:72px}
+.rmh-nav a[data-rmh="showrooms"]{font-size:11px}
+.rmh-nav a[data-rmh="estate"]{font-size:12px}
+.rmh-nav a[data-rmh="models"]{font-size:12px}
 .rmh-nav a .rmh-nav-ico{
   display:inline-flex;align-items:center;justify-content:center;
   width:22px;height:22px;line-height:1;opacity:.92;

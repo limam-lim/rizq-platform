@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.66';
+    link.href = 'rizq_header_mockup_trial.css?v=5.67';
     (document.head || document.documentElement).appendChild(link);
   }
 
