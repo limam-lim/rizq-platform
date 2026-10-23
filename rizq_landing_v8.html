@@ -5437,7 +5437,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <!-- شريط العروض — هامش ~2سم من يمين/يسار الشاشة -->
   <div class="hero-listings-section hero-promo-strip" id="hero-listings" aria-label="شريط العروض المميزة">
     <div class="listings-label">
-      <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">أحدث الإعلانات على رزق — عروض تخطف الأنظار</span></span>
+      <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">أحدث</strong></span><span class="live-label-sub" data-t="promo-strip-sub">أحدث الإعلانات على رزق — عروض تخطف الأنظار</span></span>
     </div>
     <div class="cards-track-wrap">
       <div class="cards-track" id="cards-track">
@@ -5861,7 +5861,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   <div class="rizq-styles-inner">
     <div class="fade-in" style="text-align:center;margin:0 0 14px">
       <div class="rzq-disc-live-head" role="status">
-        <span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt" data-t="ve-live">مباشر</strong></span>
+        <span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt" data-t="ve-live">أحدث</strong></span>
         <span class="live-label-sub" data-t="ve-live-sub">أحدث العقارات على رزق — عروض تليق بالجادّين</span>
       </div>
     </div>
@@ -6054,7 +6054,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
     <div class="pulse-brand-text">
       <div class="pulse-brand-row">
-        <span class="pulse-live-badge"><span class="live-dot" aria-hidden="true"></span><span id="pulse-live-lbl">مباشر</span></span>
+        <span class="pulse-live-badge"><span class="live-dot" aria-hidden="true"></span><span id="pulse-live-lbl">أحدث</span></span>
       </div>
       <h2 class="pulse-brand-title" id="pulse-brand-title">نبضة السوق <span>اليوم</span></h2>
       <p class="pulse-brand-sub" id="pulse-brand-sub">أسعار المواد الغذائية الأساسية · المحروقات · العملات — بوضوح قبل أن تشتري أو تبيع</p>
@@ -7360,8 +7360,8 @@ function syncAllMarquees(){
 }
 function liveListingsLabelHtml(fr){
   return fr
-    ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">En direct</strong></span><span class="live-label-sub" data-t="promo-strip-sub">Dernières annonces sur Rizq — offres qui impressionnent</span>'
-    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">مباشر</strong></span><span class="live-label-sub" data-t="promo-strip-sub">أحدث الإعلانات على رزق — عروض تخطف الأنظار</span>';
+    ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">Récent</strong></span><span class="live-label-sub" data-t="promo-strip-sub">Dernières annonces sur Rizq — offres qui impressionnent</span>'
+    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">أحدث</strong></span><span class="live-label-sub" data-t="promo-strip-sub">أحدث الإعلانات على رزق — عروض تخطف الأنظار</span>';
 }
 function paintLiveListingsLabel(){
   var el = document.querySelector('.listings-label > span');
@@ -10525,7 +10525,7 @@ const LANG = {
     've-card1-title': 'عرض يُقنع من أول نظرة', 've-card1-desc': 'صور ومساحة وسعر وموقع واضح — المشتري يفهم عرضك قبل أن يراسلك.',
     've-card2-title': 'وصول لمن يبحث عن عقار', 've-card2-desc': 'طلبة كراء ومشترون ومستأجرون يصلون إليك عبر بحث العقارات على رزق.',
     've-card3-title': 'ثقة ووضوح في التعامل', 've-card3-desc': 'تواصل مباشر عبر المنصة مع خصوصية محمية وشارات تساعد على بناء الثقة.',
-    've-live': 'مباشر',
+    've-live': 'أحدث',
     've-live-sub': 'أحدث العقارات على رزق — عروض تليق بالجادّين',
     'browse-estate': 'عرض سوق كل العقارات ←',
     'est-title': 'أحدث عقارات على <span>رزق</span>',
@@ -10690,7 +10690,7 @@ const LANG = {
     've-card1-title': 'Une offre convaincante au premier regard', 've-card1-desc': 'Photos, surface, prix et emplacement clairs — l\'acheteur comprend avant de vous écrire.',
     've-card2-title': 'Atteignez qui cherche un bien', 've-card2-desc': 'Locataires et acheteurs vous rejoignent via la recherche immobilière sur Rizq.',
     've-card3-title': 'Confiance et clarté', 've-card3-desc': 'Contact direct via la plateforme, confidentialité protégée et badges de confiance.',
-    've-live': 'En direct',
+    've-live': 'Récent',
     've-live-sub': 'Dernières offres immobilières sur Rizq — des offres pour acheteurs sérieux',
     'browse-estate': 'Voir tout le marché immobilier →',
     'est-title': 'Derniers biens sur <span>Rizq</span>',
@@ -11228,7 +11228,7 @@ function applyLandingLang(toAr) {
   const pulseTag = document.querySelector('#prices .section-tag');
   if(pulseTag) pulseTag.textContent = isAr ? '📊 نبضة السوق · Rizq Market Pulse' : '📊 Rizq Market Pulse';
   const pulseLive = document.getElementById('pulse-live-lbl');
-  if(pulseLive) pulseLive.textContent = isAr ? 'مباشر' : 'En direct';
+  if(pulseLive) pulseLive.textContent = isAr ? 'أحدث' : 'Récent';
   const pulseTitle = document.getElementById('pulse-brand-title');
   if(pulseTitle) pulseTitle.innerHTML = isAr ? 'نبضة السوق <span>اليوم</span>' : 'Le Pouls du Marché <span>aujourd\'hui</span>';
   const pulseSub = document.getElementById('pulse-brand-sub');
