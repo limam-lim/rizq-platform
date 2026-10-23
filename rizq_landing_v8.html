@@ -4893,12 +4893,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   .rizq-style-brand-row .rzq-brand-logo-name-img{width:34px;height:34px}
 }
 
-/* ── شريط "قريباً" — شبكة أفقية بهوية رزق (كحلي + ذهب) لا عمود واحد ── */
+/* ── شريط "قريباً" — صف أفقي مضغوط (كحلي + ذهب) لا بطاقات عمودية ── */
 #coming-soon-strip{position:relative;isolation:isolate;width:100%;clear:both}
 #coming-soon-strip .cs-strip{
   position:relative;overflow:hidden;
   display:flex;flex-direction:column;align-items:center;
-  padding:36px clamp(14px,3vw,28px) 32px;
+  padding:28px clamp(12px,2.5vw,24px) 24px;
   background:
     radial-gradient(ellipse 70% 55% at 50% 0%,rgba(201,168,76,.18),transparent 58%),
     linear-gradient(165deg,#07101c 0%,#0D1B2A 42%,#13294d 100%);
@@ -4913,104 +4913,128 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 }
 #coming-soon-strip .cs-strip-head{
   position:relative;z-index:1;width:100%;max-width:720px;
-  margin:0 auto 20px;text-align:center;
+  margin:0 auto 14px;text-align:center;
 }
 #coming-soon-strip .cs-strip-kicker{
-  font-size:11px;font-weight:800;letter-spacing:.28em;text-transform:uppercase;
-  color:rgba(232,201,106,.9);margin:0 0 8px;
+  font-size:10px;font-weight:800;letter-spacing:.28em;text-transform:uppercase;
+  color:rgba(232,201,106,.9);margin:0 0 6px;
 }
 #coming-soon-strip .cs-strip-title{
-  color:#fff;font-size:clamp(18px,2.4vw,26px);font-weight:900;line-height:1.35;
-  margin:0 0 8px;letter-spacing:.2px;
+  color:#fff;font-size:clamp(16px,2vw,22px);font-weight:900;line-height:1.35;
+  margin:0 0 6px;letter-spacing:.2px;
   text-shadow:0 8px 28px rgba(0,0,0,.35);
 }
 #coming-soon-strip .cs-strip-sub{
-  color:rgba(255,255,255,.72);font-size:13px;font-weight:600;line-height:1.6;
+  color:rgba(255,255,255,.72);font-size:12.5px;font-weight:600;line-height:1.55;
   margin:0 auto;max-width:520px;
 }
-/* شبكة أفقية: 3 أعمدة سطح مكتب — صف أخير يتوسّط تلقائياً عبر justify-items على الحاوية */
+/* صف أفقي واحد — بطاقات صغيرة جنباً إلى جنب */
 #coming-soon-strip .cs-strip-grid{
   position:relative;z-index:1;
-  display:grid!important;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:14px 16px;
-  width:100%;
-  max-width:900px;
-  margin:0 auto;
+  display:flex!important;
+  flex-direction:row!important;
+  flex-wrap:wrap;
+  justify-content:center;
   align-items:stretch;
-  justify-items:stretch;
+  gap:10px;
+  width:100%;
+  max-width:1100px;
+  margin:0 auto;
 }
 #coming-soon-strip .cs-item{
   position:relative;z-index:1;
-  display:flex!important;flex-direction:column;align-items:stretch;justify-content:space-between;gap:12px;
-  width:100%;max-width:none;min-width:0;box-sizing:border-box;
+  display:flex!important;
+  flex-direction:row!important;
+  align-items:center;
+  justify-content:flex-start;
+  gap:10px;
+  flex:0 1 auto;
+  width:auto;
+  min-width:0;
+  max-width:100%;
+  box-sizing:border-box;
   margin:0!important;
-  padding:16px 14px 14px;
+  padding:8px 10px 8px 12px;
   background:
     linear-gradient(160deg,rgba(255,255,255,.08),rgba(255,255,255,.02) 55%,rgba(201,168,76,.06)),
     rgba(8,16,28,.62);
   border:1px solid rgba(201,168,76,.32);
-  border-radius:14px;
-  box-shadow:0 12px 28px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08);
+  border-radius:12px;
+  box-shadow:0 8px 20px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.08);
   backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-  transition:transform .25s ease,border-color .25s ease,box-shadow .25s ease;
+  transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease;
 }
 #coming-soon-strip .cs-item:hover{
-  transform:translateY(-3px);
+  transform:translateY(-2px);
   border-color:rgba(232,201,106,.55);
-  box-shadow:0 18px 42px rgba(0,0,0,.34),0 0 0 1px rgba(201,168,76,.18),inset 0 1px 0 rgba(255,255,255,.1);
+  box-shadow:0 12px 28px rgba(0,0,0,.3),0 0 0 1px rgba(201,168,76,.16);
 }
-#coming-soon-strip .cs-item-top{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%}
-#coming-soon-strip .cs-item-label{font-size:13.5px;color:#fff;font-weight:800;line-height:1.35;text-align:start}
+#coming-soon-strip .cs-item-top{
+  display:flex;align-items:center;justify-content:flex-start;gap:8px;
+  flex:1 1 auto;min-width:0;width:auto;
+}
+#coming-soon-strip .cs-item-label{
+  font-size:12.5px;color:#fff;font-weight:800;line-height:1.25;
+  text-align:start;white-space:nowrap;
+}
 #coming-soon-strip .cs-item-soon{
-  flex-shrink:0;font-size:10px;font-weight:800;letter-spacing:.06em;
+  flex-shrink:0;font-size:9px;font-weight:800;letter-spacing:.04em;
   color:#E8C96A;border:1px solid rgba(201,168,76,.45);
-  background:rgba(201,168,76,.1);border-radius:999px;padding:3px 9px;
+  background:rgba(201,168,76,.1);border-radius:999px;padding:2px 7px;
   animation:csSoonPulse 2.4s ease-in-out infinite;
 }
 @keyframes csSoonPulse{
   0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0);opacity:1}
-  50%{box-shadow:0 0 0 6px rgba(201,168,76,.08);opacity:.92}
+  50%{box-shadow:0 0 0 5px rgba(201,168,76,.08);opacity:.92}
 }
 #coming-soon-strip .cs-item-btn{
-  width:100%;margin-top:auto;
-  font-size:12px;font-weight:800;letter-spacing:.02em;cursor:pointer;white-space:nowrap;
+  width:auto;margin:0;flex-shrink:0;
+  font-size:11px;font-weight:800;letter-spacing:.01em;cursor:pointer;white-space:nowrap;
   color:#E8C96A;background:transparent;
-  border:1.5px solid rgba(201,168,76,.55);border-radius:10px;
-  padding:10px 12px;
-  transition:background .2s ease,color .2s ease,border-color .2s ease,box-shadow .2s ease,transform .2s ease;
+  border:1.5px solid rgba(201,168,76,.55);border-radius:8px;
+  padding:6px 10px;
+  transition:background .2s ease,color .2s ease,border-color .2s ease,box-shadow .2s ease;
 }
 #coming-soon-strip .cs-item-btn:hover{
   color:#0D1B2A;background:linear-gradient(135deg,#F0D78A,#C9A84C 55%,#B89840);
   border-color:#E8C96A;
-  box-shadow:0 8px 22px rgba(201,168,76,.28);
-  transform:translateY(-1px);
+  box-shadow:0 6px 16px rgba(201,168,76,.25);
 }
 #coming-soon-strip .cs-item-btn:focus-visible{outline:2px solid #E8C96A;outline-offset:2px}
-/* تابلت + هاتف: شبكة أفقية عمودان — البطاقة الأخيرة تتوسّط إن بقيت وحدها */
-@media (max-width:1024px){
-  #coming-soon-strip .cs-strip{padding:30px 16px 26px}
-  #coming-soon-strip .cs-strip-grid{
-    grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    max-width:640px;gap:12px 14px;
-  }
-  #coming-soon-strip .cs-item:last-child:nth-child(odd){
-    grid-column:1 / -1;
-    max-width:calc(50% - 7px);
-    justify-self:center;
-    width:100%;
-  }
+/* تابلت: أصغر وأفقي أيضاً */
+@media (min-width:769px) and (max-width:1024px){
+  #coming-soon-strip .cs-strip{padding:22px 14px 20px}
+  #coming-soon-strip .cs-strip-head{margin-bottom:12px}
+  #coming-soon-strip .cs-strip-title{font-size:clamp(15px,2.2vw,18px)}
+  #coming-soon-strip .cs-strip-grid{gap:8px;max-width:100%}
+  #coming-soon-strip .cs-item{padding:7px 8px 7px 10px;gap:8px;border-radius:10px}
+  #coming-soon-strip .cs-item-label{font-size:11.5px}
+  #coming-soon-strip .cs-item-soon{font-size:8.5px;padding:2px 6px}
+  #coming-soon-strip .cs-item-btn{font-size:10.5px;padding:5px 8px;border-radius:7px}
 }
+/* هاتف: صف أفقي قابل للتمرير إن ضاق العرض */
 @media (max-width:768px){
-  #coming-soon-strip .cs-strip{padding:22px 12px 20px}
-  #coming-soon-strip .cs-strip-head{margin-bottom:14px}
-  #coming-soon-strip .cs-strip-title{font-size:clamp(16px,4.6vw,20px)}
-  #coming-soon-strip .cs-strip-sub{font-size:12px}
-  #coming-soon-strip .cs-strip-grid{max-width:100%;gap:10px}
-  #coming-soon-strip .cs-item{padding:12px 10px 10px;border-radius:12px;gap:10px}
-  #coming-soon-strip .cs-item-label{font-size:12px}
-  #coming-soon-strip .cs-item-btn{font-size:11px;padding:9px 8px;border-radius:8px}
-  #coming-soon-strip .cs-item:last-child:nth-child(odd){max-width:calc(50% - 5px)}
+  #coming-soon-strip .cs-strip{padding:18px 0 16px}
+  #coming-soon-strip .cs-strip-head{margin-bottom:10px;padding:0 12px}
+  #coming-soon-strip .cs-strip-title{font-size:clamp(15px,4.4vw,18px)}
+  #coming-soon-strip .cs-strip-sub{font-size:11.5px;padding:0 12px}
+  #coming-soon-strip .cs-strip-grid{
+    flex-wrap:nowrap!important;
+    justify-content:flex-start;
+    gap:8px;
+    max-width:100%;
+    padding:2px 12px 6px;
+    overflow-x:auto;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  #coming-soon-strip .cs-strip-grid::-webkit-scrollbar{display:none}
+  #coming-soon-strip .cs-item{
+    flex:0 0 auto;
+    padding:7px 8px 7px 10px;gap:8px;border-radius:10px;
+  }
+  #coming-soon-strip .cs-item-label{font-size:11px}
+  #coming-soon-strip .cs-item-btn{font-size:10px;padding:5px 8px;border-radius:7px}
 }
 @media (prefers-reduced-motion:reduce){
   #coming-soon-strip .cs-item,#coming-soon-strip .cs-item-btn,#coming-soon-strip .cs-item-soon{animation:none!important;transition:none!important}
