@@ -430,17 +430,43 @@ html[lang="fr"] #detail-content{
 .dp-verified-badge{display:inline-flex;align-items:center;gap:3px;background:rgba(22,163,74,.1);border:1px solid rgba(22,163,74,.25);border-radius:5px;padding:2px 7px;font-size:10px;color:var(--green);font-weight:700}
 
 .dp-price-box{
-  background:linear-gradient(180deg,rgba(240,215,138,.22),rgba(201,168,76,.1));
-  border:1px solid rgba(201,168,76,.42);
-  border-radius:5px;padding:8px 10px;margin-bottom:8px;
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;
-  box-shadow:inset 0 1px 0 rgba(255,248,224,.35);
+  background:
+    radial-gradient(120% 90% at 100% 0%,rgba(232,201,106,.28),transparent 55%),
+    linear-gradient(165deg,#fffaf0 0%,#f7efd8 48%,#f3e7c4 100%);
+  border:1px solid rgba(201,168,76,.45);
+  border-radius:14px;padding:12px 14px;margin-bottom:10px;
+  display:flex;flex-direction:column;gap:8px;
+  box-shadow:0 10px 24px rgba(120,90,20,.08),inset 0 1px 0 rgba(255,255,255,.7);
 }
-.dp-price-main{font-size:20px;font-weight:900;color:#a07820;letter-spacing:.15px}
-.dp-price-period{font-size:10px;color:var(--text-muted);margin-top:1px}
-.dp-pin-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(201,168,76,.18);border:1px solid rgba(201,168,76,.4);border-radius:3px;padding:3px 8px;font-size:10px;font-weight:800;color:var(--gold-dk)}
-.dp-price-orig{font-size:15px;font-weight:700;color:var(--text-muted);text-decoration:line-through;margin-inline-start:6px}
-.dp-discount-badge{display:inline-block;background:#dc2626;color:#fff;font-size:12px;font-weight:800;padding:2px 8px;border-radius:6px;margin-inline-start:8px;vertical-align:middle}
+.dp-price-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.dp-price-loc{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11.5px;font-weight:800;color:#1a2535;
+  background:rgba(255,255,255,.7);border:1px solid rgba(201,168,76,.22);
+  border-radius:999px;padding:3px 9px;
+}
+.dp-price-amount-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.dp-price-currency{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:42px;height:24px;padding:0 8px;border-radius:7px;
+  background:linear-gradient(135deg,#1B3A6B,#0f2347);color:#E8C96A;
+  font-size:11px;font-weight:900;letter-spacing:.04em;
+}
+.dp-price-main{
+  font-size:clamp(22px,2.4vw,28px);font-weight:900;color:#8a6a18;
+  letter-spacing:.2px;line-height:1.05;
+  font-variant-numeric:tabular-nums;
+}
+.dp-price-period{font-size:11px;color:#6a7a8a;margin-top:4px;font-weight:700}
+.dp-pin-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  background:linear-gradient(135deg,rgba(201,168,76,.28),rgba(232,201,106,.16));
+  border:1px solid rgba(201,168,76,.5);border-radius:999px;
+  padding:4px 10px;font-size:10.5px;font-weight:900;color:#8a6a18;
+  box-shadow:0 2px 8px rgba(201,168,76,.18);
+}
+.dp-price-orig{font-size:14px;font-weight:700;color:var(--text-muted);text-decoration:line-through;margin-inline-start:6px}
+.dp-discount-badge{display:inline-block;background:#dc2626;color:#fff;font-size:11px;font-weight:800;padding:2px 8px;border-radius:6px;margin-inline-start:8px;vertical-align:middle}
 
 .section-block{background:rgba(255,255,255,.92);border-radius:10px;border:1px solid rgba(201,168,76,.16);padding:14px 16px;margin-bottom:12px}
 .section-block-title{font-size:13.5px;font-weight:800;color:#1a2535;margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid rgba(201,168,76,.14)}
@@ -475,12 +501,12 @@ html[lang="fr"] #detail-content{
 .dp-map-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;text-align:center;font-size:12px;font-weight:700;color:var(--gold-dk);margin-top:8px;text-decoration:none;padding:7px 12px;border-radius:8px;border:1px solid rgba(201,168,76,.3);background:rgba(201,168,76,.08)}
 .dp-map-link:hover{background:rgba(201,168,76,.16)}
 
-/* CONTACT CARD — مضغوط بجانب الصورة */
+/* CONTACT CARD — بجانب الصورة */
 .dp-contact{
-  background:linear-gradient(165deg,rgba(15,31,61,.04),rgba(201,168,76,.06));
-  border:1px solid rgba(201,168,76,.32);
-  border-radius:8px;padding:10px;margin-bottom:10px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.5);
+  background:linear-gradient(180deg,#ffffff 0%,#f7f9fc 100%);
+  border:1px solid rgba(201,168,76,.28);
+  border-radius:14px;padding:10px;margin-bottom:10px;
+  box-shadow:0 8px 22px rgba(15,31,61,.06);
 }
 .dp-seller-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .dp-seller-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1B3A6B,#234d8f);border:1px solid rgba(201,168,76,.35);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
@@ -490,13 +516,15 @@ html[lang="fr"] #detail-content{
 .dp-star{font-size:11px;color:#ddd}
 .dp-star.on{color:#f59e0b}
 
-/* بطاقة الثقة داخل التفاصيل — أصغر */
+/* بطاقة البائع ذات الغلاف داخل التفاصيل */
 .dp-contact .rizq-trust-card{
-  padding:8px 10px!important;margin-bottom:8px!important;border-radius:8px!important;gap:8px!important;
+  margin-bottom:10px!important;border-radius:12px!important;
 }
-.dp-contact .rizq-trust-av{width:34px!important;height:34px!important;font-size:14px!important}
-.dp-contact .rizq-trust-name{font-size:12.5px!important}
-.dp-contact .rizq-trust-stars{font-size:10.5px!important;margin-top:1px!important}
+.dp-contact .rizq-trust-card--branded{padding:0!important}
+.dp-contact .rizq-trust-cover{height:72px}
+.dp-contact .rizq-trust-av{width:52px!important;height:52px!important;font-size:20px!important;border-radius:14px!important}
+.dp-contact .rizq-trust-name{font-size:14px!important}
+.dp-contact .rizq-trust-stars{font-size:11px!important;margin-top:2px!important}
 
 /* PHONE REVEAL */
 .dp-phone-reveal{background:rgba(255,255,255,.72);border:1px dashed rgba(201,168,76,.4);border-radius:5px;padding:7px 8px;cursor:pointer;text-align:center;margin-bottom:7px;transition:all .25s;user-select:none}
@@ -1290,8 +1318,14 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 <script src="rizq_footer_toggle.js?v=22" defer></script>
 <script src="rizq_terms_gate.js"></script>
 <script src="rizq_auth_gate.js?v=19.3" defer></script>
+<<<<<<< HEAD
 <script src="rizq_ux_polish.js?v=17.0"></script>
 <script src="rizq_ad_cards.js?v=3.12"></script>
+=======
+  <script src="rizq_seller_branding.js?v=1"></script>
+  <script src="rizq_ux_polish.js?v=17.1"></script>
+<script src="rizq_ad_cards.js?v=3.11"></script>
+>>>>>>> 7861ef1 (feat(browse): premium price card and branded seller panel)
 <script src="rizq_categories_config.js?v=20"></script>
 <script src="rizq_brands_catalog.js?v=9"></script>
 <script src="rizq_dyn_filters.js?v=2.1"></script>
@@ -2063,7 +2097,7 @@ const ALL_ADS = loadRealSearchAds().concat(DEMO_ADS);
     {id:204,subcat:'ذهب عيار 21',cat:'ذهب',wilaya:'نواكشوط',title:'ذهب عيار 21 — 50 غرام — جمالية نادرة',titleFr:'Or 21 carats — 50g — pièce rare',desc:'ذهب أصيل عيار 21 بالوثائق. فصلة من الذهب السوداني الأصيل.',descFr:'Or authentique 21 carats avec documents.',price:'450,000 MRU',priceNum:450000,verified:true,pin:true,emoji:'🥇',loc:'📍 نواكشوط',seller:'ورشة الذهب الموريتانية'},
     {id:205,subcat:'هواتف ذكية',cat:'إلكترونيات',wilaya:'نواكشوط',title:'iPhone 15 Pro Max 256GB — كالجديد',titleFr:'iPhone 15 Pro Max 256 Go — comme neuf',desc:'هاتف بحالة ممتازة، لا خدوش، بكل ملحقاته الأصلية وعلبته.',descFr:'Parfait état, accessoires d\'origine, boîte.',price:'180,000 MRU',priceNum:180000,verified:true,pin:false,emoji:'📱',loc:'📍 نواكشوط',seller:'تقني موبايل'},
     {id:206,subcat:'منازل للبيع',cat:'عقارات',wilaya:'كيفة',title:'فيلا راقية — 5 غرف — كيفة',titleFr:'Villa de standing — 5 chambres — Kiffa',desc:'فيلا فاخرة في حي راقي، 5 غرف نوم، حديقة خاصة، بناء 2022.',descFr:'Villa luxueuse, 5 chambres, jardin privé, construction 2022.',price:'4,800,000 MRU',priceNum:4800000,verified:true,pin:false,emoji:'🏡',loc:'📍 كيفة',seller:'عمار الأمين'},
-    {id:207,subcat:'سيارات للبيع',cat:'سيارات',wilaya:'نواكشوط',title:'Toyota Land Cruiser 2020 — خليجي',titleFr:'Toyota Land Cruiser 2020 — Import Golfe',desc:'لاندكروزر 2020 خليجي أصيل، مسافة 48,000 كم. فل كامل، فتحة سقف. الوثائق متوفرة.',descFr:'Land Cruiser 2020 import Golfe, 48 000 km, full options.',price:'9,500,000 MRU',priceNum:9500000,verified:true,pin:true,emoji:'🚗',loc:'📍 نواكشوط',seller:'وكالة السيارات الأولى'},
+    {id:207,subcat:'سيارات للبيع',cat:'سيارات',wilaya:'نواكشوط',title:'Toyota Land Cruiser 2020 — خليجي',titleFr:'Toyota Land Cruiser 2020 — Import Golfe',desc:'لاندكروزر 2020 خليجي أصيل، مسافة 48,000 كم. فل كامل، فتحة سقف. الوثائق متوفرة.',descFr:'Land Cruiser 2020 import Golfe, 48 000 km, full options.',price:'9,500,000 MRU',priceNum:9500000,verified:true,pin:true,emoji:'🚗',loc:'📍 نواكشوط',seller:'وكالة السيارات الأولى',sellerAdsCount:24,memberSince:'2023',seller_trust_score:76},
     {id:208,subcat:'أراضي',cat:'عقارات',wilaya:'نواذيبو',title:'أرض سكنية — 600 م² — نواذيبو',titleFr:'Terrain résidentiel — 600 m² — Nouadhibou',desc:'أرض سكنية في موقع استراتيجي قرب المنطقة الاقتصادية. وثيقة ملكية نظيفة.',descFr:'Terrain résidentiel près de la zone économique, titre clair.',price:'2,200,000 MRU',priceNum:2200000,verified:true,pin:false,emoji:'🌍',loc:'📍 نواذيبو',seller:'الوطنية للعقار'},
     {id:209,subcat:'بقر',cat:'ماشية',wilaya:'ترارزة',title:'بقر حلوب — 8 رؤوس — ترارزة',titleFr:'Vaches laitières — 8 têtes — Trarza',desc:'أبقار حلوب صافية الأصل، إنتاج يومي 15-20 لتر للرأس. شهادة بيطرية.',descFr:'Vaches laitières de race pure, 15-20L/jour, certificat vétérinaire.',price:'960,000 MRU',priceNum:960000,verified:false,pin:false,emoji:'🐄',loc:'📍 ترارزة',seller:'مزرعة البركة'},
     {id:210,subcat:'تصميم وبرمجة',cat:'خدمات',wilaya:'نواكشوط',title:'تصميم مواقع ومتاجر إلكترونية احترافية',titleFr:'Création de sites web et boutiques en ligne professionnels',desc:'متخصص في تصميم مواقع الشركات والمتاجر الإلكترونية. تسليم في 7 أيام.',descFr:'Sites vitrines et e-commerce. Livraison en 7 jours.',price:'85,000 MRU',priceNum:85000,verified:true,pin:true,emoji:'💻',loc:'📍 نواكشوط',seller:'محمد ليمام | ADMINIA'},
@@ -2858,6 +2892,17 @@ function renderDetailPanel(ad){
   const adLoc=fr?locFr(ad.loc,ad.wilaya):(ad.loc||ad.wilaya||'');
   const adDate=fr?dateFr(ad.date||''):(ad.date||'');
   const descText=escapeHtml(descPick.text);
+  /* فصل العملة عن الرقم لعرض سعري أوضح */
+  var _priceRaw=String(adPrice||'').trim();
+  var _priceCur='MRU';
+  var _priceAmt=_priceRaw;
+  var _mruMatch=_priceRaw.match(/^(.*?)(?:\s*MRU\s*)(.*)$/i);
+  if(_mruMatch){
+    _priceAmt=((_mruMatch[1]||'')+(_mruMatch[2]||'')).replace(/\s+/g,' ').trim()||_priceRaw;
+  } else if(/تفاوض|Negoc|À négocier|راتب|Contacter|تواصل/i.test(_priceRaw)){
+    _priceCur='';
+    _priceAmt=_priceRaw;
+  }
 
   // Specs
   const specIcons=CAT_SPEC_ICONS[ad.cat]||CAT_SPEC_ICONS['default'];
@@ -2989,15 +3034,20 @@ function renderDetailPanel(ad){
         </div>
         <h1 class="dp-title">${escapeHtml(adTitle)}${titleFallbackNote}</h1>
         <div class="dp-meta-row">
-          <span class="dp-loc">${escapeHtml(adLoc)}</span>
           <span class="dp-date">${escapeHtml(adDate)}</span>
         </div>
         <div class="dp-price-box">
-          <div>
-            <div class="dp-price-main">${escapeHtml(adPrice)}${ad.originalPriceNum>0?` <span class="dp-price-orig">${ad.originalPriceNum.toLocaleString()} MRU</span>`:''}${ad.discountPct>0?`<span class="dp-discount-badge">-${ad.discountPct}%</span>`:''}</div>
-            <div class="dp-price-period">${escapeHtml(period)}</div>
+          <div class="dp-price-top">
+            <span class="dp-price-loc">${escapeHtml(adLoc || (ad.wilaya ? ('📍 ' + ad.wilaya) : ''))}</span>
+            ${ad.boosted?`<div class="dp-pin-badge">⭐ ${fr?'Sponsorisé':'مُموَّل'}</div>`:(ad.pin?`<div class="dp-pin-badge">${_t('dp-featured')}</div>`:'')}
           </div>
-          ${ad.boosted?`<div class="dp-pin-badge">⭐ ${fr?'Sponsorisé':'مُموَّل'}</div>`:(ad.pin?`<div class="dp-pin-badge">${_t('dp-featured')}</div>`:'')}
+          <div class="dp-price-amount-row">
+            <div>
+              <div class="dp-price-main">${escapeHtml(_priceAmt)}${ad.originalPriceNum>0?` <span class="dp-price-orig">${ad.originalPriceNum.toLocaleString()}</span>`:''}${ad.discountPct>0?`<span class="dp-discount-badge">-${ad.discountPct}%</span>`:''}</div>
+              <div class="dp-price-period">${escapeHtml(period)}</div>
+            </div>
+            ${_priceCur?`<span class="dp-price-currency">${escapeHtml(_priceCur)}</span>`:''}
+          </div>
           ${(ad.stockQty!=null && ad.stockQty<=5)?`<div class="dp-stock-badge">⚡ ${fr?('Il ne reste que '+ad.stockQty+' !'):('متبقي '+ad.stockQty+' فقط')}</div>`:''}
         </div>
 
