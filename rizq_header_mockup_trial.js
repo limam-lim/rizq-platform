@@ -1118,10 +1118,25 @@
         var nh = Math.ceil(bottomNav.getBoundingClientRect().height || 64);
         document.body.style.setProperty('--rizq-mock-nav-h', nh + 'px');
       }
+      // #region agent log
+      try {
+        var _csP = getComputedStyle(document.body);
+        var _brP = document.getElementById('browse-right');
+        fetch('http://127.0.0.1:7242/ingest/1dd2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'1dd2'},body:JSON.stringify({sessionId:'1dd2',runId:'pre-fix',hypothesisId:'A-D',location:'rizq_header_mockup_trial.js:syncMockHdrHeight:phone',message:'phone header height sync',data:{mockHSet:topH,headerH:_csP.getPropertyValue('--rizq-header-h').trim(),brTopCss:_brP?getComputedStyle(_brP).top:null,path:location.pathname},timestamp:Date.now()})}).catch(function(){});
+      } catch (_ePhoneLog) {}
+      // #endregion
       return;
     }
     var h = Math.ceil(hdr.getBoundingClientRect().height || 188);
     document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
+    // #region agent log
+    try {
+      var _cs = getComputedStyle(document.body);
+      var _nav = hdr.querySelector('nav.rmh-nav:not(.rmh-nav-top)') || hdr.querySelector('nav.rmh-nav');
+      var _br = document.getElementById('browse-right');
+      fetch('http://127.0.0.1:7242/ingest/1dd2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'1dd2'},body:JSON.stringify({sessionId:'1dd2',runId:'pre-fix',hypothesisId:'A-D',location:'rizq_header_mockup_trial.js:syncMockHdrHeight',message:'header height sync vars',data:{mockHSet:h,mockHCss:_cs.getPropertyValue('--rizq-mock-hdr-h').trim(),headerH:_cs.getPropertyValue('--rizq-header-h').trim(),hdrBottom:Math.round(hdr.getBoundingClientRect().bottom),navBottom:_nav?Math.round(_nav.getBoundingClientRect().bottom):null,brTopCss:_br?getComputedStyle(_br).top:null,brDisplay:_br?getComputedStyle(_br).display:null,path:location.pathname},timestamp:Date.now()})}).catch(function(){});
+    } catch (_eSyncLog) {}
+    // #endregion
   }
 
   function ensureHeroTagline() {

@@ -2805,6 +2805,21 @@ function selectAd(id){
     const c=document.getElementById('detail-content');
     if(r) r.scrollTop=0;
     if(c) c.scrollTop=0;
+    // #region agent log
+    try{
+      var hdr=document.getElementById('rizq-mock-hdr');
+      var nav=document.querySelector('#rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top)')||document.querySelector('#rizq-mock-hdr nav.rmh-nav');
+      var wrap=document.querySelector('.browse-wrap');
+      var title=document.querySelector('.dp-title');
+      var cs=getComputedStyle(document.body);
+      var hr=hdr&&hdr.getBoundingClientRect();
+      var nr=nav&&nav.getBoundingClientRect();
+      var cr=c&&c.getBoundingClientRect();
+      var sampleY=nr?(nr.top+nr.height/2):(hr?hr.bottom-8:80);
+      var hit=document.elementFromPoint(Math.min(720,window.innerWidth/2),sampleY);
+      fetch('http://127.0.0.1:7242/ingest/1dd2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'1dd2'},body:JSON.stringify({sessionId:'1dd2',runId:'pre-fix',hypothesisId:'A-B-C',location:'rizq_browse.html:selectAd',message:'detail-open geometry vs mock header',data:{adId:String(id),title:title&&(title.textContent||'').slice(0,60),mockH:cs.getPropertyValue('--rizq-mock-hdr-h').trim(),headerH:cs.getPropertyValue('--rizq-header-h').trim(),padTop:cs.paddingTop,hdrZ:hdr&&getComputedStyle(hdr).zIndex,brZ:r&&getComputedStyle(r).zIndex,brTopCss:r&&getComputedStyle(r).top,wrapZ:wrap&&getComputedStyle(wrap).zIndex,hdrBottom:hr&&Math.round(hr.bottom),navBottom:nr&&Math.round(nr.bottom),dcTop:cr&&Math.round(cr.top),titleTop:title&&Math.round(title.getBoundingClientRect().top),overlapNavDc:nr&&cr?Math.round(Math.max(0,Math.min(nr.bottom,cr.bottom)-Math.max(nr.top,cr.top))):null,gapHdrToDc:hr&&cr?Math.round(cr.top-hr.bottom):null,hitInHdr:!!(hit&&hit.closest&&hit.closest('#rizq-mock-hdr'))},timestamp:Date.now()})}).catch(function(){});
+    }catch(eDbg){}
+    // #endregion
   });
 }
 
