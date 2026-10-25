@@ -448,6 +448,36 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
 }
 #rizq-mock-hdr *{box-sizing:border-box}
 
+/*
+ * Browse detail sheet (.browse-right) used legacy --rizq-header-h (~68px) while the
+ * mock capsule header is --rizq-mock-hdr-h (~150–200px). Force inset/max-height to
+ * the measured mock height so featured ads (e.g. Toyota) are not clipped under nav.
+ */
+body.rizq-mockup-hdr-trial .browse-right,
+body.rizq-mockup-hdr-trial.rizq-detail-open .browse-right,
+body.rizq-mockup-hdr-trial .browse-wrap.has-detail .browse-right,
+html.rizq-app-nav body.rizq-mockup-hdr-trial .browse-right,
+html.rizq-app-nav body.rizq-mockup-hdr-trial.rizq-detail-open .browse-right,
+html.rizq-app-nav.has-rizq-desk-nav body.rizq-mockup-hdr-trial .browse-right,
+html.rizq-app-nav.has-rizq-desk-nav body.rizq-mockup-hdr-trial.rizq-detail-open .browse-right{
+  inset:var(--rizq-mock-hdr-h,188px) 0 0 0!important;
+}
+body.rizq-mockup-hdr-trial #detail-content,
+html.rizq-app-nav body.rizq-mockup-hdr-trial #detail-content{
+  max-height:calc(100dvh - var(--rizq-mock-hdr-h,188px) - 20px)!important;
+}
+@media(max-width:900px){
+  /* Mobile detail: keep top clear of mock top bar; bottom dock uses --rizq-mock-nav-h */
+  body.rizq-mockup-hdr-trial .browse-right,
+  body.rizq-mockup-hdr-trial.rizq-detail-open .browse-right,
+  body.rizq-mockup-hdr-trial .browse-wrap.has-detail .browse-right,
+  html.rizq-app-nav body.rizq-mockup-hdr-trial .browse-right,
+  html.rizq-app-nav body.rizq-mockup-hdr-trial.rizq-detail-open .browse-right{
+    inset:var(--rizq-mock-hdr-h,128px) 0 var(--rizq-mock-nav-h,72px) 0!important;
+    padding-top:10px!important;
+  }
+}
+
 /* شريط تنويه علوي */
 .rmh-util{
   display:flex;align-items:center;justify-content:space-between;gap:14px;
