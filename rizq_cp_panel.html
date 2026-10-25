@@ -1097,8 +1097,13 @@ main, .page-content.active, .main-content, .results-area,
         </div>
         <div style="padding:18px">
           <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:16px">
-            عطّل أي قسم لإخفائه بالكامل عن الزوار (لا يظهر في التسويق ولا في التسجيل)، ويُرفض تسجيله من الخادم مباشرة حتى لو حاول أحد تجاوز الواجهة. الأقسام المغلقة تبقى مبنية وجاهزة — يكفي تفعيلها لاحقاً بلا أي حاجة لتعديل كود.
+            عطّل أي قسم لإخفائه بالكامل عن الزوار (لا يظهر في التسويق ولا في التسجيل)، ويُرفض تسجيله من الخادم مباشرة حتى لو حاول أحد تجاوز الواجهة. الأقسام المغلقة تبقى مبنية وجاهزة — يكفي تفعيلها لاحقاً بلا أي حاجة لتعديل كود. حالياً اترك الكل ظاهراً على الواجهة؛ عند الانطلاق أغلق ما لا تطلقه من هنا.
           </p>
+          <div id="modules-launch-preset" style="margin-bottom:14px;padding:12px 14px;border:1px dashed rgba(201,168,76,.45);border-radius:12px;background:rgba(201,168,76,.06)">
+            <div style="font-size:13px;font-weight:700;margin-bottom:4px">🚀 جاهز عند الانطلاق (لا يُطبَّق تلقائياً)</div>
+            <div style="font-size:11.5px;color:var(--text-muted);margin-bottom:10px">يفتح فقط: الأفراد + المحلات + سوق العقارات، ويغلق الباقي بضغطة واحدة عندما تقرر الإطلاق.</div>
+            <button type="button" class="btn-outline" style="font-size:12.5px;padding:8px 14px" onclick="applySoloLaunchModulesPreset()">تطبيق إطلاق الأفراد + المحلات + العقارات</button>
+          </div>
           <div id="modules-toggle-list"></div>
           <div style="margin-top:14px;font-size:11.5px;color:var(--text-muted)">
             💾 كل تبديل يُحفَظ فوراً على الخادم — لا حاجة لزر حفظ منفصل.
@@ -4090,12 +4095,20 @@ function saveSettingsSecurity(){
 var MODULE_DEFS = [
   {key:'individual', icon:'👤', name:'الأفراد', name_fr:'Particuliers', desc:'تسجيل ونشر إعلانات الحسابات الفردية', desc_fr:'Inscription et publication d\'annonces individuelles'},
   {key:'store',      icon:'🏪', name:'المحلات', name_fr:'Boutiques', desc:'تسجيل المحلات وكتالوج المنتجات', desc_fr:'Inscription des boutiques et catalogue produits'},
+  {key:'estate',     icon:'🏠', name:'سوق العقارات', name_fr:'Marché immobilier', desc:'وكالات ومطورون وملاك — تسجيل ونشر العقارات', desc_fr:'Agences, promoteurs et propriétaires — inscription et annonces'},
   {key:'office',     icon:'📒', name:'المكاتب', name_fr:'Bureaux', desc:'تسجيل المكاتب (تأمين، خدمات مهنية...)', desc_fr:'Inscription des bureaux (assurance, services...)'},
   {key:'corp',       icon:'🏢', name:'الشركات', name_fr:'Entreprises', desc:'تسجيل الشركات والمعارض', desc_fr:'Inscription des entreprises et showrooms'},
   {key:'tenders',    icon:'📋', name:'غرفة المناقصات', name_fr:'Appels d\'offres', desc:'باقة المناقصات المدفوعة', desc_fr:'Forfait appels d\'offres payant'},
   {key:'investments',icon:'📈', name:'غرفة الاستثمارات', name_fr:'Investissements', desc:'نشر ومراجعة فرص الاستثمار', desc_fr:'Publication et revue des opportunités d\'investissement'},
   {key:'videoAds',   icon:'🎬', name:'فيديوهات Rizq ADS', name_fr:'Vidéos Rizq ADS', desc:'شراء مساحات الفيديو الإعلاني', desc_fr:'Achat d\'espaces vidéo publicitaires'},
 ];
+/** افتراضي الواجهة قبل وصول الخادم: كل الأقسام ظاهرة — الإغلاق يدوي من الأدمن عند الانطلاق */
+var DEFAULT_MODULE_FLAGS_ADMIN = {
+  individual: true, store: true, estate: true, office: true, corp: true,
+  tenders: true, investments: true, videoAds: true
+};
+/** عند الانطلاق فقط: أفراد + محلات + عقارات */
+var SOLO_LAUNCH_OPEN_KEYS = { individual: true, store: true, estate: true };
 var _moduleFlagsCache = null;
 
 function renderModulesToggleList(flags){
@@ -4116,7 +4129,7 @@ function renderModulesToggleList(flags){
 function loadModulesPanel(){
   var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
   if(!c.backendUrl){
-    renderModulesToggleList(_moduleFlagsCache || {individual:true,store:true,office:false,corp:false,tenders:false,investments:true,videoAds:false});
+    renderModulesToggleList(_moduleFlagsCache || DEFAULT_MODULE_FLAGS_ADMIN);
     return;
   }
   fetch(c.backendUrl.replace(/\/$/,'') + '/api/site-config')
@@ -4124,11 +4137,44 @@ function loadModulesPanel(){
     .then(function(data){
       var flags = (data && data.ok && data.config && data.config.moduleFlags)
         ? data.config.moduleFlags
-        : {individual:true,store:true,office:false,corp:false,tenders:false,investments:true,videoAds:false};
+        : DEFAULT_MODULE_FLAGS_ADMIN;
       _moduleFlagsCache = flags;
       renderModulesToggleList(flags);
     }).catch(function(){
-      renderModulesToggleList(_moduleFlagsCache || {individual:true,store:true,office:false,corp:false,tenders:false,investments:true,videoAds:false});
+      renderModulesToggleList(_moduleFlagsCache || DEFAULT_MODULE_FLAGS_ADMIN);
+    });
+}
+
+function applySoloLaunchModulesPreset(){
+  var msg = RizqI18n.t2(
+    'تطبيق إطلاق الأفراد + المحلات + العقارات؟\nسيُغلق المكاتب والمعارض والمناقصات والاستثمارات وفيديوهات الإعلان.\nلا يُطبَّق إلا بعد موافقتك.',
+    'Appliquer le lancement Particuliers + Boutiques + Immobilier ?\nCela fermera bureaux, showrooms, appels d\'offres, investissements et vidéos pub.\nRien n\'est appliqué sans votre accord.'
+  );
+  if(!window.confirm(msg)) return;
+  var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!c.backendUrl){
+    showToast(RizqI18n.t2('❌ لا يوجد اتصال بالخادم','❌ Pas de connexion au serveur'));
+    return;
+  }
+  var body = {};
+  MODULE_DEFS.forEach(function(m){
+    body[m.key] = !!SOLO_LAUNCH_OPEN_KEYS[m.key];
+  });
+  fetch(c.backendUrl.replace(/\/$/,'') + '/api/site-config', {
+    method: 'POST',
+    headers: _adminAuthHeaders({ 'Content-Type':'application/json' }),
+    body: JSON.stringify({ moduleFlags: body })
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(data){
+      if(data && data.ok && data.config && data.config.moduleFlags){
+        _moduleFlagsCache = data.config.moduleFlags;
+        renderModulesToggleList(_moduleFlagsCache);
+        showToast(RizqI18n.t2('✅ تم ضبط الإطلاق: أفراد + محلات + عقارات','✅ Lancement réglé : particuliers + boutiques + immobilier'));
+      } else {
+        showToast(RizqI18n.t2('❌ فشل الحفظ، حاول مجدداً','❌ Échec de l\'enregistrement, réessayez'));
+      }
+    }).catch(function(){
+      showToast(RizqI18n.t2('❌ فشل الاتصال بالخادم','❌ Échec de connexion au serveur'));
     });
 }
 
@@ -4171,6 +4217,7 @@ var _sectionRulesCache = null;
 var DEFAULT_SECTION_RULES_ADMIN = {
   individual: { extraBannedKeywords: [], escalateAlways: false, requiredDocsNote: 'رقم هاتف صالح + اسم كامل — لا وثائق رسمية' },
   store:      { extraBannedKeywords: [], escalateAlways: false, requiredDocsNote: 'بطاقة وطنية فقط' },
+  estate:     { extraBannedKeywords: [], escalateAlways: false, requiredDocsNote: 'بطاقة وطنية + ترخيص وساطة إن وُجد (وكالة) — المالك الفردي بدون رخصة' },
   office:     { extraBannedKeywords: [], escalateAlways: true,  requiredDocsNote: 'رخصة النشاط سارية + بطاقة وطنية' },
   corp:       { extraBannedKeywords: [], escalateAlways: true,  requiredDocsNote: 'سجل تجاري/رخصة تأسيس + بطاقة وطنية للممثل القانوني' },
   tenders:    { extraBannedKeywords: [], escalateAlways: true,  requiredDocsNote: 'حساب شركة/مكتب موافَق عليه مسبقاً + باقة مدفوعة نشطة' },

@@ -123,11 +123,10 @@ const DEFAULT_MODULE_FLAGS = { individual: true, store: true, office: true, corp
 function getModuleFlags() {
   const cfg = repos.getSiteConfig();
   const envOpen = launchMode.getEnvOpenSectionFlags();
-  /* إن وُجد RIZQ_OPEN_SECTIONS فهو مصدر الحقيقة للأقسام المفتوحة عند الإطلاق */
-  const base = envOpen
-    ? Object.assign({}, DEFAULT_MODULE_FLAGS, envOpen)
-    : Object.assign({}, DEFAULT_MODULE_FLAGS);
-  return Object.assign({}, base, envOpen ? {} : (cfg.moduleFlags || {}), envOpen || {});
+  /* ترتيب الأولوية: افتراضي مفتوح → RIZQ_OPEN_SECTIONS (اختياري عند الإقلاع)
+     → moduleFlags من لوحة الأدمن (يفوز دائماً عند الحفظ). لا نغلق أقساماً
+     على الواجهة تلقائياً؛ الإغلاق يدوي من الأدمن عند الانطلاق. */
+  return Object.assign({}, DEFAULT_MODULE_FLAGS, envOpen || {}, cfg.moduleFlags || {});
 }
 
 const DEFAULT_PLATFORM_FLAGS = {
@@ -155,6 +154,7 @@ function getPlatformFlags() {
 const DEFAULT_SECTION_RULES = {
   individual:  { extraBannedKeywords: [], escalateAlways: false, requiredDocsNote: 'رقم هاتف صالح + اسم كامل — لا وثائق رسمية' },
   store:       { extraBannedKeywords: [], escalateAlways: false, requiredDocsNote: 'بطاقة وطنية فقط' },
+  estate:      { extraBannedKeywords: [], escalateAlways: false, requiredDocsNote: 'بطاقة وطنية + ترخيص وساطة إن وُجد (وكالة) — المالك الفردي بدون رخصة' },
   office:      { extraBannedKeywords: ['علاج مضمون', 'كسب القضية أكيد', 'guérison garantie'], escalateAlways: true, requiredDocsNote: 'رخصة النشاط سارية + بطاقة وطنية' },
   corp:        { extraBannedKeywords: [], escalateAlways: true, requiredDocsNote: 'سجل تجاري/رخصة تأسيس + بطاقة وطنية للممثل القانوني' },
   tenders:     { extraBannedKeywords: [], escalateAlways: true, requiredDocsNote: 'حساب شركة/مكتب موافَق عليه مسبقاً + باقة مدفوعة نشطة' },
@@ -1562,10 +1562,9 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     // ── نظام "إطلاق تدريجي" (طلب Limam 03/08/2026): كل قسم من المنصة
     // (أفراد/محلات/مكاتب/شركات/مناقصات/فيديوهات إعلانية) له علم تفعيل مستقل
     // يُخزَّن هنا (لا localStorage — نفس المبدأ المطبَّق على كل الإعدادات في
-    // هذا الملف) فيراه كل زائر من أي جهاز فوراً. القيمة الافتراضية عند عدم
-    // وجود الملف بعد: individual/store مفعَّلان، الباقي مغلق — راجع
-    // DEFAULT_MODULE_FLAGS و getModuleFlags() أدناه. ──
-    const MODULE_KEYS = ['individual', 'store', 'office', 'corp', 'tenders', 'investments', 'videoAds'];
+    // هذا الملف) فيراه كل زائر من أي جهاز فوراً. الافتراضي: كل الأقسام
+    // ظاهرة؛ الإغلاق عند الانطلاق من لوحة الأدمن — راجع DEFAULT_MODULE_FLAGS. ──
+    const MODULE_KEYS = launchMode.ALL_MODULE_KEYS;
     const existingFlags = Object.assign({}, DEFAULT_MODULE_FLAGS, current.moduleFlags || {});
     MODULE_KEYS.forEach((key) => {
       if (key in body.moduleFlags) existingFlags[key] = body.moduleFlags[key] === true;
@@ -1578,7 +1577,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     // قسم، وكيل واحد يقرأ "قواعد" مختلفة حسب نوع الحساب. تُدمَج هنا مفتاحاً
     // بمفتاح لكل قسم (لا يمسح قواعد أقسام أخرى محفوظة سابقاً)، بنفس مبدأ
     // moduleFlags أعلاه. راجع DEFAULT_SECTION_RULES/getSectionRules أعلاه. ──
-    const SECTION_KEYS = ['individual', 'store', 'office', 'corp', 'tenders', 'investments', 'videoAds'];
+    const SECTION_KEYS = Object.keys(DEFAULT_SECTION_RULES);
     const existingRules = getSectionRules(); // يبدأ من القيم الحالية (افتراضية+محفوظة) لا من الصفر
     SECTION_KEYS.forEach((key) => {
       if (!(key in body.sectionRules) || typeof body.sectionRules[key] !== 'object') return;

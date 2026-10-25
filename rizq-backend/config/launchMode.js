@@ -1,7 +1,8 @@
 /**
  * launchMode.js — وضع الإطلاق التدريجي لمنصة رزق
  * RIZQ_LAUNCH_FREE_UNTIL=YYYY-MM-DD
- * RIZQ_OPEN_SECTIONS=stores,estate,individual
+ * RIZQ_OPEN_SECTIONS=stores,estate,individual  (اختياري — قيمة ابتدائية فقط؛
+ * لوحة الأدمن moduleFlags تفوز بعد أول حفظ. اتركه فارغاً لإبقاء كل الأقسام ظاهرة.)
  */
 'use strict';
 
