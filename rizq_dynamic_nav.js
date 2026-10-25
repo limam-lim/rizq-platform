@@ -321,7 +321,7 @@
 
   function applyMoreMenus(flags) {
     flags = flags && typeof flags === 'object' ? flags : {
-      individual: true, store: true, office: true, corp: true, tenders: true, investments: true, videoAds: true
+      individual: true, store: true, estate: true, office: true, corp: true, tenders: true, investments: true, videoAds: true
     };
     /* المزيد موحّد: أقسام الشريط ظاهرة دائماً — القائمة الثانوية فقط (أقسام/نشر/باقات…) */
     document.querySelectorAll('#rizq-desk-more-li .nav-dropdown-menu, #nav-more-li .nav-dropdown-menu').forEach(function (menu) {
@@ -345,11 +345,23 @@
   }
 
   function applySectionHides(flags) {
-    var SECTION_MAP = { store: 'virtual-stores', office: 'virtual-offices', corp: 'virtual-showrooms', tenders: 'virtual-tenders', investments: 'virtual-investments' };
+    var SECTION_MAP = {
+      store: 'virtual-stores',
+      estate: 'virtual-estate',
+      office: 'virtual-offices',
+      corp: 'virtual-showrooms',
+      tenders: 'virtual-tenders',
+      investments: 'virtual-investments'
+    };
+    var EXTRA_SECTION_IDS = { estate: ['rizq-estate-models'], store: ['rizq-styles'], corp: ['rizq-showroom-models'] };
     Object.keys(SECTION_MAP).forEach(function (key) {
       if (flags[key] !== false) return;
       var sec = document.getElementById(SECTION_MAP[key]);
       if (sec) sec.style.display = 'none';
+      (EXTRA_SECTION_IDS[key] || []).forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
     });
     if (flags.store === false && flags.office === false && flags.corp === false) {
       document.querySelectorAll('.hero-biz-nav').forEach(function (el) {
@@ -397,7 +409,7 @@
     if (!flags || typeof flags !== 'object') {
       /* Keep modules navigable until /api/site-config arrives — closed-by-default
          made header links (مكاتب/معارض/مناقصات) vanish and feel “dead”. */
-      flags = { individual: true, store: true, office: true, corp: true, tenders: true, investments: true, videoAds: true };
+      flags = { individual: true, store: true, estate: true, office: true, corp: true, tenders: true, investments: true, videoAds: true };
     }
     _lastApplied = flags;
     applyMainBar(flags);

@@ -15,6 +15,10 @@
     'rizq_showroom_directory.html': 'corp',
     'rizq_directory.html': 'corp',
     'rizq_corp.html': 'corp',
+    'rizq_estate.html': 'estate',
+    'rizq_estate_agencies.html': 'estate',
+    'rizq_estate_directory.html': 'estate',
+    'rizq_real_estate_register.html': 'estate',
     'rizq_tenders.html': 'tenders',
     'rizq_investments.html': 'investments',
     'rizq_ads_info.html': 'videoAds'
@@ -62,6 +66,7 @@
     if (!href) return null;
     var disc = href.match(/#rzq-disc-(store|corp|office|tenders|investments)\b/);
     if (disc) return disc[1];
+    if (/#(virtual-estate|rizq-estate-models)\b/.test(href)) return 'estate';
     if (href.charAt(0) === '#') return null;
     var qIdx = href.indexOf('?');
     var query = qIdx !== -1 ? href.slice(qIdx + 1).split('#')[0] : '';
@@ -72,6 +77,7 @@
       try {
         var tp = new URLSearchParams(query).get('type');
         if (tp === 'store' || tp === 'office' || tp === 'corp') return tp;
+        if (tp === 'agencies' || tp === 'estate') return 'estate';
       } catch (e) {}
       return 'corp';
     }
@@ -85,11 +91,13 @@
     if (s) return t(s.ar, s.fr);
     var map = {
       store: t('المحلات', 'Boutiques'),
+      estate: t('سوق العقارات', 'Marché immobilier'),
       office: t('المكاتب', 'Bureaux'),
       corp: t('معارض الشو روم', 'Showrooms'),
       tenders: t('غرفة المناقصات', 'Appels d\'offres'),
       investments: t('غرفة الاستثمارات', 'Investissements'),
-      videoAds: t('Rizq ADS', 'Rizq ADS')
+      videoAds: t('Rizq ADS', 'Rizq ADS'),
+      individual: t('الأفراد', 'Particuliers')
     };
     return map[key] || key;
   }

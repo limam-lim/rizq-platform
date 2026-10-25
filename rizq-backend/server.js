@@ -155,6 +155,7 @@ function getPlatformFlags() {
 const DEFAULT_SECTION_RULES = {
   individual:  { extraBannedKeywords: [], escalateAlways: false, requiredDocsNote: 'رقم هاتف صالح + اسم كامل — لا وثائق رسمية' },
   store:       { extraBannedKeywords: [], escalateAlways: false, requiredDocsNote: 'بطاقة وطنية فقط' },
+  estate:      { extraBannedKeywords: [], escalateAlways: false, requiredDocsNote: 'بطاقة وطنية + ترخيص وساطة إن وُجد (وكالة) — المالك الفردي بدون رخصة' },
   office:      { extraBannedKeywords: ['علاج مضمون', 'كسب القضية أكيد', 'guérison garantie'], escalateAlways: true, requiredDocsNote: 'رخصة النشاط سارية + بطاقة وطنية' },
   corp:        { extraBannedKeywords: [], escalateAlways: true, requiredDocsNote: 'سجل تجاري/رخصة تأسيس + بطاقة وطنية للممثل القانوني' },
   tenders:     { extraBannedKeywords: [], escalateAlways: true, requiredDocsNote: 'حساب شركة/مكتب موافَق عليه مسبقاً + باقة مدفوعة نشطة' },
