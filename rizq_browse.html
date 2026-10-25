@@ -3837,6 +3837,39 @@ function doSearch(){
   const inp=document.getElementById('nav-search-input');
   searchText=inp?inp.value.trim():'';
   applyFilters();
+  try{ fetchUnifiedSearchStrip(searchText); }catch(eU){}
+}
+function fetchUnifiedSearchStrip(q){
+  var host = document.getElementById('unified-search-strip');
+  if(!host){
+    var left = document.getElementById('browse-left');
+    if(!left) return;
+    host = document.createElement('div');
+    host.id = 'unified-search-strip';
+    host.style.cssText = 'margin:0 0 12px;padding:0 4px';
+    left.insertBefore(host, left.firstChild);
+  }
+  if(!q || q.length < 2){ host.innerHTML = ''; return; }
+  if(!window.RizqOps){
+    if(!document.querySelector('script[src*="rizq_ops_client.js"]')){
+      var s=document.createElement('script');
+      s.src='rizq_ops_client.js?v=1.0';
+      s.onload=function(){ fetchUnifiedSearchStrip(q); };
+      document.head.appendChild(s);
+    }
+    return;
+  }
+  host.innerHTML = '<p style="font-size:12px;color:#64748b;font-family:Cairo,sans-serif;margin:8px 0">🔍 …</p>';
+  window.RizqOps.unifiedSearch(q, 12).then(function(j){
+    if(!j || !j.ok || !j.results || !j.results.length){
+      host.innerHTML = '';
+      return;
+    }
+    host.innerHTML = '<div style="font-family:Cairo,sans-serif;font-size:13px;font-weight:800;color:#0f2347;margin:8px 0">نتائج موحّدة عبر رزق</div>';
+    var box = document.createElement('div');
+    host.appendChild(box);
+    window.RizqOps.renderSearchCards(j.results, box);
+  }).catch(function(){ host.innerHTML = ''; });
 }
 function openLightbox(src){
   const lb=document.getElementById('lightbox');

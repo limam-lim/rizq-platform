@@ -429,7 +429,7 @@ function _initWithAccount(acc){
 
 // ══ PANELS ══
 const TITLES = {
-  overview:'📊 نظرة عامة', requests:'📩 طلبات التواصل', messages:'💬 الرسائل',
+  overview:'📊 نظرة عامة', orders:'🛒 طلبات الشراء', requests:'📩 طلبات التواصل', messages:'💬 الرسائل',
   products:'📦 منتجاتي', profile:'🏪 معلومات المحل',
   hours:'🕐 ساعات العمل', photos:'📸 صور المحل',
   subscription:'💳 اشتراكي', settings:'⚙️ الإعدادات',
@@ -438,7 +438,7 @@ const TITLES = {
   verifiedplus:'🛡️ شارة موثّق⁺'
 };
 const TITLES_FR = {
-  overview:'📊 Vue d\'ensemble', requests:'📩 Demandes de contact', messages:'💬 Messages',
+  overview:'📊 Vue d\'ensemble', orders:'🛒 Commandes', requests:'📩 Demandes de contact', messages:'💬 Messages',
   products:'📦 Mes produits', profile:'🏪 Infos boutique',
   hours:'🕐 Horaires', photos:'📸 Photos boutique',
   subscription:'💳 Mon abonnement', settings:'⚙️ Paramètres',
@@ -459,6 +459,7 @@ function showPanel(id, el){
     title.textContent = titleMap[id]||'';
   }
   if(id==='overview') renderOverview();
+  if(id==='orders') renderSellerOrdersPanel();
   if(id==='products'){ renderStoreTopicsUI(); renderProducts(); }
   if(id==='messages') renderMessages();
   if(id==='requests'){ _rizqMergeServiceRequests(); loadStoreServiceDeskForm(); renderStoreServiceRequests(); }
@@ -469,6 +470,119 @@ function showPanel(id, el){
   if(id==='tenders'){ renderTenderSubStatus(); renderMyTenders(); }
   if(id==='referral'){ renderReferralPanel(); }
   if(id==='verifiedplus'){ renderVerifiedPlusPanel(); }
+}
+
+// ── طلبات الشراء (دورة حياة السوق) ────────────────────────────────
+function _sellerOrderStatusLabel(st){
+  var map = {
+    new:_t2('جديد','Nouveau'),
+    accepted:_t2('مقبول','Accepté'),
+    out_for_delivery:_t2('خرج للتوصيل','En livraison'),
+    completed:_t2('مكتمل','Terminé'),
+    cancelled:_t2('ملغى','Annulé'),
+    disputed:_t2('نزاع','Litige')
+  };
+  return map[st] || st;
+}
+function _fmtMs(ms){
+  if(ms == null) return '—';
+  var m = Math.round(ms / 60000);
+  if(m < 60) return m + ' ' + _t2('د','min');
+  return (Math.round(m/6)/10) + ' ' + _t2('س','h');
+}
+function renderSellerOrdersPanel(){
+  var listEl = document.getElementById('seller-orders-list');
+  var metricsEl = document.getElementById('seller-order-metrics');
+  var filterEl = document.getElementById('seller-orders-filter');
+  var status = filterEl ? filterEl.value : '';
+  if(!SESSION_ID || !window.RIZQ_BACKEND_BASE){
+    if(listEl) listEl.innerHTML = '<p style="color:var(--text-muted);padding:24px;text-align:center">'+_t2('اربط الخادم لعرض الطلبات','Connectez le serveur pour voir les commandes')+'</p>';
+    return;
+  }
+  if(!window.RizqOps){
+    // تحميل كسول
+    var s = document.createElement('script');
+    s.src = 'rizq_ops_client.js?v=1.0';
+    s.onload = function(){ renderSellerOrdersPanel(); };
+    document.head.appendChild(s);
+    return;
+  }
+  if(metricsEl) metricsEl.innerHTML = '<p style="color:var(--text-muted);font-size:12px">…</p>';
+  if(listEl) listEl.innerHTML = '<p style="color:var(--text-muted);padding:20px;text-align:center">'+_t2('جاري التحميل…','Chargement…')+'</p>';
+
+  window.RizqOps.sellerMetrics(SESSION_ID).then(function(j){
+    if(!metricsEl || !j || !j.ok || !j.metrics) return;
+    var m = j.metrics;
+    metricsEl.innerHTML =
+      '<div style="background:#f8faff;border:1px solid #e2e8f0;border-radius:12px;padding:12px"><div style="font-size:11px;color:#64748b">'+_t2('طلبات اليوم','Commandes du jour')+'</div><div style="font-size:22px;font-weight:900;color:#0f2347">'+m.todayOrders+'</div></div>'+
+      '<div style="background:#f8faff;border:1px solid #e2e8f0;border-radius:12px;padding:12px"><div style="font-size:11px;color:#64748b">'+_t2('مبيعات اليوم','CA du jour')+'</div><div style="font-size:22px;font-weight:900;color:#c9a84c">'+m.todayRevenue+'</div></div>'+
+      '<div style="background:#f8faff;border:1px solid #e2e8f0;border-radius:12px;padding:12px"><div style="font-size:11px;color:#64748b">'+_t2('نسبة الإتمام','Taux de complétion')+'</div><div style="font-size:22px;font-weight:900;color:#0f2347">'+m.fulfillmentRate+'%</div></div>'+
+      '<div style="background:#f8faff;border:1px solid #e2e8f0;border-radius:12px;padding:12px"><div style="font-size:11px;color:#64748b">'+_t2('زمن الرد','Temps de réponse')+'</div><div style="font-size:22px;font-weight:900;color:#0f2347">'+_fmtMs(m.avgResponseMs)+'</div></div>';
+  }).catch(function(){});
+
+  window.RizqOps.listSellerOrders(SESSION_ID, status).then(function(j){
+    if(!listEl) return;
+    if(!j || !j.ok || !j.orders || !j.orders.length){
+      listEl.innerHTML = '<p style="color:var(--text-muted);padding:28px;text-align:center">'+_t2('لا توجد طلبات','Aucune commande')+'</p>';
+      var badge = document.getElementById('orders-badge');
+      if(badge) badge.style.display = 'none';
+      return;
+    }
+    var newCount = j.orders.filter(function(o){ return o.status === 'new'; }).length;
+    var badge2 = document.getElementById('orders-badge');
+    if(badge2){
+      if(newCount){ badge2.textContent = String(newCount); badge2.style.display = ''; }
+      else badge2.style.display = 'none';
+    }
+    listEl.innerHTML = j.orders.map(function(o){
+      var d = o.delivery || {};
+      var addr = [d.wilaya, d.district, d.address].filter(Boolean).join(' — ');
+      var nextBtns = '';
+      if(o.status === 'new') nextBtns += '<button type="button" class="btn btn-primary btn-sm" onclick="sellerAdvanceOrder(\''+o.id+'\',\'accepted\')">'+_t2('قبول','Accepter')+'</button>';
+      if(o.status === 'accepted') nextBtns += '<button type="button" class="btn btn-primary btn-sm" onclick="sellerAdvanceOrder(\''+o.id+'\',\'out_for_delivery\')">'+_t2('خرج للتوصيل','Expédier')+'</button>';
+      if(o.status === 'out_for_delivery') nextBtns += '<button type="button" class="btn btn-primary btn-sm" onclick="sellerAdvanceOrder(\''+o.id+'\',\'completed\')">'+_t2('تم التسليم','Livré')+'</button>';
+      if(o.status === 'new' || o.status === 'accepted') nextBtns += '<button type="button" class="btn btn-outline btn-sm" onclick="sellerAdvanceOrder(\''+o.id+'\',\'cancelled\')">'+_t2('إلغاء','Annuler')+'</button>';
+      var payBtns = '';
+      if(o.paymentStatus === 'awaiting_review'){
+        payBtns =
+          '<button type="button" class="btn btn-outline btn-sm" onclick="sellerReviewPay(\''+o.id+'\',\'approved\')">'+_t2('اعتماد الدفع','Valider paiement')+'</button>'+
+          '<button type="button" class="btn btn-outline btn-sm" onclick="sellerReviewPay(\''+o.id+'\',\'rejected\')">'+_t2('رفض المرجع','Refuser')+'</button>';
+      }
+      var items = (o.items || []).map(function(it){ return escapeHtml(it.title)+' ×'+it.qty; }).join('، ');
+      return '<div style="border:1px solid #e2e8f0;border-radius:12px;padding:14px;margin-bottom:10px;background:#fff">'+
+        '<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><strong>#'+escapeHtml(o.orderNumber)+'</strong>'+
+        '<span style="color:#c9a84c;font-weight:800;font-size:12px">'+_sellerOrderStatusLabel(o.status)+'</span></div>'+
+        '<div style="font-size:13px;color:#334155;margin-top:6px;line-height:1.6">'+escapeHtml(String(o.total))+' '+escapeHtml(o.currency||'MRU')+
+        ' · '+escapeHtml(o.paymentMethod||'')+
+        (o.paymentReference ? ' · Ref: '+escapeHtml(o.paymentReference) : '')+
+        (o.paymentStatus ? ' · '+escapeHtml(o.paymentStatus) : '')+
+        (items ? '<br/>'+items : '')+
+        (addr ? '<br/>📍 '+escapeHtml(addr) : '')+
+        (d.phone ? '<br/>📞 <span dir="ltr">'+escapeHtml(d.phone)+'</span>' : '')+
+        '</div>'+
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">'+nextBtns+payBtns+'</div></div>';
+    }).join('');
+  }).catch(function(){
+    if(listEl) listEl.innerHTML = '<p style="color:#b91c1c;padding:20px;text-align:center">'+_t2('تعذّر التحميل','Échec du chargement')+'</p>';
+  });
+}
+function sellerAdvanceOrder(id, status){
+  if(!window.RizqOps) return;
+  var note = '';
+  if(status === 'out_for_delivery'){
+    note = prompt(_t2('ملاحظة للمندوب (اختياري)','Note livreur (optionnel)')) || '';
+  }
+  window.RizqOps.patchOrderStatus(id, status, { note: note, driverNotes: note }, SESSION_ID).then(function(j){
+    if(j && j.ok){ showToast(_t2('تم تحديث الحالة','Statut mis à jour'),'success'); renderSellerOrdersPanel(); }
+    else showToast((j && j.error) || _t2('فشل التحديث','Échec'),'error');
+  });
+}
+function sellerReviewPay(id, decision){
+  if(!window.RizqOps) return;
+  window.RizqOps.reviewPayment(id, decision, SESSION_ID, '').then(function(j){
+    if(j && j.ok){ showToast(_t2('تم تحديث الدفع','Paiement mis à jour'),'success'); renderSellerOrdersPanel(); }
+    else showToast((j && j.error) || _t2('فشل','Échec'),'error');
+  });
 }
 
 // ── برنامج الإحالة (جيب صاحبك واربح) ────────────────────────────────

@@ -2359,6 +2359,35 @@ app.get('/api/otp/config', (req, res) => {
 });
 app.use('/api/wishlist', wishlistRouter);
 
+// ── طلبات السوق + بحث موحّد + Push + خصوصية + SEO ─────────────────
+const ordersRouter = require('./routes/orders');
+const searchUnifiedRouter = require('./routes/searchUnified');
+const pushRouter = require('./routes/push');
+const privacyRouter = require('./routes/privacy');
+const { mountSeoRoutes, configureSeoRoutes } = require('./routes/seoDynamic');
+
+ordersRouter.configureOrderRoutes({
+  readAccounts,
+  requireAdminPermission: typeof requireAdminPermission === 'function' ? requireAdminPermission : null,
+});
+searchUnifiedRouter.configureSearchRoutes({
+  readAds: () => (typeof readAds === 'function' ? readAds() : []),
+  readAccounts,
+  listCatalog: () => (typeof readCatalog === 'function' ? readCatalog() : []),
+});
+pushRouter.configurePushRoutes({ readAccounts });
+configureSeoRoutes({
+  readAds: () => (typeof readAds === 'function' ? readAds() : []),
+  readAccounts,
+  publicOrigin: () => process.env.PUBLIC_BASE_URL || ('http://localhost:' + (process.env.PORT || 3000)),
+});
+
+app.use('/api/orders', ordersRouter);
+app.use('/api/search', searchUnifiedRouter);
+app.use('/api/push', pushRouter);
+app.use('/api/privacy', privacyRouter);
+mountSeoRoutes(app);
+
 /** @deprecated � استخد�& POST /api/auth/register */
 app.post('/api/buyers/register', buyersRegisterLimiter, (req, res) => {
   res.status(410).json({ ok: false, error: 'deprecated', message: 'استخدم POST /api/auth/register بعد التحقق بـ OTP' });
@@ -4173,6 +4202,22 @@ const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
+
+// إعادة ربط مصادر البحث/SEO بعد تعريف readAds/readCatalog
+try {
+  searchUnifiedRouter.configureSearchRoutes({
+    readAds,
+    readAccounts,
+    listCatalog: readCatalog,
+  });
+  configureSeoRoutes({
+    readAds,
+    readAccounts,
+    publicOrigin: () => process.env.PUBLIC_BASE_URL || ('http://localhost:' + (process.env.PORT || 3000)),
+  });
+} catch (eSearchCfg) {
+  console.warn('[ops] search/seo reconfigure:', eSearchCfg.message);
+}
 
 startMaintenanceScheduler({
   readAds,

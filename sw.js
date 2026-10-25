@@ -13,7 +13,7 @@
  */
 'use strict';
 
-var CACHE_NAME = 'rizq-cache-v23.0';
+var CACHE_NAME = 'rizq-cache-v24.0';
 var CORE_ASSETS = [
   'rizq-theme.css',
   'rizq_header.css',
@@ -99,4 +99,53 @@ self.addEventListener('fetch', function (event) {
   event.respondWith(
     fetch(req).catch(function () { return caches.match(req); })
   );
+});
+
+/* ── Web Push ─────────────────────────────────────────── */
+self.addEventListener('push', function (event) {
+  var data = { title: 'رزق', body: '', data: {} };
+  try {
+    if (event.data) {
+      var parsed = event.data.json();
+      if (parsed && typeof parsed === 'object') data = Object.assign(data, parsed);
+    }
+  } catch (e1) {
+    try { data.body = event.data ? event.data.text() : ''; } catch (e2) {}
+  }
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'رزق', {
+      body: data.body || '',
+      icon: 'favicon-192.png',
+      badge: 'favicon-32.png',
+      dir: 'rtl',
+      lang: 'ar',
+      data: data.data || {},
+      vibrate: [80, 40, 80]
+    })
+  );
+});
+
+self.addEventListener('notificationclick', function (event) {
+  event.notification.close();
+  var target = 'rizq_landing_v8.html';
+  try {
+    var d = event.notification.data || {};
+    if (d.orderId || d.orderNumber) target = 'rizq_landing_v8.html?openAccount=1';
+  } catch (e3) {}
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (list) {
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].url && 'focus' in list[i]) {
+          list[i].navigate(target);
+          return list[i].focus();
+        }
+      }
+      if (clients.openWindow) return clients.openWindow(target);
+    })
+  );
+});
+
+self.addEventListener('pushsubscriptionchange', function (event) {
+  /* الاشتراك يُعاد من الواجهة عبر /api/push/subscribe */
+  event.waitUntil(Promise.resolve());
 });

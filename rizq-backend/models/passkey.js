@@ -99,6 +99,13 @@ function countByUser(userKind, userId) {
   return row ? row.n : 0;
 }
 
+function deleteAllForUser(userKind, userId) {
+  const r = db.prepare(
+    'DELETE FROM user_passkeys WHERE user_kind = ? AND user_id = ?'
+  ).run(String(userKind), String(userId));
+  return r.changes || 0;
+}
+
 /* ── challenges ─────────────────────────────────────────── */
 
 function purgeExpiredChallenges() {
@@ -147,6 +154,7 @@ module.exports = {
   updateCounter,
   removeById,
   countByUser,
+  deleteAllForUser,
   saveChallenge,
   consumeChallenge,
   rowToPublic,

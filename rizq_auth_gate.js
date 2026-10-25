@@ -510,6 +510,14 @@
       '#rag-overlay .rag-passkey-enable{display:none;width:100%;margin:10px 0 0;padding:12px 14px;border-radius:12px;border:1.5px solid #1b3a6b;background:#0f2347;color:#e8c96a;font-family:Cairo,\"Segoe UI\",sans-serif;font-size:13.5px;font-weight:800;cursor:pointer}',
       '#rag-overlay .rag-passkey-enable.show{display:block}',
       '#rag-overlay .rag-passkey-enable:hover{background:#1b3a6b;color:#fff}',
+      '#rag-overlay .rag-ops{margin-top:14px;padding-top:12px;border-top:1px solid #e2e8f0}',
+      '#rag-overlay .rag-ops-title{font-size:13px;font-weight:900;color:#0f2347;margin:0 0 8px}',
+      '#rag-overlay .rag-ops-actions{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}',
+      '#rag-overlay .rag-ops-btn{font-family:Cairo,\"Segoe UI\",sans-serif;font-size:12px;font-weight:800;padding:8px 10px;border-radius:9px;border:1px solid #e2e8f0;background:#f8faff;color:#0f2347;cursor:pointer}',
+      '#rag-overlay .rag-ops-btn:hover{border-color:rgba(201,168,76,.55);background:#fffaf0}',
+      '#rag-overlay .rag-ops-btn.warn{border-color:rgba(220,38,38,.3);color:#b91c1c;background:#fff5f5}',
+      '#rag-overlay #rag-orders-list{max-height:220px;overflow:auto;margin-top:4px}',
+      '#rag-overlay #rag-alerts-list{max-height:120px;overflow:auto;font-size:12px;color:#475569;line-height:1.55}',
       '#rag-overlay .rag-step{display:none}',
       '#rag-overlay .rag-step.active{display:block}',
       'body.rizq-reg-open #rizq-chat-toggle,body.rizq-reg-open .mobile-bottom-nav,body.rizq-reg-open #nav,body.rizq-reg-open .fixed-rizq-logo,body.rizq-reg-open #rizq-rlogo-edge{visibility:hidden!important;pointer-events:none!important}',
@@ -626,6 +634,18 @@
       '        <div class="rag-account-meta" id="rag-acc-meta"></div>',
       '      </div>',
       '      <button type="button" class="rag-passkey-enable" id="rag-passkey-enable-btn"></button>',
+      '      <div class="rag-ops" id="rag-ops">',
+      '        <div class="rag-ops-title" id="rag-ops-orders-title">طلباتي وتتبع التوصيل</div>',
+      '        <div id="rag-orders-list"><p style="font-size:12px;color:#94a3b8;margin:0">جاري التحميل…</p></div>',
+      '        <div class="rag-ops-title" id="rag-ops-alerts-title" style="margin-top:12px">تنبيهات</div>',
+      '        <div id="rag-alerts-list"></div>',
+      '        <div class="rag-ops-title" id="rag-ops-prefs-title" style="margin-top:12px">الإشعارات والخصوصية</div>',
+      '        <div class="rag-ops-actions">',
+      '          <button type="button" class="rag-ops-btn" id="rag-push-toggle">تفعيل إشعارات الجهاز</button>',
+      '          <button type="button" class="rag-ops-btn" id="rag-export-data">تحميل بياناتي</button>',
+      '          <button type="button" class="rag-ops-btn warn" id="rag-erase-account">حذف حسابي</button>',
+      '        </div>',
+      '      </div>',
       '      <button class="rag-btn rag-btn-ghost" id="rag-logout-btn" type="button"></button>',
       '      <a class="rag-seller-link" id="rag-seller-link" href="?openRegister=1"></a>',
       '    </div>',
@@ -701,6 +721,32 @@
     if (pkLoginBtn) pkLoginBtn.addEventListener('click', startPasskeyLogin);
     var pkEnableBtn = document.getElementById('rag-passkey-enable-btn');
     if (pkEnableBtn) pkEnableBtn.addEventListener('click', startPasskeyRegister);
+    var pushBtn = document.getElementById('rag-push-toggle');
+    if (pushBtn) pushBtn.addEventListener('click', togglePushFromAccount);
+    var exportBtn = document.getElementById('rag-export-data');
+    if (exportBtn) exportBtn.addEventListener('click', exportDataFromAccount);
+    var eraseBtn = document.getElementById('rag-erase-account');
+    if (eraseBtn) eraseBtn.addEventListener('click', eraseAccountFromAccount);
+    var ordersList = document.getElementById('rag-orders-list');
+    if (ordersList) {
+      ordersList.addEventListener('click', function (ev) {
+        var t = ev.target;
+        if (!t || !t.getAttribute) return;
+        var oid = t.getAttribute('data-oid');
+        if (!oid) return;
+        if (t.classList.contains('rag-ops-cancel')) {
+          var reasonC = prompt(t('سبب الإلغاء (اختياري)', 'Motif d\'annulation (optionnel)')) || '';
+          if (!window.RizqOps) return;
+          window.RizqOps.cancelOrder(oid, reasonC).then(function () { loadAccountOps(); });
+        }
+        if (t.classList.contains('rag-ops-dispute')) {
+          var reasonD = prompt(t('صف المشكلة باختصار', 'Décrivez le problème')) || '';
+          if (!reasonD) return;
+          if (!window.RizqOps) return;
+          window.RizqOps.disputeOrder(oid, reasonD).then(function () { loadAccountOps(); });
+        }
+      });
+    }
     document.getElementById('rag-email').addEventListener('blur', lookupReturningVisitor);
     document.getElementById('rag-wa-same').addEventListener('change', syncWhatsappFromPhones);
     document.getElementById('rag-phone-mr').addEventListener('input', function () {
@@ -1443,6 +1489,108 @@
     });
   }
 
+  function loadAccountOps() {
+    var list = document.getElementById('rag-orders-list');
+    var alerts = document.getElementById('rag-alerts-list');
+    var fr = (document.documentElement.lang === 'fr');
+    if (document.getElementById('rag-ops-orders-title')) {
+      document.getElementById('rag-ops-orders-title').textContent = fr ? 'Mes commandes & suivi' : 'طلباتي وتتبع التوصيل';
+    }
+    if (document.getElementById('rag-ops-alerts-title')) {
+      document.getElementById('rag-ops-alerts-title').textContent = fr ? 'Alertes' : 'تنبيهات';
+    }
+    if (document.getElementById('rag-ops-prefs-title')) {
+      document.getElementById('rag-ops-prefs-title').textContent = fr ? 'Notifications & confidentialité' : 'الإشعارات والخصوصية';
+    }
+    if (document.getElementById('rag-push-toggle')) {
+      document.getElementById('rag-push-toggle').textContent = fr ? 'Activer les notifications' : 'تفعيل إشعارات الجهاز';
+    }
+    if (document.getElementById('rag-export-data')) {
+      document.getElementById('rag-export-data').textContent = fr ? 'Télécharger mes données' : 'تحميل بياناتي';
+    }
+    if (document.getElementById('rag-erase-account')) {
+      document.getElementById('rag-erase-account').textContent = fr ? 'Supprimer mon compte' : 'حذف حسابي';
+    }
+    if (!window.RizqOps || !apiBase()) {
+      if (list) list.innerHTML = '<p style="font-size:12px;color:#94a3b8;margin:0">' + (fr ? 'Serveur indisponible' : 'الخادم غير متاح') + '</p>';
+      return;
+    }
+    if (list) list.innerHTML = '<p style="font-size:12px;color:#94a3b8;margin:0">' + (fr ? 'Chargement…' : 'جاري التحميل…') + '</p>';
+    window.RizqOps.listBuyerOrders().then(function (j) {
+      if (!list) return;
+      if (!j || !j.ok || !j.orders || !j.orders.length) {
+        list.innerHTML = '<p style="font-size:12px;color:#94a3b8;margin:0">' + (fr ? 'Aucune commande pour le moment' : 'لا توجد طلبات بعد') + '</p>';
+        return;
+      }
+      list.innerHTML = j.orders.map(function (o) { return window.RizqOps.orderCardHtml(o); }).join('');
+    }).catch(function () {
+      if (list) list.innerHTML = '<p style="font-size:12px;color:#b91c1c;margin:0">' + (fr ? 'Échec du chargement' : 'تعذّر تحميل الطلبات') + '</p>';
+    });
+    window.RizqOps.listAlerts().then(function (j) {
+      if (!alerts) return;
+      if (!j || !j.ok || !j.alerts || !j.alerts.length) {
+        alerts.innerHTML = '<p style="margin:0;color:#94a3b8">' + (fr ? 'Pas d\'alertes' : 'لا تنبيهات') + '</p>';
+        return;
+      }
+      alerts.innerHTML = j.alerts.slice(0, 8).map(function (a) {
+        return '<div style="padding:6px 0;border-bottom:1px solid #f1f5f9">' + window.RizqOps.esc(a.body || '') +
+          '<div style="font-size:10px;color:#94a3b8">' + window.RizqOps.esc((a.createdAt || '').slice(0, 16).replace('T', ' ')) + '</div></div>';
+      }).join('');
+    }).catch(function () {});
+  }
+
+  function togglePushFromAccount() {
+    if (!window.RizqOps) return;
+    var btn = document.getElementById('rag-push-toggle');
+    if (btn) btn.disabled = true;
+    window.RizqOps.enablePush('buyer').then(function (j) {
+      if (btn) btn.disabled = false;
+      if (typeof window.showToast === 'function') {
+        window.showToast(j && j.ok
+          ? t('✅ تم تفعيل إشعارات الجهاز', '✅ Notifications activées')
+          : t('تعذّر تفعيل الإشعارات', 'Impossible d\'activer'), j && j.ok ? 'success' : 'error');
+      }
+    }).catch(function () {
+      if (btn) btn.disabled = false;
+      alert(t('جهازك لا يدعم إشعارات الويب أو لم يُضبط VAPID', 'Notifications web non supportées / VAPID manquant'));
+    });
+  }
+
+  function exportDataFromAccount() {
+    if (!window.RizqOps) return;
+    window.RizqOps.exportMyData().then(function (j) {
+      if (typeof window.showToast === 'function') {
+        window.showToast(j && j.ok
+          ? t('✅ تم تنزيل ملف بياناتك', '✅ Export téléchargé')
+          : t('تعذّر التصدير', 'Échec de l\'export'), j && j.ok ? 'success' : 'error');
+      }
+    }).catch(function () {
+      alert(t('تعذّر تصدير البيانات', 'Échec de l\'export'));
+    });
+  }
+
+  function eraseAccountFromAccount() {
+    if (!window.RizqOps) return;
+    var word = prompt(t('لتأكيد الحذف اكتب: حذف', 'Pour confirmer, tapez : DELETE'));
+    if (!word) return;
+    if (word !== 'حذف' && word !== 'DELETE') {
+      alert(t('لم يُطابق التأكيد — لم يُحذف شيء', 'Confirmation incorrecte — rien n\'a été supprimé'));
+      return;
+    }
+    if (!confirm(t('سيتم حذف حسابك نهائياً. هل أنت متأكد؟', 'Suppression définitive. Confirmer ?'))) return;
+    window.RizqOps.eraseMyAccount(word).then(function (j) {
+      if (j && j.ok) {
+        clearSession();
+        closeModal();
+        if (typeof window.showToast === 'function') window.showToast(j.message || t('تم حذف الحساب', 'Compte supprimé'), 'info');
+      } else {
+        alert((j && j.error) || t('تعذّر الحذف', 'Échec de la suppression'));
+      }
+    }).catch(function () {
+      alert(t('تعذّر الحذف', 'Échec de la suppression'));
+    });
+  }
+
   function showAccountPanel() {
     var s = getSession();
     var dict = d();
@@ -1471,6 +1619,7 @@
       pkEn.textContent = '🔐 ' + dict.passkeyEnable;
     }
     showStep('account');
+    loadAccountOps();
   }
 
   function prefillDraft() {
@@ -1731,7 +1880,10 @@
     logout: function () { clearSession(); },
     refreshSession: verifySessionSilently,
     passkeyLogin: startPasskeyLogin,
-    passkeyRegister: startPasskeyRegister
+    passkeyRegister: startPasskeyRegister,
+    buyerAuthHeaders: buyerAuthHeaders,
+    buyerFetch: buyerFetch,
+    reloadOrders: loadAccountOps
   };
   /** محادثة عامة: بلا تسجيل في النماذج الترويجية؛ تسجيل إلزامي للمحلات الحقيقية */
   function openPublicChat(actionFn, reasonKey) {
@@ -1755,4 +1907,13 @@
 
   loadOtpConfig();
   verifySessionSilently();
+  try {
+    var bootQ = new URLSearchParams(location.search || '');
+    if (bootQ.get('openAccount') === '1' || bootQ.get('openLogin') === '1') {
+      setTimeout(function () {
+        if (isLoggedIn()) openAccountModal();
+        else openAccountChoice();
+      }, 500);
+    }
+  } catch (eBoot) {}
 })();

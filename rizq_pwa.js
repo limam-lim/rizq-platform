@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '32.0';
+  var ASSET_V = '33.0';
   var MOCK_HDR_V = '5.69';
 
   if (typeof window.showToast !== 'function') {
@@ -131,6 +131,9 @@
       appendScript('rizq_account_route.js?v=' + ASSET_V, { async: false });
     }
     /* Passkeys ثم بوابة حسابي — لازمة لزر حسابي خارج الصفحة الرئيسية */
+    if (isPublicShell() && !document.querySelector('script[src*="rizq_ops_client.js"]')) {
+      appendScript('rizq_ops_client.js?v=' + ASSET_V, { defer: true });
+    }
     if (isPublicShell() && !document.querySelector('script[src*="rizq_passkey.js"]')) {
       appendScript('rizq_passkey.js?v=' + ASSET_V, { defer: true });
     }
@@ -404,7 +407,7 @@
         }).catch(function () {});
         return;
       }
-      navigator.serviceWorker.register('sw.js?v=22.1').then(function (reg) {
+      navigator.serviceWorker.register('sw.js?v=24.0').then(function (reg) {
         try { if (reg && reg.update) reg.update(); } catch (eUp) {}
       }).catch(function (err) {
         console.warn('Rizq PWA: تعذّر تسجيل service worker', err);

@@ -219,6 +219,38 @@ function loginByPhone(phone) {
   return { buyer: publicBuyer(row), token: row.token };
 }
 
+/**
+ * حذف حساب المشتري — إخفاء الهوية مع الإبقاء على معرّف الصف للسجلات المالية
+ */
+function eraseAccount(id) {
+  const row = findById(id);
+  if (!row) return false;
+  const now = new Date().toISOString();
+  const safeId = String(id).replace(/[^a-zA-Z0-9]/g, '').slice(-18) || crypto.randomBytes(6).toString('hex');
+  const tombstone = 'deleted_' + safeId + '@erased.rizq.local';
+  // phone UNIQUE — نُبقي قيمة فريدة غير قابلة للاستخدام بعد الحذف
+  const tombPhone = ('9' + safeId.replace(/\D/g, '').padEnd(7, '0')).slice(0, 8);
+  db.prepare(`
+    UPDATE buyers SET
+      name = 'حساب محذوف',
+      phone = ?,
+      phone_intl = '',
+      whatsapp = '',
+      email = ?,
+      email_lc = ?,
+      pass_hash = NULL,
+      token = '',
+      last_login_at = ?
+    WHERE id = ?
+  `).run(tombPhone, tombstone, tombstone.toLowerCase(), now, String(id));
+  return true;
+}
+
+function exportProfile(id) {
+  const row = findById(id);
+  return publicBuyer(row);
+}
+
 module.exports = {
   MR_PHONE_RE,
   EMAIL_RE,
@@ -233,4 +265,6 @@ module.exports = {
   registerOrLogin,
   loginByEmailPassword,
   loginByPhone,
+  eraseAccount,
+  exportProfile,
 };
