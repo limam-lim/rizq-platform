@@ -445,6 +445,8 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
   box-shadow:0 8px 24px rgba(2,6,14,.35);
   direction:rtl;
   overflow:visible;
+  /* هامش أفقي موحّد: الشعار ↔ زر اللغة ↔ حواف الكبسولة */
+  --rmh-gutter-x:20px;
 }
 #rizq-mock-hdr *{box-sizing:border-box}
 
@@ -465,7 +467,7 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
   display:grid;
   grid-template-columns:minmax(120px,1fr) minmax(280px,460px) minmax(120px,1fr);
   align-items:center;gap:14px;
-  padding:10px 20px;
+  padding:10px var(--rmh-gutter-x,20px);
   background:linear-gradient(180deg,#0e1c32 0%,#0a1628 100%);
 }
 /* شعار رزق — مطابق لهيكل #nav الأصلي: علامة + رزق + RIZQ PLATFORM */
@@ -688,23 +690,23 @@ body.rizq-lang-fr #rizq-mock-hdr #rmh-lang-btn .lang-fr{
   background-image:none!important;
   box-shadow:none!important;
   height:auto;
-  min-width:78px;
-  padding:7px 10px 8px;
-  margin:2px 4px;
+  min-width:72px;
+  padding:6px 8px 7px;
+  margin:2px 3px;
   border:1.5px solid #E8C96A!important;
   border-radius:6px!important;
   border-bottom:1.5px solid #E8C96A!important;
-  font:700 12px 'Cairo',sans-serif;
+  font:700 11.5px 'Cairo',sans-serif;
   flex-direction:column;
-  gap:4px;
+  gap:3px;
   box-sizing:border-box;
 }
 .rmh-nav a.rmh-post-nav .rmh-nav-ico,
 .rmh-nav a.rmh-post-nav .rmh-post-plus{
-  font-size:18px;line-height:1;opacity:1;
+  font-size:17px;line-height:1;opacity:1;
   color:#E8C96A!important;
   font-weight:900;
-  width:22px;height:22px;
+  width:20px;height:20px;
   display:inline-flex;align-items:center;justify-content:center;
   background:transparent!important;
 }
@@ -723,7 +725,7 @@ body.rizq-lang-fr #rizq-mock-hdr #rmh-lang-btn .lang-fr{
 }
 .rmh-post-lbl{display:inline;color:inherit}
 
-/* شريط الأقسام — كبسولة مضمومة متوسّطة (نفس شكل الواجهة/الهيرو، بلا تمدد شاسع) */
+/* شريط الأقسام — كبسولة بعرض الشعار→زر اللغة؛ الأزرار تبقى متوسّطة بحجمها */
 #rizq-mock-hdr nav.rmh-nav,
 nav.rmh-nav{
   position:static!important;
@@ -731,11 +733,12 @@ nav.rmh-nav{
   height:auto!important;z-index:2!important;
   display:flex!important;align-items:stretch;
   justify-content:center;
-  gap:2px;overflow-x:auto;overflow-y:visible;scrollbar-width:none;
-  width:max-content;
-  max-width:calc(100% - 32px);
-  margin:6px auto 10px!important;
-  padding:4px 8px!important;
+  gap:1px;overflow-x:auto;overflow-y:visible;scrollbar-width:none;
+  /* خلفية الكبسولة فقط تمتد مع هامش الصف العلوي */
+  width:calc(100% - (2 * var(--rmh-gutter-x,20px)));
+  max-width:none;
+  margin:6px var(--rmh-gutter-x,20px) 10px!important;
+  padding:3px 10px!important;
   box-sizing:border-box;
   background:rgba(255,255,255,.045)!important;
   border:1px solid rgba(201,168,76,.32)!important;
@@ -766,11 +769,11 @@ body.rizq-mockup-hdr-trial #virtual-offices{
 .rmh-nav a.rmh-post-nav,
 .rmh-more-btn{
   flex:0 0 auto;
-  min-width:72px;
+  min-width:66px;
   max-width:none;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:4px;padding:9px 10px 11px;text-decoration:none;
-  color:rgba(255,255,255,.78);font:700 12px 'Cairo',sans-serif;
+  gap:3px;padding:7px 8px 9px;text-decoration:none;
+  color:rgba(255,255,255,.78);font:700 11.5px 'Cairo',sans-serif;
   border-bottom:3px solid transparent;
   transition:color .2s ease,border-bottom-color .2s ease,opacity .2s ease;
   cursor:pointer!important;
@@ -778,12 +781,12 @@ body.rizq-mockup-hdr-trial #virtual-offices{
   -webkit-user-select:none;
   white-space:nowrap;
 }
-.rmh-nav a[data-rmh="showrooms"]{min-width:100px;font-size:11.5px}
-.rmh-nav a[data-rmh="estate"]{min-width:78px}
-.rmh-nav a[data-rmh="models"]{min-width:72px}
+.rmh-nav a[data-rmh="showrooms"]{min-width:92px;font-size:11px}
+.rmh-nav a[data-rmh="estate"]{min-width:72px}
+.rmh-nav a[data-rmh="models"]{min-width:66px}
 .rmh-nav a .rmh-nav-ico{
   display:inline-flex;align-items:center;justify-content:center;
-  width:22px;height:22px;line-height:1;opacity:.92;
+  width:20px;height:20px;line-height:1;opacity:.92;
   pointer-events:none; /* المؤشر يد على الرابط كله لا تحديد نص */
 }
 .rmh-nav a .rmh-nav-ico svg{display:block;pointer-events:none}
@@ -795,11 +798,11 @@ body.rizq-mockup-hdr-trial #virtual-offices{
 .rmh-more-btn{
   appearance:none;background:transparent;border:0;cursor:pointer!important;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:4px;min-width:72px;padding:9px 10px 11px;
-  color:rgba(255,255,255,.78);font:700 12px 'Cairo',sans-serif;
+  gap:3px;min-width:66px;padding:7px 8px 9px;
+  color:rgba(255,255,255,.78);font:700 11.5px 'Cairo',sans-serif;
   border-bottom:3px solid transparent;user-select:none;
 }
-.rmh-more-btn .rmh-nav-ico{width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;pointer-events:none}
+.rmh-more-btn .rmh-nav-ico{width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;pointer-events:none}
 .rmh-more-btn .rmh-nav-ico svg{display:block}
 .rmh-more-wrap.open .rmh-more-btn,
 .rmh-more-btn:hover{
@@ -962,10 +965,11 @@ body > .rizq-help-dd-menu a,
 /* تابلت — أظهر تذييل الأقسام داخل شريط البحث دون تحريك موقعه */
 @media(max-width:1024px){
   body.rizq-mockup-hdr-trial{--rizq-mock-hdr-h: 200px}
+  #rizq-mock-hdr{--rmh-gutter-x:14px}
   .rmh-util{padding:4px 14px;font-size:10.5px}
   .rmh-main{
     grid-template-columns:minmax(100px,1fr) minmax(220px,380px) minmax(100px,1fr);
-    padding:9px 14px;gap:10px;
+    padding:9px var(--rmh-gutter-x,14px);gap:10px;
   }
   .rmh-search{max-width:380px}
   .rmh-search-cat{
@@ -998,10 +1002,11 @@ body > .rizq-help-dd-menu a,
     padding-top:var(--rizq-mock-hdr-h,212px)!important;
   }
   /* أعمدة متساوية يمين/يسار — وسط أوسع قليلاً لاستيعاب تذييل الأقسام */
+  #rizq-mock-hdr{--rmh-gutter-x:16px}
   #rizq-mock-hdr .rmh-main{
     grid-template-columns:minmax(0,1fr) minmax(0,340px) minmax(0,1fr);
     gap:10px 14px;
-    padding:9px 16px;
+    padding:9px var(--rmh-gutter-x,16px);
     align-items:center;
   }
   #rizq-mock-hdr .rmh-brand{justify-self:start!important;min-width:0}
@@ -1035,15 +1040,16 @@ body > .rizq-help-dd-menu a,
     width:38px!important;height:38px!important;
     min-width:38px!important;min-height:38px!important;
   }
-  /* أبواب الشريط — تتّسع كاملة دون قصّ الرئيسية/المزيد */
+  /* كبسولة بعرض الشعار→الأدوات؛ الأزرار تبقى مضغوطة في الوسط */
   #rizq-mock-hdr nav.rmh-nav,
   nav.rmh-nav{
-    margin:6px 8px 10px!important;
-    padding:3px 4px!important;
-    max-width:calc(100% - 16px)!important;
+    margin:6px var(--rmh-gutter-x,16px) 10px!important;
+    padding:3px 6px!important;
+    width:calc(100% - (2 * var(--rmh-gutter-x,16px)))!important;
+    max-width:none!important;
     gap:0!important;
-    justify-content:space-between!important;
-    overflow-x:hidden!important;
+    justify-content:center!important;
+    overflow-x:auto!important;
   }
   #rizq-mock-hdr .rmh-nav a,
   #rizq-mock-hdr .rmh-nav a.rmh-post-nav,
@@ -1051,10 +1057,10 @@ body > .rizq-help-dd-menu a,
   .rmh-nav a,
   .rmh-nav a.rmh-post-nav,
   .rmh-more-btn{
-    flex:1 1 0!important;
-    min-width:0!important;
+    flex:0 0 auto!important;
+    min-width:58px!important;
     max-width:none!important;
-    padding:6px 2px 8px!important;
+    padding:6px 4px 8px!important;
     font-size:10px!important;
     gap:2px!important;
   }
