@@ -40,12 +40,49 @@
       var stored = sessionStorage.getItem(dashTokenStorageKey(accountId));
       if (stored) return stored;
     } catch (e) {}
-    var sess = readStoredSession();
-    if (sess && sess.id === accountId && sess.token) return sess.token;
+    /* هجرة لمرة واحدة: إن وُجد توكن قديم في LS انقله إلى sessionStorage */
+    try {
+      var raw = localStorage.getItem('rizq_active_session');
+      var sess = raw ? JSON.parse(raw) : null;
+      if (sess && sess.id === accountId && sess.token) {
+        var migrated = String(sess.token);
+        storeDashToken(accountId, migrated);
+        delete sess.token;
+        localStorage.setItem('rizq_active_session', JSON.stringify(sess));
+        return migrated;
+      }
+    } catch (eMig) {}
+    try {
+      var rawInd = localStorage.getItem('rizq_individual_session');
+      var ind = rawInd ? JSON.parse(rawInd) : null;
+      if (ind && ind.id === accountId && ind.token) {
+        var tok = String(ind.token);
+        storeDashToken(accountId, tok);
+        delete ind.token;
+        localStorage.setItem('rizq_individual_session', JSON.stringify(ind));
+        return tok;
+      }
+    } catch (eMig2) {}
     var acc = readPendingAccounts().find(function (a) {
-      return a && a.id === accountId && a.token;
+      return a && a.id === accountId && (a.token || a.dashToken);
     });
-    return (acc && acc.token) || '';
+    if (acc && (acc.token || acc.dashToken)) {
+      var t = String(acc.token || acc.dashToken);
+      storeDashToken(accountId, t);
+      try {
+        var list = readPendingAccounts();
+        var row = list.find(function (a) { return a && a.id === accountId; });
+        if (row) {
+          delete row.token;
+          delete row.dashToken;
+          delete row.accessToken;
+          delete row.backendAccessToken;
+          localStorage.setItem('rizq_pending_accounts', JSON.stringify(list));
+        }
+      } catch (eStrip) {}
+      return t;
+    }
+    return '';
   }
 
   function stripTokenFromUrl() {
@@ -92,16 +129,26 @@
   function readStoredSession() {
     var sess = null;
     try { sess = JSON.parse(localStorage.getItem('rizq_active_session') || 'null'); } catch (e) {}
-    if (sess && sess.id && sess.token) return sess;
+    if (sess && sess.id) {
+      var tok = sess.token || readDashToken(sess.id);
+      if (tok) return Object.assign({}, sess, { token: tok });
+    }
     try { sess = JSON.parse(localStorage.getItem('rizq_individual_session') || 'null'); } catch (e2) {}
-    if (sess && sess.id && sess.token) return Object.assign({ type: 'individual' }, sess);
+    if (sess && sess.id) {
+      var tok2 = sess.token || readDashToken(sess.id);
+      if (tok2) return Object.assign({ type: 'individual' }, sess, { token: tok2 });
+    }
     return null;
   }
 
   function findApprovedAccount(sess) {
-    if (!sess || !sess.id || !sess.token) return null;
+    if (!sess || !sess.id) return null;
+    var token = sess.token || readDashToken(sess.id);
+    if (!token) return null;
     return readPendingAccounts().find(function (a) {
-      return a && a.id === sess.id && a.token === sess.token && a.status === 'approved';
+      if (!a || a.id !== sess.id || a.status !== 'approved') return false;
+      if (!a.token && !a.dashToken) return true;
+      return a.token === token || a.dashToken === token;
     }) || null;
   }
 
@@ -143,10 +190,10 @@
   function setActiveSession(acc) {
     if (!acc || !acc.id || !acc.token) return;
     storeDashToken(acc.id, acc.token);
+    /* dashToken في sessionStorage فقط — LS يحفظ الهوية للواجهة دون السر */
     try {
       localStorage.setItem('rizq_active_session', JSON.stringify({
         id: acc.id,
-        token: acc.token,
         type: acc.type || 'individual',
         name: acc.name || acc.owner || acc.manager || ''
       }));
@@ -155,7 +202,6 @@
       try {
         localStorage.setItem('rizq_individual_session', JSON.stringify({
           id: acc.id,
-          token: acc.token,
           name: acc.name || ''
         }));
       } catch (e2) {}
@@ -276,22 +322,29 @@
     rec.name = serverAcc.name || rec.name || rec.owner || rec.manager || '';
     rec.email = serverAcc.email || rec.email || '';
     rec.status = serverAcc.status || rec.status || 'approved';
-    rec.token = serverAcc.dashToken || serverAcc.token || rec.token || '';
-    // W4: لا تُخزَّن accessToken في localStorage — الذاكرة/sessionStorage فقط عبر RizqDash
+    var dash = serverAcc.dashToken || serverAcc.token || rec.token || '';
+    // W4: accessToken + dashToken خارج localStorage
     if (serverAcc.accessToken && typeof window !== 'undefined' && window.RizqDash && window.RizqDash.rememberAccessToken) {
       try { window.RizqDash.rememberAccessToken(rec.id, serverAcc.accessToken); } catch (eMem) {}
     }
+    if (dash) storeDashToken(rec.id, dash);
+    rec.token = dash;
     delete rec.backendAccessToken;
     delete rec.accessToken;
+    delete rec.dashToken;
     if (typeof serverAcc.suspended !== 'undefined') rec.suspended = !!serverAcc.suspended;
     delete rec.password;
     ['phone', 'city', 'address', 'desc', 'promo_video', 'promo_video_extra', 'category', 'whatsapp', 'facebook', 'thumb', 'cover', 'tagline', 'package', 'package_price', 'plan', 'planName'].forEach(function (k) {
       if (serverAcc[k] != null && serverAcc[k] !== '') rec[k] = serverAcc[k];
     });
-    if (idx >= 0) accs[idx] = rec;
-    else accs.push(rec);
+    var toStore = Object.assign({}, rec);
+    delete toStore.token;
+    delete toStore.dashToken;
+    delete toStore.accessToken;
+    delete toStore.backendAccessToken;
+    if (idx >= 0) accs[idx] = toStore;
+    else accs.push(toStore);
     try { localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs)); } catch (e) {}
-    if (rec.token) storeDashToken(rec.id, rec.token);
     return rec;
   }
 

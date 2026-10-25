@@ -268,11 +268,21 @@
     // rizq_auth_gate قد يكون defer — اقرأ الجلسة مباشرة حتى لا نمسح المفضلة عند الإقلاع
     try {
       var b = JSON.parse(localStorage.getItem('rizq_buyer_session') || 'null');
-      if (b && b.id && b.token && String(b.token).length >= 20 && String(b.id).length >= 4) return true;
+      if (b && b.id && String(b.id).length >= 4) {
+        if (b.cookieAuth || (b.token && String(b.token).length >= 20)) return true;
+        try {
+          if (sessionStorage.getItem('rizq_buyer_token_mem')) return true;
+        } catch (eMem) {}
+      }
     } catch (eB) {}
     try {
       var s = JSON.parse(localStorage.getItem('rizq_active_session') || 'null');
-      if (s && s.id && (s.token || s.dashToken || s.accessToken)) return true;
+      if (s && s.id) {
+        if (s.token || s.dashToken || s.accessToken) return true;
+        try {
+          if (sessionStorage.getItem('rizq_dash_token_' + s.id)) return true;
+        } catch (eDash) {}
+      }
     } catch (e2) {}
     return false;
   }

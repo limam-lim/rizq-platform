@@ -8,6 +8,7 @@
   if (window.RizqAuthGate) return;
 
   var SESSION_KEY = 'rizq_buyer_session';
+  var TOKEN_MEM_KEY = 'rizq_buyer_token_mem';
   var WISHLIST_KEY = 'rizq_wishlist';
   var DRAFT_KEY = 'rizq_buyer_draft';
   var VERIFIED_EMAILS_KEY = 'rizq_verified_emails';
@@ -18,6 +19,7 @@
   var _otpConfig = { devHintEnabled: false, production: false };
   var _ragOpenedAt = 0;
   var _lastReasonKey = 'reasonGeneric';
+  var _cookieSessionOk = false;
 
   var MR_PHONE_RE = /^(2[0-9]|3[0-9]|4[0-9])\d{6}$/;
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -230,12 +232,34 @@
     try { localStorage.setItem(WISHLIST_KEY, JSON.stringify(ids || [])); } catch (e) {}
     try { window.dispatchEvent(new CustomEvent('rizq_wishlist', { detail: { ids: ids || [] } })); } catch (e2) {}
   }
+  function readTokenMem() {
+    try { return sessionStorage.getItem(TOKEN_MEM_KEY) || ''; } catch (e) { return ''; }
+  }
+  function writeTokenMem(token) {
+    try {
+      if (token) sessionStorage.setItem(TOKEN_MEM_KEY, String(token));
+      else sessionStorage.removeItem(TOKEN_MEM_KEY);
+    } catch (e) {}
+  }
   function buyerAuthHeaders(s) {
-    return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + s.token, 'X-Buyer-Id': s.id };
+    var headers = { 'Content-Type': 'application/json' };
+    var tok = (s && s.token) || readTokenMem();
+    var id = s && s.id;
+    if (tok && id) {
+      headers.Authorization = 'Bearer ' + tok;
+      headers['X-Buyer-Id'] = id;
+    }
+    return headers;
+  }
+  function buyerFetch(url, opts) {
+    opts = opts || {};
+    opts.credentials = 'include';
+    if (!opts.headers) opts.headers = {};
+    return fetch(url, opts);
   }
   function syncWishlistToServer(s) {
-    if (!s || !s.id || !s.token || !apiBase()) return Promise.resolve();
-    return fetch(apiBase() + '/api/wishlist/sync', {
+    if (!s || !s.id || !apiBase()) return Promise.resolve();
+    return buyerFetch(apiBase() + '/api/wishlist/sync', {
       method: 'POST', headers: buyerAuthHeaders(s), body: JSON.stringify({ ids: getLocalWishlist() })
     }).then(function (res) {
       return res.json().then(function (j) {
@@ -244,8 +268,8 @@
     }).catch(function () {});
   }
   function pullWishlistFromServer(s) {
-    if (!s || !s.id || !s.token || !apiBase()) return Promise.resolve();
-    return fetch(apiBase() + '/api/wishlist', { headers: buyerAuthHeaders(s) })
+    if (!s || !s.id || !apiBase()) return Promise.resolve();
+    return buyerFetch(apiBase() + '/api/wishlist', { headers: buyerAuthHeaders(s) })
       .then(function (res) {
         return res.json().then(function (j) {
           if (!res.ok || !j || !j.ok || !Array.isArray(j.ids)) return;
@@ -261,24 +285,76 @@
       }).catch(function () {});
   }
 
+  function profileFromBuyer(buyer, extra) {
+    extra = extra || {};
+    var out = {
+      id: buyer && buyer.id,
+      name: (buyer && buyer.name) || extra.name || '',
+      phone: (buyer && buyer.phone) || extra.phone || '',
+      phoneIntl: (buyer && buyer.phoneIntl) || extra.phoneIntl || '',
+      whatsapp: (buyer && buyer.whatsapp) || extra.whatsapp || '',
+      email: (buyer && buyer.email) || extra.email || '',
+      city: extra.city || (buyer && buyer.city) || '',
+      address: extra.address || (buyer && buyer.address) || '',
+      cookieAuth: true
+    };
+    return out;
+  }
+
   function getSession() {
-    try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch (e) { return null; }
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch (e) { s = null; }
+    if (!s || typeof s !== 'object') return null;
+    // هجرة: انقل التوكن من localStorage إلى sessionStorage ثم احذفه من LS
+    if (s.token) {
+      writeTokenMem(s.token);
+      try {
+        var clean = Object.assign({}, s);
+        delete clean.token;
+        localStorage.setItem(SESSION_KEY, JSON.stringify(clean));
+        s = clean;
+      } catch (eMig) {}
+    }
+    var mem = readTokenMem();
+    if (mem) s = Object.assign({}, s, { token: mem });
+    return s;
   }
   function setSession(s) {
-    try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch (e) {}
+    if (!s || !s.id) return;
+    if (s.token) writeTokenMem(s.token);
+    var profile = {
+      id: s.id,
+      name: s.name || '',
+      phone: s.phone || '',
+      phoneIntl: s.phoneIntl || '',
+      whatsapp: s.whatsapp || '',
+      email: s.email || '',
+      city: s.city || '',
+      address: s.address || '',
+      cookieAuth: true
+    };
+    try { localStorage.setItem(SESSION_KEY, JSON.stringify(profile)); } catch (e) {}
+    _cookieSessionOk = true;
   }
   function clearSession() {
+    _cookieSessionOk = false;
     try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+    writeTokenMem('');
+    if (!apiBase()) return;
+    buyerFetch(apiBase() + '/api/auth/logout', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+      .catch(function () {});
   }
   function isLoggedIn() {
     var s = getSession();
-    if (!s || !s.id || !s.token) return false;
-    // توكنات الخادم ≥ 20 حرفاً (randomBytes) — ارفض الجلسات المزوّرة/المحلية الوهمية
-    var tok = String(s.token);
+    if (!s || !s.id) return false;
     var id = String(s.id);
-    if (tok === 'local' || /^local_/i.test(id)) return false;
-    if (tok.length < 20 || id.length < 4) return false;
-    return true;
+    if (/^local_/i.test(id) || id.length < 4) return false;
+    // كوكي HttpOnly مؤكَّد عبر /me، أو توكن ترحيل ≥ 20 حرفاً
+    if (_cookieSessionOk || s.cookieAuth) return true;
+    var tok = String(s.token || readTokenMem() || '');
+    if (tok === 'local') return false;
+    if (tok.length >= 20) return true;
+    return false;
   }
   function saveDraft(data) {
     try { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); } catch (e) {}
@@ -288,17 +364,28 @@
   }
 
   function verifySessionSilently() {
+    if (!apiBase()) return;
     var s = getSession();
-    if (!s || !s.id || !s.token || !apiBase()) return;
-    fetch(apiBase() + '/api/auth/me', {
-      headers: {
-        'Authorization': 'Bearer ' + s.token,
-        'X-Buyer-Id': s.id
-      }
-    })
+    var headers = buyerAuthHeaders(s || {});
+    buyerFetch(apiBase() + '/api/auth/me', { headers: headers })
       .then(function (res) {
-        if (res.status === 401) { clearSession(); return; }
-        if (res.ok) return pullWishlistFromServer(s);
+        if (res.status === 401) {
+          _cookieSessionOk = false;
+          try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+          writeTokenMem('');
+          return null;
+        }
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then(function (body) {
+        if (!body || !body.ok || !body.buyer) return;
+        _cookieSessionOk = true;
+        var prev = getSession() || {};
+        setSession(profileFromBuyer(body.buyer, prev));
+        // بعد نجاح الكوكي لا نحتاج نسخة التوكن في sessionStorage
+        writeTokenMem('');
+        return pullWishlistFromServer(getSession());
       }).catch(function () {});
   }
 
@@ -1125,7 +1212,7 @@
           try { sellerCb(); } catch (e) {}
           return null;
         }
-        return fetch(apiBase() + '/api/auth/register', {
+        return buyerFetch(apiBase() + '/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1140,7 +1227,8 @@
         btn.disabled = false;
         btn.textContent = dict.verifyBtn;
         if (!reg) return;
-        if (!reg.ok || !reg.body || !reg.body.ok || !reg.body.token) {
+        var hasSession = !!(reg.body && reg.body.ok && reg.body.buyer && (reg.body.token || reg.body.cookieAuth));
+        if (!reg.ok || !hasSession) {
           alert((reg.body && (reg.body.error || reg.body.message)) || networkErrorMsg(dict));
           return;
         }
@@ -1153,7 +1241,8 @@
           email: reg.body.buyer.email,
           city: data.city || '',
           address: data.address || '',
-          token: reg.body.token
+          token: reg.body.token || '',
+          cookieAuth: true
         });
       }).catch(function () {
         btn.disabled = false;
@@ -1374,32 +1463,26 @@
     }
     var s = getSession();
     var base = apiBase();
-    // بدون عنوان خادم: لا fail-open على جلسة localStorage (حتى لو طول التوكن ≥ 20)
+    // بدون عنوان خادم: لا fail-open على جلسة محلية
     if (!base) {
       _pendingAction = actionFn;
       rememberAfterAuthHref();
       openModal(reasonKey);
       return false;
     }
-    // عند توفر الخادم: تحقّق من الجلسة قبل كشف الهاتف/الاتصال (يمنع تزوير localStorage)
-    if (s && s.token) {
-      fetch(base + '/api/auth/me', {
-        headers: {
-          'Authorization': 'Bearer ' + s.token,
-          'X-Buyer-Id': s.id
-        }
-      }).then(function (res) {
+    // تحقّق عبر كوكي HttpOnly (+ رأس ترحيل إن وُجد) قبل كشف الهاتف/الاتصال
+    if (s && s.id) {
+      buyerFetch(base + '/api/auth/me', { headers: buyerAuthHeaders(s) }).then(function (res) {
         if (!res.ok) {
-          // أي فشل تحقق (401 أو غيره) — لا نكشف اتصالاً على جلسة مزوّرة
           if (res.status === 401) clearSession();
           _pendingAction = actionFn;
           rememberAfterAuthHref();
           openModal(reasonKey);
           return;
         }
+        _cookieSessionOk = true;
         if (typeof actionFn === 'function') actionFn();
       }).catch(function () {
-        // شبكة معطّلة: أغلق المسار بدل fail-open (الخادم هو مصدر الحقيقة للتواصل)
         _pendingAction = actionFn;
         rememberAfterAuthHref();
         openModal(reasonKey);
@@ -1446,7 +1529,8 @@
     isLoggedIn: isLoggedIn,
     isPromoDemoContext: isPromoDemoContext,
     getSession: getSession,
-    logout: function () { clearSession(); }
+    logout: function () { clearSession(); },
+    refreshSession: verifySessionSilently
   };
   /** محادثة عامة: بلا تسجيل في النماذج الترويجية؛ تسجيل إلزامي للمحلات الحقيقية */
   function openPublicChat(actionFn, reasonKey) {

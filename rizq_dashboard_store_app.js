@@ -348,7 +348,14 @@ function init(){
 function _initWithAccount(acc){
   STORE = loadActivatedPackage(acc);
   // جلسة عامة موحَّدة يقرأها rizq_tenders.html — ميزة المناقصات الجديدة
-  if(!IS_DEMO){ try{ localStorage.setItem('rizq_active_session', JSON.stringify({id: acc.id, token: SESSION_TOKEN, type:'store', name: acc.name||''})); }catch(e){} }
+  if(!IS_DEMO){
+    if(window.RizqAccount && typeof RizqAccount.setActiveSession === 'function'){
+      try{ RizqAccount.setActiveSession({id: acc.id, token: SESSION_TOKEN, type:'store', name: acc.name||''}); }catch(e){}
+    } else {
+      try{ sessionStorage.setItem('rizq_dash_token_'+acc.id, SESSION_TOKEN); }catch(e0){}
+      try{ localStorage.setItem('rizq_active_session', JSON.stringify({id: acc.id, type:'store', name: acc.name||''})); }catch(e){}
+    }
+  }
 
   // Load stored data (demo uses preset data)
   products = IS_DEMO ? DEMO_PRODUCTS : JSON.parse(localStorage.getItem('store_products_'+SESSION_ID)||'[]');

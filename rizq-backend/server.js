@@ -277,6 +277,7 @@ app.use(cors({
     if (isDevPreviewOrigin(origin)) return cb(null, true);
     cb(new Error('غير مسموح من هذا الأصل (CORS)'));
   },
+  credentials: true,
 }));
 
 // ── Rate limit: حماية حصة Claude API من الاستهلاك العشوائي ─────────

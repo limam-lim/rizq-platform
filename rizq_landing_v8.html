@@ -13076,9 +13076,16 @@ function _autoApproveAccount(data){
       data.id_verified_at=new Date().toISOString();
     }
     try{
-      localStorage.setItem('rizq_active_session', JSON.stringify({
-        id: data.id, token: data.token, type: t, name: data.name||data.owner||data.manager||''
-      }));
+      if(window.RizqAccount && typeof window.RizqAccount.setActiveSession === 'function'){
+        window.RizqAccount.setActiveSession({
+          id: data.id, token: data.token, type: t, name: data.name||data.owner||data.manager||''
+        });
+      } else {
+        try{ sessionStorage.setItem('rizq_dash_token_'+data.id, data.token); }catch(eTok){}
+        localStorage.setItem('rizq_active_session', JSON.stringify({
+          id: data.id, type: t, name: data.name||data.owner||data.manager||''
+        }));
+      }
     }catch(e){}
   }
 }

@@ -637,7 +637,17 @@ var _tenderAccess = { contactsUnlocked: false, canSubmitBid: false, canPost: fal
 
 // ── من المسجَّل دخوله الآن؟ (أي نوع حساب) ──
 function _getSession(){
-  try{ return JSON.parse(localStorage.getItem('rizq_active_session')||'null'); }catch(e){ return null; }
+  try{
+    var s = JSON.parse(localStorage.getItem('rizq_active_session')||'null');
+    if(!s || !s.id) return null;
+    if(!s.token){
+      try{
+        if(window.RizqAccount && typeof RizqAccount.readDashToken === 'function') s.token = RizqAccount.readDashToken(s.id);
+        else s.token = sessionStorage.getItem('rizq_dash_token_'+s.id) || '';
+      }catch(eTok){}
+    }
+    return s;
+  }catch(e){ return null; }
 }
 
 /* إصلاح جوهري: session.token هنا هو dashToken (رمز TK_... محلي تكتبه كل

@@ -200,15 +200,26 @@ function generateCode() {
 function getPublicOtpConfig() {
   const emailConfigured = !!(process.env.EMAIL_USER && process.env.EMAIL_PASS);
   const smsConfigured = !!(process.env.TWILIO_SID && process.env.TWILIO_TOKEN && process.env.RIZQ_TWILIO_NUMBER);
+  // الإنتاج: لا demo ولا إظهار الرمز في الواجهة أبداً
+  if (isProduction()) {
+    return {
+      production: true,
+      demoOtpAllowed: false,
+      smsConfigured,
+      emailConfigured,
+      deliveryAvailable: emailConfigured || smsConfigured,
+      devHintEnabled: false,
+    };
+  }
   // في التطوير: إن لم يُضبط بريد/SMS نُظهر رمز التطوير تلقائياً حتى لا يُعلَّق الزبون
-  const autoDevHint = !isProduction() && !emailConfigured && !smsConfigured;
+  const autoDevHint = !emailConfigured && !smsConfigured;
   return {
-    production: isProduction(),
+    production: false,
     demoOtpAllowed: isDemoOtpAllowed(),
     smsConfigured,
     emailConfigured,
-    deliveryAvailable: emailConfigured || smsConfigured || autoDevHint || (!isProduction() && process.env.OTP_DEV_HINT === 'true'),
-    devHintEnabled: autoDevHint || (!isProduction() && process.env.OTP_DEV_HINT === 'true'),
+    deliveryAvailable: emailConfigured || smsConfigured || autoDevHint || process.env.OTP_DEV_HINT === 'true',
+    devHintEnabled: autoDevHint || process.env.OTP_DEV_HINT === 'true',
   };
 }
 

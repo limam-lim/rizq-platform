@@ -872,6 +872,12 @@ var DELIVERY_KEY = 'rizq_buyer_delivery';
 var deliveryConfirmed = false;
 
 function _loadBuyerSession() {
+  try {
+    if (window.RizqAuthGate && typeof window.RizqAuthGate.getSession === 'function') {
+      var gate = window.RizqAuthGate.getSession();
+      if (gate && gate.id) return gate;
+    }
+  } catch (e0) {}
   try { return JSON.parse(localStorage.getItem('rizq_buyer_session') || 'null'); } catch (e) { return null; }
 }
 function _loadSavedDelivery() {
@@ -882,11 +888,18 @@ function _saveDeliveryInfo(info) {
   try {
     var s = _loadBuyerSession();
     if (s && s.id) {
-      s.name = info.name || s.name;
-      s.phone = info.phone || s.phone;
-      s.city = info.city || s.city;
-      s.address = info.address || s.address;
-      localStorage.setItem('rizq_buyer_session', JSON.stringify(s));
+      var profile = {
+        id: s.id,
+        name: info.name || s.name || '',
+        phone: info.phone || s.phone || '',
+        phoneIntl: s.phoneIntl || '',
+        whatsapp: s.whatsapp || '',
+        email: s.email || '',
+        city: info.city || s.city || '',
+        address: info.address || s.address || '',
+        cookieAuth: true
+      };
+      localStorage.setItem('rizq_buyer_session', JSON.stringify(profile));
     }
   } catch (e2) {}
 }

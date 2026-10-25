@@ -117,7 +117,19 @@ function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,
 function _params(){ return new URLSearchParams(location.search); }
 function _isDemo(){ return _params().get('demo')==='1'; }
 function _id(){ return String(_params().get('id')||'').trim(); }
-function _getSession(){ try{ return JSON.parse(localStorage.getItem('rizq_active_session')||'null'); }catch(e){ return null; } }
+function _getSession(){
+  try{
+    var s = JSON.parse(localStorage.getItem('rizq_active_session')||'null');
+    if(!s || !s.id) return null;
+    if(!s.token){
+      try{
+        if(window.RizqAccount && typeof RizqAccount.readDashToken === 'function') s.token = RizqAccount.readDashToken(s.id);
+        else s.token = sessionStorage.getItem('rizq_dash_token_'+s.id) || '';
+      }catch(eTok){}
+    }
+    return s;
+  }catch(e){ return null; }
+}
 
 window.REAL_ACCESS_TOKEN = null;
 function _resolveToken(session){

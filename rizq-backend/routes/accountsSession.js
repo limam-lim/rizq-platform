@@ -267,7 +267,7 @@ function mountAccountsSessionRoutes(app, deps) {
     });
   });
 
-  /** POST /api/accounts/mine/:id/password */
+  /** POST /api/accounts/mine/:id/password — يتطلب accessToken فقط (لا dashToken) */
   app.post('/api/accounts/mine/:id/password', sellerLoginLimiter, async (req, res) => {
     res.set('Cache-Control', 'no-store');
     const list = readAccounts();
@@ -275,8 +275,18 @@ function mountAccountsSessionRoutes(app, deps) {
     if (idx < 0) return res.status(404).json({ ok: false, error: 'account_not_found' });
     const acc = list[idx];
     const token = extractAccountToken(req);
-    if (!token || !ownerTokenOk(acc, token)) {
-      return res.status(401).json({ ok: false, error: 'unauthorized' });
+    const accessOk = !!(
+      token
+      && acc.accessToken
+      && timingSafeEqualStr(String(token).trim(), String(acc.accessToken).trim())
+    );
+    if (!accessOk) {
+      return res.status(401).json({
+        ok: false,
+        error: 'unauthorized',
+        code: 'access_token_required',
+        message: 'تغيير كلمة المرور يتطلب accessToken وليس dashToken',
+      });
     }
     if (acc.suspended) return res.status(403).json({ ok: false, error: 'account_suspended' });
 

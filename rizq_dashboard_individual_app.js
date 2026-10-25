@@ -1740,10 +1740,13 @@ function _initDashboardWithAccount(acc){
     // accessToken فحقل جديد يُضاف بعد حله أدناه، ليستخدمه rizq_post.html
     // في تعديل إعلان حقيقي عبر PATCH، دون كسر التحقق المحلي القديم في
     // publishAd() الذي يقارن sess.token بـrizq_pending_accounts[].token)
-    try{ localStorage.setItem('rizq_individual_session', JSON.stringify({id: acc.id, token: acc.token})); }catch(e){}
-    // جلسة عامة موحَّدة (كل أنواع الحسابات) يقرأها rizq_tenders.html لمعرفة "من
-    // المسجَّل دخوله الآن" بغض النظر عن نوع الحساب — ميزة المناقصات الجديدة.
-    try{ localStorage.setItem('rizq_active_session', JSON.stringify({id: acc.id, token: acc.token, type:'individual', name: acc.name||''})); }catch(e){}
+    if(window.RizqAccount && typeof RizqAccount.setActiveSession === 'function'){
+      try{ RizqAccount.setActiveSession({id: acc.id, token: acc.token, type:'individual', name: acc.name||''}); }catch(e){}
+    } else {
+      try{ sessionStorage.setItem('rizq_dash_token_'+acc.id, acc.token); }catch(e0){}
+      try{ localStorage.setItem('rizq_individual_session', JSON.stringify({id: acc.id, name: acc.name||''})); }catch(e){}
+      try{ localStorage.setItem('rizq_active_session', JSON.stringify({id: acc.id, type:'individual', name: acc.name||''})); }catch(e2){}
+    }
     // إصلاح جوهري (2026-08-05): _rizqMergeMyBackendAds و_loadRealDashboardStats
     // كلاهما يحتاج accessToken الحقيقي (وليس dashToken) لينجح فعلياً مع
     // verifyAccountOwner() بالخادم — يُستدعيان الآن بعد حل window.REAL_ACCESS_TOKEN
