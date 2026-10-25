@@ -1573,6 +1573,13 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     next.moduleFlags = existingFlags;
   }
 
+  // تاريخ نهاية الفترة المجانية للإطلاق — يُدار من لوحة التحكم (يفوق env)
+  if (Object.prototype.hasOwnProperty.call(body, 'launchFreeUntil')) {
+    const parsed = launchMode.parseFreeUntil(body.launchFreeUntil);
+    // سلسلة فارغة / null = إيقاف صريح من الداشبورد (لا نرجع للبيئة)
+    next.launchFreeUntil = parsed || '';
+  }
+
   if (body.sectionRules && typeof body.sectionRules === 'object') {
     // ── محرك القواعد المشترك (طلب Limam 03/08/2026): بدل وكيل منفصل لكل
     // قسم، وكيل واحد يقرأ "قواعد" مختلفة حسب نوع الحساب. تُدمَج هنا مفتاحاً

@@ -354,7 +354,7 @@ main, .page-content.active, .main-content, .results-area,
 <div id="login-screen">
   <button type="button" class="btn-lang btn-lang-primary" id="login-lang-btn" style="position:absolute;top:18px;left:18px;z-index:10000" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
   <div class="login-box">
-    <div class="login-logo"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
+    <div class="login-logo"><img class="logo-mark-img" src="rizq-mark.svg" width="42" height="42" alt="رزق"/></div>
     <div class="login-title" data-t="login-title">لوحة إدارة رزق</div>
     <div class="login-sub">ADMINIA SARL — Powered by M. LIMAM</div>
     <input class="login-input" type="text" id="login-user" data-ph="login-user-ph" placeholder="اسم المستخدم أو البريد الإلكتروني" autocomplete="username"/>
@@ -371,7 +371,7 @@ main, .page-content.active, .main-content, .results-area,
 <!-- ══ SIDEBAR ══ -->
 <aside class="sidebar" id="sidebar">
   <div class="sb-logo" onclick="showPanel('overview', document.querySelector('.sb-item'))" style="cursor:pointer">
-    <div class="sb-logo-mark"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
+    <div class="sb-logo-mark"><img class="logo-mark-img" src="rizq-mark.svg" width="42" height="42" alt="رزق"/></div>
     <div class="sb-logo-text">
       <div class="sb-logo-ar">رزق | Admin</div>
       <div class="sb-logo-en">ADMINIA SARL</div>
@@ -1102,6 +1102,22 @@ main, .page-content.active, .main-content, .results-area,
           <div id="modules-toggle-list"></div>
           <div style="margin-top:14px;font-size:11.5px;color:var(--text-muted)">
             💾 كل تبديل يُحفَظ فوراً على الخادم — لا حاجة لزر حفظ منفصل.
+          </div>
+
+          <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--border,#e5e7eb)">
+            <div style="font-size:13.5px;font-weight:800;color:var(--navy,#1B3A6B);margin-bottom:6px">🎁 الفترة المجانية للإطلاق</div>
+            <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.65">
+              تاريخ نهاية الفترة التي تبقى فيها إعلانات المحلات والوكالات العقارية نشطة بلا اشتراك مدفوع. يُحفَظ على الخادم ويفوق متغير البيئة.
+            </p>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+              <div style="flex:1;min-width:180px">
+                <label for="launch-free-until" style="font-size:11px;font-weight:700;color:#1B3A6B;display:block;margin-bottom:4px">تاريخ النهاية</label>
+                <input type="date" id="launch-free-until" class="form-input" dir="ltr" style="width:100%;font-family:monospace;font-size:13px"/>
+              </div>
+              <button type="button" onclick="saveLaunchFreeUntil()" style="background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border:none;padding:10px 16px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer">حفظ التاريخ</button>
+              <button type="button" onclick="clearLaunchFreeUntil()" style="background:#f1f5f9;color:#1B3A6B;border:1px solid #dbe3f0;padding:10px 14px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">إيقاف الفترة</button>
+            </div>
+            <div id="launch-free-until-status" style="margin-top:10px;font-size:12px;color:var(--text-muted)"></div>
           </div>
         </div>
       </div>
@@ -4097,6 +4113,80 @@ var MODULE_DEFS = [
   {key:'videoAds',   icon:'🎬', name:'فيديوهات Rizq ADS', name_fr:'Vidéos Rizq ADS', desc:'شراء مساحات الفيديو الإعلاني', desc_fr:'Achat d\'espaces vidéo publicitaires'},
 ];
 var _moduleFlagsCache = null;
+var _launchFreeUntilCache = null;
+
+function renderLaunchFreeUntilStatus(freeUntil, freeActive){
+  var el = document.getElementById('launch-free-until-status');
+  var input = document.getElementById('launch-free-until');
+  if (input && freeUntil) input.value = freeUntil;
+  if (input && !freeUntil) input.value = '';
+  if (!el) return;
+  if (!freeUntil) {
+    el.textContent = RizqI18n.t2('لا توجد فترة مجانية مفعّلة حالياً.','Aucune période gratuite active.');
+    el.style.color = 'var(--text-muted)';
+    return;
+  }
+  el.textContent = freeActive
+    ? RizqI18n.t2('✅ الفترة المجانية نشطة حتى '+freeUntil,'✅ Période gratuite active jusqu\'au '+freeUntil)
+    : RizqI18n.t2('⏱ التاريخ محفوظ ('+freeUntil') — الفترة منتهية.','⏱ Date enregistrée ('+freeUntil') — période terminée.');
+  el.style.color = freeActive ? '#166534' : '#9a3412';
+}
+
+function saveLaunchFreeUntil(){
+  var input = document.getElementById('launch-free-until');
+  var val = (input && input.value) || '';
+  var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!c.backendUrl){
+    showToast(RizqI18n.t2('❌ لا يوجد اتصال بالخادم — تعذّر الحفظ','❌ Pas de connexion au serveur — échec de l\'enregistrement'));
+    return;
+  }
+  fetch(c.backendUrl.replace(/\/$/,'') + '/api/site-config', {
+    method: 'POST',
+    headers: _adminAuthHeaders({ 'Content-Type':'application/json' }),
+    body: JSON.stringify({ launchFreeUntil: val })
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(data){
+      if(!data || !data.ok){
+        showToast(RizqI18n.t2('❌ فشل الحفظ، حاول مجدداً','❌ Échec de l\'enregistrement, réessayez'));
+        return;
+      }
+      _launchFreeUntilCache = (data.config && data.config.launchFreeUntil) || val || '';
+      var active = false;
+      if (_launchFreeUntilCache) {
+        active = Date.now() <= new Date(_launchFreeUntilCache + 'T23:59:59.999Z').getTime();
+      }
+      renderLaunchFreeUntilStatus(_launchFreeUntilCache || null, active);
+      showToast(RizqI18n.t2('✅ تم حفظ تاريخ الفترة المجانية','✅ Date de la période gratuite enregistrée'));
+    }).catch(function(){
+      showToast(RizqI18n.t2('❌ فشل الاتصال بالخادم','❌ Échec de connexion au serveur'));
+    });
+}
+
+function clearLaunchFreeUntil(){
+  var input = document.getElementById('launch-free-until');
+  if (input) input.value = '';
+  var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!c.backendUrl){
+    showToast(RizqI18n.t2('❌ لا يوجد اتصال بالخادم — تعذّر الحفظ','❌ Pas de connexion au serveur — échec de l\'enregistrement'));
+    return;
+  }
+  fetch(c.backendUrl.replace(/\/$/,'') + '/api/site-config', {
+    method: 'POST',
+    headers: _adminAuthHeaders({ 'Content-Type':'application/json' }),
+    body: JSON.stringify({ launchFreeUntil: '' })
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(data){
+      if(!data || !data.ok){
+        showToast(RizqI18n.t2('❌ فشل الحفظ، حاول مجدداً','❌ Échec de l\'enregistrement, réessayez'));
+        return;
+      }
+      _launchFreeUntilCache = '';
+      renderLaunchFreeUntilStatus(null, false);
+      showToast(RizqI18n.t2('⏹ تم إيقاف الفترة المجانية','⏹ Période gratuite désactivée'));
+    }).catch(function(){
+      showToast(RizqI18n.t2('❌ فشل الاتصال بالخادم','❌ Échec de connexion au serveur'));
+    });
+}
 
 function renderModulesToggleList(flags){
   var list = document.getElementById('modules-toggle-list');
@@ -4117,6 +4207,7 @@ function loadModulesPanel(){
   var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
   if(!c.backendUrl){
     renderModulesToggleList(_moduleFlagsCache || {individual:true,store:true,office:false,corp:false,tenders:false,investments:true,videoAds:false});
+    renderLaunchFreeUntilStatus(_launchFreeUntilCache, false);
     return;
   }
   fetch(c.backendUrl.replace(/\/$/,'') + '/api/site-config')
@@ -4127,8 +4218,13 @@ function loadModulesPanel(){
         : {individual:true,store:true,office:false,corp:false,tenders:false,investments:true,videoAds:false};
       _moduleFlagsCache = flags;
       renderModulesToggleList(flags);
+      var launch = (data && data.ok && data.config && data.config.launch) || {};
+      var freeUntil = launch.freeUntil || (data.config && data.config.launchFreeUntil) || null;
+      _launchFreeUntilCache = freeUntil || '';
+      renderLaunchFreeUntilStatus(freeUntil, !!launch.freePeriodActive);
     }).catch(function(){
       renderModulesToggleList(_moduleFlagsCache || {individual:true,store:true,office:false,corp:false,tenders:false,investments:true,videoAds:false});
+      renderLaunchFreeUntilStatus(_launchFreeUntilCache, false);
     });
 }
 

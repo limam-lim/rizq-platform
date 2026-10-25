@@ -1,9 +1,10 @@
 /**
  * Ad Lifecycle — 30d active → archive → 30d archive → purge media
- * Paid participants (diamond / store|office|corp / video): 60d grace after subscription end.
+ * Paid participants (diamond / store|office|corp|estate / video): 60d grace after subscription end.
+ * Launch free period (site-config / env): store+estate with null periodEnd stay active until freeUntil.
  */
-const fs = require('fs');
-const path = require('path');
+const launchMode = require('../config/launchMode');
+const objectStorage = require('../lib/objectStorage');
 const repos = require('../db/repos');
 
 const MS_DAY = 24 * 60 * 60 * 1000;
@@ -11,11 +12,19 @@ const ACTIVE_LIFECYCLE_MS = 30 * MS_DAY;
 const ARCHIVE_RETENTION_MS = 30 * MS_DAY;
 const PAID_GRACE_MS = 60 * MS_DAY;
 
-const PAID_ACCOUNT_TYPES = new Set(['store', 'office', 'corp']);
+const PAID_ACCOUNT_TYPES = new Set(['store', 'office', 'corp', 'estate']);
+/** أنواع الإطلاق المجاني: بلا periodEnd = محمية حتى freeUntil فقط (لا Infinity) */
+const LAUNCH_FREE_TYPES = new Set(['store', 'estate']);
 const DIAMOND_PKG_RE = /(ماسية|diamond)/i;
 const VIDEO_ADS_PKG_RE = /(video|فيديو|rizq\s*ads|إعلان.*فيديو)/i;
 
 const MAX_AUDIT_ENTRIES = 120;
+
+function hasConcretePeriodEnd(pkgRecord) {
+  if (!pkgRecord || pkgRecord.periodEnd == null || pkgRecord.periodEnd === '') return false;
+  const endMs = new Date(pkgRecord.periodEnd).getTime();
+  return !Number.isNaN(endMs);
+}
 
 function isPaidParticipant(account, pkgRecord) {
   if (account && PAID_ACCOUNT_TYPES.has(account.type)) return true;
@@ -27,10 +36,28 @@ function isPaidParticipant(account, pkgRecord) {
   return false;
 }
 
-/** Last instant before lifecycle may archive/delete (paid grace). null = not protected. */
-function getPaidGraceDeadlineMs(account, pkgRecord) {
+/**
+ * Last instant before lifecycle may archive/delete.
+ * null = not protected.
+ */
+function getPaidGraceDeadlineMs(account, pkgRecord, nowMs) {
+  const now = typeof nowMs === 'number' ? nowMs : Date.now();
+  const type = account && account.type;
+
+  // قاعدة الإطلاق: store/estate بلا periodEnd ملموس → حتى نهاية freeUntil فقط
+  if (type && LAUNCH_FREE_TYPES.has(type) && !hasConcretePeriodEnd(pkgRecord)) {
+    if (launchMode.isLaunchFreePeriodActive(now)) {
+      const end = launchMode.freeUntilEndMs(launchMode.getLaunchFreeUntil());
+      if (end != null) return end;
+    }
+    // انتهت المجانية ولا اشتراك بتاريخ نهاية → بلا حماية أبدية
+    return null;
+  }
+
   if (!isPaidParticipant(account, pkgRecord)) return null;
+
   if (account && PAID_ACCOUNT_TYPES.has(account.type) && !pkgRecord) {
+    // office/corp بلا سجل باقة: حماية مستمرة (سلوك سابق)
     return Infinity;
   }
   if (pkgRecord && pkgRecord.periodEnd) {
@@ -45,7 +72,7 @@ function getPaidGraceDeadlineMs(account, pkgRecord) {
 }
 
 function isUnderPaidGrace(nowMs, account, pkgRecord) {
-  const deadline = getPaidGraceDeadlineMs(account, pkgRecord);
+  const deadline = getPaidGraceDeadlineMs(account, pkgRecord, nowMs);
   if (deadline === null) return false;
   if (deadline === Infinity) return true;
   return nowMs < deadline;
@@ -63,29 +90,18 @@ function adArchivedSinceMs(ad) {
   return new Date(raw).getTime();
 }
 
-function dirSizeBytes(dirPath) {
-  if (!fs.existsSync(dirPath)) return 0;
-  let total = 0;
-  for (const name of fs.readdirSync(dirPath)) {
-    const fp = path.join(dirPath, name);
-    try {
-      const st = fs.statSync(fp);
-      if (st.isFile()) total += st.size;
-    } catch (e) { /* ignore */ }
+/**
+ * حذف وسائط الإعلان عبر objectStorage فقط (لا مسارات قرص مباشرة).
+ * @returns {number} bytes freed
+ */
+function purgeAdMedia(adId, _uploadsDir) {
+  const safeId = String(adId || '').replace(/[^a-zA-Z0-9_-]/g, '');
+  if (!safeId) return 0;
+  const result = objectStorage.deletePrefixSync('ads/' + safeId);
+  if (!result.ok && !result.skipped) {
+    throw new Error('purge_failed:' + safeId + ':' + (result.error || 'unknown'));
   }
-  return total;
-}
-
-function purgeAdMedia(adId, uploadsDir) {
-  const dir = path.join(uploadsDir, adId);
-  const bytesBefore = dirSizeBytes(dir);
-  if (!fs.existsSync(dir)) return 0;
-  try {
-    fs.rmSync(dir, { recursive: true, force: true });
-  } catch (e) {
-    throw new Error('purge_failed:' + adId + ':' + e.message);
-  }
-  return bytesBefore;
+  return Number(result.bytesFreed) || 0;
 }
 
 function readAuditLog(_dataDir) {
@@ -142,6 +158,8 @@ function runAdLifecycleMaintenance(deps) {
     mediaPurged: 0,
     bytesFreed: 0,
     skippedPaidGrace: 0,
+    freeUntil: launchMode.getLaunchFreeUntil() || null,
+    freePeriodActive: launchMode.isLaunchFreePeriodActive(nowMs),
     errors: [],
   };
 
@@ -210,6 +228,8 @@ module.exports = {
   ACTIVE_LIFECYCLE_MS,
   ARCHIVE_RETENTION_MS,
   PAID_GRACE_MS,
+  PAID_ACCOUNT_TYPES,
+  LAUNCH_FREE_TYPES,
   isPaidParticipant,
   getPaidGraceDeadlineMs,
   isUnderPaidGrace,

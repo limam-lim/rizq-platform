@@ -1,6 +1,7 @@
 /**
  * launchMode.js — وضع الإطلاق التدريجي لمنصة رزق
- * RIZQ_LAUNCH_FREE_UNTIL=YYYY-MM-DD
+ * مصدر freeUntil: site-config.launchFreeUntil (لوحة التحكم) ثم
+ * RIZQ_LAUNCH_FREE_UNTIL=YYYY-MM-DD (بيئة) إن لم يُضبط من الداشبورد.
  * RIZQ_OPEN_SECTIONS=stores,estate,individual
  */
 'use strict';
@@ -33,6 +34,9 @@ const ALL_MODULE_KEYS = [
   'individual', 'store', 'office', 'corp', 'estate', 'tenders', 'investments', 'videoAds',
 ];
 
+/** اختبارات فقط — تجاوز قراءة site-config/env */
+let _freeUntilTestOverride = undefined;
+
 function parseOpenSections(raw) {
   const text = String(raw || '').trim();
   if (!text) return null;
@@ -53,8 +57,32 @@ function parseFreeUntil(raw) {
   return s;
 }
 
+function freeUntilEndMs(until) {
+  const s = parseFreeUntil(until);
+  if (!s) return null;
+  return new Date(s + 'T23:59:59.999Z').getTime();
+}
+
+/**
+ * الداشبورد يفوز: إن وُجد مفتاح launchFreeUntil في site-config يُعتمد
+ * (حتى لو فارغاً = إيقاف الفترة). وإلا يُقرأ من البيئة.
+ */
 function getLaunchFreeUntil() {
+  if (_freeUntilTestOverride !== undefined) {
+    return parseFreeUntil(_freeUntilTestOverride);
+  }
+  try {
+    const repos = require('../db/repos');
+    const cfg = repos.getSiteConfig() || {};
+    if (Object.prototype.hasOwnProperty.call(cfg, 'launchFreeUntil')) {
+      return parseFreeUntil(cfg.launchFreeUntil);
+    }
+  } catch (e) { /* ignore — بيئة اختبار بلا repos */ }
   return parseFreeUntil(process.env.RIZQ_LAUNCH_FREE_UNTIL);
+}
+
+function setLaunchFreeUntilForTests(value) {
+  _freeUntilTestOverride = value;
 }
 
 function getEnvOpenSectionFlags() {
@@ -64,7 +92,8 @@ function getEnvOpenSectionFlags() {
 function isLaunchFreePeriodActive(nowMs) {
   const until = getLaunchFreeUntil();
   if (!until) return false;
-  const end = new Date(until + 'T23:59:59.999Z').getTime();
+  const end = freeUntilEndMs(until);
+  if (end == null) return false;
   const now = typeof nowMs === 'number' ? nowMs : Date.now();
   return now <= end;
 }
@@ -113,7 +142,9 @@ module.exports = {
   SECTION_ALIASES,
   parseOpenSections,
   parseFreeUntil,
+  freeUntilEndMs,
   getLaunchFreeUntil,
+  setLaunchFreeUntilForTests,
   getEnvOpenSectionFlags,
   isLaunchFreePeriodActive,
   getFoundingDiscountPercent,
