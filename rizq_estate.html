@@ -504,6 +504,42 @@ button{font:inherit;border:0;background:none;color:inherit}
 .est-agency-photo img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
 .est-agency-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,28,51,.5),transparent 45%)}
 
+/* باقات سوق العقارات — نماذج فقط؛ تُخفى على الوكالة الحقيقية */
+#estate-packages{
+  display:none;
+  padding:64px 20px 72px;
+  background:linear-gradient(180deg,#f7f9fc 0%,#eef2f7 100%);
+  border-top:1px solid rgba(27,58,107,.08);
+}
+#estate-packages .est-pkg-inner{max-width:1180px;margin:0 auto}
+#estate-packages .est-pkg-head{text-align:center;margin-bottom:36px}
+#estate-packages .est-pkg-eyebrow{
+  font-size:12px;letter-spacing:2px;color:var(--gold3);font-weight:800;
+  text-transform:uppercase;margin-bottom:8px;
+}
+#estate-packages .est-pkg-head h2{
+  font-family:var(--display);font-size:clamp(22px,3vw,34px);font-weight:700;
+  color:var(--navy);margin-bottom:10px;line-height:1.35;
+}
+#estate-packages .est-pkg-head h2 span{color:var(--gold2)}
+#estate-packages .est-pkg-desc{
+  color:#3d4a5c;font-size:14px;font-weight:600;line-height:1.7;max-width:52ch;margin:0 auto;
+}
+#estate-packages .est-pkg-mru{
+  font-size:12px;color:#3a5080;margin-top:14px;display:flex;align-items:center;
+  justify-content:center;gap:7px;flex-wrap:wrap;font-weight:600;
+}
+#estate-packages .est-pkg-mru .est-pkg-mru-badge{
+  background:#1B3A6B;color:#C9A84C;padding:3px 9px;border-radius:5px;
+  font-weight:800;font-size:11px;letter-spacing:.5px;
+}
+#estate-packages-grid{width:100%}
+#estate-packages-grid .rizq-pkg-grid-inner{width:100%;gap:14px!important}
+@media(max-width:720px){
+  #estate-packages{padding:40px 14px 48px}
+  #estate-packages .est-pkg-head{margin-bottom:22px}
+}
+
 /* Footer */
 .est-foot{
   margin-top:28px;border-top:1px solid var(--border);
@@ -898,6 +934,7 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
       <a href="#est-gallery">المعرض</a>
       <a href="#est-desk">الاستفسار</a>
       <a href="#est-reviews">التقييمات</a>
+      <a href="#estate-packages" id="est-nav-packages" style="display:none">الباقات</a>
     </nav>
     <div class="est-top-actions">
       <button type="button" class="est-wish-chip" id="est-top-wish" onclick="toggleEstateWishPanel()" title="المفضلة" aria-label="المفضلة">
@@ -1136,6 +1173,29 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
 </div>
 </main>
 
+<!-- باقات سوق العقارات — للنماذج فقط؛ تُخفى عن الوكالة الحقيقية -->
+<section id="estate-packages" aria-label="باقات سوق العقارات">
+  <div class="est-pkg-inner">
+    <div class="est-pkg-head">
+      <p class="est-pkg-eyebrow" id="est-pkg-eyebrow">Rizq Estate — الباقات</p>
+      <h2><span id="est-pkg-title-pre">انشر وكالتك بالباقة</span> <span id="est-pkg-title-gold">المناسبة لك</span></h2>
+      <p class="est-pkg-desc" id="est-pkg-desc">جرّب مجاناً 10 أيام (حتى 3 عقارات)، ثم اختر الباقة — الأسعار والمميزات قابلة للتحديث من لوحة التحكم</p>
+      <p class="est-pkg-mru">
+        <span class="est-pkg-mru-badge">MRU</span>
+        <span id="est-pkg-mru-text">الأسعار بالأوقية الجديدة — العملة الرسمية لموريتانيا منذ 2018 · </span>
+        <span style="color:#C9A84C;font-weight:700" dir="ltr">1 USD ≈ 40 MRU</span>
+      </p>
+    </div>
+    <div id="estate-packages-grid"
+         data-rizq-pkg-catalog="estate"
+         data-rizq-pkg-cols="3"
+         data-rizq-pkg-diamond="1"
+         data-rizq-pkg-light="1"
+         data-rizq-pkg-register="rizq_real_estate_register.html"
+         data-rizq-pkg-pricing="rizq_real_estate_register.html"></div>
+  </div>
+</section>
+
 <footer class="est-foot">
   <div class="est-foot-inner">
     <div>
@@ -1152,6 +1212,7 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
       <h4>استكشف</h4>
       <a href="#est-listings">معروضات الوكالة</a>
       <a href="#est-gallery">معرض الصور</a>
+      <a href="#estate-packages" id="est-foot-packages" style="display:none">باقات الوكالات</a>
       <a href="rizq_estate_agencies.html">دليل الوكالات</a>
       <a href="rizq_browse.html?cat=%D8%B9%D9%82%D8%A7%D8%B1%D8%A7%D8%AA">كل الإعلانات</a>
     </div>
@@ -1238,6 +1299,8 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
 <script src="rizq_estate_data.js?v=1.0"></script>
 <script src="rizq_map_preview.js?v=1.0" defer></script>
 <script src="rizq_backend_config.js"></script>
+<script src="rizq_packages_config.js?v=23.1"></script>
+<script src="rizq_packages_ui.js?v=23.1"></script>
 <script src="rizq_subscription_engine.js" defer></script>
 <script src="rizq_subscription_permissions.js" defer></script>
 <script src="rizq_reviews_engine.js"></script>
@@ -1669,7 +1732,7 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
       RizqSubscriptionPermissions.applyPublicMerchantSurface({
         accountId: window._rizqEstateAccountId || (window._rizqEstateProfile && window._rizqEstateProfile.id) || '',
         isDemo: !!window._rizqEstateIsDemo,
-        packageIds: [],
+        packageIds: ['estate-packages', 'est-nav-packages', 'est-foot-packages'],
         paymentIds: ['est-payment-methods', 'est-pay-card'],
         hideListingPrefacture: true
       });
@@ -1677,6 +1740,12 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
       if(payBar && window.RizqSubscriptionPermissions && !RizqSubscriptionPermissions.shouldShowStorefrontPayments()){
         payBar.style.display = 'none';
       }
+    } else {
+      var isPreview = !!window._rizqEstateIsDemo;
+      ['estate-packages', 'est-nav-packages', 'est-foot-packages'].forEach(function(oid){
+        var el = document.getElementById(oid);
+        if(el) el.style.display = isPreview ? '' : 'none';
+      });
     }
   }
 
@@ -3013,9 +3082,16 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
       ['a[href="#est-pay-card"]', 'الدفع', 'Paiement'],
       ['a[href="#est-gallery"]', 'المعرض', 'Galerie'],
       ['a[href="#est-desk"]', 'الاستفسار', 'Demande'],
-      ['a[href="#est-reviews"]', 'التقييمات', 'Avis']
+      ['a[href="#est-reviews"]', 'التقييمات', 'Avis'],
+      ['#est-nav-packages', 'الباقات', 'Forfaits']
     ];
     navMap.forEach(function(row){ tx(row[0], row[1], row[2]); });
+    tx('#est-pkg-eyebrow', 'Rizq Estate — الباقات', 'Rizq Estate — Forfaits');
+    tx('#est-pkg-title-pre', 'انشر وكالتك بالباقة', 'Publiez votre agence avec le forfait');
+    tx('#est-pkg-title-gold', 'المناسبة لك', 'qui vous convient');
+    tx('#est-pkg-desc', 'جرّب مجاناً 10 أيام (حتى 3 عقارات)، ثم اختر الباقة — الأسعار والمميزات قابلة للتحديث من لوحة التحكم', 'Essayez 10 jours gratuits (jusqu\'à 3 biens), puis choisissez le forfait — prix et avantages modifiables depuis le tableau de bord');
+    tx('#est-pkg-mru-text', 'الأسعار بالأوقية الجديدة — العملة الرسمية لموريتانيا منذ 2018 · ', 'Prix en Ouguiya nouvelle — monnaie officielle de la Mauritanie depuis 2018 · ');
+    tx('#est-foot-packages', 'باقات الوكالات', 'Forfaits agences');
     tx('#est-top-call', '📞 اتصال', '📞 Appel');
     tx('#est-top-wa', '💬 واتساب', '💬 WhatsApp');
     tx('[data-t="est-wish-label"]', 'المفضلة', 'Favoris');

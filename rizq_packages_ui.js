@@ -10,6 +10,7 @@
     office: 'rizq_office_packages',
     store: 'rizq_store_packages',
     corp: 'rizq_corp_packages',
+    estate: 'rizq_estate_packages',
     video: 'rizq_video_packages',
     tender: 'rizq_tender_packages',
     investment: 'rizq_investment_packages',
@@ -68,7 +69,7 @@
   }
 
   function isTrial(p) {
-    return !Number(p.price) || p.id === 'trial' || /trial|تجرب|ind-free|cp-trial|st-trial|of-trial|^Essai$/i.test(String(p.name || ''));
+    return !Number(p.price) || p.id === 'trial' || /trial|تجرب|ind-free|cp-trial|st-trial|of-trial|es-trial|^Essai$/i.test(String(p.id || '') + ' ' + String(p.name || ''));
   }
 
   function isYearly(p) {
