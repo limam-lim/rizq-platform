@@ -114,4 +114,34 @@ function migrateBuyerColumns() {
 }
 migrateBuyerColumns();
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS user_passkeys (
+    id              TEXT PRIMARY KEY,
+    user_kind       TEXT NOT NULL CHECK (user_kind IN ('buyer', 'seller')),
+    user_id         TEXT NOT NULL,
+    credential_id   TEXT NOT NULL UNIQUE,
+    public_key      TEXT NOT NULL,
+    counter         INTEGER NOT NULL DEFAULT 0,
+    transports      TEXT NOT NULL DEFAULT '[]',
+    device_type     TEXT NOT NULL DEFAULT '',
+    backed_up       INTEGER NOT NULL DEFAULT 0,
+    friendly_name   TEXT NOT NULL DEFAULT '',
+    created_at      TEXT NOT NULL,
+    last_used_at    TEXT
+  );
+  CREATE INDEX IF NOT EXISTS idx_passkeys_user ON user_passkeys(user_kind, user_id);
+  CREATE INDEX IF NOT EXISTS idx_passkeys_cred ON user_passkeys(credential_id);
+
+  CREATE TABLE IF NOT EXISTS webauthn_challenges (
+    id          TEXT PRIMARY KEY,
+    user_kind   TEXT,
+    user_id     TEXT,
+    challenge   TEXT NOT NULL,
+    purpose     TEXT NOT NULL,
+    created_at  TEXT NOT NULL,
+    expires_at  TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_webauthn_chal_exp ON webauthn_challenges(expires_at);
+`);
+
 module.exports = { db, DB_FILE, DATA_DIR };

@@ -229,6 +229,7 @@ module.exports = {
   findByPhone,
   findByEmail,
   findByIdAndToken,
+  genBuyerToken,
   registerOrLogin,
   loginByEmailPassword,
   loginByPhone,

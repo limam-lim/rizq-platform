@@ -114,6 +114,14 @@
       reasonGeneric: 'للمتابعة',
       otpSent: 'تم إرسال الرمز إلى بريدك',
       otpDevHint: 'بيئة تطوير — الرمز:',
+      passkeyLogin: 'الدخول بـ Passkey / بصمة الوجه والإصبع',
+      passkeyLoginSub: 'أسرع وأكثر أماناً على هذا الجهاز',
+      passkeyEnable: 'تفعيل Passkey (بصمة / Face ID)',
+      passkeyEnabled: '✅ تم تفعيل Passkey على هذا الجهاز',
+      passkeyBusy: 'انتظر طلب البصمة…',
+      passkeyUnsupported: 'جهازك أو متصفحك لا يدعم Passkeys — استخدم البريد ورمز التحقق',
+      passkeyFailed: 'تعذّر إكمال البصمة — يمكنك المتابعة بالبريد أو كلمة المرور',
+      passkeyCancelled: 'تم إلغاء طلب البصمة',
     },
     fr: {
       titleGate: 'Dernière étape avant de continuer',
@@ -182,6 +190,14 @@
       reasonGeneric: 'pour continuer',
       otpSent: 'Code envoyé à votre e-mail',
       otpDevHint: 'dev — code :',
+      passkeyLogin: 'Connexion Passkey / empreinte · Face ID',
+      passkeyLoginSub: 'Plus rapide et plus sûr sur cet appareil',
+      passkeyEnable: 'Activer Passkey (empreinte / Face ID)',
+      passkeyEnabled: '✅ Passkey activé sur cet appareil',
+      passkeyBusy: 'Validez la biométrie…',
+      passkeyUnsupported: 'Passkeys non supportés — utilisez e-mail + code',
+      passkeyFailed: 'Échec Passkey — continuez avec e-mail ou mot de passe',
+      passkeyCancelled: 'Demande biométrique annulée',
     }
   };
 
@@ -486,6 +502,14 @@
       '#rag-overlay .rag-account-name{font-size:16px;font-weight:800;color:#1b3a6b;margin-bottom:4px}',
       '#rag-overlay .rag-account-meta{font-size:12px;color:#64748b;line-height:1.7}',
       '#rag-overlay .rag-seller-link{display:block;text-align:center;margin-top:10px;color:#1b3a6b;font-size:13px;font-weight:700;text-decoration:none}',
+      '#rag-overlay .rag-passkey-btn{display:none;width:100%;margin:0 0 12px;padding:14px 16px;border-radius:14px;border:1.5px solid rgba(201,168,76,.55);background:linear-gradient(135deg,#fffaf0,#fff);color:#0f2347;font-family:Cairo,\"Segoe UI\",sans-serif;font-size:14px;font-weight:800;cursor:pointer;text-align:center;line-height:1.45;box-shadow:0 4px 14px rgba(15,35,65,.08)}',
+      '#rag-overlay .rag-passkey-btn.show{display:block}',
+      '#rag-overlay .rag-passkey-btn:hover{border-color:#c9a84c;background:linear-gradient(135deg,#fff6e0,#fff)}',
+      '#rag-overlay .rag-passkey-btn:disabled{opacity:.65;cursor:wait}',
+      '#rag-overlay .rag-passkey-btn .rag-pk-sub{display:block;margin-top:4px;font-size:11.5px;font-weight:700;color:#8a6a18}',
+      '#rag-overlay .rag-passkey-enable{display:none;width:100%;margin:10px 0 0;padding:12px 14px;border-radius:12px;border:1.5px solid #1b3a6b;background:#0f2347;color:#e8c96a;font-family:Cairo,\"Segoe UI\",sans-serif;font-size:13.5px;font-weight:800;cursor:pointer}',
+      '#rag-overlay .rag-passkey-enable.show{display:block}',
+      '#rag-overlay .rag-passkey-enable:hover{background:#1b3a6b;color:#fff}',
       '#rag-overlay .rag-step{display:none}',
       '#rag-overlay .rag-step.active{display:block}',
       'body.rizq-reg-open #rizq-chat-toggle,body.rizq-reg-open .mobile-bottom-nav,body.rizq-reg-open #nav,body.rizq-reg-open .fixed-rizq-logo,body.rizq-reg-open #rizq-rlogo-edge{visibility:hidden!important;pointer-events:none!important}',
@@ -522,6 +546,10 @@
       '    <div class="rag-intro" id="rag-intro"></div>',
       '    <div class="rag-returning" id="rag-returning"></div>',
       '    <div class="rag-step" id="rag-step-choice">',
+      '      <button type="button" class="rag-passkey-btn" id="rag-passkey-login-btn" aria-label="Passkey">',
+      '        <span id="rag-passkey-login-label"></span>',
+      '        <span class="rag-pk-sub" id="rag-passkey-login-sub"></span>',
+      '      </button>',
       '      <div class="rag-choice">',
       '        <div class="rag-choice-card" id="rag-choice-buyer" role="button" tabindex="0">',
       '          <div class="rag-choice-icon">👤</div>',
@@ -597,6 +625,7 @@
       '        <div class="rag-account-name" id="rag-acc-name"></div>',
       '        <div class="rag-account-meta" id="rag-acc-meta"></div>',
       '      </div>',
+      '      <button type="button" class="rag-passkey-enable" id="rag-passkey-enable-btn"></button>',
       '      <button class="rag-btn rag-btn-ghost" id="rag-logout-btn" type="button"></button>',
       '      <a class="rag-seller-link" id="rag-seller-link" href="?openRegister=1"></a>',
       '    </div>',
@@ -668,6 +697,10 @@
       closeModal();
       if (typeof window.showToast === 'function') window.showToast(t('تم تسجيل الخروج', 'Déconnecté'), 'info');
     });
+    var pkLoginBtn = document.getElementById('rag-passkey-login-btn');
+    if (pkLoginBtn) pkLoginBtn.addEventListener('click', startPasskeyLogin);
+    var pkEnableBtn = document.getElementById('rag-passkey-enable-btn');
+    if (pkEnableBtn) pkEnableBtn.addEventListener('click', startPasskeyRegister);
     document.getElementById('rag-email').addEventListener('blur', lookupReturningVisitor);
     document.getElementById('rag-wa-same').addEventListener('change', syncWhatsappFromPhones);
     document.getElementById('rag-phone-mr').addEventListener('input', function () {
@@ -833,6 +866,18 @@
     var loginSub = document.getElementById('rag-choice-seller-login-sub');
     if (loginTitle) loginTitle.textContent = dict.choiceSellerLogin;
     if (loginSub) loginSub.textContent = dict.choiceSellerLoginSub;
+    var pkLbl = document.getElementById('rag-passkey-login-label');
+    var pkSub = document.getElementById('rag-passkey-login-sub');
+    var pkBtn = document.getElementById('rag-passkey-login-btn');
+    if (pkLbl) pkLbl.textContent = '🔐 ' + dict.passkeyLogin;
+    if (pkSub) pkSub.textContent = dict.passkeyLoginSub;
+    if (pkBtn) {
+      var canPk = !!(window.RizqPasskey && typeof window.RizqPasskey.supported === 'function' && window.RizqPasskey.supported() && apiBase());
+      pkBtn.classList.toggle('show', canPk);
+      pkBtn.disabled = false;
+    }
+    var pkEn = document.getElementById('rag-passkey-enable-btn');
+    if (pkEn) pkEn.textContent = '🔐 ' + dict.passkeyEnable;
     document.getElementById('rag-name-label').textContent = dict.nameLabel;
     document.getElementById('rag-name').placeholder = dict.namePh;
     document.getElementById('rag-phone-mr-label').textContent = dict.phoneMrLabel;
@@ -1157,6 +1202,19 @@
       }
       closeModal();
       if (typeof window.showToast === 'function') window.showToast(d().successToast, 'success');
+      // بعد المصادقة: إن دعم الجهاز Passkeys اقترح التفعيل من حسابي
+      try {
+        if (window.RizqPasskey && window.RizqPasskey.supported() && apiBase()) {
+          setTimeout(function () {
+            if (typeof window.showToast === 'function') {
+              window.showToast(
+                t('🔐 فعّل البصمة من «حسابي» لدخول أسرع لاحقاً', '🔐 Activez Passkey depuis « Mon compte »'),
+                'info'
+              );
+            }
+          }, 900);
+        }
+      } catch (ePk) {}
       var hadPending = !!_pendingAction;
       runPendingAction();
       if (hadPending) {
@@ -1251,6 +1309,140 @@
       });
   }
 
+  function passkeyErrorMessage(err, dict) {
+    var name = err && (err.name || err.message) ? String(err.name || err.message) : '';
+    if (/NotAllowedError|cancelled|AbortError/i.test(name) || (err && err.message === 'cancelled')) {
+      return dict.passkeyCancelled;
+    }
+    if (/unsupported/i.test(name) || (err && err.message === 'unsupported')) {
+      return dict.passkeyUnsupported;
+    }
+    return dict.passkeyFailed;
+  }
+
+  function applyBuyerPasskeySession(body) {
+    if (!body || !body.buyer) return;
+    var session = {
+      id: body.buyer.id,
+      name: body.buyer.name,
+      phone: body.buyer.phone,
+      phoneIntl: body.buyer.phoneIntl,
+      whatsapp: body.buyer.whatsapp,
+      email: body.buyer.email,
+      city: '',
+      address: '',
+      token: body.token || '',
+      cookieAuth: true
+    };
+    setSession(session);
+    markEmailVerified(session.email);
+    syncWishlistToServer(session).finally(function () {
+      closeModal();
+      if (typeof window.showToast === 'function') window.showToast(d().welcomeBack, 'success');
+      var hadPending = !!_pendingAction;
+      runPendingAction();
+      if (hadPending) {
+        consumeAfterAuthHrefSafe();
+      } else {
+        var afterHref = consumeAfterAuthHrefSafe();
+        if (afterHref) location.href = afterHref;
+      }
+    });
+  }
+
+  function applySellerPasskeySession(body) {
+    if (!body || !body.account) return false;
+    var acc = body.account;
+    if (window.RizqAccount && typeof window.RizqAccount.mergeServerAccount === 'function') {
+      try { acc = window.RizqAccount.mergeServerAccount(acc) || acc; } catch (eM) {}
+    }
+    if (!acc.token && acc.dashToken) acc.token = acc.dashToken;
+    if (window.RizqAccount && typeof window.RizqAccount.setActiveSession === 'function' && acc.token) {
+      window.RizqAccount.setActiveSession(acc);
+    }
+    if (window.RizqDash && acc.accessToken && typeof window.RizqDash.rememberAccessToken === 'function') {
+      try { window.RizqDash.rememberAccessToken(acc.id, acc.accessToken); } catch (eA) {}
+    }
+    var url = '';
+    if (window.RizqAccount && typeof window.RizqAccount.buildDashboardUrl === 'function') {
+      url = window.RizqAccount.buildDashboardUrl(acc) || '';
+    }
+    closeModal();
+    if (typeof window.showToast === 'function') {
+      window.showToast(t('✅ تم الدخول بالبصمة', '✅ Connexion biométrique'), 'success');
+    }
+    if (url) {
+      if (window.RizqAccount && typeof window.RizqAccount.redirectAfterAuth === 'function') {
+        window.RizqAccount.redirectAfterAuth(url);
+      } else {
+        location.href = url;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  function startPasskeyLogin() {
+    var dict = d();
+    var btn = document.getElementById('rag-passkey-login-btn');
+    if (!window.RizqPasskey || !window.RizqPasskey.supported()) {
+      alert(dict.passkeyUnsupported);
+      return;
+    }
+    if (!apiBase()) {
+      alert(networkErrorMsg(dict));
+      return;
+    }
+    if (btn) {
+      btn.disabled = true;
+      var lbl = document.getElementById('rag-passkey-login-label');
+      if (lbl) lbl.textContent = dict.passkeyBusy;
+    }
+    window.RizqPasskey.login({ kind: 'any' }).then(function (body) {
+      if (btn) btn.disabled = false;
+      applyTexts(_lastReasonKey || 'reasonGeneric');
+      if (body.kind === 'seller') {
+        applySellerPasskeySession(body);
+        return;
+      }
+      applyBuyerPasskeySession(body);
+    }).catch(function (err) {
+      if (btn) btn.disabled = false;
+      applyTexts(_lastReasonKey || 'reasonGeneric');
+      alert(passkeyErrorMessage(err, dict));
+    });
+  }
+
+  function startPasskeyRegister() {
+    var dict = d();
+    var btn = document.getElementById('rag-passkey-enable-btn');
+    if (!window.RizqPasskey || !window.RizqPasskey.supported()) {
+      alert(dict.passkeyUnsupported);
+      return;
+    }
+    if (!isLoggedIn()) {
+      openAccountChoice();
+      return;
+    }
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = dict.passkeyBusy;
+    }
+    window.RizqPasskey.registerBuyer(t('جهاز المشتري', 'Appareil acheteur')).then(function () {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = dict.passkeyEnabled;
+      }
+      if (typeof window.showToast === 'function') window.showToast(dict.passkeyEnabled, 'success');
+    }).catch(function (err) {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = '🔐 ' + dict.passkeyEnable;
+      }
+      alert(passkeyErrorMessage(err, dict));
+    });
+  }
+
   function showAccountPanel() {
     var s = getSession();
     var dict = d();
@@ -1271,6 +1463,13 @@
     if (s.city) lines.push('<div>🏙️ ' + esc(s.city) + '</div>');
     if (s.address) lines.push('<div>📍 ' + esc(s.address) + '</div>');
     document.getElementById('rag-acc-meta').innerHTML = lines.join('');
+    var pkEn = document.getElementById('rag-passkey-enable-btn');
+    if (pkEn) {
+      var canPk = !!(window.RizqPasskey && window.RizqPasskey.supported() && apiBase());
+      pkEn.classList.toggle('show', canPk);
+      pkEn.disabled = false;
+      pkEn.textContent = '🔐 ' + dict.passkeyEnable;
+    }
     showStep('account');
   }
 
@@ -1530,7 +1729,9 @@
     isPromoDemoContext: isPromoDemoContext,
     getSession: getSession,
     logout: function () { clearSession(); },
-    refreshSession: verifySessionSilently
+    refreshSession: verifySessionSilently,
+    passkeyLogin: startPasskeyLogin,
+    passkeyRegister: startPasskeyRegister
   };
   /** محادثة عامة: بلا تسجيل في النماذج الترويجية؛ تسجيل إلزامي للمحلات الحقيقية */
   function openPublicChat(actionFn, reasonKey) {

@@ -130,7 +130,10 @@
     if (!document.querySelector('script[src*="rizq_account_route.js"]')) {
       appendScript('rizq_account_route.js?v=' + ASSET_V, { async: false });
     }
-    /* بوابة حسابي/المشتري — لازمة لزر حسابي خارج الصفحة الرئيسية */
+    /* Passkeys ثم بوابة حسابي — لازمة لزر حسابي خارج الصفحة الرئيسية */
+    if (isPublicShell() && !document.querySelector('script[src*="rizq_passkey.js"]')) {
+      appendScript('rizq_passkey.js?v=' + ASSET_V, { defer: true });
+    }
     if (isPublicShell() && !document.querySelector('script[src*="rizq_auth_gate.js"]')) {
       appendScript('rizq_auth_gate.js?v=' + ASSET_V, { defer: true });
     }

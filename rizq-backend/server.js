@@ -13,6 +13,7 @@ try { require('./services/secretsVault').loadAndApplyOnBoot(); } catch (eVaultBo
 ensureAnthropicEnv();
 const repos = require('./db/repos');
 const authRouter = require('./routes/auth');
+const passkeyRouter = require('./routes/passkey');
 const wishlistRouter = require('./routes/wishlist');
 const BuyerModel = require('./models/buyer');
 const { globalErrorHandler, notFoundHandler } = require('./middleware/errors');
@@ -2305,6 +2306,13 @@ const buyersRegisterLimiter = rateLimit({
 });
 
 app.use('/api/auth', authRouter);
+passkeyRouter.configurePasskeyRoutes({
+  readAccounts,
+  writeAccounts,
+  genDashToken,
+  genAccessToken,
+});
+app.use('/api/auth/passkey', passkeyRouter);
 
 const otpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

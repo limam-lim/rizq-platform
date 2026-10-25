@@ -668,6 +668,40 @@
     });
   }
 
+  function registerPasskeyAsync(accountId, token, friendlyName) {
+    if (!window.RizqPasskey || typeof window.RizqPasskey.registerSeller !== 'function') {
+      return Promise.resolve({ ok: false, code: 'unsupported' });
+    }
+    return window.RizqPasskey.registerSeller(accountId, token, friendlyName || '')
+      .then(function (body) { return { ok: true, passkey: body && body.passkey, count: body && body.count }; })
+      .catch(function (err) {
+        return { ok: false, code: (err && err.message) || 'failed', error: err };
+      });
+  }
+
+  function loginWithPasskeyAsync(email) {
+    if (!window.RizqPasskey || typeof window.RizqPasskey.login !== 'function') {
+      return Promise.resolve({ ok: false, code: 'unsupported' });
+    }
+    return window.RizqPasskey.login({ kind: email ? 'seller' : 'any', email: email || '' })
+      .then(function (body) {
+        if (!body || !body.ok) return { ok: false, code: 'failed' };
+        if (body.kind === 'seller' && body.account) {
+          var acc = mergeServerAccount(body.account);
+          if (!acc.token && body.account.dashToken) acc.token = body.account.dashToken;
+          if (acc.status === 'approved' && acc.token) setActiveSession(acc);
+          if (body.account.accessToken && window.RizqDash && window.RizqDash.rememberAccessToken) {
+            try { window.RizqDash.rememberAccessToken(acc.id, body.account.accessToken); } catch (e) {}
+          }
+          return { ok: true, kind: 'seller', account: acc, url: buildDashboardUrl(acc) };
+        }
+        return { ok: true, kind: body.kind || 'buyer', body: body };
+      })
+      .catch(function (err) {
+        return { ok: false, code: (err && err.message) || 'failed', error: err };
+      });
+  }
+
   window.RizqAccount = {
     open: openAccount,
     publicPageForAccount: publicPageForAccount,
@@ -690,6 +724,8 @@
     publicShareUrl: publicShareUrl,
     initShareLinkInput: initShareLinkInput,
     loginSellerAsync: loginSellerAsync,
+    loginWithPasskeyAsync: loginWithPasskeyAsync,
+    registerPasskeyAsync: registerPasskeyAsync,
     requestPasswordReset: requestPasswordReset,
     confirmPasswordReset: confirmPasswordReset,
     changePasswordAsync: changePasswordAsync,
