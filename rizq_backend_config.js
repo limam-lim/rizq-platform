@@ -56,8 +56,12 @@
   });
   /* يُحدَّث من /api/site-config.launch بعد التحميل */
   window.RIZQ_LAUNCH = window.RIZQ_LAUNCH || {
+    launchDate: null,
+    freeDays: 90,
     freeUntil: null,
     freePeriodActive: false,
+    daysRemaining: null,
+    maintenanceDryRun: true,
     openSections: null,
     foundingDiscountPercent: 40,
   };
@@ -86,7 +90,12 @@
       .then(function (data) {
         try {
           var launch = data && data.config && data.config.launch;
-          if (launch) window.RIZQ_LAUNCH = Object.assign({}, window.RIZQ_LAUNCH || {}, launch);
+          if (launch) {
+            window.RIZQ_LAUNCH = Object.assign({}, window.RIZQ_LAUNCH || {}, launch);
+            try {
+              document.dispatchEvent(new CustomEvent('rizq:launch', { detail: window.RIZQ_LAUNCH }));
+            } catch (eEv) {}
+          }
         } catch (eLaunch) {}
         return data;
       })

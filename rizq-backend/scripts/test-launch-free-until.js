@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/** Tests: launchFreeUntil from site-config wins over env */
+/** Tests: launchDate + freeDays → freeUntil; env fallback; dry-run; protectedUntil */
 'use strict';
 
 const launchMode = require('../config/launchMode');
@@ -18,35 +18,55 @@ function check(name, pass, detail) {
 
 const prevEnv = process.env.RIZQ_LAUNCH_FREE_UNTIL;
 process.env.RIZQ_LAUNCH_FREE_UNTIL = '2026-12-31';
+const now = Date.parse('2026-10-25T12:00:00.000Z');
 
 try {
-  launchMode.setLaunchFreeUntilForTests(undefined);
-  // Without site-config key in test override path: use env via getLaunchFreeUntil
-  // Force env path by clearing test override and mocking — use test override for determinism
-  launchMode.setLaunchFreeUntilForTests(undefined);
+  // launchDate + freeDays
+  launchMode.setLaunchSettingsForTests({ launchDate: '2026-10-01', freeDays: 90 });
+  const s1 = launchMode.getLaunchSettings();
+  check('freeUntil = launchDate + 90', s1.freeUntil === '2026-12-30', s1.freeUntil);
+  check('source site-config', s1.source === 'site-config');
+  check('not dry-run when launchDate set', s1.maintenanceDryRun === false);
+  check('free period active', launchMode.isLaunchFreePeriodActive(now) === true);
 
-  // Admin date wins
-  launchMode.setLaunchFreeUntilForTests('2027-03-15');
-  check('admin freeUntil wins', launchMode.getLaunchFreeUntil() === '2027-03-15');
-  check('free period active with future admin date', launchMode.isLaunchFreePeriodActive(Date.parse('2026-10-25T12:00:00Z')));
+  // empty launchDate → dry-run + env fallback
+  launchMode.setLaunchSettingsForTests({ launchDate: '', freeDays: 90 });
+  const s2 = launchMode.getLaunchSettings();
+  check('dry-run when launchDate empty', s2.maintenanceDryRun === true);
+  check('env fallback freeUntil', s2.freeUntil === '2026-12-31', s2.freeUntil);
+  check('source env', s2.source === 'env');
 
-  // Empty admin = off (not env fallback when override is '')
-  launchMode.setLaunchFreeUntilForTests('');
-  check('empty admin clears freeUntil', launchMode.getLaunchFreeUntil() === null);
-  check('empty admin disables free period', !launchMode.isLaunchFreePeriodActive(Date.parse('2026-10-25T12:00:00Z')));
+  // protectedUntil rules
+  launchMode.setLaunchSettingsForTests({ launchDate: '2026-10-01', freeDays: 90 });
+  const freeEnd = launchMode.freeUntilEndMs('2026-12-30');
+  const grace = 60 * launchMode.MS_DAY;
 
-  // parse helpers
-  check('parseFreeUntil valid', launchMode.parseFreeUntil('2026-11-01') === '2026-11-01');
-  check('parseFreeUntil invalid', launchMode.parseFreeUntil('not-a-date') === null);
-  check('freeUntilEndMs', launchMode.freeUntilEndMs('2026-11-01') === Date.parse('2026-11-01T23:59:59.999Z'));
+  const pStore = launchMode.getProtectedUntilMs({ type: 'store' }, null, now);
+  check('store without periodEnd → freeUntil+60', pStore === freeEnd + grace, String(pStore));
 
-  const pub = launchMode.publicLaunchConfig({ store: true, estate: true, individual: true });
-  launchMode.setLaunchFreeUntilForTests('2027-01-01');
-  const pub2 = launchMode.publicLaunchConfig({ store: true });
-  check('publicLaunchConfig exposes freeUntil', pub2.freeUntil === '2027-01-01' && pub2.freePeriodActive === true);
-  check('publicLaunchConfig shape', Array.isArray(pub.openSections));
+  const pEstate = launchMode.getProtectedUntilMs({ type: 'estate' }, { periodEnd: null }, now);
+  check('estate periodEnd null → freeUntil+60', pEstate === freeEnd + grace);
+
+  const periodEnd = '2026-11-15T00:00:00.000Z';
+  const pPaid = launchMode.getProtectedUntilMs({ type: 'store' }, { periodEnd }, now);
+  check('store with periodEnd → periodEnd+60', pPaid === Date.parse(periodEnd) + grace);
+
+  const pOffice = launchMode.getProtectedUntilMs({ type: 'office' }, null, now);
+  check('office without package → freeUntil+60 (no Infinity)', pOffice === freeEnd + grace);
+  check('no Infinity', pOffice !== Infinity && pStore !== Infinity);
+
+  // after freeUntil+60 elapsed → not protected
+  const after = freeEnd + grace + 1000;
+  check('not protected after freeUntil+60', launchMode.isUnderProtection(after, { type: 'store' }, null) === false);
+
+  const pub = launchMode.publicLaunchConfig({ store: true }, now);
+  check('public has launchDate/freeDays/daysRemaining', !!(pub.launchDate && pub.freeDays === 90 && pub.daysRemaining != null));
+  check('public maintenanceDryRun false', pub.maintenanceDryRun === false);
+
+  check('addDaysYmd', launchMode.addDaysYmd('2026-01-01', 10) === '2026-01-11');
+  check('normalizeFreeDays default', launchMode.normalizeFreeDays(undefined) === 90);
 } finally {
-  launchMode.setLaunchFreeUntilForTests(undefined);
+  launchMode.setLaunchSettingsForTests(undefined);
   if (prevEnv === undefined) delete process.env.RIZQ_LAUNCH_FREE_UNTIL;
   else process.env.RIZQ_LAUNCH_FREE_UNTIL = prevEnv;
 }

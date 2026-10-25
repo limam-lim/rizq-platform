@@ -1,10 +1,18 @@
 /**
  * launchMode.js — وضع الإطلاق التدريجي لمنصة رزق
- * مصدر freeUntil: site-config.launchFreeUntil (لوحة التحكم) ثم
- * RIZQ_LAUNCH_FREE_UNTIL=YYYY-MM-DD (بيئة) إن لم يُضبط من الداشبورد.
+ *
+ * مصدر الفترة المجانية (لوحة التحكم):
+ *   site-config.launchDate + site-config.freeDays (افتراضي 90)
+ *   freeUntil = launchDate + freeDays  (محسوب، لا يُدخَل يدوياً)
+ * احتياطي: RIZQ_LAUNCH_FREE_UNTIL عند فراغ launchDate
+ *
  * RIZQ_OPEN_SECTIONS=stores,estate,individual
  */
 'use strict';
+
+const MS_DAY = 24 * 60 * 60 * 1000;
+const DEFAULT_FREE_DAYS = 90;
+const PAID_GRACE_DAYS = 60;
 
 const SECTION_ALIASES = {
   stores: 'store',
@@ -34,8 +42,10 @@ const ALL_MODULE_KEYS = [
   'individual', 'store', 'office', 'corp', 'estate', 'tenders', 'investments', 'videoAds',
 ];
 
-/** اختبارات فقط — تجاوز قراءة site-config/env */
-let _freeUntilTestOverride = undefined;
+const PAID_ACCOUNT_TYPES = new Set(['store', 'office', 'corp', 'estate']);
+
+/** اختبارات فقط */
+let _testOverride = undefined;
 
 function parseOpenSections(raw) {
   const text = String(raw || '').trim();
@@ -49,40 +59,114 @@ function parseOpenSections(raw) {
   return out;
 }
 
-function parseFreeUntil(raw) {
+function parseYmd(raw) {
   const s = String(raw || '').trim();
   if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
-  const d = new Date(s + 'T23:59:59.999Z');
+  const d = new Date(s + 'T00:00:00.000Z');
   if (Number.isNaN(d.getTime())) return null;
   return s;
 }
 
+/** @deprecated alias — تواريخ YYYY-MM-DD */
+function parseFreeUntil(raw) {
+  return parseYmd(raw);
+}
+
+function addDaysYmd(ymd, days) {
+  const base = parseYmd(ymd);
+  if (!base) return null;
+  const n = Number(days);
+  if (!Number.isFinite(n)) return null;
+  const d = new Date(base + 'T00:00:00.000Z');
+  d.setUTCDate(d.getUTCDate() + Math.round(n));
+  return d.toISOString().slice(0, 10);
+}
+
 function freeUntilEndMs(until) {
-  const s = parseFreeUntil(until);
+  const s = parseYmd(until);
   if (!s) return null;
   return new Date(s + 'T23:59:59.999Z').getTime();
 }
 
-/**
- * الداشبورد يفوز: إن وُجد مفتاح launchFreeUntil في site-config يُعتمد
- * (حتى لو فارغاً = إيقاف الفترة). وإلا يُقرأ من البيئة.
- */
-function getLaunchFreeUntil() {
-  if (_freeUntilTestOverride !== undefined) {
-    return parseFreeUntil(_freeUntilTestOverride);
-  }
-  try {
-    const repos = require('../db/repos');
-    const cfg = repos.getSiteConfig() || {};
-    if (Object.prototype.hasOwnProperty.call(cfg, 'launchFreeUntil')) {
-      return parseFreeUntil(cfg.launchFreeUntil);
-    }
-  } catch (e) { /* ignore — بيئة اختبار بلا repos */ }
-  return parseFreeUntil(process.env.RIZQ_LAUNCH_FREE_UNTIL);
+function normalizeFreeDays(raw) {
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0) return DEFAULT_FREE_DAYS;
+  return Math.min(3650, Math.round(n));
 }
 
-function setLaunchFreeUntilForTests(value) {
-  _freeUntilTestOverride = value;
+function readSiteConfigSafe() {
+  try {
+    const repos = require('../db/repos');
+    return repos.getSiteConfig() || {};
+  } catch (e) {
+    return {};
+  }
+}
+
+/**
+ * إعدادات الإطلاق المحسوبة لحظياً من site-config.
+ * launchDate فارغ ⇒ maintenanceDryRun=true و freeUntil من البيئة إن وُجدت.
+ */
+function getLaunchSettings() {
+  if (_testOverride && typeof _testOverride === 'object') {
+    const launchDate = parseYmd(_testOverride.launchDate);
+    const freeDays = normalizeFreeDays(
+      _testOverride.freeDays != null ? _testOverride.freeDays : DEFAULT_FREE_DAYS
+    );
+    let freeUntil = null;
+    let source = 'none';
+    if (launchDate) {
+      freeUntil = addDaysYmd(launchDate, freeDays);
+      source = 'site-config';
+    } else if (_testOverride.freeUntil != null) {
+      freeUntil = parseYmd(_testOverride.freeUntil);
+      source = freeUntil ? 'test' : 'none';
+    } else {
+      freeUntil = parseYmd(process.env.RIZQ_LAUNCH_FREE_UNTIL);
+      source = freeUntil ? 'env' : 'none';
+    }
+    return {
+      launchDate,
+      freeDays,
+      freeUntil,
+      source,
+      maintenanceDryRun: !launchDate,
+    };
+  }
+
+  const cfg = readSiteConfigSafe();
+  const launchDate = parseYmd(cfg.launchDate);
+  const freeDays = normalizeFreeDays(
+    cfg.freeDays != null && cfg.freeDays !== '' ? cfg.freeDays : DEFAULT_FREE_DAYS
+  );
+  let freeUntil = null;
+  let source = 'none';
+  if (launchDate) {
+    freeUntil = addDaysYmd(launchDate, freeDays);
+    source = 'site-config';
+  } else {
+    freeUntil = parseYmd(process.env.RIZQ_LAUNCH_FREE_UNTIL);
+    source = freeUntil ? 'env' : 'none';
+  }
+  return {
+    launchDate,
+    freeDays,
+    freeUntil,
+    source,
+    maintenanceDryRun: !launchDate,
+  };
+}
+
+function getLaunchFreeUntil() {
+  return getLaunchSettings().freeUntil;
+}
+
+function isMaintenanceDryRun() {
+  return getLaunchSettings().maintenanceDryRun === true;
+}
+
+function setLaunchSettingsForTests(value) {
+  _testOverride = value;
 }
 
 function getEnvOpenSectionFlags() {
@@ -96,6 +180,14 @@ function isLaunchFreePeriodActive(nowMs) {
   if (end == null) return false;
   const now = typeof nowMs === 'number' ? nowMs : Date.now();
   return now <= end;
+}
+
+function daysRemaining(nowMs) {
+  const end = freeUntilEndMs(getLaunchFreeUntil());
+  if (end == null) return null;
+  const now = typeof nowMs === 'number' ? nowMs : Date.now();
+  if (now > end) return 0;
+  return Math.ceil((end - now) / MS_DAY);
 }
 
 function getFoundingDiscountPercent() {
@@ -112,9 +204,9 @@ function isOpenModule(flags, moduleKey) {
   return flags[key] !== false;
 }
 
-function publicLaunchConfig(moduleFlags) {
-  const freeUntil = getLaunchFreeUntil();
-  const freeActive = isLaunchFreePeriodActive();
+function publicLaunchConfig(moduleFlags, nowMs) {
+  const settings = getLaunchSettings();
+  const freeActive = isLaunchFreePeriodActive(nowMs);
   const open = [];
   const closed = [];
   const flags = moduleFlags || {};
@@ -123,11 +215,17 @@ function publicLaunchConfig(moduleFlags) {
     else open.push(k);
   });
   return {
-    freeUntil: freeUntil || null,
+    launchDate: settings.launchDate || null,
+    freeDays: settings.freeDays,
+    freeUntil: settings.freeUntil || null,
     freePeriodActive: freeActive,
+    daysRemaining: daysRemaining(nowMs),
+    maintenanceDryRun: settings.maintenanceDryRun,
+    source: settings.source,
     openSections: open,
     closedSections: closed,
     foundingDiscountPercent: getFoundingDiscountPercent(),
+    paidGraceDays: PAID_GRACE_DAYS,
   };
 }
 
@@ -137,18 +235,79 @@ function shouldMarkFoundingPartner(accountType, createdAtIso) {
   return t === 'store' || t === 'estate';
 }
 
+function hasConcretePeriodEnd(pkgRecord) {
+  if (!pkgRecord || pkgRecord.periodEnd == null || pkgRecord.periodEnd === '') return false;
+  const endMs = new Date(pkgRecord.periodEnd).getTime();
+  return !Number.isNaN(endMs);
+}
+
+/**
+ * protectedUntil لحظي — لا يُخزَّن على الإعلان.
+ * PAID_ACCOUNT_TYPES:
+ *   periodEnd محدد ⇒ periodEnd + 60 يوماً
+ *   غير ذلك ⇒ freeUntil + 60 يوماً
+ * لا Infinity ولا حساب من «الآن».
+ * @returns {number|null} epoch ms or null (غير محمي)
+ */
+function getProtectedUntilMs(account, pkgRecord, nowMs) {
+  void nowMs;
+  const type = account && account.type;
+  const freeEnd = freeUntilEndMs(getLaunchFreeUntil());
+  const graceMs = PAID_GRACE_DAYS * MS_DAY;
+
+  if (type && PAID_ACCOUNT_TYPES.has(type)) {
+    if (hasConcretePeriodEnd(pkgRecord)) {
+      return new Date(pkgRecord.periodEnd).getTime() + graceMs;
+    }
+    if (freeEnd != null) return freeEnd + graceMs;
+    return null;
+  }
+
+  /* باقة مدفوعة لغير الأنواع الأربعة (مثل فيديو فردي) إن وُجد periodEnd */
+  if (hasConcretePeriodEnd(pkgRecord)) {
+    const pkgName = String((pkgRecord && pkgRecord.pkgName) || '');
+    const priced = Number(pkgRecord.price) > 0
+      || (Array.isArray(pkgRecord.invoices) && pkgRecord.invoices.some((i) => Number(i.price) > 0));
+    const namedPaid = /(ماسية|diamond|video|فيديو|rizq\s*ads)/i.test(pkgName);
+    if (priced || namedPaid) {
+      return new Date(pkgRecord.periodEnd).getTime() + graceMs;
+    }
+  }
+  return null;
+}
+
+function isUnderProtection(nowMs, account, pkgRecord) {
+  const until = getProtectedUntilMs(account, pkgRecord, nowMs);
+  if (until == null) return false;
+  const now = typeof nowMs === 'number' ? nowMs : Date.now();
+  return now < until;
+}
+
 module.exports = {
+  MS_DAY,
+  DEFAULT_FREE_DAYS,
+  PAID_GRACE_DAYS,
+  PAID_ACCOUNT_TYPES,
   ALL_MODULE_KEYS,
   SECTION_ALIASES,
   parseOpenSections,
+  parseYmd,
   parseFreeUntil,
+  addDaysYmd,
   freeUntilEndMs,
+  normalizeFreeDays,
+  getLaunchSettings,
   getLaunchFreeUntil,
-  setLaunchFreeUntilForTests,
+  isMaintenanceDryRun,
+  setLaunchSettingsForTests,
   getEnvOpenSectionFlags,
   isLaunchFreePeriodActive,
+  daysRemaining,
   getFoundingDiscountPercent,
   isOpenModule,
   publicLaunchConfig,
   shouldMarkFoundingPartner,
+  hasConcretePeriodEnd,
+  getProtectedUntilMs,
+  isUnderProtection,
 };

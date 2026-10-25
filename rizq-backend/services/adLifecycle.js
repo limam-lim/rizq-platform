@@ -1,7 +1,13 @@
 /**
  * Ad Lifecycle — 30d active → archive → 30d archive → purge media
- * Paid participants (diamond / store|office|corp|estate / video): 60d grace after subscription end.
- * Launch free period (site-config / env): store+estate with null periodEnd stay active until freeUntil.
+ *
+ * protectedUntil لحظي من launchMode (site-config):
+ *   PAID store|office|corp|estate:
+ *     periodEnd محدد ⇒ periodEnd + 60d
+ *     غير ذلك ⇒ freeUntil + 60d
+ *   لا Infinity ولا حساب من «الآن».
+ *
+ * launchDate فارغ ⇒ dry-run: يسجّل فقط ولا يؤرشف/يحذف.
  */
 const launchMode = require('../config/launchMode');
 const objectStorage = require('../lib/objectStorage');
@@ -10,21 +16,13 @@ const repos = require('../db/repos');
 const MS_DAY = 24 * 60 * 60 * 1000;
 const ACTIVE_LIFECYCLE_MS = 30 * MS_DAY;
 const ARCHIVE_RETENTION_MS = 30 * MS_DAY;
-const PAID_GRACE_MS = 60 * MS_DAY;
+const PAID_GRACE_MS = launchMode.PAID_GRACE_DAYS * MS_DAY;
 
-const PAID_ACCOUNT_TYPES = new Set(['store', 'office', 'corp', 'estate']);
-/** أنواع الإطلاق المجاني: بلا periodEnd = محمية حتى freeUntil فقط (لا Infinity) */
-const LAUNCH_FREE_TYPES = new Set(['store', 'estate']);
+const PAID_ACCOUNT_TYPES = launchMode.PAID_ACCOUNT_TYPES;
 const DIAMOND_PKG_RE = /(ماسية|diamond)/i;
 const VIDEO_ADS_PKG_RE = /(video|فيديو|rizq\s*ads|إعلان.*فيديو)/i;
 
 const MAX_AUDIT_ENTRIES = 120;
-
-function hasConcretePeriodEnd(pkgRecord) {
-  if (!pkgRecord || pkgRecord.periodEnd == null || pkgRecord.periodEnd === '') return false;
-  const endMs = new Date(pkgRecord.periodEnd).getTime();
-  return !Number.isNaN(endMs);
-}
 
 function isPaidParticipant(account, pkgRecord) {
   if (account && PAID_ACCOUNT_TYPES.has(account.type)) return true;
@@ -36,46 +34,12 @@ function isPaidParticipant(account, pkgRecord) {
   return false;
 }
 
-/**
- * Last instant before lifecycle may archive/delete.
- * null = not protected.
- */
 function getPaidGraceDeadlineMs(account, pkgRecord, nowMs) {
-  const now = typeof nowMs === 'number' ? nowMs : Date.now();
-  const type = account && account.type;
-
-  // قاعدة الإطلاق: store/estate بلا periodEnd ملموس → حتى نهاية freeUntil فقط
-  if (type && LAUNCH_FREE_TYPES.has(type) && !hasConcretePeriodEnd(pkgRecord)) {
-    if (launchMode.isLaunchFreePeriodActive(now)) {
-      const end = launchMode.freeUntilEndMs(launchMode.getLaunchFreeUntil());
-      if (end != null) return end;
-    }
-    // انتهت المجانية ولا اشتراك بتاريخ نهاية → بلا حماية أبدية
-    return null;
-  }
-
-  if (!isPaidParticipant(account, pkgRecord)) return null;
-
-  if (account && PAID_ACCOUNT_TYPES.has(account.type) && !pkgRecord) {
-    // office/corp بلا سجل باقة: حماية مستمرة (سلوك سابق)
-    return Infinity;
-  }
-  if (pkgRecord && pkgRecord.periodEnd) {
-    const endMs = new Date(pkgRecord.periodEnd).getTime();
-    if (!Number.isNaN(endMs)) return endMs + PAID_GRACE_MS;
-  }
-  if (pkgRecord && pkgRecord.suspendedAt) {
-    const suspMs = new Date(pkgRecord.suspendedAt).getTime();
-    if (!Number.isNaN(suspMs)) return suspMs + PAID_GRACE_MS;
-  }
-  return Date.now() + PAID_GRACE_MS;
+  return launchMode.getProtectedUntilMs(account, pkgRecord, nowMs);
 }
 
 function isUnderPaidGrace(nowMs, account, pkgRecord) {
-  const deadline = getPaidGraceDeadlineMs(account, pkgRecord, nowMs);
-  if (deadline === null) return false;
-  if (deadline === Infinity) return true;
-  return nowMs < deadline;
+  return launchMode.isUnderProtection(nowMs, account, pkgRecord);
 }
 
 function adActiveSinceMs(ad) {
@@ -90,10 +54,6 @@ function adArchivedSinceMs(ad) {
   return new Date(raw).getTime();
 }
 
-/**
- * حذف وسائط الإعلان عبر objectStorage فقط (لا مسارات قرص مباشرة).
- * @returns {number} bytes freed
- */
 function purgeAdMedia(adId, _uploadsDir) {
   const safeId = String(adId || '').replace(/[^a-zA-Z0-9_-]/g, '');
   if (!safeId) return 0;
@@ -115,7 +75,7 @@ function appendAuditEntry(_dataDir, entry) {
   const all = repos.maintenanceAudit.list();
   if (all.length > MAX_AUDIT_ENTRIES) {
     all
-      .sort((a, b) => String(b.at || b.createdAt || '').localeCompare(String(a.at || a.createdAt || '')))
+      .sort((a, b) => String(b.at || b.createdAt || b.runAt || '').localeCompare(String(a.at || a.createdAt || a.runAt || '')))
       .slice(MAX_AUDIT_ENTRIES)
       .forEach((e) => repos.maintenanceAudit.remove(String(e.id)));
   }
@@ -123,15 +83,6 @@ function appendAuditEntry(_dataDir, entry) {
 
 /**
  * Run one maintenance pass.
- * @param {object} deps
- * @param {function} deps.readAds
- * @param {function} deps.writeAds
- * @param {function} deps.readAccounts
- * @param {function} deps.getAccountRecord — (accountId) => pkg record|null
- * @param {string} deps.adsUploadsDir
- * @param {string} deps.dataDir
- * @param {number} [deps.nowMs]
- * @param {string} [deps.trigger]
  */
 function runAdLifecycleMaintenance(deps) {
   const {
@@ -145,6 +96,9 @@ function runAdLifecycleMaintenance(deps) {
     trigger = 'manual',
   } = deps;
 
+  const settings = launchMode.getLaunchSettings();
+  const dryRun = settings.maintenanceDryRun === true;
+
   const accounts = readAccounts();
   const accountById = {};
   accounts.forEach((a) => { accountById[a.id] = a; });
@@ -153,13 +107,19 @@ function runAdLifecycleMaintenance(deps) {
   let changed = false;
   const summary = {
     runAt: new Date(nowMs).toISOString(),
+    at: new Date(nowMs).toISOString(),
     trigger,
+    dryRun,
+    launchDate: settings.launchDate || null,
+    freeDays: settings.freeDays,
+    freeUntil: settings.freeUntil || null,
+    freePeriodActive: launchMode.isLaunchFreePeriodActive(nowMs),
     archived: 0,
     mediaPurged: 0,
     bytesFreed: 0,
+    wouldArchive: 0,
+    wouldPurge: 0,
     skippedPaidGrace: 0,
-    freeUntil: launchMode.getLaunchFreeUntil() || null,
-    freePeriodActive: launchMode.isLaunchFreePeriodActive(nowMs),
     errors: [],
   };
 
@@ -179,12 +139,16 @@ function runAdLifecycleMaintenance(deps) {
       const since = adActiveSinceMs(ad);
       if (Number.isNaN(since)) continue;
       if (nowMs - since >= ACTIVE_LIFECYCLE_MS) {
-        ad.status = 'archived';
-        ad.archivedAt = new Date(nowMs).toISOString();
-        ad.updatedAt = ad.archivedAt;
-        list[i] = ad;
-        changed = true;
-        summary.archived++;
+        if (dryRun) {
+          summary.wouldArchive++;
+        } else {
+          ad.status = 'archived';
+          ad.archivedAt = new Date(nowMs).toISOString();
+          ad.updatedAt = ad.archivedAt;
+          list[i] = ad;
+          changed = true;
+          summary.archived++;
+        }
       }
       continue;
     }
@@ -196,29 +160,35 @@ function runAdLifecycleMaintenance(deps) {
       }
       const since = adArchivedSinceMs(ad);
       if (Number.isNaN(since)) {
-        ad.archivedAt = ad.archivedAt || new Date(nowMs).toISOString();
-        list[i] = ad;
-        changed = true;
+        if (!dryRun) {
+          ad.archivedAt = ad.archivedAt || new Date(nowMs).toISOString();
+          list[i] = ad;
+          changed = true;
+        }
         continue;
       }
       if (nowMs - since >= ARCHIVE_RETENTION_MS) {
-        try {
-          summary.bytesFreed += purgeAdMedia(ad.id, adsUploadsDir);
-          ad.images = [];
-          ad.status = 'removed';
-          ad.mediaPurgedAt = new Date(nowMs).toISOString();
-          ad.updatedAt = ad.mediaPurgedAt;
-          list[i] = ad;
-          changed = true;
-          summary.mediaPurged++;
-        } catch (e) {
-          summary.errors.push({ adId: ad.id, phase: 'purge', message: e.message });
+        if (dryRun) {
+          summary.wouldPurge++;
+        } else {
+          try {
+            summary.bytesFreed += purgeAdMedia(ad.id, adsUploadsDir);
+            ad.images = [];
+            ad.status = 'removed';
+            ad.mediaPurgedAt = new Date(nowMs).toISOString();
+            ad.updatedAt = ad.mediaPurgedAt;
+            list[i] = ad;
+            changed = true;
+            summary.mediaPurged++;
+          } catch (e) {
+            summary.errors.push({ adId: ad.id, phase: 'purge', message: e.message });
+          }
         }
       }
     }
   }
 
-  if (changed) writeAds(list);
+  if (changed && !dryRun) writeAds(list);
   appendAuditEntry(dataDir, summary);
   return summary;
 }
@@ -229,7 +199,6 @@ module.exports = {
   ARCHIVE_RETENTION_MS,
   PAID_GRACE_MS,
   PAID_ACCOUNT_TYPES,
-  LAUNCH_FREE_TYPES,
   isPaidParticipant,
   getPaidGraceDeadlineMs,
   isUnderPaidGrace,

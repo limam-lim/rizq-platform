@@ -1573,12 +1573,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     next.moduleFlags = existingFlags;
   }
 
-  // تاريخ نهاية الفترة المجانية للإطلاق — يُدار من لوحة التحكم (يفوق env)
-  if (Object.prototype.hasOwnProperty.call(body, 'launchFreeUntil')) {
-    const parsed = launchMode.parseFreeUntil(body.launchFreeUntil);
-    // سلسلة فارغة / null = إيقاف صريح من الداشبورد (لا نرجع للبيئة)
-    next.launchFreeUntil = parsed || '';
-  }
+  // launchDate/freeDays — سوبر أدمن فقط عبر POST /api/admin/launch-config
 
   if (body.sectionRules && typeof body.sectionRules === 'object') {
     // ── محرك القواعد المشترك (طلب Limam 03/08/2026): بدل وكيل منفصل لكل
@@ -2939,6 +2934,117 @@ app.patch('/api/admin/agents-ops', requireAdminPermission('ai-manager'), (req, r
     res.json({ ok: true, settings, dashboard: ops.buildDashboard() });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+const MAX_LAUNCH_AUDIT = 80;
+
+function appendLaunchAudit(cfg, entry) {
+  const list = Array.isArray(cfg.launchAudit) ? cfg.launchAudit.slice() : [];
+  list.unshift(entry);
+  cfg.launchAudit = list.slice(0, MAX_LAUNCH_AUDIT);
+}
+
+/**
+ * GET /api/admin/launch-config — إعدادات الإطلاق + سجل التدقيق (سوبر أدمن)
+ * POST /api/admin/launch-config — حفظ launchDate + freeDays مع تدقيق وتأكيد الماضي
+ */
+app.get('/api/admin/launch-config', requireSuperAdmin, (req, res) => {
+  try {
+    const cfg = repos.getSiteConfig() || {};
+    const launch = launchMode.publicLaunchConfig(getModuleFlags());
+    res.json({
+      ok: true,
+      launch,
+      stored: {
+        launchDate: cfg.launchDate || '',
+        freeDays: cfg.freeDays != null ? cfg.freeDays : launchMode.DEFAULT_FREE_DAYS,
+      },
+      audit: Array.isArray(cfg.launchAudit) ? cfg.launchAudit.slice(0, 40) : [],
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.post('/api/admin/launch-config', requireSuperAdmin, (req, res) => {
+  try {
+    const body = req.body || {};
+    const current = repos.getSiteConfig() || {};
+    const prevDate = launchMode.parseYmd(current.launchDate) || '';
+    const prevDays = launchMode.normalizeFreeDays(
+      current.freeDays != null && current.freeDays !== '' ? current.freeDays : launchMode.DEFAULT_FREE_DAYS
+    );
+    const prevUntil = prevDate
+      ? launchMode.addDaysYmd(prevDate, prevDays)
+      : (launchMode.getLaunchFreeUntil() || '');
+
+    let nextDate = prevDate;
+    if (Object.prototype.hasOwnProperty.call(body, 'launchDate')) {
+      const raw = body.launchDate;
+      if (raw === null || raw === '') nextDate = '';
+      else {
+        const parsed = launchMode.parseYmd(raw);
+        if (!parsed) {
+          return res.status(400).json({ ok: false, error: 'invalid_launch_date', message: 'تاريخ الإطلاق غير صالح' });
+        }
+        nextDate = parsed;
+      }
+    }
+
+    let nextDays = prevDays;
+    if (Object.prototype.hasOwnProperty.call(body, 'freeDays')) {
+      const n = Number(body.freeDays);
+      if (!Number.isFinite(n) || n < 0 || n > 3650) {
+        return res.status(400).json({ ok: false, error: 'invalid_free_days', message: 'عدد الأيام يجب أن يكون بين 0 و 3650' });
+      }
+      nextDays = Math.round(n);
+    }
+
+    const nextUntil = nextDate ? launchMode.addDaysYmd(nextDate, nextDays) : null;
+    const endMs = nextUntil ? launchMode.freeUntilEndMs(nextUntil) : null;
+    const inPast = !!(endMs != null && endMs < Date.now());
+    if (inPast && body.confirmPast !== true) {
+      return res.status(409).json({
+        ok: false,
+        error: 'needs_confirm_past',
+        message: 'تاريخ نهاية الفترة في الماضي — أكّد الحفظ صراحةً',
+        freeUntil: nextUntil,
+      });
+    }
+
+    const next = Object.assign({}, current, {
+      launchDate: nextDate,
+      freeDays: nextDays,
+    });
+    // أزل الحقل اليدوي القديم إن وُجد
+    if (Object.prototype.hasOwnProperty.call(next, 'launchFreeUntil')) {
+      delete next.launchFreeUntil;
+    }
+
+    const adminUser = req.adminUser || {};
+    const by = String(adminUser.user || adminUser.name || adminUser.email || 'super').slice(0, 120);
+    const byId = String(adminUser.id || '').slice(0, 80);
+    appendLaunchAudit(next, {
+      at: new Date().toISOString(),
+      by,
+      byId,
+      old: { launchDate: prevDate || null, freeDays: prevDays, freeUntil: prevUntil || null },
+      new: { launchDate: nextDate || null, freeDays: nextDays, freeUntil: nextUntil || null },
+      confirmPast: inPast === true,
+    });
+
+    repos.saveSiteConfig(next);
+    const launch = launchMode.publicLaunchConfig(getModuleFlags());
+    res.json({
+      ok: true,
+      launch,
+      stored: { launchDate: nextDate || '', freeDays: nextDays },
+      audit: Array.isArray(next.launchAudit) ? next.launchAudit.slice(0, 40) : [],
+    });
+  } catch (err) {
+    console.error('[launch-config] save', err);
+    res.status(500).json({ ok: false, error: err.message || 'فشل الحفظ' });
   }
 });
 
