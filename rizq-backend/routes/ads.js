@@ -129,9 +129,10 @@ function mountAdsRoutes(app, deps) {
   app.post('/api/ads/submit', adsSubmitLimiter, (req, res) => {
     const b = req.body || {};
     if (b.hasVideoFile || b.videoFileName || b.videoData || b.videoBase64) {
-      return res.status(503).json({
+      return res.status(403).json({
         ok: false,
-        error: 'video_upload_disabled',
+        error: 'VIDEO_UPLOAD_DISABLED',
+        code: 'VIDEO_UPLOAD_DISABLED',
         message: 'رفع الفيديو قريباً',
         message_fr: 'Téléversement vidéo bientôt disponible',
       });
@@ -212,7 +213,11 @@ function mountAdsRoutes(app, deps) {
     let id = (typeof b.id === 'string' && /^RZQ-\d{4}-\d{4,6}$/.test(b.id)) ? b.id : genAdId();
     while (list.some((a) => a.id === id)) id = genAdId(); // تفادي تصادم نادر في المعرّف
     const paidAcc = !!(acc && ['store', 'office', 'corp', 'estate'].includes(acc.type));
-    const images = await saveAdImages(id, b.images, { paid: paidAcc });
+    const images = await saveAdImages(id, b.images, {
+      paid: paidAcc,
+      maxCount: (ent.limits && ent.limits.maxPhotosPerItem) || 8,
+      maxImageBytes: ent.limits && ent.limits.maxImageBytes,
+    });
     const rec = {
       id,
       title: String(b.title).slice(0, 200),
@@ -399,7 +404,22 @@ function mountAdsRoutes(app, deps) {
         ? (readAccounts().find((a) => a.id === ad.accountId) || null)
         : null;
       const paidAcc = !!(ownerAcc && ['store', 'office', 'corp', 'estate'].includes(ownerAcc.type));
-      ad.images = await saveAdImages(ad.id, b.images, { paid: paidAcc });
+      const entUp = ad.accountId
+        ? getEntitlements(ad.accountId, ownerAcc ? ownerAcc.type : 'individual')
+        : null;
+      if (entUp && b.images.length) {
+        try { assertPhotoCount(entUp, b.images.length); }
+        catch (gateErr) {
+          return res.status(gateErr.status || 403).json({
+            ok: false, error: gateErr.message, code: gateErr.code, details: gateErr.details,
+          });
+        }
+      }
+      ad.images = await saveAdImages(ad.id, b.images, {
+        paid: paidAcc,
+        maxCount: (entUp && entUp.limits && entUp.limits.maxPhotosPerItem) || 8,
+        maxImageBytes: entUp && entUp.limits && entUp.limits.maxImageBytes,
+      });
     }
     // إصلاح ثغرة أمنية (2026-08-04): كان صاحب الإعلان (isOwner) قادراً على
     // تعيين status إلى 'active' مباشرة (نشر بلا مراجعة) أو حتى إعادته إلى
