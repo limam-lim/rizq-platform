@@ -2368,6 +2368,8 @@ const { mountSeoRoutes, configureSeoRoutes } = require('./routes/seoDynamic');
 
 ordersRouter.configureOrderRoutes({
   readAccounts,
+  readCatalog: () => (typeof readCatalog === 'function' ? readCatalog() : []),
+  writeCatalog: (list) => (typeof writeCatalog === 'function' ? writeCatalog(list) : null),
   requireAdminPermission: typeof requireAdminPermission === 'function' ? requireAdminPermission : null,
 });
 searchUnifiedRouter.configureSearchRoutes({
@@ -4203,7 +4205,7 @@ const HOST = process.env.HOST || '0.0.0.0';
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
 
-// إعادة ربط مصادر البحث/SEO بعد تعريف readAds/readCatalog
+// إعادة ربط مصادر البحث/SEO/الطلبات بعد تعريف readAds/readCatalog
 try {
   searchUnifiedRouter.configureSearchRoutes({
     readAds,
@@ -4215,8 +4217,14 @@ try {
     readAccounts,
     publicOrigin: () => process.env.PUBLIC_BASE_URL || ('http://localhost:' + (process.env.PORT || 3000)),
   });
+  ordersRouter.configureOrderRoutes({
+    readAccounts,
+    readCatalog,
+    writeCatalog,
+    requireAdminPermission,
+  });
 } catch (eSearchCfg) {
-  console.warn('[ops] search/seo reconfigure:', eSearchCfg.message);
+  console.warn('[ops] search/seo/orders reconfigure:', eSearchCfg.message);
 }
 
 startMaintenanceScheduler({

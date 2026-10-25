@@ -16,6 +16,7 @@ const {
   isAccountActive,
 } = require('../middleware/accountAuth');
 const Notify = require('../services/notificationService');
+const OrderStock = require('../services/orderStock');
 
 const router = express.Router();
 
@@ -27,10 +28,40 @@ const orderLimiter = rateLimit({
   message: { ok: false, error: 'محاولات كثيرة', code: 'RATE_LIMIT' },
 });
 
-let _deps = { readAccounts: () => [], requireAdminPermission: null };
+let _deps = {
+  readAccounts: () => [],
+  readCatalog: null,
+  writeCatalog: null,
+  requireAdminPermission: null,
+};
 
 function configureOrderRoutes(deps) {
   if (deps) _deps = Object.assign({}, _deps, deps);
+}
+
+/** وسيط صلاحية أدمن — payments/analytics */
+function withAdmin(...perms) {
+  return (req, res, next) => {
+    if (typeof _deps.requireAdminPermission === 'function') {
+      return _deps.requireAdminPermission(...(perms.length ? perms : ['payments']))(req, res, next);
+    }
+    return sendError(res, 401, 'صلاحية إدارية مطلوبة', 'ADMIN_REQUIRED');
+  };
+}
+
+function catalogDeps() {
+  return {
+    readCatalog: typeof _deps.readCatalog === 'function' ? _deps.readCatalog : null,
+    writeCatalog: typeof _deps.writeCatalog === 'function' ? _deps.writeCatalog : null,
+  };
+}
+
+function tryRestoreStock(order) {
+  try {
+    OrderStock.restoreForOrder(order, catalogDeps());
+  } catch (e) {
+    console.warn('[orders/stock-restore]', e.message);
+  }
 }
 
 function requireBuyer(req, res) {
@@ -88,12 +119,28 @@ router.post('/', orderLimiter, asyncHandler(async (req, res) => {
   const buyer = requireBuyer(req, res);
   if (!buyer) return;
   const body = req.body || {};
+  const sellerId = body.sellerId || body.storeId || body.accountId;
+  const items = body.items || body.cart || [];
+  let stockResult = null;
+  try {
+    stockResult = OrderStock.reserveForOrder(
+      { sellerId, items },
+      catalogDeps()
+    );
+  } catch (stockErr) {
+    return sendError(
+      res,
+      stockErr.status || 409,
+      stockErr.message || 'المخزون غير كافٍ',
+      stockErr.code || 'OUT_OF_STOCK'
+    );
+  }
   try {
     const order = Order.createOrder({
       buyerId: buyer.id,
-      sellerId: body.sellerId || body.storeId || body.accountId,
+      sellerId,
       sellerType: body.sellerType || 'store',
-      items: body.items || body.cart || [],
+      items,
       paymentMethod: body.paymentMethod || 'cod',
       paymentReference: body.paymentReference || body.payment_reference || '',
       paymentReceipt: body.paymentReceipt || body.receipt || '',
@@ -112,9 +159,24 @@ router.post('/', orderLimiter, asyncHandler(async (req, res) => {
       buyerNote: body.buyerNote || body.note || '',
       driverNotes: body.driverNotes || '',
     });
-    res.status(201).json({ ok: true, order });
+    res.status(201).json({
+      ok: true,
+      order,
+      stock: stockResult
+        ? { reserved: (stockResult.reserved || []).length, skipped: (stockResult.skipped || []).length }
+        : null,
+    });
     fireBuyerNotify(order, 'new');
   } catch (err) {
+    // فشل الإنشاء بعد الحجز → أعد المخزون
+    if (stockResult && (stockResult.reserved || []).length) {
+      tryRestoreStock({
+        sellerId,
+        items: (stockResult.reserved || [])
+          .filter((r) => !r.skipped)
+          .map((r) => ({ productId: r.productId, qty: r.qty, meta: { selected: r.sizeKey ? { size: r.sizeKey } : null } })),
+      });
+    }
     return sendError(res, err.status || 400, err.message || 'تعذّر إنشاء الطلب', err.code || 'CREATE_FAILED');
   }
 }));
@@ -154,19 +216,12 @@ router.get('/metrics/seller', orderLimiter, asyncHandler(async (req, res) => {
 }));
 
 /** GET /metrics/admin */
-router.get('/metrics/admin', orderLimiter, asyncHandler(async (req, res) => {
-  if (typeof _deps.requireAdminPermission === 'function') {
-    // يُحمى عبر mount بطبقة الأدمن إن وُجدت — هنا فحص بسيط للجلسة الإدارية عبر header
-  }
-  const adminToken = String(req.header('x-admin-token') || req.header('x-rizq-admin') || '').trim();
-  if (!adminToken && process.env.NODE_ENV === 'production') {
-    return sendError(res, 401, 'صلاحية إدارية مطلوبة', 'ADMIN_REQUIRED');
-  }
+router.get('/metrics/admin', orderLimiter, withAdmin('analytics', 'payments'), asyncHandler(async (req, res) => {
   res.json({ ok: true, metrics: Order.adminMetrics() });
 }));
 
 /** GET /admin/disputed */
-router.get('/admin/disputed', orderLimiter, asyncHandler(async (req, res) => {
+router.get('/admin/disputed', orderLimiter, withAdmin('payments', 'reports'), asyncHandler(async (req, res) => {
   const orders = Order.listDisputed({
     limit: Number(req.query.limit) || 50,
     offset: Number(req.query.offset) || 0,
@@ -240,6 +295,9 @@ router.patch('/:id/status', orderLimiter, asyncHandler(async (req, res) => {
       note: body.note || body.reason || '',
       driverNotes: body.driverNotes,
     });
+    if (toStatus === 'cancelled' && order.status !== 'cancelled') {
+      tryRestoreStock(order);
+    }
     res.json({ ok: true, order: updated });
     if (updated.buyerId) fireBuyerNotify(updated, updated.status);
   } catch (err) {
@@ -284,11 +342,13 @@ router.post('/:id/cancel', orderLimiter, asyncHandler(async (req, res) => {
     return sendError(res, 403, 'غير مصرّح', 'FORBIDDEN');
   }
   try {
+    const prev = order.status;
     const updated = Order.updateStatus(order.id, 'cancelled', {
       actorKind: sellerAllowed ? 'seller' : 'buyer',
       actorId: sellerAllowed ? order.sellerId : (buyer && buyer.id),
       note: (req.body || {}).reason || (req.body || {}).note || 'إلغاء الطلب',
     });
+    if (prev !== 'cancelled') tryRestoreStock(order);
     res.json({ ok: true, order: updated });
     fireBuyerNotify(updated, 'cancelled');
   } catch (err) {
@@ -317,13 +377,18 @@ router.post('/:id/dispute', orderLimiter, asyncHandler(async (req, res) => {
 }));
 
 /** POST /:id/resolve — أدمن */
-router.post('/:id/resolve', orderLimiter, asyncHandler(async (req, res) => {
+router.post('/:id/resolve', orderLimiter, withAdmin('payments'), asyncHandler(async (req, res) => {
   try {
+    const before = Order.getById(req.params.id);
+    const nextStatus = (req.body || {}).nextStatus || 'cancelled';
     const updated = Order.resolveDispute(req.params.id, {
       resolution: (req.body || {}).resolution || '',
-      nextStatus: (req.body || {}).nextStatus || 'cancelled',
-      actorId: 'admin',
+      nextStatus,
+      actorId: (req.adminUser && (req.adminUser.user || req.adminUser.name)) || 'admin',
     });
+    if (nextStatus === 'cancelled' && before && before.status === 'disputed') {
+      tryRestoreStock(before);
+    }
     res.json({ ok: true, order: updated });
     fireBuyerNotify(updated, updated.status);
   } catch (err) {

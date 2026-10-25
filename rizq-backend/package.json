@@ -16,6 +16,7 @@
     "telegram:webhook": "node scripts/setup-telegram-webhook.js",
     "test:hardening": "node scripts/test-prod-hardening.js",
     "test:orders": "node scripts/test-orders-ops-api.js",
+    "test:order-stock": "node scripts/test-order-stock.js",
     "test:passkeys": "node scripts/test-passkeys-api.js",
     "provision:admin": "node scripts/provision-secret-admin.js",
     "test:admin-roles": "node scripts/test-admin-roles.js",

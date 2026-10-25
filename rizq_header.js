@@ -320,26 +320,50 @@
     }
   }
 
+  function scopedCartHref() {
+    var sid = '';
+    try {
+      if (window.RizqStoreCommerce && typeof window.RizqStoreCommerce.storeIdFromUrl === 'function') {
+        sid = window.RizqStoreCommerce.storeIdFromUrl() || '';
+      }
+      if (!sid) {
+        var q = new URLSearchParams(location.search || '');
+        sid = q.get('id') || q.get('store') || q.get('showroom') || q.get('corp') || '';
+      }
+    } catch (e0) {}
+    var onSellerPage = isCommercePage() || isShowroomPage();
+    if (!sid || !onSellerPage) {
+      return { href: 'rizq_cart.html', label: t2('السلة', 'Panier'), title: t2('السلة العامة', 'Panier général') };
+    }
+    var href = 'rizq_cart.html?id=' + encodeURIComponent(sid);
+    if (isShowroomPage()) href += '&module=showroom';
+    return {
+      href: href,
+      label: t2('السلة', 'Panier'),
+      title: t2('سلة هذا المحل', 'Panier de cette boutique')
+    };
+  }
+
   function commerceToolbarHtml() {
-    /* مفضلة عامة (مثل السلة العامة) + سلة على صفحات التجارة */
+    /* مفضلة عامة + سلة (محل حالي إن وُجد ?id=، وإلا السلة العامة) */
+    var cart = scopedCartHref();
     var inner =
       '<a class="rizq-hdr-fav" id="rizq-hdr-fav" data-rizq-fav-wrap href="rizq_favorites.html" aria-label="' +
       t2('المفضلة', 'Favoris') +
       '" title="' +
       t2('المفضلة', 'Favoris') +
       '"><span class="rizq-hdr-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span><span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
-    /* السلة العامة دائماً — تجمع كل ما أضافه الزائر؛ شريحة المحل المحلية تبقى منفصلة */
     inner +=
-      '<a class="rizq-hdr-cart" id="rizq-hdr-cart" data-rizq-cart-wrap href="rizq_cart.html" aria-label="' +
-      t2('السلة العامة', 'Panier général') +
+      '<a class="rizq-hdr-cart" id="rizq-hdr-cart" data-rizq-cart-wrap href="' + cart.href + '" aria-label="' +
+      cart.title +
       '" title="' +
-      t2('السلة العامة', 'Panier général') +
+      cart.title +
       '">' +
       '<span class="rizq-hdr-cart-ico" aria-hidden="true">' +
       '<svg viewBox="0 0 24 24" width="18" height="18" focusable="false">' +
       '<path fill="currentColor" d="M7.2 18.4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm9.6 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM4.1 4h1.7c.5 0 .9.3 1 .8l.3 1.4h12.4c.6 0 1 .5.9 1.1l-1.1 6.2a1.8 1.8 0 0 1-1.8 1.5H8.6a1.8 1.8 0 0 1-1.8-1.5L5.4 5.6H4.1c-.5 0-.9-.4-.9-.9S3.6 4 4.1 4zm4.5 11.5h8.1l.9-5.1H7.5l1.1 5.1z"/>' +
       '</svg></span>' +
-      '<span class="rizq-hdr-cart-lbl">' + t2('السلة', 'Panier') + '</span>' +
+      '<span class="rizq-hdr-cart-lbl">' + cart.label + '</span>' +
       '<span class="rizq-hdr-fav-count" data-rizq-cart-count hidden>0</span></a>';
     if (!inner) return '';
     return '<span class="rizq-toolbar-tools rizq-hdr-tools" data-rizq-toolbar="tools" role="group" aria-label="' + t2('أدوات', 'Outils') + '">' + inner + '</span>';

@@ -145,18 +145,42 @@
     }).then(function (r) { return r.json(); });
   }
 
+  function adminHeaders() {
+    var h = { 'Content-Type': 'application/json' };
+    try {
+      if (typeof global._adminSessionToken === 'function') {
+        var t1 = global._adminSessionToken();
+        if (t1) h['x-admin-token'] = t1;
+      }
+      if (!h['x-admin-token'] && global.localStorage) {
+        var raw = global.localStorage.getItem('rizq_admin_session');
+        if (raw) {
+          var s = JSON.parse(raw);
+          if (s && s.token) h['x-admin-token'] = s.token;
+        }
+      }
+    } catch (e) {}
+    return h;
+  }
+
   function adminMetrics() {
-    return fetch(apiBase() + '/api/orders/metrics/admin', { credentials: 'include' }).then(function (r) { return r.json(); });
+    return fetch(apiBase() + '/api/orders/metrics/admin', {
+      credentials: 'include',
+      headers: adminHeaders()
+    }).then(function (r) { return r.json(); });
   }
 
   function listDisputed() {
-    return fetch(apiBase() + '/api/orders/admin/disputed', { credentials: 'include' }).then(function (r) { return r.json(); });
+    return fetch(apiBase() + '/api/orders/admin/disputed', {
+      credentials: 'include',
+      headers: adminHeaders()
+    }).then(function (r) { return r.json(); });
   }
 
   function resolveDispute(orderId, resolution, nextStatus) {
     return fetch(apiBase() + '/api/orders/' + encodeURIComponent(orderId) + '/resolve', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: adminHeaders(),
       credentials: 'include',
       body: JSON.stringify({ resolution: resolution || '', nextStatus: nextStatus || 'cancelled' })
     }).then(function (r) { return r.json(); });
