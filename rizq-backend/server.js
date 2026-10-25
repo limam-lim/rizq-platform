@@ -1227,6 +1227,11 @@ app.get('/api/site-config', (req, res) => {
     currency: raw.currency || undefined,
     quotaConfig: raw.quotaConfig || undefined,
     quotaTopups: raw.quotaTopups || undefined,
+    uploadLimits: (() => {
+      try {
+        return require('./services/uploadLimits').getUploadLimitsConfig(raw);
+      } catch (e) { return undefined; }
+    })(),
     // طرق الدفع للعامة بلا أرقام/رموز حساسة — الرمز الكامل عبر /api/pay-methods
     bankCodes: Array.isArray(raw.bankCodes)
       ? raw.bankCodes.map((b) => ({
@@ -1399,6 +1404,13 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
       diamond_pro: Object.assign({}, existingQ.diamond_pro || {}, body.quotaConfig.diamond_pro || {}),
       updatedAt: new Date().toISOString(),
     };
+  }
+
+  // ب3 — حدود الرفع حسب نوع الحساب
+  if (body.uploadLimits && typeof body.uploadLimits === 'object') {
+    const { getUploadLimitsConfig } = require('./services/uploadLimits');
+    const merged = Object.assign({}, current.uploadLimits || {}, body.uploadLimits);
+    next.uploadLimits = getUploadLimitsConfig({ uploadLimits: merged });
   }
 
   if (body.quotaTopups && typeof body.quotaTopups === 'object') {
@@ -2967,6 +2979,79 @@ app.get('/api/admin/launch-config', requireSuperAdmin, (req, res) => {
   }
 });
 
+/** GET /api/admin/ops-reports — تقارير العمليات الأسبوعية (ب4) */
+app.get('/api/admin/ops-reports', requireSuperAdmin, (req, res) => {
+  try {
+    const ops = require('./services/opsHousekeeping');
+    const limit = Math.max(1, Math.min(40, Number(req.query.limit) || 12));
+    res.json({ ok: true, reports: ops.listWeeklyReports(limit) });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+/** POST /api/admin/ops-housekeeping — تشغيل يدوي للصيانة (ب1–ب4) */
+app.post('/api/admin/ops-housekeeping', requireSuperAdmin, async (req, res) => {
+  try {
+    const ops = require('./services/opsHousekeeping');
+    const body = req.body || {};
+    const out = await ops.runOpsHousekeepingPass({
+      readAds,
+      writeAds,
+      readAccounts,
+      writeAccounts,
+      getAccountRecord,
+      adsUploadsDir: ADS_UPLOADS_DIR,
+      dataDir: DATA_DIR,
+      trigger: body.trigger || 'manual',
+      forceWeekly: body.forceWeekly === true,
+      nowMs: body.nowMs ? Number(body.nowMs) : Date.now(),
+    });
+    res.json({ ok: true, result: out });
+  } catch (err) {
+    console.error('[ops-housekeeping]', err);
+    res.status(500).json({ ok: false, error: err.message || 'فشل التشغيل' });
+  }
+});
+
+/** GET /api/account/:accountId/notifications — إشعارات الحساب (ب1) */
+app.get('/api/account/:accountId/notifications', (req, res) => {
+  const accountId = String(req.params.accountId || '').slice(0, 60);
+  const token = extractAccountToken(req) || '';
+  if (!accountId || !verifyAccountOwner(accountId, token)) {
+    return res.status(401).json({ ok: false, error: 'unauthorized' });
+  }
+  try {
+    const ops = require('./services/opsHousekeeping');
+    const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 50));
+    res.json({ ok: true, notifications: ops.listAccountNotifications(accountId, limit) });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+/** POST /api/account/:accountId/notifications/:id/read */
+app.post('/api/account/:accountId/notifications/:id/read', (req, res) => {
+  const accountId = String(req.params.accountId || '').slice(0, 60);
+  const noteId = String(req.params.id || '').slice(0, 80);
+  const token = extractAccountToken(req) || '';
+  if (!accountId || !verifyAccountOwner(accountId, token)) {
+    return res.status(401).json({ ok: false, error: 'unauthorized' });
+  }
+  try {
+    const note = repos.accountNotifications.get(noteId);
+    if (!note || String(note.accountId) !== accountId) {
+      return res.status(404).json({ ok: false, error: 'not_found' });
+    }
+    note.read = true;
+    note.readAt = new Date().toISOString();
+    repos.accountNotifications.upsert(noteId, note);
+    res.json({ ok: true, notification: note });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
 app.post('/api/admin/launch-config', requireSuperAdmin, (req, res) => {
   try {
     const body = req.body || {};
@@ -4282,6 +4367,7 @@ startMaintenanceScheduler({
   readAds,
   writeAds,
   readAccounts,
+  writeAccounts,
   getAccountRecord,
   adsUploadsDir: ADS_UPLOADS_DIR,
   dataDir: DATA_DIR,

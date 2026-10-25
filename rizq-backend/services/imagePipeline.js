@@ -31,9 +31,11 @@ function detectImageMagic(buf) {
 
 /**
  * Parse data-URI image; validate size + magic bytes.
+ * @param {string} dataUri
+ * @param {{ maxBytes?: number }} [opts]
  * Returns { buf, detected } or { error: code }.
  */
-function parseDataUriImage(dataUri) {
+function parseDataUriImage(dataUri, opts) {
   if (typeof dataUri !== 'string') return { error: 'invalid_input' };
   const m = DATA_URI_RE.exec(dataUri.trim());
   if (!m) return { error: 'invalid_data_uri' };
@@ -44,7 +46,8 @@ function parseDataUriImage(dataUri) {
     return { error: 'invalid_base64' };
   }
   if (!buf.length) return { error: 'empty_buffer' };
-  if (buf.length > MAX_INPUT_BYTES) return { error: 'too_large' };
+  const maxBytes = (opts && Number(opts.maxBytes) > 0) ? Number(opts.maxBytes) : MAX_INPUT_BYTES;
+  if (buf.length > maxBytes) return { error: 'too_large', maxBytes };
   const detected = detectImageMagic(buf);
   if (!detected) return { error: 'invalid_magic' };
   return { buf, detected };
@@ -151,9 +154,10 @@ async function processBufferToWebp(buf, outPath) {
  * @param {string} opts.entityId
  * @param {string[]} opts.images
  * @param {number} opts.maxCount
+ * @param {number} [opts.maxImageBytes]
  * @param {boolean} [opts.paid] full variant quality 90
  */
-async function saveProcessedImages({ namespace, uploadUrlPrefix, entityId, images, maxCount, paid }) {
+async function saveProcessedImages({ namespace, uploadUrlPrefix, entityId, images, maxCount, maxImageBytes, paid }) {
   if (!Array.isArray(images) || !images.length) return [];
   const ns = String(namespace || '').replace(/^\/+|\/+$/g, '')
     || String(uploadUrlPrefix || '').replace(/^\/?uploads\/?/, '').replace(/\/+$/, '')
@@ -163,6 +167,7 @@ async function saveProcessedImages({ namespace, uploadUrlPrefix, entityId, image
   const prefix = '/uploads/' + ns + '/';
   const urls = [];
   const slice = images.slice(0, maxCount);
+  const parseOpts = Number(maxImageBytes) > 0 ? { maxBytes: Number(maxImageBytes) } : undefined;
   // إعادة استخدام URL موجود فقط إن كان تحت مجلد هذا الكيان (منع اختطاف وسائط الغير)
   const ownedPrefix = prefix + safeId + '/';
   for (let i = 0; i < slice.length; i++) {
@@ -179,7 +184,7 @@ async function saveProcessedImages({ namespace, uploadUrlPrefix, entityId, image
     }
     // رفض أي /uploads/... لا يخص هذا الكيان
     if (img.indexOf('/uploads/') === 0) continue;
-    const parsed = parseDataUriImage(img);
+    const parsed = parseDataUriImage(img, parseOpts);
     if (!parsed || parsed.error) continue;
     const savedUrl = await putImageVariants(ns, safeId, i, parsed.buf, { paid: !!paid });
     urls.push(savedUrl);
@@ -188,27 +193,31 @@ async function saveProcessedImages({ namespace, uploadUrlPrefix, entityId, image
 }
 
 async function saveAdImages(adId, images, opts) {
+  const maxCount = (opts && Number(opts.maxCount) > 0) ? Number(opts.maxCount) : 8;
   return saveProcessedImages({
     namespace: 'ads',
     entityId: adId,
     images,
-    maxCount: 8,
+    maxCount,
+    maxImageBytes: opts && opts.maxImageBytes,
     paid: !!(opts && opts.paid),
   });
 }
 
 async function saveCatalogImages(itemId, images, opts) {
+  const maxCount = (opts && Number(opts.maxCount) > 0) ? Number(opts.maxCount) : 8;
   return saveProcessedImages({
     namespace: 'catalog',
     entityId: itemId,
     images,
-    maxCount: 8,
+    maxCount,
+    maxImageBytes: opts && opts.maxImageBytes,
     paid: !!(opts && opts.paid),
   });
 }
 
 async function saveCatalogImage(itemId, image, opts) {
-  const urls = await saveCatalogImages(itemId, image ? [image] : [], opts);
+  const urls = await saveCatalogImages(itemId, image ? [image] : [], Object.assign({ maxCount: 1 }, opts || {}));
   return urls[0] || null;
 }
 

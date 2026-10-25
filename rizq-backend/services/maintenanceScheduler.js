@@ -1,8 +1,9 @@
 /**
- * Daily maintenance scheduler — lifecycle at 03:00, backup immediately after.
+ * Daily maintenance scheduler — ops housekeeping at 03:00, backup immediately after.
+ * Housekeeping: lifecycle + renewal reminders + cleanups + weekly Super Admin report.
  */
 const cron = require('node-cron');
-const { runAdLifecycleMaintenance } = require('./adLifecycle');
+const { runOpsHousekeepingPass } = require('./opsHousekeeping');
 const { runDailyBackup } = require('./backupService');
 
 const DEFAULT_CRON = '0 3 * * *';
@@ -29,15 +30,21 @@ function startMaintenanceScheduler(deps) {
     cronExpr,
     async () => {
       try {
-        const summary = runAdLifecycleMaintenance(Object.assign({}, deps, { trigger: 'cron' }));
+        const out = await runOpsHousekeepingPass(Object.assign({}, deps, { trigger: 'cron' }));
+        const life = out.lifecycle || {};
+        const rem = out.reminders || {};
+        const clean = out.cleanups || {};
         console.log(
-          '[maintenance-cron] lifecycle — archived=' + summary.archived +
-          ' purged=' + summary.mediaPurged +
-          ' bytesFreed=' + summary.bytesFreed +
-          ' skippedPaid=' + summary.skippedPaidGrace
+          '[maintenance-cron] ops — dryRun=' + !!out.dryRun +
+          ' archived=' + (life.archived || 0) +
+          ' purged=' + (life.mediaPurged || 0) +
+          ' reminded=' + (rem.reminded || rem.wouldRemind || 0) +
+          ' sold=' + (clean.soldPurged || clean.wouldSoldPurge || 0) +
+          ' drafts=' + (clean.draftsRemoved || clean.wouldDraftsRemove || 0) +
+          ' weekly=' + (out.weekly ? out.weekly.id : 'skip')
         );
       } catch (e) {
-        console.error('[maintenance-cron] lifecycle error:', e.message);
+        console.error('[maintenance-cron] ops housekeeping error:', e.message);
       }
 
       try {
@@ -55,7 +62,7 @@ function startMaintenanceScheduler(deps) {
     { timezone: tz }
   );
 
-  console.log('[maintenance-cron] scheduled daily at 03:00 (' + tz + ') — lifecycle then backup — expr: ' + cronExpr);
+  console.log('[maintenance-cron] scheduled daily at 03:00 (' + tz + ') — ops then backup — expr: ' + cronExpr);
   return scheduledTask;
 }
 

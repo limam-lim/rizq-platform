@@ -87,9 +87,14 @@ function mountCatalogRoutes(app, deps) {
     // كلا المسارين: عميل جديد يرسل images[]، أو عميل قديم يرسل image واحدة.
     let catImages;
     if (Array.isArray(b.images) && b.images.length) {
-      catImages = await saveCatalogImages(id, b.images);
+      catImages = await saveCatalogImages(id, b.images, {
+        maxCount: (ent.limits && ent.limits.maxPhotosPerItem) || 8,
+        maxImageBytes: ent.limits && ent.limits.maxImageBytes,
+      });
     } else {
-      const single = await saveCatalogImage(id, b.image);
+      const single = await saveCatalogImage(id, b.image, {
+        maxImageBytes: ent.limits && ent.limits.maxImageBytes,
+      });
       catImages = single ? [single] : [];
     }
     const attrs = (b.attrs && typeof b.attrs === 'object' && !Array.isArray(b.attrs))

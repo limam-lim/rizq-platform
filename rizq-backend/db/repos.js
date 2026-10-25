@@ -201,6 +201,18 @@ const serviceRequests = createCollection('service_requests', {
   onBackup: arrayBackup,
 });
 
+/** إشعارات داخل الحساب (تذكير تجديد، تحذير بلا تحقق، …) */
+const accountNotifications = createCollection('account_notifications', {
+  backupFile: 'account-notifications.json',
+  onBackup: arrayBackup,
+});
+
+/** تقارير العمليات الأسبوعية للسوبر أدمن */
+const weeklyOpsReports = createCollection('weekly_ops_reports', {
+  backupFile: 'weekly-ops-reports.json',
+  onBackup: arrayBackup,
+});
+
 /* ── Helpers خاصّة بالأشكال ──────────────────────────────── */
 
 function getSiteConfig() {
@@ -453,6 +465,8 @@ function migrateAllSecondaryStores() {
   serviceRequests.migrateFromArray(p('service-requests.json'), 'id');
   agentOpsSettings.migrateSingleton(p('agent-ops-settings.json'), '_root');
   secretsVault.migrateSingleton(p('secrets-vault.json'), '_root');
+  accountNotifications.migrateFromArray(p('account-notifications.json'), 'id');
+  weeklyOpsReports.migrateFromArray(p('weekly-ops-reports.json'), 'id');
 
   return {
     packages: packages.count(),
@@ -461,6 +475,8 @@ function migrateAllSecondaryStores() {
     messages: messages.count(),
     siteConfig: siteConfig.count(),
     marketingCampaigns: marketingCampaigns.count(),
+    accountNotifications: accountNotifications.count(),
+    weeklyOpsReports: weeklyOpsReports.count(),
   };
 }
 
@@ -529,6 +545,8 @@ module.exports = {
   agentOpsSettings,
   secretsVault,
   serviceRequests,
+  accountNotifications,
+  weeklyOpsReports,
 
   getSiteConfig,
   saveSiteConfig,

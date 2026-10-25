@@ -751,6 +751,17 @@ function getEntitlements(accountId, accountType, accountRecordOverride) {
 
   const quotaLimits = aiPaidActive ? resolveQuotaLimitsForAccount(rec) : null;
 
+  // ب3 — حدود الرفع من site-config.uploadLimits حسب نوع الحساب
+  let uploadLim = { maxPhotosPerAd: plan.maxPhotosPerItem || 5, maxImageBytes: 3 * 1024 * 1024 };
+  try {
+    const uploadLimits = require('./uploadLimits');
+    const siteCfg = require('../db/repos').getSiteConfig() || {};
+    uploadLim = uploadLimits.getLimitsForAccountType(type, siteCfg);
+  } catch (e) { /* defaults above */ }
+  const planPhotos = plan.maxPhotosPerItem || 5;
+  // السقف الفعّال: الأدمن يضبط حسب النوع؛ الباقة لا تتجاوزه إلا إن كانت أقل
+  const maxPhotos = Math.min(planPhotos, uploadLim.maxPhotosPerAd);
+
   return {
     accountId,
     accountType: type,
@@ -762,7 +773,8 @@ function getEntitlements(accountId, accountType, accountRecordOverride) {
     limits: {
       maxActiveAds: plan.maxActiveAds != null ? plan.maxActiveAds : (plan.maxCatalogItems != null ? plan.maxCatalogItems : 5),
       maxCatalogItems: plan.maxCatalogItems != null ? plan.maxCatalogItems : (plan.maxActiveAds != null ? plan.maxActiveAds : 5),
-      maxPhotosPerItem: plan.maxPhotosPerItem || 5,
+      maxPhotosPerItem: maxPhotos,
+      maxImageBytes: uploadLim.maxImageBytes,
       videoMaxSec: plan.videoMaxSec != null ? plan.videoMaxSec : 30,
       videoMaxMb: plan.videoMaxMb != null ? plan.videoMaxMb : 20,
       videoWatermark: !!plan.videoWatermark,
