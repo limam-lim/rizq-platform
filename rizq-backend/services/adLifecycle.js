@@ -57,7 +57,8 @@ function adArchivedSinceMs(ad) {
 function purgeAdMedia(adId, _uploadsDir) {
   const safeId = String(adId || '').replace(/[^a-zA-Z0-9_-]/g, '');
   if (!safeId) return 0;
-  const result = objectStorage.deletePrefixSync('ads/' + safeId);
+  // شرطة نهائية إلزامية — ads/12/ لا يمس ads/120
+  const result = objectStorage.deletePrefixSync('ads/' + safeId + '/');
   if (!result.ok && !result.skipped) {
     throw new Error('purge_failed:' + safeId + ':' + (result.error || 'unknown'));
   }
