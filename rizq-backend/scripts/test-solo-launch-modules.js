@@ -26,14 +26,22 @@ const open = launchMode.parseOpenSections('individual,store,estate');
 ok(open && open.individual && open.store && open.estate, 'parseOpenSections opens trio');
 ok(open && !open.office && !open.corp && !open.tenders, 'parseOpenSections closes others');
 
+const serverSrc = fs.readFileSync(path.join(__dirname, '../server.js'), 'utf8');
+ok(
+  /Object\.assign\(\{\}, DEFAULT_MODULE_FLAGS, envOpen \|\| \{\}, cfg\.moduleFlags \|\| \{\}\)/.test(serverSrc),
+  'getModuleFlags: admin moduleFlags wins over env'
+);
+ok(!/envOpen \? \{\} : \(cfg\.moduleFlags/.test(serverSrc), 'getModuleFlags no longer ignores admin when env set');
+
 const panel = fs.readFileSync(path.join(__dirname, '../../rizq_cp_panel.html'), 'utf8');
 ok(/key:'estate'/.test(panel), 'cp_panel MODULE_DEFS includes estate');
 ok(/SOLO_LAUNCH_OPEN_KEYS/.test(panel), 'cp_panel has solo launch preset');
 ok(/applySoloLaunchModulesPreset/.test(panel), 'cp_panel has preset handler');
 ok(/DEFAULT_MODULE_FLAGS_ADMIN/.test(panel), 'cp_panel default flags keep modules open');
 
-const server = fs.readFileSync(path.join(__dirname, '../server.js'), 'utf8');
-ok(/estate:\s*\{\s*extraBannedKeywords/.test(server), 'server DEFAULT_SECTION_RULES has estate');
+ok(/estate:\s*\{\s*extraBannedKeywords/.test(serverSrc), 'server DEFAULT_SECTION_RULES has estate');
+ok(/MODULE_KEYS = launchMode\.ALL_MODULE_KEYS/.test(serverSrc), 'site-config POST accepts all module keys incl. estate');
+ok(/SECTION_KEYS = Object\.keys\(DEFAULT_SECTION_RULES\)/.test(serverSrc), 'site-config POST accepts estate section rules');
 
 const flagsJs = fs.readFileSync(path.join(__dirname, '../../rizq_module_flags.js'), 'utf8');
 ok(/'rizq_estate\.html':\s*'estate'/.test(flagsJs), 'module_flags maps estate pages');
