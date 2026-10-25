@@ -298,10 +298,20 @@ async function activateSubRequest(req, deps) {
       return { ok: true, category, result, adResult, accountName, isolated: true };
     }
 
-    // package (default) — باقات الحساب العامة فقط
+    // package (default) — باقات الحساب العامة فقط (store/office/corp/estate/individual)
     const existingPkg = getAccountRecord(req.accountId);
     const { periodStart, periodEnd, now } = computeActivationPeriod(days, existingPkg);
     const isTrial = isTrialPackage(req.pkg, req.price);
+    const pkgDef = findCatalogPackage({
+      id: req.packageId || req.pkgId || '',
+      pkgName: req.pkg,
+      name: req.pkg,
+      category: accountType === 'estate' ? 'estate' : (accountType || ''),
+    }) || findCatalogPackage(req.pkg);
+    const packageId = (pkgDef && pkgDef.id) || req.packageId || req.pkgId || null;
+    const resolvedDays = (pkgDef && pkgDef.durationDays)
+      ? Math.max(1, Number(pkgDef.durationDays) || days)
+      : days;
 
     const result = await syncAccountPackage({
       accountId: req.accountId,
@@ -309,11 +319,17 @@ async function activateSubRequest(req, deps) {
       accountPhone,
       accountEmail,
       accountType,
-      pkgName: req.pkg,
+      pkgName: (pkgDef && pkgDef.name) || req.pkg,
+      packageId,
       price: Number(req.price) || 0,
-      days,
+      days: resolvedDays,
       periodStart,
-      periodEnd,
+      periodEnd: (() => {
+        // أعد حساب periodEnd إن تغيّرت المدة من الكتالوج
+        if (resolvedDays === days) return periodEnd;
+        const recomputed = computeActivationPeriod(resolvedDays, existingPkg);
+        return recomputed.periodEnd;
+      })(),
       activatedBy: 'admin',
       paymentConfirmed: !isTrial,
       paidAt: isTrial ? null : now.toISOString(),

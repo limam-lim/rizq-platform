@@ -11,7 +11,7 @@ const ACTIVE_LIFECYCLE_MS = 30 * MS_DAY;
 const ARCHIVE_RETENTION_MS = 30 * MS_DAY;
 const PAID_GRACE_MS = 60 * MS_DAY;
 
-const PAID_ACCOUNT_TYPES = new Set(['store', 'office', 'corp']);
+const PAID_ACCOUNT_TYPES = new Set(['store', 'office', 'corp', 'estate']);
 const DIAMOND_PKG_RE = /(ماسية|diamond)/i;
 const VIDEO_ADS_PKG_RE = /(video|فيديو|rizq\s*ads|إعلان.*فيديو)/i;
 

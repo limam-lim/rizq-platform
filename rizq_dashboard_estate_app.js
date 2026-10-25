@@ -1218,9 +1218,11 @@ function submitPayment() {
   RizqSub.submitSubscriptionRequest({
     file: _payFile,
     pkgName: _payPkg.name,
+    packageId: _payPkg.id || '',
     price: _payPkg.price,
     accountName: (ACCOUNT && ACCOUNT.name) || 'وكالة عقارية',
     accountId: (ACCOUNT && ACCOUNT.id) || SESSION_ID || '',
+    accountType: 'estate',
     accessToken: (CTX && CTX.accessToken) || window.REAL_ACCESS_TOKEN || '',
     category: 'package'
   }).then(function () {

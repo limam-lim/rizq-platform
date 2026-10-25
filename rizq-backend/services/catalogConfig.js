@@ -12,6 +12,16 @@ const DEFAULT_INDIVIDUAL_PACKAGES = [
   { id: 'ind-monthly', name: 'باقة شهرية', price: 2000, durationDays: 30, active: true },
 ];
 
+/** افتراضيات باقات العقارات — إن غاب كتالوج estate من site-config */
+const DEFAULT_ESTATE_PACKAGES = [
+  { id: 'es-trial', name: 'تجريبية عقارات', price: 0, durationDays: 10, maxCatalogItems: 3, active: true },
+  { id: 'es-month', name: 'شهرية عقارات', price: 4000, durationDays: 30, maxCatalogItems: 25, active: true },
+  { id: 'es-quart', name: 'ربعية عقارات', price: 10500, durationDays: 90, maxCatalogItems: 80, active: true },
+  { id: 'es-year', name: 'سنوية عقارات', price: 32000, durationDays: 365, maxCatalogItems: 200, active: true },
+  { id: 'es-diam-std', name: 'الماسية الأساسية للعقارات', price: 4500, durationDays: 30, maxCatalogItems: Infinity, diamondTier: 'diamond_standard', active: true },
+  { id: 'es-diam-pro', name: 'الماسية Pro للعقارات', price: 8500, durationDays: 30, maxCatalogItems: Infinity, diamondTier: 'diamond_pro', active: true },
+];
+
 const DEFAULT_QUOTA_CONFIG = {
   diamond_standard: {
     messages: 2000,
@@ -41,8 +51,8 @@ const DEFAULT_TOPUP_CONFIG = {
 };
 
 const DIAMOND_TIER_IDS = {
-  standard: ['diamond_standard', 'st-diam-std', 'of-diam-std', 'cp-diam-std', 'diamond', 'st-diam', 'of-diam'],
-  pro: ['diamond_pro', 'st-diam-pro', 'of-diam-pro', 'cp-diam-pro', 'cp-diam'],
+  standard: ['diamond_standard', 'st-diam-std', 'of-diam-std', 'cp-diam-std', 'es-diam-std', 'diamond', 'st-diam', 'of-diam', 'es-diam'],
+  pro: ['diamond_pro', 'st-diam-pro', 'of-diam-pro', 'cp-diam-pro', 'es-diam-pro', 'cp-diam'],
 };
 
 function readSiteConfigRaw() {
@@ -81,9 +91,15 @@ function getAllCatalogPackages() {
       if (p && p.active !== false) out.push(Object.assign({ _catalog: cat }, p));
     });
   });
-  if (!out.length) {
+  const hasCat = (cat) => out.some((p) => p._catalog === cat);
+  if (!hasCat('individual')) {
     DEFAULT_INDIVIDUAL_PACKAGES.forEach((p) => {
       out.push(Object.assign({ _catalog: 'individual' }, p));
+    });
+  }
+  if (!hasCat('estate')) {
+    DEFAULT_ESTATE_PACKAGES.forEach((p) => {
+      out.push(Object.assign({ _catalog: 'estate' }, p));
     });
   }
   return out;
@@ -190,6 +206,8 @@ function isTrialPackage(pkgName, price) {
 module.exports = {
   DEFAULT_QUOTA_CONFIG,
   DEFAULT_TOPUP_CONFIG,
+  DEFAULT_INDIVIDUAL_PACKAGES,
+  DEFAULT_ESTATE_PACKAGES,
   readSiteConfigRaw,
   getQuotaConfig,
   getTopupConfig,

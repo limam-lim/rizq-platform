@@ -13417,8 +13417,8 @@ function ppRenderPackages(btype){
      بدون أي فحص للغة — تظهر بالعربية حتى في الواجهة الفرنسية. الآن تُترجَم
      الأسماء والمزايا والشارات حسب اللغة الحالية. */
   var isFr = (window.RizqI18n ? RizqI18n.getLang() : (localStorage.getItem('rizq_lang')||'ar')) === 'fr';
-  var lsKey = btype==='office' ? 'rizq_office_packages' : btype==='corp' ? 'rizq_corp_packages' : btype==='individual' ? 'rizq_individual_packages' : 'rizq_store_packages';
-  var catalogKey = btype==='office' ? 'office' : btype==='corp' ? 'corp' : btype==='individual' ? 'individual' : 'store';
+  var lsKey = btype==='office' ? 'rizq_office_packages' : btype==='corp' ? 'rizq_corp_packages' : btype==='estate' ? 'rizq_estate_packages' : btype==='individual' ? 'rizq_individual_packages' : 'rizq_store_packages';
+  var catalogKey = btype==='office' ? 'office' : btype==='corp' ? 'corp' : btype==='estate' ? 'estate' : btype==='individual' ? 'individual' : 'store';
   var pkgs=null;
   if(window.RizqPackagesConfig){
     try{
@@ -14419,7 +14419,7 @@ function goNavPackage(tab){
  * إن وُجدت جلسة بنفس النوع → لوحة اشتراكي مباشرة.
  */
 function goSubscribePackage(tab){
-  var typeMap = { stores:'store', corp:'corp', offices:'office', tender:null, investment:null, individual:'individual' };
+  var typeMap = { stores:'store', corp:'corp', offices:'office', estate:'estate', tender:null, investment:null, individual:'individual' };
   var wantType = typeMap[tab];
   try{ sessionStorage.setItem('rizq_open_panel', 'subscription'); }catch(eIntent){}
 

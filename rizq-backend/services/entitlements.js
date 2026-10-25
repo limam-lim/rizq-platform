@@ -170,6 +170,16 @@ const CORP_PLANS = {
   corp_diamond_pro: { planType: 'corp_diamond_pro', maxCatalogItems: Infinity, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'calls_channel', 'auto_reply_calls', 'quota_dashboard', 'api_erp_integration'], diamondTier: 'diamond_pro', audioAccess: true, quotaMessages: 7000, quotaMinutes: 600 },
 };
 
+/** حدود سوق العقارات — مطابقة es-* / POST_LIMITS.estate */
+const ESTATE_PLANS = {
+  estate_trial: { planType: 'estate_trial', maxCatalogItems: 3, maxPhotosPerItem: 8, videoMaxSec: 0, videoMaxMb: 0, videoWatermark: true, features: ['dashboard_access', 'visit_requests', 'agency_hours'] },
+  estate_monthly: { planType: 'estate_monthly', maxCatalogItems: 25, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['intro_video', 'analytics', 'verified_badge', 'map_listing', 'referral'] },
+  estate_quarterly: { planType: 'estate_quarterly', maxCatalogItems: 80, maxPhotosPerItem: 10, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['intro_video', 'analytics', 'priority_listing', 'visit_stats'] },
+  estate_yearly: { planType: 'estate_yearly', maxCatalogItems: 200, maxPhotosPerItem: 12, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['intro_video', 'analytics', 'priority_listing', 'vip_badge', 'annual_reports'] },
+  estate_diamond: { planType: 'estate_diamond', maxCatalogItems: Infinity, maxPhotosPerItem: 12, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'quota_dashboard'], diamondTier: 'diamond_standard', audioAccess: false, quotaMessages: 2000, quotaMinutes: 0 },
+  estate_diamond_pro: { planType: 'estate_diamond_pro', maxCatalogItems: Infinity, maxPhotosPerItem: 12, videoMaxSec: 90, videoMaxMb: 50, videoWatermark: false, features: ['unlimited_products', 'intro_video', 'analytics', 'extra_photos', 'priority_listing', 'vip_badge', 'ai_agent_full', 'widget_channel', 'whatsapp_channel', 'calls_channel', 'auto_reply_calls', 'quota_dashboard'], diamondTier: 'diamond_pro', audioAccess: true, quotaMessages: 4000, quotaMinutes: 300 },
+};
+
 const FREE_FALLBACK = INDIVIDUAL_PLANS.free;
 
 /** باقات Rizq ADS / الفيديو الإعلاني — تقارير آلية + دعم VIP (بلا مدير حساب يدوي) */
@@ -618,6 +628,12 @@ const PACKAGE_ID_TO_PLAN = {
   'cp-year': 'corp_yearly',
   'cp-diam-std': 'corp_diamond',
   'cp-diam-pro': 'corp_diamond_pro',
+  'es-trial': 'estate_trial',
+  'es-month': 'estate_monthly',
+  'es-quart': 'estate_quarterly',
+  'es-year': 'estate_yearly',
+  'es-diam-std': 'estate_diamond',
+  'es-diam-pro': 'estate_diamond_pro',
 };
 
 function mapPackageIdToPlanType(packageId, accountType) {
@@ -630,12 +646,15 @@ function mapPackageIdToPlanType(packageId, accountType) {
   if (/^of-diam/.test(id)) return 'office_diamond';
   if (/^cp-diam-pro$/.test(id)) return 'corp_diamond_pro';
   if (/^cp-diam/.test(id)) return 'corp_diamond';
+  if (/^es-diam-pro$/.test(id)) return 'estate_diamond_pro';
+  if (/^es-diam/.test(id)) return 'estate_diamond';
   if (/^tnd-/.test(id)) return mapTenderPackageToPlanType({ packageId: id });
   if (/^inv-/.test(id)) return mapInvestmentPackageToPlanType({ packageId: id });
   if (/^vid-/.test(id)) return mapMediaPackageToPlanType({ packageId: id });
   const type = String(accountType || 'individual').toLowerCase();
   if (type === 'store' || type === 'shop') return 'store_monthly';
-  if (type === 'office' || type === 'estate') return 'office_monthly';
+  if (type === 'estate') return 'estate_monthly';
+  if (type === 'office') return 'office_monthly';
   if (type === 'corp') return 'corp_monthly';
   return null;
 }
@@ -665,7 +684,18 @@ function mapPackageNameToPlanType(pkgName, accountType, packageId) {
     if (/شهر|month/.test(name)) return 'store_monthly';
     return 'store_monthly';
   }
-  if (type === 'office' || type === 'estate') {
+  if (type === 'estate') {
+    if (/تجريب|trial|مجان/.test(name)) return 'estate_trial';
+    if (/ماس|diamond|diamant/.test(name)) {
+      if (/pro|pro للعقارات|متقدم.*pro/i.test(name)) return 'estate_diamond_pro';
+      return 'estate_diamond';
+    }
+    if (/سنو|year|annual/.test(name)) return 'estate_yearly';
+    if (/ربع|quarter/.test(name)) return 'estate_quarterly';
+    if (/شهر|month/.test(name)) return 'estate_monthly';
+    return 'estate_monthly';
+  }
+  if (type === 'office') {
     if (/تجريب|trial|مجان/.test(name)) return 'office_trial';
     if (/ماس|diamond|diamant/.test(name)) {
       if (/pro|pro للمكاتب|متقدم.*pro/i.test(name)) return 'office_diamond_pro';
@@ -705,10 +735,12 @@ function resolvePlanDefinition(planType, accountType) {
   if (planType === 'diamond_pro') return DIAMOND_PRO_PLAN;
   if (INDIVIDUAL_PLANS[planType]) return INDIVIDUAL_PLANS[planType];
   if (STORE_PLANS[planType]) return STORE_PLANS[planType];
+  if (ESTATE_PLANS[planType]) return ESTATE_PLANS[planType];
   if (OFFICE_PLANS[planType]) return OFFICE_PLANS[planType];
   if (CORP_PLANS[planType]) return CORP_PLANS[planType];
   if (t === 'store') return STORE_PLANS.store_trial;
-  if (t === 'office' || t === 'estate') return OFFICE_PLANS.office_basic;
+  if (t === 'estate') return ESTATE_PLANS.estate_trial;
+  if (t === 'office') return OFFICE_PLANS.office_basic;
   if (t === 'corp') return CORP_PLANS.corp_trial;
   return FREE_FALLBACK;
 }
@@ -897,6 +929,7 @@ module.exports = {
   INDIVIDUAL_PLANS,
   STORE_PLANS,
   OFFICE_PLANS,
+  ESTATE_PLANS,
   CORP_PLANS,
   TENDER_PLANS,
   TENDER_PUBLIC_ACCESS,

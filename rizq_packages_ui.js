@@ -10,6 +10,7 @@
     office: 'rizq_office_packages',
     store: 'rizq_store_packages',
     corp: 'rizq_corp_packages',
+    estate: 'rizq_estate_packages',
     video: 'rizq_video_packages',
     tender: 'rizq_tender_packages',
     investment: 'rizq_investment_packages',
@@ -68,7 +69,7 @@
   }
 
   function isTrial(p) {
-    return !Number(p.price) || p.id === 'trial' || /trial|تجرب|ind-free|cp-trial|st-trial|of-trial|^Essai$/i.test(String(p.name || ''));
+    return !Number(p.price) || p.id === 'trial' || /trial|تجرب|ind-free|cp-trial|st-trial|of-trial|es-trial|^Essai$/i.test(String(p.id || '') + ' ' + String(p.name || ''));
   }
 
   function isYearly(p) {
@@ -213,7 +214,7 @@
     var trial = isTrial(p);
     var year = isYearly(p);
     var quarter = isQuarterly(p);
-    var highlight = !!p.highlight || (!trial && !dia && !year && (p.id === 'st-month' || p.id === 'cp-month' || p.id === 'of-month' || p.id === 'vid-pro' || p.name === 'Pro' || p.name === 'احترافية'));
+    var highlight = !!p.highlight || (!trial && !dia && !year && (p.id === 'st-month' || p.id === 'cp-month' || p.id === 'of-month' || p.id === 'es-month' || p.id === 'vid-pro' || p.name === 'Pro' || p.name === 'احترافية'));
     var bg, border, nameCol, priceCol, featCol, periodCol, btnStyle;
     if (light) {
       bg = dia ? 'linear-gradient(160deg,#fffdf5,#fff8e7)' : year ? 'linear-gradient(160deg,#ffffff,#f7f9ff)' : highlight ? 'linear-gradient(160deg,#fffaf0,#fff7e6)' : trial ? 'linear-gradient(160deg,#f0fdf4,#dcfce7)' : '#ffffff';
