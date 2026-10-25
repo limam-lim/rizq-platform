@@ -9,7 +9,7 @@
   function ensureOps(cb) {
     if (window.RizqOps) return cb();
     var s = document.createElement('script');
-    s.src = 'rizq_ops_client.js?v=1.0';
+    s.src = 'rizq_ops_client.js?v=1.1';
     s.onload = cb;
     document.head.appendChild(s);
   }
@@ -65,6 +65,39 @@
     });
   }
 
+  function closeReceiptModal() {
+    var m = document.getElementById('rizq-receipt-modal');
+    if (m) m.remove();
+  }
+
+  function showReceiptModal(payload) {
+    closeReceiptModal();
+    var overlay = document.createElement('div');
+    overlay.id = 'rizq-receipt-modal';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(15,35,71,.55);display:flex;align-items:center;justify-content:center;padding:16px;font-family:Cairo,sans-serif';
+    var receipt = payload.paymentReceipt || '';
+    var isImg = /^data:image\//i.test(receipt) || /\.(png|jpe?g|webp|gif)(\?|$)/i.test(receipt);
+    var bodyHtml = isImg
+      ? '<img src="' + esc(receipt) + '" alt="وصل الدفع" style="max-width:100%;max-height:70vh;border-radius:10px;display:block;margin:0 auto"/>'
+      : '<pre style="white-space:pre-wrap;word-break:break-word;font-size:12px;background:#f8fafc;padding:12px;border-radius:8px;max-height:60vh;overflow:auto">' + esc(receipt.slice(0, 4000)) + '</pre>';
+    overlay.innerHTML =
+      '<div style="background:#fff;border-radius:14px;max-width:560px;width:100%;padding:16px;box-shadow:0 20px 50px rgba(15,35,71,.25)">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">' +
+      '<strong style="color:#0f2347">معاينة وصل الدفع · #' + esc(payload.orderNumber || '') + '</strong>' +
+      '<button type="button" id="rizq-receipt-close" class="btn btn-outline btn-sm">إغلاق</button></div>' +
+      '<div style="font-size:13px;color:#475569;margin-bottom:10px;line-height:1.55">' +
+      'الحالة: <strong>' + esc(payload.paymentStatus || '') + '</strong>' +
+      (payload.paymentReference ? '<br/>المرجع: ' + esc(payload.paymentReference) : '') +
+      (payload.paymentMethod ? '<br/>الطريقة: ' + esc(payload.paymentMethod) : '') +
+      '</div>' + bodyHtml + '</div>';
+    overlay.addEventListener('click', function (ev) {
+      if (ev.target === overlay) closeReceiptModal();
+    });
+    document.body.appendChild(overlay);
+    var btn = document.getElementById('rizq-receipt-close');
+    if (btn) btn.onclick = closeReceiptModal;
+  }
+
   function render() {
     ensureOps(function () {
       var sid = sellerId();
@@ -88,11 +121,14 @@
           return '<div style="border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:8px">' +
             '<strong>#' + esc(o.orderNumber) + '</strong> · ' + esc(o.status) + ' · ' + esc(o.total) + ' ' + esc(o.currency || 'MRU') +
             (o.paymentReference ? '<br/>Ref: ' + esc(o.paymentReference) : '') +
+            (o.paymentReceiptStored ? '<br/><span style="color:#0f2347;font-size:12px;font-weight:700">📎 وصل مرفق</span>' : '') +
             '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">' +
             (o.status === 'new' ? '<button type="button" class="btn btn-sm btn-primary" onclick="window.rizqSellerAdvance&&rizqSellerAdvance(\'' + o.id + '\',\'accepted\')">قبول</button>' : '') +
             (o.status === 'accepted' ? '<button type="button" class="btn btn-sm btn-primary" onclick="window.rizqSellerAdvance&&rizqSellerAdvance(\'' + o.id + '\',\'out_for_delivery\')">خرج للتوصيل</button>' : '') +
             (o.status === 'out_for_delivery' ? '<button type="button" class="btn btn-sm btn-primary" onclick="window.rizqSellerAdvance&&rizqSellerAdvance(\'' + o.id + '\',\'completed\')">تم التسليم</button>' : '') +
+            (o.paymentReceiptStored ? '<button type="button" class="btn btn-sm btn-outline" onclick="window.rizqSellerReceipt&&rizqSellerReceipt(\'' + o.id + '\')">معاينة الوصل</button>' : '') +
             (o.paymentStatus === 'awaiting_review' ? '<button type="button" class="btn btn-sm btn-outline" onclick="window.rizqSellerPay&&rizqSellerPay(\'' + o.id + '\',\'approved\')">اعتماد الدفع</button>' : '') +
+            (o.paymentStatus === 'awaiting_review' ? '<button type="button" class="btn btn-sm btn-outline" onclick="window.rizqSellerPay&&rizqSellerPay(\'' + o.id + '\',\'rejected\')">رفض الدفع</button>' : '') +
             '</div></div>';
         }).join('');
       });
@@ -108,6 +144,19 @@
   window.rizqSellerPay = function (id, decision) {
     ensureOps(function () {
       window.RizqOps.reviewPayment(id, decision, sellerId(), '').then(function () { render(); });
+    });
+  };
+  window.rizqSellerReceipt = function (id) {
+    ensureOps(function () {
+      window.RizqOps.fetchPaymentReceipt(id, sellerId()).then(function (j) {
+        if (!j || !j.ok) {
+          alert((j && j.error) || 'تعذّر تحميل الوصل');
+          return;
+        }
+        showReceiptModal(j);
+      }).catch(function () {
+        alert('تعذّر تحميل الوصل');
+      });
     });
   };
 

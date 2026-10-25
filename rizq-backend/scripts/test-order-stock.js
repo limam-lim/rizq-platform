@@ -69,4 +69,30 @@ ok(catalog[0].stock === '5', 'restore returns stock 3→5');
 
 ok(OrderStock.cleanProductId('store-prod-abc__v_red') === 'abc', 'cleanProductId strips prefixes');
 
+// حجز متزامن تحت القفل — لا يبيع أكثر من المتاح
+catalog = [{ id: 'p_race', accountId: 'store_a', name: 'سباق', stock: '3', sold: 0, status: 'active' }];
+let raceErr = 0;
+let raceOk = 0;
+function tryReserveOne() {
+  try {
+    OrderStock.reserveForOrder({
+      sellerId: 'store_a',
+      items: [{ productId: 'p_race', qty: 2 }],
+    }, deps);
+    raceOk += 1;
+  } catch (e) {
+    if (e.code === 'OUT_OF_STOCK') raceErr += 1;
+    else throw e;
+  }
+}
+tryReserveOne();
+tryReserveOne();
+ok(raceOk === 1 && raceErr === 1, 'serialized reserves: one ok, one OUT_OF_STOCK');
+ok(catalog[0].stock === '1', 'race leaves stock at 1 (3−2)');
+
+ok(typeof OrderStock.withCatalogStockLock === 'function', 'withCatalogStockLock exported');
+let lockedVal = 0;
+OrderStock.withCatalogStockLock(() => { lockedVal = 7; });
+ok(lockedVal === 7, 'withCatalogStockLock runs critical section');
+
 console.log('\nAll order-stock checks passed.\n');

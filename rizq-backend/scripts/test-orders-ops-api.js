@@ -150,6 +150,21 @@ async function main() {
   }
   ok(payFail, 'digital payment requires reference');
 
+  const withReceipt = Order.createOrder({
+    buyerId: reg.buyer.id,
+    sellerId: 'store_test_ops_001',
+    items: [{ title: 'وصل', qty: 1, unitPrice: 100 }],
+    paymentMethod: 'bankily',
+    paymentReference: 'BK-RCPT-' + stamp,
+    paymentReceipt: 'data:image/png;base64,iVBORw0KGgo=',
+    delivery: { name: 'م', phone: '2' },
+  });
+  const receiptOrder = Order.getById(withReceipt.id, { includeReceipt: true });
+  ok(!!receiptOrder.paymentReceiptRaw && receiptOrder.paymentReceiptStored, 'includeReceipt returns raw receipt');
+
+  const snap = Order.exportBackupSnapshot({ limit: 10 });
+  ok(snap && snap.version === 1 && Array.isArray(snap.orders) && snap.exported >= 1, 'orders backup snapshot');
+
   console.log('\nAll ops smoke checks passed.\n');
 }
 

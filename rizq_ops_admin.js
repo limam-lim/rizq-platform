@@ -17,10 +17,13 @@
   function ensureOpsClient(cb) {
     if (window.RizqOps) return cb();
     var s = document.createElement('script');
-    s.src = 'rizq_ops_client.js?v=1.0';
+    s.src = 'rizq_ops_client.js?v=1.1';
     s.onload = cb;
     document.head.appendChild(s);
   }
+
+  var _lastDisputed = 0;
+  var _baseTitle = '';
 
   function injectUi() {
     var sidebar = document.querySelector('.sidebar') || document.querySelector('[class*="sb-nav"]') || document.querySelector('.sb-item') && document.querySelector('.sb-item').parentElement;
@@ -80,10 +83,21 @@
           '<div style="background:#f8faff;border:1px solid #e2e8f0;border-radius:12px;padding:12px"><div style="font-size:11px;color:#64748b">إيراد اليوم</div><div style="font-size:22px;font-weight:900;color:#c9a84c">' + (m.todayRevenue || 0) + '</div></div>' +
           '<div style="background:#f8faff;border:1px solid #e2e8f0;border-radius:12px;padding:12px"><div style="font-size:11px;color:#64748b">نزاعات مفتوحة</div><div style="font-size:22px;font-weight:900;color:#b91c1c">' + (m.disputedOpen || 0) + '</div></div>';
         var badge = document.getElementById('disputes-badge');
+        var openN = Number(m.disputedOpen) || 0;
         if (badge) {
-          if (m.disputedOpen) { badge.textContent = String(m.disputedOpen); badge.style.display = ''; }
+          if (openN) { badge.textContent = String(openN); badge.style.display = ''; }
           else badge.style.display = 'none';
         }
+        if (!_baseTitle) _baseTitle = document.title || 'رزق — إدارة';
+        if (openN > 0) {
+          document.title = '(' + openN + ') نزاع · ' + _baseTitle;
+          if (openN > _lastDisputed && typeof showToast === 'function') {
+            showToast('نزاعات مفتوحة: ' + openN, 'error');
+          }
+        } else if (_baseTitle) {
+          document.title = _baseTitle;
+        }
+        _lastDisputed = openN;
       }).catch(function () {});
 
       window.RizqOps.listDisputed().then(function (j) {
@@ -137,10 +151,23 @@
     };
   }
 
+  function startBadgePolling() {
+    if (window.__rizqDisputePoll) return;
+    window.__rizqDisputePoll = setInterval(function () {
+      if (!document.getElementById('disputes-badge')) return;
+      renderAdminOrders();
+    }, 45000);
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { injectUi(); setTimeout(renderAdminOrders, 800); });
+    document.addEventListener('DOMContentLoaded', function () {
+      injectUi();
+      setTimeout(renderAdminOrders, 800);
+      startBadgePolling();
+    });
   } else {
     injectUi();
     setTimeout(renderAdminOrders, 800);
+    startBadgePolling();
   }
 })();

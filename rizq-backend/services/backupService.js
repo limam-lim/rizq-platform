@@ -93,10 +93,43 @@ async function buildManifest(backendRoot) {
   };
 }
 
+function writeOrdersSnapshot(metaRoot, backendRoot) {
+  try {
+    const Order = require('../models/order');
+    const snap = Order.exportBackupSnapshot({ limit: 5000 });
+    fs.writeFileSync(
+      path.join(metaRoot, 'orders-snapshot.json'),
+      JSON.stringify(snap, null, 2),
+      'utf8'
+    );
+    return {
+      ok: true,
+      exported: snap.exported,
+      totalOrders: snap.totalOrders,
+      hasRizqDb: fs.existsSync(path.join(backendRoot || backendRootFromModule(), 'data', 'rizq.db')),
+    };
+  } catch (e) {
+    console.warn('[backup] orders snapshot skipped:', e.message);
+    return { ok: false, error: e.message };
+  }
+}
+
 async function createTarGz(backendRoot, manifest, tarGzPath) {
   const metaRoot = path.join(backendRoot, '_rizq_backup');
   fs.mkdirSync(metaRoot, { recursive: true });
-  fs.writeFileSync(path.join(metaRoot, 'manifest.json'), JSON.stringify(manifest, null, 2), 'utf8');
+
+  const ordersMeta = writeOrdersSnapshot(metaRoot, backendRoot);
+  const enriched = Object.assign({}, manifest, {
+    includes: {
+      dataDir: true,
+      uploadsDir: fs.existsSync(path.join(backendRoot, 'uploads')),
+      rizqDb: fs.existsSync(path.join(backendRoot, 'data', 'rizq.db')),
+      ordersSnapshot: !!(ordersMeta && ordersMeta.ok),
+      ordersExported: (ordersMeta && ordersMeta.exported) || 0,
+      ordersTotal: (ordersMeta && ordersMeta.totalOrders) || 0,
+    },
+  });
+  fs.writeFileSync(path.join(metaRoot, 'manifest.json'), JSON.stringify(enriched, null, 2), 'utf8');
 
   const include = ['_rizq_backup'];
   if (fs.existsSync(path.join(backendRoot, 'data'))) include.push('data');

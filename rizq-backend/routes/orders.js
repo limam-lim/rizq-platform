@@ -238,9 +238,6 @@ router.get('/:id', orderLimiter, asyncHandler(async (req, res) => {
     if (!id || !token) return null;
     return Buyer.findByIdAndToken(id, token);
   })();
-  const sellerOk = (() => {
-    try { return !!requireSeller(req, { status() { return this; }, json() {} }, order.sellerId); } catch (e) { return false; }
-  })();
   // إعادة فحص البائع بشكل صحيح
   let sellerAllowed = false;
   try {
@@ -253,6 +250,26 @@ router.get('/:id', orderLimiter, asyncHandler(async (req, res) => {
     return sendError(res, 403, 'غير مصرّح', 'FORBIDDEN');
   }
   res.json({ ok: true, order });
+}));
+
+/** GET /:id/receipt — معاينة وصل الدفع للبائع */
+router.get('/:id/receipt', orderLimiter, asyncHandler(async (req, res) => {
+  const order = Order.getById(req.params.id, { includeReceipt: true });
+  if (!order) return sendError(res, 404, 'الطلب غير موجود', 'NOT_FOUND');
+  const acc = requireSeller(req, res, order.sellerId);
+  if (!acc) return;
+  if (!order.paymentReceiptRaw) {
+    return sendError(res, 404, 'لا يوجد وصل محفوظ لهذا الطلب', 'NO_RECEIPT');
+  }
+  res.json({
+    ok: true,
+    orderId: order.id,
+    orderNumber: order.orderNumber,
+    paymentMethod: order.paymentMethod,
+    paymentReference: order.paymentReference,
+    paymentStatus: order.paymentStatus,
+    paymentReceipt: order.paymentReceiptRaw,
+  });
 }));
 
 /** PATCH /:id/status */
@@ -371,6 +388,16 @@ router.post('/:id/dispute', orderLimiter, asyncHandler(async (req, res) => {
     });
     res.json({ ok: true, order: updated });
     fireBuyerNotify(updated, 'disputed');
+    setImmediate(() => {
+      try {
+        const { sendOrderDisputeAlert } = require('../services/telegramAdmin');
+        Promise.resolve(sendOrderDisputeAlert(updated)).catch((e) => {
+          console.warn('[orders/dispute-telegram]', e && e.message);
+        });
+      } catch (e) {
+        console.warn('[orders/dispute-telegram]', e && e.message);
+      }
+    });
   } catch (err) {
     return sendError(res, err.status || 400, err.message, err.code);
   }

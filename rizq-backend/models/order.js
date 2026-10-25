@@ -461,6 +461,33 @@ function exportBuyerData(buyerId) {
   };
 }
 
+/**
+ * لقطة نسخ احتياطي صريحة للطلبات (بدون صور وصل كاملة لتفادي تضخّم الأرشيف).
+ * ملف rizq.db داخل data/ يبقى المصدر الكامل بما فيه payment_receipt.
+ */
+function exportBackupSnapshot({ limit = 5000 } = {}) {
+  const lim = Math.max(1, Math.min(20000, Number(limit) || 5000));
+  const rows = db.prepare(
+    'SELECT * FROM orders ORDER BY created_at DESC LIMIT ?'
+  ).all(lim);
+  const orders = rows.map((row) => {
+    const o = mapOrder(row);
+    o.items = listItems(row.id);
+    o.history = listHistory(row.id);
+    o.paymentReceiptBytes = row.payment_receipt ? Buffer.byteLength(String(row.payment_receipt), 'utf8') : 0;
+    return o;
+  });
+  const countRow = db.prepare('SELECT COUNT(*) AS n FROM orders').get();
+  return {
+    version: 1,
+    createdAt: new Date().toISOString(),
+    totalOrders: countRow ? countRow.n : orders.length,
+    exported: orders.length,
+    note: 'Full payment receipts remain in data/rizq.db; this JSON is an operational index.',
+    orders,
+  };
+}
+
 function anonymizeBuyerOrders(buyerId) {
   const now = new Date().toISOString();
   db.prepare(`
@@ -492,6 +519,7 @@ module.exports = {
   sellerMetrics,
   adminMetrics,
   exportBuyerData,
+  exportBackupSnapshot,
   anonymizeBuyerOrders,
   canTransition,
 };

@@ -380,7 +380,53 @@ function adminHasPermission(req, ...keys) {
 
 const anthropic = new Anthropic({ apiKey: getAnthropicApiKey() });
 
-app.get('/health', (req, res) => res.json({ ok: true }));
+function getOpsReadiness() {
+  const vapidPublic = !!String(process.env.VAPID_PUBLIC_KEY || '').trim();
+  const vapidPrivate = !!String(process.env.VAPID_PRIVATE_KEY || '').trim();
+  let pushReady = false;
+  try {
+    pushReady = !!require('./models/pushSubscription').ensureVapid();
+  } catch (e) {
+    pushReady = false;
+  }
+  let telegram = { configured: false };
+  try {
+    const tg = require('./services/telegramAdmin');
+    telegram = {
+      configured: !!tg.isConfigured(),
+      diagnostics: typeof tg.getTelegramDiagnostics === 'function' ? tg.getTelegramDiagnostics() : undefined,
+    };
+  } catch (e) {
+    telegram = { configured: false, error: e.message };
+  }
+  const backupKey = !!String(process.env.BACKUP_ENCRYPTION_KEY || '').trim();
+  return {
+    production: isProdEnv(),
+    push: {
+      vapidConfigured: vapidPublic && vapidPrivate,
+      ready: pushReady,
+      subject: process.env.VAPID_SUBJECT || 'mailto:direction@rizq.mr',
+    },
+    notifyChannels: {
+      smtp: !!(process.env.SMTP_HOST || process.env.SMTP_URL),
+      twilio: !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN),
+      telegram: !!telegram.configured,
+    },
+    telegram,
+    backup: {
+      encryptionKeySet: backupKey,
+      dir: process.env.BACKUP_DIR || 'backups',
+    },
+  };
+}
+
+app.get('/health', (req, res) => {
+  const body = { ok: true };
+  if (String(req.query.ready || '') === '1') {
+    body.readiness = getOpsReadiness();
+  }
+  res.json(body);
+});
 
 // دليل المساعدة العام للزوّار = HTML فقط.
 // الأدلة التقنية (MD) محجوبة عن الزوّار وتتطلّب مصادقة أدمن.
@@ -4261,6 +4307,18 @@ function assertProductionSecrets() {
     console.error('[FATAL] SUPER_ADMIN_PASS_HASH must be a bcrypt hash');
     process.exit(1);
   }
+  const vapidPublic = String(process.env.VAPID_PUBLIC_KEY || '').trim();
+  const vapidPrivate = String(process.env.VAPID_PRIVATE_KEY || '').trim();
+  if (!vapidPublic || !vapidPrivate) {
+    console.warn('[WARN] VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY missing — Web Push disabled in production (in-app alerts only)');
+  }
+  if (!String(process.env.BACKUP_ENCRYPTION_KEY || '').trim()) {
+    console.warn('[WARN] BACKUP_ENCRYPTION_KEY missing — encrypted daily backup will fail until set');
+  }
+  if (!String(process.env.TELEGRAM_BOT_TOKEN || '').trim()
+    || !String(process.env.TELEGRAM_ADMIN_CHAT_ID || process.env.TELEGRAM_CHAT_ID || '').trim()) {
+    console.warn('[WARN] Telegram admin not fully configured — order dispute alerts will be skipped');
+  }
 }
 assertProductionSecrets();
 
@@ -4276,6 +4334,15 @@ app.listen(PORT, HOST, async () => {
   await logTelegramEnvStatus();
   if (isTelegramAdminConfigured()) {
     console.log('[telegram-admin] subscription alerts enabled');
+  }
+  try {
+    const ready = getOpsReadiness();
+    console.log('[ops-readiness] push.vapidConfigured=' + ready.push.vapidConfigured
+      + ' push.ready=' + ready.push.ready
+      + ' telegram=' + ready.notifyChannels.telegram
+      + ' backupKey=' + ready.backup.encryptionKeySet);
+  } catch (eReady) {
+    console.warn('[ops-readiness]', eReady && eReady.message);
   }
   if (shouldUseTelegramPolling()) {
     const { getTelegramDeps } = require('./services/telegramDeps');

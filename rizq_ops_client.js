@@ -138,6 +138,13 @@
     }).then(function (r) { return r.json(); });
   }
 
+  function fetchPaymentReceipt(orderId, sellerId) {
+    return fetch(apiBase() + '/api/orders/' + encodeURIComponent(orderId) + '/receipt', {
+      headers: sellerHeaders(sellerId),
+      credentials: 'include'
+    }).then(function (r) { return r.json(); });
+  }
+
   function sellerMetrics(sellerId) {
     return fetch(apiBase() + '/api/orders/metrics/seller?sellerId=' + encodeURIComponent(sellerId), {
       headers: sellerHeaders(sellerId),
@@ -347,6 +354,7 @@
     cancelOrder: cancelOrder,
     disputeOrder: disputeOrder,
     reviewPayment: reviewPayment,
+    fetchPaymentReceipt: fetchPaymentReceipt,
     sellerMetrics: sellerMetrics,
     adminMetrics: adminMetrics,
     listDisputed: listDisputed,
