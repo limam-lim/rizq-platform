@@ -504,9 +504,8 @@ button{font:inherit;border:0;background:none;color:inherit}
 .est-agency-photo img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
 .est-agency-photo::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,28,51,.5),transparent 45%)}
 
-/* باقات سوق العقارات — نماذج فقط؛ تُخفى على الوكالة الحقيقية */
+/* باقات سوق العقارات — نماذج فقط؛ الإظهار/الإخفاء عبر JS (display inline) */
 #estate-packages{
-  display:none;
   padding:64px 20px 72px;
   background:linear-gradient(180deg,#f7f9fc 0%,#eef2f7 100%);
   border-top:1px solid rgba(27,58,107,.08);
@@ -1174,7 +1173,7 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
 </main>
 
 <!-- باقات سوق العقارات — للنماذج فقط؛ تُخفى عن الوكالة الحقيقية -->
-<section id="estate-packages" aria-label="باقات سوق العقارات">
+<section id="estate-packages" style="display:none" aria-label="باقات سوق العقارات">
   <div class="est-pkg-inner">
     <div class="est-pkg-head">
       <p class="est-pkg-eyebrow" id="est-pkg-eyebrow">Rizq Estate — الباقات</p>
