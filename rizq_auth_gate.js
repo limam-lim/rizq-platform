@@ -8,6 +8,7 @@
   if (window.RizqAuthGate) return;
 
   var SESSION_KEY = 'rizq_buyer_session';
+  var TOKEN_MEM_KEY = 'rizq_buyer_token_mem';
   var WISHLIST_KEY = 'rizq_wishlist';
   var DRAFT_KEY = 'rizq_buyer_draft';
   var VERIFIED_EMAILS_KEY = 'rizq_verified_emails';
@@ -18,6 +19,7 @@
   var _otpConfig = { devHintEnabled: false, production: false };
   var _ragOpenedAt = 0;
   var _lastReasonKey = 'reasonGeneric';
+  var _cookieSessionOk = false;
 
   var MR_PHONE_RE = /^(2[0-9]|3[0-9]|4[0-9])\d{6}$/;
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -112,6 +114,14 @@
       reasonGeneric: 'للمتابعة',
       otpSent: 'تم إرسال الرمز إلى بريدك',
       otpDevHint: 'بيئة تطوير — الرمز:',
+      passkeyLogin: 'الدخول بـ Passkey / بصمة الوجه والإصبع',
+      passkeyLoginSub: 'أسرع وأكثر أماناً على هذا الجهاز',
+      passkeyEnable: 'تفعيل Passkey (بصمة / Face ID)',
+      passkeyEnabled: '✅ تم تفعيل Passkey على هذا الجهاز',
+      passkeyBusy: 'انتظر طلب البصمة…',
+      passkeyUnsupported: 'جهازك أو متصفحك لا يدعم Passkeys — استخدم البريد ورمز التحقق',
+      passkeyFailed: 'تعذّر إكمال البصمة — يمكنك المتابعة بالبريد أو كلمة المرور',
+      passkeyCancelled: 'تم إلغاء طلب البصمة',
     },
     fr: {
       titleGate: 'Dernière étape avant de continuer',
@@ -180,6 +190,14 @@
       reasonGeneric: 'pour continuer',
       otpSent: 'Code envoyé à votre e-mail',
       otpDevHint: 'dev — code :',
+      passkeyLogin: 'Connexion Passkey / empreinte · Face ID',
+      passkeyLoginSub: 'Plus rapide et plus sûr sur cet appareil',
+      passkeyEnable: 'Activer Passkey (empreinte / Face ID)',
+      passkeyEnabled: '✅ Passkey activé sur cet appareil',
+      passkeyBusy: 'Validez la biométrie…',
+      passkeyUnsupported: 'Passkeys non supportés — utilisez e-mail + code',
+      passkeyFailed: 'Échec Passkey — continuez avec e-mail ou mot de passe',
+      passkeyCancelled: 'Demande biométrique annulée',
     }
   };
 
@@ -230,12 +248,34 @@
     try { localStorage.setItem(WISHLIST_KEY, JSON.stringify(ids || [])); } catch (e) {}
     try { window.dispatchEvent(new CustomEvent('rizq_wishlist', { detail: { ids: ids || [] } })); } catch (e2) {}
   }
+  function readTokenMem() {
+    try { return sessionStorage.getItem(TOKEN_MEM_KEY) || ''; } catch (e) { return ''; }
+  }
+  function writeTokenMem(token) {
+    try {
+      if (token) sessionStorage.setItem(TOKEN_MEM_KEY, String(token));
+      else sessionStorage.removeItem(TOKEN_MEM_KEY);
+    } catch (e) {}
+  }
   function buyerAuthHeaders(s) {
-    return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + s.token, 'X-Buyer-Id': s.id };
+    var headers = { 'Content-Type': 'application/json' };
+    var tok = (s && s.token) || readTokenMem();
+    var id = s && s.id;
+    if (tok && id) {
+      headers.Authorization = 'Bearer ' + tok;
+      headers['X-Buyer-Id'] = id;
+    }
+    return headers;
+  }
+  function buyerFetch(url, opts) {
+    opts = opts || {};
+    opts.credentials = 'include';
+    if (!opts.headers) opts.headers = {};
+    return fetch(url, opts);
   }
   function syncWishlistToServer(s) {
-    if (!s || !s.id || !s.token || !apiBase()) return Promise.resolve();
-    return fetch(apiBase() + '/api/wishlist/sync', {
+    if (!s || !s.id || !apiBase()) return Promise.resolve();
+    return buyerFetch(apiBase() + '/api/wishlist/sync', {
       method: 'POST', headers: buyerAuthHeaders(s), body: JSON.stringify({ ids: getLocalWishlist() })
     }).then(function (res) {
       return res.json().then(function (j) {
@@ -244,8 +284,8 @@
     }).catch(function () {});
   }
   function pullWishlistFromServer(s) {
-    if (!s || !s.id || !s.token || !apiBase()) return Promise.resolve();
-    return fetch(apiBase() + '/api/wishlist', { headers: buyerAuthHeaders(s) })
+    if (!s || !s.id || !apiBase()) return Promise.resolve();
+    return buyerFetch(apiBase() + '/api/wishlist', { headers: buyerAuthHeaders(s) })
       .then(function (res) {
         return res.json().then(function (j) {
           if (!res.ok || !j || !j.ok || !Array.isArray(j.ids)) return;
@@ -261,24 +301,76 @@
       }).catch(function () {});
   }
 
+  function profileFromBuyer(buyer, extra) {
+    extra = extra || {};
+    var out = {
+      id: buyer && buyer.id,
+      name: (buyer && buyer.name) || extra.name || '',
+      phone: (buyer && buyer.phone) || extra.phone || '',
+      phoneIntl: (buyer && buyer.phoneIntl) || extra.phoneIntl || '',
+      whatsapp: (buyer && buyer.whatsapp) || extra.whatsapp || '',
+      email: (buyer && buyer.email) || extra.email || '',
+      city: extra.city || (buyer && buyer.city) || '',
+      address: extra.address || (buyer && buyer.address) || '',
+      cookieAuth: true
+    };
+    return out;
+  }
+
   function getSession() {
-    try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch (e) { return null; }
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch (e) { s = null; }
+    if (!s || typeof s !== 'object') return null;
+    // هجرة: انقل التوكن من localStorage إلى sessionStorage ثم احذفه من LS
+    if (s.token) {
+      writeTokenMem(s.token);
+      try {
+        var clean = Object.assign({}, s);
+        delete clean.token;
+        localStorage.setItem(SESSION_KEY, JSON.stringify(clean));
+        s = clean;
+      } catch (eMig) {}
+    }
+    var mem = readTokenMem();
+    if (mem) s = Object.assign({}, s, { token: mem });
+    return s;
   }
   function setSession(s) {
-    try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch (e) {}
+    if (!s || !s.id) return;
+    if (s.token) writeTokenMem(s.token);
+    var profile = {
+      id: s.id,
+      name: s.name || '',
+      phone: s.phone || '',
+      phoneIntl: s.phoneIntl || '',
+      whatsapp: s.whatsapp || '',
+      email: s.email || '',
+      city: s.city || '',
+      address: s.address || '',
+      cookieAuth: true
+    };
+    try { localStorage.setItem(SESSION_KEY, JSON.stringify(profile)); } catch (e) {}
+    _cookieSessionOk = true;
   }
   function clearSession() {
+    _cookieSessionOk = false;
     try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+    writeTokenMem('');
+    if (!apiBase()) return;
+    buyerFetch(apiBase() + '/api/auth/logout', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+      .catch(function () {});
   }
   function isLoggedIn() {
     var s = getSession();
-    if (!s || !s.id || !s.token) return false;
-    // توكنات الخادم ≥ 20 حرفاً (randomBytes) — ارفض الجلسات المزوّرة/المحلية الوهمية
-    var tok = String(s.token);
+    if (!s || !s.id) return false;
     var id = String(s.id);
-    if (tok === 'local' || /^local_/i.test(id)) return false;
-    if (tok.length < 20 || id.length < 4) return false;
-    return true;
+    if (/^local_/i.test(id) || id.length < 4) return false;
+    // كوكي HttpOnly مؤكَّد عبر /me، أو توكن ترحيل ≥ 20 حرفاً
+    if (_cookieSessionOk || s.cookieAuth) return true;
+    var tok = String(s.token || readTokenMem() || '');
+    if (tok === 'local') return false;
+    if (tok.length >= 20) return true;
+    return false;
   }
   function saveDraft(data) {
     try { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); } catch (e) {}
@@ -288,17 +380,39 @@
   }
 
   function verifySessionSilently() {
+    if (!apiBase()) return;
     var s = getSession();
-    if (!s || !s.id || !s.token || !apiBase()) return;
-    fetch(apiBase() + '/api/auth/me', {
-      headers: {
-        'Authorization': 'Bearer ' + s.token,
-        'X-Buyer-Id': s.id
-      }
-    })
+    var memTok = readTokenMem();
+    // زائر بلا جلسة محلية وبلا توكن ترحيل: لا تستدعِ /me (يتجنّب ضجيج الشبكة)
+    // إن وُجدت جلسة/توكن فقط نتحقق — الكوكي HttpOnly يُجدَّد عند وجود id محلي
+    if ((!s || !s.id) && !memTok) {
+      _cookieSessionOk = false;
+      return;
+    }
+    var headers = buyerAuthHeaders(s || {});
+    buyerFetch(apiBase() + '/api/auth/me', { headers: headers })
       .then(function (res) {
-        if (res.status === 401) { clearSession(); return; }
-        if (res.ok) return pullWishlistFromServer(s);
+        if (res.status === 401) {
+          _cookieSessionOk = false;
+          try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+          writeTokenMem('');
+          return null;
+        }
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then(function (body) {
+        if (!body || body.guest) {
+          _cookieSessionOk = false;
+          return;
+        }
+        if (!body.ok || !body.buyer) return;
+        _cookieSessionOk = true;
+        var prev = getSession() || {};
+        setSession(profileFromBuyer(body.buyer, prev));
+        // بعد نجاح الكوكي لا نحتاج نسخة التوكن في sessionStorage
+        writeTokenMem('');
+        return pullWishlistFromServer(getSession());
       }).catch(function () {});
   }
 
@@ -399,6 +513,22 @@
       '#rag-overlay .rag-account-name{font-size:16px;font-weight:800;color:#1b3a6b;margin-bottom:4px}',
       '#rag-overlay .rag-account-meta{font-size:12px;color:#64748b;line-height:1.7}',
       '#rag-overlay .rag-seller-link{display:block;text-align:center;margin-top:10px;color:#1b3a6b;font-size:13px;font-weight:700;text-decoration:none}',
+      '#rag-overlay .rag-passkey-btn{display:none;width:100%;margin:0 0 12px;padding:14px 16px;border-radius:14px;border:1.5px solid rgba(201,168,76,.55);background:linear-gradient(135deg,#fffaf0,#fff);color:#0f2347;font-family:Cairo,\"Segoe UI\",sans-serif;font-size:14px;font-weight:800;cursor:pointer;text-align:center;line-height:1.45;box-shadow:0 4px 14px rgba(15,35,65,.08)}',
+      '#rag-overlay .rag-passkey-btn.show{display:block}',
+      '#rag-overlay .rag-passkey-btn:hover{border-color:#c9a84c;background:linear-gradient(135deg,#fff6e0,#fff)}',
+      '#rag-overlay .rag-passkey-btn:disabled{opacity:.65;cursor:wait}',
+      '#rag-overlay .rag-passkey-btn .rag-pk-sub{display:block;margin-top:4px;font-size:11.5px;font-weight:700;color:#8a6a18}',
+      '#rag-overlay .rag-passkey-enable{display:none;width:100%;margin:10px 0 0;padding:12px 14px;border-radius:12px;border:1.5px solid #1b3a6b;background:#0f2347;color:#e8c96a;font-family:Cairo,\"Segoe UI\",sans-serif;font-size:13.5px;font-weight:800;cursor:pointer}',
+      '#rag-overlay .rag-passkey-enable.show{display:block}',
+      '#rag-overlay .rag-passkey-enable:hover{background:#1b3a6b;color:#fff}',
+      '#rag-overlay .rag-ops{margin-top:14px;padding-top:12px;border-top:1px solid #e2e8f0}',
+      '#rag-overlay .rag-ops-title{font-size:13px;font-weight:900;color:#0f2347;margin:0 0 8px}',
+      '#rag-overlay .rag-ops-actions{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}',
+      '#rag-overlay .rag-ops-btn{font-family:Cairo,\"Segoe UI\",sans-serif;font-size:12px;font-weight:800;padding:8px 10px;border-radius:9px;border:1px solid #e2e8f0;background:#f8faff;color:#0f2347;cursor:pointer}',
+      '#rag-overlay .rag-ops-btn:hover{border-color:rgba(201,168,76,.55);background:#fffaf0}',
+      '#rag-overlay .rag-ops-btn.warn{border-color:rgba(220,38,38,.3);color:#b91c1c;background:#fff5f5}',
+      '#rag-overlay #rag-orders-list{max-height:220px;overflow:auto;margin-top:4px}',
+      '#rag-overlay #rag-alerts-list{max-height:120px;overflow:auto;font-size:12px;color:#475569;line-height:1.55}',
       '#rag-overlay .rag-step{display:none}',
       '#rag-overlay .rag-step.active{display:block}',
       'body.rizq-reg-open #rizq-chat-toggle,body.rizq-reg-open .mobile-bottom-nav,body.rizq-reg-open #nav,body.rizq-reg-open .fixed-rizq-logo,body.rizq-reg-open #rizq-rlogo-edge{visibility:hidden!important;pointer-events:none!important}',
@@ -435,6 +565,10 @@
       '    <div class="rag-intro" id="rag-intro"></div>',
       '    <div class="rag-returning" id="rag-returning"></div>',
       '    <div class="rag-step" id="rag-step-choice">',
+      '      <button type="button" class="rag-passkey-btn" id="rag-passkey-login-btn" aria-label="Passkey">',
+      '        <span id="rag-passkey-login-label"></span>',
+      '        <span class="rag-pk-sub" id="rag-passkey-login-sub"></span>',
+      '      </button>',
       '      <div class="rag-choice">',
       '        <div class="rag-choice-card" id="rag-choice-buyer" role="button" tabindex="0">',
       '          <div class="rag-choice-icon">👤</div>',
@@ -510,6 +644,19 @@
       '        <div class="rag-account-name" id="rag-acc-name"></div>',
       '        <div class="rag-account-meta" id="rag-acc-meta"></div>',
       '      </div>',
+      '      <button type="button" class="rag-passkey-enable" id="rag-passkey-enable-btn"></button>',
+      '      <div class="rag-ops" id="rag-ops">',
+      '        <div class="rag-ops-title" id="rag-ops-orders-title">طلباتي وتتبع التوصيل</div>',
+      '        <div id="rag-orders-list"><p style="font-size:12px;color:#94a3b8;margin:0">جاري التحميل…</p></div>',
+      '        <div class="rag-ops-title" id="rag-ops-alerts-title" style="margin-top:12px">تنبيهات</div>',
+      '        <div id="rag-alerts-list"></div>',
+      '        <div class="rag-ops-title" id="rag-ops-prefs-title" style="margin-top:12px">الإشعارات والخصوصية</div>',
+      '        <div class="rag-ops-actions">',
+      '          <button type="button" class="rag-ops-btn" id="rag-push-toggle">تفعيل إشعارات الجهاز</button>',
+      '          <button type="button" class="rag-ops-btn" id="rag-export-data">تحميل بياناتي</button>',
+      '          <button type="button" class="rag-ops-btn warn" id="rag-erase-account">حذف حسابي</button>',
+      '        </div>',
+      '      </div>',
       '      <button class="rag-btn rag-btn-ghost" id="rag-logout-btn" type="button"></button>',
       '      <a class="rag-seller-link" id="rag-seller-link" href="?openRegister=1"></a>',
       '    </div>',
@@ -581,6 +728,36 @@
       closeModal();
       if (typeof window.showToast === 'function') window.showToast(t('تم تسجيل الخروج', 'Déconnecté'), 'info');
     });
+    var pkLoginBtn = document.getElementById('rag-passkey-login-btn');
+    if (pkLoginBtn) pkLoginBtn.addEventListener('click', startPasskeyLogin);
+    var pkEnableBtn = document.getElementById('rag-passkey-enable-btn');
+    if (pkEnableBtn) pkEnableBtn.addEventListener('click', startPasskeyRegister);
+    var pushBtn = document.getElementById('rag-push-toggle');
+    if (pushBtn) pushBtn.addEventListener('click', togglePushFromAccount);
+    var exportBtn = document.getElementById('rag-export-data');
+    if (exportBtn) exportBtn.addEventListener('click', exportDataFromAccount);
+    var eraseBtn = document.getElementById('rag-erase-account');
+    if (eraseBtn) eraseBtn.addEventListener('click', eraseAccountFromAccount);
+    var ordersList = document.getElementById('rag-orders-list');
+    if (ordersList) {
+      ordersList.addEventListener('click', function (ev) {
+        var t = ev.target;
+        if (!t || !t.getAttribute) return;
+        var oid = t.getAttribute('data-oid');
+        if (!oid) return;
+        if (t.classList.contains('rag-ops-cancel')) {
+          var reasonC = prompt(t('سبب الإلغاء (اختياري)', 'Motif d\'annulation (optionnel)')) || '';
+          if (!window.RizqOps) return;
+          window.RizqOps.cancelOrder(oid, reasonC).then(function () { loadAccountOps(); });
+        }
+        if (t.classList.contains('rag-ops-dispute')) {
+          var reasonD = prompt(t('صف المشكلة باختصار', 'Décrivez le problème')) || '';
+          if (!reasonD) return;
+          if (!window.RizqOps) return;
+          window.RizqOps.disputeOrder(oid, reasonD).then(function () { loadAccountOps(); });
+        }
+      });
+    }
     document.getElementById('rag-email').addEventListener('blur', lookupReturningVisitor);
     document.getElementById('rag-wa-same').addEventListener('change', syncWhatsappFromPhones);
     document.getElementById('rag-phone-mr').addEventListener('input', function () {
@@ -746,6 +923,18 @@
     var loginSub = document.getElementById('rag-choice-seller-login-sub');
     if (loginTitle) loginTitle.textContent = dict.choiceSellerLogin;
     if (loginSub) loginSub.textContent = dict.choiceSellerLoginSub;
+    var pkLbl = document.getElementById('rag-passkey-login-label');
+    var pkSub = document.getElementById('rag-passkey-login-sub');
+    var pkBtn = document.getElementById('rag-passkey-login-btn');
+    if (pkLbl) pkLbl.textContent = '🔐 ' + dict.passkeyLogin;
+    if (pkSub) pkSub.textContent = dict.passkeyLoginSub;
+    if (pkBtn) {
+      var canPk = !!(window.RizqPasskey && typeof window.RizqPasskey.supported === 'function' && window.RizqPasskey.supported() && apiBase());
+      pkBtn.classList.toggle('show', canPk);
+      pkBtn.disabled = false;
+    }
+    var pkEn = document.getElementById('rag-passkey-enable-btn');
+    if (pkEn) pkEn.textContent = '🔐 ' + dict.passkeyEnable;
     document.getElementById('rag-name-label').textContent = dict.nameLabel;
     document.getElementById('rag-name').placeholder = dict.namePh;
     document.getElementById('rag-phone-mr-label').textContent = dict.phoneMrLabel;
@@ -1070,6 +1259,19 @@
       }
       closeModal();
       if (typeof window.showToast === 'function') window.showToast(d().successToast, 'success');
+      // بعد المصادقة: إن دعم الجهاز Passkeys اقترح التفعيل من حسابي
+      try {
+        if (window.RizqPasskey && window.RizqPasskey.supported() && apiBase()) {
+          setTimeout(function () {
+            if (typeof window.showToast === 'function') {
+              window.showToast(
+                t('🔐 فعّل البصمة من «حسابي» لدخول أسرع لاحقاً', '🔐 Activez Passkey depuis « Mon compte »'),
+                'info'
+              );
+            }
+          }, 900);
+        }
+      } catch (ePk) {}
       var hadPending = !!_pendingAction;
       runPendingAction();
       if (hadPending) {
@@ -1125,7 +1327,7 @@
           try { sellerCb(); } catch (e) {}
           return null;
         }
-        return fetch(apiBase() + '/api/auth/register', {
+        return buyerFetch(apiBase() + '/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -1140,7 +1342,8 @@
         btn.disabled = false;
         btn.textContent = dict.verifyBtn;
         if (!reg) return;
-        if (!reg.ok || !reg.body || !reg.body.ok || !reg.body.token) {
+        var hasSession = !!(reg.body && reg.body.ok && reg.body.buyer && (reg.body.token || reg.body.cookieAuth));
+        if (!reg.ok || !hasSession) {
           alert((reg.body && (reg.body.error || reg.body.message)) || networkErrorMsg(dict));
           return;
         }
@@ -1153,13 +1356,250 @@
           email: reg.body.buyer.email,
           city: data.city || '',
           address: data.address || '',
-          token: reg.body.token
+          token: reg.body.token || '',
+          cookieAuth: true
         });
       }).catch(function () {
         btn.disabled = false;
         btn.textContent = dict.verifyBtn;
         alert(networkErrorMsg(dict));
       });
+  }
+
+  function passkeyErrorMessage(err, dict) {
+    var name = err && (err.name || err.message) ? String(err.name || err.message) : '';
+    if (/NotAllowedError|cancelled|AbortError/i.test(name) || (err && err.message === 'cancelled')) {
+      return dict.passkeyCancelled;
+    }
+    if (/unsupported/i.test(name) || (err && err.message === 'unsupported')) {
+      return dict.passkeyUnsupported;
+    }
+    return dict.passkeyFailed;
+  }
+
+  function applyBuyerPasskeySession(body) {
+    if (!body || !body.buyer) return;
+    var session = {
+      id: body.buyer.id,
+      name: body.buyer.name,
+      phone: body.buyer.phone,
+      phoneIntl: body.buyer.phoneIntl,
+      whatsapp: body.buyer.whatsapp,
+      email: body.buyer.email,
+      city: '',
+      address: '',
+      token: body.token || '',
+      cookieAuth: true
+    };
+    setSession(session);
+    markEmailVerified(session.email);
+    syncWishlistToServer(session).finally(function () {
+      closeModal();
+      if (typeof window.showToast === 'function') window.showToast(d().welcomeBack, 'success');
+      var hadPending = !!_pendingAction;
+      runPendingAction();
+      if (hadPending) {
+        consumeAfterAuthHrefSafe();
+      } else {
+        var afterHref = consumeAfterAuthHrefSafe();
+        if (afterHref) location.href = afterHref;
+      }
+    });
+  }
+
+  function applySellerPasskeySession(body) {
+    if (!body || !body.account) return false;
+    var acc = body.account;
+    if (window.RizqAccount && typeof window.RizqAccount.mergeServerAccount === 'function') {
+      try { acc = window.RizqAccount.mergeServerAccount(acc) || acc; } catch (eM) {}
+    }
+    if (!acc.token && acc.dashToken) acc.token = acc.dashToken;
+    if (window.RizqAccount && typeof window.RizqAccount.setActiveSession === 'function' && acc.token) {
+      window.RizqAccount.setActiveSession(acc);
+    }
+    if (window.RizqDash && acc.accessToken && typeof window.RizqDash.rememberAccessToken === 'function') {
+      try { window.RizqDash.rememberAccessToken(acc.id, acc.accessToken); } catch (eA) {}
+    }
+    var url = '';
+    if (window.RizqAccount && typeof window.RizqAccount.buildDashboardUrl === 'function') {
+      url = window.RizqAccount.buildDashboardUrl(acc) || '';
+    }
+    closeModal();
+    if (typeof window.showToast === 'function') {
+      window.showToast(t('✅ تم الدخول بالبصمة', '✅ Connexion biométrique'), 'success');
+    }
+    if (url) {
+      if (window.RizqAccount && typeof window.RizqAccount.redirectAfterAuth === 'function') {
+        window.RizqAccount.redirectAfterAuth(url);
+      } else {
+        location.href = url;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  function startPasskeyLogin() {
+    var dict = d();
+    var btn = document.getElementById('rag-passkey-login-btn');
+    if (!window.RizqPasskey || !window.RizqPasskey.supported()) {
+      alert(dict.passkeyUnsupported);
+      return;
+    }
+    if (!apiBase()) {
+      alert(networkErrorMsg(dict));
+      return;
+    }
+    if (btn) {
+      btn.disabled = true;
+      var lbl = document.getElementById('rag-passkey-login-label');
+      if (lbl) lbl.textContent = dict.passkeyBusy;
+    }
+    window.RizqPasskey.login({ kind: 'any' }).then(function (body) {
+      if (btn) btn.disabled = false;
+      applyTexts(_lastReasonKey || 'reasonGeneric');
+      if (body.kind === 'seller') {
+        applySellerPasskeySession(body);
+        return;
+      }
+      applyBuyerPasskeySession(body);
+    }).catch(function (err) {
+      if (btn) btn.disabled = false;
+      applyTexts(_lastReasonKey || 'reasonGeneric');
+      alert(passkeyErrorMessage(err, dict));
+    });
+  }
+
+  function startPasskeyRegister() {
+    var dict = d();
+    var btn = document.getElementById('rag-passkey-enable-btn');
+    if (!window.RizqPasskey || !window.RizqPasskey.supported()) {
+      alert(dict.passkeyUnsupported);
+      return;
+    }
+    if (!isLoggedIn()) {
+      openAccountChoice();
+      return;
+    }
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = dict.passkeyBusy;
+    }
+    window.RizqPasskey.registerBuyer(t('جهاز المشتري', 'Appareil acheteur')).then(function () {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = dict.passkeyEnabled;
+      }
+      if (typeof window.showToast === 'function') window.showToast(dict.passkeyEnabled, 'success');
+    }).catch(function (err) {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = '🔐 ' + dict.passkeyEnable;
+      }
+      alert(passkeyErrorMessage(err, dict));
+    });
+  }
+
+  function loadAccountOps() {
+    var list = document.getElementById('rag-orders-list');
+    var alerts = document.getElementById('rag-alerts-list');
+    var fr = (document.documentElement.lang === 'fr');
+    if (document.getElementById('rag-ops-orders-title')) {
+      document.getElementById('rag-ops-orders-title').textContent = fr ? 'Mes commandes & suivi' : 'طلباتي وتتبع التوصيل';
+    }
+    if (document.getElementById('rag-ops-alerts-title')) {
+      document.getElementById('rag-ops-alerts-title').textContent = fr ? 'Alertes' : 'تنبيهات';
+    }
+    if (document.getElementById('rag-ops-prefs-title')) {
+      document.getElementById('rag-ops-prefs-title').textContent = fr ? 'Notifications & confidentialité' : 'الإشعارات والخصوصية';
+    }
+    if (document.getElementById('rag-push-toggle')) {
+      document.getElementById('rag-push-toggle').textContent = fr ? 'Activer les notifications' : 'تفعيل إشعارات الجهاز';
+    }
+    if (document.getElementById('rag-export-data')) {
+      document.getElementById('rag-export-data').textContent = fr ? 'Télécharger mes données' : 'تحميل بياناتي';
+    }
+    if (document.getElementById('rag-erase-account')) {
+      document.getElementById('rag-erase-account').textContent = fr ? 'Supprimer mon compte' : 'حذف حسابي';
+    }
+    if (!window.RizqOps || !apiBase()) {
+      if (list) list.innerHTML = '<p style="font-size:12px;color:#94a3b8;margin:0">' + (fr ? 'Serveur indisponible' : 'الخادم غير متاح') + '</p>';
+      return;
+    }
+    if (list) list.innerHTML = '<p style="font-size:12px;color:#94a3b8;margin:0">' + (fr ? 'Chargement…' : 'جاري التحميل…') + '</p>';
+    window.RizqOps.listBuyerOrders().then(function (j) {
+      if (!list) return;
+      if (!j || !j.ok || !j.orders || !j.orders.length) {
+        list.innerHTML = '<p style="font-size:12px;color:#94a3b8;margin:0">' + (fr ? 'Aucune commande pour le moment' : 'لا توجد طلبات بعد') + '</p>';
+        return;
+      }
+      list.innerHTML = j.orders.map(function (o) { return window.RizqOps.orderCardHtml(o); }).join('');
+    }).catch(function () {
+      if (list) list.innerHTML = '<p style="font-size:12px;color:#b91c1c;margin:0">' + (fr ? 'Échec du chargement' : 'تعذّر تحميل الطلبات') + '</p>';
+    });
+    window.RizqOps.listAlerts().then(function (j) {
+      if (!alerts) return;
+      if (!j || !j.ok || !j.alerts || !j.alerts.length) {
+        alerts.innerHTML = '<p style="margin:0;color:#94a3b8">' + (fr ? 'Pas d\'alertes' : 'لا تنبيهات') + '</p>';
+        return;
+      }
+      alerts.innerHTML = j.alerts.slice(0, 8).map(function (a) {
+        return '<div style="padding:6px 0;border-bottom:1px solid #f1f5f9">' + window.RizqOps.esc(a.body || '') +
+          '<div style="font-size:10px;color:#94a3b8">' + window.RizqOps.esc((a.createdAt || '').slice(0, 16).replace('T', ' ')) + '</div></div>';
+      }).join('');
+    }).catch(function () {});
+  }
+
+  function togglePushFromAccount() {
+    if (!window.RizqOps) return;
+    var btn = document.getElementById('rag-push-toggle');
+    if (btn) btn.disabled = true;
+    window.RizqOps.enablePush('buyer').then(function (j) {
+      if (btn) btn.disabled = false;
+      if (typeof window.showToast === 'function') {
+        window.showToast(j && j.ok
+          ? t('✅ تم تفعيل إشعارات الجهاز', '✅ Notifications activées')
+          : t('تعذّر تفعيل الإشعارات', 'Impossible d\'activer'), j && j.ok ? 'success' : 'error');
+      }
+    }).catch(function () {
+      if (btn) btn.disabled = false;
+      alert(t('جهازك لا يدعم إشعارات الويب أو لم يُضبط VAPID', 'Notifications web non supportées / VAPID manquant'));
+    });
+  }
+
+  function exportDataFromAccount() {
+    if (!window.RizqOps) return;
+    window.RizqOps.exportMyData().then(function (j) {
+      if (typeof window.showToast === 'function') {
+        window.showToast(j && j.ok
+          ? t('✅ تم تنزيل ملف بياناتك', '✅ Export téléchargé')
+          : t('تعذّر التصدير', 'Échec de l\'export'), j && j.ok ? 'success' : 'error');
+      }
+    }).catch(function () {
+      alert(t('تعذّر تصدير البيانات', 'Échec de l\'export'));
+    });
+  }
+
+  function eraseAccountFromAccount() {
+    if (!window.RizqOps) return;
+    var word = prompt(t('لتأكيد الحذف اكتب: حذف', 'Pour confirmer, tapez : DELETE'));
+    if (!word) return;
+    if (word !== 'حذف' && word !== 'DELETE') {
+      alert(t('لم يُطابق التأكيد — لم يُحذف شيء', 'Confirmation incorrecte — rien n\'a été supprimé'));
+      return;
+    }
+    if (!confirm(t('سيتم حذف حسابك نهائياً. هل أنت متأكد؟', 'Suppression définitive. Confirmer ?'))) return;
+    window.RizqOps.eraseMyAccount(word).then(function (j) {
+      if (j && j.ok) {
+        clearSession();
+        closeModal();
+        if (typeof window.showToast === 'function') window.showToast(j.message || t('تم حذف الحساب', 'Compte supprimé'), 'info');
+      } else {
+        alert((j && j.error) || t('تعذّر الحذف', 'Échec de la suppression'));
+      }
+    }).catch(function () {
+      alert(t('تعذّر الحذف', 'Échec de la suppression'));
+    });
   }
 
   function showAccountPanel() {
@@ -1182,7 +1622,15 @@
     if (s.city) lines.push('<div>🏙️ ' + esc(s.city) + '</div>');
     if (s.address) lines.push('<div>📍 ' + esc(s.address) + '</div>');
     document.getElementById('rag-acc-meta').innerHTML = lines.join('');
+    var pkEn = document.getElementById('rag-passkey-enable-btn');
+    if (pkEn) {
+      var canPk = !!(window.RizqPasskey && window.RizqPasskey.supported() && apiBase());
+      pkEn.classList.toggle('show', canPk);
+      pkEn.disabled = false;
+      pkEn.textContent = '🔐 ' + dict.passkeyEnable;
+    }
     showStep('account');
+    loadAccountOps();
   }
 
   function prefillDraft() {
@@ -1374,32 +1822,26 @@
     }
     var s = getSession();
     var base = apiBase();
-    // بدون عنوان خادم: لا fail-open على جلسة localStorage (حتى لو طول التوكن ≥ 20)
+    // بدون عنوان خادم: لا fail-open على جلسة محلية
     if (!base) {
       _pendingAction = actionFn;
       rememberAfterAuthHref();
       openModal(reasonKey);
       return false;
     }
-    // عند توفر الخادم: تحقّق من الجلسة قبل كشف الهاتف/الاتصال (يمنع تزوير localStorage)
-    if (s && s.token) {
-      fetch(base + '/api/auth/me', {
-        headers: {
-          'Authorization': 'Bearer ' + s.token,
-          'X-Buyer-Id': s.id
-        }
-      }).then(function (res) {
+    // تحقّق عبر كوكي HttpOnly (+ رأس ترحيل إن وُجد) قبل كشف الهاتف/الاتصال
+    if (s && s.id) {
+      buyerFetch(base + '/api/auth/me', { headers: buyerAuthHeaders(s) }).then(function (res) {
         if (!res.ok) {
-          // أي فشل تحقق (401 أو غيره) — لا نكشف اتصالاً على جلسة مزوّرة
           if (res.status === 401) clearSession();
           _pendingAction = actionFn;
           rememberAfterAuthHref();
           openModal(reasonKey);
           return;
         }
+        _cookieSessionOk = true;
         if (typeof actionFn === 'function') actionFn();
       }).catch(function () {
-        // شبكة معطّلة: أغلق المسار بدل fail-open (الخادم هو مصدر الحقيقة للتواصل)
         _pendingAction = actionFn;
         rememberAfterAuthHref();
         openModal(reasonKey);
@@ -1446,7 +1888,13 @@
     isLoggedIn: isLoggedIn,
     isPromoDemoContext: isPromoDemoContext,
     getSession: getSession,
-    logout: function () { clearSession(); }
+    logout: function () { clearSession(); },
+    refreshSession: verifySessionSilently,
+    passkeyLogin: startPasskeyLogin,
+    passkeyRegister: startPasskeyRegister,
+    buyerAuthHeaders: buyerAuthHeaders,
+    buyerFetch: buyerFetch,
+    reloadOrders: loadAccountOps
   };
   /** محادثة عامة: بلا تسجيل في النماذج الترويجية؛ تسجيل إلزامي للمحلات الحقيقية */
   function openPublicChat(actionFn, reasonKey) {
@@ -1470,4 +1918,13 @@
 
   loadOtpConfig();
   verifySessionSilently();
+  try {
+    var bootQ = new URLSearchParams(location.search || '');
+    if (bootQ.get('openAccount') === '1' || bootQ.get('openLogin') === '1') {
+      setTimeout(function () {
+        if (isLoggedIn()) openAccountModal();
+        else openAccountChoice();
+      }, 500);
+    }
+  } catch (eBoot) {}
 })();

@@ -495,7 +495,14 @@ function init(){
 function _initWithAccount(acc){
   OFFICE=loadActivatedPackage(acc);
   // جلسة عامة موحَّدة يقرأها rizq_tenders.html — ميزة المناقصات الجديدة
-  if(!IS_DEMO){ try{ localStorage.setItem('rizq_active_session', JSON.stringify({id: acc.id, token: SESSION_TOKEN, type:'office', name: acc.name||''})); }catch(e){} }
+  if(!IS_DEMO){
+    if(window.RizqAccount && typeof RizqAccount.setActiveSession === 'function'){
+      try{ RizqAccount.setActiveSession({id: acc.id, token: SESSION_TOKEN, type:'office', name: acc.name||''}); }catch(e){}
+    } else {
+      try{ sessionStorage.setItem('rizq_dash_token_'+acc.id, SESSION_TOKEN); }catch(e0){}
+      try{ localStorage.setItem('rizq_active_session', JSON.stringify({id: acc.id, type:'office', name: acc.name||''})); }catch(e){}
+    }
+  }
   if(!IS_DEMO && OFFICE && OFFICE.id) { initSubscriptionLifecycle(OFFICE.id, 'office'); }
   if(window.RizqDash && typeof RizqDash.applySubscriptionLock==='function'){
     RizqDash.applySubscriptionLock((OFFICE && OFFICE.id) || SESSION_ID, document.querySelector('.main-content') || document.body, { isDemo: !!IS_DEMO });

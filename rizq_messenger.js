@@ -149,10 +149,16 @@
   /** جلسة مشترٍ AuthGate (rizq_buyer_session) — OTP سريع للتصفح والتواصل */
   function _getAuthGateBuyer() {
     try {
+      if (window.RizqAuthGate && typeof window.RizqAuthGate.getSession === 'function') {
+        var gate = window.RizqAuthGate.getSession();
+        if (gate && gate.id) return gate;
+      }
+    } catch (e0) {}
+    try {
       var raw = localStorage.getItem('rizq_buyer_session');
       if (!raw) return null;
       var s = JSON.parse(raw);
-      return (s && s.id && s.token) ? s : null;
+      return (s && s.id) ? s : null;
     } catch (e) { return null; }
   }
 
@@ -162,7 +168,17 @@
       var raw = localStorage.getItem('rizq_individual_session');
       if (!raw) return null;
       var s = JSON.parse(raw);
-      return (s && s.id && s.token) ? s : null;
+      if (!s || !s.id) return null;
+      if (!s.token) {
+        try {
+          if (window.RizqAccount && typeof window.RizqAccount.readDashToken === 'function') {
+            s.token = window.RizqAccount.readDashToken(s.id);
+          } else {
+            s.token = sessionStorage.getItem('rizq_dash_token_' + s.id) || '';
+          }
+        } catch (eTok) {}
+      }
+      return s.token ? s : null;
     } catch(e) { return null; }
   }
 

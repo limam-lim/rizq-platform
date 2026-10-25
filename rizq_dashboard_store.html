@@ -46,7 +46,8 @@
 <script src="rizq_lang_guard.js?v=1.0"></script>
   <script src="rizq_locale_helpers.js"></script>
   <link rel="stylesheet" href="rizq_dashboard_layout.css">
-  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.4">
+  <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.6">
+  <link rel="stylesheet" href="rizq_ui_surfaces.css?v=1"/>
 <script src="rizq_account_route.js?v=9"></script>
 <script src="rizq_dashboard_shared.js?v=3"></script>
 <script src="rizq_seller_onboarding.js"></script>
@@ -106,6 +107,7 @@
   <nav class="sb-nav">
     <div class="sb-section" data-t="sb-sec-main">الرئيسية</div>
     <div class="sb-item active" onclick="showPanel('overview',this)"><span class="sb-icon">📊</span><span data-t="sb-overview">نظرة عامة</span></div>
+    <div class="sb-item" onclick="showPanel('orders',this)"><span class="sb-icon">🛒</span><span data-t="sb-orders">طلبات الشراء</span><span class="sb-badge" id="orders-badge" style="display:none">0</span></div>
     <div class="sb-item" onclick="showPanel('requests',this)"><span class="sb-icon">📩</span><span data-t="sb-requests">طلبات التواصل</span><span class="sb-badge" id="req-badge" style="display:none">0</span></div>
     <div class="sb-item" onclick="showPanel('messages',this)"><span class="sb-icon">💬</span><span data-t="sb-messages">الرسائل</span><span class="sb-badge red" id="msg-badge" style="display:none">0</span></div>
 
@@ -269,6 +271,32 @@
           <div class="card-title" data-t="messages-panel-title">💬 الرسائل والاستفسارات</div>
         </div>
         <div id="messages-list"></div>
+      </div>
+    </div>
+
+    <!-- ══ MARKETPLACE ORDERS ══ -->
+    <div class="panel" id="panel-orders">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div class="card-title" data-t="orders-metrics-title">📈 مؤشرات اليوم</div>
+          <button type="button" class="btn btn-outline btn-sm" onclick="renderSellerOrdersPanel()">🔄 تحديث</button>
+        </div>
+        <div id="seller-order-metrics" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px"></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title" data-t="orders-feed-title">🛒 طلبات الشراء</div>
+          <select id="seller-orders-filter" class="form-input" style="width:auto;min-width:140px" onchange="renderSellerOrdersPanel()">
+            <option value="">الكل</option>
+            <option value="new">جديد</option>
+            <option value="accepted">مقبول</option>
+            <option value="out_for_delivery">خرج للتوصيل</option>
+            <option value="completed">مكتمل</option>
+            <option value="disputed">نزاع</option>
+            <option value="cancelled">ملغى</option>
+          </select>
+        </div>
+        <div id="seller-orders-list"><p style="color:var(--text-muted);font-size:13px;padding:20px;text-align:center">جاري التحميل…</p></div>
       </div>
     </div>
 
@@ -955,6 +983,7 @@
   </svg>
 </a>
 <script src="rizq_dashboard_ui.js?v=1"></script>
-<script src="rizq_dashboard_store_app.js?v=2"></script>
+<script src="rizq_ops_client.js?v=1.0"></script>
+<script src="rizq_dashboard_store_app.js?v=3"></script>
 </body>
 </html>

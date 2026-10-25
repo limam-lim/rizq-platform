@@ -1,8 +1,9 @@
 {
   "meta": {
-    "label": "Rizq graduation demo seed",
-    "note": "Marked graduationDemo:true — wipe with: node scripts/seed-graduation-demo.js --clear. Not for production.",
-    "version": 1
+    "label": "Rizq graduation / pre-launch DEMO seed (FICTIONAL)",
+    "note": "All rows are fake graduationDemo:true data for UI rehearsals. Wipe before real launch: node scripts/seed-graduation-demo.js --clear. Never keep on production after go-live; replace with real merchants ~15 days before launch.",
+    "wipeCommand": "node scripts/seed-graduation-demo.js --clear",
+    "version": 2
   },
   "accounts": [
     {
@@ -188,6 +189,52 @@
       "thumb": "https://picsum.photos/seed/rizq-grad-office03/480/360",
       "phone": "44303003",
       "email": "sada.admin@demo.rizq.mr"
+    },
+    {
+      "id": "acc_grad_estate_01",
+      "type": "office",
+      "name": "وكالة الساكنية العقارية",
+      "tagline": "بيع وكراء شقق وفلل في نواكشوط",
+      "city": "نواكشوط",
+      "address": "لكصر",
+      "category": "عقارات",
+      "activity": "وكالات عقارية",
+      "activityId": "realestate",
+      "desc": "وساطة عقارية للسكن والتجارة مع معاينة ميدانية قبل الاتفاق.",
+      "thumb": "https://picsum.photos/seed/rizq-grad-estate01/480/360",
+      "phone": "44404001",
+      "email": "saknia.immo@demo.rizq.mr",
+      "verifiedPlus": true
+    },
+    {
+      "id": "acc_grad_estate_02",
+      "type": "office",
+      "name": "أفق العقار — نواذيبو",
+      "tagline": "أراضٍ ومحلات تجارية على الواجهة البحرية",
+      "city": "نواذيبو",
+      "address": "حي الميناء",
+      "category": "عقارات",
+      "activity": "وساطة عقارية",
+      "activityId": "of_realestate",
+      "desc": "فرص أراضٍ ومحلات للإيجار والبيع في نواذيبو وضواحيها.",
+      "thumb": "https://picsum.photos/seed/rizq-grad-estate02/480/360",
+      "phone": "44404002",
+      "email": "ufuq.immo@demo.rizq.mr"
+    },
+    {
+      "id": "acc_grad_estate_03",
+      "type": "office",
+      "name": "دار الإسكان",
+      "tagline": "إدارة أملاك وتأجير سكني للشركات",
+      "city": "نواكشوط",
+      "address": "توجنين",
+      "category": "عقارات",
+      "activity": "إدارة أملاك عقارية",
+      "activityId": "real_estate",
+      "desc": "إدارة أملاك وتأجير طويل الأمد للأفراد والشركات.",
+      "thumb": "https://picsum.photos/seed/rizq-grad-estate03/480/360",
+      "phone": "44404003",
+      "email": "dar.iskan@demo.rizq.mr"
     }
   ],
   "ads": [

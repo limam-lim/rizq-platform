@@ -149,8 +149,9 @@
     try {
       var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
       return accs.find(function (a) {
-        return a && a.id === sessionId && a.token === sessionToken
-          && a.status === 'approved' && a.type === expectedType;
+        if (!a || a.id !== sessionId || a.status !== 'approved' || a.type !== expectedType) return false;
+        if (!a.token && !a.dashToken) return true;
+        return a.token === sessionToken || a.dashToken === sessionToken;
       }) || null;
     } catch (e) {
       return null;
@@ -210,6 +211,14 @@
             delete a.password;
             changed = true;
           }
+          if (a.token || a.dashToken) {
+            try {
+              sessionStorage.setItem('rizq_dash_token_' + a.id, a.token || a.dashToken);
+            } catch (eMig) {}
+            delete a.token;
+            delete a.dashToken;
+            changed = true;
+          }
         });
         if (changed) localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
       }
@@ -224,6 +233,14 @@
             var dirty = false;
             if (o.accessToken) { delete o.accessToken; dirty = true; }
             if (o.backendAccessToken) { delete o.backendAccessToken; dirty = true; }
+            if (o.token) {
+              if (o.id) {
+                try { sessionStorage.setItem('rizq_dash_token_' + o.id, o.token); } catch (eTok) {}
+              }
+              delete o.token;
+              dirty = true;
+            }
+            if (o.dashToken) { delete o.dashToken; dirty = true; }
             if (dirty) localStorage.setItem(k, JSON.stringify(o));
           }
         } catch (e2) {}
@@ -287,13 +304,13 @@
             if (rec2) {
               delete rec2.backendAccessToken;
               delete rec2.accessToken;
-              rec2.token = data.dashToken;
-              rec2.dashToken = data.dashToken;
+              delete rec2.token;
+              delete rec2.dashToken;
               localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs2));
             }
             var act = JSON.parse(localStorage.getItem('rizq_active_session') || 'null');
             if (act && act.id === acc.id) {
-              act.token = data.dashToken;
+              delete act.token;
               delete act.accessToken;
               delete act.backendAccessToken;
               localStorage.setItem('rizq_active_session', JSON.stringify(act));

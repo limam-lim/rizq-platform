@@ -1,0 +1,240 @@
+/**
+ * rizq_ui_surfaces.css — حواف نوافذ نظيفة + بطاقات مضغوطة على كل المنصة
+ * (تصفح، حسابي، مودالات، داشبوردات)
+ *
+ * الهدف:
+ * 1) لا حدود ذهبية رفيعة تبرز خارج الزوايا المدوّرة
+ * 2) بطاقات السعر/البائع/الثقة أصغر حتى تبقى أزرار الاتصال ظاهرة
+ */
+
+:root {
+  --rizq-edge: rgba(15, 31, 61, 0.10);
+  --rizq-edge-soft: rgba(15, 31, 61, 0.07);
+  --rizq-edge-dark: rgba(255, 255, 255, 0.12);
+  --rizq-scroll-thumb: rgba(15, 31, 61, 0.22);
+  --rizq-scroll-thumb-dark: rgba(255, 255, 255, 0.28);
+}
+
+/* ── أزل أشرطة/زخارف الحافة الشائعة ── */
+#detail-content::before,
+#detail-content::after,
+.rag-modal::before,
+.rag-modal::after,
+.disc-modal::before,
+.disc-modal::after,
+.rizq-promo-modal::before,
+.modal-box::before,
+.rizq-modal-box::before,
+.cs-modal-box::before,
+.item-modal::before,
+.promo-modal::before,
+.dash-card::before,
+.card::before,
+.welcome-banner::before {
+  content: none !important;
+  display: none !important;
+}
+
+/* ── نوافذ/ألواح: حافة باردة بدل ذهبية ── */
+#detail-content,
+.disc-modal,
+.rag-modal,
+.rizq-promo-modal,
+.modal-overlay .modal-box,
+.rizq-modal-overlay .rizq-modal-box,
+#modal .modal-box,
+#sub-modal,
+#suggest-cat-modal,
+#pkg-modal-box,
+.cs-modal-box,
+.item-modal,
+.promo-modal,
+.rizq-promo-modal,
+.filter-sheet,
+.report-modal,
+.chat-box {
+  border-color: var(--rizq-edge) !important;
+}
+
+/* نوافذ داكنة — حلقة بيضاء خافتة لا صفراء */
+.rag-modal,
+#sub-modal,
+#suggest-cat-modal,
+.disc-modal,
+.modal-overlay .modal-box:not(.rizq-modal-light),
+.rizq-modal-overlay .rizq-modal-box,
+#pkg-modal-box,
+.cs-modal-box {
+  border: 1px solid var(--rizq-edge-dark) !important;
+  outline: none !important;
+}
+
+body.rizq-dash .modal-overlay .modal-box,
+.modal-overlay .modal-box.rizq-modal-light,
+body.rizq-dash .cs-modal-box,
+body.rizq-dash .promo-modal,
+body.rizq-dash .rizq-promo-modal,
+.item-modal {
+  border: 1px solid var(--rizq-edge) !important;
+  outline: none !important;
+}
+
+/* بطاقة تفاصيل الإعلان — ظل ناعم بلا حلقة صلبة (كانت تظهر كخط أصفر) */
+#detail-content {
+  border: none !important;
+  outline: none !important;
+  box-shadow:
+    0 22px 52px rgba(8, 15, 30, 0.34),
+    0 2px 8px rgba(8, 15, 30, 0.08) !important;
+  background-clip: padding-box !important;
+}
+
+/* ── بطاقات الثقة/البائع مضغوطة عالمياً ── */
+.rizq-trust-card {
+  border: 1px solid var(--rizq-edge) !important;
+  border-radius: 12px !important;
+  padding: 10px !important;
+  margin-bottom: 8px !important;
+  gap: 8px !important;
+  box-shadow: 0 6px 16px rgba(15, 31, 61, 0.05) !important;
+}
+a.rizq-trust-card:hover {
+  border-color: rgba(27, 58, 107, 0.22) !important;
+  box-shadow: 0 8px 20px rgba(15, 31, 61, 0.08) !important;
+}
+.rizq-trust-card--branded {
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid var(--rizq-edge) !important;
+  box-shadow: 0 6px 16px rgba(15, 31, 61, 0.06) !important;
+}
+.rizq-trust-cover {
+  height: 36px !important;
+}
+.rizq-trust-cover::after {
+  height: 14px !important;
+}
+.rizq-trust-main {
+  gap: 7px !important;
+  padding: 0 9px 7px !important;
+  margin-top: -14px !important;
+}
+.rizq-trust-av {
+  width: 36px !important;
+  height: 36px !important;
+  font-size: 14px !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 12px rgba(15, 31, 61, 0.14) !important;
+}
+.rizq-trust-kicker {
+  font-size: 9px !important;
+  margin-bottom: 0 !important;
+}
+.rizq-trust-name {
+  font-size: 13px !important;
+}
+.rizq-trust-stars {
+  font-size: 10px !important;
+  margin-top: 1px !important;
+}
+.rizq-trust-badges {
+  margin-top: 4px !important;
+  gap: 4px !important;
+}
+.rizq-trust-badge {
+  font-size: 9.5px !important;
+  padding: 2px 7px !important;
+}
+.rizq-trust-meta {
+  font-size: 10px !important;
+  margin-top: 4px !important;
+}
+
+/* ── شريط تمرير محايد للنوافذ (لا يظهر كخط ذهبي) ── */
+#detail-content,
+.browse-right,
+.modal-box,
+.rizq-modal-box,
+.disc-modal,
+.rag-modal,
+.cs-modal-box,
+.main-content,
+.main,
+.panel,
+#filters-body,
+#result-list-body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--rizq-scroll-thumb) transparent;
+}
+#detail-content::-webkit-scrollbar,
+.browse-right::-webkit-scrollbar,
+.modal-box::-webkit-scrollbar,
+.rizq-modal-box::-webkit-scrollbar,
+.disc-modal::-webkit-scrollbar,
+.rag-modal::-webkit-scrollbar,
+.main-content::-webkit-scrollbar,
+.main::-webkit-scrollbar,
+.panel::-webkit-scrollbar,
+#filters-body::-webkit-scrollbar,
+#result-list-body::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+#detail-content::-webkit-scrollbar-thumb,
+.browse-right::-webkit-scrollbar-thumb,
+.modal-box::-webkit-scrollbar-thumb,
+.rizq-modal-box::-webkit-scrollbar-thumb,
+.disc-modal::-webkit-scrollbar-thumb,
+.rag-modal::-webkit-scrollbar-thumb,
+.main-content::-webkit-scrollbar-thumb,
+.main::-webkit-scrollbar-thumb,
+.panel::-webkit-scrollbar-thumb,
+#filters-body::-webkit-scrollbar-thumb,
+#result-list-body::-webkit-scrollbar-thumb {
+  background: var(--rizq-scroll-thumb) !important;
+  border-radius: 4px;
+}
+#detail-content::-webkit-scrollbar-track,
+.browse-right::-webkit-scrollbar-track,
+.modal-box::-webkit-scrollbar-track,
+.main-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* نوافذ داكنة — إبهام فاتح خافت */
+.rag-modal,
+.disc-modal,
+#sub-modal,
+.cs-modal-box {
+  scrollbar-color: var(--rizq-scroll-thumb-dark) transparent;
+}
+.rag-modal::-webkit-scrollbar-thumb,
+.disc-modal::-webkit-scrollbar-thumb,
+#sub-modal::-webkit-scrollbar-thumb,
+.cs-modal-box::-webkit-scrollbar-thumb {
+  background: var(--rizq-scroll-thumb-dark) !important;
+}
+
+/* ── داشبورد: بطاقات المحتوى بلا حد ذهبي بارز ── */
+body.rizq-dash .card,
+body.rizq-dash .dash-card,
+body.rizq-dash .panel > .card,
+body.rizq-dash .welcome-banner,
+body.rizq-dash .stat-card,
+body.rizq-dash .qa-card,
+body.rizq-dash .product-card,
+body.rizq-dash .ov-card {
+  border-color: var(--rizq-edge) !important;
+}
+body.rizq-dash .stat-card {
+  border-width: 1px !important;
+}
+
+/* ── حسابي / بوابة المصادقة: حافة نظيفة ── */
+#rag-overlay .rag-modal,
+.rag-overlay .rag-modal {
+  border: 1px solid var(--rizq-edge-dark) !important;
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.06) !important;
+}

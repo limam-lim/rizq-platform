@@ -268,11 +268,21 @@
     // rizq_auth_gate قد يكون defer — اقرأ الجلسة مباشرة حتى لا نمسح المفضلة عند الإقلاع
     try {
       var b = JSON.parse(localStorage.getItem('rizq_buyer_session') || 'null');
-      if (b && b.id && b.token && String(b.token).length >= 20 && String(b.id).length >= 4) return true;
+      if (b && b.id && String(b.id).length >= 4) {
+        if (b.cookieAuth || (b.token && String(b.token).length >= 20)) return true;
+        try {
+          if (sessionStorage.getItem('rizq_buyer_token_mem')) return true;
+        } catch (eMem) {}
+      }
     } catch (eB) {}
     try {
       var s = JSON.parse(localStorage.getItem('rizq_active_session') || 'null');
-      if (s && s.id && (s.token || s.dashToken || s.accessToken)) return true;
+      if (s && s.id) {
+        if (s.token || s.dashToken || s.accessToken) return true;
+        try {
+          if (sessionStorage.getItem('rizq_dash_token_' + s.id)) return true;
+        } catch (eDash) {}
+      }
     } catch (e2) {}
     return false;
   }
@@ -969,7 +979,16 @@
     opts = opts || {};
     ad = ad || {};
     var fr = lang() === 'fr';
-    var name = ad.seller || ad.storeName || ad.accountName || (fr ? 'Vendeur' : 'البائع');
+    var brand =
+      typeof global.RizqSellerBranding !== 'undefined' && typeof global.RizqSellerBranding.resolve === 'function'
+        ? global.RizqSellerBranding.resolve(ad)
+        : {
+            name: ad.seller || ad.storeName || ad.accountName || '',
+            cover: (Array.isArray(ad.images) && ad.images[0]) || ad.sellerCover || '',
+            logo: ad.sellerLogo || ad.sellerAvatar || '',
+            accent: ad.sellerAccent || '#1B3A6B'
+          };
+    var name = brand.name || (fr ? 'Vendeur' : 'البائع');
     var score = Number(ad.seller_trust_score);
     if (!Number.isFinite(score)) score = ad.verified ? 75 : 60;
     score = Math.max(0, Math.min(100, Math.round(score)));
@@ -984,13 +1003,13 @@
     if (verified) {
       badges +=
         '<span class="rizq-trust-badge ok">' +
-        escapeHtml(fr ? '✅ Vérifié' : '✅ موثّق') +
+        escapeHtml(fr ? 'Vérifié' : 'موثّق') +
         '</span>';
     }
     if (score >= 80) {
       badges +=
         '<span class="rizq-trust-badge gold">' +
-        escapeHtml(fr ? '⭐ Confiance élevée' : '⭐ ثقة عالية') +
+        escapeHtml(fr ? 'Confiance élevée' : 'ثقة عالية') +
         '</span>';
     }
 
@@ -1015,18 +1034,43 @@
       meta.push('<span>' + escapeHtml((fr ? 'Depuis ' : 'منذ ') + since) + '</span>');
     }
 
+    var coverStyle =
+      'background-color:' +
+      escapeHtml(brand.accent || '#1B3A6B') +
+      ';' +
+      (brand.cover
+        ? 'background-image:linear-gradient(180deg,rgba(8,16,32,.15),rgba(8,16,32,.72)),url(\'' +
+          escapeHtml(String(brand.cover).replace(/'/g, '%27')) +
+          '\');'
+        : 'background-image:linear-gradient(135deg,' +
+          escapeHtml(brand.accent || '#1B3A6B') +
+          ',#0a1628);');
+
+    var avInner = brand.logo
+      ? '<img class="rizq-trust-av-img" src="' +
+        escapeHtml(brand.logo) +
+        '" alt="" loading="lazy" decoding="async" width="56" height="56"/>'
+      : escapeHtml((ad.emoji || ad.sellerEmoji || name || '👤').toString().slice(0, 2));
+
     var open =
       profileHref
-        ? '<a class="rizq-trust-card" href="' + escapeHtml(profileHref) + '">'
-        : '<div class="rizq-trust-card">';
+        ? '<a class="rizq-trust-card rizq-trust-card--branded" href="' + escapeHtml(profileHref) + '">'
+        : '<div class="rizq-trust-card rizq-trust-card--branded">';
     var close = profileHref ? '</a>' : '</div>';
 
     return (
       open +
+      '<div class="rizq-trust-cover" style="' +
+      coverStyle +
+      '" aria-hidden="true"></div>' +
+      '<div class="rizq-trust-main">' +
       '<div class="rizq-trust-av" aria-hidden="true">' +
-      escapeHtml((ad.emoji || name || '👤').toString().slice(0, 2)) +
+      avInner +
       '</div>' +
       '<div class="rizq-trust-body">' +
+      '<div class="rizq-trust-kicker">' +
+      escapeHtml(fr ? 'Vendeur' : 'البائع') +
+      '</div>' +
       '<div class="rizq-trust-name">' +
       escapeHtml(name) +
       '</div>' +
@@ -1040,6 +1084,7 @@
       (badges ? '<div class="rizq-trust-badges">' + badges + '</div>' : '') +
       '<div class="rizq-trust-meta">' +
       meta.join('<span class="dot">·</span>') +
+      '</div>' +
       '</div>' +
       '</div>' +
       close

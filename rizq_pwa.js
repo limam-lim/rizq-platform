@@ -5,8 +5,8 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '31.9';
-  var MOCK_HDR_V = '5.68';
+  var ASSET_V = '33.0';
+  var MOCK_HDR_V = '5.69';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -129,6 +129,16 @@
     }
     if (!document.querySelector('script[src*="rizq_account_route.js"]')) {
       appendScript('rizq_account_route.js?v=' + ASSET_V, { async: false });
+    }
+    /* Passkeys ثم بوابة حسابي — لازمة لزر حسابي خارج الصفحة الرئيسية */
+    if (isPublicShell() && !document.querySelector('script[src*="rizq_ops_client.js"]')) {
+      appendScript('rizq_ops_client.js?v=' + ASSET_V, { defer: true });
+    }
+    if (isPublicShell() && !document.querySelector('script[src*="rizq_passkey.js"]')) {
+      appendScript('rizq_passkey.js?v=' + ASSET_V, { defer: true });
+    }
+    if (isPublicShell() && !document.querySelector('script[src*="rizq_auth_gate.js"]')) {
+      appendScript('rizq_auth_gate.js?v=' + ASSET_V, { defer: true });
     }
     if (!document.querySelector('script[src*="rizq_header.js"]')) {
       appendScript('rizq_header.js?v=' + ASSET_V, { async: false });
@@ -397,7 +407,7 @@
         }).catch(function () {});
         return;
       }
-      navigator.serviceWorker.register('sw.js?v=22.1').then(function (reg) {
+      navigator.serviceWorker.register('sw.js?v=24.0').then(function (reg) {
         try { if (reg && reg.update) reg.update(); } catch (eUp) {}
       }).catch(function (err) {
         console.warn('Rizq PWA: تعذّر تسجيل service worker', err);

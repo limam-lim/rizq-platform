@@ -30,7 +30,8 @@
 <link rel="stylesheet" href="rizq_landing_ux.css?v=31.2"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.6"/>
-<link rel="stylesheet" href="rizq_modal_viewport.css?v=23.0"/>
+<link rel="stylesheet" href="rizq_modal_viewport.css?v=23.1"/>
+<link rel="stylesheet" href="rizq_ui_surfaces.css?v=1"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.3"/>
 <script>
 (function () {
@@ -43,7 +44,7 @@
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.68"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.69"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — الشريط القديم متوقف نهائياً */
@@ -5101,7 +5102,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <script src="rizq_marquee_kit.js?v=1.3"></script>
     <script src="rizq_civic_ticker.js?v=1.3"></script>
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_header_mockup_trial.js?v=5.68" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.69" defer></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
@@ -5114,8 +5115,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_footer_toggle.js?v=23.1" defer></script>
 <script src="rizq_social_links.js?v=23.5" defer></script>
 <script src="rizq_account_route.js?v=23.0"></script>
+<script src="rizq_passkey.js?v=1.0" defer></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
-<script src="rizq_ux_polish.js?v=23.1"></script>
+<script src="rizq_seller_branding.js?v=1"></script>
+<script src="rizq_ux_polish.js?v=23.2"></script>
 <script src="rizq_ad_cards.js?v=3.11"></script>
 </head>
 <body class="rizq-mockup-hdr-trial">
@@ -13074,9 +13077,16 @@ function _autoApproveAccount(data){
       data.id_verified_at=new Date().toISOString();
     }
     try{
-      localStorage.setItem('rizq_active_session', JSON.stringify({
-        id: data.id, token: data.token, type: t, name: data.name||data.owner||data.manager||''
-      }));
+      if(window.RizqAccount && typeof window.RizqAccount.setActiveSession === 'function'){
+        window.RizqAccount.setActiveSession({
+          id: data.id, token: data.token, type: t, name: data.name||data.owner||data.manager||''
+        });
+      } else {
+        try{ sessionStorage.setItem('rizq_dash_token_'+data.id, data.token); }catch(eTok){}
+        localStorage.setItem('rizq_active_session', JSON.stringify({
+          id: data.id, type: t, name: data.name||data.owner||data.manager||''
+        }));
+      }
     }catch(e){}
   }
 }
@@ -15576,30 +15586,49 @@ function closeRvidPopup(){ document.getElementById('rvid-overlay').classList.rem
     if (Array.isArray(pkgs.verified_plus)) localStorage.setItem('rizq_verified_plus_packages', JSON.stringify(pkgs.verified_plus));
     if (typeof renderPricingSection === 'function') renderPricingSection();
   }
+  function applySiteExtras(cfg) {
+    if (!cfg || typeof cfg !== 'object') return;
+    if (cfg.prices && (cfg.prices.food || cfg.prices.fuel || cfg.prices.currencies)) {
+      try { localStorage.setItem('rizq_prices', JSON.stringify(cfg.prices)); } catch (eP) {}
+      if (typeof loadPrices === 'function') loadPrices();
+    }
+    if (Array.isArray(cfg.bankCodes)) {
+      try { localStorage.setItem('rizq_bank_codes', JSON.stringify(cfg.bankCodes)); } catch (eB) {}
+      if (typeof ppRenderPayMethods === 'function') ppRenderPayMethods();
+    }
+    if (Array.isArray(cfg.extraCategories)) {
+      try { localStorage.setItem('rizq_extra_categories', JSON.stringify(cfg.extraCategories)); } catch (eC) {}
+      if (typeof renderExtraCategories === 'function') renderExtraCategories();
+    }
+  }
+  function fetchSiteConfigExtras() {
+    var base = (window.RIZQ_BACKEND_BASE && String(window.RIZQ_BACKEND_BASE).replace(/\/$/,''))
+      || (location && location.origin) || '';
+    if (!base) return;
+    fetch(base + '/api/site-config')
+      .then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(data){
+        if (!data || !data.ok || !data.config) return;
+        applySiteExtras(data.config);
+      }).catch(function(){});
+  }
   if (window.RizqPackagesUI && typeof RizqPackagesUI.syncAllFromBackend === 'function') {
     RizqPackagesUI.syncAllFromBackend(function () {
       if (typeof renderPricingSection === 'function') renderPricingSection();
     });
+    // لا نتخطّى أسعار السوق عند مزامنة الباقات
+    fetchSiteConfigExtras();
     return;
   }
-  if (!window.RIZQ_BACKEND_BASE) return;
-  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/site-config')
+  var _cfgBase = (window.RIZQ_BACKEND_BASE && String(window.RIZQ_BACKEND_BASE).replace(/\/$/,''))
+    || (location && location.origin) || '';
+  if (!_cfgBase) return;
+  fetch(_cfgBase + '/api/site-config')
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
-      applyPkgs(data && data.ok && data.config && data.config.packages);
-      if(Array.isArray(data.config.bankCodes)){
-        localStorage.setItem('rizq_bank_codes', JSON.stringify(data.config.bankCodes));
-        if(typeof ppRenderPayMethods==='function') ppRenderPayMethods();
-      }
-      var cfg = data.config || {};
-      if (cfg.prices && (cfg.prices.food || cfg.prices.fuel || cfg.prices.currencies)) {
-        localStorage.setItem('rizq_prices', JSON.stringify(cfg.prices));
-        if (typeof loadPrices === 'function') loadPrices();
-      }
-      if (Array.isArray(cfg.extraCategories)) {
-        localStorage.setItem('rizq_extra_categories', JSON.stringify(cfg.extraCategories));
-        if (typeof renderExtraCategories === 'function') renderExtraCategories();
-      }
+      if(!data || !data.ok) return;
+      applyPkgs(data.config && data.config.packages);
+      applySiteExtras(data.config || {});
     }).catch(function(){});
 })();
 

@@ -1,11 +1,17 @@
 /**
- * مصادقة المشتري — Bearer / X-Buyer-Id + X-Buyer-Token (لا query في الإنتاج)
+ * مصادقة المشتري — كوكي HttpOnly أولاً، ثم Bearer / X-Buyer-Id (لا query في الإنتاج)
  */
 const Buyer = require('../models/buyer');
 const { sendError } = require('./errors');
 const { isProdEnv } = require('./accountAuth');
+const { readBuyerSessionFromRequest } = require('../lib/buyerCookie');
 
 function extractBuyerCredentials(req) {
+  const fromCookie = readBuyerSessionFromRequest(req);
+  if (fromCookie && fromCookie.id && fromCookie.token) {
+    return fromCookie;
+  }
+
   const auth = req.header('authorization') || '';
   let id = String(req.header('x-buyer-id') || '').trim();
   let token = '';
@@ -21,7 +27,7 @@ function extractBuyerCredentials(req) {
 function requireBuyerAuth(req, res, next) {
   const { id, token } = extractBuyerCredentials(req);
   if (!id || !token) {
-    return sendError(res, 401, 'مصادقة مطلوبة — id و token', 'AUTH_REQUIRED');
+    return sendError(res, 401, 'مصادقة مطلوبة — جلسة أو id و token', 'AUTH_REQUIRED');
   }
   const row = Buyer.findByIdAndToken(id, token);
   if (!row) {

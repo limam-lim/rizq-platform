@@ -553,7 +553,9 @@ body.cart-is-general #cart-general-hub{display:block}
   <script src="rizq_mr_payment_catalog.js?v=1.1" defer></script>
   <script src="rizq_account_payments.js?v=28.3" defer></script>
   <script src="rizq_contact_gate.js" defer></script>
-  <script src="rizq_auth_gate.js?v=23.1" defer></script>
+  <script src="rizq_ops_client.js?v=1.0" defer></script>
+  <script src="rizq_passkey.js?v=1.0" defer></script>
+<script src="rizq_auth_gate.js?v=23.2" defer></script>
   <script src="rizq_ux_polish.js?v=23.3" defer></script>
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_i18n_data.js" defer></script>
@@ -677,7 +679,7 @@ body.cart-is-general #cart-general-hub{display:block}
         سيتواصل معك البائع خلال دقائق عبر واتساب لتأكيد الطلب.<br>
         الدفع يكون عند التسليم نقداً.
       </div>
-      <a href="https://wa.me/22244882212" target="_blank" rel="noopener" class="whatsapp-order" style="max-width:300px;margin:0 auto 16px">
+      <a href="https://wa.me/22244882212" id="wa-order-btn-empty" target="_blank" rel="noopener" class="whatsapp-order" style="max-width:300px;margin:0 auto 16px">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         <span data-t-fr="Parler au vendeur">تحدث مع البائع</span>
       </a>
@@ -835,8 +837,30 @@ body.cart-is-general #cart-general-hub{display:block}
             <div class="pay-opt-desc">Virement bancaire</div>
           </div>
         </label>
+        <label class="pay-opt" id="pay-bankily" onclick="selectPayment('bankily')">
+          <input type="radio" name="payment" value="bankily"/>
+          <span class="pay-opt-icon">📱</span>
+          <div>
+            <div class="pay-opt-label">Bankily</div>
+            <div class="pay-opt-desc" data-t-fr="Paiement mobile Bankily">دفع عبر بنكيلي</div>
+          </div>
+        </label>
+        <label class="pay-opt" id="pay-sedad" onclick="selectPayment('sedad')">
+          <input type="radio" name="payment" value="sedad"/>
+          <span class="pay-opt-icon">📲</span>
+          <div>
+            <div class="pay-opt-label">Sedād</div>
+            <div class="pay-opt-desc" data-t-fr="Paiement mobile Sedad">دفع عبر سداد</div>
+          </div>
+        </label>
       </div>
       <div id="cart-seller-payments" style="margin-top:12px;display:none"></div>
+      <div id="cart-pay-ref-box" style="display:none;margin-top:12px">
+        <label style="display:block;font-size:12px;font-weight:800;color:var(--navy);margin-bottom:6px" for="pay-ref-input">مرجع التحويل / رقم العملية</label>
+        <input id="pay-ref-input" type="text" dir="ltr" placeholder="TXN / Ref" style="width:100%;box-sizing:border-box;padding:11px 12px;border:1.5px solid #e0e8f0;border-radius:10px;font-family:Cairo,sans-serif;font-size:14px"/>
+        <label style="display:block;font-size:12px;font-weight:800;color:var(--navy);margin:10px 0 6px" for="pay-receipt-input">صورة الوصل (اختياري)</label>
+        <input id="pay-receipt-input" type="file" accept="image/*" style="width:100%;font-size:12px"/>
+      </div>
       <p style="font-size:11px;color:#6b7280;margin-top:8px;line-height:1.5" id="cart-pay-trust-note">
         التحويل يتم لحساب المحل مباشرة — رزق وسيط نشر فقط ولا يستلم ثمن مشترياتك.
       </p>
@@ -872,6 +896,12 @@ var DELIVERY_KEY = 'rizq_buyer_delivery';
 var deliveryConfirmed = false;
 
 function _loadBuyerSession() {
+  try {
+    if (window.RizqAuthGate && typeof window.RizqAuthGate.getSession === 'function') {
+      var gate = window.RizqAuthGate.getSession();
+      if (gate && gate.id) return gate;
+    }
+  } catch (e0) {}
   try { return JSON.parse(localStorage.getItem('rizq_buyer_session') || 'null'); } catch (e) { return null; }
 }
 function _loadSavedDelivery() {
@@ -882,11 +912,18 @@ function _saveDeliveryInfo(info) {
   try {
     var s = _loadBuyerSession();
     if (s && s.id) {
-      s.name = info.name || s.name;
-      s.phone = info.phone || s.phone;
-      s.city = info.city || s.city;
-      s.address = info.address || s.address;
-      localStorage.setItem('rizq_buyer_session', JSON.stringify(s));
+      var profile = {
+        id: s.id,
+        name: info.name || s.name || '',
+        phone: info.phone || s.phone || '',
+        phoneIntl: s.phoneIntl || '',
+        whatsapp: s.whatsapp || '',
+        email: s.email || '',
+        city: info.city || s.city || '',
+        address: info.address || s.address || '',
+        cookieAuth: true
+      };
+      localStorage.setItem('rizq_buyer_session', JSON.stringify(profile));
     }
   } catch (e2) {}
 }
@@ -1132,8 +1169,50 @@ function applyCartStoreBrand(acc, storeId, fr){
 
 // ========= CART STATE — مرتبطة فعلياً بـ rizq_products.html عبر localStorage['rizq_cart'] =========
 // مخزن واحد للزائر؛ عند ?id= تُعرض فقط أسطر ذلك المحل/المعرض.
+function migrateLegacyCartLines(items){
+  if(!Array.isArray(items)) return [];
+  var changed = false;
+  var out = items.map(function(c){
+    if(!c || c.id == null) return c;
+    var id = String(c.id);
+    var next = Object.assign({}, c);
+    if(/^(store-prod-|showroom-)/.test(id)){
+      if(!next.productId){
+        next.productId = id.replace(/__v_.*$/,'').replace(/^store-prod-/,'').replace(/^showroom-/,'');
+        changed = true;
+      }
+      if(!next.module){
+        next.module = /^showroom-/.test(id) ? 'showroom' : 'store';
+        changed = true;
+      }
+      return next;
+    }
+    // أسطر قديمة من صفحة المنتجات بدون بادئة
+    var productId = String(next.productId || id.replace(/__v_.*$/,'')).trim();
+    if(!productId) return next;
+    var base = 'store-prod-' + productId;
+    var v = id.match(/__v_.*$/);
+    next.id = v ? (base + v[0]) : base;
+    next.productId = productId;
+    next.module = next.module || 'store';
+    var sid = next.storeId || next.accountId || '';
+    if(sid){
+      next.storeId = sid;
+      next.accountId = next.accountId || sid;
+    }
+    changed = true;
+    return next;
+  });
+  if(changed){
+    try{ localStorage.setItem('rizq_cart', JSON.stringify(out)); }catch(e){}
+  }
+  return out;
+}
 function loadCart(){
-  try{ return JSON.parse(localStorage.getItem('rizq_cart') || '[]'); }catch(e){ return []; }
+  try{
+    var raw = JSON.parse(localStorage.getItem('rizq_cart') || '[]');
+    return migrateLegacyCartLines(Array.isArray(raw) ? raw : []);
+  }catch(e){ return []; }
 }
 function saveCart(){
   try{ localStorage.setItem('rizq_cart', JSON.stringify(cart)); }catch(e){}
@@ -1155,9 +1234,7 @@ function activeCart(){
   });
 }
 
-// ── "كرر آخر طلب" (إلهام أمازون/AliExpress "Buy again") — مهمة #267.
-// تخزين محلي بحت لا يمس نظام الطلب الحالي (واتساب فقط، بلا تخزين خادم) —
-// فقط نسخة من محتوى آخر سلة أُرسلت فعلياً، لإعادة تعبئتها بضغطة واحدة. ──
+// ── "كرر آخر طلب" — لقطة محلية لآخر سلة أُرسلت (بعد POST /api/orders أو مسار محلي). ──
 function saveLastOrderSnapshot(){
   try{
     localStorage.setItem('rizq_last_order', JSON.stringify({ items: activeCart(), deliveryType: deliveryType, savedAt: new Date().toISOString() }));
@@ -1474,14 +1551,23 @@ function openCartLineDetail(lineId) {
   var item = cart.find(function (c) { return String(c.id) === String(lineId); });
   if (!item || !window.RizqStoreCommerce || typeof RizqStoreCommerce.openProductDetail !== 'function') return;
   var isAr = document.documentElement.lang !== 'fr';
-  var productId = item.productId || String(item.id || '').replace(/^store-prod-/, '').replace(/__v_.*$/, '');
+  var productId = item.productId || String(item.id || '')
+    .replace(/__v_.*$/, '')
+    .replace(/^store-prod-/, '')
+    .replace(/^showroom-/, '');
   var catalogItem = null;
   try {
     var sid = item.storeId || item.accountId || '';
+    var mod = String(item.module || item.kind || 'store').toLowerCase();
     if (sid) {
-      var raw = JSON.parse(localStorage.getItem('store_products_' + sid) || '[]');
-      if (Array.isArray(raw)) {
-        catalogItem = raw.find(function (x) { return String(x.id) === String(productId); }) || null;
+      var keys = (mod === 'showroom' || mod === 'corp')
+        ? ['rizq_corp_prods_' + sid, 'store_products_' + sid]
+        : ['store_products_' + sid, 'rizq_corp_prods_' + sid];
+      for (var ki = 0; ki < keys.length && !catalogItem; ki++) {
+        var raw = JSON.parse(localStorage.getItem(keys[ki]) || '[]');
+        if (Array.isArray(raw)) {
+          catalogItem = raw.find(function (x) { return String(x.id) === String(productId); }) || null;
+        }
       }
     }
   } catch (eCat) {}
@@ -1627,12 +1713,15 @@ function selectDelivery(type) {
 
 function selectPayment(method) {
   paymentMethod = method;
-  ['cod','bank'].forEach(m => {
+  ['cod','bank','bankily','sedad'].forEach(m => {
     document.getElementById('pay-'+m)?.classList.toggle('selected', m===method);
   });
   updateOrderTerms();
   var box = document.getElementById('cart-seller-payments');
-  if(method === 'bank'){
+  var refBox = document.getElementById('cart-pay-ref-box');
+  var digital = method === 'bank' || method === 'bankily' || method === 'sedad';
+  if (refBox) refBox.style.display = digital ? 'block' : 'none';
+  if(method === 'bank' || method === 'bankily' || method === 'sedad'){
     openCartBankPicker();
     if(box) box.style.display = '';
   } else {
@@ -1770,19 +1859,39 @@ function updateSummary() {
   }
 }
 
+function _sellerWaDigits(){
+  var candidates = [
+    window._rizqCartSellerWa,
+    window._rizqCartSellerPhone,
+    window._rizqCartStoreWa,
+    window._rizqCartStorePhone
+  ];
+  for (var i = 0; i < candidates.length; i++) {
+    var d = String(candidates[i] || '').replace(/\D/g, '');
+    if (d.length >= 8) {
+      if (d.length === 8) d = '222' + d;
+      return d;
+    }
+  }
+  return '22244882212'; // احتياطي منصة رزق
+}
 function buildWALink() {
   const view = activeCart();
   if (!view.length) return;
   const isAr = document.documentElement.lang !== 'fr';
-  const seller = window._rizqCartStoreName || (view[0] && view[0].storeName) || (isAr ? 'متجر النور' : 'Boutique Al-Nour');
+  const seller = window._rizqCartSellerName || window._rizqCartStoreName || (view[0] && view[0].storeName) || (isAr ? 'المحل' : 'Boutique');
   const items = view.map(c => `- ${isAr ? (c.name||c.nameF) : (c.nameF||c.name)} ×${c.qty} = ${(c.price*c.qty).toLocaleString()} MRU`).join('\n');
   const subtotal = view.reduce((s,c) => s + c.price*c.qty, 0);
   const total = subtotal + deliveryFee - Math.round(subtotal*promoDiscount/100);
+  const payLabel = paymentMethod === 'cod'
+    ? (isAr ? 'نقداً عند التسليم' : 'à la livraison')
+    : (paymentMethod || '');
   const msg = isAr
-    ? `🛒 طلب جديد من ${seller} عبر رزق\n\n${items}\n\n${deliveryType==='delivery'?'🚚 توصيل':'🏪 استلام من المحل'}\nالإجمالي: ${total.toLocaleString()} MRU\nالدفع: نقداً عند التسليم`
-    : `🛒 Nouvelle commande depuis ${seller} via Rizq\n\n${items}\n\n${deliveryType==='delivery'?'🚚 Livraison':'🏪 Retrait en boutique'}\nTotal: ${total.toLocaleString()} MRU\nPaiement: à la livraison, en espèces`;
+    ? `🛒 طلب جديد من ${seller} عبر رزق\n\n${items}\n\n${deliveryType==='delivery'?'🚚 توصيل':'🏪 استلام من المحل'}\nالإجمالي: ${total.toLocaleString()} MRU\nالدفع: ${payLabel}`
+    : `🛒 Nouvelle commande depuis ${seller} via Rizq\n\n${items}\n\n${deliveryType==='delivery'?'🚚 Livraison':'🏪 Retrait en boutique'}\nTotal: ${total.toLocaleString()} MRU\nPaiement: ${payLabel}`;
   const el = document.getElementById('wa-order-btn');
-  if (el) el.href = `https://wa.me/22244882212?text=${encodeURIComponent(msg)}`;
+  const wa = _sellerWaDigits();
+  if (el) el.href = `https://wa.me/${wa}?text=${encodeURIComponent(msg)}`;
 }
 
 function _cartSellerId(){
@@ -1838,11 +1947,15 @@ function loadCartSellerPayments(){
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(data){
       var a = (data && data.accounts || []).find(function(x){ return x && String(x.id) === String(storeId); });
-      if(a && Array.isArray(a.paymentMethods) && a.paymentMethods.length){
+      if(!a) return;
+      if(Array.isArray(a.paymentMethods) && a.paymentMethods.length){
         applyPayments(a.paymentMethods, a.name || '');
-      } else if(a && a.name){
+      } else if(a.name){
         window._rizqCartSellerName = a.name;
       }
+      if(a.whatsapp) window._rizqCartSellerWa = a.whatsapp;
+      if(a.phone) window._rizqCartSellerPhone = a.phone;
+      try{ buildWALink(); }catch(eWa){}
     }).catch(function(){});
 }
 
@@ -1955,45 +2068,148 @@ function submitOrder(e) {
     _saveDeliveryInfo(readDeliveryForm());
   }
 
-  // Generate order number (client-side only — not secure for production)
-  const orderNum = 'RZQ-' + Date.now().toString().slice(-6);
-  document.getElementById('order-num-display').textContent = (isAr ? 'رقم الطلب: #' : 'N° de commande : #') + orderNum;
-
-  // حفظ نسخة من الطلب قبل تفريغ السلة — تُستخدم لاحقاً في "🔁 كرر آخر طلب"
-  saveLastOrderSnapshot();
-
-  // استقطاع المخزون: 20 → بيع 1 → يبقى 19 (محلياً + محاولة مزامنة الخادم)
-  try {
-    if (window.RizqStock && typeof RizqStock.decrementCartItems === 'function') {
-      RizqStock.decrementCartItems(view.slice());
+  var session = _loadBuyerSession();
+  if (!session || !session.id) {
+    if (window.RizqAuthGate && typeof window.RizqAuthGate.requireAuth === 'function') {
+      window.RizqAuthGate.requireAuth(function () { submitOrder(e); }, 'reasonGeneric');
+      return;
     }
-  } catch (stockErr) {}
-
-  // امسح أسطر هذا البائع فقط — أبقِ سلات المحلات/المعارض الأخرى
-  var scopeId = _cartScopeSellerId() || (view[0] && (view[0].storeId || view[0].accountId)) || '';
-  var orderedIds = {};
-  view.forEach(function(c){ orderedIds[String(c.id)] = true; });
-  if (scopeId) {
-    cart = cart.filter(function(c){
-      return String((c && (c.storeId || c.accountId)) || '') !== String(scopeId);
-    });
-  } else {
-    cart = cart.filter(function(c){ return !orderedIds[String(c.id)]; });
+    showToast(isAr ? '⚠️ سجّل الدخول من «حسابي» أولاً' : '⚠️ Connectez-vous d\'abord');
+    return;
   }
-  saveCart();
-  document.getElementById('main-wrap').style.display = 'none';
-  document.getElementById('empty-cart').style.display = 'none';
-  document.getElementById('success-state').style.display = 'block';
-  document.getElementById('success-state').closest('.page-wrap')?.remove();
 
-  // Rebuild full-width success
-  const pw = document.getElementById('main-wrap') || document.querySelector('.page-wrap');
-  showToast(isAr ? '✅ تم إرسال طلبك بنجاح!' : '✅ Votre commande a été envoyée avec succès !');
+  var digital = paymentMethod && paymentMethod !== 'cod';
+  var payRef = ((document.getElementById('pay-ref-input') || {}).value || '').trim();
+  if (digital && !payRef) {
+    showToast(isAr ? '⚠️ أدخل مرجع التحويل أو رقم العملية' : '⚠️ Indiquez la référence de paiement');
+    return;
+  }
 
-  // Step progress
-  document.getElementById('step1').className = 'step done';
-  document.getElementById('step2').className = 'step done';
-  document.getElementById('step3').className = 'step active';
+  var scopeId = _cartScopeSellerId() || (view[0] && (view[0].storeId || view[0].accountId)) || '';
+  if (!scopeId) {
+    showToast(isAr ? '⚠️ افتح سلة المحل عبر رابط المحل (?id=…) قبل الإرسال' : '⚠️ Ouvrez le panier du magasin (?id=…) avant d\'envoyer');
+    return;
+  }
+  var deliv = deliveryType === 'delivery' ? readDeliveryForm() : { name: (session.name || ''), phone: (session.phone || ''), notes: '' };
+  var subtotalNow = view.reduce(function (s, c) { return s + (Number(c.price) || 0) * (Number(c.qty) || 1); }, 0);
+  var discountAmt = Math.round(subtotalNow * (Number(promoDiscount) || 0) / 100);
+  var sellerMod = String((view[0] && (view[0].module || view[0].kind)) || 'store').toLowerCase();
+  var sellerType = (sellerMod === 'showroom' || sellerMod === 'corp') ? 'corp'
+    : (sellerMod === 'office' ? 'office' : (sellerMod === 'estate' ? 'estate' : 'store'));
+  var items = view.map(function (c) {
+    var cleanId = String(c.productId || '').trim();
+    if (!cleanId) {
+      cleanId = String(c.id || '')
+        .replace(/__v_.*$/, '')
+        .replace(/^store-prod-/, '')
+        .replace(/^showroom-/, '');
+    }
+    var thumb = '';
+    if (c.thumb || c.image) thumb = c.thumb || c.image;
+    else if (Array.isArray(c.images) && c.images[0]) thumb = c.images[0];
+    else if (Array.isArray(c.imgDataArr) && c.imgDataArr[0]) thumb = c.imgDataArr[0];
+    return {
+      productId: cleanId,
+      title: c.title || c.name || c.nameF || 'منتج',
+      qty: c.qty || 1,
+      unitPrice: c.price || c.unitPrice || 0,
+      meta: {
+        thumb: thumb,
+        variantLabel: c.variantLabel || '',
+        variantKey: c.variantKey || '',
+        selected: c.selected || null,
+        module: c.module || sellerMod,
+        lineId: c.id || ''
+      }
+    };
+  });
+
+  function finishLocalSuccess(orderNum) {
+    document.getElementById('order-num-display').textContent = (isAr ? 'رقم الطلب: #' : 'N° de commande : #') + orderNum;
+    saveLastOrderSnapshot();
+    try {
+      if (window.RizqStock && typeof RizqStock.decrementCartItems === 'function') {
+        RizqStock.decrementCartItems(view.slice());
+      }
+    } catch (stockErr) {}
+    var orderedIds = {};
+    view.forEach(function(c){ orderedIds[String(c.id)] = true; });
+    if (scopeId) {
+      cart = cart.filter(function(c){
+        return String((c && (c.storeId || c.accountId)) || '') !== String(scopeId);
+      });
+    } else {
+      cart = cart.filter(function(c){ return !orderedIds[String(c.id)]; });
+    }
+    saveCart();
+    document.getElementById('main-wrap').style.display = 'none';
+    document.getElementById('empty-cart').style.display = 'none';
+    document.getElementById('success-state').style.display = 'block';
+    try { document.getElementById('success-state').closest('.page-wrap')?.remove(); } catch (eR) {}
+    showToast(isAr ? '✅ تم إرسال طلبك بنجاح!' : '✅ Votre commande a été envoyée avec succès !');
+    document.getElementById('step1').className = 'step done';
+    document.getElementById('step2').className = 'step done';
+    document.getElementById('step3').className = 'step active';
+  }
+
+  function readReceiptAsDataUrl() {
+    return new Promise(function (resolve) {
+      var inp = document.getElementById('pay-receipt-input');
+      if (!inp || !inp.files || !inp.files[0]) return resolve('');
+      var file = inp.files[0];
+      if (file.size > 1.5e6) {
+        showToast(isAr ? '⚠️ صورة الوصل كبيرة جداً (حدّ 1.5MB)' : '⚠️ Reçu trop volumineux (max 1.5MB)');
+        return resolve('');
+      }
+      var reader = new FileReader();
+      reader.onload = function () { resolve(String(reader.result || '')); };
+      reader.onerror = function () { resolve(''); };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  var btnCandidates = document.querySelectorAll('.order-btn');
+  btnCandidates.forEach(function (b) { b.disabled = true; });
+
+  readReceiptAsDataUrl().then(function (receipt) {
+    if (!window.RizqOps || typeof window.RizqOps.createOrder !== 'function') {
+      btnCandidates.forEach(function (b) { b.disabled = false; });
+      finishLocalSuccess('RZQ-' + Date.now().toString().slice(-6));
+      return;
+    }
+    return window.RizqOps.createOrder({
+      sellerId: scopeId,
+      sellerType: sellerType,
+      items: items,
+      paymentMethod: paymentMethod || 'cod',
+      paymentReference: payRef,
+      paymentReceipt: receipt,
+      deliveryFee: Number(deliveryFee) || 0,
+      discount: discountAmt,
+      deliveryType: deliveryType || 'delivery',
+      delivery: {
+        name: deliv.name,
+        phone: deliv.phone,
+        wilaya: deliv.city,
+        district: deliv.district,
+        address: deliv.address,
+        notes: deliv.notes
+      },
+      buyerNote: deliv.notes || '',
+      currency: 'MRU'
+    }).then(function (r) {
+      btnCandidates.forEach(function (b) { b.disabled = false; });
+      if (!r || !r.ok || !r.body || !r.body.ok) {
+        showToast((r && r.body && (r.body.error || r.body.message)) || (isAr ? '❌ تعذّر إرسال الطلب' : '❌ Échec de la commande'));
+        return;
+      }
+      var num = (r.body.order && r.body.order.orderNumber) || ('RZQ-' + Date.now().toString().slice(-6));
+      finishLocalSuccess(num);
+    }).catch(function () {
+      btnCandidates.forEach(function (b) { b.disabled = false; });
+      showToast(isAr ? '❌ تعذّر الاتصال بالخادم' : '❌ Connexion serveur impossible');
+    });
+  });
 }
 
 let toastTimer;

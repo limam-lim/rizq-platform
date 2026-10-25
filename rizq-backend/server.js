@@ -13,6 +13,7 @@ try { require('./services/secretsVault').loadAndApplyOnBoot(); } catch (eVaultBo
 ensureAnthropicEnv();
 const repos = require('./db/repos');
 const authRouter = require('./routes/auth');
+const passkeyRouter = require('./routes/passkey');
 const wishlistRouter = require('./routes/wishlist');
 const BuyerModel = require('./models/buyer');
 const { globalErrorHandler, notFoundHandler } = require('./middleware/errors');
@@ -277,6 +278,7 @@ app.use(cors({
     if (isDevPreviewOrigin(origin)) return cb(null, true);
     cb(new Error('غير مسموح من هذا الأصل (CORS)'));
   },
+  credentials: true,
 }));
 
 // ── Rate limit: حماية حصة Claude API من الاستهلاك العشوائي ─────────
@@ -378,7 +380,53 @@ function adminHasPermission(req, ...keys) {
 
 const anthropic = new Anthropic({ apiKey: getAnthropicApiKey() });
 
-app.get('/health', (req, res) => res.json({ ok: true }));
+function getOpsReadiness() {
+  const vapidPublic = !!String(process.env.VAPID_PUBLIC_KEY || '').trim();
+  const vapidPrivate = !!String(process.env.VAPID_PRIVATE_KEY || '').trim();
+  let pushReady = false;
+  try {
+    pushReady = !!require('./models/pushSubscription').ensureVapid();
+  } catch (e) {
+    pushReady = false;
+  }
+  let telegram = { configured: false };
+  try {
+    const tg = require('./services/telegramAdmin');
+    telegram = {
+      configured: !!tg.isConfigured(),
+      diagnostics: typeof tg.getTelegramDiagnostics === 'function' ? tg.getTelegramDiagnostics() : undefined,
+    };
+  } catch (e) {
+    telegram = { configured: false, error: e.message };
+  }
+  const backupKey = !!String(process.env.BACKUP_ENCRYPTION_KEY || '').trim();
+  return {
+    production: isProdEnv(),
+    push: {
+      vapidConfigured: vapidPublic && vapidPrivate,
+      ready: pushReady,
+      subject: process.env.VAPID_SUBJECT || 'mailto:direction@rizq.mr',
+    },
+    notifyChannels: {
+      smtp: !!(process.env.SMTP_HOST || process.env.SMTP_URL),
+      twilio: !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN),
+      telegram: !!telegram.configured,
+    },
+    telegram,
+    backup: {
+      encryptionKeySet: backupKey,
+      dir: process.env.BACKUP_DIR || 'backups',
+    },
+  };
+}
+
+app.get('/health', (req, res) => {
+  const body = { ok: true };
+  if (String(req.query.ready || '') === '1') {
+    body.readiness = getOpsReadiness();
+  }
+  res.json(body);
+});
 
 // دليل المساعدة العام للزوّار = HTML فقط.
 // الأدلة التقنية (MD) محجوبة عن الزوّار وتتطلّب مصادقة أدمن.
@@ -2268,6 +2316,9 @@ mountAccountsSessionRoutes(app, {
  * مستخرجة إلى routes/accountsManage.js
  */
 const { REFERRAL_BONUS_DAYS } = require('./rizq_package_lifecycle_agent');
+const { mountDemoPublicRoutes } = require('./routes/demoPublic');
+mountDemoPublicRoutes(app);
+
 const { mountAccountsManageRoutes } = require('./routes/accountsManage');
 mountAccountsManageRoutes(app, {
   requireAdminAuth,
@@ -2304,6 +2355,13 @@ const buyersRegisterLimiter = rateLimit({
 });
 
 app.use('/api/auth', authRouter);
+passkeyRouter.configurePasskeyRoutes({
+  readAccounts,
+  writeAccounts,
+  genDashToken,
+  genAccessToken,
+});
+app.use('/api/auth/passkey', passkeyRouter);
 
 const otpLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -2349,6 +2407,37 @@ app.get('/api/otp/config', (req, res) => {
   res.json({ ok: true, otp: getPublicOtpConfig() });
 });
 app.use('/api/wishlist', wishlistRouter);
+
+// ── طلبات السوق + بحث موحّد + Push + خصوصية + SEO ─────────────────
+const ordersRouter = require('./routes/orders');
+const searchUnifiedRouter = require('./routes/searchUnified');
+const pushRouter = require('./routes/push');
+const privacyRouter = require('./routes/privacy');
+const { mountSeoRoutes, configureSeoRoutes } = require('./routes/seoDynamic');
+
+ordersRouter.configureOrderRoutes({
+  readAccounts,
+  readCatalog: () => (typeof readCatalog === 'function' ? readCatalog() : []),
+  writeCatalog: (list) => (typeof writeCatalog === 'function' ? writeCatalog(list) : null),
+  requireAdminPermission: typeof requireAdminPermission === 'function' ? requireAdminPermission : null,
+});
+searchUnifiedRouter.configureSearchRoutes({
+  readAds: () => (typeof readAds === 'function' ? readAds() : []),
+  readAccounts,
+  listCatalog: () => (typeof readCatalog === 'function' ? readCatalog() : []),
+});
+pushRouter.configurePushRoutes({ readAccounts });
+configureSeoRoutes({
+  readAds: () => (typeof readAds === 'function' ? readAds() : []),
+  readAccounts,
+  publicOrigin: () => process.env.PUBLIC_BASE_URL || ('http://localhost:' + (process.env.PORT || 3000)),
+});
+
+app.use('/api/orders', ordersRouter);
+app.use('/api/search', searchUnifiedRouter);
+app.use('/api/push', pushRouter);
+app.use('/api/privacy', privacyRouter);
+mountSeoRoutes(app);
 
 /** @deprecated � استخد�& POST /api/auth/register */
 app.post('/api/buyers/register', buyersRegisterLimiter, (req, res) => {
@@ -4165,6 +4254,28 @@ const HOST = process.env.HOST || '0.0.0.0';
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
 
+// إعادة ربط مصادر البحث/SEO/الطلبات بعد تعريف readAds/readCatalog
+try {
+  searchUnifiedRouter.configureSearchRoutes({
+    readAds,
+    readAccounts,
+    listCatalog: readCatalog,
+  });
+  configureSeoRoutes({
+    readAds,
+    readAccounts,
+    publicOrigin: () => process.env.PUBLIC_BASE_URL || ('http://localhost:' + (process.env.PORT || 3000)),
+  });
+  ordersRouter.configureOrderRoutes({
+    readAccounts,
+    readCatalog,
+    writeCatalog,
+    requireAdminPermission,
+  });
+} catch (eSearchCfg) {
+  console.warn('[ops] search/seo/orders reconfigure:', eSearchCfg.message);
+}
+
 startMaintenanceScheduler({
   readAds,
   writeAds,
@@ -4199,6 +4310,18 @@ function assertProductionSecrets() {
     console.error('[FATAL] SUPER_ADMIN_PASS_HASH must be a bcrypt hash');
     process.exit(1);
   }
+  const vapidPublic = String(process.env.VAPID_PUBLIC_KEY || '').trim();
+  const vapidPrivate = String(process.env.VAPID_PRIVATE_KEY || '').trim();
+  if (!vapidPublic || !vapidPrivate) {
+    console.warn('[WARN] VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY missing — Web Push disabled in production (in-app alerts only)');
+  }
+  if (!String(process.env.BACKUP_ENCRYPTION_KEY || '').trim()) {
+    console.warn('[WARN] BACKUP_ENCRYPTION_KEY missing — encrypted daily backup will fail until set');
+  }
+  if (!String(process.env.TELEGRAM_BOT_TOKEN || '').trim()
+    || !String(process.env.TELEGRAM_ADMIN_CHAT_ID || process.env.TELEGRAM_CHAT_ID || '').trim()) {
+    console.warn('[WARN] Telegram admin not fully configured — order dispute alerts will be skipped');
+  }
 }
 assertProductionSecrets();
 
@@ -4214,6 +4337,15 @@ app.listen(PORT, HOST, async () => {
   await logTelegramEnvStatus();
   if (isTelegramAdminConfigured()) {
     console.log('[telegram-admin] subscription alerts enabled');
+  }
+  try {
+    const ready = getOpsReadiness();
+    console.log('[ops-readiness] push.vapidConfigured=' + ready.push.vapidConfigured
+      + ' push.ready=' + ready.push.ready
+      + ' telegram=' + ready.notifyChannels.telegram
+      + ' backupKey=' + ready.backup.encryptionKeySet);
+  } catch (eReady) {
+    console.warn('[ops-readiness]', eReady && eReady.message);
   }
   if (shouldUseTelegramPolling()) {
     const { getTelegramDeps } = require('./services/telegramDeps');

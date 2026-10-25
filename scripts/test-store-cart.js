@@ -16,6 +16,8 @@ assert(
 assert(headerJs.includes('rizq-hdr-cart'), 'header must include cart control');
 assert(headerJs.includes('rizq-hdr-cart-lbl'), 'cart control must show visible السلة/Panier label');
 assert(headerJs.includes('commerceToolbarHtml()'), 'desk tools must reuse commerce toolbar');
+assert(headerJs.includes('scopedCartHref'), 'header cart must deep-link to seller-scoped cart when on store page');
+assert(headerJs.includes('rizq_cart.html?id='), 'scoped cart href must include ?id=');
 assert(storeHtml.includes('store-name-el'), 'addToCartStore must read store-name-el');
 assert(storeHtml.includes('_rizqWireStoreCartLinks'), 'store must rewire cart links after header inject');
 assert(
@@ -116,6 +118,18 @@ assert(commerceJs.includes('cartQtyForSeller'), 'commerce must export seller car
 const cartHtml = fs.readFileSync(path.join(__dirname, '..', 'rizq_cart.html'), 'utf8');
 assert(cartHtml.includes('function activeCart'), 'cart page must scope visible lines');
 assert(cartHtml.includes('_cartScopeSellerId'), 'cart page must read seller scope from URL');
+assert(cartHtml.includes('deliveryFee: Number(deliveryFee)'), 'checkout must send deliveryFee to /api/orders');
+assert(cartHtml.includes('discount: discountAmt'), 'checkout must send promo discount to /api/orders');
+assert(!/واتساب فقط، بلا تخزين خادم/.test(cartHtml), 'stale WhatsApp-only cart comment must be removed');
+const productsHtml = fs.readFileSync(path.join(__dirname, '..', 'rizq_products.html'), 'utf8');
+assert(
+  productsHtml.includes("baseId = 'store-prod-' + String(id)") || productsHtml.includes("'store-prod-' + String(id)"),
+  'products page must use store-prod-* line ids like the store page'
+);
+assert(productsHtml.includes("module: 'store'"), 'products addToCart must set module:store');
+const stockJs = fs.readFileSync(path.join(__dirname, '..', 'rizq_stock.js'), 'utf8');
+assert(stockJs.includes('c.module || c.kind'), 'stock decrement must honor cart module for showroom/corp');
+assert(stockJs.includes('function stripCartLineId'), 'stock match must strip cart line prefixes');
 const showroomHtml = fs.readFileSync(path.join(__dirname, '..', 'rizq_showroom.html'), 'utf8');
 assert(showroomHtml.includes('cartQtyForSeller') || showroomHtml.includes('cartLinesForSeller') || showroomHtml.includes("c.storeId || c.accountId"), 'showroom badge must count only its seller');
 assert(showroomHtml.includes('module=showroom'), 'showroom cart links must pass module=showroom');

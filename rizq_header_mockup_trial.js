@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.68';
+    link.href = 'rizq_header_mockup_trial.css?v=5.69';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -78,7 +78,7 @@
       '<div class="rmh-tools">' +
       '<button type="button" class="rmh-lang btn-lang btn-lang-primary" id="rmh-lang-btn" dir="ltr" aria-label="FR | AR">' +
       '<span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>' +
-      '<button type="button" class="rmh-ico" onclick="typeof goToAccount===\'function\'&&goToAccount()" aria-label="حسابي">' +
+      '<button type="button" class="rmh-ico rmh-account-btn" id="rmh-account-btn" data-rizq-toolbar="account" aria-label="حسابي" title="حسابي">' +
       '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19c1.6-3.2 4-4.8 6.5-4.8S16.9 15.8 18.5 19"/></svg></button>' +
       '<a class="rmh-ico rmh-cart-link" id="rmh-cart-btn" href="rizq_cart.html" data-rizq-cart-wrap aria-label="السلة العامة" title="السلة العامة">' +
       '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 5h2l1.5 10h11L20 8H7"/><circle cx="9.5" cy="19" r="1.3"/><circle cx="16.5" cy="19" r="1.3"/></svg>' +
@@ -545,6 +545,56 @@
     try { refreshBadge(); } catch (eCart) {}
     try { ensureHeroTagline(); } catch (eHero) {}
     } finally { __rmhLangBusy = false; }
+  }
+
+  /** زر حسابي — يعمل من أي صفحة (لا يعتمد على goToAccount المعرّف فقط في الرئيسية) */
+  function goToAccountFromHeader(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (e && e.stopPropagation) e.stopPropagation();
+    try {
+      if (window.RizqAccount && typeof window.RizqAccount.open === 'function') {
+        return window.RizqAccount.open(e);
+      }
+    } catch (errAcc) {}
+    try {
+      if (window.RizqAuthGate && typeof window.RizqAuthGate.isLoggedIn === 'function' && window.RizqAuthGate.isLoggedIn()) {
+        if (typeof window.RizqAuthGate.openAccount === 'function') {
+          window.RizqAuthGate.openAccount();
+          return false;
+        }
+      }
+      if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function') {
+        window.RizqAuthGate.openAccountChoice();
+        return false;
+      }
+      if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccount === 'function') {
+        window.RizqAuthGate.openAccount();
+        return false;
+      }
+    } catch (errGate) {}
+    /* احتياط: افتح مسار الدخول على الرئيسية مع العودة لاحقاً */
+    try {
+      if (window.RizqAccount && typeof window.RizqAccount.rememberCurrentForAfterAuth === 'function') {
+        window.RizqAccount.rememberCurrentForAfterAuth();
+      } else {
+        sessionStorage.setItem('rizq_after_auth_href', location.pathname + location.search + (location.hash || ''));
+      }
+    } catch (errMem) {}
+    location.href = 'rizq_landing_v8.html?openLogin=1';
+    return false;
+  }
+
+  function wireAccount() {
+    var btns = document.querySelectorAll('#rmh-account-btn, .rmh-account-btn, #rizq-mock-hdr [data-rizq-toolbar="account"]');
+    btns.forEach(function (btn) {
+      if (!btn || btn.getAttribute('data-rmh-acc-wired') === '1') return;
+      btn.setAttribute('data-rmh-acc-wired', '1');
+      btn.addEventListener('click', goToAccountFromHeader);
+    });
+    /* إن لم يُعرَّف بعد من rizq_account_route — وفّر الاسم العالمي */
+    if (typeof window.goToAccount !== 'function') {
+      window.goToAccount = goToAccountFromHeader;
+    }
   }
 
   function wireLang() {
@@ -1099,6 +1149,19 @@
     }
   }
 
+  function measureMockHdrExtent(hdr) {
+    if (!hdr) return 0;
+    var top = hdr.getBoundingClientRect().top;
+    var bottom = hdr.getBoundingClientRect().bottom;
+    var nodes = hdr.querySelectorAll('.rmh-main, .ticker-wrap, nav.rmh-nav, .rmh-util');
+    for (var i = 0; i < nodes.length; i++) {
+      var r = nodes[i].getBoundingClientRect();
+      if (!r.height && !r.width) continue;
+      if (r.bottom > bottom) bottom = r.bottom;
+    }
+    return Math.max(0, Math.ceil(bottom - top));
+  }
+
   function syncMockHdrHeight() {
     var hdr = document.getElementById('rizq-mock-hdr');
     if (!hdr) return;
@@ -1114,14 +1177,20 @@
       if (topNav) topH += Math.ceil(topNav.getBoundingClientRect().height || 48);
       topH = Math.max(topH, 96);
       document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
+      /* browse/detail + legacy chrome read --rizq-header-h — keep it in sync with mock top bar */
+      document.body.style.setProperty('--rizq-header-h', topH + 'px');
+      document.documentElement.style.setProperty('--rizq-header-h', topH + 'px');
       if (bottomNav) {
         var nh = Math.ceil(bottomNav.getBoundingClientRect().height || 64);
         document.body.style.setProperty('--rizq-mock-nav-h', nh + 'px');
       }
       return;
     }
-    var h = Math.ceil(hdr.getBoundingClientRect().height || 188);
+    var h = measureMockHdrExtent(hdr) || Math.ceil(hdr.getBoundingClientRect().height || 196);
     document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
+    /* Sync legacy --rizq-header-h so .browse-right inset / detail max-height clear the capsule */
+    document.body.style.setProperty('--rizq-header-h', h + 'px');
+    document.documentElement.style.setProperty('--rizq-header-h', h + 'px');
   }
 
   function ensureHeroTagline() {
@@ -1161,6 +1230,7 @@
     renderCartPanel();
     wireCart();
     wireLang();
+    wireAccount();
     applyMockLang();
     wireHelp();
     wireMore();
@@ -1168,15 +1238,27 @@
     wireModelsModal();
     ensureHeroTagline();
     syncMockHdrHeight();
-    setTimeout(function () {
+  setTimeout(function () {
       fillCategories();
       applyMockLang();
+      wireAccount();
       ensureHeroTagline();
       syncMockHdrHeight();
       markActiveFromPage();
       refreshBadge();
       refreshFavBadge();
     }, 1200);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { syncMockHdrHeight(); }).catch(function () {});
+    }
+    var hdrEl = document.getElementById('rizq-mock-hdr');
+    if (hdrEl && typeof ResizeObserver !== 'undefined') {
+      if (window.__rmhHdrRo) {
+        try { window.__rmhHdrRo.disconnect(); } catch (eRo) {}
+      }
+      window.__rmhHdrRo = new ResizeObserver(function () { syncMockHdrHeight(); });
+      window.__rmhHdrRo.observe(hdrEl);
+    }
     window.addEventListener('resize', syncMockHdrHeight);
     window.addEventListener('storage', function (ev) {
       if (ev.key === 'rizq_cart') {

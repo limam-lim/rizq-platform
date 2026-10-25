@@ -226,15 +226,51 @@ html.rizq-app-nav:has(#rizq-desk-nav) .dir-hero{padding-top:16px}
 .dir-empty-note{
   grid-column:1/-1;text-align:center;margin:0 0 8px;
   font-size:12.5px;font-weight:700;color:#5b6b85;line-height:1.5;
+  font-family:'Cairo',sans-serif;
 }
+.dir-soft-launch{
+  grid-column:1/-1;margin:4px 0 14px;padding:18px 16px 16px;border-radius:16px;text-align:center;
+  font-family:'Cairo',sans-serif;
+  background:
+    radial-gradient(ellipse 70% 80% at 50% 0%,rgba(201,168,76,.18),transparent 55%),
+    linear-gradient(165deg,#0f2347 0%,#1B3A6B 100%);
+  border:1px solid rgba(201,168,76,.4);
+  box-shadow:0 10px 28px rgba(15,35,71,.18);
+}
+.dir-soft-kicker{
+  display:inline-block;margin:0 0 8px;padding:3px 12px;border-radius:999px;
+  font-size:11px;font-weight:800;letter-spacing:.4px;
+  color:#0f2347;background:linear-gradient(135deg,#E8C96A,#C9A84C);
+}
+.dir-soft-launch strong{
+  display:block;color:#fff;font-size:18px;font-weight:900;margin:0 0 6px;line-height:1.35;
+}
+.dir-soft-launch p{
+  color:rgba(255,255,255,.82);font-size:13px;font-weight:600;line-height:1.55;
+  max-width:420px;margin:0 auto 12px;
+}
+.dir-soft-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:10px 18px;border-radius:12px;text-decoration:none;
+  font-family:'Cairo',sans-serif;font-size:13.5px;font-weight:900;
+  color:#0f2347;background:#fff;border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 4px 14px rgba(0,0,0,.15);
+}
+.dir-soft-btn:hover{background:#E8C96A;border-color:#C9A84C}
 .dir-examples-label{
   grid-column:1/-1;margin:2px 0 4px;text-align:center;
   font-size:12px;font-weight:800;color:#1B3A6B;letter-spacing:.3px;
+  font-family:'Cairo',sans-serif;
 }
 .dir-card.is-example{border-style:dashed;border-color:rgba(201,168,76,.45)}
 .dir-card .dir-example-badge{
   display:inline-block;margin-inline-start:6px;padding:1px 7px;border-radius:6px;
   font-size:9.5px;font-weight:800;background:rgba(201,168,76,.18);color:#8a6a1a;
+}
+.dir-demo-ribbon{
+  grid-column:1/-1;text-align:center;margin:0 0 8px;padding:6px 10px;border-radius:10px;
+  font-family:'Cairo',sans-serif;font-size:11.5px;font-weight:800;
+  color:#8a6a1a;background:rgba(201,168,76,.14);border:1px dashed rgba(201,168,76,.45);
 }
 
 @keyframes dirFadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -828,15 +864,27 @@ function renderDirectory(){
       if(_type === 'investments') intro = fr
         ? 'Les opportunités validées apparaîtront ici. Cliquez une carte pour ouvrir la salle de détail (abonnés).'
         : 'فرص الاستثمار المعتمدة تظهر هنا — اضغط البطاقة لفتح غرفة التفاصيل (للمشتركين).';
-      grid.innerHTML = '<p class="dir-empty-note">'+intro+'</p>' + _exampleCardsHTML();
+      var soft = _isSoftLaunchType(_type) ? _softLaunchCtaHTML(fr) : '';
+      grid.innerHTML = soft + '<p class="dir-empty-note">'+intro+'</p>' + _exampleCardsHTML();
       return;
     }
-    grid.innerHTML = '<p class="dir-empty-note">'+(fr?m.emptyFr:m.emptyAr)+'</p>';
+    var softFilter = _isSoftLaunchType(_type) ? _softLaunchCtaHTML(fr) : '';
+    grid.innerHTML = softFilter + '<p class="dir-empty-note">'+(fr?m.emptyFr:m.emptyAr)+'</p>';
     return;
   }
 
   var shown = list.slice(0, _visibleCount);
-  grid.innerHTML = shown.map(_cardHTML).join('') + _dirInfiniteHtml(fr, shown.length, list.length);
+  var fictionNote = '';
+  if(_dirShowingFictional || (list.some && list.some(function(a){
+    return a && (a.graduationDemo || a.fictional || String(a.id || '').indexOf('acc_grad_') === 0);
+  }))){
+    fictionNote = '<div class="dir-demo-ribbon">'
+      + (fr
+        ? 'Données de démonstration fictives — seront effacées avant le lancement réel'
+        : 'بيانات عرض وهمية — ستُمسح قبل الإطلاق الحقيقي')
+      + '</div>';
+  }
+  grid.innerHTML = fictionNote + shown.map(_cardHTML).join('') + _dirInfiniteHtml(fr, shown.length, list.length);
   _dirBindInfinite();
 }
 
@@ -898,16 +946,21 @@ function _dirBindInfinite(){
   _dirIO.observe(sentinel);
 }
 
-/** بذور عرض التخرج — تُستخدم إن فشل الـ API أو عاد فارغاً (فصل واضح عبر graduationDemo) */
+/** بذور عرض وهمية — عبر API عام (تجنّب مسار /rizq-backend المحجوب) */
 function _loadGraduationFixture(){
-  return fetch('rizq-backend/fixtures/graduation-demo.json')
+  var base = _backendBase().replace(/\/$/,'');
+  return fetch(base + '/api/demo/graduation')
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
-      if(!data || !Array.isArray(data.accounts)) return [];
+      var list = (data && Array.isArray(data.accounts)) ? data.accounts
+        : (data && data.ok && Array.isArray(data.accounts) ? data.accounts : null);
+      if(!list) return [];
       var now = new Date().toISOString();
-      return data.accounts.map(function(a, idx){
+      _dirShowingFictional = true;
+      return list.map(function(a, idx){
         return Object.assign({}, a, {
           graduationDemo: true,
+          fictional: true,
           status: 'approved',
           approvedAt: a.approvedAt || new Date(Date.now() - (idx + 1) * 3600000).toISOString(),
           createdAt: a.createdAt || now
@@ -915,6 +968,57 @@ function _loadGraduationFixture(){
       });
     })
     .catch(function(){ return []; });
+}
+
+var _dirShowingFictional = false;
+var _dirModuleFlags = null;
+
+function _softLaunchKeys(){
+  // وحدات الإطلاق التدريجي الشائعة — تُحدَّث من site-config إن توفّر
+  var flags = _dirModuleFlags || {};
+  var map = {
+    store: flags.store !== false,
+    corp: flags.corp === true,
+    office: flags.office === true,
+    tenders: flags.tenders === true,
+    investments: flags.investments === true,
+    agencies: flags.estate !== false
+  };
+  return map;
+}
+
+function _isSoftLaunchType(type){
+  var open = _softLaunchKeys();
+  if(type === 'agencies') return open.agencies === false;
+  return open[type] === false;
+}
+
+function _softLaunchCtaHTML(fr){
+  var m = TYPE_META[_type] || {};
+  var reg = m.reg || 'rizq_register.html';
+  var title = fr ? 'Bientôt — soyez le premier à publier' : 'قريباً — كن أول من ينشر';
+  var body = fr
+    ? 'Cette section est en lancement progressif. Inscrivez-vous maintenant pour réserver votre place.'
+    : 'هذا القسم ضمن الإطلاق التدريجي. سجّل الآن واحجز مكانك قبل فتح الباب للجميع.';
+  var cta = fr ? (m.regCtaFr || 'S\'inscrire') : (m.regCtaAr || 'سجّل الآن');
+  return '<div class="dir-soft-launch">'
+    + '<span class="dir-soft-kicker">'+(fr ? 'Soft launch' : 'إطلاق تدريجي')+'</span>'
+    + '<strong>'+title+'</strong>'
+    + '<p>'+body+'</p>'
+    + '<a class="dir-soft-btn" href="'+escapeHtml(reg)+'">'+escapeHtml(cta)+'</a>'
+    + '</div>';
+}
+
+function _loadModuleFlags(){
+  var base = _backendBase().replace(/\/$/,'');
+  return fetch(base + '/api/site-config')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(j){
+      _dirModuleFlags = (j && j.config && j.config.moduleFlags)
+        || (j && j.moduleFlags)
+        || null;
+    })
+    .catch(function(){ _dirModuleFlags = _dirModuleFlags || null; });
 }
 
 function _uniqCats(items, key){
@@ -991,35 +1095,39 @@ function loadFeedDirectory(){
 }
 
 function loadAccounts(){
+  _dirShowingFictional = false;
   if(TYPE_META[_type] && TYPE_META[_type].feed){
-    loadFeedDirectory();
+    _loadModuleFlags().finally(function(){ loadFeedDirectory(); });
     return;
   }
-  fetch(_backendBase().replace(/\/$/,'') + '/api/accounts/public')
-    .then(function(res){ return res.ok ? res.json() : null; })
-    .then(function(data){
-      var list = (data && data.ok && Array.isArray(data.accounts)) ? data.accounts : [];
-      if(list.length){
-        _accounts = list;
+  _loadModuleFlags().finally(function(){
+    fetch(_backendBase().replace(/\/$/,'') + '/api/accounts/public')
+      .then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(data){
+        var list = (data && data.ok && Array.isArray(data.accounts)) ? data.accounts : [];
+        if(list.length){
+          _accounts = list;
+          _dirShowingFictional = list.some(function(a){ return !!(a && a.graduationDemo); });
+          _loaded = true;
+          renderDirectory();
+          return null;
+        }
+        return _loadGraduationFixture();
+      })
+      .then(function(fallback){
+        if(fallback == null) return;
+        _accounts = fallback;
         _loaded = true;
         renderDirectory();
-        return null;
-      }
-      return _loadGraduationFixture();
-    })
-    .then(function(fallback){
-      if(fallback == null) return;
-      _accounts = fallback;
-      _loaded = true;
-      renderDirectory();
-    })
-    .catch(function(){
-      _loadGraduationFixture().then(function(fallback){
-        _accounts = fallback || [];
-        _loaded = true;
-        renderDirectory();
+      })
+      .catch(function(){
+        _loadGraduationFixture().then(function(fallback){
+          _accounts = fallback || [];
+          _loaded = true;
+          renderDirectory();
+        });
       });
-    });
+  });
 }
 
 document.addEventListener('rizq:langchange', function(){ renderDirectory(); });

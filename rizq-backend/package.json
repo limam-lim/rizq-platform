@@ -15,6 +15,9 @@
     "telegram:poll": "node scripts/telegram-polling-dev.js",
     "telegram:webhook": "node scripts/setup-telegram-webhook.js",
     "test:hardening": "node scripts/test-prod-hardening.js",
+    "test:orders": "node scripts/test-orders-ops-api.js",
+    "test:order-stock": "node scripts/test-order-stock.js",
+    "test:passkeys": "node scripts/test-passkeys-api.js",
     "provision:admin": "node scripts/provision-secret-admin.js",
     "test:admin-roles": "node scripts/test-admin-roles.js",
     "verify:agents": "node scripts/verify-claude-agents.js",
@@ -24,6 +27,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
+    "@simplewebauthn/server": "^13.3.3",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
@@ -36,7 +40,8 @@
     "pdf-parse": "^1.1.1",
     "sharp": "^0.35.5",
     "tar": "^7.4.3",
-    "twilio": "^5.13.1"
+    "twilio": "^5.13.1",
+    "web-push": "^3.6.7"
   },
   "optionalDependencies": {
     "@aws-sdk/client-s3": "^3.679.0",

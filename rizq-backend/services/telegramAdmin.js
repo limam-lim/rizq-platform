@@ -483,6 +483,40 @@ async function sendWidgetMediaAlert(payload) {
   return result;
 }
 
+/**
+ * تنبيه فوري عند فتح نزاع على طلب سوق
+ */
+async function sendOrderDisputeAlert(order) {
+  if (!order) return null;
+  if (!isConfigured()) {
+    console.warn('[telegram-admin] order dispute alert skipped — telegram not configured');
+    return null;
+  }
+  const lines = [
+    '⚠️ نزاع طلب جديد على رزق',
+    'الرقم: #' + String(order.orderNumber || order.id || ''),
+    'المبلغ: ' + String(order.total != null ? order.total : '') + ' ' + String(order.currency || 'MRU'),
+    'البائع: ' + String(order.sellerId || ''),
+    'المشتري: ' + String(order.buyerId || ''),
+    'السبب: ' + String(order.disputeReason || order.note || '—').slice(0, 300),
+    'الحالة: disputed · صرف البائع مجمّد',
+  ];
+  try {
+    const sent = await sendMessageToAlertChats(lines.join('\n'), {
+      kind: 'order_dispute',
+      orderId: order.id,
+    });
+    console.log('[telegram-admin] order dispute alert delivered', {
+      orderId: order.id,
+      chatId: sent && sent.chatId,
+    });
+    return sent && sent.result;
+  } catch (e) {
+    logTelegramSendFailure('sendOrderDisputeAlert', ADMIN_CHAT_ID(), e, { orderId: order && order.id });
+    return null;
+  }
+}
+
 /** alias — استدعاء موحّد لإشعارات الإدارة */
 const sendTelegramNotification = sendLeadEscalationAlert;
 const sendTelegramAdminNotification = sendLeadEscalationAlert;
@@ -1005,6 +1039,7 @@ module.exports = {
   stopPolling,
   sendSubRequestNotification,
   sendLeadEscalationAlert,
+  sendOrderDisputeAlert,
   sendWidgetMediaAlert,
   sendTelegramNotification,
   sendTelegramAdminNotification,

@@ -1586,10 +1586,20 @@ function publishAd(){
   var _verifiedAccountId = (function(){
     try{
       var sess = JSON.parse(localStorage.getItem('rizq_individual_session') || 'null');
-      if(!sess || !sess.id || !sess.token) return '';
+      if(!sess || !sess.id) return '';
+      var tok = sess.token || '';
+      if(!tok){
+        try{
+          if(window.RizqAccount && typeof RizqAccount.readDashToken === 'function') tok = RizqAccount.readDashToken(sess.id);
+          else tok = sessionStorage.getItem('rizq_dash_token_'+sess.id) || '';
+        }catch(eTok){}
+      }
+      if(!tok) return '';
       var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
       var acc = accs.find(function(a){
-        return a.id === sess.id && a.token === sess.token && a.status === 'approved' && a.type === 'individual';
+        if(!a || a.id !== sess.id || a.status !== 'approved' || a.type !== 'individual') return false;
+        if(!a.token && !a.dashToken) return true;
+        return a.token === tok || a.dashToken === tok;
       });
       return acc ? acc.id : '';
     }catch(e){ return ''; }
@@ -1755,6 +1765,12 @@ var _editAdId = null;
 
     var sess = null;
     try{ sess = JSON.parse(localStorage.getItem('rizq_individual_session') || 'null'); }catch(e){}
+    if(sess && sess.id && !sess.token){
+      try{
+        if(window.RizqAccount && typeof RizqAccount.readDashToken === 'function') sess.token = RizqAccount.readDashToken(sess.id);
+        else sess.token = sessionStorage.getItem('rizq_dash_token_'+sess.id) || '';
+      }catch(eTok){}
+    }
     if(!sess || !sess.id || !sess.token){
       showToast((typeof isAr !== 'undefined' && !isAr) ? '⚠️ Connectez-vous pour modifier une annonce' : '⚠️ يجب تسجيل الدخول لتعديل إعلان');
       _editAdId = null;
@@ -1846,6 +1862,12 @@ function saveAdEdit(){
   if(!_editAdId) return;
   var sess = null;
   try{ sess = JSON.parse(localStorage.getItem('rizq_individual_session') || 'null'); }catch(e){}
+  if(sess && sess.id && !sess.token){
+    try{
+      if(window.RizqAccount && typeof RizqAccount.readDashToken === 'function') sess.token = RizqAccount.readDashToken(sess.id);
+      else sess.token = sessionStorage.getItem('rizq_dash_token_'+sess.id) || '';
+    }catch(eTok){}
+  }
   if(!sess || !sess.id || !sess.token){
     showToast((typeof isAr !== 'undefined' && !isAr) ? '⚠️ Session expirée — reconnectez-vous' : '⚠️ انتهت الجلسة — سجّل الدخول من جديد');
     return;
