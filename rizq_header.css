@@ -189,7 +189,7 @@ html.rizq-app-nav .login-logo:not(:has(img)),
 html.rizq-app-nav .rn-logo-btn:not(:has(img)){
   width:42px !important;
   height:42px !important;
-  background:#0f172a url('rizq-mark-512.png') center / contain no-repeat !important;
+  background:#0f172a url('rizq-mark.svg') center / contain no-repeat !important;
   border:none !important;
   border-radius:10px !important;
   box-shadow:0 0 0 1px rgba(201,168,76,.28) !important;
@@ -213,7 +213,7 @@ html.rizq-app-nav .fixed-rizq-logo img{
 }
 html.rizq-app-nav .fixed-rizq-logo:not(:has(img))::before{
   content:'';display:block;width:26px;height:26px;border-radius:6px;
-  background:#0f172a url('rizq-mark-512.png') center / contain no-repeat;
+  background:#0f172a url('rizq-mark.svg') center / contain no-repeat;
 }
 
 /* ── GREY DOT / CUSTOM CURSOR ── */
@@ -770,7 +770,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
   html.rizq-app-nav #nav .logo-mark:not(:has(img)),
   html.rizq-app-nav #rizq-desk-nav .logo-mark:not(:has(img)){
-    background:#0f172a url('rizq-mark-512.png') center / contain no-repeat !important;
+    background:#0f172a url('rizq-mark.svg') center / contain no-repeat !important;
   }
   html.rizq-app-nav #nav .logo-mark svg,
   html.rizq-app-nav #rizq-desk-nav .logo-mark svg{display:none !important}
@@ -1497,7 +1497,7 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
   html.rizq-app-nav #nav .logo-mark:not(:has(img)),
   html.rizq-app-nav #rizq-desk-nav .logo-mark:not(:has(img)){
-    background:#0f172a url('rizq-mark-512.png') center / contain no-repeat !important;
+    background:#0f172a url('rizq-mark.svg') center / contain no-repeat !important;
   }
   html.rizq-app-nav #nav .logo-text,
   html.rizq-app-nav #rizq-desk-nav .logo-text{
@@ -3424,7 +3424,7 @@ html.rizq-app-nav #rizq-desk-nav > .logo:hover .logo-mark-img{
   }
   html.rizq-app-nav #nav .logo-mark:not(:has(img)),
   html.rizq-app-nav #rizq-desk-nav .logo-mark:not(:has(img)){
-    background:#0f172a url('rizq-mark-512.png') center / contain no-repeat !important;
+    background:#0f172a url('rizq-mark.svg') center / contain no-repeat !important;
   }
   html.rizq-app-nav #nav .logo-text,
   html.rizq-app-nav #rizq-desk-nav .logo-text{

@@ -31,6 +31,7 @@ var CORE_ASSETS = [
   'favicon-192.png',
   'favicon-32.png',
   'favicon-16.png',
+  'rizq-mark.svg',
   'rizq-mark-512.png',
   'apple-touch-icon.png'
 ];
