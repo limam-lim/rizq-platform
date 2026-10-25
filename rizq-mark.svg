@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Rizq">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="رزق | Rizq">
   <rect width="512" height="512" rx="108" fill="#0f172a"/>
+  <!-- Latin R (Rizq) + Arabic ر (رزق) — bilingual mark, not a comma -->
   <text x="236" y="355" text-anchor="middle" font-family="Georgia,'Times New Roman',Times,serif" font-size="268" font-weight="700" fill="#C9A84C">R</text>
-  <text x="372" y="368" text-anchor="middle" font-family="Georgia,'Times New Roman',Times,serif" font-size="168" font-weight="700" fill="#C9A84C">,</text>
+  <text x="372" y="355" text-anchor="middle" font-family="Cairo,'Segoe UI',Tahoma,sans-serif" font-size="200" font-weight="700" fill="#C9A84C">ر</text>
 </svg>
