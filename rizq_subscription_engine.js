@@ -292,7 +292,7 @@
     var id = String(pkgId || '').toLowerCase();
     var name = String(pkgName || '');
     if (/diamond_pro|diam-pro|_pro\b/.test(id) || (/pro|متقدم/i.test(name) && isDiamondName(name))) return 'diamond_pro';
-    if (isDiamondName(name) || /diamond_standard|diam-std|st-diam|of-diam|cp-diam/.test(id)) return 'diamond_standard';
+    if (isDiamondName(name) || /diamond_standard|diam-std|st-diam|of-diam|cp-diam|es-diam/.test(id)) return 'diamond_standard';
     return null;
   }
 
@@ -347,7 +347,7 @@
 
   // ── الفحص الموحّد قبل نشر أي منتج/إعلان/عرض — يجمع بين حد الخطة
   // المجانية الشهرية (canPostNewAd) والحد العددي الدقيق لكل باقة نشطة ──
-  // category: 'individual' | 'store' | 'office' | 'corp'
+  // category: 'individual' | 'store' | 'office' | 'corp' | 'estate'
   // currentActiveCount: عدد العناصر النشطة الحالية لهذا الحساب (يحسبه المستدعي
   // من مصفوفته الحقيقية في localStorage — هذه الدالة لا تفترض شكل التخزين)
   function checkPostLimit(accId, category, currentActiveCount) {
@@ -1314,7 +1314,7 @@
   var MAX_RECEIPT_BYTES = 1.5 * 1024 * 1024; // 1.5MB — حماية localStorage من الامتلاء
 
   function submitSubscriptionRequest(opts) {
-    // opts: { file, pkgName, price, accountName, accountId, category, videoUrl }
+    // opts: { file, pkgName, packageId, price, accountName, accountId, accountType, category, videoUrl }
     // category: 'package' (افتراضي — باقة عادية) أو 'video' (باقة Rizq ADS —
     // فيديو إعلاني يُفعَّل في الموضع المميز بالرئيسية بعد موافقة الأدمن)
     // P0: null/undefined/NaN ليست مجانية — رفض صريح حتى يضبط السوبر أدمن السعر.
@@ -1329,15 +1329,25 @@
           : 'سعر الباقة غير مضبوط — حدّده السوبر أدمن من لوحة إدارة الباقات أولاً'
       });
     }
+    var resolvedPkgId = opts.packageId || opts.pkgId || '';
+    if (!resolvedPkgId && opts.pkgName) {
+      try {
+        var def = _findPackageDef(opts.pkgName);
+        if (def && def.id) resolvedPkgId = String(def.id);
+      } catch (eDef) {}
+    }
     var base = {
       id: 'sub_' + Date.now(),
       pkg: opts.pkgName,
+      packageId: resolvedPkgId || null,
+      pkgId: resolvedPkgId || null,
       price: opts.price,
       expectedPrice: opts.price,
       submittedAt: new Date().toISOString(),
       status: 'pending',
       account: opts.accountName || 'مشترك',
       accountId: opts.accountId || '',
+      accountType: opts.accountType || '',
       pkgCountBefore: getPackageCount(opts.accountId),
       category: opts.category || 'package',
       videoUrl: opts.videoUrl || null,
@@ -1366,6 +1376,10 @@
             accsPending[opts.accountId].pkg_status = 'pending';
             accsPending[opts.accountId].subscriptionStatus = 'pending';
             accsPending[opts.accountId].package = opts.pkgName;
+            if (base.packageId) {
+              accsPending[opts.accountId].packageId = base.packageId;
+              accsPending[opts.accountId].pkgId = base.packageId;
+            }
             saveAccounts(accsPending);
           }
         } catch (pe) {}
