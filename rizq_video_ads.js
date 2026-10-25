@@ -511,8 +511,10 @@
     var v = card.querySelector('video');
     if (v) {
       try { v.pause(); v.currentTime = 0; } catch (e) { /* ignore */ }
+      v.muted = true;
     }
     card.classList.remove('is-playing');
+    card.removeAttribute('data-sound-on');
     if (_stripPlaying === card) _stripPlaying = null;
     syncStripActionUi(card);
   }
@@ -616,14 +618,22 @@
   }
 
   function playStripVideo(card) {
-    if (!card || _stripPlaying === card) {
+    if (!card) return;
+    if (_stripPlaying === card) {
+      // أعد المحاولة إن توقف المتصفح بصمت، مع احترام اختيار الصوت
+      var same = card.querySelector('video');
+      if (same && same.paused) {
+        if (card.getAttribute('data-sound-on') !== '1') same.muted = true;
+        same.play().catch(function () { /* ignore */ });
+      }
       syncStripActionUi(card);
       return;
     }
     if (_stripPlaying) stopStripVideo(_stripPlaying);
     var v = card.querySelector('video');
     if (!v) return;
-    v.muted = true;
+    // التشغيل التلقائي دائماً صامت؛ الصوت يبقى بعد لمسة المستخدم فقط
+    if (card.getAttribute('data-sound-on') !== '1') v.muted = true;
     var p = v.play();
     if (p && typeof p.then === 'function') {
       p.then(function () {
@@ -824,6 +834,8 @@
           syncActionUi();
         } else {
           video.muted = !video.muted;
+          if (video.muted) card.removeAttribute('data-sound-on');
+          else card.setAttribute('data-sound-on', '1');
           syncActionUi();
         }
         if (ad.accountId) trackEvent(ad.accountId, 'click');
@@ -966,6 +978,23 @@
         if (!bestCard) resumeHeroIfVisible();
       }
 
+      function visibleRatio(el) {
+        if (!el) return 0;
+        var r = el.getBoundingClientRect();
+        var vh = window.innerHeight || 1;
+        var vw = window.innerWidth || 1;
+        var visibleH = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+        var visibleW = Math.max(0, Math.min(r.right, vw) - Math.max(r.left, 0));
+        if (r.height <= 0 || r.width <= 0) return 0;
+        return (visibleH / r.height) * (visibleW / r.width);
+      }
+
+      function remeasureAndPick() {
+        cards.forEach(function (card) { ratios.set(card, visibleRatio(card)); });
+        heroRatio = heroWrap ? visibleRatio(heroWrap) : 0;
+        pickMostVisible();
+      }
+
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           if (heroWrap && entry.target === heroWrap) {
@@ -985,10 +1014,17 @@
       });
       if (heroWrap) io.observe(heroWrap);
 
-      // عند التمرير الأفقي للشريط أعد اختيار الأكثر ظهوراً
+      // تمرير عمودي/أفقي — قياس هندسي احتياطي أدق من IO وحده
       track.addEventListener('scroll', function () {
-        window.requestAnimationFrame(pickMostVisible);
+        window.requestAnimationFrame(remeasureAndPick);
       }, { passive: true });
+      window.addEventListener('scroll', function () {
+        window.requestAnimationFrame(remeasureAndPick);
+      }, { passive: true });
+      window.addEventListener('resize', function () {
+        window.requestAnimationFrame(remeasureAndPick);
+      });
+      setTimeout(remeasureAndPick, 120);
     })();
 
     return true;
