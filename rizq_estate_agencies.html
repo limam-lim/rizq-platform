@@ -454,7 +454,11 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
   }
 
   function backendBase(){
-    return (typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE) || 'http://localhost:3000';
+    if (typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE) {
+      return String(window.RIZQ_BACKEND_BASE).replace(/\/$/, '');
+    }
+    try { if (location && location.origin) return location.origin; } catch (e) {}
+    return 'http://localhost:3000';
   }
 
   function loadLive(){

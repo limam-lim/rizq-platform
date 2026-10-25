@@ -15586,30 +15586,49 @@ function closeRvidPopup(){ document.getElementById('rvid-overlay').classList.rem
     if (Array.isArray(pkgs.verified_plus)) localStorage.setItem('rizq_verified_plus_packages', JSON.stringify(pkgs.verified_plus));
     if (typeof renderPricingSection === 'function') renderPricingSection();
   }
+  function applySiteExtras(cfg) {
+    if (!cfg || typeof cfg !== 'object') return;
+    if (cfg.prices && (cfg.prices.food || cfg.prices.fuel || cfg.prices.currencies)) {
+      try { localStorage.setItem('rizq_prices', JSON.stringify(cfg.prices)); } catch (eP) {}
+      if (typeof loadPrices === 'function') loadPrices();
+    }
+    if (Array.isArray(cfg.bankCodes)) {
+      try { localStorage.setItem('rizq_bank_codes', JSON.stringify(cfg.bankCodes)); } catch (eB) {}
+      if (typeof ppRenderPayMethods === 'function') ppRenderPayMethods();
+    }
+    if (Array.isArray(cfg.extraCategories)) {
+      try { localStorage.setItem('rizq_extra_categories', JSON.stringify(cfg.extraCategories)); } catch (eC) {}
+      if (typeof renderExtraCategories === 'function') renderExtraCategories();
+    }
+  }
+  function fetchSiteConfigExtras() {
+    var base = (window.RIZQ_BACKEND_BASE && String(window.RIZQ_BACKEND_BASE).replace(/\/$/,''))
+      || (location && location.origin) || '';
+    if (!base) return;
+    fetch(base + '/api/site-config')
+      .then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(data){
+        if (!data || !data.ok || !data.config) return;
+        applySiteExtras(data.config);
+      }).catch(function(){});
+  }
   if (window.RizqPackagesUI && typeof RizqPackagesUI.syncAllFromBackend === 'function') {
     RizqPackagesUI.syncAllFromBackend(function () {
       if (typeof renderPricingSection === 'function') renderPricingSection();
     });
+    // لا نتخطّى أسعار السوق عند مزامنة الباقات
+    fetchSiteConfigExtras();
     return;
   }
-  if (!window.RIZQ_BACKEND_BASE) return;
-  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/site-config')
+  var _cfgBase = (window.RIZQ_BACKEND_BASE && String(window.RIZQ_BACKEND_BASE).replace(/\/$/,''))
+    || (location && location.origin) || '';
+  if (!_cfgBase) return;
+  fetch(_cfgBase + '/api/site-config')
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
-      applyPkgs(data && data.ok && data.config && data.config.packages);
-      if(Array.isArray(data.config.bankCodes)){
-        localStorage.setItem('rizq_bank_codes', JSON.stringify(data.config.bankCodes));
-        if(typeof ppRenderPayMethods==='function') ppRenderPayMethods();
-      }
-      var cfg = data.config || {};
-      if (cfg.prices && (cfg.prices.food || cfg.prices.fuel || cfg.prices.currencies)) {
-        localStorage.setItem('rizq_prices', JSON.stringify(cfg.prices));
-        if (typeof loadPrices === 'function') loadPrices();
-      }
-      if (Array.isArray(cfg.extraCategories)) {
-        localStorage.setItem('rizq_extra_categories', JSON.stringify(cfg.extraCategories));
-        if (typeof renderExtraCategories === 'function') renderExtraCategories();
-      }
+      if(!data || !data.ok) return;
+      applyPkgs(data.config && data.config.packages);
+      applySiteExtras(data.config || {});
     }).catch(function(){});
 })();
 

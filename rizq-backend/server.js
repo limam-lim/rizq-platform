@@ -2316,6 +2316,9 @@ mountAccountsSessionRoutes(app, {
  * مستخرجة إلى routes/accountsManage.js
  */
 const { REFERRAL_BONUS_DAYS } = require('./rizq_package_lifecycle_agent');
+const { mountDemoPublicRoutes } = require('./routes/demoPublic');
+mountDemoPublicRoutes(app);
+
 const { mountAccountsManageRoutes } = require('./routes/accountsManage');
 mountAccountsManageRoutes(app, {
   requireAdminAuth,

@@ -248,6 +248,8 @@ const ACCOUNT_PUBLIC_SAFE = [
   'activityId', 'activity', 'storeTopics',
   'facebook', 'thumb', 'cover', 'tagline', 'status', 'approvedAt', 'createdAt',
   'foundingPartner', 'foundingDiscountPercent',
+  // علامة عرض وهمي آمنة للعامة — بلا أسرار؛ تُستخدم لشريط «بيانات وهمية» قبل الإطلاق
+  'graduationDemo', 'demoSource', 'fictional',
 ];
 
 function toPublicAccountGated(acc, gate) {

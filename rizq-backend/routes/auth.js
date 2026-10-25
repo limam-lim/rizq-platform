@@ -92,7 +92,11 @@ router.post('/login', authLimiter, asyncHandler(async (req, res) => {
 /** GET /api/auth/me — التحقق من الجلسة (كوكي أو رأس) */
 router.get('/me', asyncHandler(async (req, res) => {
   const { id, token } = extractBuyerCredentials(req);
-  if (!id || !token) return sendError(res, 401, 'جلسة مطلوبة', 'AUTH_REQUIRED');
+  res.set('Cache-Control', 'no-store');
+  // زائر بلا بيانات اعتماد: 200 guest بدل 401 حتى لا يملأ الكونسول تحذيرات حمراء
+  if (!id || !token) {
+    return res.json({ ok: false, guest: true, code: 'AUTH_REQUIRED' });
+  }
   const row = Buyer.findByIdAndToken(id, token);
   if (!row) {
     clearBuyerSessionCookie(res);
@@ -100,7 +104,6 @@ router.get('/me', asyncHandler(async (req, res) => {
   }
   // جدّد الكوكي إن وصلت المصادقة بالرأس فقط (ترحيل من localStorage)
   setBuyerSessionCookie(res, row.id, row.token);
-  res.set('Cache-Control', 'no-store');
   res.json({ ok: true, buyer: Buyer.publicBuyer(row), cookieAuth: true });
 }));
 

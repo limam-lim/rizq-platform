@@ -382,6 +382,13 @@
   function verifySessionSilently() {
     if (!apiBase()) return;
     var s = getSession();
+    var memTok = readTokenMem();
+    // زائر بلا جلسة محلية وبلا توكن ترحيل: لا تستدعِ /me (يتجنّب ضجيج الشبكة)
+    // إن وُجدت جلسة/توكن فقط نتحقق — الكوكي HttpOnly يُجدَّد عند وجود id محلي
+    if ((!s || !s.id) && !memTok) {
+      _cookieSessionOk = false;
+      return;
+    }
     var headers = buyerAuthHeaders(s || {});
     buyerFetch(apiBase() + '/api/auth/me', { headers: headers })
       .then(function (res) {
@@ -395,7 +402,11 @@
         return res.json();
       })
       .then(function (body) {
-        if (!body || !body.ok || !body.buyer) return;
+        if (!body || body.guest) {
+          _cookieSessionOk = false;
+          return;
+        }
+        if (!body.ok || !body.buyer) return;
         _cookieSessionOk = true;
         var prev = getSession() || {};
         setSession(profileFromBuyer(body.buyer, prev));
