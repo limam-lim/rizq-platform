@@ -5,8 +5,8 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '31.9';
-  var MOCK_HDR_V = '5.68';
+  var ASSET_V = '32.0';
+  var MOCK_HDR_V = '5.69';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -129,6 +129,10 @@
     }
     if (!document.querySelector('script[src*="rizq_account_route.js"]')) {
       appendScript('rizq_account_route.js?v=' + ASSET_V, { async: false });
+    }
+    /* بوابة حسابي/المشتري — لازمة لزر حسابي خارج الصفحة الرئيسية */
+    if (isPublicShell() && !document.querySelector('script[src*="rizq_auth_gate.js"]')) {
+      appendScript('rizq_auth_gate.js?v=' + ASSET_V, { defer: true });
     }
     if (!document.querySelector('script[src*="rizq_header.js"]')) {
       appendScript('rizq_header.js?v=' + ASSET_V, { async: false });

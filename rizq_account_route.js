@@ -645,4 +645,7 @@
     refreshStoredSessionFromBackend: refreshStoredSessionFromBackend,
     goAfterRegistration: goAfterRegistration
   };
+
+  /* اسم عالمي يستخدمه الهيدر التجريبي وصفحات كثيرة — لا يعتمد على تعريف الصفحة الرئيسية فقط */
+  window.goToAccount = openAccount;
 })();

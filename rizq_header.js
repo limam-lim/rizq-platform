@@ -864,12 +864,26 @@
   }
 
   function openAccount(e) {
+    if (e && e.preventDefault) e.preventDefault();
     if (window.RizqAccount && typeof window.RizqAccount.open === 'function') {
       window.RizqAccount.open(e);
       return;
     }
-    if (e && e.preventDefault) e.preventDefault();
-    location.href = 'index.html';
+    if (typeof window.goToAccount === 'function') {
+      try { window.goToAccount(e); return; } catch (errGo) {}
+    }
+    if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function') {
+      window.RizqAuthGate.openAccountChoice();
+      return;
+    }
+    if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccount === 'function') {
+      window.RizqAuthGate.openAccount();
+      return;
+    }
+    try {
+      sessionStorage.setItem('rizq_after_auth_href', location.pathname + location.search + (location.hash || ''));
+    } catch (errMem) {}
+    location.href = 'rizq_landing_v8.html?openLogin=1';
   }
 
   function openAssistant() {
@@ -1835,12 +1849,12 @@
       if (!document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) {
         var l = document.createElement('link');
         l.rel = 'stylesheet';
-        l.href = 'rizq_header_mockup_trial.css?v=5.68';
+        l.href = 'rizq_header_mockup_trial.css?v=5.69';
         (document.head || document.documentElement).appendChild(l);
       }
       if (!document.querySelector('script[src*="rizq_header_mockup_trial.js"]')) {
         var s = document.createElement('script');
-        s.src = 'rizq_header_mockup_trial.js?v=5.68';
+        s.src = 'rizq_header_mockup_trial.js?v=5.69';
         s.defer = true;
         (document.head || document.documentElement).appendChild(s);
       }
