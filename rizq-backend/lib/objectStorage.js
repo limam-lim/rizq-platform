@@ -123,6 +123,58 @@ async function deleteObject(keyOrUrl) {
   }
 }
 
+function dirSizeBytes(dirPath) {
+  if (!fs.existsSync(dirPath)) return 0;
+  let total = 0;
+  const stack = [dirPath];
+  while (stack.length) {
+    const dir = stack.pop();
+    let names;
+    try { names = fs.readdirSync(dir); } catch (e) { continue; }
+    for (let i = 0; i < names.length; i++) {
+      const fp = path.join(dir, names[i]);
+      try {
+        const st = fs.statSync(fp);
+        if (st.isDirectory()) stack.push(fp);
+        else if (st.isFile()) total += st.size;
+      } catch (e) { /* ignore */ }
+    }
+  }
+  return total;
+}
+
+/**
+ * حذف مجلد/بادئة كاملة (وسائط إعلان وغيره) — المسار الوحيد المسموح لحذف المجلدات.
+ * @param {string} prefixKey مثلاً ads/AD123
+ * @returns {{ ok: boolean, bytesFreed: number, skipped?: boolean, reason?: string, error?: string }}
+ */
+function deletePrefixSync(prefixKey) {
+  const key = normalizeKey(prefixKey);
+  if (!key) return { ok: false, bytesFreed: 0, error: 'empty_prefix' };
+  if (DRIVER === 's3') {
+    return { ok: true, bytesFreed: 0, skipped: true, reason: 's3_delete_prefix_not_wired' };
+  }
+  try {
+    const abs = localAbsPath(key);
+    if (!fs.existsSync(abs)) return { ok: true, bytesFreed: 0 };
+    const st = fs.statSync(abs);
+    if (!st.isDirectory()) {
+      const bytes = st.size || 0;
+      fs.unlinkSync(abs);
+      return { ok: true, bytesFreed: bytes };
+    }
+    const bytesFreed = dirSizeBytes(abs);
+    fs.rmSync(abs, { recursive: true, force: true });
+    return { ok: true, bytesFreed };
+  } catch (e) {
+    return { ok: false, bytesFreed: 0, error: e.message };
+  }
+}
+
+async function deletePrefix(prefixKey) {
+  return deletePrefixSync(prefixKey);
+}
+
 function ensureLocalDir(relativeDir) {
   const abs = path.join(LOCAL_ROOT, normalizeKey(relativeDir));
   if (!fs.existsSync(abs)) fs.mkdirSync(abs, { recursive: true });
@@ -132,6 +184,8 @@ function ensureLocalDir(relativeDir) {
 module.exports = {
   putObject,
   deleteObject,
+  deletePrefix,
+  deletePrefixSync,
   resolveLocalPath,
   publicUrlForKey,
   normalizeKey,

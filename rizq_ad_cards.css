@@ -675,3 +675,29 @@
     border-top:1px solid rgba(201,168,76,.12)!important;
   }
 }
+
+/* ── تكبير الصورة (full variant) ── */
+.rzq-adx-zoomable{cursor:zoom-in}
+.rzq-adx-zoom{
+  position:fixed;inset:0;z-index:99999;
+  background:rgba(7,16,32,.92);
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;cursor:zoom-out;
+  animation:rzq-adx-zoom-in .18s ease-out;
+}
+.rzq-adx-zoom-img{
+  max-width:min(96vw,1200px);max-height:90vh;
+  object-fit:contain;border-radius:10px;
+  box-shadow:0 20px 60px rgba(0,0,0,.55);
+  cursor:default;
+}
+.rzq-adx-zoom-close{
+  position:absolute;top:16px;left:16px;
+  width:40px;height:40px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.35);
+  background:rgba(15,35,71,.7);color:#fff;
+  font-size:22px;line-height:1;cursor:pointer;
+}
+@keyframes rzq-adx-zoom-in{
+  from{opacity:0} to{opacity:1}
+}
