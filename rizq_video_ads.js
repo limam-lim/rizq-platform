@@ -10,7 +10,9 @@
 //
 // الموضع الثاني — STRIP (فضي):
 //   شريط بطاقات فيديو عمودية تحت الشاشة الكبيرة (#rizq-vid-strip)
-//   تشغيل صامت عند مرور الماوس / لمس على الجوال — الزائر يختار
+//   سطح المكتب: تشغيل صامت عند مرور الماوس
+//   الجوال: تشغيل تلقائي صامت عند ظهور ≥50% (IntersectionObserver)، صوت بلمسة،
+//           فيديو واحد (الأكثر ظهوراً)، saveData ⇒ غلاف + زر ▶️ فقط
 //   مصدر البيانات: videoAds.strip أو videoAds.popup (توافق خلفي)
 //   على الصفحات بلا شريط: يبقى الـ popup القديم كاحتياطي إن وُجدت إعلانات
 //
@@ -265,13 +267,12 @@
         var v = document.createElement('video');
         v.id = 'hero-featured-vid';
         v.className = 'rzq-hero-player';
-        v.setAttribute('playsinline', '');
-        v.setAttribute('muted', '');
-        v.muted = true;
-        v.autoplay = true;
         v.controls = false;
+        applyMobileVideoAttrs(v, posterForVideoUrl(ad.url));
         // حلقة واحدة فقط إن وُجدت إعلانات مدفوعة؛ وإلا loop مستمر
         v.loop = _heroPlaylist.length <= 1;
+        if (v.loop) v.setAttribute('loop', '');
+        else v.removeAttribute('loop');
         v.src = ad.url;
         v.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;background:#000';
         host.insertBefore(v, host.firstChild);
@@ -313,7 +314,13 @@
             if (typeof window.toggleHeroVidFullscreen === 'function') window.toggleHeroVidFullscreen();
           });
         }
-        v.play().catch(function () { /* autoplay policies */ });
+        var saveDataHero = prefersSaveData();
+        v.autoplay = !saveDataHero;
+        if (saveDataHero) {
+          try { v.pause(); } catch (eSd) { /* ignore */ }
+        } else {
+          v.play().catch(function () { /* autoplay policies */ });
+        }
         if (!v.loop) {
           v.onended = function () { advance(); };
         }
@@ -352,6 +359,49 @@
   var STRIP_DEMO_PHONE = '+22244882212';
   var STRIP_PHONE_SVG = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.8 21 3 13.2 3 3.7c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z" fill="currentColor"/></svg>';
   var STRIP_WA_SVG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2C6.5 2 2 6.3 2 11.6c0 2 .6 3.9 1.7 5.5L2 22l5.1-1.6c1.5.8 3.2 1.2 4.9 1.2 5.5 0 10-4.3 10-9.6S17.5 2 12 2zm0 17.5c-1.5 0-3-.4-4.3-1.2l-.3-.2-3.2 1 1-3.1-.2-.3c-.9-1.4-1.4-3-1.4-4.6 0-4.3 3.7-7.8 8.4-7.8s8.4 3.5 8.4 7.8-3.7 7.8-8.4 7.8zm4.6-5.8c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.2.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.8-.7-1.4-1.6-1.6-1.9-.2-.3 0-.4.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.1s.9 2.4 1 2.6c.1.2 1.8 2.8 4.4 3.9 1.6.7 2.2.7 3 .6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2-.1-.2-.3-.2-.6-.3z"/></svg>';
+
+  /** وضع لمس / جوال: تشغيل تلقائي صامت — لا يعتمد على hover */
+  function isTouchPlaybackMode() {
+    try {
+      if (window.matchMedia('(pointer: coarse)').matches) return true;
+      if (window.matchMedia('(hover: none)').matches) return true;
+      if (window.matchMedia('(max-width: 699px)').matches) return true;
+    } catch (e) { /* ignore */ }
+    return window.innerWidth < 700;
+  }
+
+  /** توفير البيانات — لا تشغيل تلقائي */
+  function prefersSaveData() {
+    try {
+      var c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      return !!(c && c.saveData);
+    } catch (e) { return false; }
+  }
+
+  /** غلاف الفيديو من مسار mp4 المعروف (…-light.mp4 → …-poster.jpg) */
+  function posterForVideoUrl(url) {
+    var u = String(url || '').trim();
+    if (!u || !/\.mp4(\?|#|$)/i.test(u)) return '';
+    return u.replace(/-light\.mp4(?=([?#]|$))/i, '-poster.jpg')
+      .replace(/\.mp4(?=([?#]|$))/i, '-poster.jpg');
+  }
+
+  function applyMobileVideoAttrs(v, posterUrl) {
+    if (!v) return;
+    v.muted = true;
+    v.setAttribute('muted', '');
+    v.setAttribute('playsinline', '');
+    v.setAttribute('webkit-playsinline', '');
+    v.playsInline = true;
+    v.loop = true;
+    v.setAttribute('loop', '');
+    v.preload = 'none';
+    v.setAttribute('preload', 'none');
+    if (posterUrl) {
+      v.poster = posterUrl;
+      v.setAttribute('poster', posterUrl);
+    }
+  }
 
   /** مسار نسبي حتى يعمل على GitHub Pages (/rizq-platform/) وليس فقط على الجذر */
   function resolvePromoUrl(url) {
@@ -638,9 +688,12 @@
       card.setAttribute('data-strip-id', 'strip-' + adIdx);
       var title = ad.title || ad.advertiser || (isFr ? 'Offre Rizq' : 'عرض رزق');
       var sub = [ad.loc, ad.advertiser].filter(Boolean).join(' · ');
+      var posterUrl = posterForVideoUrl(ad.url);
       card.innerHTML =
         '<div class="rizq-vcard-thumb">' +
-          '<video muted playsinline preload="metadata" loop src="' + esc(ad.url) + '"></video>' +
+          '<video muted playsinline loop preload="none"' +
+            (posterUrl ? ' poster="' + esc(posterUrl) + '"' : '') +
+            ' src="' + esc(ad.url) + '"></video>' +
           '<div class="rizq-vcard-shade"></div>' +
           '<span class="rizq-vcard-tag">' + esc(vidLbl) + '</span>' +
           '<span class="rizq-vcard-play" aria-hidden="true">▶</span>' +
@@ -662,12 +715,14 @@
         (sub ? '<div class="rizq-vcard-sub">' + esc(sub) + '</div>' : '');
 
       var video = card.querySelector('video');
+      applyMobileVideoAttrs(video, posterUrl);
       var btnPlay = card.querySelector('[data-act="play"]');
       var btnMute = card.querySelector('[data-act="mute"]');
       var btnFs = card.querySelector('[data-act="fs"]');
       var btnTel = card.querySelector('[data-act="tel"]');
       var btnWa = card.querySelector('[data-act="wa"]');
       var hoverPlayTimer = null;
+      var touchMode = isTouchPlaybackMode();
 
       function clearHoverPlayTimer() {
         if (hoverPlayTimer) {
@@ -695,22 +750,23 @@
         }
       }
 
-      // سطح المكتب: مرور = تشغيل بعد تأخير قصير؛ مغادرة = توقف
-      // أزرار الاتصال ظاهرة طالما البطاقة متوقفة، وتختفي فقط أثناء التشغيل
-      card.addEventListener('mouseenter', function () {
-        clearHoverPlayTimer();
-        hoverPlayTimer = setTimeout(function () {
-          hoverPlayTimer = null;
-          playStripVideo(card);
+      // سطح المكتب فقط: مرور = تشغيل بعد تأخير قصير؛ مغادرة = توقف
+      if (!touchMode) {
+        card.addEventListener('mouseenter', function () {
+          clearHoverPlayTimer();
+          hoverPlayTimer = setTimeout(function () {
+            hoverPlayTimer = null;
+            playStripVideo(card);
+            syncActionUi();
+          }, 480);
+        });
+        card.addEventListener('mouseleave', function () {
+          clearHoverPlayTimer();
+          if (_stripLightbox && _stripLightbox.classList.contains('is-open')) return;
+          stopStripVideo(card);
           syncActionUi();
-        }, 480);
-      });
-      card.addEventListener('mouseleave', function () {
-        clearHoverPlayTimer();
-        if (_stripLightbox && _stripLightbox.classList.contains('is-open')) return;
-        stopStripVideo(card);
-        syncActionUi();
-      });
+        });
+      }
 
       if (btnPlay) {
         btnPlay.addEventListener('click', function (ev) {
@@ -756,16 +812,20 @@
         });
       }
 
-      // جوال: لمس البطاقة (خارج الأزرار/جهات الاتصال) يشغّل/يوقف
+      // جوال: لمسة على البطاقة = تشغيل الصوت فقط (الفيديو يشتغل تلقائياً عند الظهور)
+      // مع توفير البيانات: اللمسة تشغّل الفيديو صامتاً أولاً
       card.addEventListener('click', function (ev) {
         if (ev.target.closest && ev.target.closest('.rizq-vcard-actions,.rizq-vcard-contacts,.rzq-adx-actions,.rzq-adx-tel,.rzq-adx-wa')) return;
-        if (window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-          return; // سطح المكتب يعتمد على hover
-        }
+        if (!isTouchPlaybackMode()) return;
         ev.preventDefault();
-        if (card.classList.contains('is-playing')) stopStripVideo(card);
-        else playStripVideo(card);
-        syncActionUi();
+        if (!video) return;
+        if (!card.classList.contains('is-playing') || video.paused) {
+          playStripVideo(card);
+          syncActionUi();
+        } else {
+          video.muted = !video.muted;
+          syncActionUi();
+        }
         if (ad.accountId) trackEvent(ad.accountId, 'click');
       });
       card.addEventListener('keydown', function (ev) {
@@ -818,50 +878,117 @@
     root.hidden = false;
     root.style.display = '';
 
-    /* تلميح الجوال: اضغط للتشغيل — سطح المكتب يبقى «مرّر الماوس» */
+    /* تلميح الجوال: اضغط لتشغيل الصوت — سطح المكتب يبقى «مرّر الماوس» */
     (function syncStripHint() {
       var hint = root.querySelector('.rizq-vid-strip-hint');
       if (!hint) return;
       function apply() {
-        var tap = false;
-        try { tap = window.matchMedia('(hover: none), (max-width: 699px)').matches; } catch (eHint) {}
-        var key = tap ? (hint.getAttribute('data-t-mobile') || 'vstrip-hint-tap') : (hint.getAttribute('data-t') || 'vstrip-hint');
-        var ar = { 'vstrip-hint': 'مرّر الماوس للتشغيل', 'vstrip-hint-tap': 'اضغط للتشغيل' };
-        var fr = { 'vstrip-hint': 'Survolez pour lire', 'vstrip-hint-tap': 'Appuyez pour lire' };
+        var tap = isTouchPlaybackMode();
+        var key = tap
+          ? (hint.getAttribute('data-t-mobile') || 'vstrip-hint-tap')
+          : (hint.getAttribute('data-t') || 'vstrip-hint');
+        var ar = {
+          'vstrip-hint': 'مرّر الماوس للتشغيل',
+          'vstrip-hint-tap': 'اضغط لتشغيل الصوت 🔊'
+        };
+        var fr = {
+          'vstrip-hint': 'Survolez pour lire',
+          'vstrip-hint-tap': 'Appuyez pour activer le son 🔊'
+        };
+        /* إن وُجدت ترجمة الصفحة استخدمها */
+        try {
+          if (typeof window.rizqGetT === 'function') {
+            var tr = window.rizqGetT(key);
+            if (tr) { hint.textContent = tr; return; }
+          }
+        } catch (eT) { /* ignore */ }
         hint.textContent = isFr ? (fr[key] || fr['vstrip-hint']) : (ar[key] || ar['vstrip-hint']);
       }
       apply();
       window.addEventListener('resize', apply);
     })();
 
-    /* جوال/لمس: تشغيل تلقائي عند الظهور (50%) وإيقاف عند الخروج — سطح المكتب يعتمد على hover */
+    /*
+     * جوال/لمس: تشغيل تلقائي صامت عند ظهور ≥50%، وإيقاف عند الخروج.
+     * فيديو واحد فقط — الأكثر ظهوراً. saveData ⇒ غلاف + زر ▶️ بلا تلقائي.
+     * سطح المكتب: hover كما هو.
+     */
     (function bindStripVisibilityPlay() {
-      var finePointer = false;
-      try { finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches; } catch (eFp) {}
-      if (finePointer || typeof IntersectionObserver === 'undefined') return;
-      var cards = track.querySelectorAll('.rizq-vcard');
+      if (!isTouchPlaybackMode() || typeof IntersectionObserver === 'undefined') return;
+      var cards = Array.prototype.slice.call(track.querySelectorAll('.rizq-vcard'));
       if (!cards.length) return;
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          var card = entry.target;
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-            playStripVideo(card);
-          } else {
-            stopStripVideo(card);
+      var saveData = prefersSaveData();
+      var ratios = new Map();
+      var heroWrap = document.getElementById('hero-vid-wrap');
+      var heroRatio = 0;
+
+      function pauseHeroForStrip() {
+        var hv = document.getElementById('hero-featured-vid')
+          || (heroWrap && heroWrap.querySelector('video'));
+        if (!hv) return;
+        try { hv.pause(); } catch (e) { /* ignore */ }
+      }
+
+      function resumeHeroIfVisible() {
+        if (saveData || heroRatio < 0.5) return;
+        if (_stripPlaying) return;
+        var hv = document.getElementById('hero-featured-vid')
+          || (heroWrap && heroWrap.querySelector('video'));
+        if (!hv) return;
+        hv.muted = true;
+        hv.play().catch(function () { /* ignore */ });
+      }
+
+      function pickMostVisible() {
+        if (saveData) return; // غلاف + زر فقط
+        var bestCard = null;
+        var bestR = 0;
+        ratios.forEach(function (r, card) {
+          if (r >= 0.5 && r > bestR) {
+            bestR = r;
+            bestCard = card;
           }
         });
-      }, { threshold: [0, 0.5, 1] });
+        // البطل يفوز إن كان أكثر ظهوراً من أي بطاقة شريط
+        if (heroRatio >= 0.5 && heroRatio >= bestR) {
+          cards.forEach(function (c) { stopStripVideo(c); });
+          resumeHeroIfVisible();
+          return;
+        }
+        cards.forEach(function (c) {
+          if (c === bestCard) {
+            pauseHeroForStrip();
+            playStripVideo(c);
+          } else {
+            stopStripVideo(c);
+          }
+        });
+        if (!bestCard) resumeHeroIfVisible();
+      }
+
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (heroWrap && entry.target === heroWrap) {
+            heroRatio = entry.isIntersecting ? entry.intersectionRatio : 0;
+            return;
+          }
+          ratios.set(entry.target, entry.isIntersecting ? entry.intersectionRatio : 0);
+        });
+        pickMostVisible();
+      }, { threshold: [0, 0.25, 0.5, 0.75, 1] });
+
       cards.forEach(function (card) {
         var v = card.querySelector('video');
-        if (v) {
-          v.muted = true;
-          v.setAttribute('muted', '');
-          v.setAttribute('playsinline', '');
-          v.loop = true;
-          v.setAttribute('loop', '');
-        }
+        applyMobileVideoAttrs(v, v && v.getAttribute('poster'));
+        ratios.set(card, 0);
         io.observe(card);
       });
+      if (heroWrap) io.observe(heroWrap);
+
+      // عند التمرير الأفقي للشريط أعد اختيار الأكثر ظهوراً
+      track.addEventListener('scroll', function () {
+        window.requestAnimationFrame(pickMostVisible);
+      }, { passive: true });
     })();
 
     return true;
