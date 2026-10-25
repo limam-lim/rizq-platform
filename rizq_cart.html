@@ -1192,9 +1192,7 @@ function activeCart(){
   });
 }
 
-// ── "كرر آخر طلب" (إلهام أمازون/AliExpress "Buy again") — مهمة #267.
-// تخزين محلي بحت لا يمس نظام الطلب الحالي (واتساب فقط، بلا تخزين خادم) —
-// فقط نسخة من محتوى آخر سلة أُرسلت فعلياً، لإعادة تعبئتها بضغطة واحدة. ──
+// ── "كرر آخر طلب" — لقطة محلية لآخر سلة أُرسلت (بعد POST /api/orders أو مسار محلي). ──
 function saveLastOrderSnapshot(){
   try{
     localStorage.setItem('rizq_last_order', JSON.stringify({ items: activeCart(), deliveryType: deliveryType, savedAt: new Date().toISOString() }));
@@ -1511,14 +1509,23 @@ function openCartLineDetail(lineId) {
   var item = cart.find(function (c) { return String(c.id) === String(lineId); });
   if (!item || !window.RizqStoreCommerce || typeof RizqStoreCommerce.openProductDetail !== 'function') return;
   var isAr = document.documentElement.lang !== 'fr';
-  var productId = item.productId || String(item.id || '').replace(/^store-prod-/, '').replace(/__v_.*$/, '');
+  var productId = item.productId || String(item.id || '')
+    .replace(/__v_.*$/, '')
+    .replace(/^store-prod-/, '')
+    .replace(/^showroom-/, '');
   var catalogItem = null;
   try {
     var sid = item.storeId || item.accountId || '';
+    var mod = String(item.module || item.kind || 'store').toLowerCase();
     if (sid) {
-      var raw = JSON.parse(localStorage.getItem('store_products_' + sid) || '[]');
-      if (Array.isArray(raw)) {
-        catalogItem = raw.find(function (x) { return String(x.id) === String(productId); }) || null;
+      var keys = (mod === 'showroom' || mod === 'corp')
+        ? ['rizq_corp_prods_' + sid, 'store_products_' + sid]
+        : ['store_products_' + sid, 'rizq_corp_prods_' + sid];
+      for (var ki = 0; ki < keys.length && !catalogItem; ki++) {
+        var raw = JSON.parse(localStorage.getItem(keys[ki]) || '[]');
+        if (Array.isArray(raw)) {
+          catalogItem = raw.find(function (x) { return String(x.id) === String(productId); }) || null;
+        }
       }
     }
   } catch (eCat) {}
@@ -2013,14 +2020,41 @@ function submitOrder(e) {
   }
 
   var scopeId = _cartScopeSellerId() || (view[0] && (view[0].storeId || view[0].accountId)) || '';
+  if (!scopeId) {
+    showToast(isAr ? '⚠️ افتح سلة المحل عبر رابط المحل (?id=…) قبل الإرسال' : '⚠️ Ouvrez le panier du magasin (?id=…) avant d\'envoyer');
+    return;
+  }
   var deliv = deliveryType === 'delivery' ? readDeliveryForm() : { name: (session.name || ''), phone: (session.phone || ''), notes: '' };
+  var subtotalNow = view.reduce(function (s, c) { return s + (Number(c.price) || 0) * (Number(c.qty) || 1); }, 0);
+  var discountAmt = Math.round(subtotalNow * (Number(promoDiscount) || 0) / 100);
+  var sellerMod = String((view[0] && (view[0].module || view[0].kind)) || 'store').toLowerCase();
+  var sellerType = (sellerMod === 'showroom' || sellerMod === 'corp') ? 'corp'
+    : (sellerMod === 'office' ? 'office' : (sellerMod === 'estate' ? 'estate' : 'store'));
   var items = view.map(function (c) {
+    var cleanId = String(c.productId || '').trim();
+    if (!cleanId) {
+      cleanId = String(c.id || '')
+        .replace(/__v_.*$/, '')
+        .replace(/^store-prod-/, '')
+        .replace(/^showroom-/, '');
+    }
+    var thumb = '';
+    if (c.thumb || c.image) thumb = c.thumb || c.image;
+    else if (Array.isArray(c.images) && c.images[0]) thumb = c.images[0];
+    else if (Array.isArray(c.imgDataArr) && c.imgDataArr[0]) thumb = c.imgDataArr[0];
     return {
-      productId: c.id || c.productId,
-      title: c.title || c.name,
+      productId: cleanId,
+      title: c.title || c.name || c.nameF || 'منتج',
       qty: c.qty || 1,
       unitPrice: c.price || c.unitPrice || 0,
-      meta: { thumb: c.thumb || c.image || '' }
+      meta: {
+        thumb: thumb,
+        variantLabel: c.variantLabel || '',
+        variantKey: c.variantKey || '',
+        selected: c.selected || null,
+        module: c.module || sellerMod,
+        lineId: c.id || ''
+      }
     };
   });
 
@@ -2079,11 +2113,13 @@ function submitOrder(e) {
     }
     return window.RizqOps.createOrder({
       sellerId: scopeId,
-      sellerType: 'store',
+      sellerType: sellerType,
       items: items,
       paymentMethod: paymentMethod || 'cod',
       paymentReference: payRef,
       paymentReceipt: receipt,
+      deliveryFee: Number(deliveryFee) || 0,
+      discount: discountAmt,
       deliveryType: deliveryType || 'delivery',
       delivery: {
         name: deliv.name,

@@ -173,22 +173,32 @@
     }
   }
 
+  function stripCartLineId(raw) {
+    var id = String(raw || '');
+    id = id.replace(/__v_.*$/, '');
+    id = id.replace(/^store-prod-/, '').replace(/^showroom-/, '');
+    if (id.charAt(0) === 'B') id = id.slice(1);
+    return id;
+  }
+
   function matchIndex(products, item) {
     if (!products.length || !item) return -1;
-    var id = String(item.id || item.productId || '');
-    // store-prod-N → فهرس 1-based من واجهة المحل
-    var m = id.match(/^store-prod-(\d+)$/);
+    // فضّل productId النظيف ثم strip من id السلة (store-prod- / showroom- / __v_)
+    var preferred = String(item.productId || '').trim();
+    var id = preferred || stripCartLineId(item.id);
+    var rawLine = String(item.id || '');
+    // store-prod-N → فهرس 1-based من واجهة المحل (legacy)
+    var m = rawLine.match(/^store-prod-(\d+)(?:__v_.*)?$/);
     if (m) {
       var idx = parseInt(m[1], 10) - 1;
       if (idx >= 0 && idx < products.length) return idx;
     }
-    // بطاقات مدمجة من API: id = "B" + catalogId
-    var bare = id.charAt(0) === 'B' ? id.slice(1) : id;
     for (var i = 0; i < products.length; i++) {
       var p = products[i];
       if (!p) continue;
       if (String(p.id) === id || String(p._id) === id || String(p.sku) === id) return i;
-      if (bare && (String(p.id) === bare || String(p._id) === bare)) return i;
+      if (preferred && (String(p.id) === preferred || String(p._id) === preferred)) return i;
+      if (rawLine && (String(p.id) === rawLine || String(p._id) === rawLine)) return i;
     }
     if (item.name) {
       for (var j = 0; j < products.length; j++) {
@@ -309,7 +319,8 @@
     cartItems.forEach(function (c) {
       var accountId = c.storeId || c.accountId || '';
       if (!accountId) return;
-      var kind = c.kind === 'corp' || c.kind === 'showroom' ? 'corp' : 'store';
+      var mod = String(c.module || c.kind || '').toLowerCase();
+      var kind = (mod === 'corp' || mod === 'showroom') ? 'corp' : 'store';
       var r = decrement(accountId, c, c.qty || 1, kind);
       results.push({ id: c.id, accountId: accountId, ok: r.ok, left: r.left });
     });

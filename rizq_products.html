@@ -971,12 +971,40 @@ function addToCart(id) {
   const ar = window.isAr !== false;
   const p = _findProduct(id);
   if (!p) return;
-  const ex = cart.find(c => String(c.id) === String(id));
+  var sid = p.storeId || p.accountId || (window._rizqProductsStoreId || '') || '';
+  var baseId = 'store-prod-' + String(id);
+  var lineId = (window.RizqStoreCommerce && typeof RizqStoreCommerce.cartLineIdForProduct === 'function')
+    ? RizqStoreCommerce.cartLineIdForProduct(baseId, null)
+    : baseId;
+  const ex = cart.find(c => String(c.id) === String(lineId));
   if (ex) ex.qty++;
-  else cart.push(Object.assign({}, p, { qty:1, storeId: p.storeId || (window._rizqProductsStoreId || '') }));
+  else {
+    var imgs = (window.RizqStoreCommerce && RizqStoreCommerce.imagesOf)
+      ? RizqStoreCommerce.imagesOf(p)
+      : (p.images || p.imgDataArr || []);
+    cart.push({
+      id: lineId,
+      productId: String(id),
+      name: p.name || '',
+      nameF: p.nameF || p.name || '',
+      price: Number(p.price) || 0,
+      qty: 1,
+      emoji: p.emoji || '📦',
+      storeId: sid,
+      accountId: sid,
+      storeName: p.storeName || ((document.getElementById('lux-store-name') || {}).textContent || '').trim() || '',
+      module: 'store',
+      cat: p.cat || '',
+      variants: p.variants || '',
+      unit: p.unit || '',
+      images: imgs,
+      imgDataArr: imgs,
+      stock: p.stock
+    });
+  }
   saveCart();
   updateCartCount();
-  showToast((ar ? '✅ تمت الإضافة: ' : '✅ Ajouté : ') + (ar ? p.name : p.nameF));
+  showToast((ar ? '✅ تمت الإضافة: ' : '✅ Ajouté : ') + (ar ? p.name : (p.nameF || p.name)));
 }
 
 function updateCartCount() {
@@ -1081,22 +1109,39 @@ function addModalToCart(id, selection) {
   const p = _findProduct(id);
   if (!p) return;
   selection = selection || null;
-  var baseId = String(id);
+  var sid = p.storeId || p.accountId || (window._rizqProductsStoreId || '') || '';
+  var baseId = 'store-prod-' + String(id);
   var lineId = (window.RizqStoreCommerce && typeof RizqStoreCommerce.cartLineIdForProduct === 'function')
     ? RizqStoreCommerce.cartLineIdForProduct(baseId, selection && selection.selected)
     : baseId;
   const ex = cart.find(c => String(c.id) === String(lineId));
   if (ex) ex.qty += modalQty;
   else {
-    cart.push(Object.assign({}, p, {
+    var imgs = (window.RizqStoreCommerce && RizqStoreCommerce.imagesOf)
+      ? RizqStoreCommerce.imagesOf(p)
+      : (p.images || p.imgDataArr || []);
+    cart.push({
       id: lineId,
-      productId: baseId,
+      productId: String(id),
+      name: p.name || '',
+      nameF: p.nameF || p.name || '',
+      price: Number(p.price) || 0,
       qty: modalQty,
-      storeId: p.storeId || (window._rizqProductsStoreId || ''),
+      emoji: p.emoji || '📦',
+      storeId: sid,
+      accountId: sid,
+      storeName: p.storeName || ((document.getElementById('lux-store-name') || {}).textContent || '').trim() || '',
+      module: 'store',
+      cat: p.cat || '',
+      variants: p.variants || '',
+      unit: p.unit || '',
+      images: imgs,
+      imgDataArr: imgs,
+      stock: p.stock,
       variantKey: (selection && selection.key) || '',
       variantLabel: (selection && selection.label) || '',
       selected: (selection && selection.selected) || null
-    }));
+    });
   }
   saveCart();
   updateCartCount();
