@@ -9590,13 +9590,6 @@ function goToListing(a) {
     wilaya: a.wilaya || '', subcat: a.subcat || '', accountId: a.accountId || ''
   };
   try { localStorage.setItem('rizq_active_ad', JSON.stringify(handoff)); } catch (e) {}
-  // #region agent log
-  try{
-    var _cs=getComputedStyle(document.body);
-    var _hdr=document.getElementById('rizq-mock-hdr');
-    fetch('http://127.0.0.1:7242/ingest/1dd2',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'1dd2'},body:JSON.stringify({sessionId:'1dd2',runId:'pre-fix',hypothesisId:'E',location:'rizq_landing_v8.html:goToListing',message:'navigate to browse detail',data:{adId:String(a.id),title:(a.title||'').slice(0,60),mockH:_cs.getPropertyValue('--rizq-mock-hdr-h').trim(),headerH:_cs.getPropertyValue('--rizq-header-h').trim(),hdrBottom:_hdr?Math.round(_hdr.getBoundingClientRect().bottom):null,scrollY:Math.round(window.scrollY)},timestamp:Date.now()})}).catch(function(){});
-  }catch(_eGo){}
-  // #endregion
   /* صفحة التصفح المطوّرة (شبكة + لوحة تفاصيل) — لا rizq_listing القديمة */
   window.location.href = 'rizq_browse.html?id=' + encodeURIComponent(a.id);
 }
