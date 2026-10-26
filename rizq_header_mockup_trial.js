@@ -470,16 +470,32 @@
       investments: ['الاستثمارات', 'Investissements'],
       models: ['نماذج', 'Modèles']
     };
-    /* هاتف فقط: اختصارات فرنسية لتفادي تداخل النص — الحاسوب/التابلت بالأسماء الكاملة */
+    /* هاتف فقط: اختصارات الشريط السفلي — الحاسوب/التابلت بالأسماء الكاملة */
+    var navArPhoneShort = {
+      stores: 'محلات',
+      showrooms: 'معارض',
+      estate: 'عقارات',
+      offices: 'مكاتب',
+      pulse: 'نبض',
+      tenders: 'مناقصات',
+      investments: 'استثمار',
+      models: 'نماذج'
+    };
     var navFrPhoneShort = {
+      stores: 'Boutiq.',
+      showrooms: 'Showr.',
+      estate: 'Immo',
+      offices: 'Bureaux',
       pulse: 'Pouls',
       tenders: 'A. Offer',
-      investments: 'Inftism'
+      investments: 'Inftism',
+      models: 'Modèles'
     };
-    var phoneFr = fr && isPhone();
+    var phoneShort = isPhone();
     Object.keys(nav).forEach(function (key) {
-      var frLbl = (phoneFr && navFrPhoneShort[key]) ? navFrPhoneShort[key] : nav[key][1];
-      var label = tMock(nav[key][0], frLbl);
+      var arLbl = (phoneShort && navArPhoneShort[key]) ? navArPhoneShort[key] : nav[key][0];
+      var frLbl = (phoneShort && navFrPhoneShort[key]) ? navFrPhoneShort[key] : nav[key][1];
+      var label = tMock(arLbl, frLbl);
       var aria = tMock(nav[key][0], nav[key][1]);
       /* استثناء عناصر قائمة المزيد — تُحدَّث عبر .rmh-more-item strong */
       hdr.querySelectorAll('.rmh-nav a[data-rmh="' + key + '"]:not(.rmh-more-item)').forEach(function (a) {
@@ -1060,15 +1076,15 @@
     });
   }
 
-  /* هاتف: نفس التقسيم — تبديل المواقع فقط
-     أسفل قرب الإبهام: الرئيسية·الإعلانات·المحلات·المعارض·سوق العقارات
-     أعلى: المكاتب·نبض السوق·انشر إعلان·الاستثمارات·المناقصات·المزيد
-     (نماذج تنتقل لقائمة المزيد قبل الأقسام لتخفيف الشريط) */
-  var RMH_NAV_BOTTOM_ORDER = ['home', 'ads', 'stores', 'showrooms', 'estate'];
-  var RMH_NAV_TOP_ORDER = ['offices', 'pulse', 'post', 'investments', 'tenders', 'more'];
+  /* هاتف:
+     أسفل قرب الإبهام (صف مختصرات): محلات·معارض·عقارات·مكاتب·نبض·مناقصات·استثمار
+     تحتها صف: نماذج
+     أعلى: الرئيسية·الإعلانات·انشر إعلان·المزيد */
+  var RMH_NAV_BOTTOM_ORDER = ['stores', 'showrooms', 'estate', 'offices', 'pulse', 'tenders', 'investments', 'models'];
+  var RMH_NAV_TOP_ORDER = ['home', 'ads', 'post', 'more'];
   var __rmhNavSlots = null;
 
-  /** هاتف فقط: نماذج داخل «المزيد» قبل الأقسام؛ إخفاؤها من شريط الأقسام */
+  /** هاتف: نماذج في الصف السفلي تحت المختصرات؛ إزالة نسخة «المزيد» الهاتفية إن وُجدت */
   function syncPhoneModelsInMore() {
     var hdr = document.getElementById('rizq-mock-hdr');
     if (!hdr) return;
@@ -1076,35 +1092,13 @@
     var menu = document.getElementById('rmh-more-menu') || hdr.querySelector('.rmh-more-menu');
     var moreModels = menu ? menu.querySelector('a[data-rmh="models"]') : null;
 
-    if (!isPhone()) {
-      if (modelsNav) {
-        modelsNav.hidden = false;
-        modelsNav.removeAttribute('aria-hidden');
-        modelsNav.style.removeProperty('display');
-      }
-      if (moreModels && moreModels.getAttribute('data-rmh-phone-only') === '1') {
-        try { moreModels.parentNode.removeChild(moreModels); } catch (eRm) {}
-      }
-      return;
+    if (moreModels && moreModels.getAttribute('data-rmh-phone-only') === '1') {
+      try { moreModels.parentNode.removeChild(moreModels); } catch (eRm) {}
     }
-
     if (modelsNav) {
-      modelsNav.hidden = true;
-      modelsNav.setAttribute('aria-hidden', 'true');
-      modelsNav.style.display = 'none';
-    }
-    if (!menu) return;
-    if (!moreModels) {
-      var h = navHrefs();
-      moreModels = document.createElement('a');
-      moreModels.href = h.models || '#models';
-      moreModels.className = 'rmh-more-item';
-      moreModels.setAttribute('role', 'menuitem');
-      moreModels.setAttribute('data-rmh', 'models');
-      moreModels.setAttribute('data-rmh-phone-only', '1');
-      moreModels.innerHTML = '<span aria-hidden="true">▦</span><strong>نماذج</strong>';
-      if (menu.firstChild) menu.insertBefore(moreModels, menu.firstChild);
-      else menu.appendChild(moreModels);
+      modelsNav.hidden = false;
+      modelsNav.removeAttribute('aria-hidden');
+      modelsNav.style.removeProperty('display');
     }
     try { wireModelsModal(); } catch (eWm) {}
   }
@@ -1180,11 +1174,10 @@
     appendOrdered(topNav, RMH_NAV_TOP_ORDER);
     appendOrdered(bottomNav, RMH_NAV_BOTTOM_ORDER);
 
-    /* أي عنصر غير معروف يبقى في الشريط العلوي بعد «المزيد» — عدا نماذج */
+    /* أي عنصر غير معروف يبقى في الشريط العلوي بعد «المزيد» */
     if (__rmhNavSlots) {
       __rmhNavSlots.forEach(function (slot) {
         if (!slot.el) return;
-        if (slot.key === 'models') return;
         if (RMH_NAV_BOTTOM_ORDER.indexOf(slot.key) >= 0) return;
         if (RMH_NAV_TOP_ORDER.indexOf(slot.key) >= 0) return;
         if (slot.el.parentNode !== topNav) topNav.appendChild(slot.el);
@@ -1210,6 +1203,11 @@
     var hdr = document.getElementById('rizq-mock-hdr');
     if (!hdr) return;
     syncPhoneNavSplit();
+    var phoneNow = isPhone();
+    if (window.__rmhWasPhoneShort !== phoneNow) {
+      window.__rmhWasPhoneShort = phoneNow;
+      try { applyMockLang(); } catch (eLang) {}
+    }
     var main = hdr.querySelector('.rmh-main');
     var ticker = hdr.querySelector('.ticker-wrap:not(.is-empty)');
     var topNav = document.getElementById('rmh-nav-top');
