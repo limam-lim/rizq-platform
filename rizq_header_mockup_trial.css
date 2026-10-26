@@ -1198,6 +1198,37 @@ body > .rizq-help-dd-menu a,
   body.rizq-mockup-hdr-trial{
     --rizq-mock-hdr-h: 148px;
     --rizq-mock-nav-h: 72px;
+    /* الشريط السفلي rmh بديل لـ thumb-dock — ارفع العوامات (ويدجت/رجوع) فوقه */
+    --rizq-thumb-dock-h: var(--rizq-mock-nav-h, 72px);
+  }
+  /* ويدجت مدير رزق: فوق الشريط السفلي وبجانب آمن من الحافة */
+  html.rizq-app-nav body.rizq-mockup-hdr-trial #rizq-chat-toggle,
+  body.rizq-mockup-hdr-trial #rizq-chat-toggle,
+  html[dir="rtl"] body.rizq-mockup-hdr-trial #rizq-chat-toggle{
+    bottom:calc(var(--rizq-mock-nav-h,72px) + 14px + env(safe-area-inset-bottom,0px))!important;
+    right:12px!important;
+    left:auto!important;
+    z-index:10060!important;
+  }
+  html[dir="ltr"] body.rizq-mockup-hdr-trial #rizq-chat-toggle,
+  html[dir="ltr"] html.rizq-app-nav body.rizq-mockup-hdr-trial #rizq-chat-toggle{
+    left:12px!important;
+    right:auto!important;
+  }
+  html.rizq-app-nav body.rizq-mockup-hdr-trial #rizq-prompt-bubbles,
+  body.rizq-mockup-hdr-trial #rizq-prompt-bubbles{
+    bottom:calc(var(--rizq-mock-nav-h,72px) + 76px + env(safe-area-inset-bottom,0px))!important;
+    right:12px!important;
+    z-index:10060!important;
+  }
+  html[dir="ltr"] body.rizq-mockup-hdr-trial #rizq-prompt-bubbles{
+    left:12px!important;
+    right:auto!important;
+  }
+  html.rizq-app-nav body.rizq-mockup-hdr-trial #rizq-chat-window,
+  body.rizq-mockup-hdr-trial #rizq-chat-window{
+    bottom:calc(var(--rizq-mock-nav-h,72px) + 12px + env(safe-area-inset-bottom,0px))!important;
+    z-index:10065!important;
   }
   html.rizq-app-nav:has(#nav) body.rizq-mockup-hdr-trial,
   html.rizq-app-nav:has(#rizq-desk-nav) body.rizq-mockup-hdr-trial,
