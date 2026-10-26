@@ -964,7 +964,8 @@
           var visibleH = Math.max(0, Math.min(rect.bottom, vh) - Math.max(rect.top, 0));
           var visibleW = Math.max(0, Math.min(rect.right, vw) - Math.max(rect.left, 0));
           var area = visibleH * visibleW;
-          if (area > bestArea || (area === bestArea && r > bestR)) {
+          // نسبة الظهور أولاً، ثم المساحة عند التعادل
+          if (r > bestR || (r === bestR && area > bestArea)) {
             bestArea = area;
             bestR = r;
             bestCard = card;
@@ -978,8 +979,8 @@
           heroArea = Math.max(0, Math.min(hr.bottom, hvh) - Math.max(hr.top, 0))
             * Math.max(0, Math.min(hr.right, hvw) - Math.max(hr.left, 0));
         }
-        // البطل يفوز إن كان أكبر مساحة ظاهرة
-        if (heroRatio >= 0.5 && heroArea >= bestArea) {
+        // البطل يفوز فقط إن كانت نسبة ظهوره أعلى (أو مساوية بمساحة أكبر)
+        if (heroRatio >= 0.5 && (heroRatio > bestR || (heroRatio === bestR && heroArea >= bestArea))) {
           cards.forEach(function (c) { stopStripVideo(c); });
           resumeHeroIfVisible();
           return;
