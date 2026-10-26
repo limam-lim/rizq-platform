@@ -1831,21 +1831,32 @@
     }
   }
 
-  /** هيدر النموذج الموحّد — يُحمَّل أيضاً من هنا إن غاب PWA */
+  /** هيدر/كبسولة موحّدة — كل الصفحات العامة؛ فرض الإصدار لكسر الكاش */
   function ensureMockHeaderAssets() {
     try {
       if (isDashShell()) return;
-      if (!document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) {
-        var l = document.createElement('link');
+      var v = '5.82';
+      var cssWant = 'rizq_header_mockup_trial.css?v=' + v;
+      var jsWant = 'rizq_header_mockup_trial.js?v=' + v;
+      var l = document.querySelector('link[href*="rizq_header_mockup_trial.css"]');
+      if (!l) {
+        l = document.createElement('link');
         l.rel = 'stylesheet';
-        l.href = 'rizq_header_mockup_trial.css?v=5.81';
         (document.head || document.documentElement).appendChild(l);
       }
-      if (!document.querySelector('script[src*="rizq_header_mockup_trial.js"]')) {
-        var s = document.createElement('script');
-        s.src = 'rizq_header_mockup_trial.js?v=5.81';
+      if ((l.getAttribute('href') || '').indexOf('v=' + v) < 0) l.href = cssWant;
+      var s = document.querySelector('script[src*="rizq_header_mockup_trial.js"]');
+      if (!s) {
+        s = document.createElement('script');
+        s.src = jsWant;
         s.defer = true;
         (document.head || document.documentElement).appendChild(s);
+      } else if ((s.getAttribute('src') || '').indexOf('v=' + v) < 0) {
+        var fresh = document.createElement('script');
+        fresh.src = jsWant;
+        fresh.defer = true;
+        s.parentNode.insertBefore(fresh, s.nextSibling);
+        try { s.parentNode.removeChild(s); } catch (eRm) {}
       }
     } catch (eMock) { /* ignore */ }
   }
