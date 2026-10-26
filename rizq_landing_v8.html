@@ -3892,6 +3892,8 @@ html[dir="rtl"] .diamond-pitch-grid{text-align:right;direction:rtl}
 /* Footer */
 footer{background:linear-gradient(180deg,var(--dark),var(--royal-deep));border-top:1px solid rgba(201,168,76,.1);padding:28px 5% 20px}
 footer:not(.rzq-ft-compact){padding-top:36px}
+/* قبل تحميل rizq_footer_toggle: شريط مطوي بلا فراغ علوي كبير */
+footer.rizq-footer.rzq-ft-compact{padding:8px 5% calc(var(--rizq-mock-nav-h,64px) + env(safe-area-inset-bottom,0px))}
 .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr;gap:32px;max-width:1200px;margin:0 auto;padding-bottom:24px}
 .footer-col-title{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;font-family:Georgia,serif}
 .footer-desc{font-size:13px;color:rgba(255,255,255,.82);line-height:1.85;margin-top:14px;max-width:280px}
