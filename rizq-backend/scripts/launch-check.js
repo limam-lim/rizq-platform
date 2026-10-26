@@ -62,24 +62,20 @@ function latestBackupMeta() {
 }
 
 function restoreTestEvidence() {
-  // Look for last successful test-backup-restore log marker or __backup_test__ leftovers cleaned
   const testScript = path.join(ROOT, 'scripts', 'test-backup-restore.js');
   const hasTest = fs.existsSync(testScript);
-  let lastRunNote = null;
-  const logCandidates = [
-    path.join('/opt/cursor/artifacts', 'backup-restore-check.log'),
-    path.join(DATA, 'backup-restore-last.json'),
-  ];
-  for (let i = 0; i < logCandidates.length; i++) {
-    if (fs.existsSync(logCandidates[i])) {
-      try {
-        const raw = fs.readFileSync(logCandidates[i], 'utf8');
-        lastRunNote = raw.slice(0, 200);
-        break;
-      } catch (e) { /* ignore */ }
-    }
+  let evidence = null;
+  const preferred = path.join(DATA, 'backup-restore-last.json');
+  if (fs.existsSync(preferred)) {
+    try {
+      evidence = JSON.parse(fs.readFileSync(preferred, 'utf8'));
+    } catch (e) { /* ignore */ }
   }
-  return { hasTestScript: hasTest, lastRunNote };
+  return {
+    hasTestScript: hasTest,
+    evidence,
+    lastRunNote: evidence ? JSON.stringify(evidence) : null,
+  };
 }
 
 function cronScheduled() {
@@ -107,6 +103,7 @@ function envPresent() {
     'RIZQ_API_SECRET',
     'SUPER_ADMIN_EMAIL',
     'SUPER_ADMIN_PASS_HASH',
+    'BACKUP_ENCRYPTION_KEY',
   ];
   // load .env lightly if dotenv present
   try { require('dotenv').config({ path: path.join(ROOT, '.env') }); } catch (e) { /* ignore */ }
@@ -114,6 +111,7 @@ function envPresent() {
   const storage = {
     STORAGE_DRIVER: process.env.STORAGE_DRIVER || process.env.OBJECT_STORAGE_DRIVER || 'local',
     LOCAL_ROOT: process.env.UPLOADS_DIR || path.join(ROOT, 'uploads'),
+    BACKUP_DIR: process.env.BACKUP_DIR || path.join(ROOT, 'backups'),
   };
   return { missing, storage, ok: missing.length === 0 };
 }
@@ -170,13 +168,22 @@ function main() {
   } else {
     check('backup exists', false, 'no backup file/meta found');
   }
-  check(
-    'backup restore test available',
-    !!restore.hasTestScript,
-    restore.lastRunNote
-      ? 'evidence: ' + String(restore.lastRunNote).slice(0, 80)
-      : 'run: npm run test:backup (not auto-run here)'
-  );
+  let restoreOk = false;
+  let restoreDetail = 'run: npm run test:backup (not auto-run here)';
+  if (restore.lastRunNote) {
+    try {
+      const parsed = JSON.parse(restore.lastRunNote);
+      restoreOk = parsed.ok === true;
+      restoreDetail = 'last test at ' + (parsed.at || '?') + ' passed=' + parsed.passed + '/' + parsed.total;
+    } catch (e) {
+      restoreOk = /✅|passed|ok/i.test(restore.lastRunNote);
+      restoreDetail = 'evidence: ' + String(restore.lastRunNote).slice(0, 100);
+    }
+  } else if (restore.hasTestScript) {
+    restoreOk = false;
+    restoreDetail = 'script present — no restore evidence yet (npm run test:backup)';
+  }
+  check('backup restore tested', restoreOk, restoreDetail);
 
   const demo = countDemo();
   check(
