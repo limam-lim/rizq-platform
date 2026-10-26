@@ -89,6 +89,14 @@
     };
   }
 
+  function isPhoneLike() {
+    try {
+      if (window.matchMedia && window.matchMedia('(max-width:768px)').matches) return true;
+      if (window.matchMedia && window.matchMedia('(pointer:coarse)').matches) return true;
+    } catch (e) {}
+    return false;
+  }
+
   function openImageZoom(fullUrl, alt) {
     if (!fullUrl || typeof document === 'undefined') return;
     var existing = document.getElementById('rzq-adx-zoom');
@@ -101,12 +109,29 @@
     overlay.innerHTML =
       '<button type="button" class="rzq-adx-zoom-close" aria-label="×">×</button>' +
       '<img class="rzq-adx-zoom-img" src="' + esc(fullUrl) + '" alt="' + esc(alt || '') + '"/>';
+    var pushed = false;
     function close() {
       try { overlay.remove(); } catch (e) { /* ignore */ }
       document.removeEventListener('keydown', onKey);
+      window.removeEventListener('popstate', onPop);
+      if (pushed) {
+        try {
+          if (history.state && history.state.rizqAdxZoom) history.back();
+        } catch (eBack) {}
+        pushed = false;
+      }
+    }
+    function closeUiOnly() {
+      try { overlay.remove(); } catch (e) { /* ignore */ }
+      document.removeEventListener('keydown', onKey);
+      window.removeEventListener('popstate', onPop);
+      pushed = false;
     }
     function onKey(ev) {
       if (ev.key === 'Escape') close();
+    }
+    function onPop() {
+      closeUiOnly();
     }
     overlay.addEventListener('click', function (ev) {
       if (ev.target === overlay || (ev.target && ev.target.classList && ev.target.classList.contains('rzq-adx-zoom-close'))) {
@@ -114,6 +139,11 @@
       }
     });
     document.addEventListener('keydown', onKey);
+    try {
+      history.pushState({ rizqAdxZoom: 1 }, '', location.href);
+      pushed = true;
+      window.addEventListener('popstate', onPop);
+    } catch (ePush) {}
     document.body.appendChild(overlay);
   }
 
@@ -440,6 +470,8 @@
     media.addEventListener('click', function (e) {
       var t = e.target;
       if (!t || !t.classList || !t.classList.contains('rzq-adx-zoomable')) return;
+      /* هاتف: لا تكبير بلا معلومات — اترك النقر يفتح الإعلان (openAdById / selectAd) */
+      if (isPhoneLike()) return;
       e.preventDefault();
       e.stopPropagation();
       openImageZoom(t.getAttribute('data-full') || t.getAttribute('src') || '', t.getAttribute('alt') || '');

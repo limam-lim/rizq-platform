@@ -1460,7 +1460,7 @@ body > .rizq-help-dd-menu a,
     white-space:nowrap!important;
     text-align:center;
   }
-  /* الشريط السفلي: مسافات متساوية + عرض حسب المحتوى حتى تتسع «المعارض والمصانع» */
+  /* الشريط السفلي: خط أصغر حتى لا تتقارب العناوين الطويلة */
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a,
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > .rmh-more-btn,
   nav.rmh-nav:not(.rmh-nav-top) > a,
@@ -1469,7 +1469,7 @@ body > .rizq-help-dd-menu a,
     min-width:min-content!important;
     max-width:none!important;
     padding:clamp(4px,1.1vw,8px) 2px!important;
-    font-size:clamp(11px,2.85vw,12px)!important;
+    font-size:clamp(9px,2.2vw,10px)!important;
     white-space:nowrap!important;
     text-align:center;
   }
@@ -1478,8 +1478,8 @@ body > .rizq-help-dd-menu a,
   .rmh-nav a[data-rmh="showrooms"]{
     white-space:nowrap!important;
     text-align:center;
-    font-size:clamp(8.5px,2.1vw,10px)!important;
-    letter-spacing:-.03em;
+    font-size:clamp(7.5px,1.85vw,9px)!important;
+    letter-spacing:-.04em;
   }
   #rizq-mock-hdr .rmh-nav a[data-rmh="estate"],
   .rmh-nav a[data-rmh="estate"],
@@ -1491,7 +1491,7 @@ body > .rizq-help-dd-menu a,
   .rmh-nav a.rmh-post-nav{
     white-space:nowrap!important;
     text-align:center;
-    font-size:clamp(9px,2.2vw,10.5px)!important;
+    font-size:clamp(8px,1.95vw,9.5px)!important;
   }
   #rizq-mock-hdr .rmh-nav a .rmh-nav-ico,
   #rizq-mock-hdr .rmh-more-btn .rmh-nav-ico,

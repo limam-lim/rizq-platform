@@ -2790,10 +2790,27 @@ function syncDetailChrome(open){
 }
 
 // ══════════ CORE SPA: selectAd ══════════
+var _rizqDetailHistPushing=false;
+function _rizqBrowseListUrl(){
+  try{
+    var u=new URL(location.href);
+    u.searchParams.delete('id');
+    return u.pathname+u.search+u.hash;
+  }catch(e){ return 'rizq_browse.html'; }
+}
+function _rizqPushAdDetailHistory(id){
+  try{
+    if(history.state && history.state.rizqAdDetail && String(history.state.id)===String(id)) return;
+    _rizqDetailHistPushing=true;
+    history.pushState({ rizqAdDetail:1, id:String(id) }, '', 'rizq_browse.html?id='+encodeURIComponent(id));
+    _rizqDetailHistPushing=false;
+  }catch(e){ _rizqDetailHistPushing=false; }
+}
 function selectAd(id){
   const ad=getAdById(id);
   window._currentAd=ad;
   _phoneRevealed=false;
+  try{ _rizqPushAdDetailHistory(id); }catch(eHist){}
   try{
     if(window.RizqAdCards && typeof RizqAdCards.markViewed==='function') RizqAdCards.markViewed(ad && ad.id);
     else if(typeof window.rizqMarkAdViewed==='function') window.rizqMarkAdViewed(ad && ad.id);
@@ -3366,14 +3383,20 @@ function dpOpenLightbox(idx){
     dpRenderLightbox();
     lb.classList.add('open');
     document.body.classList.add('rizq-lightbox-open');
-    return;
+  } else {
+    window._lbEmojiOnly=false;
+    if(idx==null || idx==='' || isNaN(idx)) idx=_dpCurrentIdx||0;
+    window._lbIdx=Math.max(0,Math.min(parseInt(idx,10)||0,imgs.length-1));
+    dpRenderLightbox();
+    lb.classList.add('open');
+    document.body.classList.add('rizq-lightbox-open');
   }
-  window._lbEmojiOnly=false;
-  if(idx==null || idx==='' || isNaN(idx)) idx=_dpCurrentIdx||0;
-  window._lbIdx=Math.max(0,Math.min(parseInt(idx,10)||0,imgs.length-1));
-  dpRenderLightbox();
-  lb.classList.add('open');
-  document.body.classList.add('rizq-lightbox-open');
+  /* زر رجوع الهاتف يغلق التكبير أولاً بدل الخروج من المنصة */
+  try{
+    if(!(history.state && history.state.rizqLightbox)){
+      history.pushState({ rizqLightbox:1, id:String(window._currentAd.id||'') }, '', location.href);
+    }
+  }catch(eLb){}
 }
 function dpRenderLightbox(){
   const imgs=_dpGalleryImages();
@@ -3460,7 +3483,7 @@ function rizqTagClick(el){
   // scroll القائمة للأعلى
   const rb=document.getElementById('result-list-body');if(rb)rb.scrollTop=0;
 }
-function closeAdDetail(){
+function _rizqCloseAdDetailUi(){
   const dc=document.getElementById('detail-content');
   const ed=document.getElementById('empty-detail');
   if(window._dpMap){ try{ window._dpMap.remove(); }catch(e){} window._dpMap=null; }
@@ -3473,6 +3496,17 @@ function closeAdDetail(){
   window._currentAd=null;
   if(window.innerWidth<=900) switchTab('list');
   const rb=document.getElementById('result-list-body');if(rb)rb.scrollTop=0;
+}
+function closeAdDetail(){
+  /* رجوع من الإعلان نفسه → صفحة الإعلانات (القائمة) عبر history */
+  try{
+    if(history.state && history.state.rizqAdDetail){
+      history.back();
+      return;
+    }
+  }catch(eBack){}
+  try{ history.replaceState({ rizqBrowseList:1 }, '', _rizqBrowseListUrl()); }catch(eRep){}
+  _rizqCloseAdDetailUi();
 }
 function filterByCat(cat){
   // نعمل دائماً على القيمة الموحّدة (إلكترونيات لا "هواتف وإلكترونيات")
@@ -3847,10 +3881,19 @@ function openLightbox(src){
   else{lbc.innerHTML=`<span style="font-size:80px">${src||'🏠'}</span>`;}
   lb.classList.add('open');
 }
-function closeLightbox(){
+function _rizqCloseLightboxUi(){
   const lb=document.getElementById('lightbox');
   if(lb)lb.classList.remove('open');
   document.body.classList.remove('rizq-lightbox-open');
+}
+function closeLightbox(){
+  try{
+    if(history.state && history.state.rizqLightbox){
+      history.back();
+      return;
+    }
+  }catch(eLbBack){}
+  _rizqCloseLightboxUi();
 }
 document.addEventListener('keydown',function(e){
   const lb=document.getElementById('lightbox');
@@ -4097,13 +4140,21 @@ document.addEventListener('DOMContentLoaded',()=>{
     });
   }
 
-  // إذا كان ?id= → فتح الإعلان في لوحة التصفح (لا تحويل لـ rizq_listing القديمة)
+  // إذا كان ?id= → افتح التفاصيل فوق قائمة الإعلانات حتى يرجع زر الهاتف للقائمة لا خارج المنصة
   if(_pId){
+    try{
+      /* قاعدة القائمة في التاريخ، ثم طبقة الإعلان — رجوع واحد = صفحة الإعلانات */
+      history.replaceState({ rizqBrowseList:1 }, '', _rizqBrowseListUrl());
+      history.pushState({ rizqAdDetail:1, id:String(_pId) }, '', 'rizq_browse.html?id='+encodeURIComponent(_pId));
+    }catch(eSeedHist){}
     function _openFromUrl(){
       const _adCheck = getAdById(_pId);
       const _adExists = _adCheck && (_adCheck.title || (ALL_ADS||[]).some(function(a){ return String(a.id)===String(_pId); }));
       if(_adExists){
-        selectAd(_pId);
+        /* لا تدفع history مرة ثانية — الطبقة موجودة */
+        var _prevPush=_rizqPushAdDetailHistory;
+        _rizqPushAdDetailHistory=function(){};
+        try{ selectAd(_pId); } finally { _rizqPushAdDetailHistory=_prevPush; }
         if(window.innerWidth <= 900) switchTab('detail');
         return true;
       }
@@ -4115,17 +4166,40 @@ document.addEventListener('DOMContentLoaded',()=>{
         return _rizqFetchAndOpenAd(_pId);
       }).then(function(ok){
         if(ok) return;
-        /* آخر محاولة: handoff من الصفحة الرئيسية */
         try{
           var s=JSON.parse(localStorage.getItem('rizq_active_ad')||'null');
           if(s && String(s.id)===String(_pId)){
-            selectAd(_pId);
+            var _prevPush2=_rizqPushAdDetailHistory;
+            _rizqPushAdDetailHistory=function(){};
+            try{ selectAd(_pId); } finally { _rizqPushAdDetailHistory=_prevPush2; }
             if(window.innerWidth <= 900) switchTab('detail');
           }
         }catch(e){}
       });
     }
   }
+
+  /* رجوع الهاتف: تكبير → تفاصيل الإعلان → قائمة الإعلانات */
+  window.addEventListener('popstate', function(){
+    try{
+      var lb=document.getElementById('lightbox');
+      if(lb && lb.classList.contains('open')){
+        _rizqCloseLightboxUi();
+        return;
+      }
+      var st=history.state||{};
+      if(st.rizqAdDetail && st.id){
+        var _prev=_rizqPushAdDetailHistory;
+        _rizqPushAdDetailHistory=function(){};
+        try{ selectAd(st.id); } finally { _rizqPushAdDetailHistory=_prev; }
+        if(window.innerWidth<=900) switchTab('detail');
+        return;
+      }
+      if(document.body.classList.contains('rizq-detail-open') || document.querySelector('.browse-wrap.has-detail')){
+        _rizqCloseAdDetailUi();
+      }
+    }catch(ePop){}
+  });
 
   window.addEventListener('resize',relocateFiltersForViewport);
   const btn=document.getElementById('lang-btn');
