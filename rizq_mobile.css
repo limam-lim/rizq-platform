@@ -384,12 +384,12 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     width:100%!important;max-width:100%!important;
     gap:12px!important;
   }
-  /* أسعار السوق على الهاتف: عمودان مضغوطان بدل بطاقات بعرض كامل فوق بعض */
+  /* أسعار السوق على الهاتف: عمودان مضغوطان + شريط تحديثات رقيق */
   #prices .prices-grid,
   .prices-grid{
     display:grid!important;
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    gap:8px!important;
+    gap:7px!important;
     width:100%!important;
     max-width:100%!important;
     overflow:visible!important;
@@ -399,42 +399,60 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     width:100%!important;
     max-width:100%!important;
     min-width:0!important;
-    padding:10px 10px 9px!important;
+    padding:8px 9px 7px!important;
     gap:3px!important;
-    border-radius:12px!important;
+    border-radius:11px!important;
     box-sizing:border-box!important;
   }
   #prices .price-name,
   .prices-grid .price-name{
-    font-size:11px!important;
-    line-height:1.25!important;
+    font-size:10.5px!important;
+    line-height:1.2!important;
     font-weight:800!important;
   }
   #prices .price-unit,
   .prices-grid .price-unit{
-    font-size:9.5px!important;
-    line-height:1.2!important;
+    font-size:9px!important;
+    line-height:1.15!important;
   }
   #prices .price-value,
   .prices-grid .price-value,
   #prices .price-card-currency .price-value,
   .prices-grid .price-card-currency .price-value{
-    font-size:16px!important;
-    line-height:1.15!important;
+    font-size:15px!important;
+    line-height:1.1!important;
   }
   #prices .price-trend,
   .prices-grid .price-trend{
-    font-size:9.5px!important;
-    margin-top:1px!important;
+    font-size:9px!important;
+    padding:1px 5px!important;
   }
   #prices .price-card-top,
   .prices-grid .price-card-top{
-    gap:6px!important;
+    gap:4px!important;
   }
   #prices .price-curr-flag,
   .prices-grid .price-curr-flag{
-    font-size:16px!important;
+    font-size:13px!important;
   }
+  #prices .price-ticker-wrap,
+  .price-ticker-wrap{
+    border-radius:999px!important;
+    padding:4px 0!important;
+    margin-bottom:10px!important;
+  }
+  #prices .prices-tabs,
+  .prices-tabs{
+    gap:5px!important;
+    margin-bottom:10px!important;
+  }
+  #prices .price-tab,
+  .prices-tabs .price-tab{
+    padding:5px 11px!important;
+    font-size:11px!important;
+  }
+  #prices .prices-meta{margin-bottom:8px!important}
+  #prices .prices-note{margin-top:10px!important;font-size:11px!important}
   /* شارات المحل/المعرض/المكتب تبقى صفاً مضغوطاً لا عموداً طويلاً */
   .store-meta,
   .store-badges,
@@ -1164,7 +1182,7 @@ html[dir="ltr"] .rizq-lang-fallback-block{ text-align:left; }
   }
   #prices .price-card,
   .prices-grid .price-card{
-    padding:8px 8px 7px!important;
+    padding:7px 8px 6px!important;
     border-radius:10px!important;
     gap:2px!important;
   }
@@ -1182,8 +1200,11 @@ html[dir="ltr"] .rizq-lang-fallback-block{ text-align:left; }
   .prices-grid .price-unit,
   #prices .price-trend,
   .prices-grid .price-trend{
-    font-size:9px!important;
+    font-size:8.5px!important;
   }
+  #prices .price-ticker-wrap::before{font-size:8.5px!important;padding:2px 6px!important}
+  #prices .price-ticker-inner{padding-inline-start:66px!important}
+  #prices .price-ticker-wrap .ticker-item{font-size:10.5px!important;padding:0 12px!important}
   .section-header,
   #rizq-showroom-models .section-header,
   #rizq-styles .section-header{
