@@ -519,6 +519,8 @@
       '      <div class="rag-legal-links">',
       '        <a id="rag-link-home" href="rizq_landing_v8.html">الرئيسية</a>',
       '        <a id="rag-link-browse" href="rizq_browse.html">تصفّح</a>',
+      '        <a id="rag-link-dir" href="rizq_directory.html">دليل رزق</a>',
+      '        <a id="rag-link-estate-dir" href="rizq_estate_agencies.html">دليل سوق العقارات</a>',
       '        <a id="rag-link-help" href="rizq_help.html"></a>',
       '        <a id="rag-link-terms" href="rizq_legal.html#s2" target="_blank" rel="noopener"></a>',
       '        <a id="rag-link-privacy" href="rizq_legal.html#s3" target="_blank" rel="noopener"></a>',
@@ -782,6 +784,10 @@
     if (lh) lh.textContent = dict.linkHelp;
     if (lhome) lhome.textContent = t('الرئيسية', 'Accueil');
     if (lbrowse) lbrowse.textContent = t('تصفّح', 'Parcourir');
+    var ldir = document.getElementById('rag-link-dir');
+    var lestate = document.getElementById('rag-link-estate-dir');
+    if (ldir) ldir.textContent = t('دليل رزق', 'Annuaire Rizq');
+    if (lestate) lestate.textContent = t('دليل سوق العقارات', 'Annuaire immobilier');
     var legalTitle = document.getElementById('rag-legal-title');
     var contactTitle = document.getElementById('rag-contact-title');
     if (legalTitle) legalTitle.textContent = t('روابط سريعة', 'Liens rapides');

@@ -6296,7 +6296,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     </div>
     <div>
       <h4 class="footer-col-title" data-t="ft-quick">روابط سريعة</h4>
-      <ul class="footer-links"><li><a href="rizq_landing_v8.html" data-t="ft-q1">الرئيسية</a></li><li><a href="rizq_browse.html" data-t="ft-q2">تصفّح الإعلانات</a></li><li><a href="rizq_post.html" data-t="ft-q3">انشر إعلانك</a></li><li><a href="rizq_market_pulse.html" data-t="ft-q4">نبضة السوق</a></li><li><a href="rizq_platform.html#who" data-t="ft-q5b">من نحن</a></li><li><a href="rizq_platform.html#why" data-t="ft-q5c">لماذا رزق</a></li><li><a href="rizq_about.html" data-t="ft-q5">الشركة المالكة</a></li></ul>
+      <ul class="footer-links"><li><a href="rizq_landing_v8.html" data-t="ft-q1">الرئيسية</a></li><li><a href="rizq_browse.html" data-t="ft-q2">تصفّح الإعلانات</a></li><li><a href="rizq_post.html" data-t="ft-q3">انشر إعلانك</a></li><li><a href="rizq_market_pulse.html" data-t="ft-q4">نبضة السوق</a></li><li><a href="rizq_directory.html" data-t="ft-q-dir">دليل رزق</a></li><li><a href="rizq_estate_agencies.html" data-t="ft-q-estate-dir">دليل سوق العقارات</a></li><li><a href="rizq_platform.html#who" data-t="ft-q5b">من نحن</a></li><li><a href="rizq_platform.html#why" data-t="ft-q5c">لماذا رزق</a></li><li><a href="rizq_about.html" data-t="ft-q5">الشركة المالكة</a></li></ul>
     </div>
     <div>
       <h4 class="footer-col-title" data-t="ft-topcats">أبرز الأقسام</h4>
@@ -11045,7 +11045,7 @@ const LANG = {
     'cta-btn1': '🚀 سجّل الآن — مجاناً', 'cta-btn2': '📲 التطبيق قريباً', 'cta-btn-invest': '📈 الاستثمارات',
     'cta-note': '&nbsp;ابدأ الآن — بلا رسوم خفية',
     'ft-quick': 'روابط سريعة', 'ft-topcats': 'أبرز الأقسام', 'ft-help': 'المساعدة',
-    'ft-q1':'الرئيسية','ft-q2':'تصفّح الإعلانات','ft-q3':'انشر إعلانك','ft-q4':'نبضة السوق','ft-q5b':'من نحن','ft-q5c':'لماذا رزق','ft-q5':'الشركة المالكة',
+    'ft-q1':'الرئيسية','ft-q2':'تصفّح الإعلانات','ft-q3':'انشر إعلانك','ft-q4':'نبضة السوق','ft-q-dir':'دليل رزق','ft-q-estate-dir':'دليل سوق العقارات','ft-q5b':'من نحن','ft-q5c':'لماذا رزق','ft-q5':'الشركة المالكة',
     'ft-tc1':'🏠 منازل وعقارات','ft-tc2':'🚗 سيارات وقطع غيار','ft-tc3':'🚛 شاحنات ومعدات','ft-tc4':'📱 هواتف وإلكترونيات','ft-tc5':'🐄 ماشية وحيوانات',
     'ft-h1':'مركز المساعدة','ft-h2':'سياسة الخصوصية','ft-h3':'شروط الاستخدام','ft-h4':'الإبلاغ عن إعلان','ft-h5':'تواصل معنا',
     'ft-desc': 'سوق موريتانيا الإلكتروني للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات.',
@@ -11211,7 +11211,7 @@ const LANG = {
     'cta-btn1': '🚀 S\'inscrire — Gratuit', 'cta-btn2': '📲 L\'app bientôt', 'cta-btn-invest': '📈 Investissements',
     'cta-note': '&nbsp;Commencez maintenant — sans frais cachés',
     'ft-quick': 'Liens rapides', 'ft-topcats': 'Meilleures catégories', 'ft-help': 'Aide',
-    'ft-q1':'Accueil','ft-q2':'Parcourir les annonces','ft-q3':'Publier une annonce','ft-q4':'Pouls du marché','ft-q5b':'À propos','ft-q5c':'Pourquoi Rizq','ft-q5':'Société propriétaire',
+    'ft-q1':'Accueil','ft-q2':'Parcourir les annonces','ft-q3':'Publier une annonce','ft-q4':'Pouls du marché','ft-q-dir':'Annuaire Rizq','ft-q-estate-dir':'Annuaire immobilier','ft-q5b':'À propos','ft-q5c':'Pourquoi Rizq','ft-q5':'Société propriétaire',
     'ft-tc1':'🏠 Immobilier','ft-tc2':'🚗 Voitures & pièces','ft-tc3':'🚛 Camions & engins','ft-tc4':'📱 Téléphones & électronique','ft-tc5':'🐄 Bétail & animaux',
     'ft-h1':'Centre d\'aide','ft-h2':'Politique de confidentialité','ft-h3':'Conditions d\'utilisation','ft-h4':'Signaler une annonce','ft-h5':'Contactez-nous',
     'ft-desc': 'Le marché électronique mauritanien des annonces et des affaires : boutiques, showrooms, appels d\'offres et investissements.',
@@ -12522,8 +12522,8 @@ function applyFullTranslation(lang) {
 
   // ── Footer links (quick links + top cats + help) ──
   const ftLinks = document.querySelectorAll('.footer-links');
-  const ftQuickFR = ['Accueil','Parcourir les annonces','Publier une annonce','Pouls du marché','À propos','Pourquoi Rizq','Société propriétaire'];
-  const ftQuickAR = ['الرئيسية','تصفّح الإعلانات','انشر إعلانك','نبضة السوق','من نحن','لماذا رزق','الشركة المالكة'];
+  const ftQuickFR = ['Accueil','Parcourir les annonces','Publier une annonce','Pouls du marché','Annuaire Rizq','Annuaire immobilier','À propos','Pourquoi Rizq','Société propriétaire'];
+  const ftQuickAR = ['الرئيسية','تصفّح الإعلانات','انشر إعلانك','نبضة السوق','دليل رزق','دليل سوق العقارات','من نحن','لماذا رزق','الشركة المالكة'];
   const ftCatsFR  = ['🏠 Immobilier','🚗 Voitures & pièces','🚛 Camions & engins','📱 Téléphones & électronique','🐄 Bétail & animaux'];
   const ftCatsAR  = ['🏠 منازل وعقارات','🚗 سيارات وقطع غيار','🚛 شاحنات ومعدات','📱 هواتف وإلكترونيات','🐄 ماشية وحيوانات'];
   const ftHelpFR  = ['Centre d\'aide','Politique de confidentialité','Conditions d\'utilisation','Signaler une annonce','Contactez-nous'];

@@ -204,13 +204,6 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
     <input class="ag-search" id="ag-search" type="search" placeholder="ابحث بالاسم أو المدينة…" autocomplete="off"/>
     <select class="ag-wilaya" id="ag-wilaya" aria-label="الولاية">
       <option value="">كل الولايات</option>
-      <option value="نواكشوط">نواكشوط</option>
-      <option value="تفرغ زينة">تفرغ زينة</option>
-      <option value="نواذيبو">نواذيبو</option>
-      <option value="لكصر">لكصر</option>
-      <option value="أطار">أطار</option>
-      <option value="كيفة">كيفة</option>
-      <option value="روصو">روصو</option>
     </select>
   </div>
   <div class="ag-count" id="ag-count" aria-live="polite"></div>
@@ -224,12 +217,45 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
   <a id="ag-demo-link" data-rizq-estate-promo="1" href="rizq_estate.html?demo=1&amp;id=demo_estate_atwar">نموذج وكالة</a>
 </footer>
 
+<script src="rizq_mr_geo.js?v=1.4"></script>
 <script>
 (function(){
-  var CITY_FR = {
-    'نواكشوط':'Nouakchott','تفرغ زينة':'Tevragh Zeina','نواذيبو':'Nouadhibou',
-    'لكصر':'Ksar','أطار':'Atar','كيفة':'Kiffa','روصو':'Rosso'
-  };
+  function fillAgWilayaSelect(){
+    var sel = document.getElementById('ag-wilaya');
+    if(!sel) return;
+    var fr = isFrAg();
+    var cur = sel.value || '';
+    var opts = '<option value="">'+(fr ? 'Toutes les wilayas' : 'كل الولايات')+'</option>';
+    if(window.RizqMrGeo && typeof RizqMrGeo.wilayas === 'function'){
+      RizqMrGeo.wilayas().forEach(function(w){
+        var label = RizqMrGeo.label(w, fr);
+        var val = w.ar || w.id;
+        opts += '<option value="'+String(val).replace(/"/g,'&quot;')+'"'+(cur===val?' selected':'')+'>'+label+'</option>';
+      });
+    }
+    sel.innerHTML = opts;
+  }
+
+  function agencyMatchesWilaya(a, wAr){
+    if(!wAr) return true;
+    var city = String(a.city || a.wilaya || a.location || '').trim();
+    if(!city) return false;
+    if(city.indexOf(wAr) >= 0 || wAr.indexOf(city) >= 0) return true;
+    /* نواقشيط: الوكالات غالباً تُسجَّل «نواكشوط» دون تفريق الولايات الثلاث */
+    if(wAr.indexOf('نواكشوط') >= 0 && city.indexOf('نواكشوط') >= 0) return true;
+    if(window.RizqMrGeo && typeof RizqMrGeo.wilayas === 'function'){
+      var w = RizqMrGeo.wilayas().find(function(x){ return x.ar === wAr || x.id === wAr; });
+      if(w){
+        var cities = RizqMrGeo.citiesOf(w.id) || [];
+        for(var i = 0; i < cities.length; i++){
+          var c = cities[i];
+          if(city.indexOf(c.ar) >= 0 || (c.fr && city.toLowerCase().indexOf(String(c.fr).toLowerCase()) >= 0)) return true;
+        }
+      }
+    }
+    return false;
+  }
+
   var DEMO = [
     {
       id: 'demo_estate_atwar',
@@ -395,7 +421,7 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
     var w = (wilayaEl.value||'').trim();
     return agencies.filter(function(a){
       if(!matchCat(a, catFilter)) return false;
-      if(w && String(a.city||'').indexOf(w) < 0) return false;
+      if(w && !agencyMatchesWilaya(a, w)) return false;
       if(!q) return true;
       return ((a.name||'')+' '+(a.city||'')+' '+(a.activity||'')+' '+(a.tagline||'')).toLowerCase().indexOf(q) >= 0;
     });
@@ -535,14 +561,7 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
       wilayaEl.setAttribute('aria-label', fr ? 'Wilaya' : 'الولاية');
 
       searchEl.placeholder = fr ? 'Rechercher une agence ou une ville…' : 'ابحث بالاسم أو المدينة…';
-      if(wilayaEl && wilayaEl.options){
-        for(var wi = 0; wi < wilayaEl.options.length; wi++){
-          var opt = wilayaEl.options[wi];
-          var v = opt.value;
-          if(!v){ opt.textContent = fr ? 'Toutes les wilayas' : 'كل الولايات'; }
-          else { opt.textContent = fr ? (CITY_FR[v] || v) : v; }
-        }
-      }
+      fillAgWilayaSelect();
       var listLabel = document.getElementById('ag-list');
       if(listLabel) listLabel.setAttribute('aria-label', fr ? 'Liste des agences immobilières' : 'قائمة الوكالات العقارية');
 
@@ -558,6 +577,7 @@ html.rizq-app-nav:has(#rizq-desk-nav) .ag-hero{padding-top:16px}
     agencies = [];
   }
   hidePromoExplain();
+  fillAgWilayaSelect();
   applyAgenciesLang();
   document.addEventListener('rizq:langchange', applyAgenciesLang);
   renderCats();
