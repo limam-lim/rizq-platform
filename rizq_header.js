@@ -533,7 +533,7 @@
             commerceToolbarHtml() +
           '</div>' +
           '<a class="rizq-hdr-brand logo" href="rizq_landing_v8.html" aria-label="رزق">' +
-            '<img class="rizq-hdr-brand-mark logo-mark-img" src="rizq-mark-512.png?v=10.3" width="42" height="42" alt=""/>' +
+            '<img class="rizq-hdr-brand-mark logo-mark-img" src="rizq-mark.svg?v=24.0" width="42" height="42" alt=""/>' +
             '<div class="logo-text"><span class="logo-ar rizq-hdr-brand-ar">رزق</span><span class="logo-sub rizq-hdr-brand-sub">RIZQ PLATFORM</span></div>' +
           '</a>' +
         '</div>' +
@@ -1088,7 +1088,7 @@
           '</li>' +
         '</ul>' +
         '<a href="rizq_landing_v8.html" class="logo" id="rizq-desk-brand" aria-label="رزق">' +
-          '<img class="logo-mark-img" src="rizq-mark-512.png?v=23.0" width="42" height="42" alt=""/>' +
+          '<img class="logo-mark-img" src="rizq-mark.svg?v=24.0" width="42" height="42" alt=""/>' +
           '<div class="logo-text"><span class="logo-ar">رزق</span><span class="logo-sub">RIZQ PLATFORM</span></div>' +
         '</a>' +
       '</nav>';

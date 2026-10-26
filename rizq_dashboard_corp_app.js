@@ -2356,8 +2356,9 @@ function saveMyPayment(){
     document.getElementById('ad-pkg-duration').textContent=duration+' '+_t2('يوم','jours')+' · '+views+'+ '+_t2('مشاهدة','vues');
     document.getElementById('ad-campaign-name').value='';
     document.getElementById('ad-video-name').value='';
-    document.getElementById('ad-video-file').value='';
-    document.getElementById('ad-video-name-display').textContent=_t2('اضغط لاختيار الفيديو (MP4، MOV، AVI)','Cliquez pour choisir la vidéo (MP4, MOV, AVI)');
+    var vf=document.getElementById('ad-video-file');
+    if(vf){ vf.value=''; vf.disabled=true; }
+    document.getElementById('ad-video-name-display').textContent=_t2('قريباً','Bientôt');
     document.getElementById('ad-video-preview').style.display='none';
     document.getElementById('ad-video-preview').innerHTML='';
     document.getElementById('ad-modal').style.display='flex';
@@ -2367,32 +2368,16 @@ function saveMyPayment(){
 
   document.addEventListener('DOMContentLoaded',function(){
     var vf=document.getElementById('ad-video-file');
-    if(vf) vf.addEventListener('change',function(){
-      var f=this.files[0]; if(!f) return;
-      document.getElementById('ad-video-name').value=f.name;
-      document.getElementById('ad-video-name-display').textContent='✅ '+f.name;
-      var prev=document.getElementById('ad-video-preview');
-      if(f.type.startsWith('video/')){
-        var url=URL.createObjectURL(f);
-        prev.innerHTML='<video src="'+url+'" controls style="width:100%;border-radius:8px;max-height:180px;margin-top:10px"></video>';
-        prev.style.display='block';
-      }
-    });
+    if(vf){
+      vf.disabled=true;
+      vf.value='';
+    }
   });
 
   function submitAdCampaign(){
     var name=document.getElementById('ad-campaign-name').value.trim();
-    var file=document.getElementById('ad-video-name').value.trim();
-    var pkgId=document.getElementById('ad-pkg-id').value;
-    var pkgName=document.getElementById('ad-pkg-label').textContent;
     if(!name){alert(_t2('أدخل اسم الحملة','Veuillez saisir le nom de la campagne'));return;}
-    if(!file){alert(_t2('ارفع ملف الفيديو الإعلاني','Veuillez téléverser le fichier vidéo publicitaire'));return;}
-    var campaigns=getMyCampaigns();
-    campaigns.unshift({id:'c'+Date.now(),name:name,file:file,pkg:pkgName,pkgId:pkgId,status:'reviewing',date:new Date().toLocaleDateString('ar-SA-u-nu-latn')});
-    saveMyCampaigns(campaigns);
-    closeAdModal();
-    renderAds();
-    alert(_t2('✅ تم إرسال حملتك! سيتواصل معك فريق رزق خلال 24 ساعة لتأكيد الدفع.','✅ Votre campagne a été envoyée ! L\'équipe Rizq vous contactera dans les 24 heures pour confirmer le paiement.'));
+    alert(_t2('رفع الفيديو قريباً','Téléversement vidéo bientôt disponible'));
   }
 
 

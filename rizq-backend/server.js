@@ -1227,6 +1227,11 @@ app.get('/api/site-config', (req, res) => {
     currency: raw.currency || undefined,
     quotaConfig: raw.quotaConfig || undefined,
     quotaTopups: raw.quotaTopups || undefined,
+    uploadLimits: (() => {
+      try {
+        return require('./services/uploadLimits').getUploadLimitsConfig(raw);
+      } catch (e) { return undefined; }
+    })(),
     // طرق الدفع للعامة بلا أرقام/رموز حساسة — الرمز الكامل عبر /api/pay-methods
     bankCodes: Array.isArray(raw.bankCodes)
       ? raw.bankCodes.map((b) => ({
@@ -1401,6 +1406,13 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     };
   }
 
+  // ب3 — حدود الرفع حسب نوع الحساب
+  if (body.uploadLimits && typeof body.uploadLimits === 'object') {
+    const { getUploadLimitsConfig } = require('./services/uploadLimits');
+    const merged = Object.assign({}, current.uploadLimits || {}, body.uploadLimits);
+    next.uploadLimits = getUploadLimitsConfig({ uploadLimits: merged });
+  }
+
   if (body.quotaTopups && typeof body.quotaTopups === 'object') {
     const existingT = (current.quotaTopups && typeof current.quotaTopups === 'object') ? current.quotaTopups : {};
     next.quotaTopups = {
@@ -1572,6 +1584,8 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     });
     next.moduleFlags = existingFlags;
   }
+
+  // launchDate/freeDays — سوبر أدمن فقط عبر POST /api/admin/launch-config
 
   if (body.sectionRules && typeof body.sectionRules === 'object') {
     // ── محرك القواعد المشترك (طلب Limam 03/08/2026): بدل وكيل منفصل لكل
@@ -2935,6 +2949,190 @@ app.patch('/api/admin/agents-ops', requireAdminPermission('ai-manager'), (req, r
   }
 });
 
+const MAX_LAUNCH_AUDIT = 80;
+
+function appendLaunchAudit(cfg, entry) {
+  const list = Array.isArray(cfg.launchAudit) ? cfg.launchAudit.slice() : [];
+  list.unshift(entry);
+  cfg.launchAudit = list.slice(0, MAX_LAUNCH_AUDIT);
+}
+
+/**
+ * GET /api/admin/launch-config — إعدادات الإطلاق + سجل التدقيق (سوبر أدمن)
+ * POST /api/admin/launch-config — حفظ launchDate + freeDays مع تدقيق وتأكيد الماضي
+ */
+app.get('/api/admin/launch-config', requireSuperAdmin, (req, res) => {
+  try {
+    const cfg = repos.getSiteConfig() || {};
+    const launch = launchMode.publicLaunchConfig(getModuleFlags());
+    res.json({
+      ok: true,
+      launch,
+      stored: {
+        launchDate: cfg.launchDate || '',
+        freeDays: cfg.freeDays != null ? cfg.freeDays : launchMode.DEFAULT_FREE_DAYS,
+      },
+      audit: Array.isArray(cfg.launchAudit) ? cfg.launchAudit.slice(0, 40) : [],
+    });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+/** GET /api/admin/ops-reports — تقارير العمليات الأسبوعية (ب4) */
+app.get('/api/admin/ops-reports', requireSuperAdmin, (req, res) => {
+  try {
+    const ops = require('./services/opsHousekeeping');
+    const limit = Math.max(1, Math.min(40, Number(req.query.limit) || 12));
+    res.json({ ok: true, reports: ops.listWeeklyReports(limit) });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+/** POST /api/admin/ops-housekeeping — تشغيل يدوي للصيانة (ب1–ب4) */
+app.post('/api/admin/ops-housekeeping', requireSuperAdmin, async (req, res) => {
+  try {
+    const ops = require('./services/opsHousekeeping');
+    const body = req.body || {};
+    const out = await ops.runOpsHousekeepingPass({
+      readAds,
+      writeAds,
+      readAccounts,
+      writeAccounts,
+      getAccountRecord,
+      adsUploadsDir: ADS_UPLOADS_DIR,
+      dataDir: DATA_DIR,
+      trigger: body.trigger || 'manual',
+      forceWeekly: body.forceWeekly === true,
+      nowMs: body.nowMs ? Number(body.nowMs) : Date.now(),
+    });
+    res.json({ ok: true, result: out });
+  } catch (err) {
+    console.error('[ops-housekeeping]', err);
+    res.status(500).json({ ok: false, error: err.message || 'فشل التشغيل' });
+  }
+});
+
+/** GET /api/account/:accountId/notifications — إشعارات الحساب (ب1) */
+app.get('/api/account/:accountId/notifications', (req, res) => {
+  const accountId = String(req.params.accountId || '').slice(0, 60);
+  const token = extractAccountToken(req) || '';
+  if (!accountId || !verifyAccountOwner(accountId, token)) {
+    return res.status(401).json({ ok: false, error: 'unauthorized' });
+  }
+  try {
+    const ops = require('./services/opsHousekeeping');
+    const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 50));
+    res.json({ ok: true, notifications: ops.listAccountNotifications(accountId, limit) });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+/** POST /api/account/:accountId/notifications/:id/read */
+app.post('/api/account/:accountId/notifications/:id/read', (req, res) => {
+  const accountId = String(req.params.accountId || '').slice(0, 60);
+  const noteId = String(req.params.id || '').slice(0, 80);
+  const token = extractAccountToken(req) || '';
+  if (!accountId || !verifyAccountOwner(accountId, token)) {
+    return res.status(401).json({ ok: false, error: 'unauthorized' });
+  }
+  try {
+    const note = repos.accountNotifications.get(noteId);
+    if (!note || String(note.accountId) !== accountId) {
+      return res.status(404).json({ ok: false, error: 'not_found' });
+    }
+    note.read = true;
+    note.readAt = new Date().toISOString();
+    repos.accountNotifications.upsert(noteId, note);
+    res.json({ ok: true, notification: note });
+  } catch (err) {
+    res.status(500).json({ ok: false, error: err.message });
+  }
+});
+
+app.post('/api/admin/launch-config', requireSuperAdmin, (req, res) => {
+  try {
+    const body = req.body || {};
+    const current = repos.getSiteConfig() || {};
+    const prevDate = launchMode.parseYmd(current.launchDate) || '';
+    const prevDays = launchMode.normalizeFreeDays(
+      current.freeDays != null && current.freeDays !== '' ? current.freeDays : launchMode.DEFAULT_FREE_DAYS
+    );
+    const prevUntil = prevDate
+      ? launchMode.addDaysYmd(prevDate, prevDays)
+      : (launchMode.getLaunchFreeUntil() || '');
+
+    let nextDate = prevDate;
+    if (Object.prototype.hasOwnProperty.call(body, 'launchDate')) {
+      const raw = body.launchDate;
+      if (raw === null || raw === '') nextDate = '';
+      else {
+        const parsed = launchMode.parseYmd(raw);
+        if (!parsed) {
+          return res.status(400).json({ ok: false, error: 'invalid_launch_date', message: 'تاريخ الإطلاق غير صالح' });
+        }
+        nextDate = parsed;
+      }
+    }
+
+    let nextDays = prevDays;
+    if (Object.prototype.hasOwnProperty.call(body, 'freeDays')) {
+      const n = Number(body.freeDays);
+      if (!Number.isFinite(n) || n < 0 || n > 3650) {
+        return res.status(400).json({ ok: false, error: 'invalid_free_days', message: 'عدد الأيام يجب أن يكون بين 0 و 3650' });
+      }
+      nextDays = Math.round(n);
+    }
+
+    const nextUntil = nextDate ? launchMode.addDaysYmd(nextDate, nextDays) : null;
+    const endMs = nextUntil ? launchMode.freeUntilEndMs(nextUntil) : null;
+    const inPast = !!(endMs != null && endMs < Date.now());
+    if (inPast && body.confirmPast !== true) {
+      return res.status(409).json({
+        ok: false,
+        error: 'needs_confirm_past',
+        message: 'تاريخ نهاية الفترة في الماضي — أكّد الحفظ صراحةً',
+        freeUntil: nextUntil,
+      });
+    }
+
+    const next = Object.assign({}, current, {
+      launchDate: nextDate,
+      freeDays: nextDays,
+    });
+    // أزل الحقل اليدوي القديم إن وُجد
+    if (Object.prototype.hasOwnProperty.call(next, 'launchFreeUntil')) {
+      delete next.launchFreeUntil;
+    }
+
+    const adminUser = req.adminUser || {};
+    const by = String(adminUser.user || adminUser.name || adminUser.email || 'super').slice(0, 120);
+    const byId = String(adminUser.id || '').slice(0, 80);
+    appendLaunchAudit(next, {
+      at: new Date().toISOString(),
+      by,
+      byId,
+      old: { launchDate: prevDate || null, freeDays: prevDays, freeUntil: prevUntil || null },
+      new: { launchDate: nextDate || null, freeDays: nextDays, freeUntil: nextUntil || null },
+      confirmPast: inPast === true,
+    });
+
+    repos.saveSiteConfig(next);
+    const launch = launchMode.publicLaunchConfig(getModuleFlags());
+    res.json({
+      ok: true,
+      launch,
+      stored: { launchDate: nextDate || '', freeDays: nextDays },
+      audit: Array.isArray(next.launchAudit) ? next.launchAudit.slice(0, 40) : [],
+    });
+  } catch (err) {
+    console.error('[launch-config] save', err);
+    res.status(500).json({ ok: false, error: err.message || 'فشل الحفظ' });
+  }
+});
+
 /** GET/PUT خزنة أسرار السوبر أدمن — لا تُرجع قيم المفاتيح كاملة */
 app.get('/api/admin/secrets-vault', requireSuperAdmin, (req, res) => {
   try {
@@ -4169,6 +4367,7 @@ startMaintenanceScheduler({
   readAds,
   writeAds,
   readAccounts,
+  writeAccounts,
   getAccountRecord,
   adsUploadsDir: ADS_UPLOADS_DIR,
   dataDir: DATA_DIR,

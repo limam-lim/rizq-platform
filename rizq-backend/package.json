@@ -10,6 +10,8 @@
     "backup": "node scripts/run-backup.js",
     "test:backup": "node scripts/test-backup-restore.js",
     "test:lifecycle": "node scripts/test-ad-lifecycle.js",
+    "test:ops": "node scripts/test-ops-housekeeping.js",
+    "test:prefix": "node scripts/test-delete-prefix-isolation.js",
     "test:images": "node scripts/test-image-pipeline.js",
     "test:widget-lang": "node scripts/test-widget-lang.js",
     "telegram:poll": "node scripts/telegram-polling-dev.js",

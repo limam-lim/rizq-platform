@@ -1,21 +1,20 @@
 #!/usr/bin/env node
-/** Tests: ad lifecycle archive/purge + paid 60d grace exemption */
+/** Tests: A1 protectedUntil + dry-run + purge via objectStorage */
 const fs = require('fs');
 const path = require('path');
 const {
   MS_DAY,
-  ACTIVE_LIFECYCLE_MS,
-  ARCHIVE_RETENTION_MS,
-  PAID_GRACE_MS,
   isPaidParticipant,
   isUnderPaidGrace,
   runAdLifecycleMaintenance,
   readAuditLog,
+  purgeAdMedia,
 } = require('../services/adLifecycle');
+const launchMode = require('../config/launchMode');
+const objectStorage = require('../lib/objectStorage');
 
 const ROOT = path.join(__dirname, '..');
 const TMP_DATA = path.join(ROOT, 'data', '__lifecycle_test__');
-const TMP_UPLOADS = path.join(ROOT, 'uploads', 'ads', '__lifecycle_test__');
 
 function ok(name, pass, detail) {
   console.log((pass ? '✅' : '❌') + ' ' + name + (detail ? ' — ' + detail : ''));
@@ -32,7 +31,6 @@ function writeJson(file, data) {
 
 function setupFixture(ads, accounts, pkgStore) {
   fs.mkdirSync(TMP_DATA, { recursive: true });
-  fs.mkdirSync(TMP_UPLOADS, { recursive: true });
   writeJson(path.join(TMP_DATA, 'ads.json'), ads);
   writeJson(path.join(TMP_DATA, 'accounts.json'), accounts);
   writeJson(path.join(TMP_DATA, 'account-packages.json'), pkgStore || {});
@@ -62,9 +60,10 @@ function touchMedia(adId) {
 
 function cleanup() {
   try { fs.rmSync(TMP_DATA, { recursive: true, force: true }); } catch (e) { /* ignore */ }
-  for (const id of ['AD_OLD', 'AD_ARCH', 'AD_PAID', 'AD_PURGE']) {
+  for (const id of ['AD_OLD', 'AD_PURGE', 'AD_STORE_FREE', 'AD_ESTATE_FREE', 'AD_DRY', 'AD_PURGE2', 'AD_OFFICE']) {
     try { fs.rmSync(path.join(ROOT, 'uploads', 'ads', id), { recursive: true, force: true }); } catch (e) { /* ignore */ }
   }
+  launchMode.setLaunchSettingsForTests(undefined);
 }
 
 async function run() {
@@ -76,68 +75,89 @@ async function run() {
     if (ok(name, pass, detail)) passed++;
   }
 
-  const now = Date.parse('2026-08-13T03:00:00.000Z');
+  const now = Date.parse('2026-10-25T12:00:00.000Z');
 
-  // Paid detection
+  check('store is paid type', isPaidParticipant({ type: 'store' }, null));
+  check('estate is paid type', isPaidParticipant({ type: 'estate' }, null));
+  check('individual not paid type', !isPaidParticipant({ type: 'individual' }, null));
+
+  // With launchDate set — freeUntil+60 protects store/estate/office without periodEnd
+  launchMode.setLaunchSettingsForTests({ launchDate: '2026-10-01', freeDays: 90 });
+  check('store protected via freeUntil+60', isUnderPaidGrace(now, { type: 'store' }, null));
+  check('estate protected via freeUntil+60', isUnderPaidGrace(now, { type: 'estate' }, { periodEnd: null }));
+  check('office protected via freeUntil+60 (no Infinity)', isUnderPaidGrace(now, { type: 'office' }, null));
+
+  const periodEnd = '2026-11-01T00:00:00.000Z';
   check(
-    'store account is paid participant',
-    isPaidParticipant({ id: 's1', type: 'store' }, null)
+    'periodEnd+60 still protects',
+    isUnderPaidGrace(now, { type: 'store' }, { periodEnd })
   );
   check(
-    'diamond package is paid participant',
-    isPaidParticipant(null, { pkgName: 'باقة ماسية', price: 3500 })
-  );
-  check(
-    'free individual is not paid',
-    !isPaidParticipant({ id: 'i1', type: 'individual' }, null)
+    'periodEnd+60 expired after grace',
+    !isUnderPaidGrace(
+      Date.parse(periodEnd) + 61 * MS_DAY,
+      { type: 'store' },
+      { periodEnd }
+    )
   );
 
-  // Grace: subscription ended 10 days ago → still protected (60d grace)
-  const graceEnd = now - 10 * MS_DAY + PAID_GRACE_MS;
-  check(
-    'paid grace blocks archive within 60d after periodEnd',
-    isUnderPaidGrace(now, { type: 'store' }, { periodEnd: isoDaysAgo(10, now) })
-  );
-  check(
-    'paid grace expired after 60d past periodEnd',
-    !isUnderPaidGrace(now, { type: 'store' }, { periodEnd: isoDaysAgo(61, now) })
-  );
-
-  // Archive: active ad 31 days old
+  // Dry-run when launchDate empty
+  launchMode.setLaunchSettingsForTests({ launchDate: '', freeDays: 90, freeUntil: null });
+  process.env.RIZQ_LAUNCH_FREE_UNTIL = '';
   setupFixture(
-    [{ id: 'AD_OLD', status: 'active', title: 'old', createdAt: isoDaysAgo(31, now) }],
+    [{ id: 'AD_DRY', status: 'active', title: 'dry', createdAt: isoDaysAgo(45, now) }],
+    [],
+    {}
+  );
+  const rDry = runAdLifecycleMaintenance(makeDeps(now));
+  const afterDry = makeDeps(now).readAds()[0];
+  check('dry-run does not archive', rDry.dryRun === true && afterDry.status === 'active' && rDry.wouldArchive >= 1, 'would=' + rDry.wouldArchive);
+  check('dry-run archived count 0', rDry.archived === 0);
+
+  // Real archive when launchDate set and unprotected individual
+  launchMode.setLaunchSettingsForTests({ launchDate: '2026-10-01', freeDays: 90 });
+  setupFixture(
+    [{ id: 'AD_OLD', status: 'active', title: 'old', createdAt: isoDaysAgo(45, now) }],
     [],
     {}
   );
   const r1 = runAdLifecycleMaintenance(makeDeps(now));
-  const adsAfterArchive = makeDeps(now).readAds();
-  check('archives active ad after 30 days', r1.archived === 1 && adsAfterArchive[0].status === 'archived', 'status=' + adsAfterArchive[0].status);
+  check('archives unprotected ad', r1.archived === 1 && makeDeps(now).readAds()[0].status === 'archived');
 
-  // Skip young ad
+  // Store during free+grace skipped
   setupFixture(
-    [{ id: 'AD_YOUNG', status: 'active', title: 'new', createdAt: isoDaysAgo(5, now) }],
-    [],
+    [{ id: 'AD_STORE_FREE', accountId: 's1', status: 'active', title: 's', createdAt: isoDaysAgo(45, now) }],
+    [{ id: 's1', type: 'store' }],
     {}
   );
   const r2 = runAdLifecycleMaintenance(makeDeps(now));
-  check('keeps young active ad', r2.archived === 0 && makeDeps(now).readAds()[0].status === 'active');
+  check('skips store under freeUntil+60', r2.skippedPaidGrace >= 1 && makeDeps(now).readAds()[0].status === 'active');
 
-  // Paid grace skip
+  // Estate same
   setupFixture(
-    [{ id: 'AD_PAID', accountId: 'acc_store_1', status: 'active', title: 'paid', createdAt: isoDaysAgo(45, now) }],
-    [{ id: 'acc_store_1', type: 'store', status: 'approved' }],
-    {}
+    [{ id: 'AD_ESTATE_FREE', accountId: 'e1', status: 'active', title: 'e', createdAt: isoDaysAgo(45, now) }],
+    [{ id: 'e1', type: 'estate' }],
+    { e1: { periodEnd: null } }
   );
   const r3 = runAdLifecycleMaintenance(makeDeps(now));
-  check('skips paid store ad under grace', r3.skippedPaidGrace >= 1 && makeDeps(now).readAds()[0].status === 'active');
+  check('skips estate under freeUntil+60', r3.skippedPaidGrace >= 1 && makeDeps(now).readAds()[0].status === 'active');
 
-  // Purge archived media after 30d
+  // After freeUntil+60 — store archives
+  const afterGrace = launchMode.freeUntilEndMs(launchMode.getLaunchFreeUntil()) + 61 * MS_DAY;
+  setupFixture(
+    [{ id: 'AD_STORE_FREE', accountId: 's2', status: 'active', title: 'late', createdAt: isoDaysAgo(45, afterGrace) }],
+    [{ id: 's2', type: 'store' }],
+    {}
+  );
+  const r4 = runAdLifecycleMaintenance(makeDeps(afterGrace));
+  check('archives store after freeUntil+60', r4.archived === 1 && makeDeps(afterGrace).readAds()[0].status === 'archived');
+
+  // Purge via objectStorage
   touchMedia('AD_PURGE');
   setupFixture(
     [{
       id: 'AD_PURGE',
       status: 'archived',
-      title: 'purge me',
       createdAt: isoDaysAgo(70, now),
       archivedAt: isoDaysAgo(31, now),
       images: ['/uploads/ads/AD_PURGE/0.webp'],
@@ -145,14 +165,16 @@ async function run() {
     [],
     {}
   );
-  const r4 = runAdLifecycleMaintenance(makeDeps(now));
+  const r5 = runAdLifecycleMaintenance(makeDeps(now));
   const purged = makeDeps(now).readAds()[0];
-  const mediaGone = !fs.existsSync(path.join(ROOT, 'uploads', 'ads', 'AD_PURGE'));
-  check('purges media after 30d archive', r4.mediaPurged === 1 && purged.status === 'removed' && purged.images.length === 0, 'mediaGone=' + mediaGone);
+  check('purges media via objectStorage', r5.mediaPurged === 1 && purged.status === 'removed' && !fs.existsSync(path.join(ROOT, 'uploads', 'ads', 'AD_PURGE')));
+  check('deletePrefix available', typeof objectStorage.deletePrefixSync === 'function');
 
-  // Audit log written
+  touchMedia('AD_PURGE2');
+  check('purgeAdMedia works', purgeAdMedia('AD_PURGE2') > 0);
+
   const audit = readAuditLog(TMP_DATA);
-  check('writes maintenance audit log', audit.length >= 1 && audit[0].trigger === 'test', 'entries=' + audit.length);
+  check('audit has test runs', Array.isArray(audit) && audit.some((e) => e && e.trigger === 'test'));
 
   cleanup();
   console.log('\n' + passed + '/' + total + ' checks passed\n');

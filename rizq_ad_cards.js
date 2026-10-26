@@ -75,6 +75,48 @@
     }).slice(0, 8);
   }
 
+  /** نُسخ الصورة من رابط medium المخزَّن (…/N.webp) */
+  function imageVariants(mediumUrl) {
+    var url = String(mediumUrl || '');
+    if (!url) return { thumb: '', medium: '', full: '' };
+    if (!/\.webp$/i.test(url) || /\.(thumb|full)\.webp$/i.test(url)) {
+      return { thumb: url, medium: url, full: url };
+    }
+    return {
+      thumb: url.replace(/\.webp$/i, '.thumb.webp'),
+      medium: url,
+      full: url.replace(/\.webp$/i, '.full.webp')
+    };
+  }
+
+  function openImageZoom(fullUrl, alt) {
+    if (!fullUrl || typeof document === 'undefined') return;
+    var existing = document.getElementById('rzq-adx-zoom');
+    if (existing) existing.remove();
+    var overlay = document.createElement('div');
+    overlay.id = 'rzq-adx-zoom';
+    overlay.className = 'rzq-adx-zoom';
+    overlay.setAttribute('role', 'dialog');
+    overlay.setAttribute('aria-modal', 'true');
+    overlay.innerHTML =
+      '<button type="button" class="rzq-adx-zoom-close" aria-label="×">×</button>' +
+      '<img class="rzq-adx-zoom-img" src="' + esc(fullUrl) + '" alt="' + esc(alt || '') + '"/>';
+    function close() {
+      try { overlay.remove(); } catch (e) { /* ignore */ }
+      document.removeEventListener('keydown', onKey);
+    }
+    function onKey(ev) {
+      if (ev.key === 'Escape') close();
+    }
+    overlay.addEventListener('click', function (ev) {
+      if (ev.target === overlay || (ev.target && ev.target.classList && ev.target.classList.contains('rzq-adx-zoom-close'))) {
+        close();
+      }
+    });
+    document.addEventListener('keydown', onKey);
+    document.body.appendChild(overlay);
+  }
+
   function contactPhone(ad) {
     if (!ad) return '';
     return (ad.phone || (ad.sellerContact && (ad.sellerContact.phone || ad.sellerContact.tel)) || '') + '';
@@ -287,7 +329,13 @@
     var slides = '';
     if (imgs.length) {
       slides = imgs.map(function (src) {
-        return '<div class="rzq-adx-slide"><img src="' + esc(src) + '" alt="' + esc(title) + '" loading="lazy" decoding="async"/></div>';
+        var v = imageVariants(src);
+        var srcset = esc(v.thumb) + ' 400w, ' + esc(v.medium) + ' 900w, ' + esc(v.full) + ' 1920w';
+        return '<div class="rzq-adx-slide">'
+          + '<img src="' + esc(v.medium) + '" srcset="' + srcset + '" sizes="(max-width:600px) 400px, 900px"'
+          + ' data-full="' + esc(v.full) + '" alt="' + esc(title) + '"'
+          + ' loading="lazy" decoding="async" class="rzq-adx-zoomable"/>'
+          + '</div>';
       }).join('');
     } else {
       slides = '<div class="rzq-adx-slide" style="background:' + esc(bg) + '"><span class="rzq-adx-emoji" aria-hidden="true">' + esc(emoji) + '</span></div>';
@@ -388,6 +436,14 @@
         toggleFav(fav.getAttribute('data-ad-id'), fav);
       });
     }
+
+    media.addEventListener('click', function (e) {
+      var t = e.target;
+      if (!t || !t.classList || !t.classList.contains('rzq-adx-zoomable')) return;
+      e.preventDefault();
+      e.stopPropagation();
+      openImageZoom(t.getAttribute('data-full') || t.getAttribute('src') || '', t.getAttribute('alt') || '');
+    });
 
     var x0 = null;
     media.addEventListener('touchstart', function (e) {
@@ -555,6 +611,8 @@
   var api = {
     esc: esc,
     imagesOf: imagesOf,
+    imageVariants: imageVariants,
+    openImageZoom: openImageZoom,
     mediaHtml: mediaHtml,
     actionsHtml: actionsHtml,
     brandSlotHtml: brandSlotHtml,

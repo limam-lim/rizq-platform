@@ -354,7 +354,7 @@ main, .page-content.active, .main-content, .results-area,
 <div id="login-screen">
   <button type="button" class="btn-lang btn-lang-primary" id="login-lang-btn" style="position:absolute;top:18px;left:18px;z-index:10000" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
   <div class="login-box">
-    <div class="login-logo"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
+    <div class="login-logo"><img class="logo-mark-img" src="rizq-mark.svg" width="42" height="42" alt="رزق"/></div>
     <div class="login-title" data-t="login-title">لوحة إدارة رزق</div>
     <div class="login-sub">ADMINIA SARL — Powered by M. LIMAM</div>
     <input class="login-input" type="text" id="login-user" data-ph="login-user-ph" placeholder="اسم المستخدم أو البريد الإلكتروني" autocomplete="username"/>
@@ -371,7 +371,7 @@ main, .page-content.active, .main-content, .results-area,
 <!-- ══ SIDEBAR ══ -->
 <aside class="sidebar" id="sidebar">
   <div class="sb-logo" onclick="showPanel('overview', document.querySelector('.sb-item'))" style="cursor:pointer">
-    <div class="sb-logo-mark"><img class="logo-mark-img" src="rizq-mark-512.png" width="42" height="42" alt="رزق"/></div>
+    <div class="sb-logo-mark"><img class="logo-mark-img" src="rizq-mark.svg" width="42" height="42" alt="رزق"/></div>
     <div class="sb-logo-text">
       <div class="sb-logo-ar">رزق | Admin</div>
       <div class="sb-logo-en">ADMINIA SARL</div>
@@ -1102,6 +1102,27 @@ main, .page-content.active, .main-content, .results-area,
           <div id="modules-toggle-list"></div>
           <div style="margin-top:14px;font-size:11.5px;color:var(--text-muted)">
             💾 كل تبديل يُحفَظ فوراً على الخادم — لا حاجة لزر حفظ منفصل.
+          </div>
+
+          <div style="margin-top:22px;padding-top:18px;border-top:1px solid var(--border,#e5e7eb)" id="launch-free-panel" data-admin-perm-super="1">
+            <div style="font-size:13.5px;font-weight:800;color:var(--navy,#1B3A6B);margin-bottom:6px">🎁 الفترة المجانية للإطلاق</div>
+            <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.65">
+              سوبر أدمن فقط. أدخل <b>تاريخ الإطلاق</b> وعدد الأيام المجانية (افتراضي 90). نهاية الفترة تُحسب تلقائياً: launchDate + freeDays. بلا تاريخ إطلاق تبقى الصيانة في وضع مراقبة فقط (لا أرشفة ولا حذف).
+            </p>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+              <div style="flex:1;min-width:160px">
+                <label for="launch-date" style="font-size:11px;font-weight:700;color:#1B3A6B;display:block;margin-bottom:4px">تاريخ الإطلاق</label>
+                <input type="date" id="launch-date" class="form-input" dir="ltr" style="width:100%;font-family:monospace;font-size:13px" oninput="previewLaunchFreeUntil()"/>
+              </div>
+              <div style="width:120px">
+                <label for="launch-free-days" style="font-size:11px;font-weight:700;color:#1B3A6B;display:block;margin-bottom:4px">الأيام المجانية</label>
+                <input type="number" id="launch-free-days" class="form-input" dir="ltr" min="0" max="3650" value="90" style="width:100%;font-family:monospace;font-size:13px" oninput="previewLaunchFreeUntil()"/>
+              </div>
+              <button type="button" id="btn-save-launch" onclick="saveLaunchConfig()" style="background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border:none;padding:10px 16px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer">حفظ</button>
+              <button type="button" id="btn-clear-launch" onclick="clearLaunchConfig()" style="background:#f1f5f9;color:#1B3A6B;border:1px solid #dbe3f0;padding:10px 14px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">مسح تاريخ الإطلاق</button>
+            </div>
+            <div id="launch-free-until-status" style="margin-top:10px;font-size:12px;color:var(--text-muted)"></div>
+            <div id="launch-audit-list" style="margin-top:12px;font-size:11.5px;color:#64748b;line-height:1.7"></div>
           </div>
         </div>
       </div>
@@ -4097,6 +4118,177 @@ var MODULE_DEFS = [
   {key:'videoAds',   icon:'🎬', name:'فيديوهات Rizq ADS', name_fr:'Vidéos Rizq ADS', desc:'شراء مساحات الفيديو الإعلاني', desc_fr:'Achat d\'espaces vidéo publicitaires'},
 ];
 var _moduleFlagsCache = null;
+var _launchConfigCache = { launchDate: '', freeDays: 90, freeUntil: null, freePeriodActive: false, maintenanceDryRun: true };
+
+function _addDaysYmd(ymd, days){
+  if(!ymd || !/^\d{4}-\d{2}-\d{2}$/.test(ymd)) return null;
+  var d = new Date(ymd + 'T00:00:00.000Z');
+  if (Number.isNaN(d.getTime())) return null;
+  d.setUTCDate(d.getUTCDate() + (Number(days) || 0));
+  return d.toISOString().slice(0, 10);
+}
+
+function previewLaunchFreeUntil(){
+  var dateEl = document.getElementById('launch-date');
+  var daysEl = document.getElementById('launch-free-days');
+  var date = (dateEl && dateEl.value) || '';
+  var days = daysEl ? Number(daysEl.value) : 90;
+  if (!Number.isFinite(days) || days < 0) days = 90;
+  var until = date ? _addDaysYmd(date, days) : null;
+  renderLaunchConfigStatus({
+    launchDate: date || null,
+    freeDays: days,
+    freeUntil: until,
+    freePeriodActive: !!(until && Date.now() <= new Date(until + 'T23:59:59.999Z').getTime()),
+    maintenanceDryRun: !date,
+    daysRemaining: until ? Math.max(0, Math.ceil((new Date(until + 'T23:59:59.999Z').getTime() - Date.now()) / 86400000)) : null
+  });
+}
+
+function renderLaunchConfigStatus(launch){
+  launch = launch || {};
+  var el = document.getElementById('launch-free-until-status');
+  if (!el) return;
+  var until = launch.freeUntil || null;
+  var dry = launch.maintenanceDryRun !== false && !launch.launchDate;
+  if (!launch.launchDate) {
+    el.innerHTML = RizqI18n.t2(
+      '⚠️ لا يوجد تاريخ إطلاق — الصيانة في وضع مراقبة فقط (لا أرشفة/حذف).' + (until ? (' احتياطي البيئة/الحساب: حتى ' + until) : ''),
+      '⚠️ Pas de date de lancement — maintenance en lecture seule.' + (until ? (' Secours: jusqu\'au ' + until) : '')
+    );
+    el.style.color = '#9a3412';
+    return;
+  }
+  var daysTxt = (launch.daysRemaining != null)
+    ? RizqI18n.t2(' · متبقّي '+launch.daysRemaining+' يوماً',' · reste '+launch.daysRemaining+' j')
+    : '';
+  el.innerHTML = launch.freePeriodActive
+    ? RizqI18n.t2('✅ نشطة حتى <b dir="ltr">'+until+'</b> (= إطلاق '+launch.launchDate+' + '+launch.freeDays+' يوماً)'+daysTxt,
+      '✅ Active jusqu\'au <b dir="ltr">'+until+'</b> (= lancement '+launch.launchDate+' + '+launch.freeDays+' j)'+daysTxt)
+    : RizqI18n.t2('⏱ محسوبة حتى <b dir="ltr">'+until+'</b> — الفترة منتهية.',
+      '⏱ Calculée jusqu\'au <b dir="ltr">'+until+'</b> — période terminée.');
+  el.style.color = launch.freePeriodActive ? '#166534' : '#9a3412';
+  void dry;
+}
+
+function renderLaunchAudit(list){
+  var el = document.getElementById('launch-audit-list');
+  if (!el) return;
+  if (!list || !list.length) { el.innerHTML = ''; return; }
+  el.innerHTML = '<div style="font-weight:700;color:#1B3A6B;margin-bottom:4px">'+RizqI18n.t2('سجل التعديلات','Journal des modifications')+'</div>'
+    + list.slice(0, 8).map(function(a){
+      var o = (a.old && a.old.freeUntil) || '—';
+      var n = (a.new && a.new.freeUntil) || '—';
+      return '<div dir="ltr" style="text-align:right">'+escAdmin(a.at||'')+' · '+escAdmin(a.by||'')+' · '+escAdmin(String(o))+' → '+escAdmin(String(n))+'</div>';
+    }).join('');
+}
+
+function applyLaunchConfigResponse(data){
+  if (!data) return;
+  var launch = data.launch || {};
+  var stored = data.stored || {};
+  var dateEl = document.getElementById('launch-date');
+  var daysEl = document.getElementById('launch-free-days');
+  if (dateEl) dateEl.value = stored.launchDate || launch.launchDate || '';
+  if (daysEl) daysEl.value = (stored.freeDays != null ? stored.freeDays : (launch.freeDays != null ? launch.freeDays : 90));
+  _launchConfigCache = {
+    launchDate: stored.launchDate || launch.launchDate || '',
+    freeDays: stored.freeDays != null ? stored.freeDays : 90,
+    freeUntil: launch.freeUntil || null,
+    freePeriodActive: !!launch.freePeriodActive,
+    maintenanceDryRun: !!launch.maintenanceDryRun,
+    daysRemaining: launch.daysRemaining
+  };
+  renderLaunchConfigStatus(Object.assign({}, launch, { launchDate: _launchConfigCache.launchDate, freeDays: _launchConfigCache.freeDays }));
+  renderLaunchAudit(data.audit || []);
+}
+
+function saveLaunchConfig(confirmPast){
+  var dateEl = document.getElementById('launch-date');
+  var daysEl = document.getElementById('launch-free-days');
+  var launchDate = (dateEl && dateEl.value) || '';
+  var freeDays = daysEl ? Number(daysEl.value) : 90;
+  if (!Number.isFinite(freeDays) || freeDays < 0) freeDays = 90;
+  var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!c.backendUrl){
+    showToast(RizqI18n.t2('❌ لا يوجد اتصال بالخادم — تعذّر الحفظ','❌ Pas de connexion au serveur — échec de l\'enregistrement'));
+    return;
+  }
+  var body = { launchDate: launchDate, freeDays: freeDays };
+  if (confirmPast) body.confirmPast = true;
+  fetch(c.backendUrl.replace(/\/$/,'') + '/api/admin/launch-config', {
+    method: 'POST',
+    headers: _adminAuthHeaders({ 'Content-Type':'application/json' }),
+    body: JSON.stringify(body)
+  }).then(function(res){ return res.json().then(function(j){ return { status: res.status, body: j }; }); })
+    .then(function(r){
+      if (r.status === 409 && r.body && r.body.error === 'needs_confirm_past') {
+        var ok = window.confirm(RizqI18n.t2(
+          'تاريخ نهاية الفترة ('+(r.body.freeUntil||'')+') في الماضي. هل تؤكد الحفظ؟',
+          'La fin de période ('+(r.body.freeUntil||'')+') est dans le passé. Confirmer ?'
+        ));
+        if (ok) return saveLaunchConfig(true);
+        return;
+      }
+      if (r.status === 403) {
+        showToast(RizqI18n.t2('❌ للسوبر أدمن فقط','❌ Réservé au Super Admin'));
+        return;
+      }
+      if (!r.body || !r.body.ok) {
+        showToast(RizqI18n.t2('❌ فشل الحفظ، حاول مجدداً','❌ Échec de l\'enregistrement, réessayez'));
+        return;
+      }
+      applyLaunchConfigResponse(r.body);
+      showToast(RizqI18n.t2('✅ تم حفظ إعدادات الفترة المجانية','✅ Paramètres de période gratuite enregistrés'));
+    }).catch(function(){
+      showToast(RizqI18n.t2('❌ فشل الاتصال بالخادم','❌ Échec de connexion au serveur'));
+    });
+}
+
+function clearLaunchConfig(){
+  var dateEl = document.getElementById('launch-date');
+  if (dateEl) dateEl.value = '';
+  previewLaunchFreeUntil();
+  var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!c.backendUrl){
+    showToast(RizqI18n.t2('❌ لا يوجد اتصال بالخادم — تعذّر الحفظ','❌ Pas de connexion au serveur — échec de l\'enregistrement'));
+    return;
+  }
+  fetch(c.backendUrl.replace(/\/$/,'') + '/api/admin/launch-config', {
+    method: 'POST',
+    headers: _adminAuthHeaders({ 'Content-Type':'application/json' }),
+    body: JSON.stringify({ launchDate: '' })
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(data){
+      if(!data || !data.ok){
+        showToast(RizqI18n.t2('❌ فشل الحفظ — سوبر أدمن فقط؟','❌ Échec — Super Admin uniquement ?'));
+        return;
+      }
+      applyLaunchConfigResponse(data);
+      showToast(RizqI18n.t2('⏹ تم مسح تاريخ الإطلاق — الصيانة مراقبة فقط','⏹ Date effacée — maintenance en lecture seule'));
+    }).catch(function(){
+      showToast(RizqI18n.t2('❌ فشل الاتصال بالخادم','❌ Échec de connexion au serveur'));
+    });
+}
+
+function loadLaunchConfigPanel(){
+  var panel = document.getElementById('launch-free-panel');
+  var perms = (currentAdmin && currentAdmin.permissions) || [];
+  var isSuper = perms.includes('*') || (currentAdmin && currentAdmin.role === 'super');
+  if (panel) panel.style.display = isSuper ? '' : 'none';
+  if (!isSuper) return;
+  var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!c.backendUrl){
+    previewLaunchFreeUntil();
+    return;
+  }
+  fetch(c.backendUrl.replace(/\/$/,'') + '/api/admin/launch-config', { headers: _adminAuthHeaders() })
+    .then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(data){
+      if (data && data.ok) applyLaunchConfigResponse(data);
+      else previewLaunchFreeUntil();
+    }).catch(function(){ previewLaunchFreeUntil(); });
+}
 
 function renderModulesToggleList(flags){
   var list = document.getElementById('modules-toggle-list');
@@ -4117,6 +4309,7 @@ function loadModulesPanel(){
   var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
   if(!c.backendUrl){
     renderModulesToggleList(_moduleFlagsCache || {individual:true,store:true,office:false,corp:false,tenders:false,investments:true,videoAds:false});
+    loadLaunchConfigPanel();
     return;
   }
   fetch(c.backendUrl.replace(/\/$/,'') + '/api/site-config')
@@ -4127,8 +4320,10 @@ function loadModulesPanel(){
         : {individual:true,store:true,office:false,corp:false,tenders:false,investments:true,videoAds:false};
       _moduleFlagsCache = flags;
       renderModulesToggleList(flags);
+      loadLaunchConfigPanel();
     }).catch(function(){
       renderModulesToggleList(_moduleFlagsCache || {individual:true,store:true,office:false,corp:false,tenders:false,investments:true,videoAds:false});
+      loadLaunchConfigPanel();
     });
 }
 

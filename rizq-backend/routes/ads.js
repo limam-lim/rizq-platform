@@ -124,13 +124,19 @@ function mountAdsRoutes(app, deps) {
   /**
    * POST /api/ads/submit
    * عام — صاحب معرض/محل يرسل طلب نشر فيديو إعلاني عبر Rizq ADS.
-   * ⚠️ لا يُرفع ملف الفيديو نفسه هنا (لا توجد بنية تخزين فيديو حقيقية بعد —
-   * تحتاج CDN/S3 حسب خطة rizq_backend_plan.html) — فقط بيانات الطلب +
-   * معلومات تواصل، ليتواصل فريق رزق فعلياً ويستلم الفيديو وينشره يدوياً.
-   * لا وعد بنشر تلقائي فوري لأنه غير موجود فعلاً.
+   * رفع ملف الفيديو من المستخدم معطّل مؤقتاً (أ4 — قريباً / مسار HLS لاحقاً).
    */
   app.post('/api/ads/submit', adsSubmitLimiter, (req, res) => {
     const b = req.body || {};
+    if (b.hasVideoFile || b.videoFileName || b.videoData || b.videoBase64) {
+      return res.status(403).json({
+        ok: false,
+        error: 'VIDEO_UPLOAD_DISABLED',
+        code: 'VIDEO_UPLOAD_DISABLED',
+        message: 'رفع الفيديو قريباً',
+        message_fr: 'Téléversement vidéo bientôt disponible',
+      });
+    }
     if (!b.title || !b.phone) return res.status(400).json({ error: 'العنوان ورقم التواصل مطلوبان' });
     const requests = typeof readAdsRequests === 'function' ? readAdsRequests() : [];
     const id = 'ADREQ-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
@@ -140,8 +146,8 @@ function mountAdsRoutes(app, deps) {
       category: String(b.category || '').slice(0, 80),
       phone: String(b.phone).slice(0, 20),
       pkg: String(b.pkg || 'basic').slice(0, 20),
-      hasVideoFile: !!b.hasVideoFile,
-      videoFileName: String(b.videoFileName || '').slice(0, 200),
+      hasVideoFile: false,
+      videoFileName: '',
       status: 'pending_contact',
       createdAt: new Date().toISOString(),
     });
@@ -206,7 +212,12 @@ function mountAdsRoutes(app, deps) {
     const list = readAds();
     let id = (typeof b.id === 'string' && /^RZQ-\d{4}-\d{4,6}$/.test(b.id)) ? b.id : genAdId();
     while (list.some((a) => a.id === id)) id = genAdId(); // تفادي تصادم نادر في المعرّف
-    const images = await saveAdImages(id, b.images);
+    const paidAcc = !!(acc && ['store', 'office', 'corp', 'estate'].includes(acc.type));
+    const images = await saveAdImages(id, b.images, {
+      paid: paidAcc,
+      maxCount: (ent.limits && ent.limits.maxPhotosPerItem) || 8,
+      maxImageBytes: ent.limits && ent.limits.maxImageBytes,
+    });
     const rec = {
       id,
       title: String(b.title).slice(0, 200),
@@ -388,7 +399,28 @@ function mountAdsRoutes(app, deps) {
     if (Object.prototype.hasOwnProperty.call(b, 'hidePhone')) ad.hidePhone = !!b.hidePhone;
     if (Object.prototype.hasOwnProperty.call(b, 'negotiable')) ad.negotiable = !!b.negotiable;
     if (Object.prototype.hasOwnProperty.call(b, 'urgent')) ad.urgent = !!b.urgent;
-    if (Array.isArray(b.images)) ad.images = await saveAdImages(ad.id, b.images);
+    if (Array.isArray(b.images)) {
+      const ownerAcc = ad.accountId
+        ? (readAccounts().find((a) => a.id === ad.accountId) || null)
+        : null;
+      const paidAcc = !!(ownerAcc && ['store', 'office', 'corp', 'estate'].includes(ownerAcc.type));
+      const entUp = ad.accountId
+        ? getEntitlements(ad.accountId, ownerAcc ? ownerAcc.type : 'individual')
+        : null;
+      if (entUp && b.images.length) {
+        try { assertPhotoCount(entUp, b.images.length); }
+        catch (gateErr) {
+          return res.status(gateErr.status || 403).json({
+            ok: false, error: gateErr.message, code: gateErr.code, details: gateErr.details,
+          });
+        }
+      }
+      ad.images = await saveAdImages(ad.id, b.images, {
+        paid: paidAcc,
+        maxCount: (entUp && entUp.limits && entUp.limits.maxPhotosPerItem) || 8,
+        maxImageBytes: entUp && entUp.limits && entUp.limits.maxImageBytes,
+      });
+    }
     // إصلاح ثغرة أمنية (2026-08-04): كان صاحب الإعلان (isOwner) قادراً على
     // تعيين status إلى 'active' مباشرة (نشر بلا مراجعة) أو حتى إعادته إلى
     // 'active' بعد رفضه من الأدمن — نفس قرار المراجعة (POST

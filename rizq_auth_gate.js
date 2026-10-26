@@ -420,7 +420,7 @@
       '      <button class="rag-back" id="rag-nav-back-btn" type="button"></button>',
       '      <button class="rag-close" id="rag-close-btn" type="button" aria-label="إغلاق">✕</button>',
       '    </div>',
-      '    <div class="rag-brand"><div class="rag-brand-mark"><img src="rizq-mark-512.png" width="48" height="48" alt="رزق"/></div><div class="rag-brand-name">رزق | Rizq</div></div>',
+      '    <div class="rag-brand"><div class="rag-brand-mark"><img src="rizq-mark.svg" width="48" height="48" alt="رزق"/></div><div class="rag-brand-name">رزق | Rizq</div></div>',
       '    <div class="rag-progress" id="rag-progress" aria-hidden="false">',
       '      <div class="rag-progress-steps">',
       '        <div class="rag-pstep active" id="rag-pstep-1"><div class="rag-pstep-circle">1</div><div class="rag-pstep-label" id="rag-pstep-1-label">البيانات</div></div>',

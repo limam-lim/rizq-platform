@@ -1,17 +1,24 @@
 /**
  * Ad Lifecycle — 30d active → archive → 30d archive → purge media
- * Paid participants (diamond / store|office|corp / video): 60d grace after subscription end.
+ *
+ * protectedUntil لحظي من launchMode (site-config):
+ *   PAID store|office|corp|estate:
+ *     periodEnd محدد ⇒ periodEnd + 60d
+ *     غير ذلك ⇒ freeUntil + 60d
+ *   لا Infinity ولا حساب من «الآن».
+ *
+ * launchDate فارغ ⇒ dry-run: يسجّل فقط ولا يؤرشف/يحذف.
  */
-const fs = require('fs');
-const path = require('path');
+const launchMode = require('../config/launchMode');
+const objectStorage = require('../lib/objectStorage');
 const repos = require('../db/repos');
 
 const MS_DAY = 24 * 60 * 60 * 1000;
 const ACTIVE_LIFECYCLE_MS = 30 * MS_DAY;
 const ARCHIVE_RETENTION_MS = 30 * MS_DAY;
-const PAID_GRACE_MS = 60 * MS_DAY;
+const PAID_GRACE_MS = launchMode.PAID_GRACE_DAYS * MS_DAY;
 
-const PAID_ACCOUNT_TYPES = new Set(['store', 'office', 'corp']);
+const PAID_ACCOUNT_TYPES = launchMode.PAID_ACCOUNT_TYPES;
 const DIAMOND_PKG_RE = /(ماسية|diamond)/i;
 const VIDEO_ADS_PKG_RE = /(video|فيديو|rizq\s*ads|إعلان.*فيديو)/i;
 
@@ -27,28 +34,12 @@ function isPaidParticipant(account, pkgRecord) {
   return false;
 }
 
-/** Last instant before lifecycle may archive/delete (paid grace). null = not protected. */
-function getPaidGraceDeadlineMs(account, pkgRecord) {
-  if (!isPaidParticipant(account, pkgRecord)) return null;
-  if (account && PAID_ACCOUNT_TYPES.has(account.type) && !pkgRecord) {
-    return Infinity;
-  }
-  if (pkgRecord && pkgRecord.periodEnd) {
-    const endMs = new Date(pkgRecord.periodEnd).getTime();
-    if (!Number.isNaN(endMs)) return endMs + PAID_GRACE_MS;
-  }
-  if (pkgRecord && pkgRecord.suspendedAt) {
-    const suspMs = new Date(pkgRecord.suspendedAt).getTime();
-    if (!Number.isNaN(suspMs)) return suspMs + PAID_GRACE_MS;
-  }
-  return Date.now() + PAID_GRACE_MS;
+function getPaidGraceDeadlineMs(account, pkgRecord, nowMs) {
+  return launchMode.getProtectedUntilMs(account, pkgRecord, nowMs);
 }
 
 function isUnderPaidGrace(nowMs, account, pkgRecord) {
-  const deadline = getPaidGraceDeadlineMs(account, pkgRecord);
-  if (deadline === null) return false;
-  if (deadline === Infinity) return true;
-  return nowMs < deadline;
+  return launchMode.isUnderProtection(nowMs, account, pkgRecord);
 }
 
 function adActiveSinceMs(ad) {
@@ -63,29 +54,15 @@ function adArchivedSinceMs(ad) {
   return new Date(raw).getTime();
 }
 
-function dirSizeBytes(dirPath) {
-  if (!fs.existsSync(dirPath)) return 0;
-  let total = 0;
-  for (const name of fs.readdirSync(dirPath)) {
-    const fp = path.join(dirPath, name);
-    try {
-      const st = fs.statSync(fp);
-      if (st.isFile()) total += st.size;
-    } catch (e) { /* ignore */ }
+function purgeAdMedia(adId, _uploadsDir) {
+  const safeId = String(adId || '').replace(/[^a-zA-Z0-9_-]/g, '');
+  if (!safeId) return 0;
+  // شرطة نهائية إلزامية — ads/12/ لا يمس ads/120
+  const result = objectStorage.deletePrefixSync('ads/' + safeId + '/');
+  if (!result.ok && !result.skipped) {
+    throw new Error('purge_failed:' + safeId + ':' + (result.error || 'unknown'));
   }
-  return total;
-}
-
-function purgeAdMedia(adId, uploadsDir) {
-  const dir = path.join(uploadsDir, adId);
-  const bytesBefore = dirSizeBytes(dir);
-  if (!fs.existsSync(dir)) return 0;
-  try {
-    fs.rmSync(dir, { recursive: true, force: true });
-  } catch (e) {
-    throw new Error('purge_failed:' + adId + ':' + e.message);
-  }
-  return bytesBefore;
+  return Number(result.bytesFreed) || 0;
 }
 
 function readAuditLog(_dataDir) {
@@ -99,7 +76,7 @@ function appendAuditEntry(_dataDir, entry) {
   const all = repos.maintenanceAudit.list();
   if (all.length > MAX_AUDIT_ENTRIES) {
     all
-      .sort((a, b) => String(b.at || b.createdAt || '').localeCompare(String(a.at || a.createdAt || '')))
+      .sort((a, b) => String(b.at || b.createdAt || b.runAt || '').localeCompare(String(a.at || a.createdAt || a.runAt || '')))
       .slice(MAX_AUDIT_ENTRIES)
       .forEach((e) => repos.maintenanceAudit.remove(String(e.id)));
   }
@@ -107,15 +84,6 @@ function appendAuditEntry(_dataDir, entry) {
 
 /**
  * Run one maintenance pass.
- * @param {object} deps
- * @param {function} deps.readAds
- * @param {function} deps.writeAds
- * @param {function} deps.readAccounts
- * @param {function} deps.getAccountRecord — (accountId) => pkg record|null
- * @param {string} deps.adsUploadsDir
- * @param {string} deps.dataDir
- * @param {number} [deps.nowMs]
- * @param {string} [deps.trigger]
  */
 function runAdLifecycleMaintenance(deps) {
   const {
@@ -129,6 +97,9 @@ function runAdLifecycleMaintenance(deps) {
     trigger = 'manual',
   } = deps;
 
+  const settings = launchMode.getLaunchSettings();
+  const dryRun = settings.maintenanceDryRun === true;
+
   const accounts = readAccounts();
   const accountById = {};
   accounts.forEach((a) => { accountById[a.id] = a; });
@@ -137,10 +108,18 @@ function runAdLifecycleMaintenance(deps) {
   let changed = false;
   const summary = {
     runAt: new Date(nowMs).toISOString(),
+    at: new Date(nowMs).toISOString(),
     trigger,
+    dryRun,
+    launchDate: settings.launchDate || null,
+    freeDays: settings.freeDays,
+    freeUntil: settings.freeUntil || null,
+    freePeriodActive: launchMode.isLaunchFreePeriodActive(nowMs),
     archived: 0,
     mediaPurged: 0,
     bytesFreed: 0,
+    wouldArchive: 0,
+    wouldPurge: 0,
     skippedPaidGrace: 0,
     errors: [],
   };
@@ -161,12 +140,16 @@ function runAdLifecycleMaintenance(deps) {
       const since = adActiveSinceMs(ad);
       if (Number.isNaN(since)) continue;
       if (nowMs - since >= ACTIVE_LIFECYCLE_MS) {
-        ad.status = 'archived';
-        ad.archivedAt = new Date(nowMs).toISOString();
-        ad.updatedAt = ad.archivedAt;
-        list[i] = ad;
-        changed = true;
-        summary.archived++;
+        if (dryRun) {
+          summary.wouldArchive++;
+        } else {
+          ad.status = 'archived';
+          ad.archivedAt = new Date(nowMs).toISOString();
+          ad.updatedAt = ad.archivedAt;
+          list[i] = ad;
+          changed = true;
+          summary.archived++;
+        }
       }
       continue;
     }
@@ -178,29 +161,35 @@ function runAdLifecycleMaintenance(deps) {
       }
       const since = adArchivedSinceMs(ad);
       if (Number.isNaN(since)) {
-        ad.archivedAt = ad.archivedAt || new Date(nowMs).toISOString();
-        list[i] = ad;
-        changed = true;
+        if (!dryRun) {
+          ad.archivedAt = ad.archivedAt || new Date(nowMs).toISOString();
+          list[i] = ad;
+          changed = true;
+        }
         continue;
       }
       if (nowMs - since >= ARCHIVE_RETENTION_MS) {
-        try {
-          summary.bytesFreed += purgeAdMedia(ad.id, adsUploadsDir);
-          ad.images = [];
-          ad.status = 'removed';
-          ad.mediaPurgedAt = new Date(nowMs).toISOString();
-          ad.updatedAt = ad.mediaPurgedAt;
-          list[i] = ad;
-          changed = true;
-          summary.mediaPurged++;
-        } catch (e) {
-          summary.errors.push({ adId: ad.id, phase: 'purge', message: e.message });
+        if (dryRun) {
+          summary.wouldPurge++;
+        } else {
+          try {
+            summary.bytesFreed += purgeAdMedia(ad.id, adsUploadsDir);
+            ad.images = [];
+            ad.status = 'removed';
+            ad.mediaPurgedAt = new Date(nowMs).toISOString();
+            ad.updatedAt = ad.mediaPurgedAt;
+            list[i] = ad;
+            changed = true;
+            summary.mediaPurged++;
+          } catch (e) {
+            summary.errors.push({ adId: ad.id, phase: 'purge', message: e.message });
+          }
         }
       }
     }
   }
 
-  if (changed) writeAds(list);
+  if (changed && !dryRun) writeAds(list);
   appendAuditEntry(dataDir, summary);
   return summary;
 }
@@ -210,6 +199,7 @@ module.exports = {
   ACTIVE_LIFECYCLE_MS,
   ARCHIVE_RETENTION_MS,
   PAID_GRACE_MS,
+  PAID_ACCOUNT_TYPES,
   isPaidParticipant,
   getPaidGraceDeadlineMs,
   isUnderPaidGrace,

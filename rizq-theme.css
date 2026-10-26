@@ -334,7 +334,7 @@ html .sb-logo-sub {
   height: 42px !important;
   min-width: 42px !important;
   min-height: 42px !important;
-  background: #0f172a url('rizq-mark-512.png') center / contain no-repeat !important;
+  background: #0f172a url('rizq-mark.svg') center / contain no-repeat !important;
   border: none !important;
   border-radius: 10px !important;
   box-shadow: 0 0 0 1px rgba(201,168,76,.28) !important;
@@ -370,7 +370,7 @@ html .sb-logo-sub {
   width: 26px;
   height: 26px;
   border-radius: 6px;
-  background: #0f172a url('rizq-mark-512.png') center / contain no-repeat;
+  background: #0f172a url('rizq-mark.svg') center / contain no-repeat;
 }
 div[style*="width:38px"][style*="border:2px"],
 .logo-mark[style*="border:2px"] {

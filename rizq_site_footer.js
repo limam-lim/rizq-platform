@@ -93,7 +93,7 @@
       + '  <div class="footer-grid">'
       + '    <div>'
       + '      <a href="rizq_landing_v8.html" class="logo" style="margin-bottom:14px;display:inline-flex;gap:10px;direction:ltr;align-items:center;height:42px">'
-      + '        <img class="logo-mark-img" src="rizq-mark-512.png?v=9.6" width="42" height="42" alt="رزق"/>'
+      + '        <img class="logo-mark-img" src="rizq-mark.svg?v=24.0" width="42" height="42" alt="رزق"/>'
       + '        <div class="logo-text"><span class="logo-ar">رزق</span><span class="logo-sub">RIZQ PLATFORM</span></div>'
       + '      </a>'
       + '      <p class="footer-desc" data-t="ft-desc">سوق موريتانيا الإلكتروني للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات.</p>'

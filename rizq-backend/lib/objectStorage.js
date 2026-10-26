@@ -123,6 +123,81 @@ async function deleteObject(keyOrUrl) {
   }
 }
 
+function dirSizeBytes(dirPath) {
+  if (!fs.existsSync(dirPath)) return 0;
+  let total = 0;
+  const stack = [dirPath];
+  while (stack.length) {
+    const dir = stack.pop();
+    let names;
+    try { names = fs.readdirSync(dir); } catch (e) { continue; }
+    for (let i = 0; i < names.length; i++) {
+      const fp = path.join(dir, names[i]);
+      try {
+        const st = fs.statSync(fp);
+        if (st.isDirectory()) stack.push(fp);
+        else if (st.isFile()) total += st.size;
+      } catch (e) { /* ignore */ }
+    }
+  }
+  return total;
+}
+
+/**
+ * حدود بادئة المجلد — يمنع ads/12 من مطابقة ads/120 أو ads/123.
+ * يُرجع مفتاح المجلد بلا شرطة نهائية + الشكل المحدود بشرطة.
+ */
+function boundDirectoryPrefix(prefixKey) {
+  const key = normalizeKey(prefixKey).replace(/\/+$/, '');
+  if (!key) return { ok: false, error: 'empty_prefix' };
+  return { ok: true, dirKey: key, boundedKey: key + '/' };
+}
+
+/**
+ * حذف مجلد/بادئة كاملة (وسائط إعلان وغيره) — المسار الوحيد المسموح لحذف المجلدات.
+ * المسار يُعامل كدليل مغلق بشرطة: ads/12/ لا يمس ads/120.
+ * @param {string} prefixKey مثلاً ads/12 أو ads/12/
+ * @returns {{ ok: boolean, bytesFreed: number, skipped?: boolean, reason?: string, error?: string, boundedKey?: string }}
+ */
+function deletePrefixSync(prefixKey) {
+  const bound = boundDirectoryPrefix(prefixKey);
+  if (!bound.ok) return { ok: false, bytesFreed: 0, error: bound.error };
+  const { dirKey, boundedKey } = bound;
+  if (DRIVER === 's3') {
+    return { ok: true, bytesFreed: 0, skipped: true, reason: 's3_delete_prefix_not_wired', boundedKey };
+  }
+  try {
+    const abs = localAbsPath(dirKey);
+    const root = path.resolve(LOCAL_ROOT) + path.sep;
+    const absDir = path.resolve(abs);
+    // يجب أن يكون المسار دليلاً تحت uploads وليس بادئة نصية لجارٍ
+    if (!absDir.startsWith(root) && absDir !== path.resolve(LOCAL_ROOT)) {
+      return { ok: false, bytesFreed: 0, error: 'storage_path_escape', boundedKey };
+    }
+    if (!fs.existsSync(absDir)) return { ok: true, bytesFreed: 0, boundedKey };
+    const st = fs.statSync(absDir);
+    if (!st.isDirectory()) {
+      // لا نحذف ملفاً مفرداً عبر deletePrefix — الأمان للمجلدات فقط
+      return { ok: false, bytesFreed: 0, error: 'not_a_directory', boundedKey };
+    }
+    // تأكيد أن اسم المجلد يطابق المفتاح بالضبط (عزل 12 عن 120)
+    const baseName = path.basename(absDir);
+    const expectedBase = path.basename(dirKey);
+    if (baseName !== expectedBase) {
+      return { ok: false, bytesFreed: 0, error: 'prefix_mismatch', boundedKey };
+    }
+    const bytesFreed = dirSizeBytes(absDir);
+    fs.rmSync(absDir, { recursive: true, force: true });
+    return { ok: true, bytesFreed, boundedKey };
+  } catch (e) {
+    return { ok: false, bytesFreed: 0, error: e.message, boundedKey };
+  }
+}
+
+async function deletePrefix(prefixKey) {
+  return deletePrefixSync(prefixKey);
+}
+
 function ensureLocalDir(relativeDir) {
   const abs = path.join(LOCAL_ROOT, normalizeKey(relativeDir));
   if (!fs.existsSync(abs)) fs.mkdirSync(abs, { recursive: true });
@@ -132,6 +207,9 @@ function ensureLocalDir(relativeDir) {
 module.exports = {
   putObject,
   deleteObject,
+  deletePrefix,
+  deletePrefixSync,
+  boundDirectoryPrefix,
   resolveLocalPath,
   publicUrlForKey,
   normalizeKey,
