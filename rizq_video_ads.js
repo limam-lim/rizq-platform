@@ -979,6 +979,15 @@
           heroArea = Math.max(0, Math.min(hr.bottom, hvh) - Math.max(hr.top, 0))
             * Math.max(0, Math.min(hr.right, hvw) - Math.max(hr.left, 0));
         }
+        // ثبات: أبقِ الفيديو الحالي إن بقي ظاهراً ≥40% ولم يتفوّق عليه آخر بوضوح
+        if (_stripPlaying && ratios.has(_stripPlaying)) {
+          var curR = ratios.get(_stripPlaying) || 0;
+          if (curR >= 0.4 && (!bestCard || curR >= bestR - 0.08)) {
+            bestCard = _stripPlaying;
+            bestR = curR;
+          }
+        }
+
         // البطل يفوز فقط إن كانت نسبة ظهوره أعلى (أو مساوية بمساحة أكبر)
         if (heroRatio >= 0.5 && (heroRatio > bestR || (heroRatio === bestR && heroArea >= bestArea))) {
           cards.forEach(function (c) { stopStripVideo(c); });
