@@ -1413,19 +1413,29 @@ body > .rizq-help-dd-menu a,
     max-width:100%!important;
     margin:0!important;
     /* هامش جانبي متساوٍ يمين/يسار — لا يلاصق «سوق العقارات» الحافة */
-    padding:4px 12px calc(4px + max(env(safe-area-inset-bottom,0px),20px))!important;
-    border-radius:14px 14px 0 0!important;
-    border-left:0!important;
-    border-right:0!important;
-    border-bottom:0!important;
+    padding:6px 6px calc(8px + max(env(safe-area-inset-bottom,0px),20px))!important;
+    /* مستقيم من فوق — بلا تقوّس يُظهر بياض الصفحة خلف الزوايا */
+    border-radius:0!important;
+    border:0!important;
     background:#070e1a!important;
-    box-shadow:0 -8px 24px rgba(0,0,0,.35)!important;
+    box-shadow:0 -1px 0 rgba(201,168,76,.22)!important;
     justify-content:space-between!important;
     gap:0!important;
-    overflow-x:hidden!important;
+    overflow:hidden!important;
     isolation:isolate;
     -webkit-backdrop-filter:none!important;
     backdrop-filter:none!important;
+  }
+  /* غطاء يسد أي فراغ/خط أبيض فوق الحافة العلوية */
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top)::before,
+  nav.rmh-nav:not(.rmh-nav-top)::before{
+    content:""!important;
+    position:absolute!important;
+    left:-2px!important;right:-2px!important;top:-6px!important;
+    height:10px!important;
+    background:#070e1a!important;
+    pointer-events:none!important;
+    z-index:0!important;
   }
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top)::after,
   nav.rmh-nav:not(.rmh-nav-top)::after{
@@ -1460,38 +1470,49 @@ body > .rizq-help-dd-menu a,
     white-space:nowrap!important;
     text-align:center;
   }
-  /* الشريط السفلي: خط أصغر حتى لا تتقارب العناوين الطويلة */
+  /* الشريط السفلي: خط أصغر + مساحة للأحرف السفلية بلا قص */
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a,
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > .rmh-more-btn,
   nav.rmh-nav:not(.rmh-nav-top) > a,
   nav.rmh-nav:not(.rmh-nav-top) > .rmh-more-btn{
-    flex:1 1 auto!important;
-    min-width:min-content!important;
+    flex:1 1 0!important;
+    min-width:0!important;
     max-width:none!important;
-    padding:clamp(4px,1.1vw,8px) 2px!important;
-    font-size:clamp(9px,2.2vw,10px)!important;
+    padding:2px 1px 7px!important;
+    font-size:7.5px!important;
+    line-height:1.2!important;
     white-space:nowrap!important;
     text-align:center;
+    overflow:visible!important;
+    /* خط التحديد تحت النص بدون أكل ارتفاع الحروف */
+    border-bottom:0!important;
+    box-shadow:none!important;
   }
-  /* المعارض والمصانع + العناوين الطويلة — سطر واحد بخط أصغر */
-  #rizq-mock-hdr .rmh-nav a[data-rmh="showrooms"],
-  .rmh-nav a[data-rmh="showrooms"]{
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a.is-active,
+  nav.rmh-nav:not(.rmh-nav-top) > a.is-active{
+    box-shadow:inset 0 -2px 0 var(--rmh-gold, #C9A84C)!important;
+  }
+  /* المعارض والمصانع — أصغر حتى يظهر النص كاملاً بلا قص */
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="showrooms"],
+  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="showrooms"]{
     white-space:nowrap!important;
     text-align:center;
-    font-size:clamp(7.5px,1.85vw,9px)!important;
+    font-size:6.5px!important;
+    letter-spacing:-.06em;
+    overflow:visible!important;
+  }
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="estate"],
+  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="estate"],
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="investments"],
+  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="investments"],
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="post"],
+  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="post"],
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a.rmh-post-nav,
+  nav.rmh-nav:not(.rmh-nav-top) > a.rmh-post-nav{
+    white-space:nowrap!important;
+    text-align:center;
+    font-size:7px!important;
     letter-spacing:-.04em;
-  }
-  #rizq-mock-hdr .rmh-nav a[data-rmh="estate"],
-  .rmh-nav a[data-rmh="estate"],
-  #rizq-mock-hdr .rmh-nav a[data-rmh="investments"],
-  .rmh-nav a[data-rmh="investments"],
-  #rizq-mock-hdr .rmh-nav a[data-rmh="post"],
-  .rmh-nav a[data-rmh="post"],
-  #rizq-mock-hdr .rmh-nav a.rmh-post-nav,
-  .rmh-nav a.rmh-post-nav{
-    white-space:nowrap!important;
-    text-align:center;
-    font-size:clamp(8px,1.95vw,9.5px)!important;
   }
   #rizq-mock-hdr .rmh-nav a .rmh-nav-ico,
   #rizq-mock-hdr .rmh-more-btn .rmh-nav-ico,
