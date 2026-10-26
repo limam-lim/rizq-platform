@@ -976,9 +976,9 @@ body > .rizq-help-dd-menu a,
     background-position:left 8px center;
     flex-shrink:0;
   }
-  .rmh-nav a.rmh-post-nav{min-width:68px;padding:8px 8px 10px;font-size:11px}
-  .rmh-nav a{min-width:68px;padding:8px 8px 10px;font-size:11px}
-  .rmh-nav a[data-rmh="showrooms"]{min-width:92px;font-size:10.5px}
+  .rmh-nav a.rmh-post-nav{min-width:0;padding:clamp(6px,0.9vw,10px) clamp(3px,0.55vw,8px);font-size:clamp(11px,1.25vw,12px)}
+  .rmh-nav a{min-width:0;padding:clamp(6px,0.9vw,10px) clamp(3px,0.55vw,8px);font-size:clamp(11px,1.25vw,12px)}
+  .rmh-nav a[data-rmh="showrooms"]{min-width:0;font-size:clamp(11px,1.15vw,12px)}
 }
 
 /*
@@ -1035,14 +1035,15 @@ body > .rizq-help-dd-menu a,
     width:38px!important;height:38px!important;
     min-width:38px!important;min-height:38px!important;
   }
-  /* أبواب الشريط — تتّسع كاملة دون قصّ الرئيسية/المزيد */
+  /* تابلت = كبسولة وسط مثل الكمبيوتر — أحجام clamp بلا سحق/قصّ */
   #rizq-mock-hdr nav.rmh-nav,
   nav.rmh-nav{
-    margin:6px 8px 10px!important;
-    padding:3px 4px!important;
-    max-width:calc(100% - 16px)!important;
-    gap:0!important;
-    justify-content:space-between!important;
+    width:max-content!important;
+    max-width:calc(100% - 24px)!important;
+    margin:6px auto 10px!important;
+    padding:4px clamp(4px,0.7vw,10px)!important;
+    gap:clamp(0px,0.25vw,2px)!important;
+    justify-content:center!important;
     overflow-x:hidden!important;
   }
   #rizq-mock-hdr .rmh-nav a,
@@ -1051,31 +1052,38 @@ body > .rizq-help-dd-menu a,
   .rmh-nav a,
   .rmh-nav a.rmh-post-nav,
   .rmh-more-btn{
-    flex:1 1 0!important;
+    flex:0 1 auto!important;
     min-width:0!important;
     max-width:none!important;
-    padding:6px 2px 8px!important;
-    font-size:10px!important;
+    min-height:40px!important;
+    padding:clamp(5px,0.75vw,9px) clamp(2px,0.45vw,7px)!important;
+    font-size:clamp(11px,1.2vw,12px)!important;
     gap:2px!important;
+    line-height:1.15!important;
   }
   #rizq-mock-hdr .rmh-nav a[data-rmh="showrooms"],
-  .rmh-nav a[data-rmh="showrooms"]{
-    font-size:9px!important;
+  .rmh-nav a[data-rmh="showrooms"],
+  #rizq-mock-hdr .rmh-nav a[data-rmh="estate"],
+  .rmh-nav a[data-rmh="estate"],
+  #rizq-mock-hdr .rmh-nav a[data-rmh="investments"],
+  .rmh-nav a[data-rmh="investments"]{
+    font-size:clamp(11px,1.1vw,11.5px)!important;
     white-space:normal!important;
-    line-height:1.15!important;
     text-align:center;
+    max-width:5.6em;
   }
   #rizq-mock-hdr .rmh-nav a .rmh-nav-ico,
   #rizq-mock-hdr .rmh-more-btn .rmh-nav-ico,
   .rmh-nav a .rmh-nav-ico,
   .rmh-more-btn .rmh-nav-ico{
-    width:18px!important;height:18px!important;
+    width:clamp(16px,1.8vw,20px)!important;
+    height:clamp(16px,1.8vw,20px)!important;
   }
   #rizq-mock-hdr .rmh-nav a .rmh-nav-ico svg,
   #rizq-mock-hdr .rmh-more-btn .rmh-nav-ico svg,
   .rmh-nav a .rmh-nav-ico svg,
   .rmh-more-btn .rmh-nav-ico svg{
-    width:18px!important;height:18px!important;
+    width:100%!important;height:100%!important;
   }
   /* كبسولة رزق + شارة السوق — أنزلها لتكون في رؤية واضحة تحت الهيدر */
   html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-content,
@@ -1240,15 +1248,15 @@ body > .rizq-help-dd-menu a,
     z-index:1!important;
     width:100%!important;max-width:100%!important;
     margin:0!important;
-    padding:2px 4px 4px!important;
+    padding:2px clamp(6px,1.6vw,10px) 4px!important;
     border-radius:0!important;
     border:0!important;
     border-top:1px solid rgba(201,168,76,.16)!important;
     background:rgba(8,18,34,.98)!important;
     box-shadow:none!important;
-    justify-content:space-around!important;
-    overflow-x:auto!important;
-    -webkit-overflow-scrolling:touch;
+    justify-content:space-between!important;
+    gap:0!important;
+    overflow-x:hidden!important;
   }
   /* ——— نصف الأقسام أسفل الشاشة (قرب الإبهام) ——— */
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top),
@@ -1263,14 +1271,16 @@ body > .rizq-help-dd-menu a,
     max-width:100%!important;
     margin:0!important;
     /* غطِّ أزرار نظام أندرويد خلف الشريط */
-    padding:6px 4px calc(6px + max(env(safe-area-inset-bottom,0px),20px))!important;
+    padding:4px clamp(6px,1.6vw,10px) calc(4px + max(env(safe-area-inset-bottom,0px),20px))!important;
     border-radius:14px 14px 0 0!important;
     border-left:0!important;
     border-right:0!important;
     border-bottom:0!important;
     background:#070e1a!important;
     box-shadow:0 -8px 24px rgba(0,0,0,.35)!important;
-    justify-content:space-around!important;
+    justify-content:space-between!important;
+    gap:0!important;
+    overflow-x:hidden!important;
     isolation:isolate;
     -webkit-backdrop-filter:none!important;
     backdrop-filter:none!important;
@@ -1290,12 +1300,50 @@ body > .rizq-help-dd-menu a,
     position:relative!important;
     z-index:1!important;
   }
-  .rmh-nav a.rmh-post-nav{min-width:52px;font-size:9.5px;padding:4px 4px 6px}
-  .rmh-nav a{min-width:52px;font-size:9.5px;padding:4px 4px 6px}
-  .rmh-nav a[data-rmh="showrooms"]{min-width:72px;font-size:8.5px}
-  .rmh-nav a .rmh-nav-ico{width:18px;height:18px}
-  .rmh-nav a .rmh-nav-ico svg{width:18px;height:18px}
-  .rmh-more-btn{min-width:52px;padding:4px 4px 6px;font-size:9.5px}
+  /* هاتف: كل العناصر داخل الكبسولة — clamp + لمس ≥40px + خط ≥11px بلا تمرير أفقي */
+  #rizq-mock-hdr .rmh-nav a,
+  #rizq-mock-hdr .rmh-nav a.rmh-post-nav,
+  #rizq-mock-hdr .rmh-more-btn,
+  .rmh-nav a,
+  .rmh-nav a.rmh-post-nav,
+  .rmh-more-btn{
+    flex:1 1 0!important;
+    min-width:0!important;
+    max-width:none!important;
+    min-height:40px!important;
+    padding:clamp(4px,1.1vw,8px) clamp(1px,0.6vw,4px)!important;
+    font-size:clamp(11px,2.85vw,12px)!important;
+    gap:2px!important;
+    line-height:1.12!important;
+    white-space:nowrap!important;
+  }
+  #rizq-mock-hdr .rmh-nav a[data-rmh="showrooms"],
+  .rmh-nav a[data-rmh="showrooms"],
+  #rizq-mock-hdr .rmh-nav a[data-rmh="estate"],
+  .rmh-nav a[data-rmh="estate"],
+  #rizq-mock-hdr .rmh-nav a[data-rmh="investments"],
+  .rmh-nav a[data-rmh="investments"],
+  #rizq-mock-hdr .rmh-nav a[data-rmh="post"],
+  .rmh-nav a[data-rmh="post"],
+  #rizq-mock-hdr .rmh-nav a.rmh-post-nav,
+  .rmh-nav a.rmh-post-nav{
+    white-space:normal!important;
+    text-align:center;
+    font-size:clamp(11px,2.55vw,11.5px)!important;
+  }
+  #rizq-mock-hdr .rmh-nav a .rmh-nav-ico,
+  #rizq-mock-hdr .rmh-more-btn .rmh-nav-ico,
+  .rmh-nav a .rmh-nav-ico,
+  .rmh-more-btn .rmh-nav-ico{
+    width:clamp(16px,4.4vw,20px)!important;
+    height:clamp(16px,4.4vw,20px)!important;
+  }
+  #rizq-mock-hdr .rmh-nav a .rmh-nav-ico svg,
+  #rizq-mock-hdr .rmh-more-btn .rmh-nav-ico svg,
+  .rmh-nav a .rmh-nav-ico svg,
+  .rmh-more-btn .rmh-nav-ico svg{
+    width:100%!important;height:100%!important;
+  }
   .rmh-cart-panel{
     width:min(220px,calc(100vw - 16px));
   }

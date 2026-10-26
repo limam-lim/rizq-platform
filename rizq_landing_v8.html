@@ -43,7 +43,7 @@
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.68"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.69"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — الشريط القديم متوقف نهائياً */
@@ -465,14 +465,14 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
 
 /* ── TICKER (شريط إعلانات متحرك تحت النافبار) ── */
 .ticker-wrap{width:100%;overflow:hidden;background:linear-gradient(90deg,var(--dark),var(--royal),var(--dark));border-top:1px solid rgba(201,168,76,.2);border-bottom:1px solid rgba(201,168,76,.2);padding:10px 0;position:fixed;top:var(--rizq-header-h,70px);left:0;right:0;z-index:9990;box-sizing:border-box}
-.rizq-free-countdown{
-  display:none;width:100%;box-sizing:border-box;z-index:9988;
-  padding:7px 14px;text-align:center;font-size:12.5px;font-weight:700;line-height:1.45;
-  color:#0f2347;background:linear-gradient(90deg,#F0D78A,#C9A84C 45%,#E8C96A);
-  border-bottom:1px solid rgba(15,35,71,.12);
+/* مخفي دائماً في الواجهة العامة — المنطق الخلفي (launchDate/freeDays) يبقى */
+.rizq-free-countdown,
+.rizq-free-countdown.is-on,
+#rizq-free-countdown,
+#rizq-launch-free-banner{
+  display:none!important;visibility:hidden!important;height:0!important;max-height:0!important;
+  overflow:hidden!important;padding:0!important;margin:0!important;border:0!important;
 }
-.rizq-free-countdown.is-on{display:block}
-.rizq-free-countdown[hidden]{display:none!important}
 .ticker-wrap.is-empty{display:none}
 html:has(#ticker-wrap:not(.is-empty)){--rizq-ticker-h:42px}
 /* شريط القفز الثانوي مُلغى — لا يعيد ضبط موضعه فوق التيكر */
@@ -5123,7 +5123,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_account_route.js?v=23.0"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
 <script src="rizq_ux_polish.js?v=23.1"></script>
-<script src="rizq_ad_cards.js?v=3.11"></script>
+<script src="rizq_ad_cards.js?v=3.12"></script>
 </head>
 <body class="rizq-mockup-hdr-trial">
 
@@ -15715,38 +15715,21 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 </script>
 
 <script>
-/* شريط العد التنازلي للفترة المجانية — نفس launch.freeUntil من /api/site-config */
+/* شريط الفترة المجانية — معطّل في الواجهة (الخلفية كما هي) */
 (function () {
-  function paint(launch) {
+  function hideFreeUi() {
     var el = document.getElementById('rizq-free-countdown');
     if (!el) return;
-    launch = launch || window.RIZQ_LAUNCH || {};
-    if (!launch.freePeriodActive || !launch.freeUntil) {
-      el.hidden = true;
-      el.classList.remove('is-on');
-      el.textContent = '';
-      return;
-    }
-    var days = launch.daysRemaining;
-    if (days == null) {
-      var end = Date.parse(launch.freeUntil + 'T23:59:59.999Z');
-      days = Number.isFinite(end) ? Math.max(0, Math.ceil((end - Date.now()) / 86400000)) : null;
-    }
-    var fr = document.documentElement.lang === 'fr' || (document.documentElement.dir === 'ltr');
-    el.hidden = false;
-    el.classList.add('is-on');
-    el.textContent = fr
-      ? ('Période de lancement gratuite — ' + (days != null ? days + ' j restants' : '') + ' (jusqu\'au ' + launch.freeUntil + ')')
-      : ('الفترة المجانية للإطلاق — متبقّي ' + (days != null ? days + ' يوماً' : '') + ' (حتى ' + launch.freeUntil + ')');
+    el.hidden = true;
+    el.classList.remove('is-on');
+    el.textContent = '';
+    el.setAttribute('aria-hidden', 'true');
   }
-  document.addEventListener('rizq:launch', function (ev) { paint(ev.detail); });
+  document.addEventListener('rizq:launch', hideFreeUi);
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', function () { paint(window.RIZQ_LAUNCH); });
+    document.addEventListener('DOMContentLoaded', hideFreeUi);
   } else {
-    paint(window.RIZQ_LAUNCH);
-  }
-  if (window.RizqApi && typeof window.RizqApi.siteConfig === 'function') {
-    window.RizqApi.siteConfig().then(function () { paint(window.RIZQ_LAUNCH); });
+    hideFreeUi();
   }
 })();
 </script>
@@ -15854,17 +15837,17 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
     var TYPE_CFG = {
       store: { page:'rizq_store.html',   icon:'🏪', badge:{ar:'محل',fr:'Boutique'},
         emptyTitle:{ar:'كن أول من يفتح محله هنا',fr:'Soyez le premier à ouvrir votre boutique ici'},
-        emptyDesc:{ar:'محلات رزق التجارية ستظهر هنا فور فتحها — سجّل الآن واستفد من الفترة المجانية.',fr:'Les boutiques Rizq apparaîtront ici dès leur ouverture — inscrivez-vous maintenant et profitez de la période gratuite.'},
+        emptyDesc:{ar:'محلات رزق التجارية ستظهر هنا فور فتحها — سجّل الآن وابدأ حضورك على المنصة.',fr:'Les boutiques Rizq apparaîtront ici dès leur ouverture — inscrivez-vous maintenant.'},
         emptyCta:{ar:'افتح محلك الآن',fr:'Ouvrez votre boutique maintenant'},
         bizType:'store' },
       office: { page:'rizq_office.html', icon:'🏢', badge:{ar:'مكتب',fr:'Bureau'},
         emptyTitle:{ar:'كن أول من يفتح مكتبه هنا',fr:'Soyez le premier à ouvrir votre bureau ici'},
-        emptyDesc:{ar:'المكاتب الافتراضية ستظهر هنا فور فتحها — سجّل الآن واستفد من الفترة المجانية.',fr:'Les bureaux virtuels apparaîtront ici dès leur ouverture — inscrivez-vous maintenant et profitez de la période gratuite.'},
+        emptyDesc:{ar:'المكاتب الافتراضية ستظهر هنا فور فتحها — سجّل الآن وابدأ حضورك على المنصة.',fr:'Les bureaux virtuels apparaîtront ici dès leur ouverture — inscrivez-vous maintenant.'},
         emptyCta:{ar:'أنشئ مكتبك الآن',fr:'Créez votre bureau maintenant'},
         bizType:'office' },
       corp: { page:'rizq_showroom.html', icon:'🏬', badge:{ar:'معرض',fr:'Showroom'},
         emptyTitle:{ar:'كن أول من يفتح معرضه هنا',fr:'Soyez le premier à ouvrir votre showroom ici'},
-        emptyDesc:{ar:'المعارض ستظهر هنا فور فتحها — سجّل الآن واستفد من الفترة المجانية.',fr:'Les showrooms apparaîtront ici dès leur ouverture — inscrivez-vous maintenant et profitez de la période gratuite.'},
+        emptyDesc:{ar:'المعارض ستظهر هنا فور فتحها — سجّل الآن وابدأ حضورك على المنصة.',fr:'Les showrooms apparaîtront ici dès leur ouverture — inscrivez-vous maintenant.'},
         emptyCta:{ar:'أنشئ معرضك الآن',fr:'Créez votre showroom maintenant'},
         bizType:'corp' },
       estate: { page:'rizq_estate.html', icon:'🏠', badge:{ar:'سوق العقارات',fr:'Marché immobilier'},
