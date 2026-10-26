@@ -73,7 +73,7 @@
       '<form class="rmh-search" id="rmh-search-form" action="rizq_browse.html" method="get" role="search">' +
       '<select class="rmh-search-cat" id="rmh-search-cat" name="cat" aria-label="كل الأقسام"><option value="">كل الأقسام</option></select>' +
       '<input class="rmh-search-input" id="rmh-search-q" type="search" name="q" autocomplete="off" ' +
-      'placeholder="ابحث عن سيارة، شقة، محل، مكتب..." data-ph-fr="Cherchez une voiture, un appartement, un magasin, un bureau..."/>' +
+      'placeholder="ابحث عن سيارة، شقة، محل، مكتب..." data-ph-fr="Cherchez une voiture, un appartement, un magasin, un bureau..." data-ph-fr-phone="Voiture, appart, boutiqu"/>' +
       '<button class="rmh-search-btn" type="submit" aria-label="بحث">' +
       '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>' +
       '</button></form>' +
@@ -483,12 +483,12 @@
     };
     var navFrPhoneShort = {
       stores: 'Boutiq.',
-      showrooms: 'Showr.',
+      showrooms: 'Showrooms',
       estate: 'Immo',
       offices: 'Bureaux',
       pulse: 'Pouls',
-      tenders: 'A. Offer',
-      investments: 'Inftism',
+      tenders: 'Offres',
+      investments: 'Investir',
       models: 'Modèles'
     };
     var phoneShort = isPhone();
@@ -563,16 +563,21 @@
 
     var cat = document.getElementById('rmh-search-cat');
     if (cat) {
-      cat.setAttribute('aria-label', tMock('كل الأقسام', 'Toutes les catégories'));
+      var catFr = phoneShort ? 'Catégories' : 'Toutes les catégories';
+      cat.setAttribute('aria-label', tMock('كل الأقسام', catFr));
       if (cat.options && cat.options[0] && !cat.options[0].value) {
-        cat.options[0].textContent = tMock('كل الأقسام', 'Toutes les catégories');
+        cat.options[0].textContent = tMock('كل الأقسام', catFr);
       }
     }
     var q = document.getElementById('rmh-search-q');
     if (q) {
-      q.placeholder = fr
-        ? (q.getAttribute('data-ph-fr') || 'Cherchez une voiture, un appartement, un magasin, un bureau...')
-        : 'ابحث عن سيارة، شقة، محل، مكتب...';
+      if (fr) {
+        q.placeholder = phoneShort
+          ? (q.getAttribute('data-ph-fr-phone') || 'Voiture, appart, boutiqu')
+          : (q.getAttribute('data-ph-fr') || 'Cherchez une voiture, un appartement, un magasin, un bureau...');
+      } else {
+        q.placeholder = 'ابحث عن سيارة، شقة، محل، مكتب...';
+      }
     }
     var searchBtn = hdr.querySelector('.rmh-search-btn');
     if (searchBtn) searchBtn.setAttribute('aria-label', tMock('بحث', 'Rechercher'));
