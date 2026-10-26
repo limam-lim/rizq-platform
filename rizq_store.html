@@ -3482,13 +3482,11 @@ function renderStoreCatTabs(tabsEl, topicsOrCats, fr){
           ? (item.label || (fr ? (item.nameFr || item.nameAr) : (item.nameAr || item.nameFr)) || id)
           : item;
         var raw = String(id || '');
-        // معرّف موضوع: اسمح فقط بـ [A-Za-z0-9_-]؛ أسماء التصنيف النصية تُهرَّب لـ JS
-        var safe = (item && typeof item === 'object' && item.id)
-          ? raw.replace(/[^a-zA-Z0-9_\-]/g, '').slice(0, 48)
-          : raw.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        if(!safe) return '';
+        if(!raw) return '';
         var safeLab = String(lab).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-        return '<button type="button" class="cat-tab" onclick="filterCat(this,\''+safe+'\')">'+safeLab+'</button>';
+        var safeAttr = raw.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+        /* لا تُسقط الأحرف العربية من معرّف الموضوع — كانت تكسّر الفلتر (legacy:أزياء → legacy) */
+        return '<button type="button" class="cat-tab" data-topic-filter="'+safeAttr+'" onclick="filterCat(this)">'+safeLab+'</button>';
       }).join('');
   tabsEl.innerHTML =
     '<div class="cat-tabs-cats" id="cat-tabs-cats">'+catsHtml+'</div>'
@@ -3501,12 +3499,13 @@ function renderStoreCatTabs(tabsEl, topicsOrCats, fr){
   try{ if(typeof _paintStoreWishCounts === 'function') _paintStoreWishCounts((_getWishList()||[]).length); }catch(eC){}
 }
 function filterCat(btn, cat){
+  var key = (cat != null && cat !== '') ? String(cat) : (btn && btn.getAttribute('data-topic-filter')) || 'all';
   document.querySelectorAll('.cat-tab').forEach(function(b){b.classList.remove('active');});
-  btn.classList.add('active');
+  if(btn) btn.classList.add('active');
   document.querySelectorAll('#products-grid .product-card').forEach(function(card){
     var topic = card.getAttribute('data-topic') || '';
     var cardCat = card.getAttribute('data-cat') || '';
-    var show = (cat === 'all' || topic === cat || cardCat === cat);
+    var show = (key === 'all' || topic === key || cardCat === key);
     card.style.display = show ? '' : 'none';
   });
 }

@@ -298,9 +298,19 @@
       var key = btn.getAttribute('data-rizq-module');
       var closed = isModuleClosed(flags, key);
       var badge = btn.querySelector('.hero-biz-badge[data-rizq-soon="1"]');
+      var hint = btn.querySelector('.hero-biz-hint');
+      var promoBadges = btn.querySelectorAll('.hero-biz-badge:not([data-rizq-soon="1"])');
       if (closed) {
         btn.style.display = '';
         btn.classList.add('rizq-module-soon');
+        /* أخفِ شارة «جديد» وغيرها حتى لا تتعارض مع «قريباً» */
+        promoBadges.forEach(function (b) { b.style.display = 'none'; });
+        if (hint) {
+          if (!hint.getAttribute('data-rizq-hint-open')) {
+            hint.setAttribute('data-rizq-hint-open', hint.textContent || '');
+          }
+          hint.textContent = t('قريباً — سجّل اهتمامك', 'Bientôt — réservez votre alerte');
+        }
         if (!badge) {
           badge = document.createElement('span');
           badge.className = 'hero-biz-badge';
@@ -313,6 +323,11 @@
       } else {
         btn.classList.remove('rizq-module-soon');
         if (badge) badge.remove();
+        promoBadges.forEach(function (b) { b.style.display = ''; });
+        if (hint && hint.getAttribute('data-rizq-hint-open')) {
+          hint.textContent = hint.getAttribute('data-rizq-hint-open');
+          hint.removeAttribute('data-rizq-hint-open');
+        }
       }
     });
     /* استبدال أزرار الاشتراك/التسجيل في الأقسام المغلقة بـ «سجّل اهتمامك» */

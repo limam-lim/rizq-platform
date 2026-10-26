@@ -1,7 +1,7 @@
 {
   "meta": {
     "label": "Rizq graduation demo seed",
-    "note": "Marked graduationDemo:true — wipe with: node scripts/seed-graduation-demo.js --clear. Not for production.",
+    "note": "Marked is_demo:true + graduationDemo:true — wipe with: node scripts/purge-demo.js --confirm (dry-run first). Not for production.",
     "version": 1
   },
   "accounts": [
@@ -188,6 +188,52 @@
       "thumb": "https://picsum.photos/seed/rizq-grad-office03/480/360",
       "phone": "44303003",
       "email": "sada.admin@demo.rizq.mr"
+    },
+    {
+      "id": "acc_grad_estate_01",
+      "type": "office",
+      "name": "وكالة الساكنية العقارية",
+      "tagline": "بيع وإيجار سكني وتجاري في نواكشوط",
+      "city": "نواكشوط",
+      "address": "تفرغ زينة، شارع موريتانيا",
+      "category": "عقارات",
+      "activity": "وكالات عقارية",
+      "activityId": "real_estate",
+      "desc": "وساطة عقارية للبيع والإيجار مع معاينات ميدانية وعقود واضحة.",
+      "thumb": "https://picsum.photos/seed/rizq-grad-estate01/480/360",
+      "phone": "44304001",
+      "email": "saknia.estate@demo.rizq.mr",
+      "verifiedPlus": true
+    },
+    {
+      "id": "acc_grad_estate_02",
+      "type": "office",
+      "name": "أفق العقار — نواذيبو",
+      "tagline": "وساطة عقارية على الساحل",
+      "city": "نواذيبو",
+      "address": "حي الميناء",
+      "category": "عقارات",
+      "activity": "وساطة عقارية",
+      "activityId": "real_estate",
+      "desc": "شقق وأراضٍ ومحلات تجارية في نواذيبو مع متابعة حتى التسليم.",
+      "thumb": "https://picsum.photos/seed/rizq-grad-estate02/480/360",
+      "phone": "44304002",
+      "email": "ofoq.immo@demo.rizq.mr"
+    },
+    {
+      "id": "acc_grad_estate_03",
+      "type": "office",
+      "name": "دار الإسكان",
+      "tagline": "إدارة أملاك وعقود إيجار طويلة",
+      "city": "نواكشوط",
+      "address": "السبخة",
+      "category": "عقارات",
+      "activity": "إدارة أملاك عقارية",
+      "activityId": "real_estate",
+      "desc": "إدارة أملاك سكنية وتجارية وتحصيل إيجارات وصيانة دورية.",
+      "thumb": "https://picsum.photos/seed/rizq-grad-estate03/480/360",
+      "phone": "44304003",
+      "email": "dar.iskan@demo.rizq.mr"
     }
   ],
   "ads": [

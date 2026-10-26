@@ -6,7 +6,8 @@
  *   node scripts/seed-graduation-demo.js           # زرع / تحديث
  *   node scripts/seed-graduation-demo.js --clear   # حذف سجلات التخرج فقط
  *
- * كل سجل يحمل graduationDemo:true ولا يستخدم بادئة acc_demo (تُستبعد من الـ API العام).
+ * كل سجل يحمل is_demo:true + graduationDemo:true
+ * ولا يستخدم بادئة acc_demo (تُستبعد من الـ API العام).
  * لا تشغّل هذا السكربت في الإنتاج الحقيقي.
  */
 const fs = require('fs');
@@ -32,18 +33,28 @@ function isGradId(id) {
   return s.indexOf('acc_grad_') === 0 || /^RZQ-2026-33\d{3}$/i.test(s);
 }
 
+function isDemoRecord(rec) {
+  if (!rec) return false;
+  return rec.is_demo === true
+    || rec.isDemo === true
+    || rec.graduationDemo === true
+    || isGradId(rec.id)
+    || String(rec.accountId || '').indexOf('acc_grad_') === 0
+    || String(rec.id || '').indexOf('acc_demo') === 0;
+}
+
 function clearGraduation() {
   const accounts = store.readAccounts();
   const ads = store.readAds();
   let accRemoved = 0;
   let adRemoved = 0;
   accounts.forEach((a) => {
-    if (a && (a.graduationDemo || isGradId(a.id))) {
+    if (a && isDemoRecord(a)) {
       if (store.deleteAccount(a.id)) accRemoved++;
     }
   });
   ads.forEach((ad) => {
-    if (ad && (ad.graduationDemo || isGradId(ad.id) || String(ad.accountId || '').indexOf('acc_grad_') === 0)) {
+    if (ad && isDemoRecord(ad)) {
       if (store.deleteAd(ad.id)) adRemoved++;
     }
   });
@@ -59,6 +70,8 @@ function seed() {
   fixture.accounts.forEach((row, idx) => {
     const approvedAt = new Date(Date.now() - (idx + 1) * 3 * 3600000).toISOString();
     const acc = Object.assign({}, row, {
+      is_demo: true,
+      isDemo: true,
       graduationDemo: true,
       demoSource: 'graduation',
       status: 'approved',
@@ -83,6 +96,8 @@ function seed() {
       images: [],
       emoji: '📦'
     }, row, {
+      is_demo: true,
+      isDemo: true,
       graduationDemo: true,
       demoSource: 'graduation',
       status: 'active',
@@ -95,13 +110,56 @@ function seed() {
     adsUpserted++;
   });
 
+  // وسّم أسعار نبضة السوق التجريبية إن وُجدت
+  try {
+    const repos = require('../db/repos');
+    const cfg = repos.getSiteConfig() || {};
+    if (cfg.prices && typeof cfg.prices === 'object') {
+      cfg.prices = Object.assign({}, cfg.prices, {
+        is_demo: true,
+        isDemo: true,
+        graduationDemoPrices: true,
+      });
+      repos.saveSiteConfig(cfg);
+    }
+  } catch (e) { /* ignore */ }
+
+  // ضمان is_demo على أي سجل تخرج قديم خارج الـ fixture
+  let backfilled = 0;
+  (store.readAccounts() || []).forEach((a) => {
+    if (!a || !isDemoRecord(a)) return;
+    if (a.is_demo === true && a.isDemo === true && a.graduationDemo === true) return;
+    store.upsertAccount(Object.assign({}, a, {
+      is_demo: true,
+      isDemo: true,
+      graduationDemo: true,
+      demoSource: a.demoSource || 'graduation',
+      updatedAt: now,
+    }));
+    backfilled++;
+  });
+  (store.readAds() || []).forEach((ad) => {
+    if (!ad || !isDemoRecord(ad)) return;
+    if (ad.is_demo === true && ad.isDemo === true && ad.graduationDemo === true) return;
+    store.upsertAd(Object.assign({}, ad, {
+      is_demo: true,
+      isDemo: true,
+      graduationDemo: true,
+      demoSource: ad.demoSource || 'graduation',
+      updatedAt: now,
+    }));
+    backfilled++;
+  });
+
   return {
     accountsUpserted,
     adsUpserted,
+    backfilled,
     stores: fixture.accounts.filter((a) => a.type === 'store').length,
     corps: fixture.accounts.filter((a) => a.type === 'corp').length,
     offices: fixture.accounts.filter((a) => a.type === 'office').length,
-    ads: fixture.ads.length
+    ads: fixture.ads.length,
+    flagged: { is_demo: true, graduationDemo: true },
   };
 }
 
