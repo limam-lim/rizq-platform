@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.77';
+    link.href = 'rizq_header_mockup_trial.css?v=5.78';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -465,20 +465,22 @@
       showrooms: ['المعارض والمصانع', 'Showrooms & usines'],
       estate: ['سوق العقارات', 'Marché immobilier'],
       offices: ['المكاتب', 'Bureaux'],
-      pulse: ['نبض السوق', 'Pouls'],
-      tenders: ['المناقصات', 'A. Offer'],
-      investments: ['الاستثمارات', 'Inftism'],
+      pulse: ['نبض السوق', 'Pouls du marché'],
+      tenders: ['المناقصات', 'Appels d\'offres'],
+      investments: ['الاستثمارات', 'Investissements'],
       models: ['نماذج', 'Modèles']
     };
-    /* aria كامل بالفرنسية — النص المختصر للعرض فقط على الشريط */
-    var navAriaFr = {
-      pulse: 'Pouls du marché',
-      tenders: 'Appels d\'offres',
-      investments: 'Investissements'
+    /* هاتف فقط: اختصارات فرنسية لتفادي تداخل النص — الحاسوب/التابلت بالأسماء الكاملة */
+    var navFrPhoneShort = {
+      pulse: 'Pouls',
+      tenders: 'A. Offer',
+      investments: 'Inftism'
     };
+    var phoneFr = fr && isPhone();
     Object.keys(nav).forEach(function (key) {
-      var label = tMock(nav[key][0], nav[key][1]);
-      var aria = (fr && navAriaFr[key]) ? navAriaFr[key] : label;
+      var frLbl = (phoneFr && navFrPhoneShort[key]) ? navFrPhoneShort[key] : nav[key][1];
+      var label = tMock(nav[key][0], frLbl);
+      var aria = tMock(nav[key][0], nav[key][1]);
       /* استثناء عناصر قائمة المزيد — تُحدَّث عبر .rmh-more-item strong */
       hdr.querySelectorAll('.rmh-nav a[data-rmh="' + key + '"]:not(.rmh-more-item)').forEach(function (a) {
         var ico = a.querySelector('.rmh-nav-ico');
