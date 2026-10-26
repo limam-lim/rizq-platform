@@ -1729,7 +1729,8 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav .mobile-drawer,
   html.rizq-app-nav .mobile-drawer-overlay,
   html.rizq-app-nav .nav-sticky-tools,
-  html.rizq-app-nav .btn-lang:not(#rizq-lang-btn):not(#nav-lang-btn):not(#rizq-desk-lang-btn){
+  /* استثناء زر لغة هيدر النموذج #rmh-lang-btn — يظهر على الهاتف داخل .rmh-tools */
+  html.rizq-app-nav .btn-lang:not(#rizq-lang-btn):not(#nav-lang-btn):not(#rizq-desk-lang-btn):not(#rmh-lang-btn){
     display:none !important;
   }
 
