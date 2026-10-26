@@ -159,6 +159,7 @@
       : '<a href="' + packagesHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">💎</span><div><strong data-hdr="packs">' + t2('الباقات', 'Forfaits') + '</strong></div></a>';
     return '' +
       '<a href="' + catsHref() + '" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">📂</span><div><strong data-hdr="cats">' + t2('الأقسام', 'Catégories') + '</strong></div></a>' +
+      '<a href="rizq_market_pulse.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">📈</span><div><strong data-hdr="pulse">' + t2('نبضة السوق', 'Pouls du marché') + '</strong></div></a>' +
       '<a href="rizq_ads_info.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">🎬</span><div><strong data-hdr="rizqads">Rizq ADS</strong></div></a>' +
       packsItem +
       '<a href="rizq_legal.html" class="nav-dd-item" role="menuitem"><span class="nav-dd-icon">⚖️</span><div><strong data-hdr="legal">' + t2('المواد القانونية', 'Mentions légales') + '</strong></div></a>' +
@@ -191,6 +192,7 @@
       item(moduleHref('corp'), 'showrooms', '🏬', 'المعارض والمصانع', 'Showrooms & usines') +
       item(moduleHref('office'), 'offices', '💼', 'المكاتب', 'Bureaux') +
       item(adsHref(), 'ads', '📢', 'الإعلانات', 'Annonces') +
+      item('rizq_market_pulse.html', 'pulse', '📊', 'نبضة السوق', 'Pouls du marché') +
       item(moduleHref('tenders'), 'tenders', '📑', 'المناقصات', 'A-doffres') +
       item(moduleHref('investments'), 'investments', '📈', 'الاستثمارات', 'Investissements') +
       (isLanding() ? '' : item(packagesHref(), 'packs', '💎', 'الباقات', 'Forfaits')) +
@@ -575,6 +577,7 @@
     offices: ['hdr-offices', 'dd-offices', 'nav-offices'],
     showrooms: ['hdr-showrooms', 'dd-showrooms', 'nav-showrooms'],
     rizqads: ['dd-rizqads'],
+    pulse: ['hdr-pulse', 'dd-pulse', 'nav-prices'],
     ads: ['hdr-ads', 'dd-ads'],
     tenders: ['hdr-tenders', 'dd-tenders'],
     packs: ['hdr-packs', 'dd-packs'],

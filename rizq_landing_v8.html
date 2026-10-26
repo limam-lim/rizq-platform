@@ -6202,11 +6202,12 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <button class="price-tab" data-cat="fuel" data-t="prices-tab-fuel" onclick="switchPriceTab('fuel',this)">⛽ محروقات</button>
       <button class="price-tab" data-cat="currencies" data-t="prices-tab-currencies" onclick="switchPriceTab('currencies',this)">💱 عملات</button>
     </div>
+    <!-- زر نبضة السوق فوق الشبكة مباشرة — يظهر دون تمرير تحت البطاقات -->
+    <div class="landing-ads-footer prices-browse-wrap" style="margin:10px 0 12px;padding:0 4px">
+      <a class="landing-ads-browse-full" href="rizq_market_pulse.html" id="prices-browse-full" data-t="prices-browse-full">📈 نبضة السوق — عرض كل الأسعار ←</a>
+    </div>
     <div class="prices-grid" id="prices-grid"></div>
     <p class="prices-note" id="prices-note" data-t="prices-note">الأسعار تقريبية · عيّنة من نبضة السوق</p>
-    <div class="landing-ads-footer prices-browse-wrap" style="margin-top:12px;margin-bottom:8px;padding-bottom:8px">
-      <a class="landing-ads-browse-full" href="rizq_market_pulse.html" id="prices-browse-full" data-t="prices-browse-full">📈 عرض نبضة السوق كاملة ←</a>
-    </div>
   </div>
 </section>
 
@@ -10944,7 +10945,7 @@ const LANG = {
     'prices-live': 'أحدث · آخر تحديث:',
     'prices-tab-food': '🍚 مواد غذائية', 'prices-tab-fuel': '⛽ محروقات', 'prices-tab-currencies': '💱 عملات',
     'prices-note': 'الأسعار تقريبية · عيّنة من نبضة السوق',
-    'prices-browse-full': '📈 عرض نبضة السوق كاملة ←',
+    'prices-browse-full': '📈 نبضة السوق — عرض كل الأسعار ←',
     'cta-badge1': 'انضم الآن', 'cta-badge2': 'أفراد · محلات · عقارات · وأكثر', 'cta-btn3': '🏢 افتح مساحتك على رزق',
     'cta-btn4': '📑 المناقصات',
     'cta-hubs-label': 'اختر مساحتك على رزق',
@@ -11110,7 +11111,7 @@ const LANG = {
     'prices-live': 'Récent · Dernière mise à jour :',
     'prices-tab-food': '🍚 Denrées alimentaires', 'prices-tab-fuel': '⛽ Carburants', 'prices-tab-currencies': '💱 Devises',
     'prices-note': 'Prix indicatifs · aperçu du pouls du marché',
-    'prices-browse-full': '📈 Voir le pouls du marché complet →',
+    'prices-browse-full': '📈 Pouls du marché — tous les prix →',
     'cta-badge1': 'Rejoignez-nous', 'cta-badge2': 'Particuliers · Boutiques · Immobilier · et plus', 'cta-btn3': '🏢 Ouvrir mon espace sur Rizq',
     'cta-btn4': '📑 Appels d\'offres',
     'cta-hubs-label': 'Choisissez votre espace sur Rizq',
@@ -14781,7 +14782,7 @@ function renderPrices(){
   }
   const browse = document.getElementById('prices-browse-full');
   if(browse){
-    browse.textContent = isAr ? '📈 عرض نبضة السوق كاملة ←' : '📈 Voir le pouls du marché complet →';
+    browse.textContent = isAr ? '📈 نبضة السوق — عرض كل الأسعار ←' : '📈 Pouls du marché — tous les prix →';
   }
   if(!items.length){
     grid.innerHTML = '<p class="rzq-empty" style="grid-column:1/-1;text-align:center;color:#6a7a8a;padding:28px 16px;font-size:14px">'+(isAr?'لا توجد أسعار سوق بعد.':'Aucun prix de marché pour le moment.')+'</p>';
