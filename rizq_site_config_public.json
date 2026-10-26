@@ -1,0 +1,15 @@
+{
+  "sitename": "رزق | Rizq",
+  "whatsapp": "+22244882212",
+  "social": {
+    "facebook":  { "enabled": true,  "url": "https://facebook.com/rizq.mr" },
+    "x":         { "enabled": true,  "url": "https://x.com/rizq_mr" },
+    "instagram": { "enabled": false, "url": "" },
+    "youtube":   { "enabled": true,  "url": "https://youtube.com/@rizq" },
+    "tiktok":    { "enabled": true,  "url": "https://tiktok.com/@rizq.mr" },
+    "linkedin":  { "enabled": true,  "url": "https://linkedin.com/company/rizq" },
+    "snapchat":  { "enabled": false, "url": "" },
+    "telegram":  { "enabled": false, "url": "" },
+    "whatsapp":  { "enabled": true,  "url": "https://wa.me/22244882212" }
+  }
+}

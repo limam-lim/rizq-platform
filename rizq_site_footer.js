@@ -142,9 +142,10 @@
       + '        <li class="footer-contact-row">📱 <strong class="carrier-name" style="color:#C9A84C">Chinguitel:</strong> <a href="tel:+22222708338" dir="ltr" style="color:rgba(255,255,255,.75);text-decoration:none;direction:ltr;unicode-bidi:isolate">+222 22 70 83 38</a></li>'
       + '        <li class="footer-contact-row">📧 <a href="mailto:direction@rizq.mr" style="color:rgba(255,255,255,.75);text-decoration:none">direction@rizq.mr</a></li>'
       + '      </ul>'
-      + '      <div id="rizq-social-follow" hidden></div>'
       + '    </div>'
       + '  </div>'
+      /* تابعنا خارج الطيّ — يظهر على الهاتف وكل الأجهزة بلا الحاجة لفتح «روابط وأقسام» */
+      + '  <div id="rizq-social-follow" hidden style="padding:4px 0 14px"></div>'
       + '  <div class="footer-bottom">'
       + '    <p class="footer-copy" id="rzq-site-ft-copy" data-t="ft-copy" data-t-fr="© 2026 Rizq — Tous droits réservés 🇲🇷">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</p>'
       + '    <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" title="ADMINIA SARL — À propos">'
@@ -207,7 +208,7 @@
     } catch (e) {}
     if (document.querySelector('script[src*="rizq_social_links.js"]')) return;
     var s = document.createElement('script');
-    s.src = 'rizq_social_links.js?v=23.6';
+    s.src = 'rizq_social_links.js?v=23.7';
     s.defer = true;
     document.head.appendChild(s);
   }

@@ -227,6 +227,40 @@
     }
   }
 
+  /** ملف ثابت على GitHub Pages — يظهر لكل الأجهزة حتى لو الخادم متوقف */
+  function siteFromPublicFile() {
+    var url = 'rizq_site_config_public.json';
+    try {
+      if (document.currentScript && document.currentScript.src) {
+        url = new URL('rizq_site_config_public.json', document.currentScript.src).href;
+      }
+    } catch (eUrl) {}
+    return fetch(url, { cache: 'no-store' })
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (data) {
+        return data && typeof data === 'object' ? data : null;
+      })
+      .catch(function () { return null; });
+  }
+
+  function siteWanted(site) {
+    if (!site) return 0;
+    return activeItems(enrichSocial(site)).length;
+  }
+
+  function pickBestSite(candidates) {
+    var best = null;
+    var bestN = 0;
+    for (var i = 0; i < candidates.length; i++) {
+      var n = siteWanted(candidates[i]);
+      if (n > bestN) {
+        best = candidates[i];
+        bestN = n;
+      }
+    }
+    return best;
+  }
+
   function finishRender(site) {
     var social = site ? enrichSocial(site) : null;
     var wanted = activeItems(social).length;
@@ -245,46 +279,43 @@
   function loadAndRender() {
     var local = siteFromLocal();
     var base = backendBase();
-    if (!base) {
-      return Promise.resolve(finishRender(local));
+
+    var apiPromise = Promise.resolve(null);
+    if (base) {
+      apiPromise = fetch(base + '/api/site-config', { cache: 'no-store' })
+        .then(function (res) { return res.ok ? res.json() : null; })
+        .then(function (data) {
+          return data && data.ok && data.config ? data.config.site : null;
+        })
+        .catch(function () { return null; });
     }
-    return fetch(base + '/api/site-config', { cache: 'no-store' })
-      .then(function (res) { return res.ok ? res.json() : null; })
-      .then(function (data) {
-        var site = data && data.ok && data.config ? data.config.site : null;
-        // إن رجعت API بلا social مفعّل — جرّب النسخة المحلية (حفظ أدمن / صفحات ثابتة)
-        var apiSocial = site && site.social && typeof site.social === 'object' ? site.social : null;
-        var apiWanted = apiSocial ? activeItems(enrichSocial(site)).length : 0;
-        if (!site || apiWanted === 0) {
-          if (local && local.social) {
-            var merged = Object.assign({}, local, site || {});
-            if (site && site.social) merged.social = site.social;
-            else if (local.social) merged.social = local.social;
-            // فضّل المحلي فقط إن كان فيه روابط ظاهرة
-            if (activeItems(enrichSocial(merged)).length > apiWanted) {
-              return finishRender(merged);
-            }
-          }
-        }
-        if (site) {
-          try {
-            var prev = local || {};
-            localStorage.setItem(
-              'rizq_site_config',
-              JSON.stringify(Object.assign({}, prev, site, {
-                social: (site.social && typeof site.social === 'object')
-                  ? site.social
-                  : (prev.social || {})
-              }))
-            );
-          } catch (eCache) {}
-          return finishRender(site);
-        }
-        return finishRender(local);
-      })
-      .catch(function () {
-        return finishRender(local);
-      });
+
+    return Promise.all([apiPromise, siteFromPublicFile()]).then(function (pair) {
+      var apiSite = pair[0];
+      var publicSite = pair[1];
+      var best = pickBestSite([apiSite, local, publicSite]);
+      if (apiSite && siteWanted(apiSite) > 0) {
+        try {
+          var prev = local || {};
+          localStorage.setItem(
+            'rizq_site_config',
+            JSON.stringify(Object.assign({}, prev, apiSite, {
+              social: (apiSite.social && typeof apiSite.social === 'object')
+                ? apiSite.social
+                : (prev.social || {})
+            }))
+          );
+        } catch (eCache) {}
+      } else if (best && siteWanted(best) > 0) {
+        try {
+          localStorage.setItem(
+            'rizq_site_config',
+            JSON.stringify(Object.assign({}, local || {}, best))
+          );
+        } catch (e2) {}
+      }
+      return finishRender(best);
+    });
   }
 
   var _bootTries = 0;
