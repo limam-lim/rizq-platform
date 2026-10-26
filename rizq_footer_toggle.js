@@ -53,12 +53,12 @@
       + '.rzq-ft-toggle-btn[aria-expanded="true"] .rzq-ft-chev{transform:rotate(180deg)}'
       + '.rzq-ft-collapse-wrap{max-height:0;overflow:hidden;transition:max-height .4s ease}'
       + '@media (prefers-reduced-motion: reduce){.rzq-ft-collapse-wrap{transition:none}}'
-      /* طيّ الفوتر: حشو مضغوط — يتغلّب على padding:60px!important في الصفحات */
+      /* طيّ الفوتر: أعلى مضغوط؛ أسفل يكفي لظهور شارة ADMINIA فوق الشريط العائم */
       + 'html body footer.rizq-footer.rzq-ft-compact,html body footer.rzq-ft-compact{'
-      + 'padding:6px 5% calc(28px + env(safe-area-inset-bottom,0px))!important;'
+      + 'padding:6px 5% calc(var(--rizq-mock-nav-h,64px) + env(safe-area-inset-bottom,0px))!important;'
       + 'transition:padding .3s ease}'
       + 'html body footer.rizq-footer:not(.rzq-ft-compact),html body footer:not(.rzq-ft-compact){'
-      + 'padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))!important;box-sizing:border-box!important;'
+      + 'padding-bottom:calc(var(--rizq-mock-nav-h,64px) + env(safe-area-inset-bottom,0px))!important;box-sizing:border-box!important;'
       + 'overflow:visible!important}'
       + 'html body footer.rizq-footer,html body footer{box-sizing:border-box!important;overflow:visible!important}'
       + 'html body footer.rizq-footer .footer-bottom,'
