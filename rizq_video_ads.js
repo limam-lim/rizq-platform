@@ -955,14 +955,31 @@
         if (saveData) return; // غلاف + زر فقط
         var bestCard = null;
         var bestR = 0;
+        var bestArea = 0;
         ratios.forEach(function (r, card) {
-          if (r >= 0.5 && r > bestR) {
+          if (r < 0.5) return;
+          var rect = card.getBoundingClientRect();
+          var vh = window.innerHeight || 1;
+          var vw = window.innerWidth || 1;
+          var visibleH = Math.max(0, Math.min(rect.bottom, vh) - Math.max(rect.top, 0));
+          var visibleW = Math.max(0, Math.min(rect.right, vw) - Math.max(rect.left, 0));
+          var area = visibleH * visibleW;
+          if (area > bestArea || (area === bestArea && r > bestR)) {
+            bestArea = area;
             bestR = r;
             bestCard = card;
           }
         });
-        // البطل يفوز إن كان أكثر ظهوراً من أي بطاقة شريط
-        if (heroRatio >= 0.5 && heroRatio >= bestR) {
+        var heroArea = 0;
+        if (heroWrap && heroRatio >= 0.5) {
+          var hr = heroWrap.getBoundingClientRect();
+          var hvh = window.innerHeight || 1;
+          var hvw = window.innerWidth || 1;
+          heroArea = Math.max(0, Math.min(hr.bottom, hvh) - Math.max(hr.top, 0))
+            * Math.max(0, Math.min(hr.right, hvw) - Math.max(hr.left, 0));
+        }
+        // البطل يفوز إن كان أكبر مساحة ظاهرة
+        if (heroRatio >= 0.5 && heroArea >= bestArea) {
           cards.forEach(function (c) { stopStripVideo(c); });
           resumeHeroIfVisible();
           return;
