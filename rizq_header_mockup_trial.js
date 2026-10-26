@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.70';
+    link.href = 'rizq_header_mockup_trial.css?v=5.73';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -49,6 +49,7 @@
       estate: L ? '#virtual-estate' : 'rizq_landing_v8.html#virtual-estate',
       post: 'rizq_post.html',
       offices: L ? '#virtual-offices' : 'rizq_landing_v8.html#virtual-offices',
+      pulse: 'rizq_market_pulse.html',
       tenders: 'rizq_tenders_directory.html',
       investments: 'rizq_investments_directory.html',
       models: L ? '#models' : 'rizq_landing_v8.html#models',
@@ -102,6 +103,8 @@
       '<a href="' + h.estate + '" data-rmh="estate"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V10l8-6 8 6v10"/><path d="M10 20v-6h4v6"/></svg></span>سوق العقارات</a>' +
       '<a class="rmh-post-nav" href="' + h.post + '" data-rmh="post"><span class="rmh-nav-ico rmh-post-plus" aria-hidden="true">+</span><span class="rmh-post-lbl">انشر إعلان</span></a>' +
       '<a href="' + h.offices + '" data-rmh="offices"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="16" height="11" rx="1"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M4 13h16"/></svg></span>المكاتب</a>' +
+      /* حاسوب/تابلت: بعد المكاتب — هاتف: بين المكاتب والاستثمارات عبر RMH_NAV_TOP_ORDER */
+      '<a href="' + h.pulse + '" data-rmh="pulse"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h3l2-5 3 10 2-5h5"/><path d="M18 12h3"/></svg></span>نبض السوق</a>' +
       '<a href="' + h.tenders + '" data-rmh="tenders"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 4h8a2 2 0 0 1 2 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h6"/></svg></span>المناقصات</a>' +
       '<a href="' + h.investments + '" data-rmh="investments"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 18V6M4 18h16"/><path d="M7 14l4-4 3 3 5-6"/></svg></span>الاستثمارات</a>' +
       '<a href="' + h.models + '" data-rmh="models"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg></span>نماذج</a>' +
@@ -164,9 +167,29 @@
     }
   }
 
+  /** يضمن وجود «نبض السوق» بعد المكاتب حتى لو الهيدر موجود مسبقاً في HTML */
+  function ensurePulseNavLink() {
+    var hdr = document.getElementById('rizq-mock-hdr');
+    if (!hdr) return;
+    if (hdr.querySelector('a[data-rmh="pulse"]')) return;
+    var offices = hdr.querySelector('a[data-rmh="offices"]');
+    if (!offices || !offices.parentNode) return;
+    var h = navHrefs();
+    var a = document.createElement('a');
+    a.href = h.pulse || 'rizq_market_pulse.html';
+    a.setAttribute('data-rmh', 'pulse');
+    a.innerHTML =
+      '<span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h3l2-5 3 10 2-5h5"/><path d="M18 12h3"/></svg></span>نبض السوق';
+    if (offices.nextSibling) offices.parentNode.insertBefore(a, offices.nextSibling);
+    else offices.parentNode.appendChild(a);
+    /* إعادة التقاط ترتيب الشريط بعد إضافة العنصر */
+    __rmhNavSlots = null;
+  }
+
   function ensureMockHeader() {
     if (document.getElementById('rizq-mock-hdr')) {
       try { migrateCartToLink(); } catch (eM) {}
+      try { ensurePulseNavLink(); } catch (eP) {}
       applyNavHrefs();
       markActiveFromPage();
       return;
@@ -205,6 +228,7 @@
       rizq_estate_directory: 'estate',
       rizq_estate_agencies: 'estate',
       rizq_office: 'offices',
+      rizq_market_pulse: 'pulse',
       rizq_tenders: 'tenders',
       rizq_tenders_directory: 'tenders',
       rizq_tender_detail: 'tenders',
@@ -440,6 +464,7 @@
       showrooms: ['المعارض والمصانع', 'Showrooms & usines'],
       estate: ['سوق العقارات', 'Marché immobilier'],
       offices: ['المكاتب', 'Bureaux'],
+      pulse: ['نبض السوق', 'Pouls du marché'],
       tenders: ['المناقصات', 'Appels d\'offres'],
       investments: ['الاستثمارات', 'Investissements'],
       models: ['نماذج', 'Modèles']
@@ -1011,11 +1036,11 @@
     });
   }
 
-  /* هاتف: نفس التقسيم 5/5 — تبديل المواقع فقط
+  /* هاتف: نفس التقسيم — تبديل المواقع فقط
      أسفل قرب الإبهام: الرئيسية·الإعلانات·المحلات·المعارض·سوق العقارات
-     أعلى: المكاتب·الاستثمارات·نشر·المناقصات·المزيد */
+     أعلى: المكاتب·نبض السوق·الاستثمارات·نشر·المناقصات·نماذج·المزيد */
   var RMH_NAV_BOTTOM_ORDER = ['home', 'ads', 'stores', 'showrooms', 'estate'];
-  var RMH_NAV_TOP_ORDER = ['offices', 'investments', 'post', 'tenders', 'models', 'more'];
+  var RMH_NAV_TOP_ORDER = ['offices', 'pulse', 'investments', 'post', 'tenders', 'models', 'more'];
   var __rmhNavSlots = null;
 
   function captureNavSlots(bottomNav) {

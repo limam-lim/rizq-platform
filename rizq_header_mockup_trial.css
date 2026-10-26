@@ -1143,6 +1143,12 @@ body > .rizq-help-dd-menu a,
     max-width:none!important;
     letter-spacing:-.02em;
   }
+  /* نبض السوق بعد المكاتب على التابلت/الحاسوب */
+  #rizq-mock-hdr .rmh-nav a[data-rmh="pulse"],
+  .rmh-nav a[data-rmh="pulse"]{
+    white-space:nowrap!important;
+    letter-spacing:-.02em;
+  }
   #rizq-mock-hdr .rmh-nav a[data-rmh="estate"],
   .rmh-nav a[data-rmh="estate"],
   #rizq-mock-hdr .rmh-nav a[data-rmh="investments"],
@@ -1452,7 +1458,7 @@ body > .rizq-help-dd-menu a,
     position:relative!important;
     z-index:1!important;
   }
-  /* هاتف: كل عناصر الشريط — سطر واحد + clamp موحّد (حد أدنى 11px) */
+  /* هاتف فقط: كبسولات أوضح قليلاً — سطر واحد بلا قص/تداخل */
   #rizq-mock-hdr .rmh-nav a,
   #rizq-mock-hdr .rmh-nav a.rmh-post-nav,
   #rizq-mock-hdr .rmh-more-btn,
@@ -1462,15 +1468,15 @@ body > .rizq-help-dd-menu a,
     flex:1 1 0!important;
     min-width:0!important;
     max-width:none!important;
-    min-height:36px!important;
-    padding:clamp(3px,0.9vw,6px) clamp(0px,0.4vw,3px)!important;
-    font-size:clamp(9.5px,2.4vw,11px)!important;
-    gap:1px!important;
-    line-height:1.08!important;
+    min-height:44px!important;
+    padding:clamp(5px,1.1vw,8px) clamp(1px,0.5vw,4px)!important;
+    font-size:clamp(10.5px,2.7vw,12px)!important;
+    gap:2px!important;
+    line-height:1.12!important;
     white-space:nowrap!important;
     text-align:center;
   }
-  /* الشريط السفلي: خط أصغر + مساحة للأحرف السفلية بلا قص */
+  /* الشريط السفلي (5 أزرار) — مساحة أوضح مع بقاء سطر واحد */
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a,
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > .rmh-more-btn,
   nav.rmh-nav:not(.rmh-nav-top) > a,
@@ -1478,13 +1484,12 @@ body > .rizq-help-dd-menu a,
     flex:1 1 0!important;
     min-width:0!important;
     max-width:none!important;
-    padding:2px 1px 7px!important;
-    font-size:7.5px!important;
+    padding:4px 2px 9px!important;
+    font-size:10px!important;
     line-height:1.2!important;
     white-space:nowrap!important;
     text-align:center;
     overflow:visible!important;
-    /* خط التحديد تحت النص بدون أكل ارتفاع الحروف */
     border-bottom:0!important;
     box-shadow:none!important;
   }
@@ -1492,34 +1497,36 @@ body > .rizq-help-dd-menu a,
   nav.rmh-nav:not(.rmh-nav-top) > a.is-active{
     box-shadow:inset 0 -2px 0 var(--rmh-gold, #C9A84C)!important;
   }
-  /* المعارض والمصانع — أصغر حتى يظهر النص كاملاً بلا قص */
+  /* المعارض والمصانع — أطول نص؛ يبقى سطراً واحداً */
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="showrooms"],
   nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="showrooms"]{
     white-space:nowrap!important;
     text-align:center;
-    font-size:6.5px!important;
-    letter-spacing:-.06em;
+    font-size:8.5px!important;
+    letter-spacing:-.04em;
     overflow:visible!important;
   }
+  /* نبض السوق — سطر واحد في الكبسولة العلوية */
+  #rizq-mock-hdr nav.rmh-nav-top > a[data-rmh="pulse"],
+  nav.rmh-nav-top > a[data-rmh="pulse"]{
+    font-size:8.5px!important;
+    letter-spacing:-.03em;
+    white-space:nowrap!important;
+    min-width:0!important;
+  }
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="estate"],
-  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="estate"],
-  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="investments"],
-  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="investments"],
-  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="post"],
-  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="post"],
-  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a.rmh-post-nav,
-  nav.rmh-nav:not(.rmh-nav-top) > a.rmh-post-nav{
+  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="estate"]{
     white-space:nowrap!important;
     text-align:center;
-    font-size:7px!important;
-    letter-spacing:-.04em;
+    font-size:9.5px!important;
+    letter-spacing:-.03em;
   }
   #rizq-mock-hdr .rmh-nav a .rmh-nav-ico,
   #rizq-mock-hdr .rmh-more-btn .rmh-nav-ico,
   .rmh-nav a .rmh-nav-ico,
   .rmh-more-btn .rmh-nav-ico{
-    width:clamp(16px,4.4vw,20px)!important;
-    height:clamp(16px,4.4vw,20px)!important;
+    width:clamp(18px,4.8vw,22px)!important;
+    height:clamp(18px,4.8vw,22px)!important;
   }
   #rizq-mock-hdr .rmh-nav a .rmh-nav-ico svg,
   #rizq-mock-hdr .rmh-more-btn .rmh-nav-ico svg,
