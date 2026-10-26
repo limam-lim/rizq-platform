@@ -696,6 +696,14 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,190px);
   align-items:stretch;gap:10px;margin-top:4px
 }
+/* تابلت: عمود واحد حتى لا تُسحق بطاقة الدفع بجانب زر الإرسال */
+@media(max-width:1100px){
+  .store-under-band{grid-template-columns:1fr!important;gap:12px}
+  .store-desk-actions{grid-template-columns:1fr!important}
+  .store-desk-actions #store-req-submit,
+  #store-service-desk #store-req-submit{width:100%;min-height:52px;font-size:13.5px}
+  #rf-doc-upload.rzq-doc-zone{overflow:visible!important;min-width:0;width:100%;max-width:100%}
+}
 .store-desk-note{margin:0;min-width:0}
 #store-service-desk #store-req-submit,
 .store-desk-actions #store-req-submit{
@@ -1287,7 +1295,7 @@ footer{
       <span data-t="nav-wish">❤ المفضلة</span> <span class="cart-count" id="nav-wish-count">0</span>
     </button>
     <a class="cart-btn" href="rizq_cart.html">
-      <span data-t="cart-label">🛒 السلة</span> <span class="cart-count" id="nav-cart-count">0</span>
+      <span data-t="cart-label">🛒 السلة</span> <span class="cart-count" id="nav-cart-count" data-rizq-seller-cart-count>0</span>
     </a>
   </div>
 </nav>

@@ -343,6 +343,13 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,200px);
   align-items:stretch;gap:10px;margin-top:4px
 }
+@media(max-width:1100px){
+  .showroom-under-band{grid-template-columns:1fr!important;gap:12px}
+  .showroom-desk-actions{grid-template-columns:1fr!important}
+  .showroom-desk-actions #sr-req-submit,
+  #showroom-service-desk #sr-req-submit{width:100%;min-height:52px;font-size:13.5px}
+  #rf-doc-upload.rzq-doc-zone{overflow:visible!important;min-width:0;width:100%;max-width:100%}
+}
 .showroom-desk-note{margin:0;min-width:0}
 #showroom-service-desk #sr-req-submit,
 .showroom-desk-actions #sr-req-submit{
@@ -694,7 +701,7 @@ html[dir="ltr"] .sr-wish-btn{left:auto;right:10px}
             <span>❤</span><span id="sr-wish-lbl">المفضلة</span><span class="sss-count" id="sr-wish-count" hidden>0</span>
           </button>
           <a class="sss-btn sss-cart" href="rizq_cart.html" id="sr-cart-btn">
-            <span>🛒</span><span id="sr-cart-lbl">السلة</span><span class="sss-count" id="sr-cart-count" hidden>0</span>
+            <span>🛒</span><span id="sr-cart-lbl">السلة</span><span class="sss-count" id="sr-cart-count" data-rizq-seller-cart-count hidden>0</span>
           </a>
         </div>
       </div>
