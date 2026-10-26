@@ -114,7 +114,7 @@
 
   /**
    * addReview — يعيد Promise. لا يكتب محلياً إلا بعد نجاح الخادم.
-   * opts: { rating, comment, reviewerName }
+   * opts: { rating, comment, reviewerName, adId }
    */
   function addReview(targetId, opts) {
     opts = opts || {};
@@ -154,6 +154,7 @@
         comment: comment,
         reviewerName: reviewerName
       };
+      if (opts.adId) body.adId = String(opts.adId).slice(0, 80);
       if (auth.kind === 'buyer') {
         headers['Authorization'] = 'Bearer ' + auth.token;
         headers['X-Buyer-Id'] = auth.id;
@@ -165,6 +166,7 @@
       fetch(base + '/api/reviews', {
         method: 'POST',
         headers: headers,
+        credentials: 'include',
         body: JSON.stringify(body)
       })
         .then(function (res) {
@@ -175,6 +177,10 @@
         .then(function (pack) {
           if (pack.status === 401) {
             resolve({ ok: false, error: 'auth_required' });
+            return;
+          }
+          if (pack.status === 403 || (pack.data && pack.data.error === 'interaction_required')) {
+            resolve({ ok: false, error: 'interaction_required', message: (pack.data && pack.data.message) || '' });
             return;
           }
           if (pack.status === 409 || (pack.data && pack.data.error === 'already_reviewed')) {
