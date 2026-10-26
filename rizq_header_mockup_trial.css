@@ -1264,21 +1264,31 @@ body > .rizq-help-dd-menu a,
   #rizq-mock-hdr .rmh-brand,
   .rmh-brand{
     grid-area:brand;
+    grid-column:1!important;
+    grid-row:1!important;
     justify-self:start!important;
     min-width:0;
+    position:relative;
+    z-index:2;
   }
   #rizq-mock-hdr .rmh-tools,
   .rmh-tools{
     grid-area:tools;
+    grid-column:3!important;
+    grid-row:1!important;
     justify-self:end!important;
     gap:4px;
     align-items:center;
     display:flex;
+    position:relative;
+    z-index:2;
   }
   .rmh-search,
   #rizq-mock-hdr .rmh-search{
     grid-area:search;
+    /* يجب تجاوز grid-row:1 من القاعدة العامة — وإلا يغطي البحث الشعار والأدوات */
     grid-column:1 / -1!important;
+    grid-row:2!important;
     justify-self:stretch!important;
     width:100%!important;
     max-width:none!important;
@@ -1288,6 +1298,8 @@ body > .rizq-help-dd-menu a,
     border-radius:10px!important;
     margin-inline:0!important;
     transform:none!important;
+    position:relative;
+    z-index:1;
   }
   /* تذييل الأقسام ظاهر داخل البحث — مضغوط */
   .rmh-search-cat{
