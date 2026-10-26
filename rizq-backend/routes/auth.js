@@ -7,6 +7,7 @@ const Buyer = require('../models/buyer');
 const { consumeBuyerVerificationByEmail } = require('../services/otpService');
 const { asyncHandler, sendError } = require('../middleware/errors');
 const { extractBuyerCredentials, requireBuyerAuth } = require('../middleware/buyerAuth');
+const { setBuyerSessionCookies, clearBuyerSessionCookies } = require('../lib/buyerSessionCookie');
 
 const router = express.Router();
 
@@ -26,6 +27,7 @@ router.post('/register', authLimiter, asyncHandler(async (req, res) => {
   const ver = consumeBuyerVerificationByEmail(email);
   if (!ver.ok) return sendError(res, 403, ver.message, ver.error);
   const result = Buyer.registerOrLogin(body);
+  try { setBuyerSessionCookies(req, res, result.buyer && result.buyer.id, result.token); } catch (eC) { /* ignore */ }
   res.status(result.created ? 201 : 200).json({
     ok: true,
     buyer: result.buyer,
@@ -59,6 +61,7 @@ router.post('/login', authLimiter, asyncHandler(async (req, res) => {
   try {
     const result = await Buyer.loginByEmailPassword(email, password);
     res.set('Cache-Control', 'no-store');
+    try { setBuyerSessionCookies(req, res, result.buyer && result.buyer.id, result.token); } catch (eC) { /* ignore */ }
     res.json({ ok: true, buyer: result.buyer, token: result.token });
   } catch (err) {
     const status = err.status || 401;
@@ -80,6 +83,7 @@ router.post('/logout', requireBuyerAuth, (req, res) => {
   try {
     if (req.buyer && req.buyer.id) Buyer.invalidateToken(req.buyer.id);
   } catch (e) { /* ignore */ }
+  try { clearBuyerSessionCookies(req, res); } catch (eC) { /* ignore */ }
   res.set('Cache-Control', 'no-store');
   res.json({ ok: true });
 });

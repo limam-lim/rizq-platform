@@ -193,9 +193,9 @@ function installAdminPanelGate(app, frontendRoot) {
       const qk = req.query && req.query.k;
       if (qk && timingSafeEqualStr(qk, gateKey)) {
         setGateCookie(res);
-        // لا نعيد التوجيه بعد فتح المفتاح: أول زيارة تفتح اللوحة مباشرة
-        // حتى لو رفض المتصفح حفظ الكوكي (localhost≠127.0.0.1 / سياسات صارمة)
-        return res.sendFile(panelFile);
+        // أسقط ?k= من الرابط فوراً حتى لا يبقى في التاريخ/Referer
+        const dest = '/' + panelPath + (req.path && String(req.path).endsWith('/') ? '/' : '');
+        return res.redirect(302, dest);
       }
       const cookies = parseCookies(req);
       if (!verifyGateCookie(cookies[COOKIE_NAME])) {

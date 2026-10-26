@@ -67,8 +67,11 @@ app.use((req, res, next) => {
       "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; "
       + "frame-src 'self' https://www.openstreetmap.org https://openstreetmap.org; "
       + "img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; "
-      + "font-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; "
-      + "script-src 'self' 'unsafe-inline' https:; connect-src 'self' https: wss:;"
+      + "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; "
+      + "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; "
+      /* إبقاء unsafe-inline مؤقتاً لصفحات HTML المضمنة؛ منع script من أي https: عام */
+      + "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
+      + "connect-src 'self' https: wss:;"
     );
   } else {
     // تطوير / مراجعة Cursor Ports: السماح بالإطار والمعاينة وإلا تظهر الصفحة فارغة
@@ -80,8 +83,10 @@ app.use((req, res, next) => {
       + "frame-ancestors *; "
       + "frame-src 'self' https://www.openstreetmap.org https://openstreetmap.org https:; "
       + "img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; "
-      + "font-src 'self' data: https:; style-src 'self' 'unsafe-inline' https:; "
-      + "script-src 'self' 'unsafe-inline' https:; connect-src 'self' https: wss: http: ws:;"
+      + "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; "
+      + "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; "
+      + "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
+      + "connect-src 'self' https: wss: http: ws:;"
     );
   }
   try {
@@ -213,6 +218,11 @@ app.use('/uploads/service-docs', forbidUploadPath(
   'مرفقات غرفة الطلبات محمية — لصاحب الحساب فقط',
   'Pièces jointes du bureau de demandes protégées — titulaire uniquement'
 ));
+app.use('/uploads/kyc', forbidUploadPath(
+  'kyc_forbidden',
+  'وثائق الهوية محمية — للمراجعة الإدارية وصاحب الحساب فقط',
+  'Documents d\'identité protégés — admin / titulaire uniquement'
+));
 app.use('/uploads/ads', gateUploadByStatus(
   (adId) => repos.ads.getById(adId),
   ['active', 'approved', 'published'],
@@ -277,6 +287,7 @@ app.use(cors({
     if (isDevPreviewOrigin(origin)) return cb(null, true);
     cb(new Error('غير مسموح من هذا الأصل (CORS)'));
   },
+  credentials: true,
 }));
 
 // ── Rate limit: حماية حصة Claude API من الاستهلاك العشوائي ─────────
@@ -1836,14 +1847,7 @@ const platformStore = require('./db/platformStore');
 function readAccounts() { return repos.accounts.list(); }
 function writeAccounts(list) { return repos.accounts.replaceAll(list); }
 
-/** قبول data:image/(jpeg|jpg|png|webp);base64,... فقط — رفض غير الصور وقطع الحجم */
-function sanitizeKycDataUrl(raw, maxChars) {
-  const limit = Math.max(1024, Number(maxChars) || 5_000_000);
-  const s = String(raw == null ? '' : raw).trim().slice(0, limit);
-  if (!s) return '';
-  if (!/^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/=\s]+$/i.test(s)) return '';
-  return s.replace(/\s+/g, '');
-}
+const { sanitizeKycDataUrl } = require('./lib/sanitizeKyc');
 
 /** إعادة حساب درجة ثقة البائع من متوسط التقييمات (0–100) */
 function recomputeSellerTrustScore(targetId) {
@@ -1979,6 +1983,22 @@ function stripToken(acc) {
   return safe;
 }
 
+/** اقرأ مسار KYC الخاص كـ data-URL لردّ الأدمن فقط (الملف غير عام) */
+function kycPathToDataUrl(relUrl) {
+  try {
+    const u = String(relUrl || '');
+    if (!u.startsWith('/uploads/kyc/')) return u;
+    const key = u.replace(/^\/+/, '');
+    const abs = path.join(__dirname, key);
+    const root = path.join(__dirname, 'uploads', 'kyc') + path.sep;
+    if (!abs.startsWith(root)) return '';
+    if (!fs.existsSync(abs)) return '';
+    const buf = fs.readFileSync(abs);
+    if (!buf.length || buf.length > 3_500_000) return '';
+    return 'data:image/webp;base64,' + buf.toString('base64');
+  } catch (e) { return ''; }
+}
+
 /** نسخة أدمن: تحتفظ بوثائق KYC للمراجعة، بلا أسرار وصول */
 function toAdminAccount(acc) {
   if (!acc) return null;
@@ -1990,6 +2010,12 @@ function toAdminAccount(acc) {
     ...safe
   } = acc;
   delete safe.password;
+  ['idImage', 'licenseImage', 'activityImage2', 'id_image', 'activity_image2'].forEach((k) => {
+    if (safe[k] && String(safe[k]).startsWith('/uploads/kyc/')) {
+      const data = kycPathToDataUrl(safe[k]);
+      if (data) safe[k] = data;
+    }
+  });
   return safe;
 }
 
@@ -2209,10 +2235,10 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     foreignId: String(b.foreignId || b.foreign_id || '').slice(0, 40),
     nationality: String(b.nationality || '').slice(0, 20),
     nationalityCountry: String(b.nationalityCountry || b.nationality_country || '').slice(0, 60),
-    // KYC: data:image فقط (jpeg/png/webp) — رفض نصوص/HTML/PDF خام لتقليل ضغط الذاكرة وPII غير صوري
-    idImage: sanitizeKycDataUrl(b.idImage, 5_000_000),
-    licenseImage: sanitizeKycDataUrl(b.licenseImage, 5_000_000),
-    activityImage2: sanitizeKycDataUrl(b.activityImage2 || b.activity_image2, 5_000_000),
+    // KYC: عبر imagePipeline (magic bytes + حد حجم + WebP) — مسارات خاصة تحت /uploads/kyc/
+    idImage: '',
+    licenseImage: '',
+    activityImage2: '',
     // برنامج الإحالة (جيب صاحبك واربح) — معرّف الحساب المُحيل (نفس صيغة id
     // القياسية ACC_<timestamp>) إن جاء الزائر عبر رابط ?ref=ACC_xxx. نتحقق
     // من الصيغة لمنع أي قيمة عشوائية، ونمنع أن يُحيل الحساب نفسه (لن يحدث
@@ -2249,6 +2275,21 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
       ? String(b.focusAreas || b.focus || '').slice(0, 300)
       : undefined,
   };
+  /* معالجة KYC قبل الحفظ النهائي — فشل الصورة لا يُسقط التسجيل إن باقي الحقول صالحة */
+  try {
+    const { saveKycImages } = require('./services/imagePipeline');
+    const kycSaved = await saveKycImages(id, {
+      idImage: b.idImage,
+      licenseImage: b.licenseImage,
+      activityImage2: b.activityImage2 || b.activity_image2,
+    });
+    if (kycSaved.idImage) acc.idImage = kycSaved.idImage;
+    if (kycSaved.licenseImage) acc.licenseImage = kycSaved.licenseImage;
+    if (kycSaved.activityImage2) acc.activityImage2 = kycSaved.activityImage2;
+  } catch (eKyc) {
+    console.warn('[accounts/register] kyc pipeline:', eKyc && eKyc.message);
+  }
+
   list.push(acc);
   writeAccounts(list);
   if (autoApproved && canAutoApproveAccountType(reqType) && acc.idImage) {
@@ -2369,6 +2410,7 @@ mountAccountsManageRoutes(app, {
   genDashToken,
   genAccessToken,
   purgeAccountIdDocument,
+  sanitizeKycDataUrl,
   REFERRAL_BONUS_DAYS,
   upsertSubscriberProfileFromAccount,
 });
@@ -3939,6 +3981,7 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
 
   let reviewerAccountId = '';
   let reviewerName = '';
+  let reviewerIsBuyer = false;
 
   // مسار المشتري (Guest Gate)
   try {
@@ -3949,6 +3992,7 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
       if (row) {
         reviewerAccountId = String(row.id).slice(0, 60);
         reviewerName = String(row.name || '').trim().slice(0, 60);
+        reviewerIsBuyer = true;
       }
     }
   } catch (eBuy) { /* ignore */ }
@@ -3969,8 +4013,39 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
   if (reviewerAccountId === String(b.targetId)) {
     return res.status(400).json({ error: 'cannot_review_self' });
   }
+
+  /* تقييم بعد تعامل: رسالة سابقة، أو مشترٍ يقيّم عبر إعلان يخص البائع */
+  const targetId = String(b.targetId).slice(0, 60);
+  const adId = b.adId ? String(b.adId).slice(0, 80) : '';
+  let verifiedInteraction = false;
+  try {
+    const msgs = readMessages();
+    verifiedInteraction = msgs.some((m) => {
+      if (!m) return false;
+      const sellerOk = String(m.sellerAccountId || '') === targetId;
+      const buyerOk = String(m.buyerAccountId || '') === reviewerAccountId;
+      return sellerOk && buyerOk;
+    });
+  } catch (eMsg) { /* ignore */ }
+  if (!verifiedInteraction && reviewerIsBuyer && adId) {
+    try {
+      const ads = typeof readAds === 'function' ? readAds() : [];
+      const ad = ads.find((a) => a && String(a.id) === adId);
+      if (ad && String(ad.accountId || '') === targetId) {
+        verifiedInteraction = true;
+      }
+    } catch (eAd) { /* ignore */ }
+  }
+  if (!verifiedInteraction) {
+    return res.status(403).json({
+      error: 'interaction_required',
+      code: 'interaction_required',
+      message: 'التقييم متاح بعد تواصل موثّق مع البائع (رسالة أو إعلان مرتبط)',
+    });
+  }
+
   const all = readReviews();
-  const list = all[b.targetId] || [];
+  const list = all[targetId] || [];
   if (list.some((r) => r.reviewerAccountId === reviewerAccountId)) {
     return res.status(409).json({ error: 'already_reviewed' });
   }
@@ -3980,13 +4055,42 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
     comment: String(b.comment == null ? '' : b.comment).trim().slice(0, 500),
     reviewerName: String((b.reviewerName || reviewerName || '')).trim().slice(0, 60),
     reviewerAccountId,
+    adId: adId || null,
+    verifiedInteraction: true,
+    sellerReply: null,
+    sellerReplyAt: null,
     createdAt: new Date().toISOString(),
   };
   list.unshift(review);
-  all[b.targetId] = list;
+  all[targetId] = list;
   writeReviews(all);
-  recomputeSellerTrustScore(String(b.targetId));
+  recomputeSellerTrustScore(targetId);
   res.json({ ok: true, review });
+});
+
+/** POST /api/reviews/:targetId/:reviewId/reply — رد البائع على تقييم */
+app.post('/api/reviews/:targetId/:reviewId/reply', reviewsLimiter, (req, res) => {
+  const targetId = String(req.params.targetId || '').slice(0, 60);
+  const reviewId = String(req.params.reviewId || '').slice(0, 60);
+  const token = req.header('x-account-token') || extractAccountToken(req) || '';
+  if (!targetId || !reviewId || !token) {
+    return res.status(401).json({ error: 'unauthorized', code: 'auth_required' });
+  }
+  const owner = verifyAccountOwner(targetId, token);
+  if (!owner) return res.status(401).json({ error: 'unauthorized', code: 'auth_required' });
+  const reply = String((req.body && req.body.reply) || '').trim().slice(0, 500);
+  if (!reply) return res.status(400).json({ error: 'reply_required' });
+  const all = readReviews();
+  const list = all[targetId] || [];
+  const idx = list.findIndex((r) => r && r.id === reviewId);
+  if (idx < 0) return res.status(404).json({ error: 'review_not_found' });
+  list[idx] = Object.assign({}, list[idx], {
+    sellerReply: reply,
+    sellerReplyAt: new Date().toISOString(),
+  });
+  all[targetId] = list;
+  writeReviews(all);
+  res.json({ ok: true, review: list[idx] });
 });
 
 /** GET /api/reviews/:targetId — أحدث تقييم أولاً (عام؛ بدون reviewerAccountId) */
@@ -4000,6 +4104,9 @@ app.get('/api/reviews/:targetId', (req, res) => {
       comment: r.comment,
       reviewerName: r.reviewerName,
       createdAt: r.createdAt,
+      verifiedInteraction: !!r.verifiedInteraction,
+      sellerReply: r.sellerReply || null,
+      sellerReplyAt: r.sellerReplyAt || null,
     }));
   res.json({ ok: true, reviews: list });
 });

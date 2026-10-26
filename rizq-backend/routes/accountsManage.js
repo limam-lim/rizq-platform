@@ -30,9 +30,13 @@ function mountAccountsManageRoutes(app, deps) {
     genDashToken,
     genAccessToken,
     purgeAccountIdDocument,
+    sanitizeKycDataUrl,
     REFERRAL_BONUS_DAYS,
     upsertSubscriberProfileFromAccount,
   } = deps;
+
+  const { sanitizeKycDataUrl: sanitizeKycFallback } = require('../lib/sanitizeKyc');
+  const kycSanitize = typeof sanitizeKycDataUrl === 'function' ? sanitizeKycDataUrl : sanitizeKycFallback;
 
   const adminView = typeof toAdminAccount === 'function' ? toAdminAccount : stripToken;
 
@@ -165,7 +169,7 @@ function mountAccountsManageRoutes(app, deps) {
    * يحدّث ملفه الشخصي (الوصف، الفيديو، الصورة، رقم واتساب...) من أي جهاز.
    * لا يمكن تعديل status/accessToken/id عبر هذا المسار أبداً.
    */
-  app.patch('/api/accounts/mine/:id', (req, res) => {
+  app.patch('/api/accounts/mine/:id', async (req, res) => {
     const list = readAccounts();
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
@@ -238,14 +242,31 @@ function mountAccountsManageRoutes(app, deps) {
         acc[k] = sanitizePromoVideoUrl(val);
         return;
       }
-      if (k === 'thumb' || k === 'cover' || k === 'idImage' || k === 'licenseImage') {
+      if (k === 'idImage' || k === 'licenseImage') {
+        /* تُعالَج عبر imagePipeline بعد الحلقة */
+        return;
+      }
+      if (k === 'thumb' || k === 'cover') {
         // اسمح فقط بمسارات نسبية أو data:image أو http(s) — لا javascript:
         const t = String(val || '').trim();
         if (t && (/javascript:/i.test(t) || /[\s<>"']/.test(t))) return;
         if (t && !(t.startsWith('/') || t.startsWith('./') || t.startsWith('data:image/') || /^https?:\/\//i.test(t))) return;
       }
-      acc[k] = val.slice(0, (k === 'thumb' || k === 'cover') ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
+      acc[k] = val.slice(0, (k === 'thumb' || k === 'cover') ? 2_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
     });
+    try {
+      const { saveKycImages } = require('../services/imagePipeline');
+      const kycIn = {};
+      if (b.idImage !== undefined && !acc.id_verified) kycIn.idImage = b.idImage;
+      if (b.licenseImage !== undefined) kycIn.licenseImage = b.licenseImage;
+      if (Object.keys(kycIn).length) {
+        const saved = await saveKycImages(acc.id, kycIn);
+        if (saved.idImage) acc.idImage = saved.idImage;
+        if (saved.licenseImage) acc.licenseImage = saved.licenseImage;
+      }
+    } catch (eKycMine) {
+      console.warn('[accounts/mine PATCH] kyc:', eKycMine && eKycMine.message);
+    }
     // hidePhone: تفضيل منطقي (boolean) لا نصّي — خارج حلقة EDITABLE أعلاه
     // حتى لا يتحوَّل إلى نص "true"/"false". لا علاقة له حالياً بأي عرض عام
     // فعلي: ACCOUNT_PUBLIC_FIELDS أصلاً لا يُخرج phone لغير صاحب الحساب أو
@@ -315,7 +336,7 @@ function mountAccountsManageRoutes(app, deps) {
    * الأدمن بدل توكن صاحب الحساب — يغذّي زر "تعديل" في لوحة "المستخدمون"
    * بـrizq_admin.html، الذي كان يعدّل بيانات وهمية محلية فقط سابقاً.
    */
-  app.patch('/api/accounts/admin/:id', requireAccountsAdmin, (req, res) => {
+  app.patch('/api/accounts/admin/:id', requireAccountsAdmin, async (req, res) => {
     const list = readAccounts();
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
@@ -357,13 +378,29 @@ function mountAccountsManageRoutes(app, deps) {
         acc[k] = sanitizePromoVideoUrl(val);
         return;
       }
-      if (k === 'thumb' || k === 'cover' || k === 'idImage' || k === 'licenseImage') {
+      if (k === 'idImage' || k === 'licenseImage') {
+        return;
+      }
+      if (k === 'thumb' || k === 'cover') {
         const t = String(val || '').trim();
         if (t && (/javascript:/i.test(t) || /[\s<>"']/.test(t))) return;
         if (t && !(t.startsWith('/') || t.startsWith('./') || t.startsWith('data:image/') || /^https?:\/\//i.test(t))) return;
       }
-      acc[k] = val.slice(0, (k === 'thumb' || k === 'cover') ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
+      acc[k] = val.slice(0, (k === 'thumb' || k === 'cover') ? 2_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
     });
+    try {
+      const { saveKycImages } = require('../services/imagePipeline');
+      const kycIn = {};
+      if (b.idImage !== undefined && !acc.id_verified) kycIn.idImage = b.idImage;
+      if (b.licenseImage !== undefined) kycIn.licenseImage = b.licenseImage;
+      if (Object.keys(kycIn).length) {
+        const saved = await saveKycImages(acc.id, kycIn);
+        if (saved.idImage) acc.idImage = saved.idImage;
+        if (saved.licenseImage) acc.licenseImage = saved.licenseImage;
+      }
+    } catch (eKycAdmin) {
+      console.warn('[accounts/admin PATCH] kyc:', eKycAdmin && eKycAdmin.message);
+    }
     if (b.hidePhone !== undefined) acc.hidePhone = !!b.hidePhone; // نفس منطق /mine أعلاه
     if (b.paymentMethods !== undefined) acc.paymentMethods = normalizeAccountPaymentMethods(b.paymentMethods);
     if (b.storeTopics !== undefined) acc.storeTopics = sanitizeStoreTopics(b.storeTopics);

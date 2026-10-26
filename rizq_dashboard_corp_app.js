@@ -1716,7 +1716,7 @@ function saveProduct(){
     modelId: modelId, modelName: modelName, modelNameFr: modelNameFr,
     images:   _pendingImgs.slice(),
     seller:   CORP_ACC ? CORP_ACC.name : _t2('شركة','Société'),
-    seller_trust_score: 70,
+    seller_trust_score: null,
   };
 
   function doSave(data){

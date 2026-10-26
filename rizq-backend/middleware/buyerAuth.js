@@ -1,9 +1,11 @@
 /**
- * مصادقة المشتري — Bearer / X-Buyer-Id + X-Buyer-Token (لا query في الإنتاج)
+ * مصادقة المشتري — Bearer / X-Buyer-Id + X-Buyer-Token / HttpOnly cookies
+ * (لا query في الإنتاج)
  */
 const Buyer = require('../models/buyer');
 const { sendError } = require('./errors');
 const { isProdEnv } = require('./accountAuth');
+const { readBuyerSessionCookies } = require('../lib/buyerSessionCookie');
 
 function extractBuyerCredentials(req) {
   const auth = req.header('authorization') || '';
@@ -11,6 +13,13 @@ function extractBuyerCredentials(req) {
   let token = '';
   if (auth.startsWith('Bearer ')) token = auth.slice(7).trim();
   if (!token) token = String(req.header('x-buyer-token') || '').trim();
+  if (!id || !token) {
+    try {
+      const c = readBuyerSessionCookies(req);
+      if (!id && c.id) id = c.id;
+      if (!token && c.token) token = c.token;
+    } catch (eCook) { /* ignore */ }
+  }
   if (!isProdEnv()) {
     if (!id) id = String(req.query.id || '').trim();
     if (!token) token = String(req.query.token || '').trim();

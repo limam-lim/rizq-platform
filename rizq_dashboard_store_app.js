@@ -1460,7 +1460,7 @@ function saveProduct(){
     subcat: _listingForm.subcat,
     images: [],
     seller: typeof accData !== 'undefined' ? (accData.name||_t2('محل','Boutique')) : _t2('محل','Boutique'),
-    seller_trust_score: 70,
+    seller_trust_score: null,
   };
   function doSave(data){
     var _editing = window._editingIdx!=null ? products[window._editingIdx] : null;

@@ -163,6 +163,36 @@
   }
 
   function clearSession() {
+    var prev = null;
+    try {
+      for (var si = 0; si < SESSION_KEYS.length; si++) {
+        var raw = localStorage.getItem(SESSION_KEYS[si]);
+        if (raw) {
+          prev = JSON.parse(raw);
+          if (prev && (prev.id || prev.accountId)) break;
+        }
+      }
+    } catch (ePrev) { prev = null; }
+    try {
+      var base = backendBase();
+      if (base && prev && (prev.id || prev.accountId)) {
+        var tok = prev.backendAccessToken || prev.accessToken || prev.token || '';
+        if (tok) {
+          fetch(base + '/api/accounts/logout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-account-token': tok,
+            },
+            body: JSON.stringify({
+              id: prev.id || prev.accountId,
+              accessToken: tok,
+            }),
+            keepalive: true,
+          }).catch(function () {});
+        }
+      }
+    } catch (eLogout) {}
     SESSION_KEYS.forEach(function (k) {
       try { localStorage.removeItem(k); } catch (e) {}
     });

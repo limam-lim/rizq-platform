@@ -8,34 +8,23 @@
 (function (global) {
   'use strict';
 
-  var STORAGE_KEY = 'rizq_reviews';
-  var REVIEWED_KEY = 'rizq_reviewed_targets';
+  /* كاش ذاكرة فقط — لا كتابة تقييمات في localStorage (المصدر = POST/GET API) */
+  var _memReviews = Object.create(null);
+  var _memReviewed = Object.create(null);
   var MAX_COMMENT_LEN = 500;
   var MAX_NAME_LEN = 60;
 
   function _getAll() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
-    catch (e) { return {}; }
+    return _memReviews;
   }
   function _saveAll(all) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); }
-    catch (e) { /* ignore */ }
-  }
-  function _getReviewedTargets() {
-    try { return JSON.parse(localStorage.getItem(REVIEWED_KEY) || '[]'); }
-    catch (e) { return []; }
+    _memReviews = all && typeof all === 'object' ? all : Object.create(null);
   }
   function _markReviewed(targetId) {
-    try {
-      var arr = _getReviewedTargets();
-      if (arr.indexOf(targetId) === -1) {
-        arr.push(targetId);
-        localStorage.setItem(REVIEWED_KEY, JSON.stringify(arr));
-      }
-    } catch (e) {}
+    if (targetId) _memReviewed[String(targetId)] = true;
   }
   function _hasReviewed(targetId) {
-    return _getReviewedTargets().indexOf(targetId) !== -1;
+    return !!_memReviewed[String(targetId || '')];
   }
 
   function apiBase() {
@@ -114,7 +103,7 @@
 
   /**
    * addReview — يعيد Promise. لا يكتب محلياً إلا بعد نجاح الخادم.
-   * opts: { rating, comment, reviewerName }
+   * opts: { rating, comment, reviewerName, adId }
    */
   function addReview(targetId, opts) {
     opts = opts || {};
@@ -154,6 +143,7 @@
         comment: comment,
         reviewerName: reviewerName
       };
+      if (opts.adId) body.adId = String(opts.adId).slice(0, 80);
       if (auth.kind === 'buyer') {
         headers['Authorization'] = 'Bearer ' + auth.token;
         headers['X-Buyer-Id'] = auth.id;
@@ -165,6 +155,7 @@
       fetch(base + '/api/reviews', {
         method: 'POST',
         headers: headers,
+        credentials: 'include',
         body: JSON.stringify(body)
       })
         .then(function (res) {
@@ -175,6 +166,10 @@
         .then(function (pack) {
           if (pack.status === 401) {
             resolve({ ok: false, error: 'auth_required' });
+            return;
+          }
+          if (pack.status === 403 || (pack.data && pack.data.error === 'interaction_required')) {
+            resolve({ ok: false, error: 'interaction_required', message: (pack.data && pack.data.message) || '' });
             return;
           }
           if (pack.status === 409 || (pack.data && pack.data.error === 'already_reviewed')) {

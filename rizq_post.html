@@ -429,7 +429,7 @@ main, .page-content.active, .main-content, .results-area,
        مطبَّقاً أبداً على الحسابات الفردية رغم أنه معلَن في بطاقات الباقات.
        نفس النمط المستخدَم فعلياً في rizq_dashboard_store/office/corp.html. -->
   <script src="rizq_subscription_engine.js"></script>
-<script src="rizq_pwa.js?v=31.10" defer></script>
+<script src="rizq_pwa.js?v=31.20" defer></script>
 <script src="rizq_footer_toggle.js?v=20" defer></script>
 <script src="rizq_ux_polish.js?v=17.0"></script>
 </head>
@@ -1587,7 +1587,7 @@ function publishAd(){
     loc:      cityLine ? (wilaya+' — '+cityLine) : wilaya,
     city:     cityLine,
     images:   photosData.filter(function(p){ return !!p; }), // صور حقيقية مضغوطة فعلياً (لا مصفوفة فارغة وهمية)
-    seller_trust_score: 60, // افتراضي — يُحدَّث عند توفر نظام الثقة
+    seller_trust_score: null, // يُحسب من التقييمات على السيرفر فقط
     condition: isServiceCat ? '' : (selCondition || 'جديد'),
     hidePhone: !!optFlags.hidePhone,
     negotiable: !!optFlags.negotiable,

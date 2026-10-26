@@ -5,7 +5,7 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '31.14';
+  var ASSET_V = '31.20';
   var MOCK_HDR_V = '5.82';
 
   if (typeof window.showToast !== 'function') {
@@ -412,7 +412,7 @@
         }).catch(function () {});
         return;
       }
-      navigator.serviceWorker.register('sw.js?v=22.3').then(function (reg) {
+      navigator.serviceWorker.register('sw.js?v=31.20').then(function (reg) {
         try { if (reg && reg.update) reg.update(); } catch (eUp) {}
       }).catch(function (err) {
         console.warn('Rizq PWA: تعذّر تسجيل service worker', err);

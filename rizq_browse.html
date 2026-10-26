@@ -1345,7 +1345,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   <script src="rizq_announcements.js"></script>
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين لكل إعلان (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
   <script src="rizq_subscription_engine.js"></script>
-<script src="rizq_pwa.js?v=31.10" defer></script>
+<script src="rizq_pwa.js?v=31.20" defer></script>
 <script src="rizq_footer_toggle.js?v=22" defer></script>
 <script src="rizq_terms_gate.js"></script>
 <script src="rizq_auth_gate.js?v=19.3" defer></script>
@@ -2112,10 +2112,32 @@ function _rizqFetchAndOpenAd(id){
     })
     .catch(function(){ return false; });
 }
-const ALL_ADS = loadRealSearchAds().concat(DEMO_ADS);
+const ALL_ADS = loadRealSearchAds().concat((window.RizqDemo && RizqDemo.inventoryAllowed && RizqDemo.inventoryAllowed()) ? DEMO_ADS : []);
+
+/* عند ضبط launchDate لاحقاً من site-config: أزل DEMO من القائمة (إلا ?demo=1) */
+(function(){
+  function stripDemoIfLaunched(){
+    try {
+      if (window.RizqDemo && RizqDemo.inventoryAllowed && RizqDemo.inventoryAllowed()) return;
+      if (!Array.isArray(ALL_ADS)) return;
+      var demoIds = {};
+      (DEMO_ADS||[]).forEach(function(a){ if(a&&a.id!=null) demoIds[String(a.id)] = true; });
+      for (var i = ALL_ADS.length - 1; i >= 0; i--) {
+        var id = ALL_ADS[i] && ALL_ADS[i].id;
+        if (id != null && demoIds[String(id)]) ALL_ADS.splice(i, 1);
+      }
+      if (typeof applyFilters === 'function') applyFilters();
+    } catch (eStrip) {}
+  }
+  document.addEventListener('rizq:launch', stripDemoIfLaunched);
+  if (window.RizqApi && typeof RizqApi.siteConfig === 'function') {
+    RizqApi.siteConfig().then(stripDemoIfLaunched);
+  }
+})();
 
 /* Showcase featured ads from landing (ids 201–210) so deep-links work even without handoff */
 (function _injectFeaturedShowcase(){
+  if(!(window.RizqDemo && RizqDemo.inventoryAllowed && RizqDemo.inventoryAllowed())) return;
   var showcase = [
     {id:201,subcat:'شقق للكراء',cat:'عقارات',wilaya:'نواكشوط الغربية',title:'شقة فاخرة 3 غرف — نواكشوط الغربية',titleFr:'Appartement de luxe 3 pièces — Nouakchott Ouest',desc:'تشطيب عالي الجودة، إطلالة بانورامية على المدينة، تكييف مركزي في كل الغرف، حراسة 24/7، موقف سيارات خاص.',descFr:'Finition haut de gamme, vue panoramique, climatisation centrale, sécurité 24/7, parking privé.',price:'150,000 MRU/شهر',priceNum:150000,verified:true,pin:true,emoji:'🏠',loc:'📍 نواكشوط الغربية',seller:'محمد الأمين'},
     {id:202,subcat:'معدات بناء',cat:'شاحنات',wilaya:'نواكشوط',title:'حفارة Caterpillar 320D — بحالة ممتازة',titleFr:'Pelleteuse Caterpillar 320D — excellent état',desc:'ساعات عمل منخفضة جداً (3200 ساعة فقط)، جاهزة للتسليم الفوري مع ضمان ستة أشهر.',descFr:'Très peu d\'heures (3200h), prête à livrer avec garantie six mois.',price:'35,000,000 MRU',priceNum:35000000,verified:true,pin:false,emoji:'🚛',loc:'📍 نواكشوط',seller:'شركة المعدات الموريتانية',hoursWorked:3200,year:2019},

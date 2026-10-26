@@ -1074,7 +1074,7 @@ function saveService(){
     cover: _svcCoverDraft || (existing && existing.cover) || '',
     thumb: _svcThumbDraft || (existing && existing.thumb) || '',
     seller: typeof accData !== 'undefined' ? (accData.name||_t2('مكتب','Bureau')) : _t2('مكتب','Bureau'),
-    seller_trust_score: 70,
+    seller_trust_score: null,
   };
 
   function doSave(data){

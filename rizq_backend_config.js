@@ -125,4 +125,31 @@
   window.RizqApi.invalidatePublicAccounts = function () {
     _publicAccountsByKey = Object.create(null);
   };
+
+  /**
+   * مخزون DEMO_ADS / نوافذ العرض التجريبية:
+   * - يظهر ما دام launchDate فارغاً في site-config
+   * - يختفي تلقائياً عند ضبط تاريخ الإطلاق
+   * - ?demo=1 يُبقي الظهور للاختبار فقط حتى بعد الإطلاق
+   */
+  window.RizqDemo = window.RizqDemo || {};
+  window.RizqDemo.inventoryAllowed = function () {
+    try {
+      if (/[?&]demo=1(?:&|$)/.test(String(window.location && window.location.search || ''))) {
+        return true;
+      }
+    } catch (eDemoQ) {}
+    try {
+      var ld = window.RIZQ_LAUNCH && window.RIZQ_LAUNCH.launchDate;
+      return !ld;
+    } catch (eDemoL) {
+      return true;
+    }
+  };
+  /* جلب مبكّر لـ launchDate حتى تتكيّف الصفحات قبل الرسم النهائي */
+  try {
+    if (typeof window.RizqApi.siteConfig === 'function') {
+      window.RizqApi.siteConfig();
+    }
+  } catch (eBootCfg) {}
 })();

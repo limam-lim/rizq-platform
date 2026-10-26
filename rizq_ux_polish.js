@@ -979,18 +979,28 @@
             accent: ad.sellerAccent || '#1B3A6B'
           };
     var name = brand.name || (fr ? 'Vendeur' : 'البائع');
+    var reviewCount = Number(ad.reviewCount || 0);
     var score = Number(ad.seller_trust_score);
-    if (!Number.isFinite(score) && Number.isFinite(Number(ad.reviewAverage))) {
+    if (!Number.isFinite(score) && Number.isFinite(Number(ad.reviewAverage)) && reviewCount > 0) {
       score = Math.round(Number(ad.reviewAverage) * 20);
     }
-    if (!Number.isFinite(score)) score = ad.verified ? 75 : 60;
-    score = Math.max(0, Math.min(100, Math.round(score)));
-    var verified = !!ad.verified;
+    /* لا نخترع 60/75 — اعرض الدرجة فقط إن وصلت من السيرفر مع مراجعات */
+    var hasScore = Number.isFinite(score) && reviewCount > 0;
+    if (hasScore) score = Math.max(0, Math.min(100, Math.round(score)));
+    var verified = !!(ad.verified || ad.id_verified);
     var adsCount = Number(ad.sellerAdsCount || ad.adsCount || 0);
     var since = ad.memberSince || ad.sellerSince || '';
     var profileHref = opts.profileHref || (ad.accountId ? 'rizq_profile.html?id=' + encodeURIComponent(ad.accountId) : '');
-    var rating = (score / 20).toFixed(1);
-    var stars = score >= 80 ? '★★★★★' : score >= 60 ? '★★★★☆' : score >= 40 ? '★★★☆☆' : '★★☆☆☆';
+    var rating = hasScore ? (score / 20).toFixed(1) : '';
+    var stars = !hasScore
+      ? ''
+      : score >= 80
+        ? '★★★★★'
+        : score >= 60
+          ? '★★★★☆'
+          : score >= 40
+            ? '★★★☆☆'
+            : '★★☆☆☆';
 
     var badges = '';
     if (verified) {
@@ -999,7 +1009,7 @@
         escapeHtml(fr ? 'Vérifié' : 'موثّق') +
         '</span>';
     }
-    if (score >= 80) {
+    if (hasScore && score >= 80) {
       badges +=
         '<span class="rizq-trust-badge gold">' +
         escapeHtml(fr ? 'Confiance élevée' : 'ثقة عالية') +
@@ -1007,13 +1017,23 @@
     }
 
     var meta = [];
-    meta.push(
-      '<span class="rizq-trust-score" title="' +
-        escapeHtml(fr ? 'Score de confiance' : 'درجة الثقة') +
-        '">' +
-        score +
-        '/100</span>'
-    );
+    if (hasScore) {
+      meta.push(
+        '<span class="rizq-trust-score" title="' +
+          escapeHtml(fr ? 'Score de confiance' : 'درجة الثقة') +
+          '">' +
+          score +
+          '/100</span>'
+      );
+    } else {
+      meta.push(
+        '<span class="rizq-trust-score is-empty" title="' +
+          escapeHtml(fr ? 'Pas encore d’avis' : 'لا تقييمات بعد') +
+          '">' +
+          escapeHtml(fr ? 'Sans avis' : 'بدون تقييم') +
+          '</span>'
+      );
+    }
     if (adsCount > 0) {
       meta.push(
         '<span>' +
@@ -1067,13 +1087,15 @@
       '<div class="rizq-trust-name">' +
       escapeHtml(name) +
       '</div>' +
-      '<div class="rizq-trust-stars" aria-label="' +
-      rating +
-      '">' +
-      stars +
-      ' <em>' +
-      rating +
-      '</em></div>' +
+      (hasScore
+        ? '<div class="rizq-trust-stars" aria-label="' +
+          rating +
+          '">' +
+          stars +
+          ' <em>' +
+          rating +
+          '</em></div>'
+        : '') +
       (badges ? '<div class="rizq-trust-badges">' + badges + '</div>' : '') +
       '<div class="rizq-trust-meta">' +
       meta.join('<span class="dot">·</span>') +
