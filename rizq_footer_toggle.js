@@ -35,11 +35,11 @@
       /* عند إغلاق الروابط: الزر + شعار الشركة في الوسط — لا انزياح لليمين */
       + '.rzq-ft-toggle-row{display:flex;justify-content:center;align-items:center;'
       + 'width:auto;max-width:100%;margin:0 auto;padding:0;position:relative;z-index:2}'
-      + '.rzq-ft-toggle-btn{display:flex;align-items:center;justify-content:center;gap:5px;'
-      + 'margin:0;padding:6px 14px;background:rgba(201,168,76,.14)!important;'
-      + 'border:1px solid rgba(201,168,76,.55)!important;border-radius:10px;color:#E8C96A!important;'
+      + '.rzq-ft-toggle-btn{display:flex;align-items:center;justify-content:center;gap:6px;'
+      + 'margin:0;padding:8px 18px;background:rgba(201,168,76,.14)!important;'
+      + 'border:1px solid rgba(201,168,76,.55)!important;border-radius:11px;color:#E8C96A!important;'
       + '-webkit-text-fill-color:#E8C96A!important;'
-      + 'font-size:11px;font-weight:700;cursor:pointer;transition:all .25s ease;'
+      + 'font-size:12.5px;font-weight:700;cursor:pointer;transition:all .25s ease;'
       + 'font-family:inherit;width:max-content;max-width:100%;text-align:center;'
       + 'position:relative;z-index:2}'
       + '.rzq-ft-toggle-btn .rzq-ft-txt{color:#E8C96A!important;-webkit-text-fill-color:#E8C96A!important}'
@@ -49,7 +49,7 @@
       + 'body.rizq-detail-open .rzq-ft-adminia-stack,'
       + 'body.rizq-detail-open footer.rizq-footer{'
       + 'display:none!important;visibility:hidden!important;pointer-events:none!important}'
-      + '.rzq-ft-toggle-btn .rzq-ft-chev{display:inline-block;font-size:9px;transition:transform .3s ease}'
+      + '.rzq-ft-toggle-btn .rzq-ft-chev{display:inline-block;font-size:10px;transition:transform .3s ease}'
       + '.rzq-ft-toggle-btn[aria-expanded="true"] .rzq-ft-chev{transform:rotate(180deg)}'
       + '.rzq-ft-collapse-wrap{max-height:0;overflow:hidden;transition:max-height .4s ease}'
       + '@media (prefers-reduced-motion: reduce){.rzq-ft-collapse-wrap{transition:none}}'
@@ -63,29 +63,31 @@
       + 'html body footer.rizq-footer,html body footer{box-sizing:border-box!important;overflow:visible!important}'
       + 'html body footer.rizq-footer .footer-bottom,'
       + 'html body footer .footer-bottom{'
-      + 'padding:4px 0 2px!important;margin-bottom:0!important;'
+      + 'padding:8px 0 6px!important;margin-bottom:0!important;'
       + 'align-items:center!important;justify-content:center!important;'
-      + 'flex-direction:column!important;text-align:center!important;row-gap:4px!important;gap:4px!important}'
+      + 'flex-direction:column!important;text-align:center!important;row-gap:8px!important;gap:8px!important}'
       + 'html body footer .rzq-ft-adminia-stack{padding-bottom:0!important;margin-bottom:0!important;'
-      + 'align-items:center!important;margin-left:auto!important;margin-right:auto!important;gap:2px!important}'
-      /* تابعنا: في الوسط فوق الحقوق وشعار الشركة */
-      + 'html body footer.rzq-ft-compact #rizq-social-follow,'
-      + 'html body footer.rizq-footer.rzq-ft-compact #rizq-social-follow{'
-      + 'margin:4px auto 2px!important;padding:0 0 4px!important;width:100%!important;'
+      + 'align-items:center!important;margin-left:auto!important;margin-right:auto!important;gap:8px!important}'
+      /* تابعنا داخل .footer-bottom — وسط الشاشة فوق الحقوق وشعار الشركة */
+      + 'html body footer #rizq-social-follow,'
+      + 'html body footer.rizq-footer #rizq-social-follow,'
+      + 'html body footer .footer-bottom > #rizq-social-follow{'
+      + 'margin:0 auto!important;padding:2px 0 4px!important;width:100%!important;max-width:100%!important;'
       + 'display:flex!important;flex-direction:column!important;align-items:center!important;'
-      + 'text-align:center!important}'
-      + 'html body footer.rzq-ft-compact #rizq-social-follow .rzq-soc-title{'
-      + 'margin:0 0 6px!important;font-size:11px!important;text-align:center!important;width:100%}'
-      + 'html body footer.rzq-ft-compact #rizq-social-follow .rzq-soc-row{'
-      + 'justify-content:center!important;gap:8px!important}'
-      + 'html body footer.rzq-ft-compact #rizq-social-follow .rzq-soc-btn{width:32px!important;height:32px!important}'
-      + 'html body footer.rzq-ft-compact #rizq-social-follow .rzq-soc-btn svg{width:18px!important;height:18px!important}'
+      + 'justify-content:center!important;text-align:center!important;float:none!important;'
+      + 'position:relative!important;inset:auto!important;order:-1!important}'
+      + 'html body footer #rizq-social-follow .rzq-soc-title{'
+      + 'margin:0 0 8px!important;font-size:13px!important;text-align:center!important;width:100%!important}'
+      + 'html body footer #rizq-social-follow .rzq-soc-row{'
+      + 'justify-content:center!important;align-items:center!important;gap:10px!important;width:100%!important}'
+      + 'html body footer #rizq-social-follow .rzq-soc-btn{width:36px!important;height:36px!important}'
+      + 'html body footer #rizq-social-follow .rzq-soc-btn svg{width:20px!important;height:20px!important}'
       /* توقيع ADMINIA مكرّر تحت الشارة — أخفه عند الطيّ لتقليل الارتفاع */
       + 'html body footer.rzq-ft-compact .footer-bottom > .footer-copy[data-t="ft-sig"]{'
       + 'display:none!important}'
-      + 'html body footer.rzq-ft-compact .footer-bottom > .footer-copy[data-t="ft-copy"],'
-      + 'html body footer.rizq-footer.rzq-ft-compact .footer-bottom > .footer-copy[data-t="ft-copy"]{'
-      + 'font-size:11.5px!important;line-height:1.4!important;margin:0!important}'
+      + 'html body footer .footer-bottom > .footer-copy[data-t="ft-copy"],'
+      + 'html body footer.rizq-footer .footer-bottom > .footer-copy[data-t="ft-copy"]{'
+      + 'font-size:13px!important;line-height:1.45!important;margin:0!important;text-align:center!important}'
       + 'html body footer,html body footer.rizq-footer{'
       + 'background:linear-gradient(180deg,#0D1B2A,#071020)!important;'
       + 'background-blend-mode:normal!important}'
@@ -132,29 +134,51 @@
     return open ? 'إخفاء الروابط' : 'روابط وأقسام';
   }
 
+  /** انقل #rizq-social-follow ليصبح أول طفل في .footer-bottom */
+  function placeSocialAboveCopyright(footerEl) {
+    if (!footerEl) return;
+    var fb = footerEl.querySelector('.footer-bottom');
+    if (!fb) return;
+    var soc = document.getElementById('rizq-social-follow');
+    if (!soc) {
+      soc = document.createElement('div');
+      soc.id = 'rizq-social-follow';
+      soc.setAttribute('data-rizq-social', '1');
+      soc.hidden = true;
+    }
+    if (soc.parentNode !== fb || fb.firstElementChild !== soc) {
+      fb.insertBefore(soc, fb.firstChild);
+    }
+    soc.style.width = '100%';
+    soc.style.textAlign = 'center';
+    soc.style.display = soc.classList.contains('is-visible') || soc.querySelector('.rzq-soc-btn') ? 'flex' : '';
+    soc.style.flexDirection = 'column';
+    soc.style.alignItems = 'center';
+  }
+
   function shrinkFooterBottom(scope) {
     var fb = (scope || document).querySelector('.footer-bottom');
     if (!fb || fb.dataset.rzqSlim) return;
     fb.dataset.rzqSlim = '1';
-    fb.style.padding = '6px 0 4px';
-    fb.style.gap = '8px';
+    fb.style.padding = '8px 0 6px';
+    fb.style.gap = '10px';
     /* وسط الشاشة عند طي الروابط — بدون تحريك الشعار لليمين */
     fb.style.alignItems = 'center';
     fb.style.justifyContent = 'center';
     fb.style.flexDirection = 'column';
     fb.style.textAlign = 'center';
-    fb.querySelectorAll('.footer-copy').forEach(function (p) { p.style.fontSize = '11.5px'; });
-    var icon = fb.querySelector('[style*="34px"]');
+    fb.querySelectorAll('.footer-copy').forEach(function (p) { p.style.fontSize = '13px'; });
+    var icon = fb.querySelector('[style*="34px"], .adminia-ft > div:first-child');
     if (icon) {
-      icon.style.width = '28px';
-      icon.style.height = '28px';
-      icon.style.fontSize = '7.5px';
+      icon.style.width = '32px';
+      icon.style.height = '32px';
+      icon.style.fontSize = '8.5px';
       var box = icon.parentElement;
-      if (box) { box.style.padding = '8px 14px'; box.style.gap = '8px'; }
+      if (box) { box.style.padding = '10px 16px'; box.style.gap = '10px'; }
       var textWrap = icon.nextElementSibling;
       if (textWrap && textWrap.children.length >= 2) {
-        textWrap.children[0].style.fontSize = '12px';
-        textWrap.children[1].style.fontSize = '7.5px';
+        textWrap.children[0].style.fontSize = '13.5px';
+        textWrap.children[1].style.fontSize = '8.5px';
       }
     }
   }
@@ -188,14 +212,6 @@
     var footerEl = grid.closest('footer');
     try { restoreFullFooterLayout(footerEl, grid); } catch (eRestore) { /* ignore */ }
     shrinkFooterBottom(footerEl);
-    try {
-      var soc = document.getElementById('rizq-social-follow');
-      var fbEl = footerEl && footerEl.querySelector('.footer-bottom');
-      if (soc && fbEl && soc.parentNode === footerEl && soc.nextElementSibling !== fbEl) {
-        footerEl.insertBefore(soc, fbEl);
-      }
-    } catch (eSoc) { /* ignore */ }
-
 
     var wrap = document.createElement('div');
     wrap.className = 'rzq-ft-collapse-wrap';
@@ -226,6 +242,11 @@
     } else {
       wrap.parentNode.insertBefore(row, wrap.nextSibling);
     }
+
+    /* تابعنا → أول عنصر في .footer-bottom (فوق الحقوق وشعار الشركة، وسط الشاشة) */
+    try {
+      placeSocialAboveCopyright(footerEl);
+    } catch (eSoc) { /* ignore */ }
 
     var open = false;
     var api = {
@@ -353,7 +374,7 @@
     } catch (e) {}
     if (document.querySelector('script[src*="rizq_social_links.js"]')) return;
     var s = document.createElement('script');
-    s.src = 'rizq_social_links.js?v=23.11';
+    s.src = 'rizq_social_links.js?v=23.12';
     s.defer = true;
     (document.head || document.documentElement).appendChild(s);
   }

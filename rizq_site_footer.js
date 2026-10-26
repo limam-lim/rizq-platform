@@ -148,8 +148,8 @@
       + '    </div>'
       + '  </div>'
       /* تابعنا خارج الطيّ — يظهر على الهاتف وكل الأجهزة بلا الحاجة لفتح «روابط وأقسام» */
-      + '  <div id="rizq-social-follow" hidden style="padding:2px 0 6px"></div>'
       + '  <div class="footer-bottom">'
+      + '    <div id="rizq-social-follow" hidden style="padding:2px 0 4px;width:100%;text-align:center"></div>'
       + '    <p class="footer-copy" id="rzq-site-ft-copy" data-t="ft-copy" data-t-fr="© 2026 Rizq — Tous droits réservés 🇲🇷">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</p>'
       + '    <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" title="ADMINIA SARL — À propos">'
       + '      <div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#C9A84C;letter-spacing:2px;font-family:sans-serif">AML</div>'
