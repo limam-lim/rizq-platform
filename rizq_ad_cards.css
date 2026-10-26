@@ -62,17 +62,17 @@
 #hero-listings .cards-track .ad-card:has(.rzq-adx-media),
 .cards-track .ad-card:has(.rzq-adx-media){
   /* يتسع لصورة + فئة + عنوان بسطرين + صف ماركة اختياري + موقع + أزرار */
-  height:372px!important;
-  min-height:372px!important;
-  max-height:372px!important;
+  height:380px!important;
+  min-height:380px!important;
+  max-height:380px!important;
   align-self:stretch!important;
 }
 @media (max-width:768px){
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media),
   .cards-track .ad-card:has(.rzq-adx-media){
-    height:338px!important;
-    min-height:338px!important;
-    max-height:338px!important;
+    height:348px!important;
+    min-height:348px!important;
+    max-height:348px!important;
   }
 }
 .rzq-ad-brand-slot .rzq-brand-chip{
@@ -340,14 +340,14 @@
   align-items:center;
   text-align:center;
   gap:0;
-  /* مسافة علوية كافية حتى لا تُقصّ قمم حروف الفئة تحت الصورة */
-  padding:8px 7px 8px!important;
+  /* مسافة علوية واضحة تحت شارة السعر حتى لا تُقصّ قمم الفئة */
+  padding:10px 7px 8px!important;
   position:relative;
-  z-index:1;
+  z-index:2;
   background:transparent!important;
   min-height:0;
   /* يتسع لسطر فئة + عنوان بسطرين + صف ماركة + موقع + أزرار دون ضغط flex */
-  max-height:152px;
+  max-height:156px;
   overflow:visible;
 }
 .ad-card:has(.rzq-adx-media) .rzq-adx-actions,
@@ -368,9 +368,9 @@
   letter-spacing:.2px;
   color:var(--rzq-adx-gold-light)!important;
   margin:0 0 4px!important;
-  padding:1px 0 2px;
+  padding:2px 0 3px;
   opacity:.95;
-  line-height:1.55!important;
+  line-height:1.6!important;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -386,7 +386,7 @@
   font-size:11px!important;
   font-weight:800!important;
   color:#fff!important;
-  line-height:1.45!important;
+  line-height:1.5!important;
   margin:0 0 3px!important;
   overflow:hidden;
   display:-webkit-box;
@@ -395,10 +395,10 @@
   -webkit-box-orient:vertical;
   word-break:break-word;
   overflow-wrap:anywhere;
-  /* لا max-height مع line-clamp — كان يقصّ ذيل الحروف العربية ~1px */
+  /* لا max-height مع line-clamp — كان يقصّ ذيل الحروف العربية */
   max-height:none;
-  min-height:calc(1.45em * 2);
-  padding-bottom:2px;
+  min-height:calc(1.5em * 2);
+  padding:1px 0 3px;
   box-sizing:content-box;
   text-shadow:0 1px 2px rgba(0,0,0,.28);
 }
@@ -406,33 +406,34 @@
 .ad-card:has(.rzq-adx-media) .ad-loc,
 .listing-card:has(.rzq-adx-media) .l-loc,
 .rc:has(.rzq-adx-media) .rc-loc{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:3px;
+  display:block;
   width:100%;
+  max-width:100%;
+  box-sizing:border-box;
   flex:0 0 auto!important;
   flex-shrink:0!important;
-  min-height:16px;
+  min-height:18px;
   font-size:10px!important;
   font-weight:600!important;
   color:rgba(255,255,255,.82)!important;
   margin:0 0 4px!important;
-  line-height:1.3!important;
+  padding:1px 0;
+  line-height:1.45!important;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .ad-card:has(.rzq-adx-media) .ad-footer,
 .rc:has(.rzq-adx-media) .rc-meta{
-  min-height:16px;
+  min-height:18px;
   width:100%;
+  max-width:100%;
+  overflow:hidden;
 }
+/* الموقع في البيانات يحتوي 📍 مسبقاً — لا تضف دبوساً ثانياً يسرق العرض */
 .ad-card:has(.rzq-adx-media) .ad-loc::before,
 .listing-card:has(.rzq-adx-media) .l-loc::before,
 .rc:has(.rzq-adx-media) .rc-loc::before{
-  content:'📍';
-  font-size:9px;
-  line-height:1;
-  opacity:.9;
+  content:none!important;
+  display:none!important;
 }
 
 /* إخفاء السعر المكرر في الجسم — السعر على الصورة */
@@ -647,26 +648,26 @@
   .ad-card:has(.rzq-adx-media) .ad-card-body,
   .listing-card:has(.rzq-adx-media) .l-body,
   .rc:has(.rzq-adx-media) .rc-body{
-    padding:8px 6px 8px!important;
-    max-height:148px;
+    padding:10px 6px 8px!important;
+    max-height:152px;
     overflow:visible;
   }
   .ad-card:has(.rzq-adx-media) .ad-title,
   .listing-card:has(.rzq-adx-media) .l-title,
   .rc:has(.rzq-adx-media) .rc-title{
-    line-height:1.45!important;
+    line-height:1.5!important;
     -webkit-line-clamp:2;
     line-clamp:2;
     max-height:none;
-    min-height:calc(1.45em * 2);
-    padding-bottom:2px;
+    min-height:calc(1.5em * 2);
+    padding:1px 0 3px;
   }
   .ad-card:has(.rzq-adx-media) .ad-cat,
   .listing-card:has(.rzq-adx-media) .l-cat,
   .rc:has(.rzq-adx-media) .rc-cat{
-    line-height:1.55!important;
+    line-height:1.6!important;
     margin:0 0 4px!important;
-    padding:1px 0 2px;
+    padding:2px 0 3px;
   }
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .ad-title,
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .rzq-adx-title{

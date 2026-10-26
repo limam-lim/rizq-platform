@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=31.2"/>
-<link rel="stylesheet" href="rizq_ad_cards.css?v=27.4"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=27.5"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.6"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.1"/>
 <link rel="stylesheet" href="rizq_ui_surfaces.css?v=1"/>
@@ -3428,8 +3428,32 @@ html[dir="ltr"] .listings-section .section-desc{
     height:auto!important;min-height:180px!important;max-height:none!important;
     aspect-ratio:4 / 5!important;flex:1 1 70%!important;border-radius:12px 12px 0 0!important;
   }
-  #hero-listings .cards-track .ad-card-body{padding:6px 7px!important}
-  #hero-listings .cards-track .ad-title{font-size:10.5px!important}
+  /* كان padding:6px يقصّ قمم الفئة/العنوان تحت الصورة — لا تخفّضه */
+  #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .ad-card-body,
+  #hero-listings .cards-track .ad-card-body{
+    padding:10px 6px 8px!important;
+    max-height:148px!important;
+    overflow:visible!important;
+    gap:0!important;
+  }
+  #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .ad-cat{
+    font-size:9.5px!important;line-height:1.6!important;
+    margin:0 0 4px!important;padding:2px 0 2px!important;
+    flex-shrink:0!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  #hero-listings .cards-track .ad-title{
+    font-size:10.5px!important;line-height:1.5!important;
+    -webkit-line-clamp:2!important;line-clamp:2!important;
+    display:-webkit-box!important;-webkit-box-orient:vertical!important;
+    overflow:hidden!important;max-height:none!important;
+    min-height:calc(1.5em * 2)!important;padding:1px 0 3px!important;
+    margin:0 0 3px!important;flex-shrink:0!important;
+  }
+  #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .ad-loc{
+    font-size:10px!important;line-height:1.45!important;
+    min-height:18px!important;padding:1px 0!important;margin:0!important;
+    flex-shrink:0!important;max-width:100%;
+  }
   #hero-listings .cards-track .ad-price{font-size:10px!important;padding:2px 6px!important}
   #hero-listings .cards-track .ad-hover-detail{display:none!important}
   .live-capsule{padding:2px 8px 2px 6px!important;gap:5px!important}
