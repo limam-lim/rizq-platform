@@ -2781,7 +2781,11 @@ html[dir="ltr"] .price-ticker-wrap::after{
   display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:4px 8px;
   box-shadow:0 2px 8px rgba(15,35,65,.12),inset 0 1px 0 rgba(255,255,255,.05);
   transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
-  position:relative;min-height:0;overflow:hidden;
+  position:relative;min-height:0;overflow:visible;
+}
+.price-card-currency{
+  flex-direction:column;align-items:stretch;gap:5px;padding:8px 10px 8px 12px;
+  overflow:hidden;
 }
 .price-card::before{
   content:'';position:absolute;inset-inline-start:0;top:7px;bottom:7px;width:2px;border-radius:2px;
@@ -2799,16 +2803,32 @@ html[dir="ltr"] .price-ticker-wrap::after{
 }
 .price-card-top{display:flex;align-items:center;gap:4px;min-width:0;flex:1}
 .price-curr-flag{font-size:12px;line-height:1;flex-shrink:0}
+.price-curr-flag-img{
+  width:22px;height:16px;object-fit:cover;border-radius:3px;flex-shrink:0;
+  box-shadow:0 0 0 1px rgba(255,255,255,.22),0 1px 3px rgba(0,0,0,.25);
+  background:rgba(255,255,255,.08);
+}
+.price-card-currency .price-curr-flag-img{width:26px;height:18px;border-radius:4px}
+.price-card-currency .price-curr-flag-img.is-badge{width:26px;height:26px;object-fit:contain;border-radius:7px}
 .price-card-currency .price-value{font-size:13px;letter-spacing:.1px}
 .price-icon{font-size:12px;line-height:1}
 .price-name{
   color:#fff;font-weight:800;font-size:11px;line-height:1.15;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
 }
+.price-card-currency .price-name{
+  white-space:normal;overflow:visible;text-overflow:unset;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  line-height:1.25;font-size:11.5px;
+}
 .price-card-main{
   display:flex;align-items:baseline;justify-content:flex-end;gap:5px;margin-top:0;
   flex:0 0 auto;margin-inline-start:auto;
 }
+.price-card-currency .price-card-main{
+  justify-content:space-between;margin-inline-start:0;width:100%;flex-wrap:wrap;gap:4px 8px;
+}
+.price-card-currency .price-unit{white-space:normal;line-height:1.25}
 .price-row{display:flex;align-items:baseline;gap:5px;margin-top:0}
 .price-value{
   color:var(--gold);font-weight:900;font-size:13.5px;line-height:1.05;
@@ -2824,7 +2844,13 @@ html[dir="ltr"] .price-ticker-wrap::after{
 .price-trend.up{color:#6ee7a8;border-color:rgba(110,231,168,.25);background:rgba(110,231,168,.08)}
 .price-trend.down{color:#f4a3a3;border-color:rgba(244,163,163,.25);background:rgba(244,163,163,.08)}
 .price-trend.flat{color:rgba(255,255,255,.55)}
-.prices-note{text-align:center;color:var(--text-muted);font-size:11px;margin-top:10px;line-height:1.55}
+.prices-note{
+  text-align:center;color:var(--text-muted);font-size:11px;margin-top:10px;line-height:1.55;
+  padding:0 8px;max-width:100%;box-sizing:border-box;
+  white-space:normal;overflow:visible;text-overflow:unset;word-break:break-word;
+}
+.prices-board{overflow:visible}
+.prices-grid{overflow:visible}
 
 .cat-card::before{content:'';position:absolute;inset:0;border-radius:10px;background:linear-gradient(135deg,rgba(201,168,76,.1),transparent 58%);opacity:0;transition:opacity .35s;pointer-events:none!important}
 .cat-card,.cat-icon-box,.qcat,.cat-btn,.hero-biz-btn{pointer-events:auto!important}
@@ -14668,6 +14694,30 @@ function priceTrendHTML(t){
   if(t==='down') return '<span class="price-trend down">'+L.down+'</span>';
   return '<span class="price-trend flat">'+L.flat+'</span>';
 }
+/** شعارات العملات المحلية — أعلام الدول (+ شعار CFA لـ XOF) */
+const CURRENCY_FLAG_FILES = {
+  USD: 'rizq-assets/currency-flags/USD.png',
+  EUR: 'rizq-assets/currency-flags/EUR.png',
+  MAD: 'rizq-assets/currency-flags/MAD.png',
+  DZD: 'rizq-assets/currency-flags/DZD.png',
+  TND: 'rizq-assets/currency-flags/TND.png',
+  SAR: 'rizq-assets/currency-flags/SAR.png',
+  AED: 'rizq-assets/currency-flags/AED.png',
+  XOF: 'rizq-assets/currency-flags/XOF.svg',
+  TRY: 'rizq-assets/currency-flags/TRY.png',
+  CNY: 'rizq-assets/currency-flags/CNY.png',
+  AOA: 'rizq-assets/currency-flags/AOA.png'
+};
+function currencyFlagHTML(it){
+  const code = String((it && (it.code || it.unit)) || '').toUpperCase().replace(/[^A-Z]/g,'').slice(0,3);
+  const src = CURRENCY_FLAG_FILES[code];
+  const label = escapeHtml((it && it.name) || code || 'currency');
+  if(src){
+    const badge = code === 'XOF' ? ' is-badge' : '';
+    return '<img class="price-curr-flag-img'+badge+'" src="'+escapeHtml(src)+'" alt="'+label+'" width="26" height="18" loading="lazy" decoding="async">';
+  }
+  return '<span class="price-curr-flag" aria-hidden="true">'+escapeHtml((it && it.icon) || '💱')+'</span>';
+}
 function renderPrices(){
   const grid = document.getElementById('prices-grid');
   if(!grid) return;
@@ -14687,12 +14737,12 @@ function renderPrices(){
     if(it.cat==='currencies'){
       return `<div class="price-card price-card-currency">
         <div class="price-card-head">
-          <div class="price-card-top"><span class="price-curr-flag" aria-hidden="true">${escapeHtml(it.icon||'💱')}</span><div class="price-name">${escapeHtml(it.name)}</div></div>
+          <div class="price-card-top">${currencyFlagHTML(it)}<div class="price-name">${escapeHtml(it.name)}</div></div>
           ${priceTrendHTML(it.trend)}
         </div>
         <div class="price-card-main">
-          <div class="price-value">${Number(it.price||0).toLocaleString('en-US')}</div>
           <div class="price-unit" dir="ltr">${escapeHtml(it.unit)}</div>
+          <div class="price-value">${Number(it.price||0).toLocaleString('en-US')}</div>
         </div>
       </div>`;
     }
