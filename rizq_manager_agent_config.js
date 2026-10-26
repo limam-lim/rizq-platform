@@ -621,11 +621,22 @@ function processMessage(userMessage, context) {
       };
     }
     if (/\u0645\u0648\u062B\u0648\u0642|ثقة|trust|fiabl/.test(lower)) {
-      var trust = pageAd.seller_trust_score != null ? pageAd.seller_trust_score : (pageAd.verified ? 85 : 60);
+      var trust = pageAd.seller_trust_score != null && Number(pageAd.reviewCount || 0) > 0
+        ? pageAd.seller_trust_score
+        : null;
+      var verified = !!(pageAd.verified || pageAd.id_verified);
       return {
-        reply: lang === 'fr'
-          ? 'Score de confiance: ' + trust + '/100. Préférez les vendeurs vérifiés (badge ✅).'
-          : 'درجة الثقة: ' + trust + '/100. يُفضّل البائعون الموثّقون (شارة ✅).',
+        reply: trust != null
+          ? (lang === 'fr'
+            ? 'Score de confiance (avis réels): ' + trust + '/100.'
+            : 'درجة الثقة (من تقييمات حقيقية): ' + trust + '/100.')
+          : (lang === 'fr'
+            ? (verified
+              ? 'Identité vérifiée, mais pas encore d’avis publiés pour ce vendeur.'
+              : 'Aucun avis publié pour ce vendeur pour le moment.')
+            : (verified
+              ? 'الهوية موثّقة، لكن لا توجد تقييمات منشورة لهذا البائع بعد.'
+              : 'لا توجد تقييمات منشورة لهذا البائع حالياً.')),
         lang: lang, grounded: true
       };
     }

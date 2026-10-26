@@ -78,7 +78,7 @@
     var text    = _buildTextCorpus(adData);
     var price   = _parsePrice(adData.price);
     var cat     = (adData.category || '').toLowerCase();
-    var trust   = adData.seller_trust_score || 60;
+    var trust   = Number.isFinite(Number(adData.seller_trust_score)) ? Number(adData.seller_trust_score) : null;
     var cfg     = _getModConfig();
     var secRule = _getSectionRule(adData.accountType);
 
@@ -266,10 +266,12 @@
   ══════════════════════════════════════════ */
   function _checkTrust(trust, id, cfg) {
     cfg = cfg || DEFAULT_MOD_CFG;
+    // بلا درجة معروفة (بائع جديد) — لا نختلق 60؛ نتخطّى عتبة الثقة الرقمية
+    if (trust == null || !Number.isFinite(Number(trust))) return null;
     // عتبة الثقة قابلة للضبط من لوحة "إعدادات المشرف" (threshold، افتراضياً 70).
     // أي حساب بدرجة ثقة أقل من العتبة يذهب للمراجعة البشرية.
     var threshold = (typeof cfg.threshold === 'number' && !isNaN(cfg.threshold)) ? cfg.threshold : 70;
-    if (trust < threshold) {
+    if (Number(trust) < threshold) {
       return _buildDecision('review_human', ['H01'], id, 'حساب دون عتبة الثقة المضبوطة (' + threshold + ') — يحتاج مراجعة بشرية');
     }
     return null;

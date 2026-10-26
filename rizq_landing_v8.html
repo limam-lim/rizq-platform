@@ -5225,7 +5225,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_contact_gate.js"></script>
 <script src="rizq_dynamic_nav.js?v=23.5"></script>
 <script src="rizq_module_flags.js?v=1.2"></script>
-<script src="rizq_pwa.js?v=31.10" defer></script>
+<script src="rizq_pwa.js?v=31.20" defer></script>
 <script src="rizq_footer_toggle.js?v=23.3" defer></script>
 <script src="rizq_social_links.js?v=23.8" defer></script>
 <script src="rizq_account_route.js?v=23.0"></script>
@@ -10501,6 +10501,28 @@ function _adPhotoHtml(a, d, h){
   }
   return '<span>'+(d&&d.emoji?d.emoji:'📦')+'</span>';
 }
+
+/* لا تعرض ثقة/نجوم وهمية من مخزون الديمو الثابت */
+(function(){
+  function scrubTrust(list){
+    if(!Array.isArray(list)) return;
+    list.forEach(function(a){
+      if(!a || typeof a !== 'object') return;
+      if(a.sellerMeta) a.sellerMeta = '';
+      if(a.sellerMetaFR) a.sellerMetaFR = '';
+      if(a.status && /موثّق|Vérifié|شركة موثّقة|Entreprise/.test(String(a.status))) {
+        a.status = '';
+        a.statusFR = '';
+      }
+      a.verified = false;
+      a.seller_trust_score = null;
+      a.reviewCount = 0;
+    });
+  }
+  if(typeof ADS !== 'undefined') scrubTrust(ADS);
+  if(typeof FEATURED_ADS !== 'undefined') scrubTrust(FEATURED_ADS);
+})();
+
 function refreshAllAdsIndex(){
   ALL_ADS_DATA.length = 0;
   ADS.forEach(function(a){ ALL_ADS_DATA.push(a); });

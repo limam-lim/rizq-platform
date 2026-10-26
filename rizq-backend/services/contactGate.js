@@ -248,6 +248,7 @@ const ACCOUNT_PUBLIC_SAFE = [
   'activityId', 'activity', 'storeTopics',
   'facebook', 'thumb', 'cover', 'tagline', 'status', 'approvedAt', 'createdAt',
   'foundingPartner', 'foundingDiscountPercent',
+  'seller_trust_score', 'reviewCount', 'reviewAverage', 'id_verified',
 ];
 
 function toPublicAccountGated(acc, gate) {
@@ -284,9 +285,23 @@ function toPublicAdGated(ad, gate, sellerAccount) {
   if (!ad) return null;
   const contact = sellerAccount ? toGatedContactPayload(sellerAccount, gate) : { contactsLocked: true, phone: null, email: null, whatsapp: null };
   const unlocked = gate && gate.contactsUnlocked;
+  const liveScore = sellerAccount && Number.isFinite(Number(sellerAccount.seller_trust_score))
+    ? Math.max(0, Math.min(100, Math.round(Number(sellerAccount.seller_trust_score))))
+    : null;
+  const reviewCount = sellerAccount && Number.isFinite(Number(sellerAccount.reviewCount))
+    ? Math.max(0, Math.round(Number(sellerAccount.reviewCount)))
+    : 0;
+  const reviewAverage = sellerAccount && Number.isFinite(Number(sellerAccount.reviewAverage))
+    ? Number(sellerAccount.reviewAverage)
+    : null;
   return Object.assign({}, ad, {
     desc: unlocked ? ad.desc : redactContactPatterns(ad.desc),
     descFr: unlocked ? (ad.descFr || '') : redactContactPatterns(ad.descFr || ''),
+    /* بث درجة الثقة الحية من الحساب — لا تُثبَّت 60 على الإعلان */
+    seller_trust_score: liveScore,
+    reviewCount,
+    reviewAverage,
+    verified: !!(sellerAccount && (sellerAccount.id_verified || sellerAccount.verified)),
     contactsLocked: !unlocked,
     sellerContact: unlocked ? {
       phone: contact.phone,
