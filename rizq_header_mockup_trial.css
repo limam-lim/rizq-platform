@@ -74,8 +74,6 @@ html.rizq-app-nav .rizq-thumb-dock,
 html.rizq-app-nav #rizq-search-theater,
 html.rizq-app-nav #rizq-search-pill,
 html.rizq-app-nav .nav-sticky-tools,
-html.rizq-app-nav .hero-browse-panel,
-html.rizq-app-nav .hero-stage-intent,
 html.rizq-app-nav .mobile-bottom-nav,
 html.rizq-app-nav #mobile-bottom-nav,
 html.rizq-app-nav #section-jump-bar,
@@ -89,8 +87,6 @@ body.rizq-mockup-hdr-trial .rizq-thumb-dock,
 body.rizq-mockup-hdr-trial #rizq-search-theater,
 body.rizq-mockup-hdr-trial #rizq-search-pill,
 body.rizq-mockup-hdr-trial .nav-sticky-tools,
-body.rizq-mockup-hdr-trial .hero-browse-panel,
-body.rizq-mockup-hdr-trial .hero-stage-intent,
 body.rizq-mockup-hdr-trial .mobile-bottom-nav,
 body.rizq-mockup-hdr-trial #section-jump-bar,
 body.rizq-mockup-hdr-trial #rizq-announce-ticker,
@@ -101,6 +97,30 @@ body.rizq-mockup-hdr-trial > nav:not(#rizq-desk-nav):not(#rizq-thumb-dock):not(.
   display:none!important;
   visibility:hidden!important;
   pointer-events:none!important;
+}
+/* مع الهيدر الموحّد: أظهر الأقسام السريعة + روابط المنصة، وأخفِ البحث المكرّر فقط */
+html.rizq-app-nav .hero-browse-panel .hero-search,
+html.rizq-app-nav .hero-browse-panel .hero-browse-head,
+body.rizq-mockup-hdr-trial .hero-browse-panel .hero-search,
+body.rizq-mockup-hdr-trial .hero-browse-panel .hero-browse-head{
+  display:none!important;
+}
+html.rizq-app-nav .hero-stage-intent,
+html.rizq-app-nav .hero-browse-panel,
+body.rizq-mockup-hdr-trial .hero-stage-intent,
+body.rizq-mockup-hdr-trial .hero-browse-panel{
+  display:block!important;
+  visibility:visible!important;
+  pointer-events:auto!important;
+  height:auto!important;
+  max-height:none!important;
+  opacity:1!important;
+  overflow:visible!important;
+}
+html.rizq-app-nav .hero-browse-panel,
+body.rizq-mockup-hdr-trial .hero-browse-panel{
+  padding:12px 12px 10px!important;
+  overflow:visible!important;
 }
 /* أقوى من قواعد rizq-phone-thumb-dock — الشريط الموحّد rmh يكفي */
 html.rizq-app-nav.rizq-phone-thumb-dock body.rizq-mockup-hdr-trial #rizq-thumb-dock,
@@ -1418,15 +1438,16 @@ body > .rizq-help-dd-menu a,
     width:100%!important;
     max-width:100%!important;
     margin:0!important;
-    /* هامش جانبي متساوٍ يمين/يسار — لا يلاصق «سوق العقارات» الحافة */
-    padding:6px 6px calc(8px + max(env(safe-area-inset-bottom,0px),20px))!important;
-    /* مستقيم من فوق — بلا تقوّس يُظهر بياض الصفحة خلف الزوايا */
+    /* رئيسية يمين / سوق العقارات يسار داخل الكبسولة + فراغ بين النصوص */
+    padding:6px 8px calc(8px + max(env(safe-area-inset-bottom,0px),20px))!important;
     border-radius:0!important;
     border:0!important;
     background:#070e1a!important;
     box-shadow:0 -1px 0 rgba(201,168,76,.22)!important;
+    /* توزيع متساوٍ للمسافات بين الأزرار مع عرض طبيعي للنص */
     justify-content:space-between!important;
-    gap:0!important;
+    align-items:stretch!important;
+    gap:6px!important;
     overflow:hidden!important;
     isolation:isolate;
     -webkit-backdrop-filter:none!important;
@@ -1476,17 +1497,18 @@ body > .rizq-help-dd-menu a,
     white-space:nowrap!important;
     text-align:center;
   }
-  /* الشريط السفلي (5 أزرار) — مساحة أوضح مع بقاء سطر واحد */
+  /* الشريط السفلي: عرض حسب النص + توزيع المسافة (بدون تصغير الخط) */
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a,
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > .rmh-more-btn,
   nav.rmh-nav:not(.rmh-nav-top) > a,
   nav.rmh-nav:not(.rmh-nav-top) > .rmh-more-btn{
-    flex:1 1 0!important;
+    flex:0 1 auto!important;
     min-width:0!important;
     max-width:none!important;
-    padding:4px 2px 9px!important;
+    padding:4px 3px 9px!important;
     font-size:10px!important;
     line-height:1.2!important;
+    letter-spacing:0!important;
     white-space:nowrap!important;
     text-align:center;
     overflow:visible!important;
@@ -1497,14 +1519,30 @@ body > .rizq-help-dd-menu a,
   nav.rmh-nav:not(.rmh-nav-top) > a.is-active{
     box-shadow:inset 0 -2px 0 var(--rmh-gold, #C9A84C)!important;
   }
-  /* المعارض والمصانع — أطول نص؛ يبقى سطراً واحداً */
+  /* رئيسية في رأس الكبسولة (يمين) — سوق العقارات في نهايتها (يسار) */
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="home"],
+  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="home"],
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="estate"],
+  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="estate"],
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="showrooms"],
-  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="showrooms"]{
+  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="showrooms"],
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="ads"],
+  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="ads"],
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="stores"],
+  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="stores"]{
+    flex:0 0 auto!important;
     white-space:nowrap!important;
-    text-align:center;
-    font-size:8.5px!important;
-    letter-spacing:-.04em;
+    font-size:10px!important;
+    letter-spacing:0!important;
     overflow:visible!important;
+  }
+  /* لا تشارك نماذج المخفية في توزيع الفليكس */
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="models"],
+  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="models"]{
+    display:none!important;
+    flex:none!important;
+    width:0!important;max-width:0!important;margin:0!important;padding:0!important;
+    border:0!important;overflow:hidden!important;
   }
   /* نبض السوق — سطر واحد في الكبسولة العلوية */
   #rizq-mock-hdr nav.rmh-nav-top > a[data-rmh="pulse"],
@@ -1513,13 +1551,6 @@ body > .rizq-help-dd-menu a,
     letter-spacing:-.03em;
     white-space:nowrap!important;
     min-width:0!important;
-  }
-  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="estate"],
-  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="estate"]{
-    white-space:nowrap!important;
-    text-align:center;
-    font-size:9.5px!important;
-    letter-spacing:-.03em;
   }
   #rizq-mock-hdr .rmh-nav a .rmh-nav-ico,
   #rizq-mock-hdr .rmh-more-btn .rmh-nav-ico,
