@@ -2769,11 +2769,11 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
 }
 html[lang^="fr"] .price-ticker-wrap::before{content:'Live'}
 .price-ticker-wrap::after{
-  content:'';position:absolute;inset-inline-start:0;top:0;bottom:0;width:72px;z-index:1;pointer-events:none;
-  background:linear-gradient(to left,transparent,rgba(13,27,42,.92) 72%);
+  content:'';position:absolute;inset-inline-start:0;top:0;bottom:0;width:56px;z-index:1;pointer-events:none;
+  background:linear-gradient(to left,transparent,rgba(13,27,42,.95) 70%);
 }
 html[dir="ltr"] .price-ticker-wrap::after{
-  background:linear-gradient(to right,rgba(13,27,42,.92) 72%,transparent);
+  background:linear-gradient(to right,rgba(13,27,42,.95) 70%,transparent);
 }
 .price-ticker-inner{
   display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:0;width:max-content;
@@ -2781,8 +2781,8 @@ html[dir="ltr"] .price-ticker-wrap::after{
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
   animation:none!important;
-  padding-inline-start:78px;
   min-height:20px;
+  padding:0;
 }
 .price-ticker-inner.is-mq-paused{will-change:auto}
 .price-ticker-wrap .ticker-item,
