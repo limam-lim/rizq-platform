@@ -75,8 +75,12 @@ router.get('/me', asyncHandler(async (req, res) => {
   res.json({ ok: true, buyer: Buyer.publicBuyer(row) });
 }));
 
-/** POST /api/auth/logout — للتوافق المستقبلي */
+/** POST /api/auth/logout — إبطال توكن المشتري فوراً */
 router.post('/logout', requireBuyerAuth, (req, res) => {
+  try {
+    if (req.buyer && req.buyer.id) Buyer.invalidateToken(req.buyer.id);
+  } catch (e) { /* ignore */ }
+  res.set('Cache-Control', 'no-store');
   res.json({ ok: true });
 });
 

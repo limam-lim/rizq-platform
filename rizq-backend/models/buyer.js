@@ -69,12 +69,30 @@ function findByEmail(email) {
 }
 
 function findByIdAndToken(id, token) {
-  return db.prepare('SELECT * FROM buyers WHERE id = ? AND token = ?').get(id, token);
+  const row = db.prepare('SELECT * FROM buyers WHERE id = ?').get(id);
+  if (!row || !row.token || !token) return null;
+  try {
+    const { timingSafeEqualStr } = require('../lib/secureCompare');
+    if (!timingSafeEqualStr(row.token, token)) return null;
+  } catch (e) {
+    if (String(row.token) !== String(token)) return null;
+  }
+  return row;
+}
+
+/** إبطال جلسة المشتري (logout) — تدوير التوكن إلى قيمة جديدة غير معروفة للعميل */
+function invalidateToken(id) {
+  const row = findById(id);
+  if (!row) return false;
+  const token = genBuyerToken();
+  db.prepare('UPDATE buyers SET token = ? WHERE id = ?').run(token, id);
+  return true;
 }
 
 function hashPassword(password) {
   const pw = String(password || '');
-  if (pw.length < 6 || pw.length > 128) return null;
+  /* موحّد مع البائعين: ≥8 أحرف */
+  if (pw.length < 8 || pw.length > 128) return null;
   return bcrypt.hashSync(pw, BCRYPT_ROUNDS);
 }
 
@@ -111,9 +129,9 @@ function registerOrLogin(payload) {
     err.code = 'WHATSAPP_REQUIRED';
     throw err;
   }
-  /* كلمة المرور اختيارية بعد OTP (Guest Gate) — إن وُجدت يجب ≥6 */
+  /* كلمة المرور اختيارية بعد OTP (Guest Gate) — إن وُجدت يجب ≥8 */
   if (password && !passHash) {
-    const err = new Error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+    const err = new Error('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
     err.status = 400;
     err.code = 'WEAK_PASSWORD';
     throw err;
@@ -199,24 +217,15 @@ async function loginByEmailPassword(email, password) {
   return { buyer: publicBuyer(updated), token };
 }
 
-function loginByPhone(phone) {
-  const cleanPhone = normalizePhone(phone);
-  if (!MR_PHONE_RE.test(cleanPhone)) {
-    const err = new Error('رقم هاتف موريتاني غير صالح');
-    err.status = 400;
-    err.code = 'INVALID_PHONE';
-    throw err;
-  }
-  const row = findByPhone(cleanPhone);
-  if (!row) {
-    const err = new Error('لا يوجد حساب بهذا الرقم — سجّل أولاً');
-    err.status = 404;
-    err.code = 'NOT_FOUND';
-    throw err;
-  }
-  const now = new Date().toISOString();
-  db.prepare('UPDATE buyers SET last_login_at = ? WHERE id = ?').run(now, row.id);
-  return { buyer: publicBuyer(row), token: row.token };
+/**
+ * دخول بالهاتف وحده — معطّل لأسباب أمنية (كان يعيد التوكن الحالي بلا OTP/كلمة مرور).
+ * أبقِ الدالة لتجنب كسر require، وارفض دائماً.
+ */
+function loginByPhone() {
+  const err = new Error('دخول الهاتف غير متاح — استخدم البريد وكلمة المرور أو OTP');
+  err.status = 403;
+  err.code = 'PHONE_LOGIN_DISABLED';
+  throw err;
 }
 
 module.exports = {
@@ -229,6 +238,7 @@ module.exports = {
   findByPhone,
   findByEmail,
   findByIdAndToken,
+  invalidateToken,
   registerOrLogin,
   loginByEmailPassword,
   loginByPhone,

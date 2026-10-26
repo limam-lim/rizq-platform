@@ -329,7 +329,8 @@ const ADMIN_ACCOUNTS = OWNER_SUPER_ADMIN.passHash && OWNER_SUPER_ADMIN.passHash.
   ? [OWNER_SUPER_ADMIN]
   : [];
 const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 ساعة
-const adminSessions = new Map(); // token -> { user, name, role, expiresAt }
+const { createAdminSessionStore } = require('./services/adminSessionStore');
+const adminSessions = createAdminSessionStore(); // SQLite — يبقى بعد إعادة التشغيل
 const adminTeamService = require('./services/adminTeam');
 const { hasAdminPermission, PANEL_PERMISSION_MAP } = require('./services/adminPermissions');
 if (ADMIN_ACCOUNTS.length) adminTeamService.seedFromLegacyAccounts(ADMIN_ACCOUNTS);
@@ -1835,6 +1836,36 @@ const platformStore = require('./db/platformStore');
 function readAccounts() { return repos.accounts.list(); }
 function writeAccounts(list) { return repos.accounts.replaceAll(list); }
 
+/** قبول data:image/(jpeg|jpg|png|webp);base64,... فقط — رفض غير الصور وقطع الحجم */
+function sanitizeKycDataUrl(raw, maxChars) {
+  const limit = Math.max(1024, Number(maxChars) || 5_000_000);
+  const s = String(raw == null ? '' : raw).trim().slice(0, limit);
+  if (!s) return '';
+  if (!/^data:image\/(jpeg|jpg|png|webp);base64,[A-Za-z0-9+/=\s]+$/i.test(s)) return '';
+  return s.replace(/\s+/g, '');
+}
+
+/** إعادة حساب درجة ثقة البائع من متوسط التقييمات (0–100) */
+function recomputeSellerTrustScore(targetId) {
+  try {
+    const all = readReviews();
+    const list = all[targetId] || [];
+    if (!list.length) return;
+    const sum = list.reduce((s, r) => s + (Number(r.rating) || 0), 0);
+    const avg = sum / list.length;
+    const score = Math.max(0, Math.min(100, Math.round(avg * 20)));
+    const accounts = readAccounts();
+    const idx = accounts.findIndex((a) => a && a.id === targetId);
+    if (idx < 0) return;
+    accounts[idx] = Object.assign({}, accounts[idx], {
+      seller_trust_score: score,
+      reviewCount: list.length,
+      reviewAverage: Math.round(avg * 10) / 10,
+    });
+    writeAccounts(accounts);
+  } catch (e) { /* ignore */ }
+}
+
 /**
  * بعد التوثيق: تُحذف صورة الهوية فقط (idImage/id_image).
  * وثائق النشاط (licenseImage, activityImage2) تُحفظ — لا تُمسّ أبداً هنا.
@@ -2178,14 +2209,10 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     foreignId: String(b.foreignId || b.foreign_id || '').slice(0, 40),
     nationality: String(b.nationality || '').slice(0, 20),
     nationalityCountry: String(b.nationalityCountry || b.nationality_country || '').slice(0, 60),
-    // الحد 8 ملايين حرف (~5.8MB ثنائي بعد فك base64) لأن واجهة الرفع تعرض
-    // "حجم أقصى 5MB" فعلياً — حد thumb (2M) أضيق بكثير وكان سيقصّ صورة
-    // هوية حقيقية بحجمها الطبيعي فتفسدها (base64 يُضخّم الحجم ~37%).
-    idImage: String(b.idImage || '').slice(0, 8_000_000),
-    // وثيقة ثانوية (رخصة نشاط/سجل تجاري/ختم) — كانت تُجمَع في واجهة تسجيل
-    // المكتب/الشركة (ofFile1/crFile2) وتُفقَد بالكامل، لا تُحفظ حتى محلياً.
-    licenseImage: String(b.licenseImage || '').slice(0, 8_000_000),
-    activityImage2: String(b.activityImage2 || b.activity_image2 || '').slice(0, 8_000_000),
+    // KYC: data:image فقط (jpeg/png/webp) — رفض نصوص/HTML/PDF خام لتقليل ضغط الذاكرة وPII غير صوري
+    idImage: sanitizeKycDataUrl(b.idImage, 5_000_000),
+    licenseImage: sanitizeKycDataUrl(b.licenseImage, 5_000_000),
+    activityImage2: sanitizeKycDataUrl(b.activityImage2 || b.activity_image2, 5_000_000),
     // برنامج الإحالة (جيب صاحبك واربح) — معرّف الحساب المُحيل (نفس صيغة id
     // القياسية ACC_<timestamp>) إن جاء الزائر عبر رابط ?ref=ACC_xxx. نتحقق
     // من الصيغة لمنع أي قيمة عشوائية، ونمنع أن يُحيل الحساب نفسه (لن يحدث
@@ -3898,11 +3925,9 @@ const reviewsLimiter = rateLimit({
 });
 
 /**
- * POST /api/reviews — إضافة تقييم. body: { targetId, rating(1-5 صحيح),
- * comment?, reviewerName?, reviewerAccountId? }. إن أُرسل reviewerAccountId
- * (مشترٍ صاحب حساب) نتحقق من x-account-token الحقيقي ونمنع تكرار التقييم
- * لنفس الحساب على نفس الهدف بشكل حقيقي غير قابل للتجاوز (بخلاف حارس
- * localStorage القديم الذي كان يُلغى بمجرد مسح بيانات المتصفح).
+ * POST /api/reviews — مصدر الحقيقة للخادم.
+ * مصادقة: (1) حساب بائع x-account-token + reviewerAccountId
+ * أو (2) مشتري Guest Gate عبر X-Buyer-Id + Bearer/X-Buyer-Token.
  */
 app.post('/api/reviews', reviewsLimiter, (req, res) => {
   const b = req.body || {};
@@ -3911,16 +3936,39 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
   if (typeof rating !== 'number' || isNaN(rating) || !isFinite(rating) || !Number.isInteger(rating) || rating < 1 || rating > 5) {
     return res.status(400).json({ error: 'rating يجب أن يكون عدداً صحيحاً بين 1 و5' });
   }
-  // تقييمات مجهولة ممنوعة — يلزم حساب مشتري/بائع موثّق
-  const token = req.header('x-account-token') || '';
-  const buyerId = String(b.reviewerAccountId || '').slice(0, 60);
-  if (!buyerId) return res.status(401).json({ error: 'unauthorized', code: 'auth_required' });
-  const reviewerAcc = verifyAccountOwner(buyerId, token);
-  if (!reviewerAcc) return res.status(401).json({ error: 'unauthorized' });
-  if (buyerId === String(b.targetId)) {
+
+  let reviewerAccountId = '';
+  let reviewerName = '';
+
+  // مسار المشتري (Guest Gate)
+  try {
+    const { extractBuyerCredentials } = require('./middleware/buyerAuth');
+    const cred = extractBuyerCredentials(req);
+    if (cred.id && cred.token) {
+      const row = BuyerModel.findByIdAndToken(cred.id, cred.token);
+      if (row) {
+        reviewerAccountId = String(row.id).slice(0, 60);
+        reviewerName = String(row.name || '').trim().slice(0, 60);
+      }
+    }
+  } catch (eBuy) { /* ignore */ }
+
+  // مسار حساب البائع/المحل
+  if (!reviewerAccountId) {
+    const token = req.header('x-account-token') || extractAccountToken(req) || '';
+    const accountId = String(b.reviewerAccountId || '').slice(0, 60);
+    if (!accountId || !token) {
+      return res.status(401).json({ error: 'unauthorized', code: 'auth_required' });
+    }
+    const reviewerAcc = verifyAccountOwner(accountId, token);
+    if (!reviewerAcc) return res.status(401).json({ error: 'unauthorized', code: 'auth_required' });
+    reviewerAccountId = accountId;
+    reviewerName = String(reviewerAcc.name || reviewerAcc.businessName || '').trim().slice(0, 60);
+  }
+
+  if (reviewerAccountId === String(b.targetId)) {
     return res.status(400).json({ error: 'cannot_review_self' });
   }
-  const reviewerAccountId = buyerId;
   const all = readReviews();
   const list = all[b.targetId] || [];
   if (list.some((r) => r.reviewerAccountId === reviewerAccountId)) {
@@ -3930,13 +3978,14 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
     id: genReviewId(),
     rating,
     comment: String(b.comment == null ? '' : b.comment).trim().slice(0, 500),
-    reviewerName: String((b.reviewerName || reviewerAcc.name || '')).trim().slice(0, 60),
+    reviewerName: String((b.reviewerName || reviewerName || '')).trim().slice(0, 60),
     reviewerAccountId,
     createdAt: new Date().toISOString(),
   };
   list.unshift(review);
   all[b.targetId] = list;
   writeReviews(all);
+  recomputeSellerTrustScore(String(b.targetId));
   res.json({ ok: true, review });
 });
 
@@ -3976,6 +4025,7 @@ app.delete('/api/reviews/:targetId/:reviewId', requireAdminPermission('moderatio
   if (next.length === list.length) return res.status(404).json({ error: 'review_not_found' });
   all[req.params.targetId] = next;
   writeReviews(all);
+  recomputeSellerTrustScore(String(req.params.targetId || ''));
   res.json({ ok: true });
 });
 

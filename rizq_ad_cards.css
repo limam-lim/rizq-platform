@@ -61,17 +61,18 @@
 /* بطاقات الشريط الحي: ارتفاع موحّد — أقل عمودية قليلاً */
 #hero-listings .cards-track .ad-card:has(.rzq-adx-media),
 .cards-track .ad-card:has(.rzq-adx-media){
-  height:330px!important;
-  min-height:330px!important;
-  max-height:330px!important;
+  /* يتسع لصورة + فئة + عنوان بسطرين + صف ماركة اختياري + موقع + أزرار */
+  height:380px!important;
+  min-height:380px!important;
+  max-height:380px!important;
   align-self:stretch!important;
 }
 @media (max-width:768px){
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media),
   .cards-track .ad-card:has(.rzq-adx-media){
-    height:295px!important;
-    min-height:295px!important;
-    max-height:295px!important;
+    height:348px!important;
+    min-height:348px!important;
+    max-height:348px!important;
   }
 }
 .rzq-ad-brand-slot .rzq-brand-chip{
@@ -98,7 +99,7 @@
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .l-body,
 .listings-grid .listing-card:has(.rzq-adx-media) .l-body{
   flex:0 0 auto!important;
-  padding:4px 7px 6px!important;
+  padding:7px 7px 6px!important;
 }
 .ad-card:has(.rzq-adx-media){
   width:200px;
@@ -339,17 +340,15 @@
   align-items:center;
   text-align:center;
   gap:0;
-  padding:4px 7px 6px!important;
+  /* مسافة علوية واضحة تحت شارة السعر حتى لا تُقصّ قمم الفئة */
+  padding:10px 7px 8px!important;
   position:relative;
-  z-index:1;
+  z-index:2;
   background:transparent!important;
   min-height:0;
-  max-height:108px;
-}
-.ad-card:has(.rzq-adx-media) .ad-title,
-.listing-card:has(.rzq-adx-media) .l-title,
-.rc:has(.rzq-adx-media) .rc-title{
-  min-height:0;
+  /* يتسع لسطر فئة + عنوان بسطرين + صف ماركة + موقع + أزرار دون ضغط flex */
+  max-height:156px;
+  overflow:visible;
 }
 .ad-card:has(.rzq-adx-media) .rzq-adx-actions,
 .listing-card:has(.rzq-adx-media) .rzq-adx-actions,
@@ -362,66 +361,79 @@
 .rc:has(.rzq-adx-media) .rc-cat{
   display:block;
   width:100%;
+  flex:0 0 auto!important;
+  flex-shrink:0!important;
   font-size:9.5px!important;
   font-weight:700!important;
   letter-spacing:.2px;
   color:var(--rzq-adx-gold-light)!important;
-  margin:0 0 2px!important;
+  margin:0 0 4px!important;
+  padding:2px 0 3px;
   opacity:.95;
-  line-height:1.3!important;
+  line-height:1.6!important;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
+  box-sizing:border-box;
 }
 
 .ad-card:has(.rzq-adx-media) .ad-title,
 .listing-card:has(.rzq-adx-media) .l-title,
 .rc:has(.rzq-adx-media) .rc-title{
   width:100%;
+  flex:0 0 auto!important;
+  flex-shrink:0!important;
   font-size:11px!important;
   font-weight:800!important;
   color:#fff!important;
-  line-height:1.3!important;
-  margin:0 0 2px!important;
+  line-height:1.5!important;
+  margin:0 0 3px!important;
   overflow:hidden;
   display:-webkit-box;
   -webkit-line-clamp:2;
+  line-clamp:2;
   -webkit-box-orient:vertical;
   word-break:break-word;
   overflow-wrap:anywhere;
-  padding-bottom:0;
+  /* لا max-height مع line-clamp — كان يقصّ ذيل الحروف العربية */
+  max-height:none;
+  min-height:calc(1.5em * 2);
+  padding:1px 0 3px;
+  box-sizing:content-box;
   text-shadow:0 1px 2px rgba(0,0,0,.28);
-  max-height:2.7em;
 }
 
 .ad-card:has(.rzq-adx-media) .ad-loc,
 .listing-card:has(.rzq-adx-media) .l-loc,
 .rc:has(.rzq-adx-media) .rc-loc{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:3px;
+  display:block;
   width:100%;
-  min-height:16px;
+  max-width:100%;
+  box-sizing:border-box;
+  flex:0 0 auto!important;
+  flex-shrink:0!important;
+  min-height:18px;
   font-size:10px!important;
   font-weight:600!important;
   color:rgba(255,255,255,.82)!important;
   margin:0 0 4px!important;
-  line-height:1.3!important;
+  padding:1px 0;
+  line-height:1.45!important;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .ad-card:has(.rzq-adx-media) .ad-footer,
 .rc:has(.rzq-adx-media) .rc-meta{
-  min-height:16px;
+  min-height:18px;
   width:100%;
+  max-width:100%;
+  overflow:hidden;
 }
+/* الموقع في البيانات يحتوي 📍 مسبقاً — لا تضف دبوساً ثانياً يسرق العرض */
 .ad-card:has(.rzq-adx-media) .ad-loc::before,
 .listing-card:has(.rzq-adx-media) .l-loc::before,
 .rc:has(.rzq-adx-media) .rc-loc::before{
-  content:'📍';
-  font-size:9px;
-  line-height:1;
-  opacity:.9;
+  content:none!important;
+  display:none!important;
 }
 
 /* إخفاء السعر المكرر في الجسم — السعر على الصورة */
@@ -449,6 +461,18 @@
   margin-top:0;
   padding-top:0;
   width:100%;
+  flex:0 0 auto!important;
+  flex-shrink:0!important;
+}
+.ad-card:has(.rzq-adx-media) .rzq-ad-brand-slot,
+.listing-card:has(.rzq-adx-media) .rzq-ad-brand-slot,
+.rc:has(.rzq-adx-media) .rzq-ad-brand-slot{
+  flex-shrink:0!important;
+}
+.ad-card:has(.rzq-adx-media) .rzq-ad-brand-slot.has-brand,
+.listing-card:has(.rzq-adx-media) .rzq-ad-brand-slot.has-brand,
+.rc:has(.rzq-adx-media) .rzq-ad-brand-slot.has-brand{
+  margin-bottom:3px!important;
 }
 .rzq-adx-tel,
 .rzq-adx-actions .rzq-adx-wa{
@@ -547,14 +571,19 @@
     min-height:175px!important;
   }
   #result-list-body .rc:has(.rzq-adx-media) .rc-body{
-    padding:4px 7px 6px!important;
-    max-height:100px;
+    padding:6px 7px 8px!important;
+    max-height:152px;
+    overflow:visible;
   }
   #result-list-body .rc:has(.rzq-adx-media) .rc-title{
     -webkit-line-clamp:2;
+    line-clamp:2;
     font-size:11.5px!important;
     line-height:1.45!important;
     margin:0 0 3px!important;
+    max-height:none;
+    min-height:calc(1.45em * 2);
+    padding-bottom:2px;
   }
   #result-list-body .rc:has(.rzq-adx-media) .rc-cat{
     margin:0 0 2px!important;
@@ -619,8 +648,26 @@
   .ad-card:has(.rzq-adx-media) .ad-card-body,
   .listing-card:has(.rzq-adx-media) .l-body,
   .rc:has(.rzq-adx-media) .rc-body{
-    padding:3px 6px 5px!important;
-    max-height:96px;
+    padding:10px 6px 8px!important;
+    max-height:152px;
+    overflow:visible;
+  }
+  .ad-card:has(.rzq-adx-media) .ad-title,
+  .listing-card:has(.rzq-adx-media) .l-title,
+  .rc:has(.rzq-adx-media) .rc-title{
+    line-height:1.5!important;
+    -webkit-line-clamp:2;
+    line-clamp:2;
+    max-height:none;
+    min-height:calc(1.5em * 2);
+    padding:1px 0 3px;
+  }
+  .ad-card:has(.rzq-adx-media) .ad-cat,
+  .listing-card:has(.rzq-adx-media) .l-cat,
+  .rc:has(.rzq-adx-media) .rc-cat{
+    line-height:1.6!important;
+    margin:0 0 4px!important;
+    padding:2px 0 3px;
   }
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .ad-title,
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .rzq-adx-title{
@@ -668,7 +715,8 @@
     width:100%!important;
     box-sizing:border-box!important;
     margin-top:2px!important;
-    padding:4px 4px 6px!important;
+    /* padding رفيع — كان 4/6 يرفع صف الأزرار لـ ~39px ويقصّ النص فوقه */
+    padding:2px 4px 2px!important;
     border-radius:0 0 12px 12px!important;
     background:transparent!important;
     background-color:transparent!important;

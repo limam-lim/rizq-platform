@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_landing_ux.css?v=31.2"/>
-<link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
+<link rel="stylesheet" href="rizq_ad_cards.css?v=27.5"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.6"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.1"/>
 <link rel="stylesheet" href="rizq_ui_surfaces.css?v=1"/>
@@ -3135,12 +3135,13 @@ html[dir="ltr"] .listings-section .section-desc{
   height:auto!important;min-height:180px!important;max-height:none!important;
   aspect-ratio:4 / 5!important;flex:1 1 70%!important;font-size:inherit!important
 }
-.landing-ads-grid .listing-card:has(.rzq-adx-media) .l-body{padding:4px 7px 6px!important;max-height:108px}
+.landing-ads-grid .listing-card:has(.rzq-adx-media) .l-body{padding:8px 7px 8px!important;max-height:152px;overflow:visible}
 .landing-ads-grid .l-body{padding:8px 9px 10px!important}
-.landing-ads-grid .l-cat{font-size:9.5px!important;margin-bottom:2px!important}
+.landing-ads-grid .l-cat{font-size:9.5px!important;margin-bottom:4px!important;line-height:1.55!important;flex-shrink:0!important;padding:1px 0 2px}
+.landing-ads-grid .l-title{flex-shrink:0!important}
 .landing-ads-grid .l-title{
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-  min-height:2.2em;font-size:12px!important;line-height:1.3!important;margin:0 0 4px!important
+  display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  min-height:calc(1.45em * 2);max-height:none;padding-bottom:2px;font-size:12px!important;line-height:1.45!important;margin:0 0 3px!important
 }
 .landing-ads-grid .l-meta{font-size:10.5px!important;gap:4px!important}
 .landing-ads-grid .l-price{font-size:11.5px!important}
@@ -3282,8 +3283,15 @@ html[dir="ltr"] .listings-section .section-desc{
     height:auto!important;min-height:175px!important;max-height:none!important;
     aspect-ratio:4 / 5!important;flex:1 1 70%!important
   }
-  .listings-grid .listing-card .l-title{font-size:11px!important;-webkit-line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
-  .listings-grid .listing-card:has(.rzq-adx-media) .l-body{padding:3px 6px 5px!important;max-height:96px}
+  .listings-grid .listing-card .l-title{
+    font-size:11px!important;-webkit-line-clamp:2;line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;
+    line-height:1.45!important;min-height:calc(1.45em * 2);max-height:none;padding-bottom:2px
+  }
+  .listings-grid .listing-card:has(.rzq-adx-media) .l-body{padding:8px 6px 8px!important;max-height:148px;overflow:visible}
+  .listings-grid .listing-card:has(.rzq-adx-media) .l-cat{
+    line-height:1.55!important;margin-bottom:4px!important;flex-shrink:0!important;font-size:9.5px!important;padding:1px 0 2px
+  }
+  .listings-grid .listing-card:has(.rzq-adx-media) .l-title{flex-shrink:0!important}
   .listings-grid .listing-card .l-body{padding:7px 8px!important}
   .listings-grid .listing-card .lc-hover{display:none!important}
 }
@@ -3420,8 +3428,32 @@ html[dir="ltr"] .listings-section .section-desc{
     height:auto!important;min-height:180px!important;max-height:none!important;
     aspect-ratio:4 / 5!important;flex:1 1 70%!important;border-radius:12px 12px 0 0!important;
   }
-  #hero-listings .cards-track .ad-card-body{padding:6px 7px!important}
-  #hero-listings .cards-track .ad-title{font-size:10.5px!important}
+  /* كان padding:6px يقصّ قمم الفئة/العنوان تحت الصورة — لا تخفّضه */
+  #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .ad-card-body,
+  #hero-listings .cards-track .ad-card-body{
+    padding:10px 6px 8px!important;
+    max-height:148px!important;
+    overflow:visible!important;
+    gap:0!important;
+  }
+  #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .ad-cat{
+    font-size:9.5px!important;line-height:1.6!important;
+    margin:0 0 4px!important;padding:2px 0 2px!important;
+    flex-shrink:0!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  #hero-listings .cards-track .ad-title{
+    font-size:10.5px!important;line-height:1.5!important;
+    -webkit-line-clamp:2!important;line-clamp:2!important;
+    display:-webkit-box!important;-webkit-box-orient:vertical!important;
+    overflow:hidden!important;max-height:none!important;
+    min-height:calc(1.5em * 2)!important;padding:1px 0 3px!important;
+    margin:0 0 3px!important;flex-shrink:0!important;
+  }
+  #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .ad-loc{
+    font-size:10px!important;line-height:1.45!important;
+    min-height:18px!important;padding:1px 0!important;margin:0!important;
+    flex-shrink:0!important;max-width:100%;
+  }
   #hero-listings .cards-track .ad-price{font-size:10px!important;padding:2px 6px!important}
   #hero-listings .cards-track .ad-hover-detail{display:none!important}
   .live-capsule{padding:2px 8px 2px 6px!important;gap:5px!important}
@@ -4722,14 +4754,24 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 html[dir="rtl"] .rizq-styles-rail .rizq-style-card{direction:rtl}
 html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 .rizq-styles-rail.is-empty{
-  display:block;
-  width:100%;
-  max-width:100%;
-  animation:none;
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+  transform:none!important;
+  will-change:auto!important;
+  animation:none!important;
+  overflow:visible!important;
 }
 .rizq-styles-empty{
+  box-sizing:border-box!important;
+  width:100%!important;
+  max-width:100%!important;
+  margin:0!important;
   text-align:center;padding:28px 16px;
   color:#5b6b85;font-size:13.5px;line-height:1.7;
+  white-space:normal!important;
+  overflow-wrap:anywhere;word-break:break-word;
   background:rgba(27,58,107,.04);border:1.5px dashed rgba(27,58,107,.18);border-radius:14px
 }
 /* بطاقات أنماط الأزياء + أنماط المعارض — الصورة أكبر من النص */
@@ -4912,7 +4954,21 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     margin:0!important;padding:2px 0!important;
     will-change:transform;backface-visibility:hidden;transform:translate3d(0,0,0);
   }
-  .rizq-styles-empty{font-size:12px;padding:18px 12px}
+  /* فارغ: لا يرث width:max-content — يبقى داخل عرض الشاشة بهوامش متساوية */
+  .rizq-styles-rail.is-empty{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+    transform:none!important;
+    will-change:auto!important;
+    overflow:visible!important;
+  }
+  .rizq-styles-empty{
+    font-size:12px;padding:18px 12px;
+    width:100%!important;max-width:100%!important;box-sizing:border-box!important;
+    white-space:normal!important;overflow-wrap:anywhere;word-break:break-word
+  }
   .rizq-style-card{
     width:168px!important;min-width:168px!important;max-width:168px!important;
     flex:0 0 168px!important;
@@ -7152,16 +7208,16 @@ const ADS=[
 
 // Full FEATURED ADS data for openAdModal
 const FEATURED_ADS=[
-  {id:201,emoji:'🏠',bg:'linear-gradient(135deg,#1B3A6B,#0f2347)',cat:'🏠 منازل وعقارات — شقق للكراء',catKey:'عقارات',title:'شقة فاخرة 3 غرف — نواكشوط الغربية',titleFR:'Appartement de luxe 3 pièces — Nouakchott Ouest',desc:'تشطيب عالي الجودة، إطلالة بانورامية على المدينة، تكييف مركزي في كل الغرف، حراسة 24/7، موقف سيارات خاص. قريبة من المراكز التجارية الكبرى ومحطات النقل.',descFR:'Finition haut de gamme, vue panoramique sur la ville, climatisation centrale dans toutes les pièces, sécurité 24/7, parking privé. Proche des grands centres commerciaux et des stations de transport.',price:'150,000 MRU/شهر',priceFR:'150,000 MRU/mois',loc:'📍 نواكشوط الغربية',locFR:'📍 Nouakchott Ouest',tags:['3 غرف','مفروشة جزئياً','طابق 4','مصعد','موقف سيارات','تكييف مركزي'],tagsFR:['3 pièces','Partiellement meublé','4ème étage','Ascenseur','Parking','Climatisation centrale'],seller:'محمد الأمين',sellerFR:'Mohamed El Amine',sellerEmoji:'🏠',sellerMeta:'★★★★★ (48 تقييم) — بائع موثّق منذ 2023',sellerMetaFR:'★★★★★ (48 avis) — Vendeur vérifié depuis 2023',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
-  {id:202,emoji:'🚛',bg:'linear-gradient(135deg,#234d8f,#1B3A6B)',cat:'🚛 شاحنات ومعدات — للبيع',catKey:'شاحنات',title:'حفارة Caterpillar 320D — بحالة ممتازة',titleFR:'Pelleteuse Caterpillar 320D — excellent état',desc:'ساعات عمل منخفضة جداً (3200 ساعة فقط)، جاهزة للتسليم الفوري مع ضمان ستة أشهر على قطع الغيار الرئيسية. مستوردة مباشرة، وثائق الجمارك والتسجيل متوفرة.',descFR:'Très peu d\'heures d\'utilisation (3200 heures seulement), prête à livrer immédiatement avec garantie de six mois sur les pièces principales. Importée directement, documents de douane et d\'immatriculation disponibles.',price:'35,000,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['3200 ساعة','ضمان 6 أشهر','وثائق كاملة','Caterpillar'],tagsFR:['3200 heures','Garantie 6 mois','Documents complets','Caterpillar'],seller:'شركة المعدات الموريتانية',sellerFR:'Société d\'Équipements Mauritanienne',sellerEmoji:'🏢',sellerMeta:'★★★★☆ (23 تقييم) — شركة موثّقة',sellerMetaFR:'★★★★☆ (23 avis) — Entreprise vérifiée',status:'🏢 شركة موثّقة',statusFR:'🏢 Entreprise vérifiée',pin:false},
-  {id:203,emoji:'🐪',bg:'linear-gradient(135deg,#0f2347,#162235)',cat:'🐄 ماشية وحيوانات — إبل',catKey:'ماشية',title:'إبل للبيع — 10 رؤوس أصيلة من أدرار',titleFR:'Chameaux à vendre — 10 têtes pur-sang d\'Adrar',desc:'من منطقة أدرار الشهيرة بجودة إبلها الأصيلة. أصيلة وبصحة ممتازة، مستعدة للفحص البيطري في أي وقت. السعر 240,000 MRU للرأس الواحد أو تفاوض على الجملة.',descFR:'De la région d\'Adrar, réputée pour la qualité de ses chameaux pur-sang. En excellente santé, prêts pour un contrôle vétérinaire à tout moment. Prix : 240 000 MRU par tête, ou négociable en gros.',price:'2,400,000 MRU',loc:'📍 أدرار',locFR:'📍 Adrar',tags:['10 رؤوس','أصيلة','أدرار','قابل للتفاوض'],tagsFR:['10 têtes','Pur-sang','Adrar','Négociable'],seller:'احمد ولد أمبارك',sellerFR:'Ahmed Ould Embarek',sellerEmoji:'🐪',sellerMeta:'★★★☆☆ (7 تقييم) — مربّي',sellerMetaFR:'★★★☆☆ (7 avis) — Éleveur',status:'⏳ قيد المراجعة',statusFR:'⏳ En cours de vérification',pin:false},
-  {id:204,emoji:'🥇',bg:'linear-gradient(135deg,#3a2200,#7a4a00)',cat:'🪙 ذهب ومجوهرات — ذهب للبيع',catKey:'ذهب',title:'ذهب عيار 21 — 50 غرام — جمالية نادرة',titleFR:'Or 21 carats — 50g — pièce rare',desc:'ذهب أصيل عيار 21 بالوثائق. فصلة من الذهب السوداني الأصيل، حلقات وأساور بتشكيلة حصرية. الوزن: 50 غرام صافي.',descFR:'Or authentique 21 carats avec documents. Parure en or soudanais, bracelets et bagues collection exclusive. Poids : 50g net.',price:'450,000 MRU',priceFR:'450,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['21 عيار','50 غرام','وثائق','سوداني'],tagsFR:['21 carats','50g','Documents','Soudanais'],seller:'ورشة الذهب الموريتانية',sellerFR:'Atelier Or Mauritanien',sellerEmoji:'🥇',sellerMeta:'★★★★★ (34 تقييم) — موثّق',sellerMetaFR:'★★★★★ (34 avis) — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
-  {id:205,emoji:'📱',bg:'linear-gradient(135deg,#0d1b2e,#1a3a5c)',cat:'📱 إلكترونيات — هواتف ذكية',catKey:'إلكترونيات',title:'iPhone 15 Pro Max 256GB — كالجديد',titleFR:'iPhone 15 Pro Max 256 Go — comme neuf',desc:'هاتف بحالة ممتازة، لا خدوش، بكل ملحقاته الأصلية وعلبته. ضمان Apple Care متبقي 8 أشهر.',descFR:'Appareil en parfait état, sans rayures, avec tous les accessoires d\'origine et la boîte. Apple Care encore valable 8 mois.',price:'180,000 MRU',priceFR:'180,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['256GB','كالجديد','ضمان','أصلي'],tagsFR:['256 Go','Comme neuf','Garantie','Authentique'],seller:'تقني موبايل',sellerFR:'Tech Mobile MR',sellerEmoji:'📱',sellerMeta:'★★★★☆ (18 تقييم) — موثّق',sellerMetaFR:'★★★★☆ (18 avis) — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
-  {id:206,emoji:'🏡',bg:'linear-gradient(135deg,#0b1e35,#1e3d6a)',cat:'🏠 منازل وعقارات — منازل للبيع',catKey:'عقارات',title:'فيلا راقية — 5 غرف — كيفة',titleFR:'Villa de standing — 5 chambres — Kiffa',desc:'فيلا فاخرة في حي راقي، 5 غرف نوم، صالتان، حديقة خاصة، ملحق خادمة. بناء حديث 2022. وثائق عقارية سليمة.',descFR:'Villa luxueuse dans un quartier résidentiel calme, 5 chambres, 2 salons, jardin privé, dépendance. Construction 2022. Documents en règle.',price:'4,800,000 MRU',priceFR:'4,800,000 MRU',loc:'📍 كيفة',locFR:'📍 Kiffa',tags:['5 غرف','حديقة','2022','وثائق'],tagsFR:['5 chambres','Jardin','2022','Documents'],seller:'عمار الأمين',sellerFR:'Ammar El Amine',sellerEmoji:'🏡',sellerMeta:'★★★★★ (12 تقييم) — موثّق',sellerMetaFR:'★★★★★ (12 avis) — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
-  {id:207,emoji:'🚗',bg:'linear-gradient(135deg,#0e1d2e,#1d3a5e)',cat:'🚗 سيارات — سيارات للبيع',catKey:'سيارات',title:'Toyota Land Cruiser 2020 — خليجي',titleFR:'Toyota Land Cruiser 2020 — Import Golfe',desc:'لاندكروزر 2020 خليجي أصيل، مسافة 48,000 كم. لون أبيض لؤلؤي، تجهيز فل كامل، فتحة سقف. الوثائق الجمركية والتسجيل متوفرة.',descFR:'Land Cruiser 2020 import Golfe authentique, 48 000 km. Blanc nacré, full options, toit ouvrant. Documents douane et immatriculation disponibles.',price:'9,500,000 MRU',priceFR:'9,500,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['48,000 km','خليجي','فل كامل','2020'],tagsFR:['48 000 km','Import Golfe','Full options','2020'],seller:'وكالة السيارات الأولى',sellerFR:'Première Auto MR',sellerEmoji:'🚗',sellerMeta:'★★★★★ (51 تقييم) — موثّق',sellerMetaFR:'★★★★★ (51 avis) — Vérifié',status:'🏢 شركة موثّقة',statusFR:'🏢 Entreprise vérifiée',pin:true},
-  {id:208,emoji:'🌍',bg:'linear-gradient(135deg,#163012,#2a5a20)',cat:'🏠 منازل وعقارات — أراضي',catKey:'عقارات',title:'أرض سكنية — 600 م² — نواذيبو',titleFR:'Terrain résidentiel — 600 m² — Nouadhibou',desc:'أرض سكنية في موقع استراتيجي قرب المنطقة الاقتصادية. وثيقة ملكية نظيفة، مسوّرة، جاهزة للبناء فوراً.',descFR:'Terrain résidentiel bien situé près de la zone économique. Titre foncier clair, clôturé, prêt à construire immédiatement.',price:'2,200,000 MRU',priceFR:'2,200,000 MRU',loc:'📍 نواذيبو',locFR:'📍 Nouadhibou',tags:['600م²','موقع استراتيجي','وثيقة نظيفة','مسوّرة'],tagsFR:['600m²','Emplacement stratégique','Titre clair','Clôturé'],seller:'الوطنية للعقار',sellerFR:'Nationale Immobilier',sellerEmoji:'🌍',sellerMeta:'★★★★☆ (9 تقييم) — موثّق',sellerMetaFR:'★★★★☆ (9 avis) — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
-  {id:209,emoji:'🐄',bg:'linear-gradient(135deg,#1a1000,#3d2800)',cat:'🐄 ماشية — بقر للبيع',catKey:'ماشية',title:'بقر حلوب — 8 رؤوس — ترارزة',titleFR:'Vaches laitières — 8 têtes — Trarza',desc:'أبقار حلوب صافية الأصل، إنتاج يومي 15-20 لتر للرأس. مع شهادة صحية بيطرية حديثة. السعر قابل للتفاوض على الجملة.',descFR:'Vaches laitières de race pure, production journalière 15-20L par tête. Avec certificat sanitaire vétérinaire récent. Prix négociable en gros.',price:'960,000 MRU',priceFR:'960,000 MRU',loc:'📍 ترارزة',locFR:'📍 Trarza',tags:['8 رؤوس','حلوب','شهادة بيطرية','قابل للتفاوض'],tagsFR:['8 têtes','Laitière','Certificat vétérinaire','Négociable'],seller:'مزرعة البركة',sellerFR:'Ferme Al Baraka',sellerEmoji:'🐄',sellerMeta:'★★★☆☆ (5 تقييم) — مربّي',sellerMetaFR:'★★★☆☆ (5 avis) — Éleveur',status:'⏳ قيد المراجعة',statusFR:'⏳ En cours de vérification',pin:false},
-  {id:210,emoji:'🌿',bg:'linear-gradient(135deg,#0d1e12,#1a3d22)',cat:'🔧 خدمات — تصميم وبرمجة',catKey:'خدمات',title:'تصميم مواقع ومتاجر إلكترونية احترافية',titleFR:'Création de sites web et boutiques en ligne professionnels',desc:'متخصص في تصميم مواقع الشركات والمتاجر الإلكترونية. تسليم في 7 أيام، لوحة تحكم سهلة، دعم تقني 30 يوماً.',descFR:'Spécialiste en création de sites vitrines et boutiques e-commerce. Livraison en 7 jours, panneau d\'administration facile, support technique 30 jours.',price:'85,000 MRU',priceFR:'85,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['تسليم 7 أيام','دعم تقني','متجر إلكتروني','موثّق'],tagsFR:['Livraison 7 jours','Support technique','Boutique en ligne','Vérifié'],seller:'محمد ليمام | ADMINIA',sellerFR:'Mohamed Limam | ADMINIA',sellerEmoji:'💻',sellerMeta:'★★★★★ (28 تقييم) — موثّق',sellerMetaFR:'★★★★★ (28 avis) — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
+  {id:201,emoji:'🏠',bg:'linear-gradient(135deg,#1B3A6B,#0f2347)',cat:'🏠 منازل وعقارات — شقق للكراء',catKey:'عقارات',title:'شقة فاخرة 3 غرف — نواكشوط الغربية',titleFR:'Appartement de luxe 3 pièces — Nouakchott Ouest',desc:'تشطيب عالي الجودة، إطلالة بانورامية على المدينة، تكييف مركزي في كل الغرف، حراسة 24/7، موقف سيارات خاص. قريبة من المراكز التجارية الكبرى ومحطات النقل.',descFR:'Finition haut de gamme, vue panoramique sur la ville, climatisation centrale dans toutes les pièces, sécurité 24/7, parking privé. Proche des grands centres commerciaux et des stations de transport.',price:'150,000 MRU/شهر',priceFR:'150,000 MRU/mois',loc:'📍 نواكشوط الغربية',locFR:'📍 Nouakchott Ouest',tags:['3 غرف','مفروشة جزئياً','طابق 4','مصعد','موقف سيارات','تكييف مركزي'],tagsFR:['3 pièces','Partiellement meublé','4ème étage','Ascenseur','Parking','Climatisation centrale'],seller:'محمد الأمين',sellerFR:'Mohamed El Amine',sellerEmoji:'🏠',sellerMeta:'★★★★★ بائع موثّق منذ 2023',sellerMetaFR:'★★★★★ Vendeur vérifié depuis 2023',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
+  {id:202,emoji:'🚛',bg:'linear-gradient(135deg,#234d8f,#1B3A6B)',cat:'🚛 شاحنات ومعدات — للبيع',catKey:'شاحنات',title:'حفارة Caterpillar 320D — بحالة ممتازة',titleFR:'Pelleteuse Caterpillar 320D — excellent état',desc:'ساعات عمل منخفضة جداً (3200 ساعة فقط)، جاهزة للتسليم الفوري مع ضمان ستة أشهر على قطع الغيار الرئيسية. مستوردة مباشرة، وثائق الجمارك والتسجيل متوفرة.',descFR:'Très peu d\'heures d\'utilisation (3200 heures seulement), prête à livrer immédiatement avec garantie de six mois sur les pièces principales. Importée directement, documents de douane et d\'immatriculation disponibles.',price:'35,000,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['3200 ساعة','ضمان 6 أشهر','وثائق كاملة','Caterpillar'],tagsFR:['3200 heures','Garantie 6 mois','Documents complets','Caterpillar'],seller:'شركة المعدات الموريتانية',sellerFR:'Société d\'Équipements Mauritanienne',sellerEmoji:'🏢',sellerMeta:'★★★★☆ شركة موثّقة',sellerMetaFR:'★★★★☆ Entreprise vérifiée',status:'🏢 شركة موثّقة',statusFR:'🏢 Entreprise vérifiée',pin:false},
+  {id:203,emoji:'🐪',bg:'linear-gradient(135deg,#0f2347,#162235)',cat:'🐄 ماشية وحيوانات — إبل',catKey:'ماشية',title:'إبل للبيع — 10 رؤوس أصيلة من أدرار',titleFR:'Chameaux à vendre — 10 têtes pur-sang d\'Adrar',desc:'من منطقة أدرار الشهيرة بجودة إبلها الأصيلة. أصيلة وبصحة ممتازة، مستعدة للفحص البيطري في أي وقت. السعر 240,000 MRU للرأس الواحد أو تفاوض على الجملة.',descFR:'De la région d\'Adrar, réputée pour la qualité de ses chameaux pur-sang. En excellente santé, prêts pour un contrôle vétérinaire à tout moment. Prix : 240 000 MRU par tête, ou négociable en gros.',price:'2,400,000 MRU',loc:'📍 أدرار',locFR:'📍 Adrar',tags:['10 رؤوس','أصيلة','أدرار','قابل للتفاوض'],tagsFR:['10 têtes','Pur-sang','Adrar','Négociable'],seller:'احمد ولد أمبارك',sellerFR:'Ahmed Ould Embarek',sellerEmoji:'🐪',sellerMeta:'★★★☆☆ مربّي',sellerMetaFR:'★★★☆☆ Éleveur',status:'⏳ قيد المراجعة',statusFR:'⏳ En cours de vérification',pin:false},
+  {id:204,emoji:'🥇',bg:'linear-gradient(135deg,#3a2200,#7a4a00)',cat:'🪙 ذهب ومجوهرات — ذهب للبيع',catKey:'ذهب',title:'ذهب عيار 21 — 50 غرام — جمالية نادرة',titleFR:'Or 21 carats — 50g — pièce rare',desc:'ذهب أصيل عيار 21 بالوثائق. فصلة من الذهب السوداني الأصيل، حلقات وأساور بتشكيلة حصرية. الوزن: 50 غرام صافي.',descFR:'Or authentique 21 carats avec documents. Parure en or soudanais, bracelets et bagues collection exclusive. Poids : 50g net.',price:'450,000 MRU',priceFR:'450,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['21 عيار','50 غرام','وثائق','سوداني'],tagsFR:['21 carats','50g','Documents','Soudanais'],seller:'ورشة الذهب الموريتانية',sellerFR:'Atelier Or Mauritanien',sellerEmoji:'🥇',sellerMeta:'★★★★★ موثّق',sellerMetaFR:'★★★★★ Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
+  {id:205,emoji:'📱',bg:'linear-gradient(135deg,#0d1b2e,#1a3a5c)',cat:'📱 إلكترونيات — هواتف ذكية',catKey:'إلكترونيات',title:'iPhone 15 Pro Max 256GB — كالجديد',titleFR:'iPhone 15 Pro Max 256 Go — comme neuf',desc:'هاتف بحالة ممتازة، لا خدوش، بكل ملحقاته الأصلية وعلبته. ضمان Apple Care متبقي 8 أشهر.',descFR:'Appareil en parfait état, sans rayures, avec tous les accessoires d\'origine et la boîte. Apple Care encore valable 8 mois.',price:'180,000 MRU',priceFR:'180,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['256GB','كالجديد','ضمان','أصلي'],tagsFR:['256 Go','Comme neuf','Garantie','Authentique'],seller:'تقني موبايل',sellerFR:'Tech Mobile MR',sellerEmoji:'📱',sellerMeta:'★★★★☆ موثّق',sellerMetaFR:'★★★★☆ Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:206,emoji:'🏡',bg:'linear-gradient(135deg,#0b1e35,#1e3d6a)',cat:'🏠 منازل وعقارات — منازل للبيع',catKey:'عقارات',title:'فيلا راقية — 5 غرف — كيفة',titleFR:'Villa de standing — 5 chambres — Kiffa',desc:'فيلا فاخرة في حي راقي، 5 غرف نوم، صالتان، حديقة خاصة، ملحق خادمة. بناء حديث 2022. وثائق عقارية سليمة.',descFR:'Villa luxueuse dans un quartier résidentiel calme, 5 chambres, 2 salons, jardin privé, dépendance. Construction 2022. Documents en règle.',price:'4,800,000 MRU',priceFR:'4,800,000 MRU',loc:'📍 كيفة',locFR:'📍 Kiffa',tags:['5 غرف','حديقة','2022','وثائق'],tagsFR:['5 chambres','Jardin','2022','Documents'],seller:'عمار الأمين',sellerFR:'Ammar El Amine',sellerEmoji:'🏡',sellerMeta:'★★★★★ موثّق',sellerMetaFR:'★★★★★ Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:207,emoji:'🚗',bg:'linear-gradient(135deg,#0e1d2e,#1d3a5e)',cat:'🚗 سيارات — سيارات للبيع',catKey:'سيارات',title:'Toyota Land Cruiser 2020 — خليجي',titleFR:'Toyota Land Cruiser 2020 — Import Golfe',desc:'لاندكروزر 2020 خليجي أصيل، مسافة 48,000 كم. لون أبيض لؤلؤي، تجهيز فل كامل، فتحة سقف. الوثائق الجمركية والتسجيل متوفرة.',descFR:'Land Cruiser 2020 import Golfe authentique, 48 000 km. Blanc nacré, full options, toit ouvrant. Documents douane et immatriculation disponibles.',price:'9,500,000 MRU',priceFR:'9,500,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['48,000 km','خليجي','فل كامل','2020'],tagsFR:['48 000 km','Import Golfe','Full options','2020'],seller:'وكالة السيارات الأولى',sellerFR:'Première Auto MR',sellerEmoji:'🚗',sellerMeta:'★★★★★ موثّق',sellerMetaFR:'★★★★★ Vérifié',status:'🏢 شركة موثّقة',statusFR:'🏢 Entreprise vérifiée',pin:true},
+  {id:208,emoji:'🌍',bg:'linear-gradient(135deg,#163012,#2a5a20)',cat:'🏠 منازل وعقارات — أراضي',catKey:'عقارات',title:'أرض سكنية — 600 م² — نواذيبو',titleFR:'Terrain résidentiel — 600 m² — Nouadhibou',desc:'أرض سكنية في موقع استراتيجي قرب المنطقة الاقتصادية. وثيقة ملكية نظيفة، مسوّرة، جاهزة للبناء فوراً.',descFR:'Terrain résidentiel bien situé près de la zone économique. Titre foncier clair, clôturé, prêt à construire immédiatement.',price:'2,200,000 MRU',priceFR:'2,200,000 MRU',loc:'📍 نواذيبو',locFR:'📍 Nouadhibou',tags:['600م²','موقع استراتيجي','وثيقة نظيفة','مسوّرة'],tagsFR:['600m²','Emplacement stratégique','Titre clair','Clôturé'],seller:'الوطنية للعقار',sellerFR:'Nationale Immobilier',sellerEmoji:'🌍',sellerMeta:'★★★★☆ موثّق',sellerMetaFR:'★★★★☆ Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},
+  {id:209,emoji:'🐄',bg:'linear-gradient(135deg,#1a1000,#3d2800)',cat:'🐄 ماشية — بقر للبيع',catKey:'ماشية',title:'بقر حلوب — 8 رؤوس — ترارزة',titleFR:'Vaches laitières — 8 têtes — Trarza',desc:'أبقار حلوب صافية الأصل، إنتاج يومي 15-20 لتر للرأس. مع شهادة صحية بيطرية حديثة. السعر قابل للتفاوض على الجملة.',descFR:'Vaches laitières de race pure, production journalière 15-20L par tête. Avec certificat sanitaire vétérinaire récent. Prix négociable en gros.',price:'960,000 MRU',priceFR:'960,000 MRU',loc:'📍 ترارزة',locFR:'📍 Trarza',tags:['8 رؤوس','حلوب','شهادة بيطرية','قابل للتفاوض'],tagsFR:['8 têtes','Laitière','Certificat vétérinaire','Négociable'],seller:'مزرعة البركة',sellerFR:'Ferme Al Baraka',sellerEmoji:'🐄',sellerMeta:'★★★☆☆ مربّي',sellerMetaFR:'★★★☆☆ Éleveur',status:'⏳ قيد المراجعة',statusFR:'⏳ En cours de vérification',pin:false},
+  {id:210,emoji:'🌿',bg:'linear-gradient(135deg,#0d1e12,#1a3d22)',cat:'🔧 خدمات — تصميم وبرمجة',catKey:'خدمات',title:'تصميم مواقع ومتاجر إلكترونية احترافية',titleFR:'Création de sites web et boutiques en ligne professionnels',desc:'متخصص في تصميم مواقع الشركات والمتاجر الإلكترونية. تسليم في 7 أيام، لوحة تحكم سهلة، دعم تقني 30 يوماً.',descFR:'Spécialiste en création de sites vitrines et boutiques e-commerce. Livraison en 7 jours, panneau d\'administration facile, support technique 30 jours.',price:'85,000 MRU',priceFR:'85,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['تسليم 7 أيام','دعم تقني','متجر إلكتروني','موثّق'],tagsFR:['Livraison 7 jours','Support technique','Boutique en ligne','Vérifié'],seller:'محمد ليمام | ADMINIA',sellerFR:'Mohamed Limam | ADMINIA',sellerEmoji:'💻',sellerMeta:'★★★★★ موثّق',sellerMetaFR:'★★★★★ Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
   /* منتجات أناقة لإطلالات رزق — بلاطة لكل منتج عند النقر */
   {id:211,emoji:'👔',bg:'linear-gradient(135deg,#1B3A6B,#0f2347)',cat:'👗 أزياء — دراعة رجالية',catKey:'أزياء',subcat:'دراعة رجالية',gender:'men',title:'دراعة موريتانية فاخرة مطرزة — أزرق سماوي',titleFR:'Daraa mauritanienne brodée — bleu ciel',desc:'دراعة رجالية من قماش فاخر بتطريز يدوي على الصدر، مناسبة للمناسبات والخروج. صورة تجريبية: شارع موريتاني.',descFR:'Daraa homme en tissu premium, broderie artisanale poitrine. Visuel démo : rue mauritanienne.',price:'45,000 MRU',priceFR:'45,000 MRU',loc:'📍 نواكشوط — السوق الكبير',locFR:'📍 Nouakchott — Grand marché',tags:['دراعة','رجالي','تطريز','شارع'],tagsFR:['Daraa','Homme','Broderie','Rue'],seller:'مرتضى حبيب',sellerFR:'Mortada Habib',sellerEmoji:'👔',sellerMeta:'★★★★★ — خياط محترف',sellerMetaFR:'★★★★★ — Tailleur',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:true},
   {id:212,emoji:'⌚',bg:'linear-gradient(135deg,#162235,#1B3A6B)',cat:'👗 أزياء — إكسسوارات',catKey:'أزياء',subcat:'ملابس رجالية',gender:'men',title:'ساعة رجالية كلاسيكية — ستيل',titleFR:'Montre homme classique — acier',desc:'ساعة يد رجالية أنيقة، مقاومة للماء، سوار ستيل قابل للتعديل.',descFR:'Montre homme élégante, étanche, bracelet acier ajustable.',price:'28,000 MRU',priceFR:'28,000 MRU',loc:'📍 نواكشوط',locFR:'📍 Nouakchott',tags:['ساعة','رجالي','ستيل','إكسسوار'],tagsFR:['Montre','Homme','Acier','Accessoire'],seller:'ساعة الوقت',sellerFR:'L\'Heure MR',sellerEmoji:'⌚',sellerMeta:'★★★★☆ — موثّق',sellerMetaFR:'★★★★☆ — Vérifié',status:'✅ موثّق',statusFR:'✅ Vérifié',pin:false},

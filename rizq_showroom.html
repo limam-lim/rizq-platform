@@ -2314,31 +2314,29 @@ try { if(typeof mountShowroomIntroVideo === 'function') mountShowroomIntroVideo(
     var rating = window._rizqShowroomSelectedStars || 0;
     var nameEl = document.getElementById('sr-review-name');
     var commentEl = document.getElementById('sr-review-comment');
-    var res = RizqReviews.addReview(targetId, {
+    if(msgEl){ msgEl.textContent = fr ? 'Envoi…' : 'جاري الإرسال…'; msgEl.style.color='#5b6b85'; }
+    RizqReviews.addReview(targetId, {
       rating: rating,
       comment: commentEl ? commentEl.value : '',
       reviewerName: nameEl ? nameEl.value : ''
-    });
-    if(!res.ok){
-      var errs = {
-        invalid_rating: fr ? 'Merci de choisir une note entre 1 et 5 étoiles.' : 'الرجاء اختيار تقييم بين 1 و5 نجوم.',
-        already_reviewed: fr ? 'Vous avez déjà évalué ce showroom depuis cet appareil.' : 'لقد سبق أن قيّمت هذا المعرض من هذا الجهاز.',
-        invalid_target: fr ? "Impossible d'identifier ce showroom." : 'تعذر تحديد هذا المعرض.'
-      };
-      if(msgEl){ msgEl.textContent = errs[res.error] || (fr?'Une erreur est survenue.':'حدث خطأ ما.'); msgEl.style.color='#dc2626'; }
-      return;
-    }
-    if(typeof showToast==='function') showToast(fr?'✅ Merci pour votre avis !':'✅ شكراً على تقييمك!');
-    try{
-      if(typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE){
-        fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/reviews', {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ targetId: targetId, rating: rating, comment: commentEl?commentEl.value:'', reviewerName: nameEl?nameEl.value:'' })
-        }).catch(function(){});
+    }).then(function(res){
+      if(!res || !res.ok){
+        var errs = {
+          invalid_rating: fr ? 'Merci de choisir une note entre 1 et 5 étoiles.' : 'الرجاء اختيار تقييم بين 1 و5 نجوم.',
+          already_reviewed: fr ? 'Vous avez déjà évalué ce showroom.' : 'لقد سبق أن قيّمت هذا المعرض.',
+          invalid_target: fr ? "Impossible d'identifier ce showroom." : 'تعذر تحديد هذا المعرض.',
+          auth_required: fr ? 'Connectez-vous pour laisser un avis.' : 'يلزم تسجيل الدخول لإضافة تقييم.',
+          network_error: fr ? 'Réseau indisponible — réessayez.' : 'تعذر الاتصال — أعد المحاولة.',
+          backend_unavailable: fr ? 'Service avis indisponible.' : 'خدمة التقييمات غير متاحة.'
+        };
+        if(msgEl){ msgEl.textContent = errs[res && res.error] || (fr?'Une erreur est survenue.':'حدث خطأ ما.'); msgEl.style.color='#dc2626'; }
+        return;
       }
-    }catch(e){}
-    window._rizqShowroomSelectedStars = 0;
-    render();
+      if(typeof showToast==='function') showToast(fr?'✅ Merci pour votre avis !':'✅ شكراً على تقييمك!');
+      if(msgEl) msgEl.textContent = '';
+      window._rizqShowroomSelectedStars = 0;
+      render();
+    });
   };
   window._rizqRenderShowroomReviews = render;
   function boot(){

@@ -1,140 +1,250 @@
 /**
  * rizq_reviews_engine.js
  * ═══════════════════════════════════════════════════════════════════
- * محرك التقييمات والمراجعات — رزق
- * ────────────────────────────────────────────────────────────────
- * تخزين محلي بالكامل عبر localStorage — بنفس معمارية باقي المنصة
- * (لا يوجد خادم/قاعدة بيانات حقيقية لهذا الجزء، تماماً كالإعلانات
- * rizq_ads والحسابات rizq_pending_accounts). كل تقييم مرتبط بمعرّف
- * الهدف targetId — نفس القيمة المستخدمة كـ sellerKey/sellerId في
- * نظام المراسلة الآمنة rizq_messenger.js، حتى يبقى التقييم مرتبطاً
- * بنفس البائع/المتجر الذي تراسله أو تشتري منه.
- *
- * البنية المخزَّنة في rizq_reviews:
- *   { [targetId]: [ {id, rating, comment, reviewerName, createdAt}, ... ] }
- *
- * حماية بسيطة من التكرار (rizq_reviewed_targets): متصفح واحد = تقييم
- * واحد لكل هدف. هذه ليست حماية "حقيقية" لا يمكن تجاوزها — مسح
- * localStorage يلغيها فوراً — لكنها كافية لمنع السبام العرضي، بنفس
- * منطق حد النشر اليومي المضاف سابقاً في rizq_post.html.
+ * محرك التقييمات — مصدر الحقيقة = الخادم (/api/reviews).
+ * التخزين المحلي كاش عرض فقط بعد نجاح POST/GET — لا نجاح وهمي بلا مصادقة.
  * ═══════════════════════════════════════════════════════════════════
  */
-(function(global){
+(function (global) {
   'use strict';
 
-  var STORAGE_KEY  = 'rizq_reviews';
+  var STORAGE_KEY = 'rizq_reviews';
   var REVIEWED_KEY = 'rizq_reviewed_targets';
   var MAX_COMMENT_LEN = 500;
-  var MAX_NAME_LEN    = 60;
+  var MAX_NAME_LEN = 60;
 
-  // ── localStorage helpers ──────────────────────────────────────────
-  function _getAll(){
-    try{ return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
-    catch(e){ return {}; }
+  function _getAll() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+    catch (e) { return {}; }
   }
-  function _saveAll(all){
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); }
-    catch(e){ /* مساحة localStorage ممتلئة أو غير متاحة — نفشل بصمت كباقي المنصة */ }
+  function _saveAll(all) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); }
+    catch (e) { /* ignore */ }
   }
-  function _getReviewedTargets(){
-    try{ return JSON.parse(localStorage.getItem(REVIEWED_KEY) || '[]'); }
-    catch(e){ return []; }
+  function _getReviewedTargets() {
+    try { return JSON.parse(localStorage.getItem(REVIEWED_KEY) || '[]'); }
+    catch (e) { return []; }
   }
-  function _markReviewed(targetId){
-    try{
+  function _markReviewed(targetId) {
+    try {
       var arr = _getReviewedTargets();
-      if(arr.indexOf(targetId) === -1){
+      if (arr.indexOf(targetId) === -1) {
         arr.push(targetId);
         localStorage.setItem(REVIEWED_KEY, JSON.stringify(arr));
       }
-    }catch(e){}
+    } catch (e) {}
   }
-  function _hasReviewed(targetId){
+  function _hasReviewed(targetId) {
     return _getReviewedTargets().indexOf(targetId) !== -1;
   }
-  function _genId(){
-    return 'RV-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+
+  function apiBase() {
+    try {
+      if (typeof global.RIZQ_BACKEND_BASE === 'string' && global.RIZQ_BACKEND_BASE) {
+        return String(global.RIZQ_BACKEND_BASE).replace(/\/$/, '');
+      }
+    } catch (e) {}
+    return '';
   }
 
-  // ── getReviews(targetId): أحدث تقييم أولاً ──────────────────────
-  function getReviews(targetId){
-    if(!targetId) return [];
-    var all = _getAll();
-    var list = all[targetId] || [];
-    return list.slice().sort(function(a, b){
+  /** جلسة مشتري أو حساب بائع للمصادقة */
+  function resolveAuth() {
+    // مشتري Guest Gate
+    try {
+      if (global.RizqAuthGate && typeof global.RizqAuthGate.getSession === 'function') {
+        var bs = global.RizqAuthGate.getSession();
+        if (bs && bs.id && bs.token && String(bs.token).length >= 20) {
+          return { kind: 'buyer', id: String(bs.id), token: String(bs.token), name: bs.name || '' };
+        }
+      }
+    } catch (e1) {}
+    try {
+      var raw = localStorage.getItem('rizq_buyer_session');
+      var s = raw ? JSON.parse(raw) : null;
+      if (s && s.id && s.token && String(s.token).length >= 20) {
+        return { kind: 'buyer', id: String(s.id), token: String(s.token), name: s.name || '' };
+      }
+    } catch (e2) {}
+    // حساب بائع / محل
+    try {
+      var keys = ['rizq_account_session', 'rizq_session', 'rizq_active_account'];
+      for (var i = 0; i < keys.length; i++) {
+        var a = JSON.parse(localStorage.getItem(keys[i]) || 'null');
+        if (!a) continue;
+        var tok = a.backendAccessToken || a.accessToken || a.token || '';
+        var id = a.id || a.accountId || '';
+        if (id && tok && String(tok).length >= 16) {
+          return { kind: 'account', id: String(id), token: String(tok), name: a.name || a.businessName || '' };
+        }
+      }
+    } catch (e3) {}
+    return null;
+  }
+
+  function getReviews(targetId) {
+    if (!targetId) return [];
+    var list = (_getAll()[targetId] || []).slice();
+    return list.sort(function (a, b) {
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
   }
 
-  // ── getStats(targetId): {count, average} — بدون قسمة على صفر ────
-  function getStats(targetId){
+  function getStats(targetId) {
     var list = getReviews(targetId);
     var count = list.length;
-    if(count === 0) return { count: 0, average: 0 };
-    var sum = list.reduce(function(s, r){ return s + (Number(r.rating) || 0); }, 0);
-    var average = Math.round((sum / count) * 10) / 10;
-    return { count: count, average: average };
+    if (count === 0) return { count: 0, average: 0 };
+    var sum = list.reduce(function (s, r) { return s + (Number(r.rating) || 0); }, 0);
+    return { count: count, average: Math.round((sum / count) * 10) / 10 };
   }
 
-  // ── addReview(targetId, {rating, comment, reviewerName}) ─────────
-  function addReview(targetId, opts){
-    opts = opts || {};
-    if(!targetId){
-      return { ok: false, error: 'invalid_target' };
-    }
-
-    // تحقق صارم: عدد صحيح بين 1 و5 (وليس "3.5" أو نص عشوائي)
-    var rawRating = opts.rating;
-    var rating = (typeof rawRating === 'number') ? rawRating : parseFloat(rawRating);
-    if(typeof rating !== 'number' || isNaN(rating) || !isFinite(rating) ||
-       !Number.isInteger(rating) || rating < 1 || rating > 5){
-      return { ok: false, error: 'invalid_rating' };
-    }
-
-    // حارس بسيط ضد التكرار — متصفح واحد = تقييم واحد لكل هدف (غير مضمون 100%، انظر التعليق أعلاه)
-    if(_hasReviewed(targetId)){
-      return { ok: false, error: 'already_reviewed' };
-    }
-
-    var comment = (opts.comment == null ? '' : String(opts.comment)).trim().slice(0, MAX_COMMENT_LEN);
-    var reviewerName = (opts.reviewerName == null ? '' : String(opts.reviewerName)).trim().slice(0, MAX_NAME_LEN);
-
-    var review = {
-      id: _genId(),
-      rating: rating,
-      comment: comment,
-      reviewerName: reviewerName,
-      createdAt: new Date().toISOString()
-    };
-
+  function cacheReview(targetId, review) {
     var all = _getAll();
-    if(!all[targetId]) all[targetId] = [];
+    if (!all[targetId]) all[targetId] = [];
+    all[targetId] = all[targetId].filter(function (r) { return r.id !== review.id; });
     all[targetId].unshift(review);
     _saveAll(all);
     _markReviewed(targetId);
-
-    return { ok: true, review: review };
   }
 
-  // ── deleteReview(targetId, reviewId) — لموديريشن البائع لاحقاً (اختياري) ──
-  function deleteReview(targetId, reviewId){
-    if(!targetId || !reviewId) return { ok: false, error: 'invalid_input' };
+  function replaceCache(targetId, reviews) {
     var all = _getAll();
-    var list = all[targetId] || [];
-    var next = list.filter(function(r){ return r.id !== reviewId; });
-    if(next.length === list.length) return { ok: false, error: 'not_found' };
-    all[targetId] = next;
+    all[targetId] = Array.isArray(reviews) ? reviews.slice() : [];
     _saveAll(all);
-    return { ok: true };
+  }
+
+  /**
+   * addReview — يعيد Promise. لا يكتب محلياً إلا بعد نجاح الخادم.
+   * opts: { rating, comment, reviewerName }
+   */
+  function addReview(targetId, opts) {
+    opts = opts || {};
+    return new Promise(function (resolve) {
+      if (!targetId) {
+        resolve({ ok: false, error: 'invalid_target' });
+        return;
+      }
+      var rawRating = opts.rating;
+      var rating = (typeof rawRating === 'number') ? rawRating : parseFloat(rawRating);
+      if (typeof rating !== 'number' || isNaN(rating) || !isFinite(rating)
+        || !Number.isInteger(rating) || rating < 1 || rating > 5) {
+        resolve({ ok: false, error: 'invalid_rating' });
+        return;
+      }
+      if (_hasReviewed(targetId)) {
+        resolve({ ok: false, error: 'already_reviewed' });
+        return;
+      }
+      var auth = resolveAuth();
+      if (!auth) {
+        resolve({ ok: false, error: 'auth_required' });
+        return;
+      }
+      var base = apiBase();
+      if (!base) {
+        resolve({ ok: false, error: 'backend_unavailable' });
+        return;
+      }
+      var comment = (opts.comment == null ? '' : String(opts.comment)).trim().slice(0, MAX_COMMENT_LEN);
+      var reviewerName = (opts.reviewerName == null ? '' : String(opts.reviewerName)).trim().slice(0, MAX_NAME_LEN)
+        || auth.name || '';
+      var headers = { 'Content-Type': 'application/json' };
+      var body = {
+        targetId: targetId,
+        rating: rating,
+        comment: comment,
+        reviewerName: reviewerName
+      };
+      if (auth.kind === 'buyer') {
+        headers['Authorization'] = 'Bearer ' + auth.token;
+        headers['X-Buyer-Id'] = auth.id;
+        headers['X-Buyer-Token'] = auth.token;
+      } else {
+        headers['x-account-token'] = auth.token;
+        body.reviewerAccountId = auth.id;
+      }
+      fetch(base + '/api/reviews', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body)
+      })
+        .then(function (res) {
+          return res.json().catch(function () { return {}; }).then(function (data) {
+            return { status: res.status, data: data || {} };
+          });
+        })
+        .then(function (pack) {
+          if (pack.status === 401) {
+            resolve({ ok: false, error: 'auth_required' });
+            return;
+          }
+          if (pack.status === 409 || (pack.data && pack.data.error === 'already_reviewed')) {
+            _markReviewed(targetId);
+            resolve({ ok: false, error: 'already_reviewed' });
+            return;
+          }
+          if (pack.status === 400 && pack.data && pack.data.error === 'cannot_review_self') {
+            resolve({ ok: false, error: 'cannot_review_self' });
+            return;
+          }
+          if (pack.status >= 200 && pack.status < 300 && pack.data && pack.data.ok && pack.data.review) {
+            cacheReview(targetId, pack.data.review);
+            resolve({ ok: true, review: pack.data.review });
+            return;
+          }
+          resolve({ ok: false, error: (pack.data && pack.data.error) || 'server_error' });
+        })
+        .catch(function () {
+          resolve({ ok: false, error: 'network_error' });
+        });
+    });
+  }
+
+  /** مزامنة قائمة التقييمات من الخادم إلى الكاش المحلي */
+  function hydrate(targetId) {
+    return new Promise(function (resolve) {
+      var base = apiBase();
+      if (!base || !targetId) {
+        resolve({ ok: false, reviews: getReviews(targetId) });
+        return;
+      }
+      fetch(base + '/api/reviews/' + encodeURIComponent(targetId))
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          if (data && data.ok && Array.isArray(data.reviews)) {
+            replaceCache(targetId, data.reviews);
+            resolve({ ok: true, reviews: data.reviews });
+            return;
+          }
+          resolve({ ok: false, reviews: getReviews(targetId) });
+        })
+        .catch(function () {
+          resolve({ ok: false, reviews: getReviews(targetId) });
+        });
+    });
+  }
+
+  function deleteReview() {
+    return { ok: false, error: 'admin_only' };
+  }
+
+  /** إزالة أعداد التقييمات الوهمية من نصوص العرض (ديمو) */
+  function scrubFakeReviewMeta(text) {
+    var s = String(text == null ? '' : text);
+    s = s.replace(/\(\s*\d+\s*تقييم(?:ات)?\s*\)/g, '');
+    s = s.replace(/\(\s*\d+\s*avis\s*\)/gi, '');
+    s = s.replace(/\s{2,}/g, ' ').replace(/\s+—/g, ' —').trim();
+    return s;
   }
 
   global.RizqReviews = {
     addReview: addReview,
     getReviews: getReviews,
     getStats: getStats,
-    deleteReview: deleteReview
+    deleteReview: deleteReview,
+    hydrate: hydrate,
+    resolveAuth: resolveAuth,
+    scrubFakeReviewMeta: scrubFakeReviewMeta
   };
 
-  if(global.console) console.log('[RIZQ-REVIEWS] Reviews Engine v1.0 loaded ✅');
-
+  if (global.console) console.log('[RIZQ-REVIEWS] Reviews Engine v2.0 (API source of truth)');
 })(typeof window !== 'undefined' ? window : global);

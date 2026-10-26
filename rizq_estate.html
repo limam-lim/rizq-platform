@@ -2492,31 +2492,29 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
     var rating = window._rizqEstateSelectedStars || 0;
     var nameEl = document.getElementById('est-review-name');
     var commentEl = document.getElementById('est-review-comment');
-    var res = RizqReviews.addReview(targetId, {
+    if(msgEl){ msgEl.textContent = fr ? 'Envoi…' : 'جاري الإرسال…'; msgEl.style.color='#5b6b85'; }
+    RizqReviews.addReview(targetId, {
       rating: rating,
       comment: commentEl ? commentEl.value : '',
       reviewerName: nameEl ? nameEl.value : ''
-    });
-    if(!res.ok){
-      var errs = {
-        invalid_rating: fr ? 'Merci de choisir une note entre 1 et 5 étoiles.' : 'الرجاء اختيار تقييم بين 1 و5 نجوم.',
-        already_reviewed: fr ? 'Vous avez déjà évalué cette agence depuis cet appareil.' : 'لقد سبق أن قيّمت هذه الوكالة من هذا الجهاز.',
-        invalid_target: fr ? "Impossible d'identifier cette agence." : 'تعذر تحديد هذه الوكالة.'
-      };
-      if(msgEl){ msgEl.textContent = errs[res.error] || (fr?'Une erreur est survenue.':'حدث خطأ ما.'); msgEl.style.color='#dc2626'; }
-      return;
-    }
-    if(typeof showToast==='function') showToast(fr?'✅ Merci pour votre avis !':'✅ شكراً على تقييمك!');
-    try{
-      if(typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE){
-        fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/reviews', {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ targetId: targetId, rating: rating, comment: commentEl?commentEl.value:'', reviewerName: nameEl?nameEl.value:'' })
-        }).catch(function(){});
+    }).then(function(res){
+      if(!res || !res.ok){
+        var errs = {
+          invalid_rating: fr ? 'Merci de choisir une note entre 1 et 5 étoiles.' : 'الرجاء اختيار تقييم بين 1 و5 نجوم.',
+          already_reviewed: fr ? 'Vous avez déjà évalué cette agence.' : 'لقد سبق أن قيّمت هذه الوكالة.',
+          invalid_target: fr ? "Impossible d'identifier cette agence." : 'تعذر تحديد هذه الوكالة.',
+          auth_required: fr ? 'Connectez-vous pour laisser un avis.' : 'يلزم تسجيل الدخول لإضافة تقييم.',
+          network_error: fr ? 'Réseau indisponible — réessayez.' : 'تعذر الاتصال — أعد المحاولة.',
+          backend_unavailable: fr ? 'Service avis indisponible.' : 'خدمة التقييمات غير متاحة.'
+        };
+        if(msgEl){ msgEl.textContent = errs[res && res.error] || (fr?'Une erreur est survenue.':'حدث خطأ ما.'); msgEl.style.color='#dc2626'; }
+        return;
       }
-    }catch(e){}
-    window._rizqEstateSelectedStars = 0;
-    renderReviews();
+      if(typeof showToast==='function') showToast(fr?'✅ Merci pour votre avis !':'✅ شكراً على تقييمك!');
+      if(msgEl) msgEl.textContent = '';
+      window._rizqEstateSelectedStars = 0;
+      renderReviews();
+    });
   };
 
   function renderGrid(){

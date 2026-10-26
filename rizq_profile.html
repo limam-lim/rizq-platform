@@ -933,22 +933,28 @@ window._pfSubmitReview = function(){
   var rating = window._pfSelectedStars || 0;
   var nameEl = document.getElementById('pf-review-name');
   var commentEl = document.getElementById('pf-review-comment');
-  var res = RizqReviews.addReview(targetId, {
+  if(msgEl){ msgEl.textContent = fr ? 'Envoi…' : 'جاري الإرسال…'; msgEl.style.color='#5b6b85'; }
+  RizqReviews.addReview(targetId, {
     rating: rating,
     comment: commentEl ? commentEl.value : '',
     reviewerName: nameEl ? nameEl.value : ''
+  }).then(function(res){
+    if(!res || !res.ok){
+      var errs = {
+        invalid_rating: fr ? 'Merci de sélectionner une note entre 1 et 5 étoiles.' : 'الرجاء اختيار تقييم بين 1 و5 نجوم.',
+        already_reviewed: fr ? 'Vous avez déjà laissé un avis pour ce vendeur.' : 'لقد سبق أن أضفت تقييماً لهذا البائع.',
+        invalid_target: fr ? "Impossible d'identifier ce profil." : 'تعذر تحديد هذا الملف الشخصي.',
+        auth_required: fr ? 'Connectez-vous pour laisser un avis.' : 'يلزم تسجيل الدخول لإضافة تقييم.',
+        network_error: fr ? 'Réseau indisponible — réessayez.' : 'تعذر الاتصال — أعد المحاولة.',
+        backend_unavailable: fr ? 'Service avis indisponible.' : 'خدمة التقييمات غير متاحة.'
+      };
+      if(msgEl){ msgEl.textContent = errs[res && res.error] || (fr?'Une erreur est survenue.':'حدث خطأ ما.'); msgEl.style.color = '#dc2626'; }
+      return;
+    }
+    if(typeof showToast === 'function') showToast(fr ? '✅ Merci pour votre avis !' : '✅ شكراً على تقييمك!');
+    if(msgEl) msgEl.textContent = '';
+    renderProfileReviewsUI(targetId);
   });
-  if(!res.ok){
-    var errs = {
-      invalid_rating: fr ? 'Merci de sélectionner une note entre 1 et 5 étoiles.' : 'الرجاء اختيار تقييم بين 1 و5 نجوم.',
-      already_reviewed: fr ? 'Vous avez déjà laissé un avis pour ce vendeur depuis cet appareil.' : 'لقد سبق أن أضفت تقييماً لهذا البائع من هذا الجهاز.',
-      invalid_target: fr ? "Impossible d'identifier ce profil." : 'تعذر تحديد هذا الملف الشخصي.'
-    };
-    if(msgEl){ msgEl.textContent = errs[res.error] || (fr?'Une erreur est survenue.':'حدث خطأ ما.'); msgEl.style.color = '#dc2626'; }
-    return;
-  }
-  if(typeof showToast === 'function') showToast(fr ? '✅ Merci pour votre avis !' : '✅ شكراً على تقييمك!');
-  renderProfileReviewsUI(targetId);
 };
 
 // Animate rating bars
