@@ -468,6 +468,11 @@
 .rc:has(.rzq-adx-media) .rzq-ad-brand-slot{
   flex-shrink:0!important;
 }
+.ad-card:has(.rzq-adx-media) .rzq-ad-brand-slot.has-brand,
+.listing-card:has(.rzq-adx-media) .rzq-ad-brand-slot.has-brand,
+.rc:has(.rzq-adx-media) .rzq-ad-brand-slot.has-brand{
+  margin-bottom:3px!important;
+}
 .rzq-adx-tel,
 .rzq-adx-actions .rzq-adx-wa{
   width:28px;height:28px;border-radius:50%;
