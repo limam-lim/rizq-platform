@@ -1034,7 +1034,7 @@ body > .rizq-help-dd-menu a,
 
 /*
  * تابلت فقط (769–1024): إصلاحات خفيفة — لا تلمس كمبيوتر ولا هاتف
- * 1) بحث أضيق + إزاحة نحو الشعار (يمين الشاشة في RTL) حتى لا يلامس الشعار ولا أدوات اليسار
+ * 1) بحث في وسط العمود الأوسط تماماً (بلا إزاحة نحو الشعار)
  * 2) تصغير خط الشعار دون تغيير التصميم
  * 3) إنزال كبسولة رزق / شارة السوق لتظهر كاملة تحت الهيدر مثل الكمبيوتر
  */
@@ -1058,14 +1058,14 @@ body > .rizq-help-dd-menu a,
   }
   #rizq-mock-hdr .rmh-brand{justify-self:start!important;min-width:0}
   #rizq-mock-hdr .rmh-tools{justify-self:end!important;min-width:0}
-  /* البحث: نفس الموضع + متّسع قليلاً لتذييل الأقسام */
+  /* البحث: وسط العمود الأوسط على التابلت — بلا translateX */
   #rizq-mock-hdr .rmh-search{
     max-width:340px!important;
     width:100%!important;
     min-width:0!important;
     justify-self:center!important;
     margin-inline:0!important;
-    transform:translateX(22px)!important;
+    transform:none!important;
   }
   #rizq-mock-hdr .rmh-search-cat{
     display:block!important;
@@ -1155,13 +1155,13 @@ body > .rizq-help-dd-menu a,
   body.rizq-mockup-hdr-trial .hero-brand-row .hero-eyebrow{
     margin-top:4px!important;
   }
-  /* الفرنسية LTR: سحب طفيف نحو الشعار (يسار الشاشة) */
+  /* الفرنسية LTR على التابلت: نفس الوسط بلا إزاحة */
   html[dir="ltr"] #rizq-mock-hdr .rmh-search,
   html[lang="fr"] #rizq-mock-hdr .rmh-search,
   body.rizq-lang-fr #rizq-mock-hdr .rmh-search{
     justify-self:center!important;
     margin-inline:0!important;
-    transform:translateX(-22px)!important;
+    transform:none!important;
   }
 }
 
