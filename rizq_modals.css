@@ -12,8 +12,9 @@
     0 15px 50px -10px rgba(0, 0, 0, 0.45);
   --rzq-modal-backdrop: rgba(5, 10, 22, 0.78);
   --rzq-modal-backdrop-blur: 20px;
-  --rzq-modal-border-dark: 1px solid rgba(201, 168, 76, 0.22);
-  --rzq-modal-border-light: 1px solid rgba(27, 58, 107, 0.1);
+  /* حواف باردة — الحد الذهبي كان يظهر كخط أصفر خارج الزوايا */
+  --rzq-modal-border-dark: 1px solid rgba(255, 255, 255, 0.12);
+  --rzq-modal-border-light: 1px solid rgba(15, 31, 61, 0.10);
   --rzq-modal-gold: #c9a84c;
   --rzq-modal-navy: #1b3a6b;
 }
@@ -517,21 +518,21 @@ body.rizq-dash .cs-modal-input {
 #pkg-modal-box,
 .cs-modal-box {
   scrollbar-width: thin;
-  scrollbar-color: rgba(201, 168, 76, 0.35) transparent;
+  scrollbar-color: rgba(15, 31, 61, 0.22) transparent;
 }
 
 .modal-box::-webkit-scrollbar,
 .rizq-modal-box::-webkit-scrollbar,
 .disc-modal::-webkit-scrollbar,
 #ad-modal-box::-webkit-scrollbar {
-  width: 4px;
+  width: 5px;
 }
 
 .modal-box::-webkit-scrollbar-thumb,
 .rizq-modal-box::-webkit-scrollbar-thumb,
 .disc-modal::-webkit-scrollbar-thumb,
 #ad-modal-box::-webkit-scrollbar-thumb {
-  background: rgba(201, 168, 76, 0.35);
+  background: rgba(15, 31, 61, 0.22);
   border-radius: 4px;
 }
 

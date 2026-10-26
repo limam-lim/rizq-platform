@@ -29,12 +29,12 @@ html[dir="ltr"] .main-content {
 
 /* rizq_dashboard.html sidebar border */
 html[dir="rtl"] .sidebar {
-  border-left: 1px solid rgba(201, 168, 76, 0.1);
+  border-left: 1px solid rgba(15, 31, 61, 0.08);
   border-right: none;
 }
 
 html[dir="ltr"] .sidebar {
-  border-right: 1px solid rgba(201, 168, 76, 0.1);
+  border-right: 1px solid rgba(15, 31, 61, 0.08);
   border-left: none;
 }
 
@@ -73,15 +73,17 @@ html[dir="ltr"] .nav-badge {
   margin-right: 0;
 }
 
-/* Card accent borders */
+/* Card accent borders — رفيعة وبحرية بدل شريط ذهبي سميك */
 html[dir="rtl"] .stat-card {
-  border-right-width: 4px;
+  border-right-width: 3px;
   border-left-width: 1px;
+  border-right-color: rgba(27, 58, 107, 0.35);
 }
 
 html[dir="ltr"] .stat-card {
-  border-left-width: 4px;
+  border-left-width: 3px;
   border-right-width: 1px;
+  border-left-color: rgba(27, 58, 107, 0.35);
 }
 
 html[dir="ltr"] .inq-item {
