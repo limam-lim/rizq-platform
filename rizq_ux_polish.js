@@ -573,15 +573,22 @@
   function updateCartBadges() {
     var nAll = cartCountAll();
     var nScoped = cartCount();
-    /* شارة الهيدر / السلة العامة = المجموع الكامل */
-    _paintCartCountEls('#rizq-hdr-cart [data-rizq-cart-count], [data-rizq-cart-wrap] > [data-rizq-cart-count], #nav-cart-count', nAll);
-    document.querySelectorAll('[data-rizq-cart-wrap], #rizq-hdr-cart').forEach(function (el) {
+    /* شارة الهيدر / السلة العامة = المجموع الكامل — لا تلمس #nav-cart-count (سلة المحل) */
+    _paintCartCountEls(
+      '#rizq-hdr-cart [data-rizq-cart-count], [data-rizq-cart-wrap] > [data-rizq-cart-count], #rmh-cart-count, [data-rizq-cart-general-count]',
+      nAll
+    );
+    document.querySelectorAll('[data-rizq-cart-wrap], #rizq-hdr-cart, #rmh-cart-btn, .rmh-cart-link').forEach(function (el) {
       el.classList.toggle('has-items', nAll > 0);
       el.setAttribute('aria-label', t('السلة العامة (' + nAll + ')', 'Panier général (' + nAll + ')'));
       el.setAttribute('title', t('السلة العامة (' + nAll + ')', 'Panier général (' + nAll + ')'));
     });
-    /* شريحة المحل/المعرض المحلية = مقيّدة بالبائع الحالي إن وُجد */
-    _paintCartCountEls('#ab-cart-count, #sr-cart-count, [data-rizq-seller-cart-count]', nScoped);
+    /* شريحة المحل/المعرض / #nav-cart-count = مقيّدة بالبائع الحالي إن وُجد، وإلا المجموع */
+    var nShopChrome = pageSellerScopeId() ? nScoped : nAll;
+    _paintCartCountEls(
+      '#nav-cart-count, #ab-cart-count, #sr-cart-count, [data-rizq-seller-cart-count]',
+      nShopChrome
+    );
   }
 
   function updateStoreWishBadge(count) {

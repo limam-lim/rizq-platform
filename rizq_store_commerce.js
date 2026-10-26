@@ -421,12 +421,31 @@
     }
   }
 
+  function isGeneralCartAnchor(a) {
+    if (!a || !a.getAttribute) return false;
+    if (a.hasAttribute('data-rizq-cart-general')) return true;
+    var id = a.id || '';
+    if (id === 'rizq-hdr-cart' || id === 'rmh-cart-btn') return true;
+    if (a.closest && (a.closest('#rizq-hdr-cart') || a.closest('[data-rizq-cart-wrap]') || a.closest('#rmh-cart-btn'))) {
+      return true;
+    }
+    if (a.classList && (a.classList.contains('rmh-cart-link') || a.classList.contains('rizq-hdr-cart'))) {
+      return true;
+    }
+    /* تسمية صريحة للسلة العامة — لا تُقيَّد بمعرّف المحل */
+    var label = String(a.getAttribute('aria-label') || a.getAttribute('title') || a.textContent || '');
+    if (/السلة العامة|Panier g[eé]n[eé]ral/i.test(label)) return true;
+    return false;
+  }
+
   function wireStoreLinks(storeId, root) {
     if (!storeId) return;
     var scope = root || document;
     scope.querySelectorAll('a[href*="rizq_products.html"], a[href*="rizq_cart.html"], a[href*="rizq_store.html"]').forEach(function (a) {
       var href = a.getAttribute('href') || '';
       if (/^https?:/i.test(href) && href.indexOf(location.host) === -1) return;
+      /* السلة العامة في الهيدر تبقى بلا ?id — الدفع للمحل عبر .sss-cart / روابط المحل فقط */
+      if (/rizq_cart\.html/i.test(href) && isGeneralCartAnchor(a)) return;
       a.setAttribute('href', withStoreId(href, storeId));
     });
   }

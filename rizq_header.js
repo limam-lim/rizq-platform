@@ -332,7 +332,7 @@
       '"><span class="rizq-hdr-fav-ico" data-rizq-fav-heart aria-hidden="true">♡</span><span class="rizq-hdr-fav-count" data-rizq-fav-count hidden>0</span></a>';
     /* السلة العامة دائماً — تجمع كل ما أضافه الزائر؛ شريحة المحل المحلية تبقى منفصلة */
     inner +=
-      '<a class="rizq-hdr-cart" id="rizq-hdr-cart" data-rizq-cart-wrap href="rizq_cart.html" aria-label="' +
+      '<a class="rizq-hdr-cart" id="rizq-hdr-cart" data-rizq-cart-wrap data-rizq-cart-general href="rizq_cart.html" aria-label="' +
       t2('السلة العامة', 'Panier général') +
       '" title="' +
       t2('السلة العامة', 'Panier général') +

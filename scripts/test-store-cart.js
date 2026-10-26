@@ -113,11 +113,27 @@ assert.strictEqual(cartLinesForSeller(mixed, '').length, 3, 'no seller id => gen
 
 assert(commerceJs.includes('cartLinesForSeller'), 'commerce must export seller cart filter');
 assert(commerceJs.includes('cartQtyForSeller'), 'commerce must export seller cart qty');
+assert(commerceJs.includes('isGeneralCartAnchor'), 'wireStoreLinks must skip general cart anchors');
+assert(commerceJs.includes('data-rizq-cart-general'), 'general cart marker must be recognized');
+const uxJs = fs.readFileSync(path.join(__dirname, '..', 'rizq_ux_polish.js'), 'utf8');
+const nAllPaint = uxJs.match(/_paintCartCountEls\(\s*'([^']+)'\s*,\s*nAll\s*\)/);
+assert(nAllPaint, 'updateCartBadges must paint general total');
+assert(
+  !nAllPaint[1].includes('#nav-cart-count'),
+  'general total paint must not include #nav-cart-count (shop chrome)'
+);
+assert(
+  /_paintCartCountEls\(\s*'[^']*#nav-cart-count[^']*'\s*,\s*nShopChrome\s*\)/.test(uxJs.replace(/\s+/g, ' '))
+    || uxJs.includes("nShopChrome"),
+  'shop #nav-cart-count must use seller-scoped paint'
+);
 const cartHtml = fs.readFileSync(path.join(__dirname, '..', 'rizq_cart.html'), 'utf8');
 assert(cartHtml.includes('function activeCart'), 'cart page must scope visible lines');
 assert(cartHtml.includes('_cartScopeSellerId'), 'cart page must read seller scope from URL');
 const showroomHtml = fs.readFileSync(path.join(__dirname, '..', 'rizq_showroom.html'), 'utf8');
 assert(showroomHtml.includes('cartQtyForSeller') || showroomHtml.includes('cartLinesForSeller') || showroomHtml.includes("c.storeId || c.accountId"), 'showroom badge must count only its seller');
 assert(showroomHtml.includes('module=showroom'), 'showroom cart links must pass module=showroom');
+assert(showroomHtml.includes('max-width:1100px') && showroomHtml.includes('showroom-desk-actions'), 'showroom payment desk must stack on tablet');
+assert(storeHtml.includes('max-width:1100px') && storeHtml.includes('store-desk-actions'), 'store payment desk must stack on tablet');
 
 console.log('OK: store cart smoke tests passed');
