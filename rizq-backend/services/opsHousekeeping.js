@@ -35,7 +35,15 @@ function pushNotification(accountId, note) {
   return rec;
 }
 
+/** قابل للحقن في الاختبارات — ب1 يجب أن يحاول البريد دائماً مع إشعار الحساب */
+let _sendEmailImpl = null;
+
+function setSendEmailImplForTests(fn) {
+  _sendEmailImpl = typeof fn === 'function' ? fn : null;
+}
+
 async function sendEmailSafe(to, subject, html) {
+  if (_sendEmailImpl) return _sendEmailImpl(to, subject, html);
   if (!to || !process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     return { ok: false, skipped: true, reason: 'email_not_configured' };
   }
@@ -55,6 +63,17 @@ async function sendEmailSafe(to, subject, html) {
   }
 }
 
+function accountEmail(account) {
+  if (!account || typeof account !== 'object') return '';
+  return String(
+    account.email
+    || account.contactEmail
+    || account.loginEmail
+    || account.userEmail
+    || ''
+  ).trim();
+}
+
 function purgeMediaBounded(adId) {
   const safeId = String(adId || '').replace(/[^a-zA-Z0-9_-]/g, '');
   if (!safeId) return 0;
@@ -72,7 +91,15 @@ async function runRenewalReminders(deps) {
   } = deps;
   const dryRun = launchMode.isMaintenanceDryRun();
   const summary = {
-    reminded: 0, wouldRemind: 0, emailed: 0, skippedProtected: 0, dryRun, errors: [],
+    reminded: 0,
+    wouldRemind: 0,
+    notified: 0,
+    emailed: 0,
+    emailAttempted: 0,
+    emailSkipped: 0,
+    skippedProtected: 0,
+    dryRun,
+    errors: [],
   };
   const accounts = readAccounts() || [];
   const byId = {};
@@ -101,26 +128,52 @@ async function runRenewalReminders(deps) {
     const days = Math.max(1, Math.ceil(left / MS_DAY));
     const title = 'تذكير تجديد الإعلان';
     const body = `إعلانك «${String(ad.title || ad.id).slice(0, 80)}» ينتهي خلال ${days} ${days === 1 ? 'يوم' : 'أيام'}. جدّده ليبقي ظاهراً.`;
+    const toEmail = accountEmail(account);
 
     if (dryRun) {
       summary.wouldRemind++;
       continue;
     }
-    pushNotification(ad.accountId, {
+    // ب1 — الاثنان معاً: إشعار داخل الحساب + بريد إلكتروني
+    const note = pushNotification(ad.accountId, {
       type: 'ad_renewal_reminder',
       title,
       body,
-      meta: { adId: ad.id, daysLeft: days },
+      meta: { adId: ad.id, daysLeft: days, email: toEmail || null },
     });
-    if (account && account.email) {
+    if (note) summary.notified++;
+
+    if (toEmail) {
+      summary.emailAttempted++;
       const mail = await sendEmailSafe(
-        account.email,
+        toEmail,
         'رزق — تذكير بقرب انتهاء إعلانك',
-        `<p dir="rtl">${body}</p>`
+        `<p dir="rtl">${body}</p><p dir="rtl">يمكنك أيضاً مراجعة الإشعار داخل حسابك على رزق.</p>`
       );
       if (mail.ok) summary.emailed++;
+      else {
+        summary.emailSkipped++;
+        summary.errors.push({
+          adId: ad.id,
+          phase: 'renewal_email',
+          message: mail.error || mail.reason || 'email_failed',
+        });
+      }
+    } else {
+      summary.emailSkipped++;
+      summary.errors.push({
+        adId: ad.id,
+        phase: 'renewal_email',
+        message: 'account_email_missing',
+      });
     }
+
     ad.renewalReminderSentAt = new Date(nowMs).toISOString();
+    ad.renewalReminderChannels = {
+      notification: !!note,
+      email: !!toEmail,
+      emailedAt: toEmail ? new Date(nowMs).toISOString() : null,
+    };
     list[i] = ad;
     changed = true;
     summary.reminded++;
@@ -345,20 +398,41 @@ function buildWeeklyReport(parts) {
   return report;
 }
 
+/**
+ * ب4 — التقرير الأسبوعي فقط عند trigger=weekly أو forceWeekly.
+ * لا يُبنى من cron اليومي (حتى لو كان اليوم اثنين/أحد) — الجدولة منفصلة الاثنين 04:00.
+ */
 async function runOpsHousekeepingPass(deps) {
   const trigger = deps.trigger || 'manual';
   const nowMs = deps.nowMs || Date.now();
+  const weeklyOnly = deps.weeklyOnly === true;
   const { runAdLifecycleMaintenance } = require('./adLifecycle');
-  const lifecycle = runAdLifecycleMaintenance(Object.assign({}, deps, { nowMs, trigger }));
-  const reminders = await runRenewalReminders(Object.assign({}, deps, { nowMs }));
-  const cleanups = await runCleanups(Object.assign({}, deps, { nowMs }));
+
+  let lifecycle = {
+    archived: 0, mediaPurged: 0, bytesFreed: 0,
+    wouldArchive: 0, wouldPurge: 0, skippedPaidGrace: 0, dryRun: launchMode.isMaintenanceDryRun(),
+  };
+  let reminders = {
+    reminded: 0, wouldRemind: 0, emailed: 0, notified: 0, dryRun: launchMode.isMaintenanceDryRun(),
+  };
+  let cleanups = {
+    dryRun: launchMode.isMaintenanceDryRun(),
+    soldPurged: 0, draftsRemoved: 0, unverifiedWarned: 0, unverifiedDeleted: 0, bytesFreed: 0,
+  };
+
+  if (!weeklyOnly) {
+    lifecycle = runAdLifecycleMaintenance(Object.assign({}, deps, { nowMs, trigger }));
+    reminders = await runRenewalReminders(Object.assign({}, deps, { nowMs }));
+    cleanups = await runCleanups(Object.assign({}, deps, { nowMs }));
+  }
+
   let weekly = null;
-  const dow = new Date(nowMs).getUTCDay(); // 0=Sun
   const forceWeekly = deps.forceWeekly === true;
-  if (forceWeekly || dow === 0 || trigger === 'weekly') {
+  // أسبوعي صراحة فقط — ليس حسب يوم الأسبوع داخل الـ cron اليومي
+  if (forceWeekly || trigger === 'weekly') {
     weekly = buildWeeklyReport({ lifecycle, reminders, cleanups, nowMs });
     const adminEmail = process.env.SUPER_ADMIN_EMAIL || process.env.OPS_REPORT_EMAIL;
-    if (adminEmail && !lifecycle.dryRun) {
+    if (adminEmail && !launchMode.isMaintenanceDryRun()) {
       await sendEmailSafe(
         adminEmail,
         'رزق — تقرير العمليات الأسبوعي',
@@ -366,7 +440,11 @@ async function runOpsHousekeepingPass(deps) {
       );
     }
   }
-  return { lifecycle, reminders, cleanups, weekly, dryRun: launchMode.isMaintenanceDryRun() };
+  return {
+    lifecycle, reminders, cleanups, weekly,
+    dryRun: launchMode.isMaintenanceDryRun(),
+    trigger,
+  };
 }
 
 function listAccountNotifications(accountId, limit) {
@@ -397,4 +475,7 @@ module.exports = {
   listAccountNotifications,
   listWeeklyReports,
   pushNotification,
+  setSendEmailImplForTests,
+  accountEmail,
+  sendEmailSafe,
 };

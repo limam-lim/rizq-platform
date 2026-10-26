@@ -15,7 +15,13 @@ const {
   runCleanups,
   buildWeeklyReport,
   runOpsHousekeepingPass,
+  setSendEmailImplForTests,
 } = require('../services/opsHousekeeping');
+const {
+  DEFAULT_CRON,
+  DEFAULT_WEEKLY_CRON,
+  DEFAULT_TZ,
+} = require('../services/maintenanceScheduler');
 
 const ROOT = path.join(__dirname, '..');
 const TMP = path.join(ROOT, 'data', '__ops_hk_test__');
@@ -177,10 +183,26 @@ async function run() {
   touchMedia('AD_PROT');
   deps = makeDeps(now, adsLive, accountsLive, {});
 
+  const emailsSent = [];
+  setSendEmailImplForTests(async (to, subject, html) => {
+    emailsSent.push({ to, subject, html: String(html || '').slice(0, 200) });
+    return { ok: true };
+  });
+
   const rem = await runRenewalReminders(deps);
   check('B1 reminded', rem.reminded >= 1, JSON.stringify(rem));
   const notes = (repos.accountNotifications.list() || []).filter((n) => n.accountId === 'acc_ind' && n.type === 'ad_renewal_reminder');
   check('B1 notification stored', notes.length >= 1);
+  check('B1 notified count', rem.notified >= 1);
+  check('B1 email attempted', rem.emailAttempted >= 1);
+  check('B1 emailed', rem.emailed >= 1 && emailsSent.some((e) => e.to === 'ind@test.local'));
+  check('B1 email subject', emailsSent.some((e) => /تذكير|انتهاء/.test(e.subject)));
+  const adRem = deps.readAds().find((a) => a.id === 'AD_REM');
+  check(
+    'B1 both channels recorded',
+    !!(adRem && adRem.renewalReminderChannels && adRem.renewalReminderChannels.notification && adRem.renewalReminderChannels.email)
+  );
+  setSendEmailImplForTests(null);
 
   const clean = await runCleanups(deps);
   check('B2 sold purged', clean.soldPurged >= 1, JSON.stringify(clean));
@@ -213,10 +235,30 @@ async function run() {
   check('B4 has storage', typeof report.storage.uploadsBytes === 'number');
   check('B4 persisted', (repos.weeklyOpsReports.get(report.id) || {}).id === report.id);
 
-  // full pass with forceWeekly
+  // daily cron must NOT emit weekly even on Monday morning
+  const mondayMs = Date.parse('2026-10-26T03:00:00.000Z'); // Monday
+  const dailyPass = await runOpsHousekeepingPass(Object.assign({}, deps, {
+    trigger: 'cron',
+    nowMs: mondayMs,
+  }));
+  check('B4 daily cron skips weekly', dailyPass.weekly == null, 'trigger=' + dailyPass.trigger);
+
+  // Monday 04:00 weekly job — report only
+  const weeklyPass = await runOpsHousekeepingPass(Object.assign({}, deps, {
+    trigger: 'weekly',
+    weeklyOnly: true,
+    nowMs: Date.parse('2026-10-26T04:00:00.000Z'),
+  }));
+  check('B4 weekly trigger builds report', !!(weeklyPass.weekly && weeklyPass.weekly.id));
+
+  // forceWeekly still works for admin manual run
   const pass = await runOpsHousekeepingPass(Object.assign({}, deps, { forceWeekly: true, trigger: 'test' }));
   check('B4 pass weekly', !!(pass.weekly && pass.weekly.id));
   check('B4 pass has parts', !!(pass.lifecycle && pass.reminders && pass.cleanups));
+
+  check('scheduler daily 03:00', DEFAULT_CRON === '0 3 * * *');
+  check('scheduler weekly Mon 04:00', DEFAULT_WEEKLY_CRON === '0 4 * * 1');
+  check('scheduler tz Nouakchott', DEFAULT_TZ === 'Africa/Nouakchott');
 
   // window edge: reminder only within 3 days
   check('REMIND window 3d', REMIND_BEFORE_MS === 3 * MS_DAY);
