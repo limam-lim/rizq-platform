@@ -98,7 +98,7 @@
 .landing-ads-grid .listing-card:has(.rzq-adx-media) .l-body,
 .listings-grid .listing-card:has(.rzq-adx-media) .l-body{
   flex:0 0 auto!important;
-  padding:4px 7px 6px!important;
+  padding:7px 7px 6px!important;
 }
 .ad-card:has(.rzq-adx-media){
   width:200px;
@@ -339,12 +339,15 @@
   align-items:center;
   text-align:center;
   gap:0;
-  padding:4px 7px 6px!important;
+  /* مسافة علوية كافية حتى لا تُقصّ قمم حروف الفئة تحت الصورة */
+  padding:8px 7px 6px!important;
   position:relative;
   z-index:1;
   background:transparent!important;
   min-height:0;
-  max-height:108px;
+  /* يتسع لسطر فئة + عنوان بسطرين كاملين + موقع + أزرار دون ضغط flex للعناصر */
+  max-height:124px;
+  overflow:visible;
 }
 .ad-card:has(.rzq-adx-media) .ad-title,
 .listing-card:has(.rzq-adx-media) .l-title,
@@ -362,13 +365,16 @@
 .rc:has(.rzq-adx-media) .rc-cat{
   display:block;
   width:100%;
+  flex:0 0 auto!important;
+  flex-shrink:0!important;
   font-size:9.5px!important;
   font-weight:700!important;
   letter-spacing:.2px;
   color:var(--rzq-adx-gold-light)!important;
-  margin:0 0 2px!important;
+  margin:0 0 3px!important;
+  padding-top:0;
   opacity:.95;
-  line-height:1.3!important;
+  line-height:1.45!important;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -378,20 +384,25 @@
 .listing-card:has(.rzq-adx-media) .l-title,
 .rc:has(.rzq-adx-media) .rc-title{
   width:100%;
+  flex:0 0 auto!important;
+  flex-shrink:0!important;
   font-size:11px!important;
   font-weight:800!important;
   color:#fff!important;
-  line-height:1.3!important;
+  line-height:1.4!important;
   margin:0 0 2px!important;
   overflow:hidden;
   display:-webkit-box;
   -webkit-line-clamp:2;
+  line-clamp:2;
   -webkit-box-orient:vertical;
   word-break:break-word;
   overflow-wrap:anywhere;
   padding-bottom:0;
   text-shadow:0 1px 2px rgba(0,0,0,.28);
-  max-height:2.7em;
+  /* ارتفاع يكفي لسطرين كاملين قبل «…» (بدون قصّ السطر الثاني) */
+  max-height:calc(1.4em * 2);
+  min-height:calc(1.4em * 2);
 }
 
 .ad-card:has(.rzq-adx-media) .ad-loc,
@@ -402,6 +413,8 @@
   justify-content:center;
   gap:3px;
   width:100%;
+  flex:0 0 auto!important;
+  flex-shrink:0!important;
   min-height:16px;
   font-size:10px!important;
   font-weight:600!important;
@@ -449,6 +462,13 @@
   margin-top:0;
   padding-top:0;
   width:100%;
+  flex:0 0 auto!important;
+  flex-shrink:0!important;
+}
+.ad-card:has(.rzq-adx-media) .rzq-ad-brand-slot,
+.listing-card:has(.rzq-adx-media) .rzq-ad-brand-slot,
+.rc:has(.rzq-adx-media) .rzq-ad-brand-slot{
+  flex-shrink:0!important;
 }
 .rzq-adx-tel,
 .rzq-adx-actions .rzq-adx-wa{
@@ -619,8 +639,25 @@
   .ad-card:has(.rzq-adx-media) .ad-card-body,
   .listing-card:has(.rzq-adx-media) .l-body,
   .rc:has(.rzq-adx-media) .rc-body{
-    padding:3px 6px 5px!important;
-    max-height:96px;
+    padding:8px 6px 5px!important;
+    max-height:120px;
+    overflow:visible;
+  }
+  .ad-card:has(.rzq-adx-media) .ad-title,
+  .listing-card:has(.rzq-adx-media) .l-title,
+  .rc:has(.rzq-adx-media) .rc-title{
+    line-height:1.4!important;
+    -webkit-line-clamp:2;
+    line-clamp:2;
+    max-height:calc(1.4em * 2);
+    min-height:calc(1.4em * 2);
+  }
+  .ad-card:has(.rzq-adx-media) .ad-cat,
+  .listing-card:has(.rzq-adx-media) .l-cat,
+  .rc:has(.rzq-adx-media) .rc-cat{
+    line-height:1.45!important;
+    margin:0 0 3px!important;
+    padding-top:1px;
   }
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .ad-title,
   #hero-listings .cards-track .ad-card:has(.rzq-adx-media) .rzq-adx-title{
