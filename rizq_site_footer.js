@@ -194,7 +194,7 @@
     } catch (e) {}
     if (document.querySelector('script[src*="rizq_footer_toggle.js"]')) return;
     var s = document.createElement('script');
-    s.src = 'rizq_footer_toggle.js?v=23.2';
+    s.src = 'rizq_footer_toggle.js?v=23.3';
     s.defer = true;
     document.head.appendChild(s);
   }

@@ -31,11 +31,10 @@
   function injectStyle() {
     var css = ''
       + '.rzq-ft-adminia-stack{display:flex;flex-direction:column;align-items:center;'
-      + 'justify-content:flex-start;gap:8px;flex:0 0 auto;margin:0}'
-      /* زر «روابط وأقسام» يمين الشاشة في العربية — لا توسيط؛ شعار الشركة يبقى كما هو */
-      + '.rzq-ft-toggle-row{display:flex;justify-content:flex-start;align-items:center;'
-      + 'width:100%;max-width:100%;margin:0;padding:0;position:relative;z-index:2;'
-      + 'align-self:stretch;box-sizing:border-box}'
+      + 'justify-content:flex-start;gap:8px;flex:0 0 auto;margin:0 auto}'
+      /* عند إغلاق الروابط: الزر + شعار الشركة في الوسط — لا انزياح لليمين */
+      + '.rzq-ft-toggle-row{display:flex;justify-content:center;align-items:center;'
+      + 'width:auto;max-width:100%;margin:0 auto;padding:0;position:relative;z-index:2}'
       + '.rzq-ft-toggle-btn{display:flex;align-items:center;justify-content:center;gap:5px;'
       + 'margin:0;padding:5px 16px;background:rgba(201,168,76,.14)!important;'
       + 'border:1px solid rgba(201,168,76,.55)!important;border-radius:10px;color:#E8C96A!important;'
@@ -62,8 +61,10 @@
       + 'html body footer.rizq-footer .footer-bottom,'
       + 'html body footer .footer-bottom{'
       + 'padding:14px 0 18px!important;margin-bottom:0!important;'
-      + 'align-items:flex-start!important;row-gap:12px!important}'
-      + 'html body footer .rzq-ft-adminia-stack{padding-bottom:12px!important;margin-bottom:4px!important}'
+      + 'align-items:center!important;justify-content:center!important;'
+      + 'flex-direction:column!important;text-align:center!important;row-gap:12px!important}'
+      + 'html body footer .rzq-ft-adminia-stack{padding-bottom:12px!important;margin-bottom:4px!important;'
+      + 'align-items:center!important;margin-left:auto!important;margin-right:auto!important}'
       + 'html body footer,html body footer.rizq-footer{'
       + 'background:linear-gradient(180deg,#0D1B2A,#071020)!important;'
       + 'background-blend-mode:normal!important}'
@@ -117,7 +118,11 @@
     /* لا نضغط الحشو السفلي — شارة ADMINIA تحتاج فراغاً فوق حافة الشاشة */
     fb.style.padding = '14px 0 18px';
     fb.style.gap = '10px';
-    fb.style.alignItems = 'flex-start';
+    /* وسط الشاشة عند طي الروابط — بدون تحريك الشعار لليمين */
+    fb.style.alignItems = 'center';
+    fb.style.justifyContent = 'center';
+    fb.style.flexDirection = 'column';
+    fb.style.textAlign = 'center';
     fb.querySelectorAll('.footer-copy').forEach(function (p) { p.style.fontSize = '10.5px'; });
     var icon = fb.querySelector('[style*="34px"]');
     if (icon) {
