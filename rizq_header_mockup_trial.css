@@ -790,7 +790,7 @@ nav.rmh-nav{
   /* خلفية الكبسولة فقط تمتد مع هامش الصف العلوي — لا نغيّر حجم الأزرار */
   width:calc(100% - (2 * var(--rmh-gutter-x,20px)));
   max-width:none;
-  /* مسافة متناسقة تحت صف البحث (~12–16px) بلا فراغ ميّت */
+  /* تحت صف البحث مباشرة: padding سفلي لـ .rmh-main (8px) + margin-top (6px) ≈ 14px */
   margin:6px var(--rmh-gutter-x,20px) 0!important;
   padding:4px 10px!important;
   box-sizing:border-box;
