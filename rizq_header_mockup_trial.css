@@ -162,7 +162,7 @@ body.rizq-mockup-hdr-trial .hero{
   flex-direction:column!important;
   align-items:center!important;
   justify-content:flex-start!important;
-  padding-top:8px!important;
+  padding-top:2px!important;
   padding-bottom:16px!important;
   margin-top:0!important;
   min-height:0!important;
@@ -171,13 +171,13 @@ body.rizq-mockup-hdr-trial .hero{
 }
 html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-content,
 body.rizq-mockup-hdr-trial .hero-content{
-  padding-top:2px!important;
+  padding-top:0!important;
   margin-top:0!important;
   overflow:visible!important;
 }
 html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-brand-row,
 body.rizq-mockup-hdr-trial .hero-brand-row{
-  margin-top:2px!important;
+  margin-top:0!important;
   margin-bottom:4px!important;
   gap:8px!important;
   min-width:0!important;
@@ -1056,14 +1056,17 @@ body > .rizq-help-dd-menu a,
  * 3) إنزال كبسولة رزق / شارة السوق لتظهر كاملة تحت الهيدر مثل الكمبيوتر
  */
 @media(min-width:769px) and (max-width:1024px){
-  body.rizq-mockup-hdr-trial{--rizq-mock-hdr-h: 212px}
+  body.rizq-mockup-hdr-trial{
+    --rizq-mock-hdr-h: 212px;
+    --rizq-mock-hdr-gap: 4px;
+  }
   /* تغلب على rizq_header.css الذي يفرض --rizq-header-h (~74px) ويخفي كبسولة رزق */
   html.rizq-app-nav:not(.rizq-reg-page) body.rizq-mockup-hdr-trial:not(.rizq-reg-open),
   html.rizq-app-nav:not(.rizq-reg-page) body.rizq-mockup-hdr-trial:has(#nav):not(.rizq-reg-open),
   html.rizq-app-nav:has(#nav) body.rizq-mockup-hdr-trial:not(.rizq-reg-open),
   html.rizq-app-nav.has-rizq-desk-nav:not(.rizq-reg-page) body.rizq-mockup-hdr-trial:not(.rizq-reg-open),
   html.rizq-app-nav:has(#rizq-desk-nav) body.rizq-mockup-hdr-trial{
-    padding-top:calc(var(--rizq-mock-hdr-h,212px) + var(--rizq-mock-hdr-gap,12px))!important;
+    padding-top:calc(var(--rizq-mock-hdr-h,212px) + var(--rizq-mock-hdr-gap,4px))!important;
   }
   /* شعار | بحث في فراغ الوسط | أدوات — البحث يتوسّط المسافة بينهما (لا عمودين 1fr يزيّفانه بصرياً) */
   #rizq-mock-hdr{--rmh-gutter-x:16px}
@@ -1161,23 +1164,27 @@ body > .rizq-help-dd-menu a,
   .rmh-more-btn .rmh-nav-ico svg{
     width:100%!important;height:100%!important;
   }
-  /* كبسولة رزق + شارة السوق — أنزلها لتكون في رؤية واضحة تحت الهيدر */
+  /* كبسولة رزق — أقرب للشريط العلوي (كانت هوامش 16px تبعدها كثيراً) */
+  html.rizq-app-nav body.rizq-mockup-hdr-trial .hero,
+  body.rizq-mockup-hdr-trial .hero{
+    padding-top:2px!important;
+  }
   html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-content,
   html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) body.rizq-mockup-hdr-trial .hero-content,
   html.rizq-app-nav body.rizq-mockup-hdr-trial:has(#ticker-wrap:not(.is-empty)) .hero-content,
   html:has(#ticker-wrap:not(.is-empty)) body.rizq-mockup-hdr-trial .hero-content,
   body.rizq-mockup-hdr-trial .hero-content{
-    padding-top:16px!important;
+    padding-top:0!important;
   }
   html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-brand-row,
   body.rizq-mockup-hdr-trial .hero-brand-row{
-    margin-top:16px!important;
-    margin-bottom:12px!important;
-    gap:10px!important;
+    margin-top:0!important;
+    margin-bottom:8px!important;
+    gap:8px!important;
   }
   html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-brand-row .hero-eyebrow,
   body.rizq-mockup-hdr-trial .hero-brand-row .hero-eyebrow{
-    margin-top:4px!important;
+    margin-top:0!important;
   }
   /* الفرنسية LTR على التابلت: نفس الوسط بلا إزاحة */
   html[dir="ltr"] #rizq-mock-hdr .rmh-search,
