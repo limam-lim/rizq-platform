@@ -26,6 +26,8 @@ html.rizq-app-nav #rizq-search-theater,
 html.rizq-app-nav #rizq-search-pill,
 html.rizq-app-nav .nav-sticky-tools,
 html.rizq-app-nav #nav-sticky-tools,
+html.rizq-app-nav .hero-browse-panel,
+html.rizq-app-nav .hero-stage-intent,
 html.rizq-app-nav #rizq-app-header,
 html.rizq-app-nav .rizq-splash{
   display:none !important;
@@ -36,21 +38,6 @@ html.rizq-app-nav .rizq-splash{
   min-height:0 !important;
   overflow:hidden !important;
   opacity:0 !important;
-}
-/* أظهر الأقسام السريعة وروابط المنصة؛ أخفِ البحث المكرّر فقط */
-html.rizq-app-nav .hero-browse-panel .hero-search,
-html.rizq-app-nav .hero-browse-panel .hero-browse-head{
-  display:none !important;
-}
-html.rizq-app-nav .hero-stage-intent,
-html.rizq-app-nav .hero-browse-panel{
-  display:block !important;
-  visibility:visible !important;
-  pointer-events:auto !important;
-  height:auto !important;
-  max-height:none !important;
-  opacity:1 !important;
-  overflow:visible !important;
 }
 
 /* أرقام الهاتف والحسابات: لاتينية وLTR — علامة + دائماً من اليسار */
