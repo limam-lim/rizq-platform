@@ -1340,7 +1340,23 @@ body > .rizq-help-dd-menu a,
     width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important;
     border-radius:8px!important;padding:0!important;
   }
-  .rmh-lang{display:none}
+  /* زر اللغة ظاهر على الهاتف — مضغوط ليتسع مع الأدوات */
+  #rizq-mock-hdr .rmh-lang,
+  #rizq-mock-hdr #rmh-lang-btn,
+  .rmh-lang{
+    display:inline-flex!important;
+    align-items:center!important;
+    min-height:30px!important;
+    height:30px!important;
+    padding:0 7px!important;
+    border-radius:8px!important;
+    font-size:10.5px!important;
+    flex-shrink:0;
+  }
+  #rizq-mock-hdr #rmh-lang-btn .lang-fr,
+  #rizq-mock-hdr #rmh-lang-btn .lang-ar{
+    font-size:10.5px!important;
+  }
   /* أدوات عامة أصغر قليلاً */
   .rmh-ico{width:30px;height:30px;border-radius:8px}
   .rmh-ico svg{width:15px;height:15px}
