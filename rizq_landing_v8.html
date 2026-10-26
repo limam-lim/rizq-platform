@@ -44,7 +44,7 @@
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.74"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.75"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — الشريط القديم متوقف نهائياً */
@@ -2088,7 +2088,27 @@ body.rizq-lang-fr .hero-biz-nav{
 .hero-biz-btn:focus-visible,.hero-cta-primary:focus-visible{outline:2px solid #fff;outline-offset:3px}
 
 /* ── QUICK CATS (أيقونات سريعة) ── */
-.quick-cats{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;animation:fadeUp .8s .4s ease both;position:relative;z-index:20;overflow:visible}
+.quick-cats{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;animation:fadeUp .8s .4s ease both;position:relative;z-index:20;overflow:visible}
+.quick-modules{
+  display:flex;flex-wrap:wrap;gap:6px;justify-content:center;
+  margin:0 0 16px;animation:fadeUp .8s .45s ease both;position:relative;z-index:19;
+}
+.quick-modules .qmod{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 11px;border-radius:999px;text-decoration:none;
+  background:rgba(255,255,255,.08);border:1px solid rgba(201,168,76,.28);
+  color:rgba(255,255,255,.92);font-weight:700;font-size:11.5px;line-height:1.2;
+  transition:background .2s,border-color .2s,color .2s,transform .2s;
+}
+.quick-modules .qmod:hover{
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  border-color:rgba(201,168,76,.55);color:var(--royal-dark);transform:translateY(-1px);
+}
+.quick-modules .qmod-ico{font-size:13px;line-height:1}
+.quick-modules .qmod-pulse{
+  background:rgba(201,168,76,.18);border-color:rgba(201,168,76,.45);
+  color:#FFE7A0;
+}
 .qcat{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 8px;background:linear-gradient(135deg,var(--royal),var(--royal-light));border:1px solid rgba(201,168,76,.18);border-radius:12px;cursor:pointer;transition:all .35s;text-decoration:none;min-width:0;position:relative;box-shadow:0 2px 8px rgba(15,35,65,.12);z-index:1}
 .qcat.qcat-open{
   background:linear-gradient(135deg,var(--gold),var(--gold-light))!important;
@@ -3434,7 +3454,7 @@ html[dir="ltr"] .listings-section .section-desc{
     flex-wrap:nowrap!important;gap:6px!important;
     overflow-x:auto!important;-webkit-overflow-scrolling:touch;
     justify-content:flex-start!important;scrollbar-width:none;
-    padding-bottom:2px;
+    padding-bottom:2px;margin-bottom:8px!important;
   }
   .hero-browse-panel .quick-cats::-webkit-scrollbar{display:none}
   .hero-browse-panel .qcat{
@@ -3443,6 +3463,17 @@ html[dir="ltr"] .listings-section .section-desc{
   }
   .hero-browse-panel .qcat-icon{font-size:14px!important}
   .hero-browse-panel .qcat-name{font-size:12px!important;line-height:1.1!important;white-space:nowrap!important}
+  .hero-browse-panel .quick-modules{
+    flex-wrap:nowrap!important;gap:6px!important;
+    overflow-x:auto!important;-webkit-overflow-scrolling:touch;
+    justify-content:flex-start!important;scrollbar-width:none;
+    margin-bottom:12px!important;padding-bottom:2px;
+  }
+  .hero-browse-panel .quick-modules::-webkit-scrollbar{display:none}
+  .hero-browse-panel .quick-modules .qmod{
+    flex:0 0 auto!important;font-size:11.5px!important;padding:7px 12px!important;
+    white-space:nowrap!important;
+  }
   /* لا نكسر شريط البحث العام خارج اللوحة — داخل اللوحة يبقى صف واحد */
   .search-bar{flex-wrap:wrap}
   .search-cat-select{width:100%;border-right:none;border-bottom:1px solid #dde3ea;border-radius:14px 14px 0 0}
@@ -5159,7 +5190,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <script src="rizq_marquee_kit.js?v=1.3"></script>
     <script src="rizq_civic_ticker.js?v=1.3"></script>
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_header_mockup_trial.js?v=5.74" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.75" defer></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
@@ -5552,6 +5583,14 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           <div class="qcat" data-qcat="رحلات" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">✈️</div><div class="qcat-name" data-t="qc-travel">رحلات</div></div>
           <div class="qcat" data-qcat="ماشية" onmouseenter="scheduleQcatOpen(this)" onmouseleave="cancelQcatOpen();scheduleQcatClose()"><div class="qcat-icon">🐄</div><div class="qcat-name" data-t="qc7">ماشية</div></div>
         </div>
+        <!-- روابط أقسام المنصة تحت شريط الأقسام السريعة -->
+        <nav class="quick-modules" aria-label="أقسام المنصة">
+          <a class="qmod" href="#virtual-stores"><span class="qmod-ico" aria-hidden="true">🏪</span><span class="qmod-name" data-t="qmod-stores">كل المحلات</span></a>
+          <a class="qmod" href="#virtual-showrooms"><span class="qmod-ico" aria-hidden="true">🏬</span><span class="qmod-name" data-t="qmod-showrooms">كل المعارض والمصانع</span></a>
+          <a class="qmod" href="#virtual-estate"><span class="qmod-ico" aria-hidden="true">🏠</span><span class="qmod-name" data-t="qmod-estate">سوق العقارات</span></a>
+          <a class="qmod" href="#virtual-offices"><span class="qmod-ico" aria-hidden="true">💼</span><span class="qmod-name" data-t="qmod-offices">كل المكاتب</span></a>
+          <a class="qmod qmod-pulse" href="#prices"><span class="qmod-ico" aria-hidden="true">📈</span><span class="qmod-name" data-t="qmod-prices">أسعار السوق</span></a>
+        </nav>
         <div id="qcat-inline-panel" onmouseenter="clearQcatClose()" onmouseleave="scheduleQcatClose()"></div>
       </section>
     </div><!-- /hero-stage-intent -->
@@ -10910,6 +10949,7 @@ window.goToPost = goToPost;
 const LANG = {
   ar: {
     'qc0':'عقارات','qc1':'سيارات','qc2':'شاحنات','qc3':'إلكترونيات','qc4':'أزياء','qc5':'صحة وجمال','qc6':'وظائف','qc7':'ماشية','qc8':'ذهب',
+    'qmod-stores':'كل المحلات','qmod-showrooms':'كل المعارض والمصانع','qmod-estate':'سوق العقارات','qmod-offices':'كل المكاتب','qmod-prices':'أسعار السوق',
     'qc-home':'معدات منزل','qc-energy':'طاقة','qc-travel':'رحلات',
     'f-all':'الكل','f-re':'عقارات','f-car':'سيارات','f-live':'ماشية','f-elec':'إلكترونيات','f-truck':'شاحنات','f-srv':'خدمات','f-fashion':'موضة',
     'nav-cats': 'الأقسام', 'nav-ads': 'الإعلانات', 'nav-prices': 'الأسعار', 'nav-about': 'من نحن',
@@ -11243,6 +11283,7 @@ const LANG = {
     'srm-jewelry': 'Bijoux',
     'srm-cta': 'Voir le modèle',
     'qc0':'Immobilier','qc1':'Voitures','qc2':'Camions','qc3':'Électronique','qc4':'Mode','qc5':'Santé','qc6':'Emplois','qc7':'Bétail','qc8':'Or',
+    'qmod-stores':'Toutes les boutiques','qmod-showrooms':'Tous les showrooms','qmod-estate':'Marché immobilier','qmod-offices':'Tous les bureaux','qmod-prices':'Prix du marché',
     'qc-home':'Électroménager','qc-energy':'Énergie','qc-travel':'Voyages',
     'f-all':'Tout','f-re':'Immobilier','f-car':'Voitures','f-live':'Bétail','f-elec':'Électronique','f-truck':'Camions','f-srv':'Services','f-fashion':'Mode',
   }
