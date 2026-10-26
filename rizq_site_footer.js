@@ -52,7 +52,7 @@
     if (document.getElementById('rzq-site-footer-css')) return;
     var css = ''
       + 'footer.rizq-footer{background:linear-gradient(180deg,#0d1b2e,#071020)!important;'
-      + 'border-top:1px solid rgba(201,168,76,.1)!important;padding:28px 5% 20px!important;'
+      + 'border-top:1px solid rgba(201,168,76,.1)!important;padding:16px 5% 12px!important;'
       + 'color:rgba(255,255,255,.72)!important;margin:0!important;width:100%;box-sizing:border-box;'
       + 'position:relative;z-index:4;overflow:visible!important}'
       + 'footer.rizq-footer .footer-grid{display:grid!important;'
@@ -80,7 +80,8 @@
       + 'body.rizq-dash .main-content > footer.rizq-footer{margin-top:auto}'
       + '@media(max-width:900px){footer.rizq-footer .footer-grid{grid-template-columns:1fr 1fr 1fr!important}}'
       + '@media(max-width:600px){footer.rizq-footer .footer-grid{grid-template-columns:1fr!important;'
-      + 'gap:22px!important}footer.rizq-footer{padding:36px 4% 0!important}}';
+      + 'gap:22px!important}footer.rizq-footer{padding:12px 4% 0!important}'
+      + 'footer.rizq-footer.rzq-ft-compact{padding:2px 4% calc(6px + env(safe-area-inset-bottom,0px))!important}}';
     var style = document.createElement('style');
     style.id = 'rzq-site-footer-css';
     style.textContent = css;

@@ -35,11 +35,11 @@
       /* عند إغلاق الروابط: الزر + شعار الشركة في الوسط — لا انزياح لليمين */
       + '.rzq-ft-toggle-row{display:flex;justify-content:center;align-items:center;'
       + 'width:auto;max-width:100%;margin:0 auto;padding:0;position:relative;z-index:2}'
-      + '.rzq-ft-toggle-btn{display:flex;align-items:center;justify-content:center;gap:5px;'
-      + 'margin:0;padding:4px 12px;background:rgba(201,168,76,.14)!important;'
-      + 'border:1px solid rgba(201,168,76,.55)!important;border-radius:10px;color:#E8C96A!important;'
+      + '.rzq-ft-toggle-btn{display:flex;align-items:center;justify-content:center;gap:4px;'
+      + 'margin:0;padding:3px 10px;background:rgba(201,168,76,.14)!important;'
+      + 'border:1px solid rgba(201,168,76,.55)!important;border-radius:8px;color:#E8C96A!important;'
       + '-webkit-text-fill-color:#E8C96A!important;'
-      + 'font-size:10px;font-weight:700;cursor:pointer;transition:all .25s ease;'
+      + 'font-size:9.5px;font-weight:700;cursor:pointer;transition:all .25s ease;'
       + 'font-family:inherit;width:max-content;max-width:100%;text-align:center;'
       + 'position:relative;z-index:2}'
       + '.rzq-ft-toggle-btn .rzq-ft-txt{color:#E8C96A!important;-webkit-text-fill-color:#E8C96A!important}'
@@ -53,31 +53,34 @@
       + '.rzq-ft-toggle-btn[aria-expanded="true"] .rzq-ft-chev{transform:rotate(180deg)}'
       + '.rzq-ft-collapse-wrap{max-height:0;overflow:hidden;transition:max-height .4s ease}'
       + '@media (prefers-reduced-motion: reduce){.rzq-ft-collapse-wrap{transition:none}}'
-      /* طيّ الفوتر: أعلى مضغوط؛ أسفل يكفي لظهور شارة ADMINIA فوق الشريط العائم */
+      /* طيّ الفوتر: بلا حشو بمقدار الشريط العائم — body/html يحجز --rizq-mock-nav-h أصلاً */
       + 'html body footer.rizq-footer.rzq-ft-compact,html body footer.rzq-ft-compact{'
-      + 'padding:6px 5% calc(var(--rizq-mock-nav-h,64px) + env(safe-area-inset-bottom,0px))!important;'
-      + 'transition:padding .3s ease}'
+      + 'padding:2px 5% calc(6px + env(safe-area-inset-bottom,0px))!important;'
+      + 'min-height:0!important;transition:padding .3s ease}'
       + 'html body footer.rizq-footer:not(.rzq-ft-compact),html body footer:not(.rzq-ft-compact){'
-      + 'padding-bottom:calc(var(--rizq-mock-nav-h,64px) + env(safe-area-inset-bottom,0px))!important;box-sizing:border-box!important;'
+      + 'padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))!important;box-sizing:border-box!important;'
       + 'overflow:visible!important}'
       + 'html body footer.rizq-footer,html body footer{box-sizing:border-box!important;overflow:visible!important}'
       + 'html body footer.rizq-footer .footer-bottom,'
       + 'html body footer .footer-bottom{'
-      + 'padding:8px 0 4px!important;margin-bottom:0!important;'
+      + 'padding:4px 0 2px!important;margin-bottom:0!important;'
       + 'align-items:center!important;justify-content:center!important;'
-      + 'flex-direction:column!important;text-align:center!important;row-gap:6px!important;gap:6px!important}'
-      + 'html body footer .rzq-ft-adminia-stack{padding-bottom:2px!important;margin-bottom:0!important;'
-      + 'align-items:center!important;margin-left:auto!important;margin-right:auto!important}'
-      /* شبكات التواصل فوق شريط الحقوق — بلا هامش كبير */
+      + 'flex-direction:column!important;text-align:center!important;row-gap:4px!important;gap:4px!important}'
+      + 'html body footer .rzq-ft-adminia-stack{padding-bottom:0!important;margin-bottom:0!important;'
+      + 'align-items:center!important;margin-left:auto!important;margin-right:auto!important;gap:2px!important}'
+      /* شبكات التواصل: أصغر عند الطيّ */
       + 'html body footer.rzq-ft-compact #rizq-social-follow,'
       + 'html body footer.rizq-footer.rzq-ft-compact #rizq-social-follow{'
-      + 'margin-top:2px!important;margin-bottom:0!important;padding:0 0 4px!important}'
-      + 'html body footer.rzq-ft-compact #rizq-social-follow .rzq-soc-title{margin:0 0 4px!important;font-size:10px!important}'
-      + 'html body footer.rzq-ft-compact #rizq-social-follow .rzq-soc-btn{width:28px!important;height:28px!important}'
-      + 'html body footer.rzq-ft-compact #rizq-social-follow .rzq-soc-btn svg{width:18px!important;height:18px!important}'
+      + 'margin-top:0!important;margin-bottom:0!important;padding:0 0 2px!important}'
+      + 'html body footer.rzq-ft-compact #rizq-social-follow .rzq-soc-title{margin:0 0 2px!important;font-size:9px!important}'
+      + 'html body footer.rzq-ft-compact #rizq-social-follow .rzq-soc-btn{width:24px!important;height:24px!important}'
+      + 'html body footer.rzq-ft-compact #rizq-social-follow .rzq-soc-btn svg{width:14px!important;height:14px!important}'
       /* توقيع ADMINIA مكرّر تحت الشارة — أخفه عند الطيّ لتقليل الارتفاع */
       + 'html body footer.rzq-ft-compact .footer-bottom > .footer-copy[data-t="ft-sig"]{'
       + 'display:none!important}'
+      + 'html body footer.rzq-ft-compact .footer-bottom > .footer-copy[data-t="ft-copy"],'
+      + 'html body footer.rizq-footer.rzq-ft-compact .footer-bottom > .footer-copy[data-t="ft-copy"]{'
+      + 'font-size:10px!important;line-height:1.3!important;margin:0!important}'
       + 'html body footer,html body footer.rizq-footer{'
       + 'background:linear-gradient(180deg,#0D1B2A,#071020)!important;'
       + 'background-blend-mode:normal!important}'
@@ -128,25 +131,25 @@
     var fb = (scope || document).querySelector('.footer-bottom');
     if (!fb || fb.dataset.rzqSlim) return;
     fb.dataset.rzqSlim = '1';
-    fb.style.padding = '8px 0 4px';
-    fb.style.gap = '6px';
+    fb.style.padding = '4px 0 2px';
+    fb.style.gap = '4px';
     /* وسط الشاشة عند طي الروابط — بدون تحريك الشعار لليمين */
     fb.style.alignItems = 'center';
     fb.style.justifyContent = 'center';
     fb.style.flexDirection = 'column';
     fb.style.textAlign = 'center';
-    fb.querySelectorAll('.footer-copy').forEach(function (p) { p.style.fontSize = '10.5px'; });
+    fb.querySelectorAll('.footer-copy').forEach(function (p) { p.style.fontSize = '10px'; });
     var icon = fb.querySelector('[style*="34px"]');
     if (icon) {
-      icon.style.width = '26px';
-      icon.style.height = '26px';
-      icon.style.fontSize = '7px';
+      icon.style.width = '22px';
+      icon.style.height = '22px';
+      icon.style.fontSize = '6px';
       var box = icon.parentElement;
-      if (box) { box.style.padding = '6px 12px'; box.style.gap = '8px'; }
+      if (box) { box.style.padding = '4px 10px'; box.style.gap = '6px'; }
       var textWrap = icon.nextElementSibling;
       if (textWrap && textWrap.children.length >= 2) {
-        textWrap.children[0].style.fontSize = '11px';
-        textWrap.children[1].style.fontSize = '7px';
+        textWrap.children[0].style.fontSize = '10px';
+        textWrap.children[1].style.fontSize = '6.5px';
       }
     }
   }
@@ -337,7 +340,7 @@
     } catch (e) {}
     if (document.querySelector('script[src*="rizq_social_links.js"]')) return;
     var s = document.createElement('script');
-    s.src = 'rizq_social_links.js?v=23.9';
+    s.src = 'rizq_social_links.js?v=23.10';
     s.defer = true;
     (document.head || document.documentElement).appendChild(s);
   }

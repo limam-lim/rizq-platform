@@ -2769,7 +2769,14 @@ html[dir="ltr"] .price-ticker-wrap::after{
 .ptab-card:hover:not(.active){border-color:rgba(27,58,107,.2);box-shadow:0 3px 14px rgba(27,58,107,.1);transform:translateY(-2px)}
 .ptab-card:hover:not(.active) .ptab-icon{box-shadow:0 5px 18px rgba(27,58,107,.3)}
 .ptab-card:hover:not(.active) .ptab-lbl{color:var(--royal)}
-.prices-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px}
+/* نبضة السوق على الرئيسية: 5 أعمدة × 4 صفوف (عيّنة 20) */
+.prices-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+@media(max-width:1100px){
+  .prices-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+}
+@media(max-width:900px){
+  .prices-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+}
 @media(max-width:768px){
   .prices-grid{
     grid-template-columns:repeat(2,minmax(0,1fr));
@@ -3892,8 +3899,8 @@ html[dir="rtl"] .diamond-pitch-grid{text-align:right;direction:rtl}
 /* Footer */
 footer{background:linear-gradient(180deg,var(--dark),var(--royal-deep));border-top:1px solid rgba(201,168,76,.1);padding:28px 5% 20px}
 footer:not(.rzq-ft-compact){padding-top:36px}
-/* قبل تحميل rizq_footer_toggle: شريط مطوي بلا فراغ علوي كبير */
-footer.rizq-footer.rzq-ft-compact{padding:8px 5% calc(var(--rizq-mock-nav-h,64px) + env(safe-area-inset-bottom,0px))}
+/* قبل تحميل rizq_footer_toggle: مطوي بلا فراغ بحجم الشريط السفلي — body يحجز مساحة الـnav */
+footer.rizq-footer.rzq-ft-compact{padding:4px 5% calc(8px + env(safe-area-inset-bottom,0px))}
 .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr;gap:32px;max-width:1200px;margin:0 auto;padding-bottom:24px}
 .footer-col-title{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;font-family:Georgia,serif}
 .footer-desc{font-size:13px;color:rgba(255,255,255,.82);line-height:1.85;margin-top:14px;max-width:280px}
@@ -5228,9 +5235,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_contact_gate.js"></script>
 <script src="rizq_dynamic_nav.js?v=23.5"></script>
 <script src="rizq_module_flags.js?v=1.2"></script>
-<script src="rizq_pwa.js?v=31.10" defer></script>
-<script src="rizq_footer_toggle.js?v=23.4" defer></script>
-<script src="rizq_social_links.js?v=23.9" defer></script>
+<script src="rizq_pwa.js?v=31.21" defer></script>
+<script src="rizq_footer_toggle.js?v=23.5" defer></script>
+<script src="rizq_social_links.js?v=23.10" defer></script>
 <script src="rizq_account_route.js?v=23.0"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
 <script src="rizq_seller_branding.js?v=1"></script>
@@ -6376,7 +6383,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </ul>
     </div>
   </div>
-  <div id="rizq-social-follow" hidden style="padding:2px 0 6px"></div>
+  <div id="rizq-social-follow" hidden style="padding:0 0 2px"></div>
   <div class="footer-bottom">
     <p class="footer-copy" data-t="ft-copy">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</p>
     <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" title="ADMINIA SARL — التعريف بالشركة / À propos">
@@ -14754,7 +14761,15 @@ const DEFAULT_PRICES = {
     {icon:'🍅',name:'طماطم (1كغ)',price:55,unit:'MRU / كغ',trend:'up'},
     {icon:'🧅',name:'بصل (1كغ)',price:38,unit:'MRU / كغ',trend:'flat'},
     {icon:'🥔',name:'بطاطس (1كغ)',price:42,unit:'MRU / كغ',trend:'down'},
-    {icon:'🍞',name:'خبز (الرغيف)',price:10,unit:'MRU / رغيف',trend:'flat'}
+    {icon:'🍞',name:'خبز (الرغيف)',price:10,unit:'MRU / رغيف',trend:'flat'},
+    {icon:'🍵',name:'شاي أخضر (كغ)',price:420,unit:'MRU / كغ',trend:'flat'},
+    {icon:'🍝',name:'معكرونة (علبة 500غ)',price:95,unit:'MRU / علبة',trend:'up'},
+    {icon:'🫘',name:'فاصوليا بيضاء (كغ)',price:180,unit:'MRU / كغ',trend:'flat'},
+    {icon:'🐟',name:'سمك طازج (كغ)',price:220,unit:'MRU / كغ',trend:'up'},
+    {icon:'🥚',name:'بيض (طبق 30)',price:450,unit:'MRU / طبق',trend:'down'},
+    {icon:'🧈',name:'زبدة (250غ)',price:160,unit:'MRU / عبوة',trend:'flat'},
+    {icon:'🌴',name:'تمر (كغ)',price:280,unit:'MRU / كغ',trend:'up'},
+    {icon:'🧴',name:'ماء معدني (1.5ل)',price:35,unit:'MRU / قارورة',trend:'flat'}
   ],
   fuel: [
     {icon:'⛽',name:'بنزين (سوبر)',price:16.2,unit:'MRU / لتر',trend:'up'},
@@ -14828,8 +14843,8 @@ function currencyFlagHTML(it){
   }
   return '<span class="price-curr-flag" aria-hidden="true">'+escapeHtml((it && it.icon) || '💱')+'</span>';
 }
-/* الرئيسية تعرض عيّنة قصيرة فقط — اللوحة الكاملة في rizq_market_pulse.html */
-const LANDING_PULSE_PREVIEW = 4;
+/* الرئيسية: شبكة 5×4 = 20 بطاقة — اللوحة الكاملة في rizq_market_pulse.html */
+const LANDING_PULSE_PREVIEW = 20;
 function renderPrices(){
   const grid = document.getElementById('prices-grid');
   if(!grid) return;
