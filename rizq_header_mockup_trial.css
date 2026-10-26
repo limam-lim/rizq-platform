@@ -120,6 +120,7 @@ body.rizq-mockup-hdr-trial .hero-browse-panel{
 html.rizq-app-nav .hero-browse-panel,
 body.rizq-mockup-hdr-trial .hero-browse-panel{
   padding:12px 12px 10px!important;
+  overflow:visible!important;
 }
 /* أقوى من قواعد rizq-phone-thumb-dock — الشريط الموحّد rmh يكفي */
 html.rizq-app-nav.rizq-phone-thumb-dock body.rizq-mockup-hdr-trial #rizq-thumb-dock,
