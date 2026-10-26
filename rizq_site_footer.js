@@ -194,7 +194,7 @@
     } catch (e) {}
     if (document.querySelector('script[src*="rizq_footer_toggle.js"]')) return;
     var s = document.createElement('script');
-    s.src = 'rizq_footer_toggle.js?v=23.1';
+    s.src = 'rizq_footer_toggle.js?v=23.2';
     s.defer = true;
     document.head.appendChild(s);
   }
@@ -208,7 +208,7 @@
     } catch (e) {}
     if (document.querySelector('script[src*="rizq_social_links.js"]')) return;
     var s = document.createElement('script');
-    s.src = 'rizq_social_links.js?v=23.7';
+    s.src = 'rizq_social_links.js?v=23.8';
     s.defer = true;
     document.head.appendChild(s);
   }

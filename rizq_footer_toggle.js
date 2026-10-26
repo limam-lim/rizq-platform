@@ -32,8 +32,10 @@
     var css = ''
       + '.rzq-ft-adminia-stack{display:flex;flex-direction:column;align-items:center;'
       + 'justify-content:flex-start;gap:8px;flex:0 0 auto;margin:0}'
-      + '.rzq-ft-toggle-row{display:flex;justify-content:center;align-items:center;'
-      + 'width:auto;max-width:100%;margin:0;padding:0;position:relative;z-index:2}'
+      /* زر «روابط وأقسام» يمين الشاشة في العربية — لا توسيط؛ شعار الشركة يبقى كما هو */
+      + '.rzq-ft-toggle-row{display:flex;justify-content:flex-start;align-items:center;'
+      + 'width:100%;max-width:100%;margin:0;padding:0;position:relative;z-index:2;'
+      + 'align-self:stretch;box-sizing:border-box}'
       + '.rzq-ft-toggle-btn{display:flex;align-items:center;justify-content:center;gap:5px;'
       + 'margin:0;padding:5px 16px;background:rgba(201,168,76,.14)!important;'
       + 'border:1px solid rgba(201,168,76,.55)!important;border-radius:10px;color:#E8C96A!important;'
@@ -318,7 +320,7 @@
     } catch (e) {}
     if (document.querySelector('script[src*="rizq_social_links.js"]')) return;
     var s = document.createElement('script');
-    s.src = 'rizq_social_links.js?v=23.7';
+    s.src = 'rizq_social_links.js?v=23.8';
     s.defer = true;
     (document.head || document.documentElement).appendChild(s);
   }

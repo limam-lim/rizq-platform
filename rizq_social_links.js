@@ -105,11 +105,14 @@
   function ensureStyle() {
     if (document.getElementById(STYLE_ID)) return;
     var css = ''
-      + '#' + ROOT_ID + '{margin-top:14px;display:none}'
+      + '#' + ROOT_ID + '{margin-top:10px;margin-bottom:4px;display:none;width:100%;'
+      + 'text-align:start;box-sizing:border-box}'
       + '#' + ROOT_ID + '.is-visible{display:block}'
+      /* عنوان «تابعنا» والأيقونات تبقى على اليمين في العربية (start) — لا توسيط */
       + '#' + ROOT_ID + ' .rzq-soc-title{font-size:11px;font-weight:800;color:#C9A84C;'
-      + 'letter-spacing:1.2px;text-transform:uppercase;margin:0 0 10px;font-family:Georgia,serif}'
-      + '#' + ROOT_ID + ' .rzq-soc-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px}'
+      + 'letter-spacing:1.2px;text-transform:uppercase;margin:0 0 10px;font-family:Georgia,serif;'
+      + 'text-align:start}'
+      + '#' + ROOT_ID + ' .rzq-soc-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:10px}'
       + '#' + ROOT_ID + ' .rzq-soc-btn{width:34px;height:34px;display:inline-flex;align-items:center;'
       + 'justify-content:center;color:rgba(255,255,255,.88);background:transparent;border:none;'
       + 'padding:0;border-radius:8px;transition:color .2s ease,transform .2s ease,background .2s ease}'
