@@ -1099,6 +1099,19 @@
     }
   }
 
+  function measureMockHdrExtent(hdr) {
+    if (!hdr) return 0;
+    var top = hdr.getBoundingClientRect().top;
+    var bottom = hdr.getBoundingClientRect().bottom;
+    var nodes = hdr.querySelectorAll('.rmh-main, .ticker-wrap, nav.rmh-nav, .rmh-util');
+    for (var i = 0; i < nodes.length; i++) {
+      var r = nodes[i].getBoundingClientRect();
+      if (!r.height && !r.width) continue;
+      if (r.bottom > bottom) bottom = r.bottom;
+    }
+    return Math.max(0, Math.ceil(bottom - top));
+  }
+
   function syncMockHdrHeight() {
     var hdr = document.getElementById('rizq-mock-hdr');
     if (!hdr) return;
@@ -1114,14 +1127,20 @@
       if (topNav) topH += Math.ceil(topNav.getBoundingClientRect().height || 48);
       topH = Math.max(topH, 96);
       document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
+      /* browse/detail + legacy chrome read --rizq-header-h — keep it in sync with mock top bar */
+      document.body.style.setProperty('--rizq-header-h', topH + 'px');
+      document.documentElement.style.setProperty('--rizq-header-h', topH + 'px');
       if (bottomNav) {
         var nh = Math.ceil(bottomNav.getBoundingClientRect().height || 64);
         document.body.style.setProperty('--rizq-mock-nav-h', nh + 'px');
       }
       return;
     }
-    var h = Math.ceil(hdr.getBoundingClientRect().height || 188);
+    var h = measureMockHdrExtent(hdr) || Math.ceil(hdr.getBoundingClientRect().height || 196);
     document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
+    /* Sync legacy --rizq-header-h so .browse-right inset / detail max-height clear the capsule */
+    document.body.style.setProperty('--rizq-header-h', h + 'px');
+    document.documentElement.style.setProperty('--rizq-header-h', h + 'px');
   }
 
   function ensureHeroTagline() {
@@ -1177,6 +1196,17 @@
       refreshBadge();
       refreshFavBadge();
     }, 1200);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { syncMockHdrHeight(); }).catch(function () {});
+    }
+    var hdrEl = document.getElementById('rizq-mock-hdr');
+    if (hdrEl && typeof ResizeObserver !== 'undefined') {
+      if (window.__rmhHdrRo) {
+        try { window.__rmhHdrRo.disconnect(); } catch (eRo) {}
+      }
+      window.__rmhHdrRo = new ResizeObserver(function () { syncMockHdrHeight(); });
+      window.__rmhHdrRo.observe(hdrEl);
+    }
     window.addEventListener('resize', syncMockHdrHeight);
     window.addEventListener('storage', function (ev) {
       if (ev.key === 'rizq_cart') {

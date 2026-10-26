@@ -3,12 +3,19 @@
  * يُفعَّل بـ body.rizq-mockup-hdr-trial — سهل الإلغاء بحذف الكلاس أو الملف.
  */
 body.rizq-mockup-hdr-trial{
-  --rizq-mock-hdr-h: 188px;
+  /* احتياطي قبل قياس JS — أوسع قليلاً لتفادي قصّ المحتوى تحت الكبسولة */
+  --rizq-mock-hdr-h: 196px;
+  --rizq-mock-hdr-gap: 12px;
   --rmh-navy: #0a1628;
   --rmh-navy-2: #0d1a2e;
   --rmh-gold: #C9A84C;
   --rmh-gold-2: #E8C96A;
   background:#eef1f5;
+  scroll-padding-top:calc(var(--rizq-mock-hdr-h) + var(--rizq-mock-hdr-gap,12px));
+}
+html.rizq-app-nav body.rizq-mockup-hdr-trial,
+html:has(body.rizq-mockup-hdr-trial){
+  scroll-padding-top:calc(var(--rizq-mock-hdr-h,196px) + var(--rizq-mock-hdr-gap,12px));
 }
 /* صفحة العقارات الداكنة فقط — صفحة الوكالة الفاتحة (rizq-page-light) تبقى بيضاء كالـمحلات */
 body.rizq-mockup-hdr-trial:has(.est-wrap):not(.rizq-page-light),
@@ -431,12 +438,13 @@ body.rizq-mockup-hdr-trial #hero-tagline .hero-tagline-place{
   body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline,
   body.rizq-mockup-hdr-trial #hero-tagline{animation:none!important}
 }
-/* body padding تحت الهيدر الثابت — يتفوّق على html.rizq-app-nav:has(#nav) body (specificity ID) */
+/* body padding تحت الهيدر الثابت — ارتفاع مقيس + فجوة أمان (كل الشاشات) */
 html.rizq-app-nav:has(#nav) body.rizq-mockup-hdr-trial,
 html.rizq-app-nav:has(#rizq-desk-nav) body.rizq-mockup-hdr-trial,
 html.rizq-app-nav.has-rizq-desk-nav body.rizq-mockup-hdr-trial,
-html.rizq-app-nav body.rizq-mockup-hdr-trial{
-  padding-top:var(--rizq-mock-hdr-h)!important;
+html.rizq-app-nav body.rizq-mockup-hdr-trial,
+body.rizq-mockup-hdr-trial{
+  padding-top:calc(var(--rizq-mock-hdr-h) + var(--rizq-mock-hdr-gap,12px))!important;
 }
 #rizq-mock-hdr{
   position:fixed;top:0;left:0;right:0;z-index:10050;
@@ -445,8 +453,43 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
   box-shadow:0 8px 24px rgba(2,6,14,.35);
   direction:rtl;
   overflow:visible;
+  /* هامش أفقي موحّد: الشعار ↔ زر اللغة ↔ حواف الكبسولة */
+  --rmh-gutter-x:20px;
+  /* padding سفلي بدل margin الكبسولة حتى يدخل في قياس الارتفاع */
+  padding-bottom:10px;
+  box-sizing:border-box;
 }
 #rizq-mock-hdr *{box-sizing:border-box}
+
+/*
+ * Browse detail sheet (.browse-right) used legacy --rizq-header-h (~68px) while the
+ * mock capsule header is --rizq-mock-hdr-h (~150–200px). Force inset/max-height to
+ * the measured mock height so featured ads are not clipped under nav.
+ */
+body.rizq-mockup-hdr-trial .browse-right,
+body.rizq-mockup-hdr-trial.rizq-detail-open .browse-right,
+body.rizq-mockup-hdr-trial .browse-wrap.has-detail .browse-right,
+html.rizq-app-nav body.rizq-mockup-hdr-trial .browse-right,
+html.rizq-app-nav body.rizq-mockup-hdr-trial.rizq-detail-open .browse-right,
+html.rizq-app-nav.has-rizq-desk-nav body.rizq-mockup-hdr-trial .browse-right,
+html.rizq-app-nav.has-rizq-desk-nav body.rizq-mockup-hdr-trial.rizq-detail-open .browse-right{
+  inset:calc(var(--rizq-mock-hdr-h,188px) + var(--rizq-mock-hdr-gap,12px)) 0 0 0!important;
+  z-index:10040!important; /* تحت الهيدر (10050) وفوق قائمة التصفح */
+}
+body.rizq-mockup-hdr-trial #detail-content,
+html.rizq-app-nav body.rizq-mockup-hdr-trial #detail-content{
+  max-height:calc(100dvh - var(--rizq-mock-hdr-h,188px) - var(--rizq-mock-hdr-gap,12px) - 20px)!important;
+}
+@media(max-width:900px){
+  body.rizq-mockup-hdr-trial .browse-right,
+  body.rizq-mockup-hdr-trial.rizq-detail-open .browse-right,
+  body.rizq-mockup-hdr-trial .browse-wrap.has-detail .browse-right,
+  html.rizq-app-nav body.rizq-mockup-hdr-trial .browse-right,
+  html.rizq-app-nav body.rizq-mockup-hdr-trial.rizq-detail-open .browse-right{
+    inset:calc(var(--rizq-mock-hdr-h,128px) + var(--rizq-mock-hdr-gap,8px)) 0 var(--rizq-mock-nav-h,72px) 0!important;
+    padding-top:10px!important;
+  }
+}
 
 /* شريط تنويه علوي */
 .rmh-util{
@@ -465,7 +508,7 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial{
   display:grid;
   grid-template-columns:minmax(120px,1fr) minmax(280px,460px) minmax(120px,1fr);
   align-items:center;gap:14px;
-  padding:10px 20px;
+  padding:10px var(--rmh-gutter-x,20px);
   background:linear-gradient(180deg,#0e1c32 0%,#0a1628 100%);
 }
 /* شعار رزق — مطابق لهيكل #nav الأصلي: علامة + رزق + RIZQ PLATFORM */
@@ -723,7 +766,7 @@ body.rizq-lang-fr #rizq-mock-hdr #rmh-lang-btn .lang-fr{
 }
 .rmh-post-lbl{display:inline;color:inherit}
 
-/* شريط الأقسام — كبسولة مضمومة متوسّطة (نفس شكل الواجهة/الهيرو، بلا تمدد شاسع) */
+/* شريط الأقسام — كبسولة طويلة بعرض الشعار→زر اللغة؛ الأزرار تبقى متوسّطة بحجمها دون مساس */
 #rizq-mock-hdr nav.rmh-nav,
 nav.rmh-nav{
   position:static!important;
@@ -732,10 +775,12 @@ nav.rmh-nav{
   display:flex!important;align-items:stretch;
   justify-content:center;
   gap:2px;overflow-x:auto;overflow-y:visible;scrollbar-width:none;
-  width:max-content;
-  max-width:calc(100% - 32px);
-  margin:6px auto 10px!important;
-  padding:4px 8px!important;
+  /* خلفية الكبسولة فقط تمتد مع هامش الصف العلوي — لا نغيّر حجم الأزرار */
+  width:calc(100% - (2 * var(--rmh-gutter-x,20px)));
+  max-width:none;
+  /* الهامش السفلي صار padding على #rizq-mock-hdr حتى لا ينهار خارج القياس */
+  margin:6px var(--rmh-gutter-x,20px) 0!important;
+  padding:4px 10px!important;
   box-sizing:border-box;
   background:rgba(255,255,255,.045)!important;
   border:1px solid rgba(201,168,76,.32)!important;
@@ -753,11 +798,16 @@ body.rizq-lang-fr nav.rmh-nav{
 /* أقسام الصفحة — هامش تمرير تحت الهيدر الثابت */
 body.rizq-mockup-hdr-trial #hero,
 body.rizq-mockup-hdr-trial #listings,
+body.rizq-mockup-hdr-trial #categories,
+body.rizq-mockup-hdr-trial #hero-listings,
 body.rizq-mockup-hdr-trial #virtual-stores,
 body.rizq-mockup-hdr-trial #virtual-showrooms,
 body.rizq-mockup-hdr-trial #virtual-estate,
-body.rizq-mockup-hdr-trial #virtual-offices{
-  scroll-margin-top:calc(var(--rizq-mock-hdr-h,188px) + 12px);
+body.rizq-mockup-hdr-trial #virtual-offices,
+body.rizq-mockup-hdr-trial .listing-card,
+body.rizq-mockup-hdr-trial .ad-card,
+body.rizq-mockup-hdr-trial .aam-card{
+  scroll-margin-top:calc(var(--rizq-mock-hdr-h,196px) + var(--rizq-mock-hdr-gap,12px) + 8px);
 }
 #rizq-mock-hdr .rmh-nav a,
 #rizq-mock-hdr .rmh-nav a.rmh-post-nav,
@@ -962,10 +1012,11 @@ body > .rizq-help-dd-menu a,
 /* تابلت — أظهر تذييل الأقسام داخل شريط البحث دون تحريك موقعه */
 @media(max-width:1024px){
   body.rizq-mockup-hdr-trial{--rizq-mock-hdr-h: 200px}
+  #rizq-mock-hdr{--rmh-gutter-x:14px}
   .rmh-util{padding:4px 14px;font-size:10.5px}
   .rmh-main{
     grid-template-columns:minmax(100px,1fr) minmax(220px,380px) minmax(100px,1fr);
-    padding:9px 14px;gap:10px;
+    padding:9px var(--rmh-gutter-x,14px);gap:10px;
   }
   .rmh-search{max-width:380px}
   .rmh-search-cat{
@@ -995,13 +1046,14 @@ body > .rizq-help-dd-menu a,
   html.rizq-app-nav:has(#nav) body.rizq-mockup-hdr-trial:not(.rizq-reg-open),
   html.rizq-app-nav.has-rizq-desk-nav:not(.rizq-reg-page) body.rizq-mockup-hdr-trial:not(.rizq-reg-open),
   html.rizq-app-nav:has(#rizq-desk-nav) body.rizq-mockup-hdr-trial{
-    padding-top:var(--rizq-mock-hdr-h,212px)!important;
+    padding-top:calc(var(--rizq-mock-hdr-h,212px) + var(--rizq-mock-hdr-gap,12px))!important;
   }
   /* أعمدة متساوية يمين/يسار — وسط أوسع قليلاً لاستيعاب تذييل الأقسام */
+  #rizq-mock-hdr{--rmh-gutter-x:16px}
   #rizq-mock-hdr .rmh-main{
     grid-template-columns:minmax(0,1fr) minmax(0,340px) minmax(0,1fr);
     gap:10px 14px;
-    padding:9px 16px;
+    padding:9px var(--rmh-gutter-x,16px);
     align-items:center;
   }
   #rizq-mock-hdr .rmh-brand{justify-self:start!important;min-width:0}
@@ -1035,16 +1087,16 @@ body > .rizq-help-dd-menu a,
     width:38px!important;height:38px!important;
     min-width:38px!important;min-height:38px!important;
   }
-  /* تابلت = كبسولة وسط مثل الكمبيوتر — أحجام clamp بلا سحق/قصّ */
+  /* تابلت = كبسولة طويلة بعرض الشعار→الأدوات؛ الأزرار تبقى مضغوطة في الوسط بحجمها */
   #rizq-mock-hdr nav.rmh-nav,
   nav.rmh-nav{
-    width:max-content!important;
-    max-width:calc(100% - 24px)!important;
-    margin:6px auto 10px!important;
+    width:calc(100% - (2 * var(--rmh-gutter-x,16px)))!important;
+    max-width:none!important;
+    margin:6px var(--rmh-gutter-x,16px) 0!important;
     padding:4px clamp(4px,0.7vw,10px)!important;
     gap:clamp(0px,0.25vw,2px)!important;
     justify-content:center!important;
-    overflow-x:hidden!important;
+    overflow-x:auto!important;
   }
   #rizq-mock-hdr .rmh-nav a,
   #rizq-mock-hdr .rmh-nav a.rmh-post-nav,
