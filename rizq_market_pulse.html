@@ -162,6 +162,30 @@ html[dir="ltr"] .mp-ticker-wrap::after{
   text-align:center;font-size:11.5px;font-weight:700;color:#5b6b85;
   margin:0 0 10px;
 }
+/* تحميل المزيد — نفس أسلوب صفحة الإعلانات */
+.mp-infinite{
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  padding:16px 12px 8px;color:#5b6b85;font-size:12.5px;font-weight:700;
+}
+.mp-infinite .mi-bar{
+  width:min(280px,70%);height:4px;border-radius:99px;background:rgba(27,58,107,.08);overflow:hidden;
+}
+.mp-infinite .mi-bar>i{
+  display:block;height:100%;width:40%;border-radius:99px;
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+  animation:mpMoreSlide 1.1s ease-in-out infinite;
+}
+@keyframes mpMoreSlide{0%{transform:translateX(-120%)}100%{transform:translateX(280%)}}
+.mp-infinite.done .mi-bar{display:none}
+.mp-infinite button{
+  margin-top:4px;padding:8px 16px;border-radius:9px;border:1px solid rgba(201,168,76,.35);
+  background:#fff;color:#8a6f2a;font-weight:800;font-size:12.5px;cursor:pointer;
+  font-family:'Cairo',sans-serif;
+}
+.mp-infinite button:hover{background:rgba(201,168,76,.1)}
+@media(prefers-reduced-motion:reduce){
+  .mp-infinite .mi-bar>i{animation:none}
+}
 
 /* لوحة بورصة — صفوف داكنة على بطاقة بيضاء */
 .mp-table{
@@ -293,8 +317,6 @@ html[dir="ltr"] .mp-ticker-wrap::after{
       <input class="mp-search" id="mp-search" type="search" placeholder="ابحث عن مادة أو عملة…" autocomplete="off"/>
     </div>
 
-    <div class="mp-count" id="mp-count"></div>
-
     <div id="mp-grid-host">
       <table class="mp-table" id="mp-table" aria-live="polite">
         <thead>
@@ -308,8 +330,9 @@ html[dir="ltr"] .mp-ticker-wrap::after{
         <tbody id="mp-tbody"></tbody>
       </table>
     </div>
+    <div id="mp-infinite-host"></div>
 
-    <p class="mp-note" id="mp-note">الأسعار تقريبية وقد تختلف حسب المنطقة والمحل · تُحدَّث تلقائياً عند توفر بيانات جديدة.</p>
+    <p class="mp-note" id="mp-note">الأسعار تقريبية وقد تختلف حسب المنطقة والمحل · تُحدَّث تلقائياً عند توفر بيانات جديدة من الأدمن.</p>
   </div>
 
   <div class="mp-back">
@@ -354,13 +377,19 @@ html[dir="ltr"] .mp-ticker-wrap::after{
       {icon:'🔥',name:'غاز بوتان (قارورة 12.5كغ)',price:2700,unit:'MRU / قارورة',trend:'flat'},
       {icon:'🛢️',name:'زيت محرك (4 لتر)',price:3800,unit:'MRU / عبوة',trend:'down'}
     ],
+    /* 11 عملة أساسية — الأدمن يضيف/يعدّل عبر rizq_prices */
     currencies: [
       {code:'USD',icon:'🇺🇸',name:'دولار أمريكي',name_fr:'Dollar américain',divisor:1,enabled:true,price:40,trend:'flat'},
       {code:'EUR',icon:'🇪🇺',name:'يورو',name_fr:'Euro',divisor:1,enabled:true,price:44,trend:'flat'},
       {code:'MAD',icon:'🇲🇦',name:'درهم مغربي',name_fr:'Dirham marocain',divisor:100,enabled:true,price:4,trend:'flat'},
+      {code:'DZD',icon:'🇩🇿',name:'دينار جزائري',name_fr:'Dinar algérien',divisor:100,enabled:true,price:0.3,trend:'flat'},
+      {code:'TND',icon:'🇹🇳',name:'دينار تونسي',name_fr:'Dinar tunisien',divisor:100,enabled:true,price:13,trend:'flat'},
       {code:'SAR',icon:'🇸🇦',name:'ريال سعودي',name_fr:'Riyal saoudien',divisor:1,enabled:true,price:10.5,trend:'flat'},
       {code:'AED',icon:'🇦🇪',name:'درهم إماراتي',name_fr:'Dirham émirati',divisor:1,enabled:true,price:11,trend:'flat'},
-      {code:'XOF',icon:'🌍',name:'فرنك غرب أفريقي',name_fr:'Franc CFA (UEMOA)',divisor:100,enabled:true,price:0.065,trend:'flat'}
+      {code:'XOF',icon:'🌍',name:'فرنك غرب أفريقي',name_fr:'Franc CFA (UEMOA)',divisor:100,enabled:true,price:0.065,trend:'flat'},
+      {code:'TRY',icon:'🇹🇷',name:'ليرة تركية',name_fr:'Livre turque',divisor:1,enabled:true,price:1.2,trend:'flat'},
+      {code:'CNY',icon:'🇨🇳',name:'يوان صيني',name_fr:'Yuan chinois',divisor:1,enabled:true,price:5.5,trend:'flat'},
+      {code:'AOA',icon:'🇦🇴',name:'كوانزا أنغولي',name_fr:'Kwanza angolais',divisor:100,enabled:true,price:0.045,trend:'flat'}
     ]
   };
 
@@ -391,6 +420,9 @@ html[dir="ltr"] .mp-ticker-wrap::after{
   var _rows = [];
   var _tab = 'food';
   var _q = '';
+  var PER_PAGE = 8;
+  var _visible = PER_PAGE;
+  var _loadingMore = false;
 
   function isAr(){
     try{
@@ -404,12 +436,46 @@ html[dir="ltr"] .mp-ticker-wrap::after{
   function trName(n){ return (!isAr() && PRICE_NAME_FR[n]) ? PRICE_NAME_FR[n] : n; }
   function trUnit(u){ return (!isAr() && PRICE_UNIT_FR[u]) ? PRICE_UNIT_FR[u] : u; }
 
+  /** ادمج قوائم الأدمن مع الاحتياطي — لا تفقد عملات/مواد أساسية إن نقصت في التخزين */
+  function mergeBoard(stored){
+    var base = JSON.parse(JSON.stringify(DEFAULT_PRICES));
+    if(!stored || typeof stored !== 'object') return base;
+    ['food','fuel','currencies'].forEach(function(cat){
+      var incoming = Array.isArray(stored[cat]) ? stored[cat].filter(Boolean) : null;
+      if(!incoming || !incoming.length) return;
+      if(cat === 'currencies'){
+        var byCode = {};
+        incoming.forEach(function(it){
+          var code = String(it.code || '').toUpperCase();
+          if(code) byCode[code] = it;
+        });
+        var merged = [];
+        var seen = {};
+        base.currencies.forEach(function(def){
+          var code = String(def.code || '').toUpperCase();
+          seen[code] = true;
+          merged.push(byCode[code] ? Object.assign({}, def, byCode[code]) : def);
+        });
+        incoming.forEach(function(it){
+          var code = String(it.code || '').toUpperCase();
+          if(code && !seen[code]){ seen[code] = true; merged.push(it); }
+        });
+        base.currencies = merged;
+      } else {
+        /* مواد: إن وفّر الأدمن قائمة استخدمها؛ وإلا احتفظ بالافتراضي */
+        base[cat] = incoming;
+      }
+    });
+    return base;
+  }
+
   function normalize(p){
     if(!p) return [];
     if(Array.isArray(p)) return p;
+    var board = mergeBoard(p);
     var out = [];
     ['food','fuel','currencies'].forEach(function(cat){
-      (p[cat]||[]).forEach(function(it){
+      (board[cat]||[]).forEach(function(it){
         if(!it) return;
         if(cat==='currencies' && it.enabled===false) return;
         var row = Object.assign({}, it, { cat: cat });
@@ -472,34 +538,91 @@ html[dir="ltr"] .mp-ticker-wrap::after{
     }).join('');
   }
 
+  function rowHTML(it){
+    var nameInner = it.cat==='currencies'
+      ? (flagHTML(it)+'<span>'+esc(it.name)+'</span>')
+      : ('<span class="ico" aria-hidden="true">'+esc(it.icon||'🏷️')+'</span><span>'+esc(trName(it.name))+'</span>');
+    var unit = it.cat==='currencies' ? it.unit : trUnit(it.unit);
+    var price = Number(it.price||0).toLocaleString('en-US');
+    return '<tr class="mp-row">'
+      + '<td><div class="mp-name">'+nameInner+'</div></td>'
+      + '<td class="mp-td-mid mp-unit-cell"><span class="mp-unit" dir="ltr">'+esc(unit)+'</span></td>'
+      + '<td class="mp-td-mid mp-price-cell"><div class="mp-price">'+price+'</div></td>'
+      + '<td class="mp-trend-cell">'+trendHTML(it.trend)+'</td>'
+      + '</tr>';
+  }
+
+  function infiniteHTML(shown, total){
+    var ar = isAr();
+    if(!total) return '';
+    if(shown >= total){
+      return '<div class="mp-infinite done" id="mp-infinite"><span>'+(ar?('تم عرض كل الأسعار — '+total):( 'Fin — '+total+' prix'))+'</span></div>';
+    }
+    return '<div class="mp-infinite" id="mp-infinite">'
+      + '<span>'+(ar?('عرض '+shown+' من '+total+' — مرّر للأسفل للمزيد'):('Affichage '+shown+' / '+total+' — continuez à défiler'))+'</span>'
+      + '<div class="mi-bar" aria-hidden="true"><i></i></div>'
+      + '<button type="button" id="mp-load-more">'+(ar?'تحميل المزيد':'Charger plus')+'</button>'
+      + '</div>';
+  }
+
   function renderTable(){
     var tbody = document.getElementById('mp-tbody');
-    var count = document.getElementById('mp-count');
+    var host = document.getElementById('mp-infinite-host');
     if(!tbody) return;
     var items = filtered();
-    if(count){
-      count.textContent = isAr()
-        ? ('عرض '+items.length+' من '+(_tab==='all'?_rows.length: _rows.filter(function(r){return r.cat===_tab}).length))
-        : ('Affichage de '+items.length+' / '+(_tab==='all'?_rows.length: _rows.filter(function(r){return r.cat===_tab}).length));
-    }
+    if(_visible < PER_PAGE) _visible = PER_PAGE;
+    if(_visible > items.length) _visible = Math.max(PER_PAGE, items.length);
+    var shown = Math.min(_visible, items.length);
+    var page = items.slice(0, shown);
+
     if(!items.length){
       tbody.innerHTML = '<tr><td colspan="4" class="mp-empty">'+(isAr()?'لا توجد أسعار مطابقة.':'Aucun prix correspondant.')+'</td></tr>';
+      if(host) host.innerHTML = '';
       return;
     }
-    tbody.innerHTML = items.map(function(it){
-      var nameInner = it.cat==='currencies'
-        ? (flagHTML(it)+'<span>'+esc(it.name)+'</span>')
-        : ('<span class="ico" aria-hidden="true">'+esc(it.icon||'🏷️')+'</span><span>'+esc(trName(it.name))+'</span>');
-      var unit = it.cat==='currencies' ? it.unit : trUnit(it.unit);
-      var price = Number(it.price||0).toLocaleString('en-US');
-      return '<tr class="mp-row">'
-        + '<td><div class="mp-name">'+nameInner+'</div></td>'
-        + '<td class="mp-td-mid mp-unit-cell"><span class="mp-unit" dir="ltr">'+esc(unit)+'</span></td>'
-        + '<td class="mp-td-mid mp-price-cell"><div class="mp-price">'+price+'</div></td>'
-        + '<td class="mp-trend-cell">'+trendHTML(it.trend)+'</td>'
-        + '</tr>';
-    }).join('');
+    tbody.innerHTML = page.map(rowHTML).join('');
+    if(host){
+      host.innerHTML = infiniteHTML(shown, items.length);
+      var btn = document.getElementById('mp-load-more');
+      if(btn) btn.addEventListener('click', function(){ loadMorePrices(); });
+    }
+    bindInfiniteScroll();
   }
+
+  function loadMorePrices(){
+    if(_loadingMore) return false;
+    var items = filtered();
+    if(_visible >= items.length) return false;
+    _loadingMore = true;
+    _visible = Math.min(_visible + PER_PAGE, items.length);
+    renderTable();
+    setTimeout(function(){ _loadingMore = false; }, 120);
+    return true;
+  }
+  window.loadMorePrices = loadMorePrices;
+
+  function bindInfiniteScroll(){
+    if(window._mpIO){ try{ window._mpIO.disconnect(); }catch(e){} window._mpIO = null; }
+    var sentinel = document.getElementById('mp-infinite');
+    if(!sentinel || typeof IntersectionObserver === 'undefined') return;
+    if(_visible >= filtered().length) return;
+    if(!window._mpScrollBound){
+      window._mpScrollBound = true;
+      window._mpUserScrolled = false;
+      window.addEventListener('scroll', function(){
+        if((window.scrollY || document.documentElement.scrollTop) > 40) window._mpUserScrolled = true;
+      }, {passive:true});
+    }
+    window._mpIO = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(!en.isIntersecting || _loadingMore || !window._mpUserScrolled) return;
+        loadMorePrices();
+      });
+    }, {root:null, rootMargin:'140px 0px', threshold:0});
+    window._mpIO.observe(sentinel);
+  }
+
+  function resetPaging(){ _visible = PER_PAGE; window._mpUserScrolled = false; }
 
   function updateStamp(){
     var el = document.getElementById('mp-updated-date');
@@ -564,6 +687,7 @@ html[dir="ltr"] .mp-ticker-wrap::after{
       document.querySelectorAll('.mp-tab').forEach(function(b){ b.classList.remove('active'); });
       btn.classList.add('active');
       _tab = btn.getAttribute('data-cat') || 'food';
+      resetPaging();
       renderTicker();
       renderTable();
     });
@@ -572,6 +696,7 @@ html[dir="ltr"] .mp-ticker-wrap::after{
   if(searchEl){
     searchEl.addEventListener('input', function(){
       _q = (searchEl.value || '').trim().toLowerCase();
+      resetPaging();
       renderTable();
     });
   }
