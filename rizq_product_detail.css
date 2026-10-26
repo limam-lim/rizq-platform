@@ -10,7 +10,8 @@
   --pd-line:rgba(201,168,76,.16);
   --pd-muted:#6a7a8a;
   --pd-soft:#3a4a5a;
-  position:fixed;inset:0;z-index:9200;
+  /* فوق شريط الهيدر/التنقل السفلي (≈10050) حتى لا تُحجب أزرار الكمية والمقاس */
+  position:fixed;inset:0;z-index:10500;
   display:none;
   align-items:center;
   justify-content:center;

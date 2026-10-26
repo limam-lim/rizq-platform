@@ -700,9 +700,44 @@
     return box;
   }
 
+  /**
+   * تفويض أحداث لوحة المنتج — تجنّب onclick مضمّن مع JSON.stringify
+   * داخل سمات HTML بعلامات اقتباس مزدوجة (كانت تقطع المعالج وتجمّد المقاس/الوزن/المشابه).
+   */
+  function wireDetailDelegation(root) {
+    if (!root || root.dataset.pdWired === '1') return;
+    root.dataset.pdWired = '1';
+    root.addEventListener('click', function (e) {
+      if (e.target === root) {
+        closeProductDetail();
+        return;
+      }
+      var t = e.target && e.target.closest ? e.target.closest('.rzq-pd-vopt') : null;
+      if (t && root.contains(t) && !t.disabled && !t.classList.contains('is-oos')) {
+        e.preventDefault();
+        selectVariant(t.getAttribute('data-vgroup'), t.getAttribute('data-vval'));
+        return;
+      }
+      t = e.target && e.target.closest ? e.target.closest('[data-pd-qty]') : null;
+      if (t && root.contains(t)) {
+        e.preventDefault();
+        var delta = Number(t.getAttribute('data-pd-qty'));
+        if (!isNaN(delta)) changeQty(delta);
+        return;
+      }
+      t = e.target && e.target.closest ? e.target.closest('.rzq-pd-sim[data-pid]') : null;
+      if (t && root.contains(t)) {
+        e.preventDefault();
+        openProductDetail(t.getAttribute('data-pid'));
+        return;
+      }
+    });
+  }
+
   function ensureDetailHost() {
     var root = document.getElementById('rzq-pd-root');
     if (root) {
+      wireDetailDelegation(root);
       ensureLightboxHost();
       return root;
     }
@@ -712,9 +747,7 @@
     root.setAttribute('role', 'dialog');
     root.setAttribute('aria-modal', 'true');
     root.innerHTML = '<div class="rzq-pd-sheet" id="rzq-pd-sheet"></div>';
-    root.addEventListener('click', function (e) {
-      if (e.target === root) closeProductDetail();
-    });
+    wireDetailDelegation(root);
     document.body.appendChild(root);
     ensureLightboxHost();
     return root;
@@ -790,7 +823,6 @@
               + ' data-vgroup="' + esc(g.key) + '" data-vval="' + esc(o.value) + '"'
               + (oos ? ' disabled aria-disabled="true" title="' + (fr ? 'Rupture' : 'غير متوفر') + '"' : '')
               + ' aria-pressed="' + (on ? 'true' : 'false') + '"'
-              + (oos ? '' : (' onclick="RizqStoreCommerce.selectVariant(' + JSON.stringify(String(g.key)) + ',' + JSON.stringify(String(o.value)) + ')"'))
               + '>'
               + '<span class="rzq-pd-vopt-lab">' + esc(o.label) + '</span>'
               + qtyHint
@@ -834,13 +866,12 @@
     var similarHtml = similar.length
       ? '<div class="rzq-pd-block"><div class="rzq-pd-block-title">' + (fr ? '✦ Produits similaires' : '✦ منتجات مشابهة') + '</div>'
         + '<div class="rzq-pd-similar">' + similar.map(function (s) {
-          var sid = JSON.stringify(String(s.id));
           var sn = fr ? (s.nameF || s.name) : (s.name || s.nameF);
           var simImgs = imagesOf(s);
           var media = simImgs[0]
             ? '<img src="' + esc(simImgs[0]) + '" alt="" loading="lazy"/>'
             : esc(s.emoji || '📦');
-          return '<div class="rzq-pd-sim" onclick="RizqStoreCommerce.openProductDetail(' + sid + ')">'
+          return '<div class="rzq-pd-sim" role="button" tabindex="0" data-pid="' + esc(String(s.id)) + '">'
             + '<div class="rzq-pd-sim-media">' + media + '</div>'
             + '<div class="rzq-pd-sim-body"><div class="rzq-pd-sim-title">' + esc(sn) + '</div>'
             + '<div class="rzq-pd-sim-price">' + (Number(s.price) || 0).toLocaleString('en-US') + ' MRU</div></div></div>';
@@ -880,9 +911,9 @@
       + variantsHtml
       + (showCart
         ? ('<div class="rzq-pd-qty"><span>' + (fr ? 'Quantité' : 'الكمية') + '</span>'
-          + '<button type="button" onclick="RizqStoreCommerce.changeQty(-1)" aria-label="-">−</button>'
+          + '<button type="button" data-pd-qty="-1" aria-label="-">−</button>'
           + '<span id="rzq-pd-qty">' + qty + '</span>'
-          + '<button type="button" onclick="RizqStoreCommerce.changeQty(1)" aria-label="+">+</button>'
+          + '<button type="button" data-pd-qty="1" aria-label="+">+</button>'
           + '<strong id="rzq-pd-total" class="rzq-pd-total" style="margin-inline-start:6px">'
           + (priceNum > 0 ? ((priceNum * qty).toLocaleString('en-US') + ' MRU') : '—')
           + '</strong></div>')
