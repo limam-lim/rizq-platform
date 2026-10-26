@@ -1222,6 +1222,8 @@ app.get('/api/site-config', (req, res) => {
       wilayasCount: raw.site.wilayasCount,
       bannerActive: !!raw.site.bannerActive,
       bannerText: String(raw.site.bannerText || '').slice(0, 300),
+      // روابط تابعنا للفوتر العام (فيسبوك/إكس/يوتيوب/… من لوحة الأدمن)
+      social: sanitizeSiteSocial(raw.site.social),
     } : undefined,
     legalOverrides: raw.legalOverrides || undefined,
     currency: raw.currency || undefined,
@@ -1264,6 +1266,39 @@ const LEGAL_KEYS_AR = ['s1','s2','s3','s4','s5','s6','s7','s8','s9','s10','s11']
 const LEGAL_KEYS_FR = ['f1','f2','f3','f4','f5','f6','f7','f8','f9','f10','f11'];
 const LEGAL_MAX_LEN = 20000; // سخي بما يكفي لقسم قانوني كامل بصياغة HTML بسيطة
 const { sanitizeLegalHtml, sanitizeSafeUrl } = require('./lib/sanitizeHtml');
+
+/** منصات «تابعنا» — نفس مفاتيح لوحة السوبر أدمن + rizq_social_links.js */
+const SITE_SOCIAL_KEYS = [
+  'facebook', 'x', 'instagram', 'youtube', 'tiktok',
+  'linkedin', 'snapchat', 'telegram', 'whatsapp',
+];
+
+/**
+ * تنظيف روابط المنصات العامة: مفاتيح معروفة فقط، http(s) آمن، بدون XSS.
+ * الصف المعطّل أو بلا رابط صالح يبقى {enabled,url} لكن الواجهة العامة
+ * تعرض فقط enabled + رابط آمن بمسار حساب (ليس جذر النطاق).
+ */
+function sanitizeSiteSocial(raw) {
+  const out = {};
+  const src = raw && typeof raw === 'object' ? raw : {};
+  for (let i = 0; i < SITE_SOCIAL_KEYS.length; i++) {
+    const key = SITE_SOCIAL_KEYS[i];
+    const item = src[key];
+    const enabled = !!(item && typeof item === 'object' && item.enabled);
+    let url = sanitizeSafeUrl(item && typeof item === 'object' ? item.url : '', 500);
+    // ارفض جذر النطاق فقط (x.com/) — يلزم مسار حساب مثل x.com/rizq
+    if (url && /^https?:\/\//i.test(url)) {
+      try {
+        const path = String(new URL(url).pathname || '').replace(/\/+$/, '');
+        if (!path) url = '';
+      } catch (e) {
+        url = '';
+      }
+    }
+    out[key] = { enabled, url };
+  }
+  return out;
+}
 
 /**
  * POST /api/site-config
@@ -1629,6 +1664,11 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
 
   if (body.site && typeof body.site === 'object') {
     const s = body.site;
+    const prevSite = current.site && typeof current.site === 'object' ? current.site : {};
+    // إن لم يُرسل social في هذا الطلب نُبقي المحفوظ سابقاً (حفظ تواصل جزئي)
+    const socialSrc = Object.prototype.hasOwnProperty.call(s, 'social')
+      ? s.social
+      : prevSite.social;
     next.site = {
       sitename: String(s.sitename || '').slice(0, 80),
       tagline: String(s.tagline || '').slice(0, 200),
@@ -1642,6 +1682,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
       wilayasCount: Math.max(0, Number(s.wilayasCount) || 0),
       bannerActive: !!s.bannerActive,
       bannerText: String(s.bannerText || '').slice(0, 300),
+      social: sanitizeSiteSocial(socialSrc),
       updatedAt: new Date().toISOString(),
     };
   }

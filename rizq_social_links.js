@@ -215,32 +215,75 @@
     return '';
   }
 
+  /** نسخة محلية من إعدادات الموقع (بعد حفظ الأدمن أو مزامنة سابقة) */
+  function siteFromLocal() {
+    try {
+      var raw = localStorage.getItem('rizq_site_config');
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      return parsed && typeof parsed === 'object' ? parsed : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function finishRender(site) {
+    var social = site ? enrichSocial(site) : null;
+    var wanted = activeItems(social).length;
+    render(social);
+    var root = document.getElementById(ROOT_ID);
+    if (!root && wanted > 0) return { mounted: false, wanted: wanted };
+    if (wanted > 0) {
+      return {
+        mounted: !!(root && root.querySelector('.rzq-soc-btn')),
+        wanted: wanted
+      };
+    }
+    return { mounted: true, wanted: 0 };
+  }
+
   function loadAndRender() {
+    var local = siteFromLocal();
     var base = backendBase();
     if (!base) {
-      render(null);
-      return Promise.resolve(false);
+      return Promise.resolve(finishRender(local));
     }
     return fetch(base + '/api/site-config', { cache: 'no-store' })
       .then(function (res) { return res.ok ? res.json() : null; })
       .then(function (data) {
         var site = data && data.ok && data.config ? data.config.site : null;
-        var social = site ? enrichSocial(site) : null;
-        var wanted = activeItems(social).length;
-        render(social);
-        var root = document.getElementById(ROOT_ID);
-        if (!root && wanted > 0) return { mounted: false, wanted: wanted };
-        if (wanted > 0) {
-          return {
-            mounted: !!root.querySelector('.rzq-soc-btn'),
-            wanted: wanted
-          };
+        // إن رجعت API بلا social مفعّل — جرّب النسخة المحلية (حفظ أدمن / صفحات ثابتة)
+        var apiSocial = site && site.social && typeof site.social === 'object' ? site.social : null;
+        var apiWanted = apiSocial ? activeItems(enrichSocial(site)).length : 0;
+        if (!site || apiWanted === 0) {
+          if (local && local.social) {
+            var merged = Object.assign({}, local, site || {});
+            if (site && site.social) merged.social = site.social;
+            else if (local.social) merged.social = local.social;
+            // فضّل المحلي فقط إن كان فيه روابط ظاهرة
+            if (activeItems(enrichSocial(merged)).length > apiWanted) {
+              return finishRender(merged);
+            }
+          }
         }
-        return { mounted: true, wanted: 0 };
+        if (site) {
+          try {
+            var prev = local || {};
+            localStorage.setItem(
+              'rizq_site_config',
+              JSON.stringify(Object.assign({}, prev, site, {
+                social: (site.social && typeof site.social === 'object')
+                  ? site.social
+                  : (prev.social || {})
+              }))
+            );
+          } catch (eCache) {}
+          return finishRender(site);
+        }
+        return finishRender(local);
       })
       .catch(function () {
-        render(null);
-        return { mounted: false, wanted: -1 };
+        return finishRender(local);
       });
   }
 
