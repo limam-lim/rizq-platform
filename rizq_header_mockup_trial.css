@@ -74,6 +74,8 @@ html.rizq-app-nav .rizq-thumb-dock,
 html.rizq-app-nav #rizq-search-theater,
 html.rizq-app-nav #rizq-search-pill,
 html.rizq-app-nav .nav-sticky-tools,
+html.rizq-app-nav .hero-browse-panel,
+html.rizq-app-nav .hero-stage-intent,
 html.rizq-app-nav .mobile-bottom-nav,
 html.rizq-app-nav #mobile-bottom-nav,
 html.rizq-app-nav #section-jump-bar,
@@ -87,6 +89,8 @@ body.rizq-mockup-hdr-trial .rizq-thumb-dock,
 body.rizq-mockup-hdr-trial #rizq-search-theater,
 body.rizq-mockup-hdr-trial #rizq-search-pill,
 body.rizq-mockup-hdr-trial .nav-sticky-tools,
+body.rizq-mockup-hdr-trial .hero-browse-panel,
+body.rizq-mockup-hdr-trial .hero-stage-intent,
 body.rizq-mockup-hdr-trial .mobile-bottom-nav,
 body.rizq-mockup-hdr-trial #section-jump-bar,
 body.rizq-mockup-hdr-trial #rizq-announce-ticker,
@@ -97,30 +101,6 @@ body.rizq-mockup-hdr-trial > nav:not(#rizq-desk-nav):not(#rizq-thumb-dock):not(.
   display:none!important;
   visibility:hidden!important;
   pointer-events:none!important;
-}
-/* مع الهيدر الموحّد: أظهر الأقسام السريعة + روابط المنصة، وأخفِ البحث المكرّر فقط */
-html.rizq-app-nav .hero-browse-panel .hero-search,
-html.rizq-app-nav .hero-browse-panel .hero-browse-head,
-body.rizq-mockup-hdr-trial .hero-browse-panel .hero-search,
-body.rizq-mockup-hdr-trial .hero-browse-panel .hero-browse-head{
-  display:none!important;
-}
-html.rizq-app-nav .hero-stage-intent,
-html.rizq-app-nav .hero-browse-panel,
-body.rizq-mockup-hdr-trial .hero-stage-intent,
-body.rizq-mockup-hdr-trial .hero-browse-panel{
-  display:block!important;
-  visibility:visible!important;
-  pointer-events:auto!important;
-  height:auto!important;
-  max-height:none!important;
-  opacity:1!important;
-  overflow:visible!important;
-}
-html.rizq-app-nav .hero-browse-panel,
-body.rizq-mockup-hdr-trial .hero-browse-panel{
-  padding:12px 12px 10px!important;
-  overflow:visible!important;
 }
 /* أقوى من قواعد rizq-phone-thumb-dock — الشريط الموحّد rmh يكفي */
 html.rizq-app-nav.rizq-phone-thumb-dock body.rizq-mockup-hdr-trial #rizq-thumb-dock,
