@@ -441,11 +441,44 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
   }
   #prices .price-card-top,
   .prices-grid .price-card-top{
-    gap:3px!important;
+    gap:5px!important;
+    min-width:0!important;
   }
   #prices .price-curr-flag,
   .prices-grid .price-curr-flag{
     font-size:11px!important;
+  }
+  #prices .price-curr-flag-img,
+  .prices-grid .price-curr-flag-img{
+    width:24px!important;height:16px!important;flex-shrink:0!important;
+  }
+  #prices .price-card-currency .price-curr-flag-img.is-badge,
+  .prices-grid .price-card-currency .price-curr-flag-img.is-badge{
+    width:22px!important;height:22px!important;
+  }
+  #prices .price-card-currency .price-name,
+  .prices-grid .price-card-currency .price-name{
+    white-space:normal!important;
+    overflow:visible!important;
+    text-overflow:unset!important;
+    display:-webkit-box!important;
+    -webkit-line-clamp:2!important;
+    -webkit-box-orient:vertical!important;
+    font-size:10px!important;
+    line-height:1.25!important;
+  }
+  #prices .price-card-currency .price-unit,
+  .prices-grid .price-card-currency .price-unit{
+    white-space:normal!important;
+    font-size:8.5px!important;
+  }
+  #prices .prices-note,
+  .prices-note{
+    white-space:normal!important;
+    overflow:visible!important;
+    padding-inline:6px!important;
+    line-height:1.5!important;
+    word-break:break-word!important;
   }
   #prices .price-ticker-wrap,
   .price-ticker-wrap{
