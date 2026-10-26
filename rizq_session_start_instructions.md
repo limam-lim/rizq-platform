@@ -1,12 +1,17 @@
 # رزق — تعليمات بدء الجلسة (بعد إغلاق graduation-demo-v2)
 
-*آخر تحديث: 2026-10-26 صباحاً (Europe/Madrid) — استعادة نبضة السوق + واجهة الإعلان.*
+*آخر تحديث: 2026-10-26 11:36 Europe/Madrid — جلسة هاتف: نبضة السوق + نسخة احتياطية مطابقة لـ GitHub.*
+
+## جهاز العمل
+- **المالك يعمل غالباً من الهاتف** — اختبر دائماً ~375px أولاً، وأبقِ الأزرار والنصوص واضحة دون الاعتماد على تمرير طويل.
+- عند فتح **الكمبيوتر** لاحقاً: خزّن محلياً آخر نسخة احتياطية من `backups/LATEST-GITHUB-BACKUP.*` (نفس commit على `origin/main`).
 
 ## نقطة الانطلاق
 - الوسم: `graduation-demo-v2` على طرف `main` (يُحدَّث مع كل دمج ضروري للعرض).
-- الوسم القديم `graduation-demo` **لا يُحرَّك**.
+- الوسم الثابت `graduation-demo` **لا يُحرَّك**.
 - `launchDate` يبقى **فارغاً** (dry-run للصيانة) — لا تملأه قبل الإطلاق الحقيقي.
 - محتوى التخرج موسوم `is_demo` + `graduationDemo` (seed عبر `npm run seed:graduation` داخل `rizq-backend`).
+- **نسخة احتياطية أخيرة = GitHub `main`:** انظر `backups/LATEST-GITHUB-BACKUP.json` (commit + مسار الأرشيف). أرشيف الكود: `backups/LATEST-GITHUB-BACKUP.tar.gz`. بيانات التشغيل المشفّرة: `rizq-backend/backups/rizq-backup-*.rizqenc`.
 
 ## إصلاح 2026-10-26 — تحسينات كانت خارج الدمج
 - **نبضة السوق فارغة على Pages:** `DEFAULT_PRICES` مضمّن في `rizq_landing_v8.html`؛ و`*.github.io` يوجّه API إلى Render بدل أصل Pages.

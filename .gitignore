@@ -24,3 +24,7 @@ _maintenance/
 Thumbs.db
 *.log
 rizq-backend/_probe_delete_me.json
+
+# Local GitHub-matching code archives (meta committed; tarballs stay local)
+backups/*.tar.gz
+backups/*.sha256
