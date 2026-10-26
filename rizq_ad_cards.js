@@ -567,11 +567,27 @@
       '233': [fashion.melhafaLilac, fashion.melhafaShop],
       '234': [fashion.daraaShop, fashion.daraaBoutique]
     };
+    var byCat = {
+      'عقارات': map['101'],
+      'سيارات': map['102'],
+      'إلكترونيات': map['103'],
+      'ذهب': map['204'],
+      'شاحنات': map['207'],
+      'أزياء': [fashion.melhafaShop, fashion.daraaBoutique, fashion.melhafaStreet],
+      'ماشية': ['https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=800&q=70','https://images.unsplash.com/photo-1500595046743-cd271d973d8b?auto=format&fit=crop&w=800&q=70'],
+      'بناء': ['https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=800&q=70','https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=800&q=70'],
+      'خدمات': ['https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&w=800&q=70','https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=800&q=70']
+    };
+    var fallback = ['https://images.unsplash.com/photo-1556740749-887f6717d7e4?auto=format&fit=crop&w=800&q=70','https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=800&q=70'];
     for (var i = 0; i < list.length; i++) {
       var a = list[i];
       if (!a || a.id == null) continue;
       if (Array.isArray(a.images) && a.images.length) continue;
       var g = map[String(a.id)];
+      if (!g) {
+        var ck = String(a.catKey || a.cat || '').replace(/^[^\u0600-\u06FFa-zA-Z]+/, '').split(/[—\-\s]/)[0];
+        g = byCat[ck] || byCat[a.catKey] || fallback;
+      }
       if (g) a.images = g.slice();
       if (!a.phone && !a.whatsapp) {
         a.phone = a.phone || '+22245000000';

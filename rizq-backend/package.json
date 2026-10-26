@@ -22,7 +22,10 @@
     "verify:agents": "node scripts/verify-claude-agents.js",
     "verify:claude": "node scripts/verify-claude-agents.js",
     "seed:graduation": "node scripts/seed-graduation-demo.js",
-    "seed:graduation:clear": "node scripts/seed-graduation-demo.js --clear"
+    "seed:graduation:clear": "node scripts/seed-graduation-demo.js --clear",
+    "purge:demo": "node scripts/purge-demo.js",
+    "purge:demo:confirm": "node scripts/purge-demo.js --confirm",
+    "launch:check": "node scripts/launch-check.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",

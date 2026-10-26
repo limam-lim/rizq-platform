@@ -94,6 +94,30 @@ async function run() {
   check('retention keeps at most 30 backups', retention.kept <= 30, 'kept=' + retention.kept);
   check('retention removes old backups', retention.removed.length >= 2, 'removed=' + retention.removed.length);
 
+  const evidence = {
+    ok: passed === total,
+    at: new Date().toISOString(),
+    passed,
+    total,
+    backupFile: backupPath ? path.basename(backupPath) : null,
+  };
+  try {
+    fs.mkdirSync(path.join(ROOT, 'data'), { recursive: true });
+    fs.writeFileSync(
+      path.join(ROOT, 'data', 'backup-restore-last.json'),
+      JSON.stringify(evidence, null, 2),
+      'utf8'
+    );
+  } catch (e) { /* ignore */ }
+  try {
+    fs.mkdirSync('/opt/cursor/artifacts', { recursive: true });
+    fs.writeFileSync(
+      '/opt/cursor/artifacts/backup-restore-check.log',
+      JSON.stringify(evidence, null, 2) + '\n',
+      'utf8'
+    );
+  } catch (e) { /* ignore */ }
+
   cleanup();
   console.log('\n' + passed + '/' + total + ' checks passed\n');
   process.exit(passed === total ? 0 : 1);

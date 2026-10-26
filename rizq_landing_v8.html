@@ -10152,8 +10152,10 @@ function hydrateLiveAds(){
   });
 function isDemoAd(a){
   if(!a) return true;
+  if(a.is_demo === true || a.isDemo === true) return true;
   var id=String(a.id||'');
   var acc=String(a.accountId||'');
+  /* محتوى التخرج (graduationDemo / acc_grad_) يُحسب حياً للعرض — ليس «acc_demo» */
   return acc.indexOf('acc_demo')===0 || /^RZQ-2026-1000\d/i.test(id);
 }
 function applyList(list){
@@ -10191,7 +10193,8 @@ function applyList(list){
     else {
       var adStat = document.querySelector('#platform-stats [data-stat="ads"] .h-stat-num');
       if(adStat){
-        var liveCount = usingShowcase ? 0 : ADS.length;
+        /* عرض التخرج: اعرض عدد البطاقات الظاهرة (حية أو showcase) — لا تُصفِّر العداد */
+        var liveCount = ADS.length;
         adStat.dataset.target = String(liveCount);
         adStat.dataset.counted = '1';
         adStat.textContent = liveCount.toLocaleString('en-US');
@@ -15592,31 +15595,37 @@ function closeRvidPopup(){ document.getElementById('rvid-overlay').classList.rem
     if (Array.isArray(pkgs.verified_plus)) localStorage.setItem('rizq_verified_plus_packages', JSON.stringify(pkgs.verified_plus));
     if (typeof renderPricingSection === 'function') renderPricingSection();
   }
+  function fetchSiteConfigExtras() {
+    if (!window.RIZQ_BACKEND_BASE) return;
+    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/site-config')
+      .then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(data){
+        if (!data || !data.ok || !data.config) return;
+        applyPkgs(data.config.packages);
+        if (Array.isArray(data.config.bankCodes)) {
+          localStorage.setItem('rizq_bank_codes', JSON.stringify(data.config.bankCodes));
+          if (typeof ppRenderPayMethods === 'function') ppRenderPayMethods();
+        }
+        var cfg = data.config || {};
+        if (cfg.prices && (cfg.prices.food || cfg.prices.fuel || cfg.prices.currencies)) {
+          localStorage.setItem('rizq_prices', JSON.stringify(cfg.prices));
+          if (typeof loadPrices === 'function') loadPrices();
+        }
+        if (Array.isArray(cfg.extraCategories)) {
+          localStorage.setItem('rizq_extra_categories', JSON.stringify(cfg.extraCategories));
+          if (typeof renderExtraCategories === 'function') renderExtraCategories();
+        }
+      }).catch(function(){});
+  }
   if (window.RizqPackagesUI && typeof RizqPackagesUI.syncAllFromBackend === 'function') {
     RizqPackagesUI.syncAllFromBackend(function () {
       if (typeof renderPricingSection === 'function') renderPricingSection();
+      /* كان المسار القديم يتوقف هنا فلا تُحمَّل أسعار نبضة السوق */
+      fetchSiteConfigExtras();
     });
     return;
   }
-  if (!window.RIZQ_BACKEND_BASE) return;
-  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/site-config')
-    .then(function(res){ return res.ok ? res.json() : null; })
-    .then(function(data){
-      applyPkgs(data && data.ok && data.config && data.config.packages);
-      if(Array.isArray(data.config.bankCodes)){
-        localStorage.setItem('rizq_bank_codes', JSON.stringify(data.config.bankCodes));
-        if(typeof ppRenderPayMethods==='function') ppRenderPayMethods();
-      }
-      var cfg = data.config || {};
-      if (cfg.prices && (cfg.prices.food || cfg.prices.fuel || cfg.prices.currencies)) {
-        localStorage.setItem('rizq_prices', JSON.stringify(cfg.prices));
-        if (typeof loadPrices === 'function') loadPrices();
-      }
-      if (Array.isArray(cfg.extraCategories)) {
-        localStorage.setItem('rizq_extra_categories', JSON.stringify(cfg.extraCategories));
-        if (typeof renderExtraCategories === 'function') renderExtraCategories();
-      }
-    }).catch(function(){});
+  fetchSiteConfigExtras();
 })();
 
 // ── الإطلاق التدريجي: moduleFlags عبر RizqModuleFlags + RizqDynamicNav ──
