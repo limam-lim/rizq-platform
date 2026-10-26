@@ -273,12 +273,12 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
   #rizq-chat-toggle{z-index:10020!important}
 
   #back-to-top{
-    bottom:calc(var(--rizq-thumb-dock-h,72px) + 14px + env(safe-area-inset-bottom,0))!important;
+    bottom:calc(var(--rizq-thumb-dock-h,72px) + 28px + env(safe-area-inset-bottom,0))!important;
     left:12px!important;z-index:10015!important;
   }
   html[dir="ltr"] #back-to-top{left:auto!important;right:12px!important}
   #rizq-chat-toggle{
-    bottom:calc(var(--rizq-thumb-dock-h,72px) + 14px + env(safe-area-inset-bottom,0))!important;
+    bottom:calc(var(--rizq-thumb-dock-h,72px) + 28px + env(safe-area-inset-bottom,0))!important;
     right:12px!important;z-index:10020!important;
   }
   html[dir="ltr"] #rizq-chat-toggle{right:auto!important;left:12px!important}

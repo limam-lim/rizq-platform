@@ -2507,9 +2507,9 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   html.rizq-app-nav #back-to-top{
     left:16px !important;
     right:auto !important;
-    bottom:calc(var(--rizq-thumb-dock-h,72px) + 14px + env(safe-area-inset-bottom,0px)) !important;
-    width:44px !important;
-    height:44px !important;
+    bottom:calc(var(--rizq-thumb-dock-h,72px) + 28px + env(safe-area-inset-bottom,0px)) !important;
+    width:46px !important;
+    height:46px !important;
     margin:0 !important;
     z-index:10015 !important;
   }

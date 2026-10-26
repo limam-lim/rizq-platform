@@ -1219,7 +1219,7 @@ body > .rizq-help-dd-menu a,
   html.rizq-app-nav body.rizq-mockup-hdr-trial #rizq-chat-toggle,
   body.rizq-mockup-hdr-trial #rizq-chat-toggle,
   html[dir="rtl"] body.rizq-mockup-hdr-trial #rizq-chat-toggle{
-    bottom:calc(var(--rizq-mock-nav-h,72px) + 14px + env(safe-area-inset-bottom,0px))!important;
+    bottom:calc(var(--rizq-mock-nav-h,72px) + 28px + env(safe-area-inset-bottom,0px))!important;
     right:12px!important;
     left:auto!important;
     z-index:10060!important;
@@ -1231,7 +1231,7 @@ body > .rizq-help-dd-menu a,
   }
   html.rizq-app-nav body.rizq-mockup-hdr-trial #rizq-prompt-bubbles,
   body.rizq-mockup-hdr-trial #rizq-prompt-bubbles{
-    bottom:calc(var(--rizq-mock-nav-h,72px) + 76px + env(safe-area-inset-bottom,0px))!important;
+    bottom:calc(var(--rizq-mock-nav-h,72px) + 90px + env(safe-area-inset-bottom,0px))!important;
     right:12px!important;
     z-index:10060!important;
   }
