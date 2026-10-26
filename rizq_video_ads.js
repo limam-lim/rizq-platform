@@ -35,6 +35,7 @@
   var stripAds = [];
   var _stripPlaying = null;
   var _stripLightbox = null;
+  var _stripPickLockUntil = 0;
 
   function _loadLocalVideoAdsConfig() {
     try { return JSON.parse(localStorage.getItem('rizq_video_ads') || '{}'); }
@@ -828,6 +829,7 @@
         if (ev.target.closest && ev.target.closest('.rizq-vcard-actions,.rizq-vcard-contacts,.rzq-adx-actions,.rzq-adx-tel,.rzq-adx-wa')) return;
         if (!isTouchPlaybackMode()) return;
         ev.preventDefault();
+        _stripPickLockUntil = Date.now() + 900;
         if (!video) return;
         if (!card.classList.contains('is-playing') || video.paused) {
           playStripVideo(card);
@@ -953,6 +955,7 @@
 
       function pickMostVisible() {
         if (saveData) return; // غلاف + زر فقط
+        if (Date.now() < _stripPickLockUntil) return;
         var bestCard = null;
         var bestR = 0;
         var bestArea = 0;
