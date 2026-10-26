@@ -5,8 +5,8 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '31.9';
-  var MOCK_HDR_V = '5.81';
+  var ASSET_V = '31.10';
+  var MOCK_HDR_V = '5.82';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -120,12 +120,30 @@
       hdrCss.href = 'rizq_header.css?v=' + ASSET_V;
       document.head.appendChild(hdrCss);
     }
-    /* هيدر النموذج الموحّد — كل الصفحات العامة */
-    if (isPublicShell() && !document.querySelector('link[rel="stylesheet"][href*="rizq_header_mockup_trial.css"]')) {
-      var mockCss = document.createElement('link');
-      mockCss.rel = 'stylesheet';
-      mockCss.href = 'rizq_header_mockup_trial.css?v=' + MOCK_HDR_V;
-      document.head.appendChild(mockCss);
+    /* هيدر/كبسولة موحّدة على كل الصفحات العامة — فرض الإصدار الحالي لكسر الكاش القديم */
+    if (isPublicShell()) {
+      var mockCssWant = 'rizq_header_mockup_trial.css?v=' + MOCK_HDR_V;
+      var mockJsWant = 'rizq_header_mockup_trial.js?v=' + MOCK_HDR_V;
+      var mockCssEl = document.querySelector('link[rel="stylesheet"][href*="rizq_header_mockup_trial.css"]');
+      if (!mockCssEl) {
+        mockCssEl = document.createElement('link');
+        mockCssEl.rel = 'stylesheet';
+        document.head.appendChild(mockCssEl);
+      }
+      if ((mockCssEl.getAttribute('href') || '').indexOf('v=' + MOCK_HDR_V) < 0) {
+        mockCssEl.href = mockCssWant;
+      }
+      var mockJsEl = document.querySelector('script[src*="rizq_header_mockup_trial.js"]');
+      if (!mockJsEl) {
+        appendScript(mockJsWant, { defer: true });
+      } else if ((mockJsEl.getAttribute('src') || '').indexOf('v=' + MOCK_HDR_V) < 0) {
+        /* استبدال الوسم القديم حتى تُحمَّل الكبسولة بالإصدار الصحيح على كل الصفحات */
+        var fresh = document.createElement('script');
+        fresh.src = mockJsWant;
+        fresh.defer = true;
+        mockJsEl.parentNode.insertBefore(fresh, mockJsEl.nextSibling);
+        try { mockJsEl.parentNode.removeChild(mockJsEl); } catch (eRmMock) {}
+      }
     }
     if (!document.querySelector('script[src*="rizq_account_route.js"]')) {
       appendScript('rizq_account_route.js?v=' + ASSET_V, { async: false });
@@ -133,9 +151,6 @@
     if (!document.querySelector('script[src*="rizq_header.js"]')) {
       appendScript('rizq_header.js?v=' + ASSET_V, { async: false });
       appendScript('rizq_input_bidi.js?v=' + ASSET_V, { defer: true });
-    }
-    if (isPublicShell() && !document.querySelector('script[src*="rizq_header_mockup_trial.js"]')) {
-      appendScript('rizq_header_mockup_trial.js?v=' + MOCK_HDR_V, { defer: true });
     }
     /* فوتر المنصة الموحّد — زوار + داشبوردات المشتركين */
     if (!document.querySelector('script[src*="rizq_site_footer.js"]')) {
