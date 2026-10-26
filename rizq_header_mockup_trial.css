@@ -1065,23 +1065,24 @@ body > .rizq-help-dd-menu a,
   html.rizq-app-nav:has(#rizq-desk-nav) body.rizq-mockup-hdr-trial{
     padding-top:calc(var(--rizq-mock-hdr-h,212px) + var(--rizq-mock-hdr-gap,12px))!important;
   }
-  /* أعمدة متساوية يمين/يسار — وسط أوسع قليلاً لاستيعاب تذييل الأقسام */
+  /* شعار | بحث في فراغ الوسط | أدوات — البحث يتوسّط المسافة بينهما (لا عمودين 1fr يزيّفانه بصرياً) */
   #rizq-mock-hdr{--rmh-gutter-x:16px}
   #rizq-mock-hdr .rmh-main{
-    grid-template-columns:minmax(0,1fr) minmax(0,340px) minmax(0,1fr);
-    gap:10px 14px;
-    padding:9px var(--rmh-gutter-x,16px);
+    grid-template-columns:auto minmax(0,1fr) auto;
+    gap:10px 12px;
+    /* أقرب قليلاً للشريط العلوي */
+    padding:4px var(--rmh-gutter-x,16px) 8px;
     align-items:center;
   }
-  #rizq-mock-hdr .rmh-brand{justify-self:start!important;min-width:0}
-  #rizq-mock-hdr .rmh-tools{justify-self:end!important;min-width:0}
-  /* البحث: وسط العمود الأوسط على التابلت — بلا translateX */
+  #rizq-mock-hdr .rmh-brand{justify-self:start!important;min-width:0;align-self:center!important}
+  #rizq-mock-hdr .rmh-tools{justify-self:end!important;min-width:0;align-self:center!important}
+  /* البحث: وسط الفراغ بين الشعار والأدوات — بلا translateX */
   #rizq-mock-hdr .rmh-search{
-    max-width:340px!important;
+    max-width:min(340px,100%)!important;
     width:100%!important;
     min-width:0!important;
     justify-self:center!important;
-    margin-inline:0!important;
+    margin-inline:auto!important;
     transform:none!important;
   }
   #rizq-mock-hdr .rmh-search-cat{
@@ -1183,7 +1184,7 @@ body > .rizq-help-dd-menu a,
   html[lang="fr"] #rizq-mock-hdr .rmh-search,
   body.rizq-lang-fr #rizq-mock-hdr .rmh-search{
     justify-self:center!important;
-    margin-inline:0!important;
+    margin-inline:auto!important;
     transform:none!important;
   }
 }
