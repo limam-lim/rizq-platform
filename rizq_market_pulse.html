@@ -225,26 +225,24 @@ html[lang^="fr"] .mp-ticker-wrap::before{content:'Live'}
 
 @media(max-width:560px){
   .mp-board{padding:12px 8px 14px;border-radius:14px}
-  .mp-name{font-size:12px}
+  .mp-name{font-size:12px;gap:6px}
   .mp-price{font-size:13.5px}
   .mp-unit{font-size:10px}
   .mp-table thead{display:none}
-  .mp-row td{display:block;padding:6px 10px}
-  .mp-row td:first-child{
-    border-radius:9px 9px 0 0;border-inline-end:1px solid rgba(201,168,76,.18);
-    padding-top:9px;
+  .mp-table,.mp-table tbody{display:block;width:100%}
+  .mp-row{display:block;width:100%;margin-bottom:5px;
+    background:linear-gradient(155deg,rgba(15,35,71,.92),rgba(27,58,107,.88));
+    border:1px solid rgba(201,168,76,.18);border-inline-start:2px solid var(--gold);
+    border-radius:9px;padding:4px 2px;white-space:nowrap}
+  .mp-row:hover{border-color:rgba(201,168,76,.4)}
+  .mp-row td{
+    display:inline-block;vertical-align:middle;padding:6px 4px;
+    border:none!important;background:transparent!important;border-radius:0!important;
   }
-  .mp-row td:last-child{
-    border-radius:0 0 9px 9px;border-inline-start:2px solid var(--gold);
-    padding-bottom:9px;
-  }
-  .mp-row td.mp-td-mid{
-    border-radius:0;border-inline-start:2px solid var(--gold);
-    border-inline-end:1px solid rgba(201,168,76,.18);
-  }
-  .mp-row .mp-price,.mp-row .mp-trend-cell{text-align:start}
-  .mp-row .mp-unit-cell{padding-top:0}
-  .mp-row .mp-price-cell,.mp-row .mp-trend-cell{padding-top:2px;padding-bottom:2px}
+  .mp-row td:first-child{width:54%;padding-inline-start:8px;white-space:normal}
+  .mp-row .mp-unit-cell{display:none}
+  .mp-row .mp-price-cell{width:22%;text-align:end}
+  .mp-row .mp-trend-cell{width:22%;text-align:end;padding-inline-end:8px}
 }
 
 .fixed-rizq-logo{
