@@ -2414,13 +2414,25 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
     var starsEl = document.getElementById('est-rev-stars');
     if(targetId && window.RizqReviews){
       var stats = RizqReviews.getStats(targetId);
-      if(avgEl) avgEl.textContent = stats.count ? String(stats.average) : '—';
-      if(countEl) countEl.textContent = stats.count
-        ? (stats.count + (fr ? ' avis' : ' تقييم'))
-        : (fr ? '0 avis' : '0 تقييم');
-      if(starsEl){
-        var n = Math.round(stats.average || 0);
-        starsEl.textContent = stats.count ? ('★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n)) : '☆☆☆☆☆';
+      /* إن لم يُضف الزائر تقييماً بعد — اعرض ملخص آراء العرض التجريبي */
+      if(!stats.count && list.length){
+        var sumDemo = list.reduce(function(s, r){ return s + (Number(r.stars) || 0); }, 0);
+        var avgDemo = Math.round((sumDemo / list.length) * 10) / 10;
+        if(avgEl) avgEl.textContent = String(avgDemo);
+        if(countEl) countEl.textContent = list.length + (fr ? ' avis' : ' تقييم');
+        if(starsEl){
+          var nDemo = Math.round(avgDemo);
+          starsEl.textContent = '★★★★★'.slice(0, nDemo) + '☆☆☆☆☆'.slice(0, 5 - nDemo);
+        }
+      } else {
+        if(avgEl) avgEl.textContent = stats.count ? String(stats.average) : '—';
+        if(countEl) countEl.textContent = stats.count
+          ? (stats.count + (fr ? ' avis' : ' تقييم'))
+          : (fr ? '0 avis' : '0 تقييم');
+        if(starsEl){
+          var n = Math.round(stats.average || 0);
+          starsEl.textContent = stats.count ? ('★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n)) : '☆☆☆☆☆';
+        }
       }
     } else if(list.length){
       var sum = list.reduce(function(s, r){ return s + (Number(r.stars) || 0); }, 0);

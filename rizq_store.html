@@ -1268,7 +1268,7 @@ footer{
 <body data-t-ns="store">
 <!-- حقن الهيدر الموحّد قبل أول رسم — يمنع الشريط الأبيض فوق الهيرو -->
 <script src="rizq_header.js?v=27.0"></script>
-<button class="btn-lang-primary btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
+<!-- مبدّل اللغة الوحيد من الهيدر الموحّد — لا زر مكرر هنا -->
 
 <!-- TOPNAV -->
 <nav class="topnav">
@@ -3879,7 +3879,7 @@ if(typeof _t2 === 'undefined'){
       }
     } catch(eRepaint){}
     // Lang button
-    var btn = document.getElementById('lang-btn') || document.getElementById('store-lang-btn');
+    var btn = document.getElementById('rmh-lang-btn') || document.getElementById('lang-btn') || document.getElementById('store-lang-btn');
     if(btn && window.RizqI18n && typeof window.RizqI18n.paintPrimaryLangBtn === 'function'){
       window.RizqI18n.paintPrimaryLangBtn(btn, isFr ? 'fr' : 'ar');
     } else if(btn) {

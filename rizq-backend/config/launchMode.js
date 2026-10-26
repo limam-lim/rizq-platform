@@ -13,6 +13,10 @@
 const MS_DAY = 24 * 60 * 60 * 1000;
 const DEFAULT_FREE_DAYS = 90;
 const PAID_GRACE_DAYS = 60;
+/** مدة الباقة التجريبية الموحّدة (أيام) — مطابقة للكتالوجات */
+const TRIAL_DURATION_DAYS = 10;
+/** مهلة المطالبة بالتجربة بعد نهاية الفترة المجانية */
+const TRIAL_CLAIM_WINDOW_DAYS = 7;
 
 const SECTION_ALIASES = {
   stores: 'store',
@@ -204,6 +208,20 @@ function isOpenModule(flags, moduleKey) {
   return flags[key] !== false;
 }
 
+/**
+ * الباقة التجريبية تظهر فقط بعد انتهاء الفترة المجانية (ووجود launchDate)،
+ * وخلال مهلة المطالبة (7 أيام من freeUntil).
+ */
+function isTrialOfferVisible(nowMs) {
+  const settings = getLaunchSettings();
+  if (!settings.launchDate) return false;
+  if (isLaunchFreePeriodActive(nowMs)) return false;
+  const freeEnd = freeUntilEndMs(settings.freeUntil);
+  if (freeEnd == null) return false;
+  const now = typeof nowMs === 'number' ? nowMs : Date.now();
+  return now <= freeEnd + TRIAL_CLAIM_WINDOW_DAYS * MS_DAY;
+}
+
 function publicLaunchConfig(moduleFlags, nowMs) {
   const settings = getLaunchSettings();
   const freeActive = isLaunchFreePeriodActive(nowMs);
@@ -226,6 +244,9 @@ function publicLaunchConfig(moduleFlags, nowMs) {
     closedSections: closed,
     foundingDiscountPercent: getFoundingDiscountPercent(),
     paidGraceDays: PAID_GRACE_DAYS,
+    trialOfferVisible: isTrialOfferVisible(nowMs),
+    trialDurationDays: TRIAL_DURATION_DAYS,
+    trialClaimWindowDays: TRIAL_CLAIM_WINDOW_DAYS,
   };
 }
 
@@ -287,6 +308,8 @@ module.exports = {
   MS_DAY,
   DEFAULT_FREE_DAYS,
   PAID_GRACE_DAYS,
+  TRIAL_DURATION_DAYS,
+  TRIAL_CLAIM_WINDOW_DAYS,
   PAID_ACCOUNT_TYPES,
   ALL_MODULE_KEYS,
   SECTION_ALIASES,
@@ -305,6 +328,7 @@ module.exports = {
   daysRemaining,
   getFoundingDiscountPercent,
   isOpenModule,
+  isTrialOfferVisible,
   publicLaunchConfig,
   shouldMarkFoundingPartner,
   hasConcretePeriodEnd,

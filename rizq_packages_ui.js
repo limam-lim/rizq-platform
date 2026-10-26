@@ -68,7 +68,20 @@
   }
 
   function isTrial(p) {
-    return !Number(p.price) || p.id === 'trial' || /trial|تجرب|ind-free|cp-trial|st-trial|of-trial|^Essai$/i.test(String(p.name || ''));
+    return !Number(p.price) || p.id === 'trial' || /trial|تجرب|ind-free|cp-trial|st-trial|of-trial|es-trial|tnd-trial|inv-trial|^Essai$/i.test(String(p.name || '') + ' ' + String(p.id || ''));
+  }
+
+  /** مخفية أثناء الفترة المجانية أو launchDate فارغ؛ تظهر بعدها ضمن مهلة المطالبة */
+  function shouldShowTrialPackages() {
+    try {
+      var L = global.RIZQ_LAUNCH || {};
+      if (typeof L.trialOfferVisible === 'boolean') return L.trialOfferVisible;
+      if (!L.launchDate) return false;
+      if (L.freePeriodActive) return false;
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   function isYearly(p) {
@@ -116,7 +129,12 @@
     if (!list.length && global.RizqPackagesConfig && global.RizqPackagesConfig.CATALOGS) {
       list = JSON.parse(JSON.stringify(global.RizqPackagesConfig.CATALOGS[key] || []));
     }
-    return (list || []).filter(function (p) { return p && p.active !== false; }).map(function (p) {
+    var showTrial = shouldShowTrialPackages();
+    return (list || []).filter(function (p) {
+      if (!p || p.active === false) return false;
+      if (isTrial(p) && !showTrial) return false;
+      return true;
+    }).map(function (p) {
       return enrich(p, lang);
     });
   }
@@ -338,6 +356,12 @@
 
     drawAfterMin();
     syncAllFromBackend(function () { draw(); });
+    try {
+      if (global.RizqApi && typeof global.RizqApi.siteConfig === 'function') {
+        global.RizqApi.siteConfig().then(function () { draw(); }).catch(function () {});
+      }
+      document.addEventListener('rizq:launch', function () { draw(); });
+    } catch (eLaunchUi) {}
   }
 
   function renderAdsCard(p, idx, opts) {

@@ -62,6 +62,18 @@ try {
   const pub = launchMode.publicLaunchConfig({ store: true }, now);
   check('public has launchDate/freeDays/daysRemaining', !!(pub.launchDate && pub.freeDays === 90 && pub.daysRemaining != null));
   check('public maintenanceDryRun false', pub.maintenanceDryRun === false);
+  check('trial hidden while free period active', pub.trialOfferVisible === false);
+  check('trialDurationDays=10', pub.trialDurationDays === 10);
+  check('trialClaimWindowDays=7', pub.trialClaimWindowDays === 7);
+
+  /* بعد freeUntil وضمن مهلة 7 أيام — تظهر التجربة */
+  const afterFree = freeEnd + 2 * launchMode.MS_DAY;
+  check('trial visible after free period', launchMode.isTrialOfferVisible(afterFree) === true);
+  const afterClaim = freeEnd + 8 * launchMode.MS_DAY;
+  check('trial hidden after 7-day claim window', launchMode.isTrialOfferVisible(afterClaim) === false);
+
+  launchMode.setLaunchSettingsForTests({ launchDate: '', freeDays: 90 });
+  check('trial hidden when launchDate empty', launchMode.isTrialOfferVisible(now) === false);
 
   check('addDaysYmd', launchMode.addDaysYmd('2026-01-01', 10) === '2026-01-11');
   check('normalizeFreeDays default', launchMode.normalizeFreeDays(undefined) === 90);

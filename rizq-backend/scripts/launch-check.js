@@ -139,15 +139,22 @@ function launchDateEmpty() {
 
 function countDemo() {
   const store = require('../db/platformStore');
-  const ads = (store.readAds() || []).filter(isDemoRec);
-  const accounts = (store.readAccounts() || []).filter(isDemoRec);
-  let catalog = [];
-  try { catalog = (store.readCatalog() || []).filter(isDemoRec); } catch (e) { /* ignore */ }
+  const adsAll = store.readAds() || [];
+  const accountsAll = store.readAccounts() || [];
+  let catalogAll = [];
+  try { catalogAll = store.readCatalog() || []; } catch (e) { /* ignore */ }
+  const ads = adsAll.filter(isDemoRec);
+  const accounts = accountsAll.filter(isDemoRec);
+  const catalog = catalogAll.filter(isDemoRec);
+  const gradTagged = []
+    .concat(adsAll, accountsAll, catalogAll)
+    .filter((r) => r && r.graduationDemo === true).length;
   return {
     ads: ads.length,
     accounts: accounts.length,
     catalog: catalog.length,
     total: ads.length + accounts.length + catalog.length,
+    graduationTagged: gradTagged,
   };
 }
 
@@ -186,12 +193,23 @@ function main() {
   check('backup restore tested', restoreOk, restoreDetail);
 
   const demo = countDemo();
-  check(
-    'is_demo remaining is 0 (pre-launch)',
-    demo.total === 0,
-    'ads=' + demo.ads + ' accounts=' + demo.accounts + ' catalog=' + demo.catalog
-      + (demo.total ? ' — expected >0 during graduation demo' : '')
-  );
+  /* أثناء عرض التخرج: المحتوى الموسوم graduationDemo مطلوب.
+     قبل الإطلاق الحقيقي: بعد purge يجب أن يكون المجموع 0. */
+  if (demo.graduationTagged > 0) {
+    check(
+      'graduation demo seeded',
+      demo.total > 0,
+      'ads=' + demo.ads + ' accounts=' + demo.accounts + ' catalog=' + demo.catalog
+        + ' graduationTagged=' + demo.graduationTagged
+        + ' — purge before real launch'
+    );
+  } else {
+    check(
+      'is_demo remaining is 0 (pre-launch)',
+      demo.total === 0,
+      'ads=' + demo.ads + ' accounts=' + demo.accounts + ' catalog=' + demo.catalog
+    );
+  }
 
   const cron = cronScheduled();
   check('cron daily 03:00', !!(cron.daily), cron.dailyExpr + ' ' + (cron.timezone || ''));
