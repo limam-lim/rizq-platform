@@ -14673,7 +14673,38 @@ function trPriceName(n){ return (!isAr && PRICE_NAME_FR[n]) ? PRICE_NAME_FR[n] :
 function trPriceUnit(u){ return (!isAr && PRICE_UNIT_FR[u]) ? PRICE_UNIT_FR[u] : u; }
 
 // ══ Prices board ══
-const DEFAULT_PRICES = [];
+/* احتياطي عرض التخرج — إن فشل /api/site-config أو كان localStorage فارغاً */
+const DEFAULT_PRICES = {
+  food: [
+    {icon:'🍚',name:'أرز (الكيس 25كغ)',price:11500,unit:'MRU / كيس',trend:'flat'},
+    {icon:'🌾',name:'دقيق (الكيس 50كغ)',price:14800,unit:'MRU / كيس',trend:'up'},
+    {icon:'🛢️',name:'زيت طعام (5 لتر)',price:3200,unit:'MRU / عبوة',trend:'up'},
+    {icon:'🍬',name:'سكر (الكيس 50كغ)',price:13900,unit:'MRU / كيس',trend:'down'},
+    {icon:'🥛',name:'حليب مجفف (علبة 2.5كغ)',price:2650,unit:'MRU / علبة',trend:'flat'},
+    {icon:'🥩',name:'لحم بقر (1كغ)',price:340,unit:'MRU / كغ',trend:'up'},
+    {icon:'🐪',name:'لحم إبل (1كغ)',price:300,unit:'MRU / كغ',trend:'flat'},
+    {icon:'🍗',name:'دجاج (1كغ)',price:185,unit:'MRU / كغ',trend:'down'},
+    {icon:'🍅',name:'طماطم (1كغ)',price:55,unit:'MRU / كغ',trend:'up'},
+    {icon:'🧅',name:'بصل (1كغ)',price:38,unit:'MRU / كغ',trend:'flat'},
+    {icon:'🥔',name:'بطاطس (1كغ)',price:42,unit:'MRU / كغ',trend:'down'},
+    {icon:'🍞',name:'خبز (الرغيف)',price:10,unit:'MRU / رغيف',trend:'flat'}
+  ],
+  fuel: [
+    {icon:'⛽',name:'بنزين (سوبر)',price:16.2,unit:'MRU / لتر',trend:'up'},
+    {icon:'🛢️',name:'مازوت (غازوال)',price:15.6,unit:'MRU / لتر',trend:'up'},
+    {icon:'🔥',name:'غاز بوتان (قارورة 6كغ)',price:1450,unit:'MRU / قارورة',trend:'flat'},
+    {icon:'🔥',name:'غاز بوتان (قارورة 12.5كغ)',price:2700,unit:'MRU / قارورة',trend:'flat'},
+    {icon:'🛢️',name:'زيت محرك (4 لتر)',price:3800,unit:'MRU / عبوة',trend:'down'}
+  ],
+  currencies: [
+    {code:'USD',icon:'🇺🇸',name:'دولار أمريكي',name_fr:'Dollar américain',divisor:1,enabled:true,adjustPct:0,manual:false,ratePerUnit:40,price:40,trend:'flat'},
+    {code:'EUR',icon:'🇪🇺',name:'يورو',name_fr:'Euro',divisor:1,enabled:true,adjustPct:0,manual:false,ratePerUnit:44,price:44,trend:'flat'},
+    {code:'MAD',icon:'🇲🇦',name:'درهم مغربي',name_fr:'Dirham marocain',divisor:100,enabled:true,adjustPct:0,manual:false,ratePerUnit:4,price:4,trend:'flat'},
+    {code:'SAR',icon:'🇸🇦',name:'ريال سعودي',name_fr:'Riyal saoudien',divisor:1,enabled:true,adjustPct:0,manual:false,ratePerUnit:10.5,price:10.5,trend:'flat'},
+    {code:'AED',icon:'🇦🇪',name:'درهم إماراتي',name_fr:'Dirham émirati',divisor:1,enabled:true,adjustPct:0,manual:false,ratePerUnit:11,price:11,trend:'flat'},
+    {code:'XOF',icon:'🌍',name:'فرنك غرب أفريقي',name_fr:'Franc CFA (UEMOA)',divisor:100,enabled:true,adjustPct:0,manual:false,ratePerUnit:0.065,price:0.065,trend:'flat'}
+  ]
+};
 let _pricesData = [];
 let _priceTab = 'food';
 function normalizePricesBoard(p){
@@ -14876,8 +14907,12 @@ function loadPrices(){
     if(raw){
       const p = JSON.parse(raw);
       _pricesData = normalizePricesBoard(p);
-    } else _pricesData=[];
-  }catch(e){ _pricesData=[]; }
+      if(_pricesData.length){ renderPrices(); renderPriceTicker(); return; }
+    }
+  }catch(e){ /* fall through */ }
+  /* بلا بيانات مخزّنة أو لوحة فارغة — اعرض احتياطي التخرج */
+  _pricesData = normalizePricesBoard(DEFAULT_PRICES);
+  try{ if(!localStorage.getItem('rizq_prices')) localStorage.setItem('rizq_prices', JSON.stringify(DEFAULT_PRICES)); }catch(eSeed){}
   renderPrices();
   renderPriceTicker();
 }

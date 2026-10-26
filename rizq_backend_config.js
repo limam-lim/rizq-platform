@@ -24,21 +24,25 @@
   var host = '';
   try { host = window.location.hostname || ''; } catch (e) {}
   var h = String(host || '').toLowerCase();
-  var isPreview = h.endsWith('.cursorusercontent.com')
+  var isTunnelPreview = h.endsWith('.cursorusercontent.com')
     || h.endsWith('.gitpod.io')
     || h.endsWith('.loca.lt')
     || h.endsWith('.localtunnel.me')
     || h.endsWith('.serveousercontent.com')
-    || h.endsWith('.trycloudflare.com')
-    || /\.github\.io$/i.test(h);
-  var isLocal = !h || h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local') || isPreview;
-  window.RIZQ_IS_LOCAL = isLocal;
+    || h.endsWith('.trycloudflare.com');
+  /* GitHub Pages = واجهة ثابتة فقط — لا API على نفس الأصل */
+  var isGitHubPages = /\.github\.io$/i.test(h);
+  var isLocal = !h || h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local') || isTunnelPreview;
+  window.RIZQ_IS_LOCAL = isLocal && !isGitHubPages;
   // rizq-backend.onrender.com = مشروع قديم (Jobs API) — ليس خادم منصة رزق.
   // الخادم الصحيح يُنشأ من render.yaml باسم rizq-platform-api
   /* Local API is always rizq-backend on :3000 (static + /api same port).
      Do not use location.host — dev.ps1 may serve HTML on :5500 while API is :3000.
-     Cursor / Gitpod previews serve HTML+API on the same forwarded origin. */
-  if (isPreview) {
+     Cursor / Gitpod previews serve HTML+API on the same forwarded origin.
+     github.io → Render API حتى تُحمَّل نبضة السوق والإعلانات. */
+  if (isGitHubPages) {
+    window.RIZQ_BACKEND_BASE = 'https://rizq-platform-api.onrender.com';
+  } else if (isTunnelPreview) {
     try {
       window.RIZQ_BACKEND_BASE = String(window.location.origin || '').replace(/\/$/, '');
     } catch (e2) {
