@@ -377,12 +377,63 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     justify-self:center!important;
   }
 
-  .quick-cats,.products-grid,.ads-grid,.all-ads-grid,.prices-grid,
+  .quick-cats,.products-grid,.ads-grid,.all-ads-grid,
   .similar-grid,.dp-similar-grid,.cta-btns{
     display:flex!important;flex-direction:column!important;
     flex-wrap:nowrap!important;overflow-x:hidden!important;
     width:100%!important;max-width:100%!important;
     gap:12px!important;
+  }
+  /* أسعار السوق على الهاتف: عمودان مضغوطان بدل بطاقات بعرض كامل فوق بعض */
+  #prices .prices-grid,
+  .prices-grid{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+    width:100%!important;
+    max-width:100%!important;
+    overflow:visible!important;
+  }
+  #prices .price-card,
+  .prices-grid .price-card{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    padding:10px 10px 9px!important;
+    gap:3px!important;
+    border-radius:12px!important;
+    box-sizing:border-box!important;
+  }
+  #prices .price-name,
+  .prices-grid .price-name{
+    font-size:11px!important;
+    line-height:1.25!important;
+    font-weight:800!important;
+  }
+  #prices .price-unit,
+  .prices-grid .price-unit{
+    font-size:9.5px!important;
+    line-height:1.2!important;
+  }
+  #prices .price-value,
+  .prices-grid .price-value,
+  #prices .price-card-currency .price-value,
+  .prices-grid .price-card-currency .price-value{
+    font-size:16px!important;
+    line-height:1.15!important;
+  }
+  #prices .price-trend,
+  .prices-grid .price-trend{
+    font-size:9.5px!important;
+    margin-top:1px!important;
+  }
+  #prices .price-card-top,
+  .prices-grid .price-card-top{
+    gap:6px!important;
+  }
+  #prices .price-curr-flag,
+  .prices-grid .price-curr-flag{
+    font-size:16px!important;
   }
   /* شارات المحل/المعرض/المكتب تبقى صفاً مضغوطاً لا عموداً طويلاً */
   .store-meta,
@@ -582,12 +633,13 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
   }
   .qcat-name{white-space:normal!important;font-size:12px!important}
 
-  .cat-card,.listing-card,.product-card,.hero-biz-btn,.price-card,
+  .cat-card,.listing-card,.product-card,.hero-biz-btn,
   .ptab-card{
     width:100%!important;max-width:100%!important;min-width:0!important;
     flex:none!important;height:auto!important;
     box-sizing:border-box;
   }
+  /* price-card يبقى داخل شبكة عمودين — لا نفرض عرض 100% على صف الشبكة */
   .ads-grid .ad-card,
   .products-grid .product-card{
     width:100%!important;max-width:100%!important;min-width:0!important;
@@ -1106,6 +1158,32 @@ html[dir="ltr"] .rizq-lang-fallback-block{ text-align:left; }
 
 /* هاتف ضيق: عناوين الأقسام أصغر أكثر */
 @media(max-width:480px){
+  #prices .prices-grid,
+  .prices-grid{
+    gap:6px!important;
+  }
+  #prices .price-card,
+  .prices-grid .price-card{
+    padding:8px 8px 7px!important;
+    border-radius:10px!important;
+    gap:2px!important;
+  }
+  #prices .price-name,
+  .prices-grid .price-name{
+    font-size:10px!important;
+  }
+  #prices .price-value,
+  .prices-grid .price-value,
+  #prices .price-card-currency .price-value,
+  .prices-grid .price-card-currency .price-value{
+    font-size:14px!important;
+  }
+  #prices .price-unit,
+  .prices-grid .price-unit,
+  #prices .price-trend,
+  .prices-grid .price-trend{
+    font-size:9px!important;
+  }
   .section-header,
   #rizq-showroom-models .section-header,
   #rizq-styles .section-header{

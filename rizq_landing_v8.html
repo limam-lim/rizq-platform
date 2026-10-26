@@ -2787,6 +2787,12 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
 .ptab-card:hover:not(.active) .ptab-icon{box-shadow:0 5px 18px rgba(27,58,107,.3)}
 .ptab-card:hover:not(.active) .ptab-lbl{color:var(--royal)}
 .prices-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+@media(max-width:768px){
+  .prices-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+  }
+}
 .price-card{background:linear-gradient(145deg,var(--dark-2),var(--royal));border:1px solid rgba(201,168,76,.16);border-radius:16px;padding:20px 18px;display:flex;flex-direction:column;gap:6px;box-shadow:0 4px 16px rgba(0,0,0,.16);transition:transform .3s ease,box-shadow .3s ease}
 .price-card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(15,35,65,.3)}
 .price-card-top{display:flex;align-items:center;gap:10px}
