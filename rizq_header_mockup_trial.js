@@ -472,7 +472,8 @@
     };
     Object.keys(nav).forEach(function (key) {
       var label = tMock(nav[key][0], nav[key][1]);
-      hdr.querySelectorAll('.rmh-nav a[data-rmh="' + key + '"]').forEach(function (a) {
+      /* استثناء عناصر قائمة المزيد — تُحدَّث عبر .rmh-more-item strong */
+      hdr.querySelectorAll('.rmh-nav a[data-rmh="' + key + '"]:not(.rmh-more-item)').forEach(function (a) {
         var ico = a.querySelector('.rmh-nav-ico');
         a.setAttribute('aria-label', label);
         var textNode = null;
