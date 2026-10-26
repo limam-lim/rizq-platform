@@ -268,7 +268,22 @@
     try { localStorage.setItem(SESSION_KEY, JSON.stringify(s)); } catch (e) {}
   }
   function clearSession() {
+    var prev = null;
+    try { prev = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch (e0) { prev = null; }
     try { localStorage.removeItem(SESSION_KEY); } catch (e) {}
+    /* إبطال التوكن على الخادم — يمنع استخدام الجلسة المسروقة بعد الخروج */
+    try {
+      if (prev && prev.id && prev.token && apiBase()) {
+        fetch(apiBase() + '/api/auth/logout', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + prev.token,
+            'X-Buyer-Id': prev.id,
+            'X-Buyer-Token': prev.token
+          }
+        }).catch(function () {});
+      }
+    } catch (e2) {}
   }
   function isLoggedIn() {
     var s = getSession();

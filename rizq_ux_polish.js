@@ -980,6 +980,9 @@
           };
     var name = brand.name || (fr ? 'Vendeur' : 'البائع');
     var score = Number(ad.seller_trust_score);
+    if (!Number.isFinite(score) && Number.isFinite(Number(ad.reviewAverage))) {
+      score = Math.round(Number(ad.reviewAverage) * 20);
+    }
     if (!Number.isFinite(score)) score = ad.verified ? 75 : 60;
     score = Math.max(0, Math.min(100, Math.round(score)));
     var verified = !!ad.verified;

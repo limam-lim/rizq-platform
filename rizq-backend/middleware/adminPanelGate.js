@@ -9,6 +9,7 @@
  */
 const crypto = require('crypto');
 const path = require('path');
+const { timingSafeEqualStr } = require('../lib/secureCompare');
 
 const COOKIE_NAME = 'rizq_admin_gate';
 const GATE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -100,7 +101,7 @@ function verifyGateCookie(value) {
   const exp = Number(parts[0]);
   if (!Number.isFinite(exp) || Date.now() > exp) return false;
   const expected = crypto.createHmac('sha256', gateSecret()).update(String(exp)).digest('hex');
-  return parts[1] === expected;
+  return timingSafeEqualStr(parts[1], expected);
 }
 
 function setGateCookie(res) {
@@ -190,7 +191,7 @@ function installAdminPanelGate(app, frontendRoot) {
 
     if (gateKey) {
       const qk = req.query && req.query.k;
-      if (qk && qk === gateKey) {
+      if (qk && timingSafeEqualStr(qk, gateKey)) {
         setGateCookie(res);
         // لا نعيد التوجيه بعد فتح المفتاح: أول زيارة تفتح اللوحة مباشرة
         // حتى لو رفض المتصفح حفظ الكوكي (localhost≠127.0.0.1 / سياسات صارمة)
