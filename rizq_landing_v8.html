@@ -2783,6 +2783,8 @@ html[dir="ltr"] .price-ticker-wrap::after{
   animation:none!important;
   min-height:20px;
   padding:0;
+  /* الماركي يقيس يميناً→يساراً كمسار LTR؛ النص العربي يبقى RTL داخل كل شريحة */
+  direction:ltr;
 }
 .price-ticker-inner.is-mq-paused{will-change:auto}
 .price-ticker-wrap .ticker-item,
@@ -2791,6 +2793,7 @@ html[dir="ltr"] .price-ticker-wrap::after{
   padding:0 14px;white-space:nowrap;flex:0 0 auto;
   font-size:11.5px;font-weight:700;color:rgba(255,255,255,.9);
   border-inline-end:1px solid rgba(201,168,76,.18);
+  direction:rtl;unicode-bidi:isolate;
 }
 .price-ticker-wrap .ticker-item strong,
 .price-ticker-item .pt-price{color:var(--gold-light);font-weight:800;font-variant-numeric:tabular-nums}
@@ -14497,7 +14500,14 @@ function renderPriceTicker(){
     const un = it.cat==='currencies' ? it.unit : trPriceUnit(it.unit);
     return `<span class="ticker-item price-ticker-item"><span class="pt-name">${escapeHtml(nm)}</span> <strong class="pt-price">${Number(it.price||0).toLocaleString('en-US')}</strong> <span class="pt-unit">${escapeHtml(un)}</span> ${priceTrendHTML(it.trend)}</span>`;
   }).join('');
-  requestAnimationFrame(function(){ syncMarqueeShift(track); });
+  requestAnimationFrame(function(){
+    syncMarqueeShift(track);
+    /* مسار الأسعار يُرسم LTR داخل الحاوية — لا تستخدم إزاحة RTL العامة وإلا يختفي الشريط */
+    if(track._rzqMarquee){
+      track._rzqMarquee.rtl = false;
+      track._rzqMarquee.remeasure();
+    }
+  });
 }
 function updatePriceTimestamp(){
   const el = document.getElementById('prices-updated-date');
