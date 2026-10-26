@@ -1345,8 +1345,8 @@ body > .rizq-help-dd-menu a,
     width:100%!important;
     max-width:100%!important;
     margin:0!important;
-    /* غطِّ أزرار نظام أندرويد خلف الشريط */
-    padding:4px clamp(6px,1.6vw,10px) calc(4px + max(env(safe-area-inset-bottom,0px),20px))!important;
+    /* هامش جانبي متساوٍ يمين/يسار — لا يلاصق «سوق العقارات» الحافة */
+    padding:4px 12px calc(4px + max(env(safe-area-inset-bottom,0px),20px))!important;
     border-radius:14px 14px 0 0!important;
     border-left:0!important;
     border-right:0!important;
@@ -1375,7 +1375,7 @@ body > .rizq-help-dd-menu a,
     position:relative!important;
     z-index:1!important;
   }
-  /* هاتف: كل العناصر داخل الكبسولة — clamp + لمس ≥40px + خط ≥11px بلا تمرير أفقي */
+  /* هاتف: كل عناصر الشريط — سطر واحد + clamp موحّد (حد أدنى 11px) */
   #rizq-mock-hdr .rmh-nav a,
   #rizq-mock-hdr .rmh-nav a.rmh-post-nav,
   #rizq-mock-hdr .rmh-more-btn,
@@ -1391,6 +1391,20 @@ body > .rizq-help-dd-menu a,
     gap:1px!important;
     line-height:1.08!important;
     white-space:nowrap!important;
+    text-align:center;
+  }
+  /* الشريط السفلي: مسافات متساوية + عرض حسب المحتوى حتى تتسع «المعارض والمصانع» */
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a,
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > .rmh-more-btn,
+  nav.rmh-nav:not(.rmh-nav-top) > a,
+  nav.rmh-nav:not(.rmh-nav-top) > .rmh-more-btn{
+    flex:1 1 auto!important;
+    min-width:min-content!important;
+    max-width:none!important;
+    padding:clamp(4px,1.1vw,8px) 2px!important;
+    font-size:clamp(11px,2.85vw,12px)!important;
+    white-space:nowrap!important;
+    text-align:center;
   }
   /* المعارض والمصانع + العناوين الطويلة — سطر واحد بخط أصغر */
   #rizq-mock-hdr .rmh-nav a[data-rmh="showrooms"],
