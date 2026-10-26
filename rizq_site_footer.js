@@ -52,7 +52,7 @@
     if (document.getElementById('rzq-site-footer-css')) return;
     var css = ''
       + 'footer.rizq-footer{background:linear-gradient(180deg,#0d1b2e,#071020)!important;'
-      + 'border-top:1px solid rgba(201,168,76,.1)!important;padding:48px 5% 36px!important;'
+      + 'border-top:1px solid rgba(201,168,76,.1)!important;padding:28px 5% 20px!important;'
       + 'color:rgba(255,255,255,.72)!important;margin:0!important;width:100%;box-sizing:border-box;'
       + 'position:relative;z-index:4;overflow:visible!important}'
       + 'footer.rizq-footer .footer-grid{display:grid!important;'
@@ -89,7 +89,7 @@
 
   function footerHtml() {
     return ''
-      + '<footer class="rizq-footer" id="rizq-site-footer" data-rizq-injected="1">'
+      + '<footer class="rizq-footer rzq-ft-compact" id="rizq-site-footer" data-rizq-injected="1">'
       + '  <div class="footer-grid">'
       + '    <div>'
       + '      <a href="rizq_landing_v8.html" class="logo" style="margin-bottom:14px;display:inline-flex;gap:10px;direction:ltr;align-items:center;height:42px">'
@@ -147,7 +147,7 @@
       + '    </div>'
       + '  </div>'
       /* تابعنا خارج الطيّ — يظهر على الهاتف وكل الأجهزة بلا الحاجة لفتح «روابط وأقسام» */
-      + '  <div id="rizq-social-follow" hidden style="padding:4px 0 14px"></div>'
+      + '  <div id="rizq-social-follow" hidden style="padding:2px 0 6px"></div>'
       + '  <div class="footer-bottom">'
       + '    <p class="footer-copy" id="rzq-site-ft-copy" data-t="ft-copy" data-t-fr="© 2026 Rizq — Tous droits réservés 🇲🇷">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</p>'
       + '    <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" title="ADMINIA SARL — À propos">'
@@ -196,7 +196,7 @@
     } catch (e) {}
     if (document.querySelector('script[src*="rizq_footer_toggle.js"]')) return;
     var s = document.createElement('script');
-    s.src = 'rizq_footer_toggle.js?v=23.3';
+    s.src = 'rizq_footer_toggle.js?v=23.4';
     s.defer = true;
     document.head.appendChild(s);
   }
@@ -210,7 +210,7 @@
     } catch (e) {}
     if (document.querySelector('script[src*="rizq_social_links.js"]')) return;
     var s = document.createElement('script');
-    s.src = 'rizq_social_links.js?v=23.8';
+    s.src = 'rizq_social_links.js?v=23.9';
     s.defer = true;
     document.head.appendChild(s);
   }
