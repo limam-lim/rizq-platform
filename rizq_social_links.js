@@ -105,20 +105,20 @@
   function ensureStyle() {
     if (document.getElementById(STYLE_ID)) return;
     var css = ''
-      + '#' + ROOT_ID + '{margin-top:10px;margin-bottom:4px;display:none;width:100%;'
+      + '#' + ROOT_ID + '{margin-top:4px;margin-bottom:0;display:none;width:100%;'
       + 'text-align:start;box-sizing:border-box}'
       + '#' + ROOT_ID + '.is-visible{display:block}'
       /* عنوان «تابعنا» والأيقونات تبقى على اليمين في العربية (start) — لا توسيط */
-      + '#' + ROOT_ID + ' .rzq-soc-title{font-size:11px;font-weight:800;color:#C9A84C;'
-      + 'letter-spacing:1.2px;text-transform:uppercase;margin:0 0 10px;font-family:Georgia,serif;'
+      + '#' + ROOT_ID + ' .rzq-soc-title{font-size:10.5px;font-weight:800;color:#C9A84C;'
+      + 'letter-spacing:1.2px;text-transform:uppercase;margin:0 0 6px;font-family:Georgia,serif;'
       + 'text-align:start}'
-      + '#' + ROOT_ID + ' .rzq-soc-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:10px}'
-      + '#' + ROOT_ID + ' .rzq-soc-btn{width:34px;height:34px;display:inline-flex;align-items:center;'
+      + '#' + ROOT_ID + ' .rzq-soc-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:8px}'
+      + '#' + ROOT_ID + ' .rzq-soc-btn{width:30px;height:30px;display:inline-flex;align-items:center;'
       + 'justify-content:center;color:rgba(255,255,255,.88);background:transparent;border:none;'
       + 'padding:0;border-radius:8px;transition:color .2s ease,transform .2s ease,background .2s ease}'
       + '#' + ROOT_ID + ' .rzq-soc-btn:hover{color:#C9A84C;background:rgba(201,168,76,.1);transform:translateY(-1px)}'
       + '#' + ROOT_ID + ' .rzq-soc-btn:focus-visible{outline:2px solid #C9A84C;outline-offset:2px}'
-      + '#' + ROOT_ID + ' .rzq-soc-btn svg{width:22px;height:22px;display:block}'
+      + '#' + ROOT_ID + ' .rzq-soc-btn svg{width:20px;height:20px;display:block}'
       + '@media (prefers-reduced-motion:reduce){#' + ROOT_ID + ' .rzq-soc-btn{transition:none}}';
     var style = document.createElement('style');
     style.id = STYLE_ID;
