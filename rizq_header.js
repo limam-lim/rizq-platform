@@ -188,7 +188,7 @@
     }
     return '' +
       item(moduleHref('store'), 'stores', '🏪', 'المحلات', 'Boutiques') +
-      item(moduleHref('corp'), 'showrooms', '🏬', 'المعارض و المصانع', 'Showrooms & usines') +
+      item(moduleHref('corp'), 'showrooms', '🏬', 'المعارض والمصانع', 'Showrooms & usines') +
       item(moduleHref('office'), 'offices', '💼', 'المكاتب', 'Bureaux') +
       item(adsHref(), 'ads', '📢', 'الإعلانات', 'Annonces') +
       item(moduleHref('tenders'), 'tenders', '📑', 'المناقصات', 'A-doffres') +
@@ -618,7 +618,7 @@
       more: t2('المزيد', 'Plus'),
       stores: t2('المحلات', 'Boutiques'),
       offices: t2('المكاتب', 'Bureaux'),
-      showrooms: t2('المعارض و المصانع', 'Showrooms & usines'),
+      showrooms: t2('المعارض والمصانع', 'Showrooms & usines'),
       ads: t2('الإعلانات', 'Annonces'),
       tenders: t2('المناقصات', 'A-doffres'),
       investments: t2('الاستثمارات', 'Investissements'),
@@ -1076,7 +1076,7 @@
           '<li data-nav-order="1" data-nav-tier="home"><a href="rizq_landing_v8.html" data-hdr="home">' + m3LinkInner(NAV_ICOS.home, t2('الرئيسية', 'Accueil')) + '</a></li>' +
           '<li class="rizq-nav-extra" data-rizq-nav-extra="ads" data-nav-order="2" data-nav-tier="thumb"><a href="' + adsHref() + '" data-hdr="ads">' + m3LinkInner(NAV_ICOS.ads, t2('الإعلانات', 'Annonces')) + '</a></li>' +
           '<li class="rizq-nav-module" data-rizq-module="store" data-nav-order="3" data-nav-tier="thumb"><a href="' + moduleHref('store') + '" data-hdr="stores">' + m3LinkInner(NAV_ICOS.stores, t2('المحلات', 'Boutiques')) + '</a></li>' +
-          '<li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="4" data-nav-tier="thumb"><a href="' + moduleHref('corp') + '" data-hdr="showrooms">' + m3LinkInner(NAV_ICOS.showrooms, t2('المعارض و المصانع', 'Showrooms & usines')) + '</a></li>' +
+          '<li class="rizq-nav-module" data-rizq-module="corp" data-nav-order="4" data-nav-tier="thumb"><a href="' + moduleHref('corp') + '" data-hdr="showrooms">' + m3LinkInner(NAV_ICOS.showrooms, t2('المعارض والمصانع', 'Showrooms & usines')) + '</a></li>' +
           '<li class="rizq-nav-post" data-nav-order="5" data-nav-tier="thumb"><a href="rizq_post.html" class="nav-post-plus" data-hdr="post">' + m3LinkInner('➕', t2('نشر', 'Publier')) + '</a></li>' +
           '<li class="rizq-nav-module" data-rizq-module="office" data-nav-order="6" data-nav-tier="secondary"><a href="' + moduleHref('office') + '" data-hdr="offices">' + m3LinkInner(NAV_ICOS.offices, t2('المكاتب', 'Bureaux')) + '</a></li>' +
           '<li class="rizq-nav-module" data-rizq-module="tenders" data-nav-order="7" data-nav-tier="secondary"><a href="' + moduleHref('tenders') + '" data-hdr="tenders">' + m3LinkInner(NAV_ICOS.tenders, t2('المناقصات', 'A-doffres')) + '</a></li>' +
@@ -1835,7 +1835,7 @@
       if (!document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) {
         var l = document.createElement('link');
         l.rel = 'stylesheet';
-        l.href = 'rizq_header_mockup_trial.css?v=5.68';
+        l.href = 'rizq_header_mockup_trial.css?v=5.69';
         (document.head || document.documentElement).appendChild(l);
       }
       if (!document.querySelector('script[src*="rizq_header_mockup_trial.js"]')) {

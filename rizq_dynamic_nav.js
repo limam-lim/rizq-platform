@@ -49,7 +49,7 @@
   var LABELS = {
     stores: { ar: 'المحلات', fr: 'Boutiques' },
     offices: { ar: 'المكاتب', fr: 'Bureaux' },
-    showrooms: { ar: 'المعارض و المصانع', fr: 'Showrooms & usines' },
+    showrooms: { ar: 'المعارض والمصانع', fr: 'Showrooms & usines' },
     tenders: { ar: 'المناقصات', fr: 'Appels d\'offres' },
     investments: { ar: 'الاستثمارات', fr: 'Investissements' },
     ads: { ar: 'الإعلانات', fr: 'Annonces' },
