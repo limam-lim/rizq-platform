@@ -65,7 +65,8 @@ html.rizq-app-nav .nav-sticky-tools{
 }
 @media(max-width:768px),(orientation:landscape) and (max-height:500px){
   /* هاتف: مساحة الهيدر الموحّد فقط (لا شريط قديم) */
-  html.rizq-app-nav{--rizq-header-h:128px;--rizq-mock-nav-h:72px;--rizq-thumb-dock-h:0px}
+  /* thumb-dock-h = ارتفاع الشريط السفلي rmh (لا 0) حتى لا يختبئ ويدجت الدردشة خلفه */
+  html.rizq-app-nav{--rizq-header-h:128px;--rizq-mock-nav-h:72px;--rizq-thumb-dock-h:var(--rizq-mock-nav-h,72px)}
   html.rizq-app-nav body{
     padding-top:var(--rizq-mock-hdr-h,var(--rizq-header-h,128px))!important;
     /* شريط الأقسام السفلي يحسب الـsafe-area داخله — لا نضاعف الفراغ */

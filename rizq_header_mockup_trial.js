@@ -1133,6 +1133,8 @@
       if (bottomNav) {
         var nh = Math.ceil(bottomNav.getBoundingClientRect().height || 64);
         document.body.style.setProperty('--rizq-mock-nav-h', nh + 'px');
+        /* نفس الارتفاع لـ thumb-dock-h حتى تبقى العوامات (ويدجت) فوق الشريط */
+        document.body.style.setProperty('--rizq-thumb-dock-h', nh + 'px');
       }
       return;
     }
