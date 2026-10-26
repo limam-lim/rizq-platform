@@ -2188,27 +2188,43 @@ function rizqShare(title, url) {
       var abCount = document.getElementById('store-ab-rating-count');
       if(abCount) abCount.textContent = stats.count ? ('('+stats.count+(fr?' avis)':' تقييم)')) : (fr?'(Aucun avis)':'(بدون تقييم)');
 
+      var emptyReviews = !stats.count;
       var bigRating = document.getElementById('store-big-rating');
-      if(bigRating) bigRating.textContent = stats.count ? String(stats.average) : '—';
       var bigStars = document.getElementById('store-big-stars');
-      if(bigStars) bigStars.textContent = starsHTML(Math.round(stats.average));
       var bigCount = document.getElementById('store-big-count');
-      if(bigCount) bigCount.textContent = stats.count ? (stats.count+(fr?' avis':' تقييم')) : (fr?'Aucun avis':'لا يوجد تقييم');
-
       var breakdown = document.getElementById('store-rating-breakdown');
-      if(breakdown){
-        var dist=[0,0,0,0,0];
-        list.forEach(function(r){ if(r.rating>=1&&r.rating<=5) dist[r.rating-1]++; });
-        var html='';
-        for(var star=5; star>=1; star--){
-          var cnt = dist[star-1];
-          var pct = stats.count ? Math.round(cnt/stats.count*100) : 0;
-          html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
-            + '<span style="font-size:12px;color:#6a7a8a;width:20px">'+star+'★</span>'
-            + '<div style="flex:1;height:8px;background:#f0f3f8;border-radius:4px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:#F5A623;border-radius:4px"></div></div>'
-            + '<span style="font-size:12px;color:#6a7a8a">'+pct+'%</span></div>';
+      var viewAllBtn = document.querySelector('#reviews-section .view-all-btn');
+      var abRatingWrap = document.querySelector('.store-rating');
+
+      if(emptyReviews){
+        /* محل حقيقي بلا تقييمات: لا جدول نسب 0% — دعوة لطيفة فقط */
+        if(bigRating) bigRating.textContent = '⭐';
+        if(bigStars) bigStars.textContent = '';
+        if(bigCount) bigCount.textContent = fr ? 'Soyez le premier à évaluer' : 'كن أول من يقيّم';
+        if(breakdown){ breakdown.innerHTML = ''; breakdown.style.display = 'none'; }
+        if(viewAllBtn) viewAllBtn.style.display = 'none';
+        if(abRatingWrap) abRatingWrap.style.display = 'none';
+      } else {
+        if(bigRating) bigRating.textContent = String(stats.average);
+        if(bigStars) bigStars.textContent = starsHTML(Math.round(stats.average));
+        if(bigCount) bigCount.textContent = stats.count+(fr?' avis':' تقييم');
+        if(viewAllBtn) viewAllBtn.style.display = '';
+        if(abRatingWrap) abRatingWrap.style.display = '';
+        if(breakdown){
+          breakdown.style.display = '';
+          var dist=[0,0,0,0,0];
+          list.forEach(function(r){ if(r.rating>=1&&r.rating<=5) dist[r.rating-1]++; });
+          var html='';
+          for(var star=5; star>=1; star--){
+            var cnt = dist[star-1];
+            var pct = Math.round(cnt/stats.count*100);
+            html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">'
+              + '<span style="font-size:12px;color:#6a7a8a;width:20px">'+star+'★</span>'
+              + '<div style="flex:1;height:8px;background:#f0f3f8;border-radius:4px;overflow:hidden"><div style="width:'+pct+'%;height:100%;background:#F5A623;border-radius:4px"></div></div>'
+              + '<span style="font-size:12px;color:#6a7a8a">'+pct+'%</span></div>';
+          }
+          breakdown.innerHTML = html;
         }
-        breakdown.innerHTML = html;
       }
 
       var reviewsList = document.getElementById('reviews-list');
@@ -2222,7 +2238,9 @@ function rizqShare(title, url) {
             + '<div style="font-size:11px;color:#8a9ab5">'+timeAgo(r.createdAt,fr)+'</div></div>'
             + '<div style="margin-'+(fr?'left':'right')+':auto;color:#F5A623;font-size:14px">'+starsHTML(r.rating)+'</div>'
             + '</div><div style="font-size:13px;color:#4a5a6a;line-height:1.6">'+esc(r.comment || (fr?'(Sans commentaire)':'(بدون تعليق)'))+'</div></div>';
-        }).join('') : ('<p style="font-size:13px;color:#6a7a8a;padding:8px 0">'+(fr?'Aucun avis pour l\'instant — soyez le premier à évaluer cette boutique.':'لا توجد آراء حتى الآن — كن أول من يقيّم هذا المحل.')+'</p>');
+        }).join('') : ('<div style="padding:14px 12px;margin:4px 0 8px;border-radius:12px;background:linear-gradient(135deg,#f8fafc,#eef4fb);border:1px dashed rgba(27,58,107,.22);text-align:center">'
+          + '<div style="font-size:15px;font-weight:800;color:#1B3A6B;margin-bottom:4px">'+(fr?'⭐ Soyez le premier à évaluer':'⭐ كن أول من يقيّم')+'</div>'
+          + '<p style="font-size:12.5px;color:#6a7a8a;margin:0;line-height:1.55">'+(fr?'Aucun avis pour l\'instant — partagez votre expérience avec les prochains clients.':'لا توجد آراء بعد — شارك تجربتك مع الزبائن القادمين.')+'</p></div>');
 
         var starPicker = '<div id="store-star-picker" style="display:flex;gap:5px;margin-bottom:10px;font-size:24px">'
           + [1,2,3,4,5].map(function(n){ return '<span data-n="'+n+'" onclick="_rizqStoreSetStar('+n+')" id="store-star-'+n+'" style="cursor:pointer;color:rgba(13,27,42,.18)">★</span>'; }).join('')
@@ -2615,6 +2633,80 @@ function rizqShare(title, url) {
         || /^acc_promo_store/.test(id);
     }
 
+    /**
+     * صفحة المشترك الحقيقي: أخفِ الأقسام الاختيارية الفارغة بالكامل
+     * (ساعات، عن المحل، باقات النموذج). الفيديو يُخفى أصلاً في mountStorePromoVideo.
+     * التقييمات تبقى مع دعوة «كن أول من يقيّم» بدل جدول 0%.
+     */
+    function syncRealStoreOptionalSections(opts){
+      opts = opts || {};
+      var id = String(opts.id || window._rizqStoreAccountId || '');
+      var params = opts.params || new URLSearchParams(location.search);
+      var isDemo = !!(opts.isDemo
+        || window._rizqStoreIsDemo
+        || id === 'demo_store'
+        || isStorePreviewPortal(id, params)
+        || /^acc_promo_/i.test(id));
+      var hoursCard = document.getElementById('hours-card-el');
+      var aboutSec = document.getElementById('about-section');
+      var pkg = document.getElementById('store-packages');
+      var videoSpot = document.getElementById('store-video-spotlight');
+
+      if(isDemo){
+        if(hoursCard) hoursCard.style.display = '';
+        if(aboutSec) aboutSec.style.display = '';
+        return;
+      }
+
+      /* باقات صفحات النماذج — لا تُعرض أبداً على محل حقيقي */
+      if(pkg){ pkg.style.display = 'none'; try{ pkg.setAttribute('hidden','hidden'); }catch(eP){} }
+      document.querySelectorAll('.rizq-promo-card, .promo-card, [data-t="store-promo"]').forEach(function(el){
+        el.style.display = 'none';
+      });
+
+      var hasHours = opts.hasHours;
+      if(hasHours == null){
+        hasHours = false;
+        try{
+          var localH = JSON.parse(localStorage.getItem('store_hours_' + id) || 'null');
+          hasHours = Array.isArray(localH) && localH.length > 0;
+        }catch(eH){}
+        if(!hasHours && hoursCard){
+          var times = hoursCard.querySelectorAll('.hours-time, .hours-closed');
+          for(var i=0;i<times.length;i++){
+            var tv = (times[i].textContent || '').trim();
+            if(tv && tv !== '—' && tv !== '-'){ hasHours = true; break; }
+          }
+        }
+      }
+      if(hoursCard) hoursCard.style.display = hasHours ? '' : 'none';
+
+      var acc = opts.acc || window._rizqStoreProfile || {};
+      var hasAbout = !!(String(acc.desc || '').trim());
+      if(aboutSec) aboutSec.style.display = hasAbout ? '' : 'none';
+
+      /* معرض الصور / إحصائيات الخبرة والزبائن غير موجودة في قالب المحل —
+         إن وُجدت عناصر مُحقَنة لاحقاً تُخفى بلا بيانات */
+      ['store-gallery', 'store-stats', 'stat-years', 'stat-clients', 'stat-exp'].forEach(function(gid){
+        var gel = document.getElementById(gid);
+        if(!gel) return;
+        var filled = opts[gid] === true;
+        if(!filled){
+          var num = gel.querySelector && gel.querySelector('.stat-num, .about-stat-val');
+          var raw = num ? String(num.textContent || '').trim() : String(gel.textContent || '').trim();
+          filled = !!(raw && raw !== '—' && raw !== '-' && raw !== '0');
+        }
+        gel.style.display = filled ? '' : 'none';
+      });
+
+      if(videoSpot && videoSpot.style.display !== 'none'){
+        /* spotlight يُدار في mountStorePromoVideo — لا نُظهره فارغاً */
+        var hasVid = !!(acc.promo_video || acc.promo_video_extra);
+        if(!hasVid) videoSpot.style.display = 'none';
+      }
+    }
+    window.syncRealStoreOptionalSections = syncRealStoreOptionalSections;
+
     function mountStorePromoVideo(acc){
       /* بطاقات هادئة على الهيرو: تعريفي + إضافي — بلا شريط مكرر أسفل */
       if(!acc || !window.RizqIntroVideo) return;
@@ -2819,8 +2911,8 @@ function rizqShare(title, url) {
         window._rizqStoreProfile = acc;
 
         // باقات المنصة للنماذج فقط — المحل الحقيقي صفحة نقية (منتجات + هوية).
+        var isPreview = !!(window._rizqStoreIsDemo || id === 'demo_store' || isStorePreviewPortal(id, params));
         (function hidePlatformUpsellOnBoundStore(){
-          var isPreview = !!(window._rizqStoreIsDemo || id === 'demo_store' || isStorePreviewPortal(id, params));
           if(window.RizqSubscriptionPermissions && typeof RizqSubscriptionPermissions.applyPublicMerchantSurface === 'function'){
             RizqSubscriptionPermissions.applyPublicMerchantSurface({
               accountId: id,
@@ -2873,9 +2965,11 @@ function rizqShare(title, url) {
         }catch(e){}
 
         // ── ساعات العمل — إعادة بناء القائمة وشارة مفتوح/مغلق من بيانات حقيقية ──
+        var paintedHours = false;
         try{
           var hours = JSON.parse(localStorage.getItem('store_hours_' + id) || 'null');
           if(Array.isArray(hours) && hours.length){
+            paintedHours = true;
             var dayFr = {'الأحد':'Dimanche','الاثنين':'Lundi','الثلاثاء':'Mardi','الأربعاء':'Mercredi','الخميس':'Jeudi','الجمعة':'Vendredi','السبت':'Samedi'};
             var card = document.getElementById('hours-card-el');
             if(card){
@@ -2920,6 +3014,14 @@ function rizqShare(title, url) {
             }
           }
         }catch(e){}
+
+        syncRealStoreOptionalSections({
+          id: id,
+          params: params,
+          isDemo: isPreview,
+          hasHours: paintedHours,
+          acc: acc
+        });
 
         if(window._rizqLoadStoreContacts) window._rizqLoadStoreContacts(id);
       }catch(e){}
@@ -3038,6 +3140,9 @@ function rizqShare(title, url) {
                     RizqServiceDesk.autofillBuyerFields({ root: document.getElementById('store-req-form') });
                   }
                 }
+                if(typeof window.syncRealStoreOptionalSections === 'function'){
+                  window.syncRealStoreOptionalSections({ id: id, isDemo: apiIsDemo, acc: acc });
+                }
                 }
               }
             }
@@ -3045,9 +3150,11 @@ function rizqShare(title, url) {
 
         // 2–4) كتالوج + ساعات + تقييمات بالتوازي (بدل انتظار تسلسلي)
         var needHours = true;
+        var hadLocalHours = false;
         try{
           var localHours = JSON.parse(localStorage.getItem('store_hours_'+id)||'null');
-          needHours = !(Array.isArray(localHours) && localHours.length);
+          hadLocalHours = Array.isArray(localHours) && localHours.length > 0;
+          needHours = !hadLocalHours;
         }catch(eH){}
         var settled = await Promise.all([
           fetch(base+'/api/catalog?accountId='+encodeURIComponent(id)+'&kind=product').then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; }),
@@ -3080,8 +3187,10 @@ function rizqShare(title, url) {
           }
         }catch(e){}
 
+        var apiHoursPainted = false;
         try{
           if(hdata && hdata.hours && Array.isArray(hdata.hours) && hdata.hours.length){
+            apiHoursPainted = true;
             var dayFr={'الأحد':'Dimanche','الاثنين':'Lundi','الثلاثاء':'Mardi','الأربعاء':'Mercredi','الخميس':'Jeudi','الجمعة':'Vendredi','السبت':'Samedi'};
             var card = document.getElementById('hours-card-el');
             if(card){
@@ -3096,6 +3205,14 @@ function rizqShare(title, url) {
             }
           }
         }catch(e){}
+
+        if(typeof window.syncRealStoreOptionalSections === 'function'){
+          window.syncRealStoreOptionalSections({
+            id: id,
+            hasHours: !!(hadLocalHours || apiHoursPainted),
+            acc: window._rizqStoreProfile || {}
+          });
+        }
 
         try{
           if(rdata){
@@ -3114,6 +3231,8 @@ function rizqShare(title, url) {
               if(added){ all[id] = local; localStorage.setItem('rizq_reviews', JSON.stringify(all)); }
             }
             if(typeof window._rizqRenderStoreReviews === 'function') window._rizqRenderStoreReviews();
+          } else if(typeof window._rizqRenderStoreReviews === 'function'){
+            window._rizqRenderStoreReviews();
           }
         }catch(e){}
 
