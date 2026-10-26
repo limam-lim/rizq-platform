@@ -2705,15 +2705,16 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
   position:relative;box-shadow:0 3px 12px rgba(15,35,65,.14);
 }
 .price-ticker-wrap::before{
-  content:'مباشر';position:absolute;inset-inline-start:8px;top:50%;transform:translateY(-50%);
-  z-index:2;font-size:9.5px;font-weight:800;letter-spacing:.02em;color:#0D1B2A;
-  background:linear-gradient(135deg,#F0D78A,#C9A84C);padding:3px 8px;border-radius:999px;
-  box-shadow:0 1px 4px rgba(0,0,0,.18);pointer-events:none;
+  content:'أحدث أسعار سوق';position:absolute;inset-inline-start:8px;top:50%;transform:translateY(-50%);
+  z-index:2;font-size:9px;font-weight:800;letter-spacing:.02em;color:#0D1B2A;
+  background:linear-gradient(135deg,#F0D78A,#C9A84C);padding:3px 9px;border-radius:999px;
+  box-shadow:0 1px 4px rgba(0,0,0,.18);pointer-events:none;white-space:nowrap;
+  max-width:42%;overflow:hidden;text-overflow:ellipsis;
 }
-html[lang^="fr"] .price-ticker-wrap::before{content:'Live'}
+html[lang^="fr"] .price-ticker-wrap::before{content:'Derniers prix'}
 .price-ticker-wrap::after{
-  content:'';position:absolute;inset-inline-start:0;top:0;bottom:0;width:56px;z-index:1;pointer-events:none;
-  background:linear-gradient(to left,transparent,rgba(13,27,42,.95) 70%);
+  content:'';position:absolute;inset-inline-start:0;top:0;bottom:0;width:118px;z-index:1;pointer-events:none;
+  background:linear-gradient(to left,transparent,rgba(13,27,42,.95) 55%);
 }
 html[dir="ltr"] .price-ticker-wrap::after{
   background:linear-gradient(to right,rgba(13,27,42,.95) 70%,transparent);
@@ -6191,7 +6192,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   </div>
   <div class="prices-board fade-in">
     <div class="prices-meta">
-      <span class="prices-updated"><span class="live-dot"></span>&nbsp;<span data-t="prices-live">مباشر · آخر تحديث:</span> <b id="prices-updated-date">—</b><script>(function(){try{var el=document.getElementById('prices-updated-date');if(!el)return;var ar=(document.documentElement.lang||'ar').indexOf('fr')!==0;el.textContent=new Date().toLocaleDateString(ar?'ar-MR-u-nu-latn':'fr-FR',{day:'numeric',month:'long',year:'numeric'});}catch(e){}})();</script></span>
+      <span class="prices-updated"><span class="live-dot"></span>&nbsp;<span data-t="prices-live">أحدث · آخر تحديث:</span> <b id="prices-updated-date">—</b><script>(function(){try{var el=document.getElementById('prices-updated-date');if(!el)return;var ar=(document.documentElement.lang||'ar').indexOf('fr')!==0;el.textContent=new Date().toLocaleDateString(ar?'ar-MR-u-nu-latn':'fr-FR',{day:'numeric',month:'long',year:'numeric'});}catch(e){}})();</script></span>
     </div>
     <div class="price-ticker-wrap" aria-label="آخر تحديثات الأسعار">
       <div class="price-ticker-inner" id="price-ticker"></div>
@@ -10940,7 +10941,7 @@ const LANG = {
     'est-all': 'الكل', 'est-apt': 'شقق', 'est-villa': 'فلل', 'est-land': 'أراضي', 'est-shop': 'محلات',
     's-prices-title': 'نبضة السوق — <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">أسعار اليوم بوضوح</span>',
     's-prices-desc': 'أسعار اليوم في موريتانيا — قرار أوضح قبل أن تشتري أو تبيع',
-    'prices-live': 'مباشر · آخر تحديث:',
+    'prices-live': 'أحدث · آخر تحديث:',
     'prices-tab-food': '🍚 مواد غذائية', 'prices-tab-fuel': '⛽ محروقات', 'prices-tab-currencies': '💱 عملات',
     'prices-note': 'الأسعار تقريبية · عيّنة من نبضة السوق',
     'prices-browse-full': '📈 عرض نبضة السوق كاملة ←',
@@ -11106,7 +11107,7 @@ const LANG = {
     'est-all': 'Tout', 'est-apt': 'Appartements', 'est-villa': 'Villas', 'est-land': 'Terrains', 'est-shop': 'Locaux',
     's-prices-title': 'Le Pouls du Marché — <span style="background:linear-gradient(135deg,var(--gold),var(--gold-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">les prix du jour, clairement</span>',
     's-prices-desc': 'Les prix du jour en Mauritanie — décidez plus clairement avant d\'acheter ou de vendre',
-    'prices-live': 'En direct · Dernière mise à jour :',
+    'prices-live': 'Récent · Dernière mise à jour :',
     'prices-tab-food': '🍚 Denrées alimentaires', 'prices-tab-fuel': '⛽ Carburants', 'prices-tab-currencies': '💱 Devises',
     'prices-note': 'Prix indicatifs · aperçu du pouls du marché',
     'prices-browse-full': '📈 Voir le pouls du marché complet →',
