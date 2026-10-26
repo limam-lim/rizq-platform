@@ -109,6 +109,8 @@
       + '        <li><a href="rizq_browse.html" data-t="ft-q2">تصفّح الإعلانات</a></li>'
       + '        <li><a href="rizq_post.html" data-t="ft-q3">انشر إعلانك</a></li>'
       + '        <li><a href="rizq_market_pulse.html" data-t="ft-q4">نبضة السوق</a></li>'
+      + '        <li><a href="rizq_directory.html" data-t="ft-q-dir">دليل رزق</a></li>'
+      + '        <li><a href="rizq_estate_agencies.html" data-t="ft-q-estate-dir">دليل سوق العقارات</a></li>'
       + '        <li><a href="rizq_platform.html#who" data-t="ft-q5b">من نحن</a></li>'
       + '        <li><a href="rizq_platform.html#why" data-t="ft-q5c">لماذا رزق</a></li>'
       + '        <li><a href="rizq_about.html" data-t="ft-q5">الشركة المالكة</a></li>'
