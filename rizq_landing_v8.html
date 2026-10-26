@@ -7987,7 +7987,7 @@ function _styCollectStoreStyleItems(){
 function _styPool(){
   return _styCollectStoreStyleItems();
 }
-/** مجمع إعلانات للمنصات الأخرى (نماذج المعارض/العقارات) — منفصل عن إطلالات المحلات */
+/** مجمع إعلانات للمنصات الأخرى (نماذج العقارات…) — منفصل عن إطلالات المحلات ونماذج المعارض */
 function _styAdsPool(){
   var seen = {};
   var out = [];
@@ -8004,6 +8004,204 @@ function _styAdsPool(){
   if(typeof FEATURED_ADS !== 'undefined') add(FEATURED_ADS);
   if(typeof ALL_ADS_DATA !== 'undefined') add(ALL_ADS_DATA);
   return out;
+}
+
+/**
+ * مصدر نماذج المعارض = كتالوج المعارض/المصانع (rizq_corp_prods_* + API)،
+ * لا إعلانات التصفح الفردية — حتى تتطابق اللقطة مع منتج المعرض.
+ */
+function _srmReadShowroomAccounts(){
+  var map = {};
+  try {
+    var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+    (accs || []).forEach(function(a){
+      if(!a || !a.id) return;
+      var typ = String(a.type || '').toLowerCase();
+      if(typ !== 'corp' && typ !== 'showroom' && typ !== 'company') return;
+      map[String(a.id)] = a;
+    });
+  } catch(eA){}
+  return map;
+}
+function _srmParsePriceNum(p){
+  if(!p) return 0;
+  if(typeof p.priceNum === 'number' && isFinite(p.priceNum)) return p.priceNum;
+  var raw = p.price != null ? p.price : 0;
+  if(typeof raw === 'number' && isFinite(raw)) return raw;
+  var n = Number(String(raw).replace(/[^\d.]/g, ''));
+  return isFinite(n) ? n : 0;
+}
+function _srmNormalizeCatalogProduct(p, showroom){
+  if(!p) return null;
+  var showroomId = String((showroom && (showroom.id || showroom.storeId)) || 'showroom');
+  var showroomName = String((showroom && (showroom.name || showroom.title)) || showroomId);
+  var showroomNameF = String((showroom && (showroom.nameF || showroom.nameFr || showroomName)) || showroomName);
+  var pid = String(p.id != null ? p.id : '');
+  if(!pid) return null;
+  var priceNum = _srmParsePriceNum(p);
+  var priceStr = (typeof _styFormatStorePrice === 'function')
+    ? _styFormatStorePrice(priceNum)
+    : (priceNum ? (priceNum.toLocaleString('fr-FR') + ' MRU') : '');
+  if(!priceStr && p.price != null && String(p.price).trim()){
+    priceStr = String(p.price).indexOf('MRU') >= 0 ? String(p.price) : (String(p.price) + ' MRU');
+  }
+  var imgs = [];
+  if(Array.isArray(p.images)) imgs = p.images.filter(Boolean).slice(0, 4);
+  else if(Array.isArray(p.imgDataArr)) imgs = p.imgDataArr.filter(Boolean).slice(0, 4);
+  else if(p.imgData) imgs = [p.imgData];
+  else if(p.image) imgs = [p.image];
+  var cat = String(p.cat || p.category || p.catKey || '').trim() || 'سيارات';
+  return {
+    id: 'showroom:' + showroomId + ':' + pid,
+    productId: pid,
+    storeId: showroomId,
+    showroomId: showroomId,
+    storeName: showroomName,
+    title: String(p.name || p.title || pid),
+    titleFR: String(p.nameF || p.nameFr || p.titleFR || p.name || pid),
+    emoji: p.emoji || '🏬',
+    cat: cat,
+    catKey: cat,
+    subcat: p.subcat || cat,
+    price: priceStr,
+    priceFR: priceStr,
+    priceNum: priceNum,
+    images: imgs,
+    bg: p.bg || 'linear-gradient(145deg,#0f2347,#1B3A6B)',
+    href: 'rizq_showroom.html?id=' + encodeURIComponent(showroomId),
+    source: 'showroom',
+    module: 'showroom',
+    seller: showroomName,
+    sellerFR: showroomNameF,
+    tags: [cat, showroomName].filter(Boolean),
+    fromShowroom: true,
+    specs: p.specs || p.desc || ''
+  };
+}
+/** كتالوجات معارض تجريبية — عندما لا يوجد كتالوج معرض مسجّل بعد */
+function _srmDemoShowroomCatalogs(){
+  var carImgs = [
+    'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=800&q=70',
+    'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=800&q=70',
+    'https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=800&q=70'
+  ];
+  var elecImgs = [
+    'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=800&q=70',
+    'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=70',
+    'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=70'
+  ];
+  var furnImgs = [
+    'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=70',
+    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=70',
+    'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=800&q=70'
+  ];
+  return [
+    {
+      id: 'demo-corp-001',
+      name: 'معرض بريستيج',
+      nameF: 'Showroom Prestige',
+      type: 'corp',
+      products: [
+        { id: 'SR-C1', name: 'هيونداي توسان 2022 — SUV', nameF: 'Hyundai Tucson 2022 — SUV', price: 5800000, cat: 'سيارات', emoji: '🚙', images: carImgs.slice() },
+        { id: 'SR-C2', name: 'تويوتا كورولا 2021', nameF: 'Toyota Corolla 2021', price: 4500000, cat: 'سيارات', emoji: '🚗', images: [carImgs[1], carImgs[2], carImgs[0]] },
+        { id: 'SR-C3', name: 'مفتاح وريموت أصلي', nameF: 'Clé / télécommande', price: 8500, cat: 'سيارات', emoji: '🔑', images: ['https://picsum.photos/seed/rizq-sr-keys/640/480'] },
+        { id: 'SR-C4', name: 'إطارات SUV طقم', nameF: 'Pneus SUV jeu', price: 68000, cat: 'سيارات', emoji: '🛞', images: ['https://picsum.photos/seed/rizq-sr-tires/640/480'] },
+        { id: 'SR-E1', name: 'لابتوب احترافي', nameF: 'Laptop pro', price: 85000, cat: 'إلكترونيات', emoji: '💻', images: elecImgs.slice() },
+        { id: 'SR-E2', name: 'شاشة Smart TV 55"', nameF: 'Smart TV 55"', price: 95000, cat: 'إلكترونيات', emoji: '📺', images: [elecImgs[0], elecImgs[2]] },
+        { id: 'SR-F1', name: 'طقم صالون', nameF: 'Salon', price: 120000, cat: 'أثاث', emoji: '🛋️', images: furnImgs.slice() },
+        { id: 'SR-Q1', name: 'مولد كهرباء', nameF: 'Groupe électrogène', price: 95000, cat: 'معدات', emoji: '⚙️', images: ['https://picsum.photos/seed/rizq-sr-gen/640/480'] }
+      ]
+    },
+    {
+      id: 'acc_grad_corp_01',
+      name: 'معرض أمل للسيارات',
+      nameF: 'Showroom Amal Auto',
+      type: 'corp',
+      products: [
+        { id: 'GA1', name: 'Toyota Corolla 2021 — مفحوصة', nameF: 'Toyota Corolla 2021', price: 6200000, cat: 'سيارات', emoji: '🚗', images: ['https://picsum.photos/seed/rizq-grad-ad07a/640/480', 'https://picsum.photos/seed/rizq-grad-ad07b/640/480'] },
+        { id: 'GA2', name: 'Hyundai Tucson 2019', nameF: 'Hyundai Tucson 2019', price: 7800000, cat: 'سيارات', emoji: '🚙', images: ['https://picsum.photos/seed/rizq-grad-ad08/640/480', carImgs[0]] },
+        { id: 'GA3', name: 'إطارات 265/65 R17', nameF: 'Pneus 265/65 R17', price: 68000, cat: 'سيارات', emoji: '🛞', images: ['https://picsum.photos/seed/rizq-grad-ad11/640/480'] }
+      ]
+    },
+    {
+      id: 'acc_grad_corp_02',
+      name: 'معرض المحيط للإلكترونيات',
+      nameF: 'Showroom Océan Tech',
+      type: 'corp',
+      products: [
+        { id: 'GE1', name: 'شاشة Smart TV 55 بوصة', nameF: 'Smart TV 55"', price: 95000, cat: 'إلكترونيات', emoji: '📺', images: ['https://picsum.photos/seed/rizq-grad-ad09/640/480'].concat(elecImgs.slice(0, 2)) },
+        { id: 'GE2', name: 'لابتوب للعمل', nameF: 'Laptop travail', price: 110000, cat: 'إلكترونيات', emoji: '💻', images: elecImgs.slice() },
+        { id: 'GE3', name: 'هاتف ذكي', nameF: 'Smartphone', price: 45000, cat: 'إلكترونيات', emoji: '📱', images: [elecImgs[2], elecImgs[0]] }
+      ]
+    },
+    {
+      id: 'acc_grad_corp_03',
+      name: 'معرض الواحة للأثاث',
+      nameF: 'Showroom Oasis Meubles',
+      type: 'corp',
+      products: [
+        { id: 'GF1', name: 'مكتب إداري خشبي مع كرسي', nameF: 'Bureau bois + chaise', price: 45000, cat: 'أثاث', emoji: '🪑', images: ['https://picsum.photos/seed/rizq-grad-ad12/640/480'].concat(furnImgs.slice(0, 2)) },
+        { id: 'GF2', name: 'طقم صالون أنيق', nameF: 'Salon élégant', price: 185000, cat: 'أثاث', emoji: '🛋️', images: furnImgs.slice() },
+        { id: 'GF3', name: 'غرفة نوم متكاملة', nameF: 'Chambre complète', price: 220000, cat: 'أثاث', emoji: '🛏️', images: [furnImgs[1], furnImgs[2], furnImgs[0]] }
+      ]
+    }
+  ];
+}
+function _srmCollectShowroomCatalogItems(){
+  var seen = {};
+  var out = [];
+  var accounts = _srmReadShowroomAccounts();
+  var touched = {};
+
+  function pushProduct(p, showroom){
+    var item = _srmNormalizeCatalogProduct(p, showroom);
+    if(!item) return;
+    if(seen[item.id]) return;
+    seen[item.id] = 1;
+    out.push(item);
+  }
+
+  /* 1) كتالوج المعارض المحلي rizq_corp_prods_<id> */
+  try {
+    for(var i = 0; i < localStorage.length; i++){
+      var key = localStorage.key(i);
+      if(!key || key.indexOf('rizq_corp_prods_') !== 0) continue;
+      var sid = key.slice('rizq_corp_prods_'.length);
+      if(!sid) continue;
+      var list = [];
+      try { list = JSON.parse(localStorage.getItem(key) || '[]'); } catch(eP){ list = []; }
+      if(!Array.isArray(list) || !list.length) continue;
+      var acc = accounts[sid] || { id: sid, name: sid, type: 'corp' };
+      touched[sid] = 1;
+      list.forEach(function(p){ pushProduct(p, acc); });
+    }
+  } catch(eScan){}
+
+  /* 2) كتالوج مُحمَّل من API (يُملأ عبر _srmHydrateFromApi) */
+  try {
+    var apiRows = window.__rizqSrmApiCatalog;
+    if(Array.isArray(apiRows)){
+      apiRows.forEach(function(row){
+        if(!row || !row.acc || !Array.isArray(row.items)) return;
+        var aid = String(row.acc.id || '');
+        if(!aid || touched[aid]) return;
+        touched[aid] = 1;
+        row.items.forEach(function(p){ pushProduct(p, row.acc); });
+      });
+    }
+  } catch(eApi){}
+
+  /* 3) احتياطي: كتالوجات معارض تجريبية */
+  if(out.length < 9){
+    _srmDemoShowroomCatalogs().forEach(function(demo){
+      if(touched[demo.id]) return;
+      (demo.products || []).forEach(function(p){ pushProduct(p, demo); });
+    });
+  }
+  return out;
+}
+function _srmPool(){
+  return _srmCollectShowroomCatalogItems();
 }
 function _styMatchGender(a, gender){
   var g = _styDetectGender(a);
@@ -8096,6 +8294,12 @@ function _styFindAdById(id){
   for(var i=0;i<pool.length;i++){
     if(String(pool[i].id) === sid) return pool[i];
   }
+  if(typeof _srmPool === 'function'){
+    var srmPool = _srmPool();
+    for(var si=0;si<srmPool.length;si++){
+      if(String(srmPool[si].id) === sid) return srmPool[si];
+    }
+  }
   if(typeof FEATURED_ADS !== 'undefined'){
     for(var j=0;j<FEATURED_ADS.length;j++){
       if(String(FEATURED_ADS[j].id) === sid) return FEATURED_ADS[j];
@@ -8125,6 +8329,20 @@ function rizqOpenStyleItem(ev, adId){
       window.location.href = 'rizq_store.html?id=' + encodeURIComponent(m[1]);
       return false;
     }
+    var ms = String(adId).match(/^showroom:([^:]+):/);
+    if(ms){
+      window.location.href = 'rizq_showroom.html?id=' + encodeURIComponent(ms[1]);
+      return false;
+    }
+    return false;
+  }
+  /* منتجات المعارض → صفحة المعرض / الكتالوج */
+  if(ad.fromShowroom || ad.source === 'showroom' || String(ad.id).indexOf('showroom:') === 0){
+    var srHref = ad.href || (ad.showroomId || ad.storeId
+      ? ('rizq_showroom.html?id=' + encodeURIComponent(ad.showroomId || ad.storeId))
+      : '');
+    var safeSr = _rizqSafeNavHref(srHref);
+    if(safeSr) window.location.href = safeSr;
     return false;
   }
   /* منتجات المحلات → صفحة المحل */
@@ -8854,6 +9072,19 @@ function _srmPickCompanions(primary, pool, n, avoidIds){
   var list = (pool || []).filter(function(a){
     return a && a.id != null && !used[String(a.id)];
   });
+  /* فضّل منتجات نفس المعرض أولاً — كتالوج واحد متماسك */
+  var sameId = primary && (primary.showroomId || primary.storeId)
+    ? String(primary.showroomId || primary.storeId) : '';
+  if(sameId){
+    var sameShowroom = list.filter(function(a){
+      return String(a.showroomId || a.storeId || '') === sameId;
+    });
+    if(sameShowroom.length){
+      list = sameShowroom.concat(list.filter(function(a){
+        return String(a.showroomId || a.storeId || '') !== sameId;
+      }));
+    }
+  }
   var primaryKind = _srmAdKind(primary);
   var picks = [];
   /* فضّل منتجات بأنواع مختلفة (مثل أمازون: سيارة + إطار + مفتاح) */
@@ -8981,12 +9212,12 @@ function buildShowroomModels(reshuffle){
   var cat = RIZQ_SRM_CATS[_rizqSrmCat] ? _rizqSrmCat : 'cars';
   var meta = _srmCatMeta(cat);
   var templates = _srmTemplatesFor(cat);
-  /* دائماً أدرج FEATURED showcase حتى بعد hydrateLiveAds الذي يفرّغ ADS */
-  var pool = (typeof _styAdsPool === 'function' ? _styAdsPool() : (typeof _styPool === 'function' ? _styPool() : [])).filter(function(a){ return _srmIsModelCat(a, cat); });
+  /* كتالوج المعارض فقط — لا إعلانات التصفح (تفادي صور خاطئة مثل توسان←فورد) */
+  var pool = (typeof _srmPool === 'function' ? _srmPool() : []).filter(function(a){ return _srmIsModelCat(a, cat); });
   var tplList = (typeof _styShuffle === 'function' ? _styShuffle(templates) : templates.slice());
   var usedPrimary = {};
   var cards = [];
-  var cta = fr ? 'Voir le modèle' : 'تصفّح النموذج';
+  var cta = fr ? 'Voir le showroom' : 'تصفّح المعرض';
   var badge = fr ? meta.fr : meta.ar;
   var esc = typeof _styEsc === 'function' ? _styEsc : function(s){ return String(s==null?'':s); };
 
@@ -9003,9 +9234,11 @@ function buildShowroomModels(reshuffle){
       tileItems.push(filler);
     }
     if(tileItems.length < 3) return; /* لا بطاقة ببلاطات جامدة */
-    var href = primary && primary.id
-      ? ('rizq_browse.html?id=' + encodeURIComponent(primary.id))
-      : ('rizq_directory.html?type=corp&cat=' + encodeURIComponent(meta.dirCat));
+    var href = (primary && primary.href)
+      ? primary.href
+      : (primary && (primary.showroomId || primary.storeId)
+        ? ('rizq_showroom.html?id=' + encodeURIComponent(primary.showroomId || primary.storeId))
+        : ('rizq_directory.html?type=corp&cat=' + encodeURIComponent(meta.dirCat)));
     var tiles = '';
     for(var ti=0; ti<3; ti++){
       var adT = tileItems[ti];
@@ -9080,8 +9313,8 @@ function buildShowroomModels(reshuffle){
   if(!cards.length){
     rail.classList.add('is-empty');
     rail.innerHTML = '<div class="rizq-styles-empty">'+(fr
-      ? 'Pas encore assez d\'annonces pour suggérer des modèles. Explorez le guide des showrooms.'
-      : 'لا توجد إعلانات كافية بعد لاقتراح نماذج. تصفّح دليل المعارض.')+'</div>';
+      ? 'Pas encore assez de produits catalogue showroom. Explorez le guide des showrooms.'
+      : 'لا توجد منتجات كافية في كتالوج المعارض بعد. تصفّح دليل المعارض.')+'</div>';
     return;
   }
   rail.classList.remove('is-empty');
@@ -9092,8 +9325,45 @@ function buildShowroomModels(reshuffle){
   _srmUpdateTick(fr);
   requestAnimationFrame(function(){ syncMarqueeShift(rail); });
 }
+/** جلب كتالوجات المعارض من الخادم ثم إعادة بناء اللقطات */
+function _srmHydrateFromApi(){
+  var base = (typeof window.RIZQ_BACKEND_BASE === 'string' ? window.RIZQ_BACKEND_BASE : '').replace(/\/$/,'');
+  if(!base) return;
+  if(window.__rizqSrmHydrating) return;
+  window.__rizqSrmHydrating = 1;
+  fetch(base + '/api/accounts/public')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data){
+      var list = (data && Array.isArray(data.accounts)) ? data.accounts : [];
+      var corps = list.filter(function(a){
+        var t = String(a && a.type || '').toLowerCase();
+        return t === 'corp' || t === 'showroom' || t === 'company';
+      });
+      if(!corps.length) return null;
+      return Promise.all(corps.map(function(acc){
+        return fetch(base + '/api/catalog?accountId=' + encodeURIComponent(acc.id) + '&kind=product')
+          .then(function(r){ return r.ok ? r.json() : null; })
+          .then(function(cdata){
+            var items = (cdata && Array.isArray(cdata.items)) ? cdata.items : [];
+            return { acc: acc, items: items };
+          })
+          .catch(function(){ return { acc: acc, items: [] }; });
+      }));
+    })
+    .then(function(rows){
+      if(!rows) return;
+      var withItems = rows.filter(function(row){ return row && row.items && row.items.length; });
+      if(withItems.length){
+        window.__rizqSrmApiCatalog = withItems;
+        try { buildShowroomModels(false); } catch(eB){}
+      }
+    })
+    .catch(function(){})
+    .then(function(){ window.__rizqSrmHydrating = 0; });
+}
 try { buildShowroomModels(false); } catch(eSrm) {}
 try { _srmStartAutoRefresh(); } catch(eSrmAuto) {}
+try { _srmHydrateFromApi(); } catch(eSrmHyd) {}
 try { refreshLandingBrandStrips(); } catch(eBrandBoot) {}
 if(document.readyState === 'loading'){
   document.addEventListener('DOMContentLoaded', function(){

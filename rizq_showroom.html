@@ -1168,10 +1168,22 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
     thumb: 'rizq-assets/demo-heroes/showroom-appliances-promo.jpg'
   };
   var items = [
-    { id: 'SR1', name: 'سيارة SUV 2022', nameFr: 'SUV 2022', cat: 'سيارات', price: '2,850,000 MRU', emoji: '🚗', stock: 2, specs: 'بيانات عرض', featured: true },
-    { id: 'SR2', name: 'لابتوب احترافي', nameFr: 'Laptop pro', cat: 'إلكترونيات', price: '85,000 MRU', emoji: '💻', stock: 6, specs: 'بيانات عرض' },
-    { id: 'SR3', name: 'طقم صالون', nameFr: 'Salon', cat: 'أثاث', price: '120,000 MRU', emoji: '🛋️', stock: 3, specs: 'بيانات عرض' },
-    { id: 'SR4', name: 'مولد كهرباء', nameFr: 'Groupe électrogène', cat: 'معدات', price: '95,000 MRU', emoji: '⚙️', stock: 5, specs: 'بيانات عرض' }
+    { id: 'SR1', name: 'هيونداي توسان 2022 — SUV', nameFr: 'Hyundai Tucson 2022 — SUV', cat: 'سيارات', price: '5,800,000 MRU', emoji: '🚙', stock: 2, specs: 'بيانات عرض', featured: true,
+      image: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=800&q=70',
+      images: [
+        'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=800&q=70',
+        'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=800&q=70',
+        'https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=800&q=70'
+      ] },
+    { id: 'SR2', name: 'لابتوب احترافي', nameFr: 'Laptop pro', cat: 'إلكترونيات', price: '85,000 MRU', emoji: '💻', stock: 6, specs: 'بيانات عرض',
+      image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=70',
+      images: ['https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=70'] },
+    { id: 'SR3', name: 'طقم صالون', nameFr: 'Salon', cat: 'أثاث', price: '120,000 MRU', emoji: '🛋️', stock: 3, specs: 'بيانات عرض',
+      image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=70',
+      images: ['https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=70'] },
+    { id: 'SR4', name: 'مولد كهرباء', nameFr: 'Groupe électrogène', cat: 'معدات', price: '95,000 MRU', emoji: '⚙️', stock: 5, specs: 'بيانات عرض',
+      image: 'https://picsum.photos/seed/rizq-sr-gen/640/480',
+      images: ['https://picsum.photos/seed/rizq-sr-gen/640/480'] }
   ];
   try{
     localStorage.setItem('rizq_corp_prods_' + _showroomId, JSON.stringify(items));
