@@ -30,9 +30,13 @@ function mountAccountsManageRoutes(app, deps) {
     genDashToken,
     genAccessToken,
     purgeAccountIdDocument,
+    sanitizeKycDataUrl,
     REFERRAL_BONUS_DAYS,
     upsertSubscriberProfileFromAccount,
   } = deps;
+
+  const { sanitizeKycDataUrl: sanitizeKycFallback } = require('../lib/sanitizeKyc');
+  const kycSanitize = typeof sanitizeKycDataUrl === 'function' ? sanitizeKycDataUrl : sanitizeKycFallback;
 
   const adminView = typeof toAdminAccount === 'function' ? toAdminAccount : stripToken;
 
@@ -238,13 +242,19 @@ function mountAccountsManageRoutes(app, deps) {
         acc[k] = sanitizePromoVideoUrl(val);
         return;
       }
-      if (k === 'thumb' || k === 'cover' || k === 'idImage' || k === 'licenseImage') {
+      if (k === 'idImage' || k === 'licenseImage') {
+        const cleaned = kycSanitize(val, 5_000_000);
+        if (!cleaned) return;
+        acc[k] = cleaned;
+        return;
+      }
+      if (k === 'thumb' || k === 'cover') {
         // اسمح فقط بمسارات نسبية أو data:image أو http(s) — لا javascript:
         const t = String(val || '').trim();
         if (t && (/javascript:/i.test(t) || /[\s<>"']/.test(t))) return;
         if (t && !(t.startsWith('/') || t.startsWith('./') || t.startsWith('data:image/') || /^https?:\/\//i.test(t))) return;
       }
-      acc[k] = val.slice(0, (k === 'thumb' || k === 'cover') ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
+      acc[k] = val.slice(0, (k === 'thumb' || k === 'cover') ? 2_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
     });
     // hidePhone: تفضيل منطقي (boolean) لا نصّي — خارج حلقة EDITABLE أعلاه
     // حتى لا يتحوَّل إلى نص "true"/"false". لا علاقة له حالياً بأي عرض عام
@@ -357,12 +367,18 @@ function mountAccountsManageRoutes(app, deps) {
         acc[k] = sanitizePromoVideoUrl(val);
         return;
       }
-      if (k === 'thumb' || k === 'cover' || k === 'idImage' || k === 'licenseImage') {
+      if (k === 'idImage' || k === 'licenseImage') {
+        const cleaned = kycSanitize(val, 5_000_000);
+        if (!cleaned) return;
+        acc[k] = cleaned;
+        return;
+      }
+      if (k === 'thumb' || k === 'cover') {
         const t = String(val || '').trim();
         if (t && (/javascript:/i.test(t) || /[\s<>"']/.test(t))) return;
         if (t && !(t.startsWith('/') || t.startsWith('./') || t.startsWith('data:image/') || /^https?:\/\//i.test(t))) return;
       }
-      acc[k] = val.slice(0, (k === 'thumb' || k === 'cover') ? 2_000_000 : (k === 'idImage' || k === 'licenseImage') ? 8_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
+      acc[k] = val.slice(0, (k === 'thumb' || k === 'cover') ? 2_000_000 : k === 'desc' ? 1000 : k === 'tagline' ? 50 : k === 'nni' ? 20 : k === 'category' ? 40 : 500);
     });
     if (b.hidePhone !== undefined) acc.hidePhone = !!b.hidePhone; // نفس منطق /mine أعلاه
     if (b.paymentMethods !== undefined) acc.paymentMethods = normalizeAccountPaymentMethods(b.paymentMethods);

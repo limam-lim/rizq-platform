@@ -233,9 +233,14 @@
   function buyerAuthHeaders(s) {
     return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + s.token, 'X-Buyer-Id': s.id };
   }
+  function buyerFetch(url, opts) {
+    opts = opts || {};
+    opts.credentials = 'include';
+    return fetch(url, opts);
+  }
   function syncWishlistToServer(s) {
     if (!s || !s.id || !s.token || !apiBase()) return Promise.resolve();
-    return fetch(apiBase() + '/api/wishlist/sync', {
+    return buyerFetch(apiBase() + '/api/wishlist/sync', {
       method: 'POST', headers: buyerAuthHeaders(s), body: JSON.stringify({ ids: getLocalWishlist() })
     }).then(function (res) {
       return res.json().then(function (j) {
@@ -245,7 +250,7 @@
   }
   function pullWishlistFromServer(s) {
     if (!s || !s.id || !s.token || !apiBase()) return Promise.resolve();
-    return fetch(apiBase() + '/api/wishlist', { headers: buyerAuthHeaders(s) })
+    return buyerFetch(apiBase() + '/api/wishlist', { headers: buyerAuthHeaders(s) })
       .then(function (res) {
         return res.json().then(function (j) {
           if (!res.ok || !j || !j.ok || !Array.isArray(j.ids)) return;
@@ -274,7 +279,7 @@
     /* إبطال التوكن على الخادم — يمنع استخدام الجلسة المسروقة بعد الخروج */
     try {
       if (prev && prev.id && prev.token && apiBase()) {
-        fetch(apiBase() + '/api/auth/logout', {
+        buyerFetch(apiBase() + '/api/auth/logout', {
           method: 'POST',
           headers: {
             'Authorization': 'Bearer ' + prev.token,
@@ -305,7 +310,7 @@
   function verifySessionSilently() {
     var s = getSession();
     if (!s || !s.id || !s.token || !apiBase()) return;
-    fetch(apiBase() + '/api/auth/me', {
+    buyerFetch(apiBase() + '/api/auth/me', {
       headers: {
         'Authorization': 'Bearer ' + s.token,
         'X-Buyer-Id': s.id
@@ -1146,7 +1151,7 @@
           try { sellerCb(); } catch (e) {}
           return null;
         }
-        return fetch(apiBase() + '/api/auth/register', {
+        return buyerFetch(apiBase() + '/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
