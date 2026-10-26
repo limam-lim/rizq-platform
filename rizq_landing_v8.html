@@ -7423,7 +7423,11 @@ function bindRafMarquee(el, opts){
         el.style.setProperty('animation', 'none', 'important');
         el.style.setProperty('animation-name', 'none', 'important');
       }catch(eAnim){ el.style.animation = 'none'; }
+      /* احترم direction على العنصر نفسه (مثلاً شريط الأسعار LTR) بدل فرض اتجاه الصفحة */
       var nextRtl = _rzqIsRtl();
+      try{
+        if(getComputedStyle(el).direction === 'ltr') nextRtl = false;
+      }catch(eDir){}
       if(state.rtl !== nextRtl){
         state.rtl = nextRtl;
         state.pos = 0;
@@ -14493,21 +14497,25 @@ function renderPrices(){
 function renderPriceTicker(){
   const track = document.getElementById('price-ticker');
   if(!track) return;
-  if(!_pricesData.length){ track.innerHTML=''; return; }
-  const items = [..._pricesData,..._pricesData];
+  const wrap = track.closest('.price-ticker-wrap');
+  // الشريط يتبع التبويب النشط: مواد غذائية / محروقات / عملات
+  const cat = _priceTab || 'food';
+  const filtered = _pricesData.filter(function(it){ return it && it.cat === cat; });
+  if(wrap){
+    var labels = isAr
+      ? {food:'آخر تحديثات المواد الغذائية',fuel:'آخر تحديثات المحروقات',currencies:'آخر تحديثات العملات'}
+      : {food:'Dernières denrées',fuel:'Derniers carburants',currencies:'Dernières devises'};
+    wrap.setAttribute('aria-label', labels[cat] || labels.food);
+    wrap.setAttribute('data-ticker-cat', cat);
+  }
+  if(!filtered.length){ track.innerHTML=''; return; }
+  const items = filtered.concat(filtered);
   track.innerHTML = items.map(it=>{
     const nm = it.cat==='currencies' ? it.name : trPriceName(it.name);
     const un = it.cat==='currencies' ? it.unit : trPriceUnit(it.unit);
     return `<span class="ticker-item price-ticker-item"><span class="pt-name">${escapeHtml(nm)}</span> <strong class="pt-price">${Number(it.price||0).toLocaleString('en-US')}</strong> <span class="pt-unit">${escapeHtml(un)}</span> ${priceTrendHTML(it.trend)}</span>`;
   }).join('');
-  requestAnimationFrame(function(){
-    syncMarqueeShift(track);
-    /* مسار الأسعار يُرسم LTR داخل الحاوية — لا تستخدم إزاحة RTL العامة وإلا يختفي الشريط */
-    if(track._rzqMarquee){
-      track._rzqMarquee.rtl = false;
-      track._rzqMarquee.remeasure();
-    }
-  });
+  requestAnimationFrame(function(){ syncMarqueeShift(track); });
 }
 function updatePriceTimestamp(){
   const el = document.getElementById('prices-updated-date');
