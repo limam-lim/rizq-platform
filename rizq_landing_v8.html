@@ -2776,28 +2776,33 @@ html[dir="ltr"] .price-ticker-wrap::after{
   background:linear-gradient(to right,rgba(13,27,42,.92) 72%,transparent);
 }
 .price-ticker-inner{
-  display:flex;align-items:center;gap:0;width:max-content;
+  display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:0;width:max-content;
   will-change:transform;
   backface-visibility:hidden;
   transform:translate3d(0,0,0);
-  contain:layout style paint;
   animation:none!important;
   padding-inline-start:78px;
+  min-height:20px;
 }
 .price-ticker-inner.is-mq-paused{will-change:auto}
 .price-ticker-wrap .ticker-item,
 .price-ticker-item{
-  display:inline-flex;align-items:center;gap:6px;padding:0 16px;white-space:nowrap;
-  font-size:11.5px;font-weight:700;color:rgba(255,255,255,.88);
+  display:inline-flex!important;flex-direction:row!important;align-items:center;gap:6px;
+  padding:0 14px;white-space:nowrap;flex:0 0 auto;
+  font-size:11.5px;font-weight:700;color:rgba(255,255,255,.9);
   border-inline-end:1px solid rgba(201,168,76,.18);
 }
 .price-ticker-wrap .ticker-item strong,
 .price-ticker-item .pt-price{color:var(--gold-light);font-weight:800;font-variant-numeric:tabular-nums}
-.price-ticker-wrap .ticker-item .price-trend,
+.price-ticker-wrap .ticker-item .price-trend{
+  padding:0!important;margin:0!important;background:transparent!important;border:none!important;
+  font-size:10px!important;font-weight:900;line-height:1;
+}
 .price-ticker-item .pt-arrow{font-weight:900;font-size:10px;margin:0}
-.price-ticker-item .pt-up,.price-ticker-wrap .ticker-item .price-trend.up{color:#6ee7a8}
-.price-ticker-item .pt-down,.price-ticker-wrap .ticker-item .price-trend.down{color:#f4a3a3}
-.price-ticker-item .pt-flat,.price-ticker-wrap .ticker-item .price-trend.flat{color:rgba(255,255,255,.45)}
+.price-ticker-item .pt-up,.price-ticker-wrap .ticker-item .price-trend.up{color:#6ee7a8!important}
+.price-ticker-item .pt-down,.price-ticker-wrap .ticker-item .price-trend.down{color:#f4a3a3!important}
+.price-ticker-item .pt-flat,.price-ticker-wrap .ticker-item .price-trend.flat{color:rgba(255,255,255,.5)!important}
+.price-ticker-wrap .pt-unit{color:rgba(255,255,255,.62);font-size:10.5px;font-weight:600}
 .live-dot{width:6px;height:6px;border-radius:50%;background:#ff4444;display:inline-block;animation:pulse 1.5s infinite}
 
 .prices-updated{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(201,168,76,.14),rgba(201,168,76,.05));border:1px solid rgba(201,168,76,.35);color:var(--gold);font-size:10.5px;font-weight:700;padding:4px 12px;border-radius:999px}
