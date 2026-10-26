@@ -2681,8 +2681,8 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
 /* شعار/ترويسة نبضة السوق — أوضح وأفخم دون كسر هوية رزق */
 #prices .section-header{display:none}
 .pulse-brand{
-  display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
-  max-width:640px;margin:0 auto 12px;padding:10px 14px 9px;text-align:center;
+  display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+  max-width:560px;margin:0 auto 8px;padding:7px 12px 6px;text-align:center;
   background:
     linear-gradient(180deg, rgba(255,255,255,.45) 0%, transparent 42%),
     linear-gradient(165deg,#0D1B2A 0%,#1B3A6B 55%,#152e58 100%);
@@ -2730,8 +2730,8 @@ html[dir="ltr"] .section-header .section-desc{text-align:center}
   background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
 }
 .pulse-brand-title{
-  margin:0 0 2px;font-family:'Noto Naskh Arabic','Cairo',Georgia,serif;
-  font-size:clamp(16px,2.1vw,20px);font-weight:800;line-height:1.25;color:#fff;
+  margin:0 0 1px;font-family:'Noto Naskh Arabic','Cairo',Georgia,serif;
+  font-size:clamp(14px,1.8vw,17px);font-weight:800;line-height:1.2;color:#fff;
   text-shadow:0 2px 8px rgba(0,0,0,.22);
 }
 .pulse-brand-title span{
@@ -2824,62 +2824,65 @@ html[dir="ltr"] .price-ticker-wrap::after{
 .ptab-card:hover:not(.active){border-color:rgba(27,58,107,.2);box-shadow:0 3px 14px rgba(27,58,107,.1);transform:translateY(-2px)}
 .ptab-card:hover:not(.active) .ptab-icon{box-shadow:0 5px 18px rgba(27,58,107,.3)}
 .ptab-card:hover:not(.active) .ptab-lbl{color:var(--royal)}
-.prices-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
+.prices-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px}
 @media(max-width:768px){
   .prices-grid{
     grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:7px;
+    gap:5px;
   }
 }
-/* بلاطات أسعار مضغوطة وجذابة — صف اسم/اتجاه ثم سعر+وحدة */
+/* شرائح أسعار قصيرة جداً — اسم + سعر + اتجاه في صف واحد */
 .price-card{
   background:linear-gradient(155deg,#0f2347 0%,#1B3A6B 58%,#243f72 100%);
-  border:1px solid rgba(201,168,76,.28);
-  border-radius:12px;padding:9px 11px 8px;
-  display:flex;flex-direction:column;gap:4px;
-  box-shadow:0 3px 12px rgba(15,35,65,.14),inset 0 1px 0 rgba(255,255,255,.06);
-  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+  border:1px solid rgba(201,168,76,.26);
+  border-radius:9px;padding:6px 8px 6px 10px;
+  display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:4px 8px;
+  box-shadow:0 2px 8px rgba(15,35,65,.12),inset 0 1px 0 rgba(255,255,255,.05);
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
   position:relative;min-height:0;overflow:hidden;
 }
 .price-card::before{
-  content:'';position:absolute;inset-inline-start:0;top:10px;bottom:10px;width:2.5px;border-radius:2px;
+  content:'';position:absolute;inset-inline-start:0;top:7px;bottom:7px;width:2px;border-radius:2px;
   background:linear-gradient(180deg,var(--gold-light),var(--gold));
   opacity:.85;
 }
 .price-card:hover{
-  transform:translateY(-2px);
-  border-color:rgba(201,168,76,.55);
-  box-shadow:0 8px 20px rgba(15,35,65,.22),inset 0 1px 0 rgba(255,255,255,.08);
+  transform:translateY(-1px);
+  border-color:rgba(201,168,76,.5);
+  box-shadow:0 5px 14px rgba(15,35,65,.18),inset 0 1px 0 rgba(255,255,255,.07);
 }
 .price-card-head{
-  display:flex;align-items:flex-start;justify-content:space-between;gap:6px;min-width:0;
+  display:flex;align-items:center;justify-content:space-between;gap:4px;min-width:0;
+  flex:1 1 auto;
 }
-.price-card-top{display:flex;align-items:center;gap:6px;min-width:0;flex:1}
-.price-curr-flag{font-size:15px;line-height:1;flex-shrink:0}
-.price-card-currency .price-value{font-size:16px;letter-spacing:.15px}
-.price-icon{font-size:16px;line-height:1}
+.price-card-top{display:flex;align-items:center;gap:4px;min-width:0;flex:1}
+.price-curr-flag{font-size:12px;line-height:1;flex-shrink:0}
+.price-card-currency .price-value{font-size:13px;letter-spacing:.1px}
+.price-icon{font-size:12px;line-height:1}
 .price-name{
-  color:#fff;font-weight:800;font-size:12px;line-height:1.25;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  color:#fff;font-weight:800;font-size:11px;line-height:1.15;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
 }
 .price-card-main{
-  display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-top:1px;
+  display:flex;align-items:baseline;justify-content:flex-end;gap:5px;margin-top:0;
+  flex:0 0 auto;margin-inline-start:auto;
 }
-.price-row{display:flex;align-items:baseline;gap:6px;margin-top:0}
+.price-row{display:flex;align-items:baseline;gap:5px;margin-top:0}
 .price-value{
-  color:var(--gold);font-weight:900;font-size:17px;line-height:1.1;
+  color:var(--gold);font-weight:900;font-size:13.5px;line-height:1.05;
   font-family:Georgia,'Times New Roman',serif;font-variant-numeric:tabular-nums;
 }
-.price-unit{color:rgba(255,255,255,.72);font-size:10px;line-height:1.2;font-weight:600}
+.price-unit{color:rgba(255,255,255,.68);font-size:9px;line-height:1.1;font-weight:600;white-space:nowrap}
 .price-trend{
-  display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:800;
-  margin-top:0;padding:2px 6px;border-radius:999px;flex-shrink:0;
+  display:inline-flex;align-items:center;gap:2px;font-size:8.5px;font-weight:800;
+  margin-top:0;padding:1px 5px;border-radius:999px;flex-shrink:0;
   background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+  white-space:nowrap;
 }
 .price-trend.up{color:#6ee7a8;border-color:rgba(110,231,168,.25);background:rgba(110,231,168,.08)}
 .price-trend.down{color:#f4a3a3;border-color:rgba(244,163,163,.25);background:rgba(244,163,163,.08)}
 .price-trend.flat{color:rgba(255,255,255,.55)}
-.prices-note{text-align:center;color:var(--text-muted);font-size:11.5px;margin-top:14px;line-height:1.65}
+.prices-note{text-align:center;color:var(--text-muted);font-size:11px;margin-top:10px;line-height:1.55}
 
 .cat-card::before{content:'';position:absolute;inset:0;border-radius:10px;background:linear-gradient(135deg,rgba(201,168,76,.1),transparent 58%);opacity:0;transition:opacity .35s;pointer-events:none!important}
 .cat-card,.cat-icon-box,.qcat,.cat-btn,.hero-biz-btn{pointer-events:auto!important}
@@ -14597,6 +14600,7 @@ function switchPriceTab(tab, btn){
   }
   if(btn) btn.classList.add('active');
   renderPrices();
+  renderPriceTicker();
 }
 function loadPrices(){
   try{
