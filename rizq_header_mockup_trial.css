@@ -1458,7 +1458,7 @@ body > .rizq-help-dd-menu a,
     position:relative!important;
     z-index:1!important;
   }
-  /* هاتف: كبسولات الأقسام — سطر واحد + خط أوضح قليلاً دون تغيير الشكل */
+  /* هاتف فقط: كبسولات أوضح قليلاً — سطر واحد بلا قص/تداخل */
   #rizq-mock-hdr .rmh-nav a,
   #rizq-mock-hdr .rmh-nav a.rmh-post-nav,
   #rizq-mock-hdr .rmh-more-btn,
@@ -1468,15 +1468,15 @@ body > .rizq-help-dd-menu a,
     flex:1 1 0!important;
     min-width:0!important;
     max-width:none!important;
-    min-height:40px!important;
-    padding:clamp(4px,1vw,7px) clamp(0px,0.45vw,3px)!important;
-    font-size:clamp(10px,2.55vw,11.5px)!important;
+    min-height:44px!important;
+    padding:clamp(5px,1.1vw,8px) clamp(1px,0.5vw,4px)!important;
+    font-size:clamp(10.5px,2.7vw,12px)!important;
     gap:2px!important;
-    line-height:1.1!important;
+    line-height:1.12!important;
     white-space:nowrap!important;
     text-align:center;
   }
-  /* الشريط السفلي: خط أوضح + مساحة للأحرف السفلية بلا قص */
+  /* الشريط السفلي (5 أزرار) — مساحة أوضح مع بقاء سطر واحد */
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a,
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > .rmh-more-btn,
   nav.rmh-nav:not(.rmh-nav-top) > a,
@@ -1484,8 +1484,8 @@ body > .rizq-help-dd-menu a,
     flex:1 1 0!important;
     min-width:0!important;
     max-width:none!important;
-    padding:3px 1px 8px!important;
-    font-size:8.5px!important;
+    padding:4px 2px 9px!important;
+    font-size:10px!important;
     line-height:1.2!important;
     white-space:nowrap!important;
     text-align:center;
@@ -1497,42 +1497,36 @@ body > .rizq-help-dd-menu a,
   nav.rmh-nav:not(.rmh-nav-top) > a.is-active{
     box-shadow:inset 0 -2px 0 var(--rmh-gold, #C9A84C)!important;
   }
-  /* المعارض والمصانع — سطر واحد كامل */
+  /* المعارض والمصانع — أطول نص؛ يبقى سطراً واحداً */
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="showrooms"],
   nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="showrooms"]{
     white-space:nowrap!important;
     text-align:center;
-    font-size:7.5px!important;
-    letter-spacing:-.05em;
+    font-size:8.5px!important;
+    letter-spacing:-.04em;
     overflow:visible!important;
   }
-  /* نبض السوق — نفس أسلوب الكبسولة العلوية، سطر واحد */
+  /* نبض السوق — سطر واحد في الكبسولة العلوية */
   #rizq-mock-hdr nav.rmh-nav-top > a[data-rmh="pulse"],
   nav.rmh-nav-top > a[data-rmh="pulse"]{
-    font-size:8px!important;
-    letter-spacing:-.04em;
+    font-size:8.5px!important;
+    letter-spacing:-.03em;
     white-space:nowrap!important;
     min-width:0!important;
   }
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="estate"],
-  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="estate"],
-  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="investments"],
-  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="investments"],
-  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="post"],
-  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="post"],
-  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top) > a.rmh-post-nav,
-  nav.rmh-nav:not(.rmh-nav-top) > a.rmh-post-nav{
+  nav.rmh-nav:not(.rmh-nav-top) > a[data-rmh="estate"]{
     white-space:nowrap!important;
     text-align:center;
-    font-size:8px!important;
+    font-size:9.5px!important;
     letter-spacing:-.03em;
   }
   #rizq-mock-hdr .rmh-nav a .rmh-nav-ico,
   #rizq-mock-hdr .rmh-more-btn .rmh-nav-ico,
   .rmh-nav a .rmh-nav-ico,
   .rmh-more-btn .rmh-nav-ico{
-    width:clamp(17px,4.6vw,21px)!important;
-    height:clamp(17px,4.6vw,21px)!important;
+    width:clamp(18px,4.8vw,22px)!important;
+    height:clamp(18px,4.8vw,22px)!important;
   }
   #rizq-mock-hdr .rmh-nav a .rmh-nav-ico svg,
   #rizq-mock-hdr .rmh-more-btn .rmh-nav-ico svg,
