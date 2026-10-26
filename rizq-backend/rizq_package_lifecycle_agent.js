@@ -174,6 +174,7 @@ async function syncAccountPackage(opts) {
   if (!opts.accountId || !opts.pkgName) return { ok: false, error: 'accountId + pkgName مطلوبان' };
 
   const { mapPackageIdToPlanType, mapPackageNameToPlanType } = require('./services/entitlements');
+  const launchMode = require('./config/launchMode');
   const store = _load();
   const existing = store[opts.accountId] || {};
   const accessToken = existing.accessToken || _genToken();
@@ -182,6 +183,27 @@ async function syncAccountPackage(opts) {
     || mapPackageNameToPlanType(opts.pkgName, accountType, opts.packageId);
   const diamondTier = resolveDiamondTier({ id: opts.packageId, pkgName: opts.pkgName, planType });
   const isTrial = opts.isTrial === true || isTrialPackage(opts.pkgName, opts.price);
+
+  /* تجربة واحدة لكل هوية + ظهور فقط بعد الفترة المجانية وخلال مهلة 7 أيام */
+  if (isTrial && opts.activatedBy !== 'admin') {
+    if (!launchMode.isTrialOfferVisible()) {
+      return { ok: false, error: 'trial_not_available', msg: 'الباقة التجريبية غير متاحة حالياً' };
+    }
+    const phoneKey = String(opts.accountPhone || existing.accountPhone || '').replace(/\D/g, '');
+    const emailKey = String(opts.accountEmail || existing.accountEmail || '').trim().toLowerCase();
+    const already = Object.keys(store).some(function (id) {
+      if (id === '__meta' || id === opts.accountId) return false;
+      const r = store[id];
+      if (!r || !r.isTrial) return false;
+      const p = String(r.accountPhone || '').replace(/\D/g, '');
+      const e = String(r.accountEmail || '').trim().toLowerCase();
+      return (phoneKey && p && p === phoneKey) || (emailKey && e && e === emailKey);
+    });
+    if (already || existing.isTrial) {
+      return { ok: false, error: 'trial_already_used', msg: 'تم استخدام التجربة المجانية لهذه الهوية مسبقاً' };
+    }
+  }
+
   const paymentConfirmed = !isTrial && (
     opts.paymentConfirmed === true
     || !!opts.paidAt
@@ -189,10 +211,20 @@ async function syncAccountPackage(opts) {
   );
 
   // إن أُرسل days بلا periodEnd (لوحة الأدمن)، نحسب نهاية الفترة هنا
+  // التجربة موحّدة: 10 أيام إن لم يُمرَّر days صراحةً
   let periodStart = opts.periodStart || null;
   let periodEnd = opts.periodEnd || null;
   if (paymentConfirmed || isTrial) {
-    const daysNum = Math.max(1, Math.min(3650, Number(opts.days) || 0));
+    const rawDays = Number(opts.days);
+    const daysNum = Math.max(
+      1,
+      Math.min(
+        3650,
+        (Number.isFinite(rawDays) && rawDays > 0)
+          ? rawDays
+          : (isTrial ? launchMode.TRIAL_DURATION_DAYS : 0)
+      )
+    );
     if (!periodStart) periodStart = new Date().toISOString();
     if (!periodEnd && daysNum > 0) {
       const startMs = new Date(periodStart).getTime() || Date.now();
@@ -225,8 +257,8 @@ async function syncAccountPackage(opts) {
     subscriptionStatus: isTrial ? 'active' : (paymentConfirmed ? 'active' : 'pending'),
     pkgName: opts.pkgName,
     price: Number(opts.price) || 0,
-    periodStart: paymentConfirmed ? (periodStart || new Date().toISOString()) : (existing.periodStart || null),
-    periodEnd: paymentConfirmed ? (periodEnd || null) : (existing.periodEnd || null),
+    periodStart: (paymentConfirmed || isTrial) ? (periodStart || new Date().toISOString()) : (existing.periodStart || null),
+    periodEnd: (paymentConfirmed || isTrial) ? (periodEnd || null) : (existing.periodEnd || null),
     activatedBy: opts.activatedBy || 'admin',
     status: isTrial ? 'active' : (paymentConfirmed ? 'active' : 'pending'),
     paymentConfirmed: !!paymentConfirmed,

@@ -72,6 +72,8 @@ function dumpDom(url) {
 }
 
 function checkBrowseHeader(dom) {
+  /* الهيدر الموحّد الحالي = #rizq-mock-hdr (الكبسولة)؛ desk-nav قديم ومتوقّف */
+  const hasMock = /id=["']rizq-mock-hdr["']/.test(dom);
   const hasDesk = dom.includes('id="rizq-desk-nav"');
   const hasClass = dom.includes('has-rizq-desk-nav');
   const stripClass = dom.includes('rizq-search-strip-nav');
@@ -82,10 +84,16 @@ function checkBrowseHeader(dom) {
   if (navMatch) {
     const chunk = navMatch[1];
     const actions = chunk.match(/class="nav-actions"/);
-    const hidden = chunk.includes('data-rizq-chrome-hidden') || chunk.includes('display:none');
-    actionsVisible = !!(actions && !hidden && !stripClass);
+    const hidden = chunk.includes('data-rizq-chrome-hidden') || chunk.includes('display:none')
+      || /hidden|aria-hidden=["']true["']/.test(navMatch[0]);
+    actionsVisible = !!(actions && !hidden && !stripClass && !hasMock);
   }
-  return { hasDesk, hasClass, stripClass, chromeHidden, actionsVisible, ok: hasDesk && (hasClass || stripClass || chromeHidden) && !actionsVisible };
+  const unified = hasMock || hasDesk;
+  const stripOk = hasClass || stripClass || chromeHidden || hasMock;
+  return {
+    hasMock, hasDesk, hasClass, stripClass, chromeHidden, actionsVisible,
+    ok: unified && stripOk && !actionsVisible
+  };
 }
 
 function httpOk(url) {
@@ -121,7 +129,7 @@ if (!hdr.ok) {
   failed++;
   console.log('FAIL browse header duplication check');
 } else {
-  console.log('OK browse header (desk nav + search strip mode)');
+  console.log('OK browse header (mock/unified + no duplicate chrome)');
 }
 
 screenshot('smoke-browse-mobile', '/rizq_browse.html', 390, 844);
