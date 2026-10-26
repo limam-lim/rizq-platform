@@ -151,21 +151,30 @@ html.rizq-app-nav:has(#rizq-desk-nav) .dir-hero{padding-top:16px}
   box-shadow:0 4px 14px rgba(201,168,76,.35);
 }
 
+/* عمود مضغوط على الهاتف — بلا فراغ بين البحث والولاية؛ صفّان جنبًا إلى جنب من ≥720px */
 .dir-toolbar{
-  display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px;
-  padding:10px;border-radius:12px;background:#fff;
+  display:flex;flex-direction:column;flex-wrap:nowrap;gap:6px;align-items:stretch;margin-bottom:12px;
+  padding:8px;border-radius:12px;background:#fff;
   border:1px solid rgba(27,58,107,.08);box-shadow:0 4px 12px rgba(15,35,65,.04);
 }
 .dir-search{
-  flex:1 1 220px;min-width:160px;background:#f7f9fc;border:1.5px solid #e2e8f5;
+  display:block;width:100%;margin:0;flex:none;min-width:0;
+  background:#f7f9fc;border:1.5px solid #e2e8f5;
   border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;
+  -webkit-appearance:none;appearance:none;
 }
 .dir-search:focus{border-color:var(--gold);background:#fff;box-shadow:0 0 0 3px rgba(201,168,76,.14)}
 .dir-wilaya{
-  flex:0 1 200px;min-width:140px;background:#f7f9fc;border:1.5px solid #e2e8f5;
+  display:block;width:100%;margin:0;flex:none;min-width:0;
+  background:#f7f9fc;border:1.5px solid #e2e8f5;
   border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;cursor:pointer;
 }
 .dir-wilaya:focus{border-color:var(--gold);background:#fff;box-shadow:0 0 0 3px rgba(201,168,76,.14)}
+@media(min-width:720px){
+  .dir-toolbar{flex-direction:row;flex-wrap:nowrap;align-items:center;gap:8px;padding:10px}
+  .dir-search{flex:1 1 auto;width:auto}
+  .dir-wilaya{flex:0 0 200px;width:auto}
+}
 .dir-count{font-size:12.5px;color:#5b6b85;margin-bottom:12px;font-weight:700}
 /* شبكة بطاقات — نفس منطق صفحة الإعلانات (auto-fill) */
 .dir-grid{

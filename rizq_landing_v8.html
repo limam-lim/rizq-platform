@@ -6168,7 +6168,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 
 <!-- ══ DAILY PRICES BOARD ══ -->
 <section class="section" id="prices" style="background:var(--bg-section)">
-  <div class="pulse-brand fade-in" id="pulse-brand">
+  <a class="pulse-brand fade-in" id="pulse-brand" href="rizq_market_pulse.html" style="text-decoration:none;color:inherit">
     <div class="pulse-brand-mark" aria-hidden="true">
       <span class="pulse-ring"></span>
       <span class="pulse-ring pulse-ring-delay"></span>
@@ -6182,7 +6182,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <p class="pulse-brand-sub" id="pulse-brand-sub">أسعار المواد الغذائية الأساسية · المحروقات · العملات — بوضوح قبل أن تشتري أو تبيع</p>
       <p class="pulse-brand-en" id="pulse-brand-en">Rizq Market Pulse</p>
     </div>
-  </div>
+  </a>
   <!-- عنوان قديم مخفي للتوافق مع data-t / الاختبارات -->
   <div class="section-header fade-in" aria-hidden="true">
     <p class="section-tag">📊 نبضة السوق · Rizq Market Pulse</p>
@@ -6202,7 +6202,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       <button class="price-tab" data-cat="currencies" data-t="prices-tab-currencies" onclick="switchPriceTab('currencies',this)">💱 عملات</button>
     </div>
     <div class="prices-grid" id="prices-grid"></div>
-    <p class="prices-note" id="prices-note" data-t="prices-note">الأسعار تقريبية وقد تختلف حسب المنطقة والمحل · هل تبيع هذه المواد؟ <a href="rizq_register.html?mode=seller" style="color:var(--royal);font-weight:700;text-decoration:none">انشر منتجاتك على رزق الآن ←</a></p>
+    <p class="prices-note" id="prices-note" data-t="prices-note">الأسعار تقريبية · عيّنة من نبضة السوق</p>
+    <div class="landing-ads-footer" style="margin-top:14px">
+      <a class="landing-ads-browse-full" href="rizq_market_pulse.html" id="prices-browse-full" data-t="prices-browse-full">📈 عرض نبضة السوق كاملة ←</a>
+    </div>
   </div>
 </section>
 
@@ -10939,7 +10942,8 @@ const LANG = {
     's-prices-desc': 'أسعار اليوم في موريتانيا — قرار أوضح قبل أن تشتري أو تبيع',
     'prices-live': 'مباشر · آخر تحديث:',
     'prices-tab-food': '🍚 مواد غذائية', 'prices-tab-fuel': '⛽ محروقات', 'prices-tab-currencies': '💱 عملات',
-    'prices-note': 'الأسعار تقريبية وتعكس متوسط السوق المحلي — <a href="#" onclick="openModal(\'register\');return false" style="color:var(--royal);font-weight:700">انشر منتجاتك على رزق الآن ←</a>',
+    'prices-note': 'الأسعار تقريبية · عيّنة من نبضة السوق',
+    'prices-browse-full': '📈 عرض نبضة السوق كاملة ←',
     'cta-badge1': 'انضم الآن', 'cta-badge2': 'أفراد · محلات · عقارات · وأكثر', 'cta-btn3': '🏢 افتح مساحتك على رزق',
     'cta-btn4': '📑 المناقصات',
     'cta-hubs-label': 'اختر مساحتك على رزق',
@@ -11039,7 +11043,7 @@ const LANG = {
     'cta-btn1': '🚀 سجّل الآن — مجاناً', 'cta-btn2': '📲 التطبيق قريباً', 'cta-btn-invest': '📈 الاستثمارات',
     'cta-note': '&nbsp;ابدأ الآن — بلا رسوم خفية',
     'ft-quick': 'روابط سريعة', 'ft-topcats': 'أبرز الأقسام', 'ft-help': 'المساعدة',
-    'ft-q1':'الرئيسية','ft-q2':'تصفّح الإعلانات','ft-q3':'انشر إعلانك','ft-q4':'الأسعار','ft-q5b':'من نحن','ft-q5c':'لماذا رزق','ft-q5':'الشركة المالكة',
+    'ft-q1':'الرئيسية','ft-q2':'تصفّح الإعلانات','ft-q3':'انشر إعلانك','ft-q4':'نبضة السوق','ft-q5b':'من نحن','ft-q5c':'لماذا رزق','ft-q5':'الشركة المالكة',
     'ft-tc1':'🏠 منازل وعقارات','ft-tc2':'🚗 سيارات وقطع غيار','ft-tc3':'🚛 شاحنات ومعدات','ft-tc4':'📱 هواتف وإلكترونيات','ft-tc5':'🐄 ماشية وحيوانات',
     'ft-h1':'مركز المساعدة','ft-h2':'سياسة الخصوصية','ft-h3':'شروط الاستخدام','ft-h4':'الإبلاغ عن إعلان','ft-h5':'تواصل معنا',
     'ft-desc': 'سوق موريتانيا الإلكتروني للإعلانات والأعمال: محلات، معارض، مناقصات، واستثمارات.',
@@ -11104,7 +11108,8 @@ const LANG = {
     's-prices-desc': 'Les prix du jour en Mauritanie — décidez plus clairement avant d\'acheter ou de vendre',
     'prices-live': 'En direct · Dernière mise à jour :',
     'prices-tab-food': '🍚 Denrées alimentaires', 'prices-tab-fuel': '⛽ Carburants', 'prices-tab-currencies': '💱 Devises',
-    'prices-note': 'Les prix sont indicatifs et reflètent la moyenne du marché local — <a href="#" onclick="openModal(\'register\');return false" style="color:var(--royal);font-weight:700">Publiez vos produits sur Rizq →</a>',
+    'prices-note': 'Prix indicatifs · aperçu du pouls du marché',
+    'prices-browse-full': '📈 Voir le pouls du marché complet →',
     'cta-badge1': 'Rejoignez-nous', 'cta-badge2': 'Particuliers · Boutiques · Immobilier · et plus', 'cta-btn3': '🏢 Ouvrir mon espace sur Rizq',
     'cta-btn4': '📑 Appels d\'offres',
     'cta-hubs-label': 'Choisissez votre espace sur Rizq',
@@ -11204,7 +11209,7 @@ const LANG = {
     'cta-btn1': '🚀 S\'inscrire — Gratuit', 'cta-btn2': '📲 L\'app bientôt', 'cta-btn-invest': '📈 Investissements',
     'cta-note': '&nbsp;Commencez maintenant — sans frais cachés',
     'ft-quick': 'Liens rapides', 'ft-topcats': 'Meilleures catégories', 'ft-help': 'Aide',
-    'ft-q1':'Accueil','ft-q2':'Parcourir les annonces','ft-q3':'Publier une annonce','ft-q4':'Tarifs','ft-q5b':'À propos','ft-q5c':'Pourquoi Rizq','ft-q5':'Société propriétaire',
+    'ft-q1':'Accueil','ft-q2':'Parcourir les annonces','ft-q3':'Publier une annonce','ft-q4':'Pouls du marché','ft-q5b':'À propos','ft-q5c':'Pourquoi Rizq','ft-q5':'Société propriétaire',
     'ft-tc1':'🏠 Immobilier','ft-tc2':'🚗 Voitures & pièces','ft-tc3':'🚛 Camions & engins','ft-tc4':'📱 Téléphones & électronique','ft-tc5':'🐄 Bétail & animaux',
     'ft-h1':'Centre d\'aide','ft-h2':'Politique de confidentialité','ft-h3':'Conditions d\'utilisation','ft-h4':'Signaler une annonce','ft-h5':'Contactez-nous',
     'ft-desc': 'Le marché électronique mauritanien des annonces et des affaires : boutiques, showrooms, appels d\'offres et investissements.',
@@ -14755,15 +14760,27 @@ function currencyFlagHTML(it){
   }
   return '<span class="price-curr-flag" aria-hidden="true">'+escapeHtml((it && it.icon) || '💱')+'</span>';
 }
+/* الرئيسية تعرض عيّنة قصيرة فقط — اللوحة الكاملة في rizq_market_pulse.html */
+const LANDING_PULSE_PREVIEW = 4;
 function renderPrices(){
   const grid = document.getElementById('prices-grid');
   if(!grid) return;
-  const items = _pricesData.filter(it=>it.cat===_priceTab);
+  const allItems = _pricesData.filter(it=>it.cat===_priceTab);
+  const items = allItems.slice(0, LANDING_PULSE_PREVIEW);
   const note = document.getElementById('prices-note');
   if(note){
+    const more = allItems.length > LANDING_PULSE_PREVIEW ? (allItems.length - LANDING_PULSE_PREVIEW) : 0;
     note.innerHTML = _priceTab==='currencies'
-      ? (isAr ? 'أسعار إرشادية من السوق · قد تختلف عن الصرافين المحليين · تُحدَّث تلقائياً من الإنترنت' : 'Taux indicatifs du marché · peuvent différer des bureaux de change locaux · mise à jour automatique')
-      : (isAr ? 'الأسعار تقريبية وقد تختلف حسب المنطقة والمحل · هل تبيع هذه المواد؟ <a href="#" onclick="openModal(\'register\');return false" style="color:var(--royal);font-weight:700;text-decoration:none">انشر منتجاتك على رزق الآن ←</a>' : 'Prix indicatifs · peuvent varier selon la région · <a href="#" onclick="openModal(\'register\');return false" style="color:var(--royal);font-weight:700;text-decoration:none">Publiez sur Rizq →</a>');
+      ? (isAr
+        ? ('أسعار إرشادية · عيّنة'+(more?(' · +'+more+' في الصفحة الكاملة'):''))
+        : ('Taux indicatifs · aperçu'+(more?(' · +'+more+' sur la page complète'):'')))
+      : (isAr
+        ? ('الأسعار تقريبية · عيّنة من نبضة السوق'+(more?(' · +'+more+' أخرى'):''))
+        : ('Prix indicatifs · aperçu'+(more?(' · +'+more+' autres'):'')));
+  }
+  const browse = document.getElementById('prices-browse-full');
+  if(browse){
+    browse.textContent = isAr ? '📈 عرض نبضة السوق كاملة ←' : '📈 Voir le pouls du marché complet →';
   }
   if(!items.length){
     grid.innerHTML = '<p class="rzq-empty" style="grid-column:1/-1;text-align:center;color:#6a7a8a;padding:28px 16px;font-size:14px">'+(isAr?'لا توجد أسعار سوق بعد.':'Aucun prix de marché pour le moment.')+'</p>';
