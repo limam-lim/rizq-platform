@@ -115,6 +115,36 @@ function mountAccountsSessionRoutes(app, deps) {
     });
   });
 
+  /** POST /api/accounts/logout — إبطال توكنات البائع فوراً (تدوير access + dash) */
+  app.post('/api/accounts/logout', sellerLoginLimiter, (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    const b = req.body || {};
+    const id = String(b.id || b.accountId || '').slice(0, 60);
+    const token = String(
+      b.accessToken || b.token || extractAccountToken(req) || req.header('x-account-token') || ''
+    ).trim();
+    if (!id || !token) {
+      return res.status(400).json({ ok: false, code: 'missing', error: 'معرّف الحساب والتوكن مطلوبان' });
+    }
+    const list = readAccounts();
+    const idx = list.findIndex((a) => a && a.id === id);
+    if (idx < 0) {
+      return res.json({ ok: true });
+    }
+    const acc = list[idx];
+    const accessOk = !!(acc.accessToken && timingSafeEqualStr(acc.accessToken, token));
+    const dashOk = !!(acc.dashToken && timingSafeEqualStr(acc.dashToken, token));
+    if (!accessOk && !dashOk) {
+      return res.status(401).json({ ok: false, code: 'unauthorized', error: 'unauthorized' });
+    }
+    acc.accessToken = genAccessToken();
+    acc.dashToken = genDashToken();
+    acc.updatedAt = new Date().toISOString();
+    list[idx] = acc;
+    writeAccounts(list);
+    res.json({ ok: true });
+  });
+
   /** POST /api/accounts/activate-by-otp */
   app.post('/api/accounts/activate-by-otp', accountsRegisterLimiter, (req, res) => {
     res.set('Cache-Control', 'no-store');

@@ -218,6 +218,11 @@ app.use('/uploads/service-docs', forbidUploadPath(
   'مرفقات غرفة الطلبات محمية — لصاحب الحساب فقط',
   'Pièces jointes du bureau de demandes protégées — titulaire uniquement'
 ));
+app.use('/uploads/kyc', forbidUploadPath(
+  'kyc_forbidden',
+  'وثائق الهوية محمية — للمراجعة الإدارية وصاحب الحساب فقط',
+  'Documents d\'identité protégés — admin / titulaire uniquement'
+));
 app.use('/uploads/ads', gateUploadByStatus(
   (adId) => repos.ads.getById(adId),
   ['active', 'approved', 'published'],
@@ -1978,6 +1983,22 @@ function stripToken(acc) {
   return safe;
 }
 
+/** اقرأ مسار KYC الخاص كـ data-URL لردّ الأدمن فقط (الملف غير عام) */
+function kycPathToDataUrl(relUrl) {
+  try {
+    const u = String(relUrl || '');
+    if (!u.startsWith('/uploads/kyc/')) return u;
+    const key = u.replace(/^\/+/, '');
+    const abs = path.join(__dirname, key);
+    const root = path.join(__dirname, 'uploads', 'kyc') + path.sep;
+    if (!abs.startsWith(root)) return '';
+    if (!fs.existsSync(abs)) return '';
+    const buf = fs.readFileSync(abs);
+    if (!buf.length || buf.length > 3_500_000) return '';
+    return 'data:image/webp;base64,' + buf.toString('base64');
+  } catch (e) { return ''; }
+}
+
 /** نسخة أدمن: تحتفظ بوثائق KYC للمراجعة، بلا أسرار وصول */
 function toAdminAccount(acc) {
   if (!acc) return null;
@@ -1989,6 +2010,12 @@ function toAdminAccount(acc) {
     ...safe
   } = acc;
   delete safe.password;
+  ['idImage', 'licenseImage', 'activityImage2', 'id_image', 'activity_image2'].forEach((k) => {
+    if (safe[k] && String(safe[k]).startsWith('/uploads/kyc/')) {
+      const data = kycPathToDataUrl(safe[k]);
+      if (data) safe[k] = data;
+    }
+  });
   return safe;
 }
 
@@ -2208,10 +2235,10 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     foreignId: String(b.foreignId || b.foreign_id || '').slice(0, 40),
     nationality: String(b.nationality || '').slice(0, 20),
     nationalityCountry: String(b.nationalityCountry || b.nationality_country || '').slice(0, 60),
-    // KYC: data:image فقط (jpeg/png/webp) — رفض نصوص/HTML/PDF خام لتقليل ضغط الذاكرة وPII غير صوري
-    idImage: sanitizeKycDataUrl(b.idImage, 5_000_000),
-    licenseImage: sanitizeKycDataUrl(b.licenseImage, 5_000_000),
-    activityImage2: sanitizeKycDataUrl(b.activityImage2 || b.activity_image2, 5_000_000),
+    // KYC: عبر imagePipeline (magic bytes + حد حجم + WebP) — مسارات خاصة تحت /uploads/kyc/
+    idImage: '',
+    licenseImage: '',
+    activityImage2: '',
     // برنامج الإحالة (جيب صاحبك واربح) — معرّف الحساب المُحيل (نفس صيغة id
     // القياسية ACC_<timestamp>) إن جاء الزائر عبر رابط ?ref=ACC_xxx. نتحقق
     // من الصيغة لمنع أي قيمة عشوائية، ونمنع أن يُحيل الحساب نفسه (لن يحدث
@@ -2248,6 +2275,21 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
       ? String(b.focusAreas || b.focus || '').slice(0, 300)
       : undefined,
   };
+  /* معالجة KYC قبل الحفظ النهائي — فشل الصورة لا يُسقط التسجيل إن باقي الحقول صالحة */
+  try {
+    const { saveKycImages } = require('./services/imagePipeline');
+    const kycSaved = await saveKycImages(id, {
+      idImage: b.idImage,
+      licenseImage: b.licenseImage,
+      activityImage2: b.activityImage2 || b.activity_image2,
+    });
+    if (kycSaved.idImage) acc.idImage = kycSaved.idImage;
+    if (kycSaved.licenseImage) acc.licenseImage = kycSaved.licenseImage;
+    if (kycSaved.activityImage2) acc.activityImage2 = kycSaved.activityImage2;
+  } catch (eKyc) {
+    console.warn('[accounts/register] kyc pipeline:', eKyc && eKyc.message);
+  }
+
   list.push(acc);
   writeAccounts(list);
   if (autoApproved && canAutoApproveAccountType(reqType) && acc.idImage) {

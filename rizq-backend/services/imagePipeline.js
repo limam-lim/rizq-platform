@@ -241,6 +241,43 @@ async function saveInvestmentImages(invId, images, opts) {
   });
 }
 
+/**
+ * KYC عند التسجيل/التحديث — magic bytes + حد حجم + إعادة ترميز WebP.
+ * يُحفظ تحت uploads/kyc/<accountId>/ (محظور من static العام).
+ * @returns {{ idImage?: string, licenseImage?: string, activityImage2?: string }}
+ */
+async function saveKycImages(accountId, fields, opts) {
+  const out = {};
+  const src = fields && typeof fields === 'object' ? fields : {};
+  const slots = [
+    ['idImage', 0],
+    ['licenseImage', 1],
+    ['activityImage2', 2],
+  ];
+  const maxBytes = (opts && Number(opts.maxImageBytes) > 0)
+    ? Number(opts.maxImageBytes)
+    : MAX_INPUT_BYTES;
+  for (let s = 0; s < slots.length; s++) {
+    const key = slots[s][0];
+    const index = slots[s][1];
+    const raw = src[key];
+    if (!raw || typeof raw !== 'string') continue;
+    /* مسار KYC سابق لنفس الحساب — أبقِه */
+    const owned = '/uploads/kyc/' + String(accountId || '').replace(/[^a-zA-Z0-9_-]/g, '') + '/';
+    if (raw.indexOf(owned) === 0) {
+      out[key] = raw.replace(/\.(thumb|full)\.webp$/i, '.webp');
+      continue;
+    }
+    const parsed = parseDataUriImage(raw, { maxBytes: maxBytes });
+    if (!parsed || parsed.error) continue;
+    const safeId = String(accountId || '').replace(/[^a-zA-Z0-9_-]/g, '');
+    if (!safeId) continue;
+    const savedUrl = await putImageVariants('kyc', safeId, index, parsed.buf, { paid: false });
+    if (savedUrl) out[key] = savedUrl;
+  }
+  return out;
+}
+
 module.exports = {
   detectImageMagic,
   parseDataUriImage,
@@ -255,6 +292,7 @@ module.exports = {
   saveCatalogImage,
   saveTenderImages,
   saveInvestmentImages,
+  saveKycImages,
   VARIANT_SPECS,
   MAX_INPUT_BYTES,
 };

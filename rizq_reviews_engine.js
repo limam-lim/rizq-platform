@@ -8,34 +8,23 @@
 (function (global) {
   'use strict';
 
-  var STORAGE_KEY = 'rizq_reviews';
-  var REVIEWED_KEY = 'rizq_reviewed_targets';
+  /* كاش ذاكرة فقط — لا كتابة تقييمات في localStorage (المصدر = POST/GET API) */
+  var _memReviews = Object.create(null);
+  var _memReviewed = Object.create(null);
   var MAX_COMMENT_LEN = 500;
   var MAX_NAME_LEN = 60;
 
   function _getAll() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
-    catch (e) { return {}; }
+    return _memReviews;
   }
   function _saveAll(all) {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); }
-    catch (e) { /* ignore */ }
-  }
-  function _getReviewedTargets() {
-    try { return JSON.parse(localStorage.getItem(REVIEWED_KEY) || '[]'); }
-    catch (e) { return []; }
+    _memReviews = all && typeof all === 'object' ? all : Object.create(null);
   }
   function _markReviewed(targetId) {
-    try {
-      var arr = _getReviewedTargets();
-      if (arr.indexOf(targetId) === -1) {
-        arr.push(targetId);
-        localStorage.setItem(REVIEWED_KEY, JSON.stringify(arr));
-      }
-    } catch (e) {}
+    if (targetId) _memReviewed[String(targetId)] = true;
   }
   function _hasReviewed(targetId) {
-    return _getReviewedTargets().indexOf(targetId) !== -1;
+    return !!_memReviewed[String(targetId || '')];
   }
 
   function apiBase() {

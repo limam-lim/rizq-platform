@@ -10576,9 +10576,12 @@ function applyList(list){
     (list||[]).filter(function(a){ return a && !isDemoAd(a) && (a.status==='active' || !a.status); }).forEach(function(a){
       ADS.push(mapApiAdToHero(a));
     });
-    /* لا إعلانات حية على الخادم بعد — أظهر نوافذ العرض (FEATURED_ADS) بدل إخفاء القسم */
+    /* لا إعلانات حية — أظهر نوافذ DEMO فقط ما دام launchDate فارغاً (أو ?demo=1) */
     var usingShowcase = false;
-    if(!ADS.length && typeof FEATURED_ADS !== 'undefined' && FEATURED_ADS.length){
+    var demoOk = (window.RizqDemo && typeof RizqDemo.inventoryAllowed === 'function')
+      ? RizqDemo.inventoryAllowed()
+      : !(window.RIZQ_LAUNCH && RIZQ_LAUNCH.launchDate);
+    if(!ADS.length && demoOk && typeof FEATURED_ADS !== 'undefined' && FEATURED_ADS.length){
       usingShowcase = true;
       /* قدّم إعلانات الملحفة/الدراعة التجريبية أولاً لتجربة البطاقات الفاخرة */
       var fashionDemoIds = {211:1,216:1,231:1,232:1,233:1,234:1};
@@ -10589,6 +10592,15 @@ function applyList(list){
         else restAds.push(a);
       });
       fashionFirst.concat(restAds).forEach(function(a){ ADS.push(a); });
+    } else if (demoOk && typeof FEATURED_ADS !== 'undefined' && FEATURED_ADS.length) {
+      /* قبل الإطلاق: ادمج نوافذ DEMO مع أي إعلانات حية حتى تبقى التجريبية ظاهرة */
+      var have = {};
+      ADS.forEach(function(a){ if(a&&a.id!=null) have[String(a.id)] = true; });
+      FEATURED_ADS.forEach(function(a){
+        if(!a || a.id==null || have[String(a.id)]) return;
+        ADS.push(a);
+        have[String(a.id)] = true;
+      });
     }
     refreshAllAdsIndex();
     /* كتالوج الموزاييك يبقى متاحاً عبر FEATURED في _styPool حتى مع إعلانات حية */
