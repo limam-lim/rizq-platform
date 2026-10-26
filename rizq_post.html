@@ -39,7 +39,8 @@ body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f8faff;c
 
 /* ══ NAVBAR ══ */
 nav{position:sticky;top:0;z-index:1000;background:rgba(15,23,42,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.1);height:60px;display:flex;align-items:center;padding:0 4%;gap:14px;direction:ltr}
-.logo{display:flex;align-items:center;gap:8px;text-decoration:none;order:5}
+/* order فقط على شريط nav القديم — لا يمسّ شعار #rizq-mock-hdr (.rmh-brand.logo) */
+body > nav > .logo{display:flex;align-items:center;gap:8px;text-decoration:none;order:5}
 .nav-title{order:2}
 .btn-ns{order:3}
 #lang-btn{order:4}
@@ -137,6 +138,14 @@ html[dir="ltr"] .progress-steps .step:not(:last-child)::after{
   transition:transform .15s ease,box-shadow .3s,border-color .3s;
   font-family:'Cairo',system-ui,sans-serif;
   box-shadow:0 10px 30px -10px rgba(0,0,0,0.08);
+  overflow:hidden !important; /* يمنع أيقونة/شارة من الخروج بين البطاقات */
+  position:relative;
+  z-index:0;
+}
+.post-wrap .cats-grid{
+  align-items:stretch;
+  position:relative;
+  z-index:0;
 }
 .post-wrap .cats-grid .cat-btn:active,
 #panel-1 .cat-btn:active{transform:scale(0.98)}
