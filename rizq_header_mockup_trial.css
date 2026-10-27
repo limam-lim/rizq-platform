@@ -276,7 +276,7 @@ body.rizq-mockup-hdr-trial .hero-subtitle-secondary{
   text-shadow:none;
   opacity:1!important;
 }
-/* بيع/اشتر/تميّز — كبسولة زجاجية كحلي/ذهبي أوضح وأكثر فخامة */
+/* بيع/اشتر/تميّز — كبسولة بيضاء كما كانت (لون فقط) */
 html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pills,
 body.rizq-mockup-hdr-trial .hero-pills{
   width:100%!important;
@@ -286,36 +286,21 @@ body.rizq-mockup-hdr-trial .hero-pills{
   padding:6px 5px!important;
   margin:0 auto!important;
   border-radius:14px!important;
-  border:1.5px solid rgba(201,168,76,.62)!important;
-  background:
-    linear-gradient(165deg,rgba(255,255,255,.72) 0%,rgba(247,241,225,.55) 42%,rgba(232,237,245,.4) 100%),
-    linear-gradient(135deg,rgba(27,58,107,.08),rgba(201,168,76,.14))!important;
-  box-shadow:
-    0 12px 28px rgba(13,27,42,.14),
-    0 0 0 1px rgba(201,168,76,.12),
-    0 0 24px rgba(201,168,76,.12),
-    inset 0 1px 0 rgba(255,255,255,.85),
-    inset 0 -1px 0 rgba(13,27,42,.05)!important;
-  backdrop-filter:blur(14px) saturate(1.2)!important;
-  -webkit-backdrop-filter:blur(14px) saturate(1.2)!important;
+  border:1.5px solid rgba(15,35,71,.14)!important;
+  background:#fff!important;
+  background-image:none!important;
+  box-shadow:0 10px 28px rgba(13,27,42,.1)!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
   box-sizing:border-box!important;
   position:relative!important;
   overflow:hidden!important;
 }
 html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pills::before,
 body.rizq-mockup-hdr-trial .hero-pills::before{
-  content:''!important;
-  position:absolute!important;inset:0!important;
-  background:linear-gradient(105deg,transparent 35%,rgba(243,226,168,.28) 48%,transparent 62%)!important;
-  transform:translateX(-120%)!important;
-  animation:rmhPillSheen 5.5s ease-in-out infinite!important;
-  pointer-events:none!important;
-  z-index:0!important;
-}
-@keyframes rmhPillSheen{
-  0%,55%{transform:translateX(-120%)}
-  75%{transform:translateX(120%)}
-  100%{transform:translateX(120%)}
+  content:none!important;
+  display:none!important;
+  animation:none!important;
 }
 html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pill,
 body.rizq-mockup-hdr-trial .hero-pill{
@@ -340,7 +325,7 @@ body.rizq-mockup-hdr-trial .hero-pill-sep{
   margin:0 3px!important;
   flex:0 0 1.5px!important;
   align-self:center!important;
-  background:linear-gradient(180deg,transparent,rgba(201,168,76,.75),transparent)!important;
+  background:linear-gradient(180deg,transparent,rgba(15,35,71,.22),transparent)!important;
   color:transparent!important;
   font-size:0!important;
   position:relative!important;
@@ -386,13 +371,11 @@ body.rizq-mockup-hdr-trial #hero-tagline{
   min-height:1.45em!important;
   color:#0F2347!important;
   -webkit-text-fill-color:#0F2347!important;
-  background:
-    linear-gradient(180deg,rgba(255,255,255,.55),rgba(247,241,225,.35))!important;
-  border:1px solid rgba(201,168,76,.38)!important;
+  background:#fff!important;
+  background-image:none!important;
+  border:1.5px solid rgba(15,35,71,.14)!important;
   border-radius:12px!important;
-  box-shadow:
-    0 8px 20px rgba(13,27,42,.08),
-    inset 0 1px 0 rgba(255,255,255,.7)!important;
+  box-shadow:0 8px 20px rgba(13,27,42,.08)!important;
   text-shadow:none!important;
   filter:none!important;
   mix-blend-mode:normal!important;
@@ -769,11 +752,19 @@ body.rizq-lang-fr #rizq-mock-hdr #rmh-lang-btn .lang-fr{
 .rmh-nav a.rmh-post-nav .rmh-nav-ico,
 .rmh-nav a.rmh-post-nav .rmh-post-plus{
   font-size:18px;line-height:1;opacity:1;
-  color:#E8C96A!important;
+  color:#fff!important;
   font-weight:900;
   width:22px;height:22px;
   display:inline-flex;align-items:center;justify-content:center;
   background:transparent!important;
+}
+.rmh-nav a.rmh-post-nav:hover .rmh-nav-ico,
+.rmh-nav a.rmh-post-nav:hover .rmh-post-plus,
+.rmh-nav a.rmh-post-nav.is-active .rmh-nav-ico,
+.rmh-nav a.rmh-post-nav.is-active .rmh-post-plus,
+.rmh-nav a.rmh-post-nav:focus .rmh-nav-ico,
+.rmh-nav a.rmh-post-nav:focus .rmh-post-plus{
+  color:var(--rmh-gold,#E8C96A)!important;
 }
 .rmh-nav a.rmh-post-nav:hover,
 .rmh-nav a.rmh-post-nav.is-active,
@@ -878,12 +869,29 @@ body.rizq-mockup-hdr-trial .aam-card{
     pointer-events:auto!important;
   }
 }
-.rmh-nav a .rmh-nav-ico{
+.rmh-nav a .rmh-nav-ico,
+.rmh-more-btn .rmh-nav-ico{
   display:inline-flex;align-items:center;justify-content:center;
   width:22px;height:22px;line-height:1;opacity:.92;
+  color:#fff!important; /* أبيض افتراضياً — ذهبي عند المرور فقط */
   pointer-events:none; /* المؤشر يد على الرابط كله لا تحديد نص */
 }
 .rmh-nav a .rmh-nav-ico svg{display:block;pointer-events:none}
+#rizq-mock-hdr nav.rmh-nav a .rmh-nav-ico,
+nav.rmh-nav a .rmh-nav-ico,
+#rizq-mock-hdr .rmh-more-btn .rmh-nav-ico,
+.rmh-more-btn .rmh-nav-ico{
+  color:#fff!important;
+}
+#rizq-mock-hdr nav.rmh-nav a:hover .rmh-nav-ico,
+nav.rmh-nav a:hover .rmh-nav-ico,
+#rizq-mock-hdr .rmh-more-wrap.open .rmh-more-btn .rmh-nav-ico,
+.rmh-more-wrap.open .rmh-more-btn .rmh-nav-ico,
+#rizq-mock-hdr .rmh-more-btn:hover .rmh-nav-ico,
+.rmh-more-btn:hover .rmh-nav-ico{
+  color:var(--rmh-gold,#C9A84C)!important;
+  opacity:1;
+}
 
 /* المزيد — قائمة منسدلة (fixed عبر JS حتى لا تُقصّ بـ overflow) */
 .rmh-more-wrap{
@@ -953,15 +961,15 @@ body.rizq-lang-fr body > .rmh-more-menu{
 .rmh-nav a.is-active{
   color:var(--rmh-gold);border-bottom-color:var(--rmh-gold);
 }
-.rmh-nav a.is-active .rmh-nav-ico{opacity:1;color:var(--rmh-gold)}
+.rmh-nav a.is-active .rmh-nav-ico{opacity:1;color:var(--rmh-gold)!important}
 .rmh-nav:hover a.is-active:not(:hover){
   color:rgba(255,255,255,.78);border-bottom-color:transparent;
 }
-.rmh-nav:hover a.is-active:not(:hover) .rmh-nav-ico{color:inherit;opacity:.92}
+.rmh-nav:hover a.is-active:not(:hover) .rmh-nav-ico{color:#fff!important;opacity:.92}
 .rmh-nav a:hover{
   color:var(--rmh-gold)!important;border-bottom-color:var(--rmh-gold)!important;
 }
-.rmh-nav a:hover .rmh-nav-ico{opacity:1;color:var(--rmh-gold)}
+.rmh-nav a:hover .rmh-nav-ico{opacity:1;color:var(--rmh-gold)!important}
 
 /* منسدلة السلة — fixed عبر JS حتى لا تتداخل مع قائمة المزيد ولا تُقصّ */
 .rmh-cart-wrap{position:relative;z-index:30}
