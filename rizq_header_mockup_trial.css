@@ -566,6 +566,21 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial #detail-content{
   grid-row:1!important;
   order:0!important;
   align-self:center!important;
+  pointer-events:auto!important;
+  position:relative;
+  z-index:40;
+}
+#rizq-mock-hdr .rmh-tools .rmh-lang,
+#rizq-mock-hdr .rmh-tools .rmh-ico,
+#rizq-mock-hdr .rmh-tools a.rmh-ico,
+#rizq-mock-hdr .rmh-tools .rmh-help-dd,
+#rizq-mock-hdr .rmh-tools #rmh-lang-btn,
+#rizq-mock-hdr .rmh-tools #rmh-cart-btn,
+#rizq-mock-hdr .rmh-tools #rmh-help-btn{
+  pointer-events:auto!important;
+  cursor:pointer!important;
+  position:relative;
+  z-index:41;
 }
 
 .rmh-search{
