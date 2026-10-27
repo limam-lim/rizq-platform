@@ -42,3 +42,8 @@ Seed: `scripts/seed-public-promo-interfaces.js`
 
 **Disclaimer burned into every segment:**  
 `بيانات ترويجية فقط — ليست بيانات حقيقية`
+
+## Graduation tags
+- `graduation-demo-v5.3` — hero promo restored to `rizq-platform-promo-light.mp4` (full ~44s)
+- `graduation-demo-v5.4` — Market Pulse price cards/rows light (directory style; navy on header/ticker only)
+
