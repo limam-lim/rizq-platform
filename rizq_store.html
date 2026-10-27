@@ -817,17 +817,28 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   margin:0!important;min-height:32px;height:32px;border-radius:8px!important
 }
 #reviews-section .rzq-rev-empty{display:none!important}
-/* تابلت: طلب فوق تقييم؛ النموذج بعرضين */
+/* تابلت: طلب فوق تقييم؛ النموذج بعرضين — التقييمات تبقى شريطاً قصيراً بلا فراغ */
 @media(max-width:1100px) and (min-width:701px){
   .store-under-band{
     gap:8px;padding:8px;
     grid-template-columns:1fr !important;
   }
-  .store-desk-form{grid-template-columns:1fr 1fr !important}
+  .store-desk-form{grid-template-columns:1fr 1fr !important;gap:6px}
   .store-desk-span2{grid-column:span 1}
-  .store-desk-actions{flex-direction:row;flex-wrap:wrap}
-  #reviews-section.store-reviews-hz{flex-wrap:wrap}
-  #reviews-section .rzq-rev-form{flex-wrap:wrap!important}
+  .store-desk-actions{flex-direction:row;flex-wrap:nowrap;gap:8px}
+  #store-service-desk.store-desk-hz{padding:8px 8px 6px!important}
+  #reviews-section.store-reviews-hz{
+    flex-wrap:wrap;align-items:center;gap:6px 8px;padding:6px 8px!important
+  }
+  #reviews-section .store-reviews-inner{flex-wrap:wrap;width:100%}
+  #reviews-section #reviews-list{width:100%}
+  #reviews-section .rzq-rev-form{
+    flex-wrap:wrap!important;gap:6px;width:100%
+  }
+  #reviews-section #store-review-name{flex:1 1 120px;max-width:none}
+  #reviews-section #store-review-comment{flex:2 1 160px;min-width:120px}
+  #reviews-section .rzq-rev-submit{margin-inline-start:auto!important}
+  #reviews-section #store-big-stars{display:none} /* النجوم في النموذج كافية */
 }
 @media(max-width:700px){
   /* الشريط نفسه ينهار بـ contents في رحلة الجوال — لا تُبقِه grid فوق المنتجات */
