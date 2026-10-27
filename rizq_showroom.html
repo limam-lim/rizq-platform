@@ -16,7 +16,7 @@
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="stylesheet" href="rizq-theme.css"/>
 <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
-<link rel="stylesheet" href="rizq_product_detail.css?v=28.6"/>
+<link rel="stylesheet" href="rizq_product_detail.css?v=29.0"/>
 <link rel="stylesheet" href="rizq_close_band.css?v=1"/>
 <link rel="stylesheet" href="rizq_prefacture.css?v=2"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.6"/>
@@ -288,20 +288,36 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 .info-card{background:#fff;border-radius:var(--radius);padding:20px;border:1px solid #ece3d1;border-top:3px solid var(--gold);box-shadow:0 14px 32px rgba(27,58,107,.1)}
 .info-card-title{font-size:12.5px;font-weight:800;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:1px}
 
-/* غرفة الطلبات تحت الكتالوج — التقييمات قسم منفصل أسفل معلومات المعرض */
+/* غرفة الطلبات + التقييمات — أفقي على تابلت/كمبيوتر لملء الفراغ */
 .showroom-under-band{
-  display:block;
+  display:grid !important;
+  grid-template-columns:minmax(0,1.15fr) minmax(260px,0.85fr) !important;
+  grid-template-areas:
+    "desk reviews"
+    "pay pay";
+  gap:14px;
   margin:20px 0 8px;
   width:100%;
   min-width:0;
   box-sizing:border-box;
-  padding:12px;
+  padding:14px;
   border-radius:20px;
+  align-items:stretch;
   background:
     radial-gradient(ellipse at 90% 0%, rgba(201,168,76,.06), transparent 42%),
     linear-gradient(165deg,#ffffff 0%,#faf7f0 100%);
   border:1px solid rgba(27,58,107,.08);
   box-shadow:0 12px 40px rgba(15,35,65,.06);
+}
+#showroom-service-desk.showroom-desk-hz{grid-area:desk}
+#reviews-section.showroom-reviews-hz{grid-area:reviews;min-height:100%}
+#showroom-under-band > #showroom-payment-methods{grid-area:pay;margin:0!important}
+@media(max-width:1100px) and (min-width:701px){
+  .showroom-under-band{
+    gap:12px;padding:12px;
+    grid-template-columns:minmax(0,1.05fr) minmax(240px,0.95fr) !important;
+  }
+  .showroom-desk-actions{grid-template-columns:minmax(0,1fr) minmax(140px,170px)}
 }
 #showroom-service-desk.showroom-desk-hz{
   margin:0;
@@ -350,19 +366,20 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   background:linear-gradient(135deg,#0D1B2A,#1B3A6B);color:#fff;font-weight:800;font-size:12.5px;
   cursor:pointer;font-family:inherit;min-height:48px
 }
+#reviews-section.showroom-reviews-hz,
 #reviews-section.showroom-reviews-below{
-  margin:20px 0 8px;
-  padding:18px 16px 14px;
+  margin:0;
+  padding:12px 12px 10px;
   background:#fff;
   border:1px solid rgba(27,58,107,.08);
-  border-radius:16px;
+  border-radius:14px;
   border-top:3px solid var(--gold);
-  box-shadow:0 12px 32px rgba(15,35,65,.06);
+  box-shadow:none;
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
   min-width:0;
-  width:100%;
+  width:auto;
 }
 #reviews-section .showroom-reviews-inner{
   background:transparent!important;border:none!important;border-radius:0!important;
@@ -377,9 +394,17 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 #reviews-section .showroom-reviews-stars{color:#F5A623;font-size:16px;margin:3px 0}
 #reviews-section #rev-count-txt{font-size:12px;color:#6a7a8a}
 #reviews-section #reviews-list{flex:1 1 auto}
-@media(max-width:800px){
-  .showroom-under-band{padding:12px;border-radius:16px}
+@media(max-width:700px){
+  .showroom-under-band{
+    grid-template-columns:1fr !important;
+    grid-template-areas:
+      "desk"
+      "pay"
+      "reviews";
+    padding:12px;border-radius:16px;
+  }
   #showroom-service-desk.showroom-desk-hz,
+  #reviews-section.showroom-reviews-hz,
   #reviews-section.showroom-reviews-below{padding:12px 10px 10px;border-radius:12px}
   .showroom-desk-form{grid-template-columns:1fr}
   .showroom-desk-span2{grid-column:auto}
@@ -413,7 +438,12 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 .catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:12px}
 @media(min-width:1100px){.catalog-grid{grid-template-columns:repeat(5,minmax(0,1fr))}}
 @media(max-width:700px){.catalog-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
-.cat-tabs{display:flex;align-items:center;gap:8px;margin-bottom:20px}
+.cat-tabs{
+  display:flex;align-items:center;gap:8px;margin-bottom:20px;
+  position:sticky;top:calc(var(--rizq-header-h, var(--rizq-mock-hdr-h, 68px)) + 4px);
+  z-index:45;padding:8px 0 10px;
+  background:linear-gradient(180deg,#FBF8F2 75%,rgba(251,248,242,.92));
+}
 .cat-tabs-cats{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;flex:1;flex-wrap:nowrap}
 .cat-tabs-shop{display:inline-flex;flex-direction:row;align-items:center;gap:8px;flex-shrink:0;margin-inline-start:auto;flex-wrap:nowrap}
 .sss-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;border-radius:10px;font:inherit;font-size:12px;font-weight:800;text-decoration:none;cursor:pointer;border:1.5px solid transparent;min-width:0;white-space:nowrap}
@@ -837,44 +867,45 @@ html[dir="ltr"] .sr-wish-btn{left:auto;right:10px}
           </div>
         </div>
       </section>
-    </div>
 
-    <div class="info-card" id="showroom-payment-methods" style="display:block;margin:16px 0 8px">
-      <div class="info-card-title" id="sr-pay-title">🏦 طرق الدفع</div>
-      <div id="showroom-pay-box"></div>
-    </div>
-
-    <!-- التقييمات في نهاية رحلة الزائر -->
-    <section class="showroom-reviews-below" id="reviews-section" aria-label="تقييمات الزبائن">
-      <div class="info-card-title" style="margin-bottom:10px" id="reviews-title-lbl">⭐ تقييمات الزبائن</div>
-      <div class="showroom-reviews-inner">
-        <div class="showroom-reviews-summary">
-          <div class="showroom-reviews-score">
-            <div id="rev-score">—</div>
-            <div class="showroom-reviews-stars">☆☆☆☆☆</div>
-            <div id="rev-count-txt">0 تقييم</div>
-          </div>
-          <div id="showroom-rating-breakdown" style="flex:1;min-width:160px">
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-              <span style="font-size:12px;color:#8a8474;width:20px">5★</span>
-              <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
-              <span style="font-size:12px;color:#8a8474">0%</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
-              <span style="font-size:12px;color:#8a8474;width:20px">4★</span>
-              <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
-              <span style="font-size:12px;color:#8a8474">0%</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:12px;color:#8a8474;width:20px">3★</span>
-              <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
-              <span style="font-size:12px;color:#8a8474">0%</span>
-            </div>
-          </div>
-        </div>
-        <div id="reviews-list"></div>
+      <!-- الدفع في الـ DOM قبل التقييمات (رحلة الهاتف) — بصرياً صف كامل تحت desk|reviews على التابلت -->
+      <div class="info-card" id="showroom-payment-methods" style="display:block">
+        <div class="info-card-title" id="sr-pay-title">🏦 طرق الدفع</div>
+        <div id="showroom-pay-box"></div>
       </div>
-    </section>
+
+      <!-- التقييمات بجانب غرفة الطلبات (تابلت/كمبيوتر عبر grid-area) -->
+      <section class="showroom-reviews-hz" id="reviews-section" aria-label="تقييمات الزبائن">
+        <div class="info-card-title" style="margin-bottom:10px" id="reviews-title-lbl">⭐ تقييمات الزبائن</div>
+        <div class="showroom-reviews-inner">
+          <div class="showroom-reviews-summary">
+            <div class="showroom-reviews-score">
+              <div id="rev-score">—</div>
+              <div class="showroom-reviews-stars">☆☆☆☆☆</div>
+              <div id="rev-count-txt">0 تقييم</div>
+            </div>
+            <div id="showroom-rating-breakdown" style="flex:1;min-width:160px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="font-size:12px;color:#8a8474;width:20px">5★</span>
+                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
+                <span style="font-size:12px;color:#8a8474">0%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span style="font-size:12px;color:#8a8474;width:20px">4★</span>
+                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
+                <span style="font-size:12px;color:#8a8474">0%</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:12px;color:#8a8474;width:20px">3★</span>
+                <div style="flex:1;height:8px;background:#f2ede1;border-radius:4px;overflow:hidden"><div style="width:0%;height:100%;background:#F5A623;border-radius:4px"></div></div>
+                <span style="font-size:12px;color:#8a8474">0%</span>
+              </div>
+            </div>
+          </div>
+          <div id="reviews-list"></div>
+        </div>
+      </section>
+    </div>
 
 </main>
 </div>
@@ -1012,7 +1043,7 @@ html[dir="ltr"] .sr-wish-btn{left:auto;right:10px}
 <script src="rizq_stock.js?v=1.1" defer></script>
 <script src="rizq_site_banner.js" defer></script>
 <script src="rizq_auth_gate.js?v=23.1" defer></script>
-<script src="rizq_ux_polish.js?v=23.3" defer></script>
+<script src="rizq_ux_polish.js?v=23.4" defer></script>
 <script src="rizq_contact_gate.js" defer></script>
 <script src="rizq_mr_payment_catalog.js?v=1.1" defer></script>
 <script src="rizq_account_payments.js?v=28.3" defer></script>
@@ -1630,7 +1661,11 @@ function openShowroomItemDetail(itemId){
 }
 
 var SR_WISH_KEY = 'rizq_showroom_wishlist';
-function _srWishIds(){
+function _srWishScopeId(){
+  return String(_showroomId || (new URLSearchParams(location.search).get('id') || 'showroom'));
+}
+/** كل مفضّلات المعارض (مخزن مشترك) مع ترحيل المفاتيح القديمة */
+function _srWishAll(){
   try {
     var v = JSON.parse(localStorage.getItem(SR_WISH_KEY) || '[]');
     if (!Array.isArray(v)) return [];
@@ -1640,14 +1675,29 @@ function _srWishIds(){
     });
   } catch (e) { return []; }
 }
-function _srWishScopeId(){
-  return String(_showroomId || (new URLSearchParams(location.search).get('id') || 'showroom'));
+/** مفضّلة هذا المعرض فقط — السلة/المفضلة مبنيتان داخل واجهة المعرض */
+function _srWishIds(){
+  var scope = _srWishScopeId();
+  var all = _srWishAll();
+  var scoped = all.filter(function(p){ return p && p.showroomId && String(p.showroomId) === scope; });
+  if (scoped.length || all.some(function(p){ return p && p.showroomId; })) return scoped;
+  /* ترحيل: قائمة قديمة بلا showroomId تُنسب للمعرض الحالي عند أول تفاعل */
+  return all.filter(function(p){ return p && !p.showroomId; });
 }
 function _srWishGlobalId(itemId){
   return 'showroom:' + _srWishScopeId() + ':' + String(itemId);
 }
-function _saveSrWish(list){
-  try { localStorage.setItem(SR_WISH_KEY, JSON.stringify(list || [])); } catch (e) {}
+function _saveSrWish(listForThisShowroom){
+  var scope = _srWishScopeId();
+  var others = _srWishAll().filter(function(p){
+    return p && p.showroomId && String(p.showroomId) !== scope;
+  });
+  var merged = others.concat((listForThisShowroom || []).map(function(p){
+    var o = Object.assign({}, p);
+    o.showroomId = scope;
+    return o;
+  }));
+  try { localStorage.setItem(SR_WISH_KEY, JSON.stringify(merged)); } catch (e) {}
 }
 function toggleShowroomItemWish(itemId){
   itemId = String(itemId || '');
@@ -2202,7 +2252,7 @@ footer.rizq-footer .footer-copy{font-size:12px!important;color:rgba(255,255,255,
 <script src="rizq_video_ads.js"></script>
 <script src="rizq_intro_video.js?v=29.9"></script>
 <script src="rizq_live_showcase.js?v=1.0"></script>
-<script src="rizq_store_commerce.js?v=29.7"></script>
+<script src="rizq_store_commerce.js?v=29.10"></script>
 <script src="rizq_map_preview.js?v=1.0"></script>
 <script src="rizq_prefacture_engine.js?v=2"></script>
 <script>

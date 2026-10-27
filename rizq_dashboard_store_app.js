@@ -336,6 +336,10 @@ function loadActivatedPackage(acc) {
 }
 
 // ══ INIT ══
+var STORE = null;
+var products = [];
+var storePhotos = [];
+
 function init(){
   if(IS_DEMO){ _initWithAccount(DEMO_ACCOUNT); return; }
   if(!SESSION_ID || !SESSION_TOKEN){ showAccessDenied(); return; }
@@ -1872,6 +1876,18 @@ function _rizqMergeHoursFromBackend(){
       }).catch(function(){});
   }catch(e){}
 }
+var DAYS_AR = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+var DAYS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+var DEFAULT_HOURS = [
+  { day:'الأحد', open:true, from:'09:00', to:'20:00' },
+  { day:'الإثنين', open:true, from:'09:00', to:'20:00' },
+  { day:'الثلاثاء', open:true, from:'09:00', to:'20:00' },
+  { day:'الأربعاء', open:true, from:'09:00', to:'20:00' },
+  { day:'الخميس', open:true, from:'09:00', to:'20:00' },
+  { day:'الجمعة', open:false, from:'09:00', to:'13:00' },
+  { day:'السبت', open:true, from:'10:00', to:'18:00' }
+];
+
 function renderHoursTable(){
   const saved = JSON.parse(localStorage.getItem('store_hours_'+SESSION_ID)||'null') || DEFAULT_HOURS;
   const el = document.getElementById('hours-table');
@@ -2501,10 +2517,12 @@ function _rizqTwilioForwardNum(){
 function doUpgrade(){ showPanel('subscription', document.querySelector('.sb-item[onclick*=subscription]')); }
 // ── وكيل كلود: زر التفعيل/الإيقاف ──────────────────────
 var RIZQ_TWILIO_NUM = (typeof _rizqTwilioForwardNum==='function'?_rizqTwilioForwardNum():'');
-var _agentToggleKey = 'rizq_agent_active_' + (STORE && STORE.phone ? STORE.phone : 'unknown');
+function _agentToggleKey(){
+  return 'rizq_agent_active_' + (STORE && STORE.phone ? STORE.phone : 'unknown');
+}
 
 function _getAgentActive(){
-  try{ return localStorage.getItem(_agentToggleKey) !== 'false'; }catch(e){ return true; }
+  try{ return localStorage.getItem(_agentToggleKey()) !== 'false'; }catch(e){ return true; }
 }
 
 function _renderAgentToggle(){
@@ -2591,7 +2609,7 @@ function toggleAccountChannel(key, on){
 function toggleRizqAgent(active){
   var phone = STORE && STORE.phone ? STORE.phone : null;
   if(!phone){ showToast(_t2('⚠️ لا يوجد رقم هاتف مسجّل في ملفك','⚠️ Aucun numéro enregistré dans votre profil'),'warn'); return; }
-  try{ localStorage.setItem(_agentToggleKey, active ? 'true' : 'false'); }catch(e){}
+  try{ localStorage.setItem(_agentToggleKey(), active ? 'true' : 'false'); }catch(e){}
   // إصلاح: كان يقرأ window.RIZQ_BACKEND_URL غير المُعرَّف إطلاقاً في أي مكان
   // بالمشروع (يفشل بصمت دائماً)، وسرّاً ثابتاً بالكود بدل الإعداد الحقيقي.
   // الآن يستخدم نفس مصدر الحقيقة الوحيد (RizqSub.getAgentConfig) الذي يضبطه

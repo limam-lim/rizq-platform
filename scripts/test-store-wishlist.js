@@ -17,7 +17,11 @@ assert(
   !/function commerceToolbarHtml\(\)\s*\{\s*if \(isStorePage\(\)\) \{\s*return '';/.test(headerJs),
   'header must not early-return empty toolbar on store pages'
 );
-assert(headerJs.includes('rizq-hdr-store-wish'), 'header must include store wish button');
+/* مفضلة المحل مدمجة في شريحة التصنيفات (.sss-wish) — ليست زر هيدر منفصل */
+assert(
+  storeHtml.includes('sss-wish') && storeHtml.includes('data-rizq-store-wish-count'),
+  'store must include embedded shop wish chrome'
+);
 assert(storeHtml.includes('class="wish-btn"'), 'store cards must include wish-btn');
 assert(storeHtml.includes('_wishAuthToggle'), 'store must expose auth-gated wish toggle');
 assert(/function\s+_qvEsc\s*\(/.test(storeHtml), 'store must define _qvEsc for wishlist panel HTML escape');

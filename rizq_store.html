@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
 <link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.82"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
-<link rel="stylesheet" href="rizq_product_detail.css?v=28.6"/>
+<link rel="stylesheet" href="rizq_product_detail.css?v=29.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.6"/>
 <link rel="preload" href="rizq_header.js?v=27.0" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
@@ -373,18 +373,27 @@ body.rzq-storefront-lb-on{overflow:hidden}
 }
 .content-grid{
   display:grid;
-  /* يمين = الموقع والتواصل | يسار = المنتجات + شريط الطلبات/التقييمات (RTL) */
-  grid-template-columns:minmax(300px,340px) minmax(0,1fr);
-  grid-template-areas:"side main";
-  gap:28px;
+  /* صف علوي: شريط المعلومات | المنتجات — صف سفلي: غرفة الطلبات + التقييمات بعرض الصفحة كاملاً */
+  grid-template-columns:minmax(280px,320px) minmax(0,1fr);
+  grid-template-areas:
+    "side main"
+    "band band";
+  gap:20px 24px;
   align-items:start;
 }
+.content-grid > aside#info-section{grid-area:side}
 .content-grid > .store-main-col{
   grid-area:main;
   min-width:0;
   display:flex;
   flex-direction:column;
   gap:14px;
+}
+.content-grid > #store-under-band,
+.content-grid > .store-under-band{
+  grid-area:band;
+  width:100%;
+  max-width:100%;
 }
 .content-grid > .store-main-col > main{
   min-width:0;
@@ -583,6 +592,9 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 /* Category tabs */
 .cat-tabs{
   display:flex;align-items:center;gap:12px;margin-bottom:16px;width:100%;
+  position:sticky;top:calc(var(--rizq-header-h, var(--rizq-mock-hdr-h, 68px)) + 4px);
+  z-index:35;padding:8px 0 10px;
+  background:linear-gradient(180deg,#0D1B2A 70%,rgba(13,27,42,.92));
 }
 .cat-tabs-cats{
   display:flex;gap:8px;overflow-x:auto;flex:1 1 auto;min-width:0;
@@ -637,17 +649,17 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   content:'✦';
   display:block;font-size:28px;color:var(--gold);line-height:1;margin-bottom:2px;
 }
-/* غرفة الطلبات + التقييمات — شريط أفقي تحت المنتجات يملأ فراغ العمود بتناسق الواجهة */
+/* غرفة الطلبات + التقييمات — صف كامل تحت الشبكة يملأ فراغ التابلت/الكمبيوتر */
 .store-under-band{
-  display:grid;
-  grid-template-columns:1.08fr 0.92fr;
-  gap:12px;
+  display:grid !important;
+  grid-template-columns:minmax(0,1.15fr) minmax(260px,0.85fr) !important;
+  gap:14px;
   margin:0;
-  align-items:start;
+  align-items:stretch;
   width:100%;
   min-width:0;
   box-sizing:border-box;
-  padding:12px;
+  padding:14px;
   border-radius:20px;
   background:
     radial-gradient(ellipse at 90% 0%, rgba(201,168,76,.06), transparent 42%),
@@ -663,6 +675,7 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   border:1px solid rgba(27,58,107,.08);
   background:#fff;
   height:auto;
+  min-height:100%;
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
@@ -711,6 +724,7 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   border-radius:14px;
   box-shadow:none;
   height:auto;
+  min-height:100%;
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
@@ -733,11 +747,20 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   color:var(--navy);border-color:rgba(27,58,107,.2);background:#fff;font-size:12.5px;padding:9px 12px;margin-top:auto
 }
 #reviews-section .view-all-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
-@media(max-width:1100px) and (min-width:801px){
-  .store-under-band{gap:12px;padding:12px}
+/* تابلت: أفقياً دائماً — لا فراغ أبيض بجانب العمود */
+@media(max-width:1100px) and (min-width:701px){
+  .store-under-band{
+    gap:12px;padding:12px;
+    grid-template-columns:minmax(0,1.05fr) minmax(240px,0.95fr) !important;
+  }
+  .store-desk-actions{grid-template-columns:minmax(0,1fr) minmax(140px,170px)}
 }
-@media(max-width:800px){
-  .store-under-band{grid-template-columns:1fr;gap:12px;padding:12px;border-radius:16px}
+@media(max-width:700px){
+  .store-under-band{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:12px;padding:12px;border-radius:16px;
+  }
   #store-service-desk.store-desk-hz,
   #reviews-section.store-reviews-hz{padding:12px 10px 10px;border-radius:12px}
   .store-desk-form{grid-template-columns:1fr}
@@ -921,16 +944,22 @@ footer{
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
 /* ====== RESPONSIVE ====== */
-/* Tablet: keep 2-col when space allows, tighten hero */
-@media(max-width:1100px) and (min-width:801px){
-  .content-grid{grid-template-columns:minmax(260px,300px) minmax(0,1fr);gap:20px}
+/* Tablet: صف علوي مزدوج + شريط الطلبات/التقييمات بعرض كامل أفقياً */
+@media(max-width:1100px) and (min-width:701px){
+  .content-grid{
+    grid-template-columns:minmax(240px,280px) minmax(0,1fr);
+    grid-template-areas:
+      "side main"
+      "band band";
+    gap:16px 18px;
+  }
   .main-wrap{padding:22px 16px 40px}
   .content-grid > .store-main-col > main{padding:16px}
   .store-name{font-size:26px}
   .action-btn{padding:9px 14px;font-size:12.5px}
 }
 
-@media(max-width:800px){
+@media(max-width:700px){
   /* رحلة الجوال: منتجات → تعريف → موقع → ساعات → استفسار → دفع → تقييمات */
   .content-grid{
     grid-template-columns:1fr;
@@ -945,6 +974,7 @@ footer{
   }
   .content-grid > aside#info-section,
   .content-grid > .store-main-col,
+  .content-grid > #store-under-band,
   #store-under-band{display:contents}
   .content-grid > aside#info-section{position:static;width:100%;max-width:100%}
   .content-grid .card,
@@ -1014,10 +1044,17 @@ footer{
   }
   .cat-tabs-shop .sss-btn{flex:1 1 0;min-width:0;padding:8px 10px;font-size:12px}
   .cat-tabs-cats{width:100%;min-width:0}
+  /* هاتف: شريط الاتصال يمرّ؛ التصنيفات/المفضلة/السلة تثبت تحت الهيدر ولا تُحجب */
   .actions-bar{
-    position:sticky;top:var(--rizq-header-h,0);z-index:40;
+    position:relative;top:auto;z-index:1;
     padding:0 12px;
-    box-shadow:0 4px 16px rgba(15,35,65,.06);
+    box-shadow:none;
+  }
+  .cat-tabs{
+    top:calc(var(--rizq-header-h, var(--rizq-mock-hdr-h, 68px)) + 2px);
+    z-index:45;
+    margin-inline:-4px;padding-inline:4px;
+    box-shadow:0 6px 16px rgba(0,0,0,.25);
   }
   .actions-bar-inner{
     flex-direction:column;align-items:stretch;
@@ -1256,10 +1293,10 @@ footer{
   <script src="rizq_account_payments.js?v=28.3" defer></script>
   <script src="rizq_service_desk.js?v=1.3" defer></script>
   <script src="rizq_terms_gate.js?v=23.0" defer></script>
-  <script src="rizq_ux_polish.js?v=23.3" defer></script>
+  <script src="rizq_ux_polish.js?v=23.4" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=29.7" defer></script>
+  <script src="rizq_store_commerce.js?v=29.10" defer></script>
   <script src="rizq_map_preview.js?v=1.0" defer></script>
   <script src="rizq_pwa.js?v=31.20" defer></script>
   <script src="rizq_footer_toggle.js?v=23.1" defer></script>
@@ -1561,8 +1598,9 @@ footer{
       </div>
       <button type="button" class="store-load-more" id="store-load-more" onclick="window._rizqStoreShowMoreProducts && window._rizqStoreShowMoreProducts()">عرض 8 منتجات التالية</button>
     </main>
+    </div><!-- /.store-main-col -->
 
-    <!-- غرفة الطلبات + التقييمات — أفقيان تحت المنتجات يملآن الفراغ بتناسق الواجهة -->
+    <!-- صف كامل بعرض الشبكة: غرفة الطلبات | التقييمات — يملأ فراغ التابلت/الكمبيوتر -->
     <div class="store-under-band" id="store-under-band">
       <section class="info-card store-desk-hz" id="store-service-desk" style="border-top:3px solid var(--gold);display:flex!important" aria-label="غرفة الطلبات">
         <div class="store-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
@@ -1631,7 +1669,6 @@ footer{
         </div>
       </section>
     </div>
-    </div><!-- /.store-main-col -->
   </div>
 </div>
 
@@ -1831,14 +1868,11 @@ function _renderWishUI(){
       var safeName = _qvEsc(p.name);
       var safeEmoji = _qvEsc(p.emoji);
       var safePrice = _qvEsc(p.price);
-      var idJs = JSON.stringify(String(p.id));
-      var nameJs = JSON.stringify(String(p.name == null ? '' : p.name));
-      var priceJs = JSON.stringify(String(p.price == null ? '' : p.price));
-      var emojiJs = JSON.stringify(String(p.emoji == null ? '' : p.emoji));
+      var safeId = _qvEsc(String(p.id == null ? '' : p.id));
       return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(201,168,76,.12)">'
         + '<div style="font-size:26px">'+safeEmoji+'</div>'
         + '<div style="flex:1"><div style="font-weight:700;color:#fff;font-size:13.5px">'+safeName+'</div><div style="color:#C9A84C;font-size:12.5px;font-weight:700">'+safePrice+'</div></div>'
-        + '<button type="button" onclick="toggleWish('+idJs+','+nameJs+','+priceJs+','+emojiJs+')" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:16px;cursor:pointer" aria-label="✕">✕</button>'
+        + '<button type="button" data-wish-remove="1" data-wish-id="'+safeId+'" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:16px;cursor:pointer" aria-label="✕">✕</button>'
         + '</div>';
     }).join('') : '<p style="color:rgba(255,255,255,.55);font-size:13px;text-align:center;padding:20px 0">'+(
       (localStorage.getItem('rizq_lang')||'ar')==='fr'
@@ -1858,7 +1892,21 @@ window._wishAuthToggle = _wishAuthToggle;
 window.toggleWishPanel = toggleWishPanel;
 window._getWishList = _getWishList;
 window._renderWishUI = _renderWishUI;
-document.addEventListener('DOMContentLoaded', _renderWishUI);
+document.addEventListener('DOMContentLoaded', function(){
+  _renderWishUI();
+  var panel = document.getElementById('wish-panel-list');
+  if(panel && !panel.dataset.wishDelegated){
+    panel.dataset.wishDelegated = '1';
+    panel.addEventListener('click', function(e){
+      var btn = e.target && e.target.closest ? e.target.closest('[data-wish-remove][data-wish-id]') : null;
+      if(!btn || !panel.contains(btn)) return;
+      e.preventDefault();
+      var id = btn.getAttribute('data-wish-id') || '';
+      var row = (_getWishList() || []).find(function(p){ return String(p.id) === String(id); });
+      toggleWish(id, row && row.name, row && row.price, row && row.emoji);
+    });
+  }
+});
 
 /* ── تفاصيل منتج بهوية عرض الإعلان (لوحة فاخرة) ── */
 function openQuickView(id, name, price, emoji, cat){
