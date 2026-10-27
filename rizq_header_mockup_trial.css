@@ -760,8 +760,6 @@ body.rizq-lang-fr #rizq-mock-hdr #rmh-lang-btn .lang-fr{
 }
 .rmh-nav a.rmh-post-nav:hover .rmh-nav-ico,
 .rmh-nav a.rmh-post-nav:hover .rmh-post-plus,
-.rmh-nav a.rmh-post-nav.is-active .rmh-nav-ico,
-.rmh-nav a.rmh-post-nav.is-active .rmh-post-plus,
 .rmh-nav a.rmh-post-nav:focus .rmh-nav-ico,
 .rmh-nav a.rmh-post-nav:focus .rmh-post-plus{
   color:var(--rmh-gold,#E8C96A)!important;
@@ -958,16 +956,26 @@ body.rizq-lang-fr body > .rmh-more-menu{
 }
 .rmh-more-item strong{font-weight:800}
 /* نشط افتراضياً — وعند المرور على قسم آخر يبقى الذهبي للماوس فقط */
+/* النص أبيض؛ التسطير يبيّن النشط؛ الأيقونة بيضاء إلا عند المرور بالماوس */
 .rmh-nav a.is-active{
-  color:var(--rmh-gold);border-bottom-color:var(--rmh-gold);
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  border-bottom-color:var(--rmh-gold);
 }
-.rmh-nav a.is-active .rmh-nav-ico{opacity:1;color:var(--rmh-gold)!important}
+.rmh-nav a.is-active .rmh-nav-ico{
+  opacity:1;
+  color:#fff!important; /* أبيض مثل الاسم — لا أصفر إلا عند hover */
+}
 .rmh-nav:hover a.is-active:not(:hover){
-  color:rgba(255,255,255,.78);border-bottom-color:transparent;
+  color:rgba(255,255,255,.78)!important;
+  -webkit-text-fill-color:rgba(255,255,255,.78)!important;
+  border-bottom-color:transparent;
 }
 .rmh-nav:hover a.is-active:not(:hover) .rmh-nav-ico{color:#fff!important;opacity:.92}
 .rmh-nav a:hover{
-  color:var(--rmh-gold)!important;border-bottom-color:var(--rmh-gold)!important;
+  color:var(--rmh-gold)!important;
+  -webkit-text-fill-color:var(--rmh-gold)!important;
+  border-bottom-color:var(--rmh-gold)!important;
 }
 .rmh-nav a:hover .rmh-nav-ico{opacity:1;color:var(--rmh-gold)!important}
 
