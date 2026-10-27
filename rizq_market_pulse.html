@@ -10,11 +10,11 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="stylesheet" href="rizq-theme.css?v=17.4"/>
+<link rel="stylesheet" href="rizq-theme.css?v=31.25"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_header.css?v=31.6"/>
+<link rel="stylesheet" href="rizq_header.css?v=31.8"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>نبضة السوق — رزق | Rizq Market Pulse</title>
 <style>
@@ -187,7 +187,7 @@ html[dir="ltr"] .mp-ticker-wrap::after{
   .mp-infinite .mi-bar>i{animation:none}
 }
 
-/* لوحة بورصة — صفوف داكنة على بطاقة بيضاء */
+/* لوحة أسعار فاتحة — مثل الدليل: أزرق داكن للهيدر فقط، الصفوف بيضاء بنص داكن */
 .mp-table{
   width:100%;border-collapse:separate;border-spacing:0 5px;
 }
@@ -197,43 +197,47 @@ html[dir="ltr"] .mp-ticker-wrap::after{
   border-bottom:1px solid rgba(27,58,107,.1);
 }
 .mp-row td{
-  background:linear-gradient(155deg,#0f2347 0%,#1B3A6B 58%,#243f72 100%);
-  border-top:1px solid rgba(201,168,76,.18);
-  border-bottom:1px solid rgba(201,168,76,.18);
+  background:#fff;
+  border-top:1px solid rgba(27,58,107,.08);
+  border-bottom:1px solid rgba(27,58,107,.08);
   padding:9px 10px;vertical-align:middle;
+  box-shadow:0 1px 0 rgba(15,35,65,.03);
 }
 .mp-row td:first-child{
   border-inline-start:2px solid var(--gold);
   border-start-start-radius:9px;border-end-start-radius:9px;
 }
 .mp-row td:last-child{
-  border-inline-end:1px solid rgba(201,168,76,.18);
+  border-inline-end:1px solid rgba(27,58,107,.08);
   border-start-end-radius:9px;border-end-end-radius:9px;
 }
-.mp-row:hover td{background:linear-gradient(155deg,#1a3a6e,#234d8f);border-color:rgba(201,168,76,.4)}
+.mp-row:hover td{
+  background:#f7f9fc;
+  border-color:rgba(201,168,76,.4);
+}
 .mp-name{
   display:flex;align-items:center;gap:8px;min-width:0;
-  color:#fff;font-weight:800;font-size:13px;line-height:1.25;
+  color:#0f2347;font-weight:800;font-size:13px;line-height:1.25;
 }
 .mp-name img{
   width:26px;height:18px;object-fit:cover;border-radius:3px;flex-shrink:0;
-  box-shadow:0 0 0 1px rgba(255,255,255,.2);
+  box-shadow:0 0 0 1px rgba(27,58,107,.12);
 }
 .mp-name img.is-badge{width:22px;height:22px;object-fit:contain;border-radius:6px}
 .mp-name .ico{font-size:14px;flex-shrink:0;line-height:1}
-.mp-unit{color:rgba(255,255,255,.55);font-size:11px;font-weight:600;white-space:nowrap}
+.mp-unit{color:#5b6b85;font-size:11px;font-weight:600;white-space:nowrap}
 .mp-price{
-  color:var(--gold2);font-weight:900;font-size:15px;font-variant-numeric:tabular-nums;
+  color:#1B3A6B;font-weight:900;font-size:15px;font-variant-numeric:tabular-nums;
   font-family:Georgia,'Times New Roman',serif;white-space:nowrap;text-align:end;
 }
 .mp-trend{
   display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:800;
   padding:2px 8px;border-radius:999px;white-space:nowrap;
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+  background:#f7f9fc;border:1px solid rgba(27,58,107,.1);
 }
-.mp-trend.up{color:#6ee7a8;border-color:rgba(110,231,168,.25);background:rgba(110,231,168,.08)}
-.mp-trend.down{color:#f4a3a3;border-color:rgba(244,163,163,.25);background:rgba(244,163,163,.08)}
-.mp-trend.flat{color:rgba(255,255,255,.55)}
+.mp-trend.up{color:#15803d;border-color:rgba(22,163,74,.28);background:rgba(22,163,74,.08)}
+.mp-trend.down{color:#b91c1c;border-color:rgba(220,38,38,.25);background:rgba(220,38,38,.06)}
+.mp-trend.flat{color:#5b6b85}
 
 .mp-empty{
   text-align:center;color:#5b6b85;padding:28px 12px;font-size:13px;font-weight:700;
@@ -265,13 +269,15 @@ html[dir="ltr"] .mp-ticker-wrap::after{
   .mp-table thead{display:none}
   .mp-table,.mp-table tbody{display:block;width:100%}
   .mp-row{display:block;width:100%;margin-bottom:5px;
-    background:linear-gradient(155deg,rgba(15,35,71,.92),rgba(27,58,107,.88));
-    border:1px solid rgba(201,168,76,.18);border-inline-start:2px solid var(--gold);
-    border-radius:9px;padding:4px 2px;white-space:nowrap}
-  .mp-row:hover{border-color:rgba(201,168,76,.4)}
+    background:#fff;
+    border:1px solid rgba(27,58,107,.1);border-inline-start:2px solid var(--gold);
+    border-radius:9px;padding:4px 2px;white-space:nowrap;
+    box-shadow:0 2px 8px rgba(15,35,65,.05)}
+  .mp-row:hover{border-color:rgba(201,168,76,.45);background:#f7f9fc}
   .mp-row td{
     display:inline-block;vertical-align:middle;padding:6px 4px;
     border:none!important;background:transparent!important;border-radius:0!important;
+    box-shadow:none!important;
   }
   .mp-row td:first-child{width:54%;padding-inline-start:8px;white-space:normal}
   .mp-row .mp-unit-cell{display:none}

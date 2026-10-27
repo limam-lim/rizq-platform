@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=31.2"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=31.3"/>
 <!-- deploy: ad-card clip fix v27.5 -->
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.5"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.6"/>
@@ -2783,15 +2783,17 @@ html[dir="ltr"] .price-ticker-wrap::after{
     gap:5px;
   }
 }
-/* شرائح أسعار قصيرة جداً — اسم + سعر + اتجاه في صف واحد */
+/* شرائح أسعار فاتحة — أقوى من rizq-theme/ux التي تفرض تدرّج كحلي على .price-card */
 .price-card{
-  background:linear-gradient(155deg,#0f2347 0%,#1B3A6B 58%,#243f72 100%);
-  border:1px solid rgba(201,168,76,.26);
+  background:#fff!important;
+  background-image:none!important;
+  border:1px solid rgba(27,58,107,.1)!important;
   border-radius:9px;padding:6px 8px 6px 10px;
   display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:4px 8px;
-  box-shadow:0 2px 8px rgba(15,35,65,.12),inset 0 1px 0 rgba(255,255,255,.05);
+  box-shadow:0 2px 8px rgba(15,35,65,.05);
   transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
   position:relative;min-height:0;overflow:visible;
+  color:#0f2347;
 }
 .price-card-currency{
   flex-direction:column;align-items:stretch;gap:5px;padding:8px 10px 8px 12px;
@@ -2800,12 +2802,12 @@ html[dir="ltr"] .price-ticker-wrap::after{
 .price-card::before{
   content:'';position:absolute;inset-inline-start:0;top:7px;bottom:7px;width:2px;border-radius:2px;
   background:linear-gradient(180deg,var(--gold-light),var(--gold));
-  opacity:.85;
+  opacity:.9;
 }
 .price-card:hover{
   transform:translateY(-1px);
-  border-color:rgba(201,168,76,.5);
-  box-shadow:0 5px 14px rgba(15,35,65,.18),inset 0 1px 0 rgba(255,255,255,.07);
+  border-color:rgba(201,168,76,.55);
+  box-shadow:0 5px 14px rgba(15,35,65,.1);
 }
 .price-card-head{
   display:flex;align-items:center;justify-content:space-between;gap:4px;min-width:0;
@@ -2815,15 +2817,15 @@ html[dir="ltr"] .price-ticker-wrap::after{
 .price-curr-flag{font-size:12px;line-height:1;flex-shrink:0}
 .price-curr-flag-img{
   width:22px;height:16px;object-fit:cover;border-radius:3px;flex-shrink:0;
-  box-shadow:0 0 0 1px rgba(255,255,255,.22),0 1px 3px rgba(0,0,0,.25);
-  background:rgba(255,255,255,.08);
+  box-shadow:0 0 0 1px rgba(27,58,107,.12),0 1px 3px rgba(15,35,65,.08);
+  background:#f7f9fc;
 }
 .price-card-currency .price-curr-flag-img{width:26px;height:18px;border-radius:4px}
 .price-card-currency .price-curr-flag-img.is-badge{width:26px;height:26px;object-fit:contain;border-radius:7px}
 .price-card-currency .price-value{font-size:13px;letter-spacing:.1px}
 .price-icon{font-size:12px;line-height:1}
 .price-name{
-  color:#fff;font-weight:800;font-size:11px;line-height:1.15;
+  color:#0f2347;font-weight:800;font-size:11px;line-height:1.15;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
 }
 .price-card-currency .price-name{
@@ -2841,19 +2843,19 @@ html[dir="ltr"] .price-ticker-wrap::after{
 .price-card-currency .price-unit{white-space:normal;line-height:1.25}
 .price-row{display:flex;align-items:baseline;gap:5px;margin-top:0}
 .price-value{
-  color:var(--gold);font-weight:900;font-size:13.5px;line-height:1.05;
+  color:#1B3A6B;font-weight:900;font-size:13.5px;line-height:1.05;
   font-family:Georgia,'Times New Roman',serif;font-variant-numeric:tabular-nums;
 }
-.price-unit{color:rgba(255,255,255,.68);font-size:9px;line-height:1.1;font-weight:600;white-space:nowrap}
+.price-unit{color:#5b6b85;font-size:9px;line-height:1.1;font-weight:600;white-space:nowrap}
 .price-trend{
   display:inline-flex;align-items:center;gap:2px;font-size:8.5px;font-weight:800;
   margin-top:0;padding:1px 5px;border-radius:999px;flex-shrink:0;
-  background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);
+  background:#f7f9fc;border:1px solid rgba(27,58,107,.1);
   white-space:nowrap;
 }
-.price-trend.up{color:#6ee7a8;border-color:rgba(110,231,168,.25);background:rgba(110,231,168,.08)}
-.price-trend.down{color:#f4a3a3;border-color:rgba(244,163,163,.25);background:rgba(244,163,163,.08)}
-.price-trend.flat{color:rgba(255,255,255,.55)}
+.price-trend.up{color:#15803d;border-color:rgba(22,163,74,.28);background:rgba(22,163,74,.08)}
+.price-trend.down{color:#b91c1c;border-color:rgba(220,38,38,.25);background:rgba(220,38,38,.06)}
+.price-trend.flat{color:#5b6b85}
 .prices-note{
   text-align:center;color:var(--text-muted);font-size:11px;margin-top:10px;line-height:1.55;
   padding:0 8px;max-width:100%;box-sizing:border-box;

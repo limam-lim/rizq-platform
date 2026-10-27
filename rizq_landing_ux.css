@@ -10,7 +10,6 @@
 .section-header,
 .cta-inner,
 .price-ticker-wrap,
-.price-card,
 .cs-strip,
 .rzq-disc-empty,
 .hero-stats-bar,
@@ -27,6 +26,7 @@
 nav:not(.rizq-hdr-row2):not(.hero-biz-nav):not(.section-jump-bar):not(.mobile-bottom-nav):not(.rizq-reg-footer):not(.rizq-reg-chrome):not(.cta-hubs),
 .rpkg-card[style*="#1B3A6B"],
 .pricing-card[style*="#1B3A6B"]{
+  /* .price-card excluded: keep pulse price chips light (not navy+white text) */
   background-image:linear-gradient(135deg,#0D1B2A,#1B3A6B),var(--rizq-navy-grid)!important;
   background-size:auto,60px 60px!important;
   background-repeat:no-repeat,repeat!important;
