@@ -42,12 +42,17 @@ assert(
 );
 assert(
   storeHtml.includes('store-under-band') && storeHtml.includes('max-width:700px'),
-  'store desk+reviews stay side-by-side on tablet (stack only under 700px)'
+  'store under-band uses 700px breakpoint for phone stack'
 );
 assert(
-  /grid-template-areas:[\s\S]*?"band band"/.test(storeHtml) &&
-    storeHtml.includes('content-grid > #store-under-band'),
-  'under-band must span full content-grid width (band band) on tablet/desktop'
+  storeHtml.includes('store-main-col') &&
+    storeHtml.includes('store-main-col > #store-under-band') &&
+    storeHtml.includes('grid-template-columns:1fr !important'),
+  'under-band stacks full-width order above reviews inside store-main-col'
+);
+assert(
+  storeHtml.includes('store-desk-head') && storeHtml.includes('rzq-rev-form'),
+  'order header and review form stay compact horizontal on desktop'
 );
 
 // Logic twin of withStoreId — GitHub project pages base path must not duplicate
