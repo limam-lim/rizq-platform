@@ -648,27 +648,27 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   content:'✦';
   display:block;font-size:28px;color:var(--gold);line-height:1;margin-bottom:2px;
 }
-/* غرفة الطلبات ثم التقييمات — بطاقتان أفقيتان بعرض كامل (طلب فوق، تقييم تحت) */
+/* غرفة الطلبات ثم التقييمات — بطاقتان مضغوطتان بعرض كامل (طلب فوق، تقييم تحت) */
 .store-under-band{
   display:grid !important;
   grid-template-columns:1fr !important;
-  gap:14px;
+  gap:10px;
   margin:0;
   align-items:stretch;
   width:100%;
   min-width:0;
   box-sizing:border-box;
-  padding:14px;
-  border-radius:20px;
+  padding:10px;
+  border-radius:16px;
   background:
     radial-gradient(ellipse at 90% 0%, rgba(201,168,76,.06), transparent 42%),
     linear-gradient(165deg,#ffffff 0%,#f7f9fc 100%);
   border:1px solid rgba(27,58,107,.08);
-  box-shadow:0 12px 40px rgba(15,35,65,.06);
+  box-shadow:0 8px 24px rgba(15,35,65,.05);
 }
 #store-service-desk.store-desk-hz{
   margin:0;
-  padding:12px 14px 10px;
+  padding:10px 12px 8px;
   border-radius:14px;
   box-shadow:none;
   border:1px solid rgba(27,58,107,.08);
@@ -712,9 +712,9 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 .store-desk-field .req-input,
 .store-desk-field input.req-input,
 .store-desk-field textarea.req-input{
-  display:block;width:100%;margin:0;padding:8px 10px;
+  display:block;width:100%;margin:0;padding:6px 9px;
   border:1.5px solid #e2e8f5;border-radius:8px;font-size:12.5px;font-family:inherit;
-  box-sizing:border-box;min-height:36px;max-height:72px;background:#fff;resize:vertical
+  box-sizing:border-box;min-height:32px;max-height:40px;background:#fff;resize:none
 }
 /* الموضوع والرسالة جنباً إلى جنب — لا عمودان طويلان فوق بعض */
 .store-desk-span2{grid-column:span 2}
@@ -742,12 +742,13 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 }
 #reviews-section.store-reviews-hz{
   margin:0;
-  padding:14px 16px 12px;
+  padding:10px 12px 8px;
   background:#fff;
   border:1px solid rgba(27,58,107,.08);
   border-radius:14px;
   box-shadow:none;
   height:auto;
+  max-height:none;
   min-height:0;
   box-sizing:border-box;
   display:flex;
@@ -755,25 +756,46 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   min-width:0;
   width:100%;
 }
+#reviews-section.store-reviews-hz > .info-card-title{
+  margin-bottom:6px!important;padding-bottom:6px!important;font-size:13.5px
+}
 #reviews-section .store-reviews-inner{
   background:transparent!important;border:none!important;border-radius:0!important;
-  box-shadow:none!important;padding:0!important;flex:1 1 auto;
-  display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;gap:12px 18px;
+  box-shadow:none!important;padding:0!important;flex:0 0 auto;
+  display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:10px 14px;
 }
 #reviews-section .store-reviews-summary{
-  display:flex;align-items:flex-start;gap:12px;margin-bottom:0;flex-wrap:wrap;
-  flex:1 1 220px;min-width:180px
+  display:flex;align-items:center;gap:8px;margin-bottom:0;flex-wrap:nowrap;
+  flex:0 0 auto;min-width:0
 }
-#reviews-section .store-reviews-score{text-align:center;min-width:72px}
-#reviews-section #store-big-rating{font-size:28px;font-weight:900;color:var(--navy);line-height:1}
-#reviews-section #store-big-stars{color:#F5A623;font-size:14px;margin:3px 0}
-#reviews-section #store-big-count{font-size:11px;color:#6a7a8a}
-#reviews-section #reviews-list{flex:1 1 280px;min-width:200px}
-#reviews-section .view-all-btn{
-  color:var(--navy);border-color:rgba(27,58,107,.2);background:#fff;font-size:12.5px;padding:9px 12px;
-  margin-top:0;flex:0 0 auto;align-self:center;width:auto;min-width:160px
-}
+#reviews-section .store-reviews-score{text-align:center;min-width:auto}
+#reviews-section #store-big-rating{font-size:18px;font-weight:900;color:var(--navy);line-height:1}
+#reviews-section #store-big-stars{color:#F5A623;font-size:12px;margin:0}
+#reviews-section #store-big-count{font-size:11px;color:#6a7a8a;white-space:nowrap}
+#reviews-section #store-rating-breakdown{display:none!important} /* يطيل البطاقة — مخفي في الشريط المضغوط */
+#reviews-section #reviews-list{flex:1 1 auto;min-width:0;width:100%}
+#reviews-section .view-all-btn{display:none!important} /* اختصار الارتفاع */
 #reviews-section .view-all-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+/* نموذج التقييم مضغوط أفقياً — لا textarea طويلة */
+#reviews-section .rzq-rev-form{
+  display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;
+  margin-top:6px!important;padding-top:8px!important;border-top:1px solid #e8edf3
+}
+#reviews-section .rzq-rev-form-title{font-size:12.5px!important;font-weight:800;color:#1B3A6B;margin:0!important;flex:0 0 auto}
+#reviews-section #store-star-picker{display:flex;gap:3px;margin:0!important;font-size:18px!important;flex:0 0 auto}
+#reviews-section #store-review-name{
+  flex:1 1 120px;min-width:100px;max-width:180px;margin:0!important;padding:7px 10px!important;font-size:12.5px!important
+}
+#reviews-section #store-review-comment{
+  flex:1 1 180px;min-width:140px;margin:0!important;padding:7px 10px!important;font-size:12.5px!important;
+  min-height:34px!important;max-height:40px!important;rows:1;resize:none!important
+}
+#reviews-section .rzq-rev-submit{
+  flex:0 0 auto;width:auto!important;min-width:120px;padding:8px 14px!important;font-size:12.5px!important;margin:0!important
+}
+#reviews-section .rzq-rev-empty{
+  display:none!important; /* الملخص يكفي — يمنع تكرار «كن أول من يقيّم» وفراغ يمين */
+}
 /* تابلت: طلب فوق تقييم؛ النموذج يبقى أفقياً بعرضين */
 @media(max-width:1100px) and (min-width:701px){
   .store-under-band{
@@ -787,14 +809,17 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 @media(max-width:700px){
   /* الشريط نفسه ينهار بـ contents في رحلة الجوال — لا تُبقِه grid فوق المنتجات */
   #store-service-desk.store-desk-hz,
-  #reviews-section.store-reviews-hz{padding:12px 10px 10px;border-radius:12px;margin-bottom:8px}
+  #reviews-section.store-reviews-hz{padding:10px 10px 8px;border-radius:12px;margin-bottom:8px}
   .store-desk-form{grid-template-columns:1fr !important}
   .store-desk-span2{grid-column:auto}
   .store-desk-actions{flex-direction:column;align-items:stretch;flex-wrap:wrap}
   .store-desk-actions #store-req-submit{width:100%;min-width:0}
   #store-service-desk #rf-doc-upload.rzq-doc-zone{flex-wrap:wrap}
-  #reviews-section .store-reviews-inner{flex-direction:column}
-  #reviews-section .view-all-btn{width:100%}
+  #reviews-section .store-reviews-inner{flex-direction:column;align-items:stretch}
+  #reviews-section .rzq-rev-form{flex-direction:column;align-items:stretch}
+  #reviews-section #store-review-name,
+  #reviews-section #store-review-comment{max-width:none;width:100%}
+  #reviews-section .rzq-rev-submit{width:100%!important}
 }
 .product-img{
   height:150px;
@@ -2324,20 +2349,18 @@ function rizqShare(title, url) {
             + '<div style="font-size:11px;color:#8a9ab5">'+timeAgo(r.createdAt,fr)+'</div></div>'
             + '<div style="margin-'+(fr?'left':'right')+':auto;color:#F5A623;font-size:14px">'+starsHTML(r.rating)+'</div>'
             + '</div><div style="font-size:13px;color:#4a5a6a;line-height:1.6">'+esc(r.comment || (fr?'(Sans commentaire)':'(بدون تعليق)'))+'</div></div>';
-        }).join('') : ('<div style="padding:14px 12px;margin:4px 0 8px;border-radius:12px;background:linear-gradient(135deg,#f8fafc,#eef4fb);border:1px dashed rgba(27,58,107,.22);text-align:center">'
-          + '<div style="font-size:15px;font-weight:800;color:#1B3A6B;margin-bottom:4px">'+(fr?'⭐ Soyez le premier à évaluer':'⭐ كن أول من يقيّم')+'</div>'
-          + '<p style="font-size:12.5px;color:#6a7a8a;margin:0;line-height:1.55">'+(fr?'Aucun avis pour l\'instant — partagez votre expérience avec les prochains clients.':'لا توجد آراء بعد — شارك تجربتك مع الزبائن القادمين.')+'</p></div>');
+        }).join('') : '<div class="rzq-rev-empty" hidden></div>';
 
-        var starPicker = '<div id="store-star-picker" style="display:flex;gap:5px;margin-bottom:10px;font-size:24px">'
+        var starPicker = '<div id="store-star-picker">'
           + [1,2,3,4,5].map(function(n){ return '<span data-n="'+n+'" onclick="_rizqStoreSetStar('+n+')" id="store-star-'+n+'" style="cursor:pointer;color:rgba(13,27,42,.18)">★</span>'; }).join('')
           + '</div>';
-        var formHtml = '<div style="margin-top:16px;padding-top:16px;border-top:1px solid #e0e8f0">'
-          + '<div style="font-size:14px;font-weight:700;color:#1B3A6B;margin-bottom:10px">'+(fr?'✍️ Laisser un avis':'✍️ أضف تقييمك')+'</div>'
-          + '<div id="store-review-msg" style="font-size:12px;margin-bottom:8px"></div>'
+        var formHtml = '<div class="rzq-rev-form">'
+          + '<div class="rzq-rev-form-title">'+(fr?'✍️ Laisser un avis':'✍️ أضف تقييمك')+'</div>'
+          + '<div id="store-review-msg" style="font-size:11px;width:100%;display:none"></div>'
           + starPicker
-          + '<input type="text" id="store-review-name" maxlength="60" placeholder="'+(fr?'Votre nom (optionnel)':'اسمك (اختياري)')+'" style="width:100%;padding:10px 12px;border:1px solid #e0e8f0;border-radius:8px;font-size:13px;margin-bottom:8px;font-family:inherit;box-sizing:border-box">'
-          + '<textarea id="store-review-comment" maxlength="500" rows="3" placeholder="'+(fr?'Votre commentaire...':'اكتب تعليقك...')+'" style="width:100%;padding:10px 12px;border:1px solid #e0e8f0;border-radius:8px;font-size:13px;margin-bottom:10px;font-family:inherit;resize:vertical;box-sizing:border-box"></textarea>'
-          + '<button onclick="_rizqStoreSubmitReview()" style="width:100%;padding:12px;background:#1B3A6B;color:#fff;border:none;border-radius:8px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit">'+(fr?'Envoyer mon avis':'إرسال التقييم')+'</button>'
+          + '<input type="text" id="store-review-name" maxlength="60" placeholder="'+(fr?'Votre nom (optionnel)':'اسمك (اختياري)')+'" style="border:1px solid #e0e8f0;border-radius:8px;font-family:inherit;box-sizing:border-box">'
+          + '<textarea id="store-review-comment" maxlength="500" rows="1" placeholder="'+(fr?'Votre commentaire...':'اكتب تعليقك...')+'" style="border:1px solid #e0e8f0;border-radius:8px;font-family:inherit;box-sizing:border-box"></textarea>'
+          + '<button class="rzq-rev-submit" onclick="_rizqStoreSubmitReview()" style="background:#1B3A6B;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit">'+(fr?'Envoyer':'إرسال التقييم')+'</button>'
           + '</div>';
 
         reviewsList.innerHTML = listHtml + formHtml;
