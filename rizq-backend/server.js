@@ -1596,7 +1596,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
       automatedReports: !!a.automatedReports,
     }));
     const prevVideoAds = (current && current.videoAds) || {};
-    const defaultPromo = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
+    const defaultPromo = '/rizq-assets/promo/rizq-platform-promo-clean-light.mp4';
     next.videoAds = {
       hero: sanitizeAdList(body.videoAds.hero),
       popup: sanitizeAdList(body.videoAds.popup),
