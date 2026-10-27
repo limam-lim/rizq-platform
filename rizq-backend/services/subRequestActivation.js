@@ -53,7 +53,7 @@ function activateVideoAdOnServer(req) {
   const videoAds = {
     hero: prev.hero || [],
     popup: prev.popup || [],
-    platformPromoUrl: prev.platformPromoUrl || '/rizq-assets/promo/rizq-platform-promo-light.mp4',
+    platformPromoUrl: prev.platformPromoUrl || 'rizq-assets/promo/rizq-platform-promo-light.mp4',
     platformPromoEnabled: prev.platformPromoEnabled !== false,
     adSlotSeconds: Number(prev.adSlotSeconds) || 25,
     stats: prev.stats && typeof prev.stats === 'object' ? prev.stats : {},

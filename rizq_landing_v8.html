@@ -64,7 +64,7 @@ html,body{background:#eef2f8}
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.87"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.88"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — الشريط القديم متوقف نهائياً */
@@ -5274,7 +5274,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <script src="rizq_marquee_kit.js?v=1.3"></script>
     <script src="rizq_civic_ticker.js?v=1.3"></script>
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_header_mockup_trial.js?v=5.87" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.88" defer></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
@@ -16125,8 +16125,10 @@ function closeRvidPopup(){ document.getElementById('rvid-overlay').classList.rem
           var heroSrc = String(pv.heroUrl || pv.url || '');
           /* clean-light stub قصير (~9ث) كان يعطّل الترويج — استخدم الملف الكامل */
           if (!heroSrc || /rizq-platform-promo-clean-light\.mp4(\?|#|$)/i.test(heroSrc)) {
-            heroSrc = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
+            heroSrc = 'rizq-assets/promo/rizq-platform-promo-light.mp4';
           }
+          /* بدون / أولية — وإلا يفشل على GitHub Pages تحت /rizq-platform/ */
+          if (/^\/rizq-assets\//i.test(heroSrc)) heroSrc = heroSrc.replace(/^\//, '');
           vid.src = heroSrc;
           vid.play().catch(function(){});
           wrap.style.display = '';
@@ -16149,7 +16151,12 @@ function closeRvidPopup(){ document.getElementById('rvid-overlay').classList.rem
 
       // ── ② Section Promo Video (الفيديو الترويجي للمنصة — بعد الـ hero) ──
       if (pv.sectionActive) {
-        document.getElementById('rvid-section-video').src = pv.url;
+        var sectionSrc = String(pv.url || '');
+        if (!sectionSrc || /rizq-platform-promo-clean-light\.mp4(\?|#|$)/i.test(sectionSrc)) {
+          sectionSrc = 'rizq-assets/promo/rizq-platform-promo-light.mp4';
+        }
+        if (/^\/rizq-assets\//i.test(sectionSrc)) sectionSrc = sectionSrc.replace(/^\//, '');
+        document.getElementById('rvid-section-video').src = sectionSrc;
         document.getElementById('rvid-section-title').textContent = pv.title || '';
         document.getElementById('rvid-section-sub').textContent = pv.subtitle || '';
         document.getElementById('rvid-section').classList.add('active');
@@ -16159,7 +16166,12 @@ function closeRvidPopup(){ document.getElementById('rvid-overlay').classList.rem
       if (pv.popupActive && !sessionStorage.getItem('rizq_promo_video_shown')) {
         var delay = (Number(pv.delay) || 3) * 1000;
         setTimeout(function(){
-          document.getElementById('rvid-popup-video').src = pv.url;
+          var popSrc = String(pv.url || '');
+          if (!popSrc || /rizq-platform-promo-clean-light\.mp4(\?|#|$)/i.test(popSrc)) {
+            popSrc = 'rizq-assets/promo/rizq-platform-promo-light.mp4';
+          }
+          if (/^\/rizq-assets\//i.test(popSrc)) popSrc = popSrc.replace(/^\//, '');
+          document.getElementById('rvid-popup-video').src = popSrc;
           document.getElementById('rvid-popup-title').textContent = pv.title || '';
           document.getElementById('rvid-popup-sub').textContent = pv.subtitle || '';
           document.getElementById('rvid-overlay').classList.add('active');
@@ -16333,7 +16345,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <script src="rizq_packages_ui.js?v=23.0"></script>
 <script src="rizq_merchant_activities.js?v=23.0"></script>
 <script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo21"></script>
+<script src="rizq_video_ads.js?v=promo22"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=24.1"></script>
 <script src="rizq_disclaimer.js"></script>

@@ -114,8 +114,9 @@
 
   // فيديو المنصة المزروع — بداية الحلقة وبعد انتهاء إعلانات المعلنين
   /* light = الترويج الكامل العامل. clean-light كان ملفاً قصيراً رديئاً (~9ث) فكسر التشغيل.
-     طبقات النص فوق مساحة الفيديو تُمنع عبر CSS/paintMeta وليس بتبديل الملف. */
-  var DEFAULT_PLATFORM_PROMO = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
+     طبقات النص فوق مساحة الفيديو تُمنع عبر CSS/paintMeta وليس بتبديل الملف.
+     بدون / في البداية: على GitHub Pages (…/rizq-platform/) المسار المطلق /rizq-assets يذهب لجذر github.io و404. */
+  var DEFAULT_PLATFORM_PROMO = 'rizq-assets/promo/rizq-platform-promo-light.mp4';
   var DEFAULT_AD_SLOT_SEC = 25;
   var _heroAdvanceTimer = null;
   var _heroPlaylist = [];
@@ -136,8 +137,10 @@
     var u = String(url || '').trim() || DEFAULT_PLATFORM_PROMO;
     /* إن وُجدت إشارة للـ stub القصير clean-light → أعد الترويج الكامل */
     if (/rizq-platform-promo-clean-light\.mp4(\?|#|$)/i.test(u)) {
-      return DEFAULT_PLATFORM_PROMO;
+      u = DEFAULT_PLATFORM_PROMO;
     }
+    /* جذر مطلق يكسر GitHub Pages project site — اجعله نسبياً لأصل الصفحة */
+    if (/^\/rizq-assets\//i.test(u)) u = u.replace(/^\//, '');
     return u;
   }
 
@@ -1143,7 +1146,11 @@
         if (_settled) return; _settled = true;
         clearTimeout(_localFallbackTimer);
         var remote = data && data.ok && data.config && data.config.videoAds;
-        if (remote && typeof remote === 'object' && (Array.isArray(remote.hero) || Array.isArray(remote.popup) || Array.isArray(remote.strip))) {
+        var remoteUsable = remote && typeof remote === 'object' && (
+          Array.isArray(remote.hero) || Array.isArray(remote.popup) || Array.isArray(remote.strip)
+          || !!remote.platformPromoUrl || remote.platformPromoEnabled != null
+        );
+        if (remoteUsable) {
           try { localStorage.setItem('rizq_video_ads', JSON.stringify(remote)); } catch (e) {}
           _startWithConfig(remote);
         } else {

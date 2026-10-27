@@ -1206,7 +1206,11 @@ app.get('/api/site-config', (req, res) => {
     production: isProdEnv(),
     packages: raw.packages || undefined,
     prices: raw.prices || undefined,
-    promoVideo: raw.promoVideo || undefined,
+    promoVideo: raw.promoVideo ? {
+      ...raw.promoVideo,
+      url: sanitizePlatformPromoUrl(raw.promoVideo.url),
+      heroUrl: sanitizePlatformPromoUrl(raw.promoVideo.heroUrl || raw.promoVideo.url),
+    } : undefined,
     // لا نُسرّب stats (مشاهدات/نقرات المعلنين) للعامة
     videoAds: raw.videoAds ? {
       hero: raw.videoAds.hero,
@@ -1290,11 +1294,13 @@ const SITE_SOCIAL_KEYS = [
  * الصف المعطّل أو بلا رابط صالح يبقى {enabled,url} لكن الواجهة العامة
  * تعرض فقط enabled + رابط آمن بمسار حساب (ليس جذر النطاق).
  */
-/** Stub clean-light (~9s) كسر الهيرو — أعد الترويج الكامل light.mp4 */
+/** Stub clean-light (~9s) كسر الهيرو — أعد الترويج الكامل light.mp4.
+ *  مسار نسبي بلا / أولية حتى يعمل على GitHub Pages (/rizq-platform/). */
 function sanitizePlatformPromoUrl(url) {
-  const u = String(url || '').trim();
-  const fallback = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
-  if (!u || /rizq-platform-promo-clean-light\.mp4(\?|#|$)/i.test(u)) return fallback;
+  let u = String(url || '').trim();
+  const fallback = 'rizq-assets/promo/rizq-platform-promo-light.mp4';
+  if (!u || /rizq-platform-promo-clean-light\.mp4(\?|#|$)/i.test(u)) u = fallback;
+  if (/^\/rizq-assets\//i.test(u)) u = u.replace(/^\//, '');
   return u.slice(0, 500);
 }
 
@@ -1341,14 +1347,14 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     // لكن هذا الـ endpoint كان يتجاهلها تماماً عند الحفظ — أي تفعيل لهذا
     // الموضع من الأدمن كان يُفقَد فوراً بلا أي خطأ ظاهر. أضيفت هنا فعلياً.
     next.promoVideo = {
-      url: String(body.promoVideo.url || '').slice(0, 500),
+      url: sanitizePlatformPromoUrl(body.promoVideo.url),
       title: String(body.promoVideo.title || '').slice(0, 200),
       subtitle: String(body.promoVideo.subtitle || '').slice(0, 300),
       delay: Math.max(0, Math.min(30, Number(body.promoVideo.delay) || 3)),
       popupActive: !!body.promoVideo.popupActive,
       sectionActive: !!body.promoVideo.sectionActive,
       heroActive: !!body.promoVideo.heroActive,
-      heroUrl: String(body.promoVideo.heroUrl || '').slice(0, 500),
+      heroUrl: sanitizePlatformPromoUrl(body.promoVideo.heroUrl || body.promoVideo.url),
       heroViews: String(body.promoVideo.heroViews || '').slice(0, 40),
       heroAdvertiser: String(body.promoVideo.heroAdvertiser || '').slice(0, 120),
       heroAdvertiserLoc: String(body.promoVideo.heroAdvertiserLoc || '').slice(0, 120),
@@ -1604,7 +1610,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
       automatedReports: !!a.automatedReports,
     }));
     const prevVideoAds = (current && current.videoAds) || {};
-    const defaultPromo = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
+    const defaultPromo = 'rizq-assets/promo/rizq-platform-promo-light.mp4';
     next.videoAds = {
       hero: sanitizeAdList(body.videoAds.hero),
       popup: sanitizeAdList(body.videoAds.popup),
