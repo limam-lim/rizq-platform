@@ -707,6 +707,11 @@
   function wireDetailDelegation(root) {
     if (!root || root.dataset.pdWired === '1') return;
     root.dataset.pdWired = '1';
+    function handleSimActivate(t) {
+      if (!t || !root.contains(t)) return;
+      var pid = t.getAttribute('data-pid');
+      if (pid) openProductDetail(pid);
+    }
     root.addEventListener('click', function (e) {
       if (e.target === root) {
         closeProductDetail();
@@ -728,9 +733,16 @@
       t = e.target && e.target.closest ? e.target.closest('.rzq-pd-sim[data-pid]') : null;
       if (t && root.contains(t)) {
         e.preventDefault();
-        openProductDetail(t.getAttribute('data-pid'));
+        handleSimActivate(t);
         return;
       }
+    });
+    root.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      var t = e.target && e.target.closest ? e.target.closest('.rzq-pd-sim[data-pid]') : null;
+      if (!t || !root.contains(t)) return;
+      e.preventDefault();
+      handleSimActivate(t);
     });
   }
 
