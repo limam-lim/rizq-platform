@@ -4472,8 +4472,8 @@ function renderUsers(data){
     <td style="font-size:12px;color:var(--text-muted)">${escAdmin(u.date)}</td>
     <td>${statMap[u.status]}</td>
     <td><div style="display:flex;gap:5px">
-      <button class="btn-sm btn-outline" onclick="editUser('${u.id}')">${RizqI18n.t2('تعديل','Modifier')}</button>
-      ${u.status==='active'?`<button class="btn-sm btn-danger" onclick="adminTableSuspendUser('${u.id}')">${RizqI18n.t2('تعليق','Suspendre')}</button>`:(u.status==='banned'?`<button class="btn-sm btn-success" onclick="adminTableActivateUser('${u.id}')">${RizqI18n.t2('تفعيل','Activer')}</button>`:'')}
+      <button class="btn-sm btn-outline" onclick="editUser('${escJsId(u.id)}')">${RizqI18n.t2('تعديل','Modifier')}</button>
+      ${u.status==='active'?`<button class="btn-sm btn-danger" onclick="adminTableSuspendUser('${escJsId(u.id)}')">${RizqI18n.t2('تعليق','Suspendre')}</button>`:(u.status==='banned'?`<button class="btn-sm btn-success" onclick="adminTableActivateUser('${escJsId(u.id)}')">${RizqI18n.t2('تفعيل','Activer')}</button>`:'')}
       <button class="btn-sm" style="background:#f8faff;border:1px solid #e2e8f5;color:var(--text-muted)" onclick="showPanel('ads')">${RizqI18n.t2('إعلانات','Annonces')}</button>
     </div></td>
   </tr>`).join('');
@@ -4635,8 +4635,8 @@ function renderAds(data){
     <td style="font-size:12px;color:var(--text-muted)">${escAdmin(a.date)}</td>
     <td>${statMap[a.status]||a.status}</td>
     <td><div style="display:flex;gap:5px">
-      ${a.status==='pending'?`<button class="btn-sm btn-success" onclick="adminTableApproveAd('${a.id}')">${RizqI18n.t2('قبول','Accepter')}</button><button class="btn-sm btn-danger" onclick="adminTableRejectAd('${a.id}')">${RizqI18n.t2('رفض','Refuser')}</button>`:''}
-      ${a.status!=='removed'?`<button class="btn-sm btn-danger" onclick="adminTableDeleteAd('${a.id}')">${RizqI18n.t2('حذف','Supprimer')}</button>`:''}
+      ${a.status==='pending'?`<button class="btn-sm btn-success" onclick="adminTableApproveAd('${escJsId(a.id)}')">${RizqI18n.t2('قبول','Accepter')}</button><button class="btn-sm btn-danger" onclick="adminTableRejectAd('${escJsId(a.id)}')">${RizqI18n.t2('رفض','Refuser')}</button>`:''}
+      ${a.status!=='removed'?`<button class="btn-sm btn-danger" onclick="adminTableDeleteAd('${escJsId(a.id)}')">${RizqI18n.t2('حذف','Supprimer')}</button>`:''}
     </div></td>
   </tr>`).join('');
 }
@@ -7312,6 +7312,10 @@ function escAdmin(s){
   return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
     return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
   });
+}
+/** معرّفات آمنة داخل onclick="fn('id')" — يمنع كسر السلسلة / XSS */
+function escJsId(s){
+  return String(s == null ? '' : s).replace(/[^a-zA-Z0-9_\-.:@]/g, '');
 }
 
 // ── إصلاح جوهري: طلبات شراء/تجديد الباقة (بما فيها فيديوهات Rizq ADS) كانت

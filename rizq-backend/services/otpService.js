@@ -199,7 +199,8 @@ function generateCode() {
 
 function getPublicOtpConfig() {
   const emailConfigured = !!(process.env.EMAIL_USER && process.env.EMAIL_PASS);
-  const smsConfigured = !!(process.env.TWILIO_SID && process.env.TWILIO_TOKEN && process.env.RIZQ_TWILIO_NUMBER);
+  const twilioToken = process.env.TWILIO_TOKEN || process.env.TWILIO_AUTH_TOKEN;
+  const smsConfigured = !!(process.env.TWILIO_SID && twilioToken && process.env.RIZQ_TWILIO_NUMBER);
   // في التطوير: إن لم يُضبط بريد/SMS نُظهر رمز التطوير تلقائياً حتى لا يُعلَّق الزبون
   const autoDevHint = !isProduction() && !emailConfigured && !smsConfigured;
   return {
@@ -248,7 +249,7 @@ async function sendOtp(phone, opts) {
 
   const smsText = `رمز التحقق رزق: ${code}. صالح 5 دقائق.`;
   let sentViaSms = false;
-  if (process.env.TWILIO_SID && process.env.TWILIO_TOKEN && process.env.RIZQ_TWILIO_NUMBER) {
+  if (process.env.TWILIO_SID && (process.env.TWILIO_TOKEN || process.env.TWILIO_AUTH_TOKEN) && process.env.RIZQ_TWILIO_NUMBER) {
     const sms = await sendSMS('+222' + ph, smsText);
     sentViaSms = !!(sms && sms.ok);
   }
@@ -380,7 +381,7 @@ async function sendBuyerOtp(payload) {
   writeStore(list);
 
   let sentViaSms = false;
-  if (isValidMauritanianPhone(mr) && process.env.TWILIO_SID && process.env.TWILIO_TOKEN && process.env.RIZQ_TWILIO_NUMBER) {
+  if (isValidMauritanianPhone(mr) && process.env.TWILIO_SID && (process.env.TWILIO_TOKEN || process.env.TWILIO_AUTH_TOKEN) && process.env.RIZQ_TWILIO_NUMBER) {
     const sms = await sendSMS('+222' + mr, `رمز التحقق رزق: ${code}. صالح 5 دقائق.`);
     sentViaSms = !!(sms && sms.ok);
   }

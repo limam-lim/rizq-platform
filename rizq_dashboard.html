@@ -120,7 +120,7 @@
       <button class="mobile-menu-btn" onclick="openSidebar()" aria-label="Menu">☰</button>
       <div class="topbar-actions" dir="ltr">
         <div class="topbar-utils">
-          <button type="button" class="btn-lang btn-lang-primary" id="lang-btn" dir="ltr" aria-label="FR | AR" data-bilingual-ok="1"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
+          <button type="button" class="btn-lang btn-lang-primary" id="lang-btn" dir="ltr" aria-label="FR | AR" data-bilingual-ok="1" onclick="toggleLangPage()"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
           <button type="button" class="btn-icon" onclick="showPanel('notifications',document.querySelector('.nav-item[onclick*=notifications]'))" data-t-title="notif-title" aria-label="الإشعارات"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 9.5a5.5 5.5 0 1 1 11 0c0 6.2 2.5 7.5 2.5 7.5H4s2.5-1.3 2.5-7.5"/><path d="M10 20.2a2 2 0 0 0 4 0"/></svg><span class="notif-dot" id="notif-dot" hidden></span></button>
           <button type="button" class="btn-icon" onclick="showPanel('messages',document.querySelector('.nav-item[onclick*=messages]'))" data-t-title="messages-title" aria-label="الرسائل"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 12.2a7.5 7.5 0 0 1-7.2 7.5H8.2L4 22.5v-9.3a7.5 7.5 0 1 1 16.5-1"/></svg></button>
         </div>

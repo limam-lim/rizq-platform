@@ -1409,7 +1409,7 @@ function applyAccountData(){
   // الفعلي عبر RizqSub.getBadges — تعمل حتى مع الحساب المُجلَب من الباك-إند
   // (fetch fallback أعلاه) لأنها تعتمد فقط على _showroomId لا على _acc.
   if(typeof RizqSub !== 'undefined' && _showroomId && _showroomId !== 'demo'){
-    var _srBadges = RizqSub.getBadges(_showroomId);
+    var _srBadges = RizqSub.getBadges(_showroomId, _acc || null);
     var _srVerifiedEl = document.getElementById('badge-verified-lbl');
     if(_srVerifiedEl) _srVerifiedEl.style.display = _srBadges.verified ? '' : 'none';
     var _srPremiumEl = document.getElementById('premium-badge-lbl');

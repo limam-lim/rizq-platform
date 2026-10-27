@@ -879,9 +879,18 @@
   // شراء (rizq_admin.html، activateVerifiedPlusForRequest) أو منحاً يدوياً —
   // تنتهي تلقائياً عند تجاوز verifiedPlusExpiresAt (تُحسَب حيّة، لا تُخزَّن
   // كحالة نهائية) تماماً كمنطق حساب حالة الباقة العامة أعلاه.
-  function getBadges(accId) {
+  function getBadges(accId, accFromApi) {
+    /* إن وُجدت شارات الخادم على الحساب العام — هي مصدر الحقيقة (لا localStorage) */
+    if (accFromApi && accFromApi.badges && typeof accFromApi.badges === 'object') {
+      return {
+        verified: !!accFromApi.badges.verified,
+        premium: !!accFromApi.badges.premium,
+        priorityListing: !!accFromApi.badges.priorityListing,
+        verifiedPlus: !!accFromApi.badges.verifiedPlus,
+      };
+    }
     var accounts = getAccounts();
-    var acc = accounts[accId];
+    var acc = (accFromApi && typeof accFromApi === 'object') ? accFromApi : accounts[accId];
     var verifiedPlusActive = !!(acc && acc.verifiedPlus && acc.verifiedPlusExpiresAt && new Date(acc.verifiedPlusExpiresAt) > new Date());
     return {
       verified: !!(acc && acc.status === 'approved'),

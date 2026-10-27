@@ -367,11 +367,10 @@
       return Promise.resolve().then(function () { return afterAccount(null); });
     }
 
-    var local = verifyAccessLocal(ctx.sessionId, ctx.sessionToken, expectedType);
-    if (local) return Promise.resolve().then(function () { return afterAccount(local); });
-
+    /* دائماً تحقق من الخادم — لا تثق بـ localStorage وحده (يمنع تزوير جلسة عقار/لوحة) */
     return verifyAccessRemote(ctx.sessionId, ctx.sessionToken, expectedType).then(function (remote) {
-      return afterAccount(remote);
+      if (remote) return afterAccount(remote);
+      finishDenied();
     });
   }
 
