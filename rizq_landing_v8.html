@@ -3890,7 +3890,10 @@ html[dir="rtl"] .diamond-pitch-grid{text-align:right;direction:rtl}
 .pkg-popular{position:absolute;top:-14px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--royal-dark);font-size:10px;font-weight:800;padding:5px 14px;border-radius:20px;white-space:nowrap}
 
 /* Footer */
-footer{background:linear-gradient(180deg,var(--dark),var(--royal-deep));border-top:1px solid rgba(201,168,76,.1);padding:60px 5% 36px}
+footer{background:linear-gradient(180deg,var(--dark),var(--royal-deep));border-top:1px solid rgba(201,168,76,.1);padding:28px 5% 20px}
+footer:not(.rzq-ft-compact){padding-top:36px}
+/* قبل تحميل rizq_footer_toggle: مطوي بلا فراغ بحجم الشريط السفلي — body يحجز مساحة الـnav */
+footer.rizq-footer.rzq-ft-compact{padding:4px 5% calc(8px + env(safe-area-inset-bottom,0px))}
 .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1.2fr;gap:32px;max-width:1200px;margin:0 auto;padding-bottom:24px}
 .footer-col-title{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px;font-family:Georgia,serif}
 .footer-desc{font-size:13px;color:rgba(255,255,255,.82);line-height:1.85;margin-top:14px;max-width:280px}
@@ -5226,8 +5229,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_dynamic_nav.js?v=23.5"></script>
 <script src="rizq_module_flags.js?v=1.2"></script>
 <script src="rizq_pwa.js?v=31.20" defer></script>
-<script src="rizq_footer_toggle.js?v=23.3" defer></script>
-<script src="rizq_social_links.js?v=23.8" defer></script>
+<script src="rizq_footer_toggle.js?v=23.8" defer></script>
+<script src="rizq_social_links.js?v=23.13" defer></script>
 <script src="rizq_account_route.js?v=23.0"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
 <script src="rizq_seller_branding.js?v=1"></script>
@@ -6332,7 +6335,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <div id="coming-soon-strip" style="display:none"></div>
 
 <!-- ══ FOOTER ══ -->
-<footer class="rizq-footer">
+<footer class="rizq-footer rzq-ft-compact">
   <div class="footer-grid">
     <div>
       <a href="rizq_landing_v8.html" class="logo" style="margin-bottom:14px;display:inline-flex;gap:10px;direction:ltr;align-items:center;height:42px">
@@ -6373,8 +6376,8 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
       </ul>
     </div>
   </div>
-  <div id="rizq-social-follow" hidden style="padding:4px 0 14px"></div>
   <div class="footer-bottom">
+    <div id="rizq-social-follow" hidden style="padding:2px 0 4px;width:100%;text-align:center"></div>
     <p class="footer-copy" data-t="ft-copy">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</p>
     <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" title="ADMINIA SARL — التعريف بالشركة / À propos">
       <div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:var(--gold);letter-spacing:2px;font-family:sans-serif">AML</div>
