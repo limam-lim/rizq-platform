@@ -1602,7 +1602,7 @@ function rebuildCorpCatTabs(cats){
                 ['wa-btn','visit-wa-btn'].forEach(function(bid){ setHref(bid, 'https://wa.me/'+waNum); });
               }
               if(typeof RizqSub!=='undefined'){
-                var b = RizqSub.getBadges(id);
+                var b = RizqSub.getBadges(id, acc);
                 var ve=document.getElementById('badge-verified-lbl'); if(ve) ve.style.display=b.verified?'':'none';
                 var pe=document.getElementById('plan-badge'); if(pe) pe.style.display=b.premium?'':'none';
                 var vpe=document.getElementById('verified-plus-badge-lbl'); if(vpe) vpe.style.display=b.verifiedPlus?'inline-flex':'none';

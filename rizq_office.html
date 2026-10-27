@@ -2700,7 +2700,7 @@ function openMaps(){
                   }
                 }
                 if(typeof RizqSub!=='undefined'){
-                  var b = RizqSub.getBadges(id);
+                  var b = RizqSub.getBadges(id, acc);
                   var ve=document.getElementById('verified-badge'); if(ve) ve.style.display=b.verified?'':'none';
                   var pe=document.getElementById('premium-badge-lbl'); if(pe) pe.style.display=b.premium?'':'none';
                   var vpe=document.getElementById('verified-plus-badge-lbl'); if(vpe) vpe.style.display=b.verifiedPlus?'inline-flex':'none';

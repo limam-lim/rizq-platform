@@ -89,10 +89,11 @@ async function _sendWhatsApp(to, text) {
 let _twilioClient = null;
 function _getTwilioClient() {
   if (_twilioClient) return _twilioClient;
-  if (!process.env.TWILIO_SID || !process.env.TWILIO_TOKEN) return null;
+  const twilioToken = process.env.TWILIO_TOKEN || process.env.TWILIO_AUTH_TOKEN;
+  if (!process.env.TWILIO_SID || !twilioToken) return null;
   try {
     const twilio = require('twilio');
-    _twilioClient = twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
+    _twilioClient = twilio(process.env.TWILIO_SID, twilioToken);
     return _twilioClient;
   } catch (e) {
     console.error('⚠️ twilio غير مثبَّت (npm install twilio):', e.message);

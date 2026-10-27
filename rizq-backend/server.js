@@ -102,13 +102,13 @@ app.use((req, res, next) => {
   next();
 });
 
-// إصلاح جوهري 29/07/2026: كان الحد 4mb كافياً فقط لصورة وصل دفع واحدة —
-// إعلان واحد قد يحمل حتى 6 صور مضغوطة (~1-1.5MB لكل صورة بعد ضغط العميل)
-// أي حتى ~9MB بالطلب الواحد. رُفع الحد هنا؛ الصور نفسها تُكتب كملفات على
-// القرص فوراً (انظر _saveAdImages أدناه) ولا تبقى محفوظة كنص base64 ضخم
-// داخل ads.json — فقط الحد الأقصى للطلب الوارد (قبل فك التشفير) يحتاج
-// رفعاً هنا.
-app.use(express.json({ limit: '20mb' }));
+// حد JSON عام منخفض ضد DoS؛ مسارات الوسائط/الرفع تحتفظ بـ 20mb.
+app.use((req, res, next) => {
+  const p = String(req.path || '');
+  const heavy = /^\/api\/(ads|catalog|sub-requests|accounts\/[^/]+\/kyc|knowledge|service-requests)/.test(p)
+    || /^\/api\/admin\/(receipts|kyc)/.test(p);
+  express.json({ limit: heavy ? '20mb' : '1mb' })(req, res, next);
+});
 
 // ── تخزين بسيط على ملفات JSON على القرص ─────────────────────────────
 // هذا ليس قاعدة بيانات حقيقية (المطلوبة قبل الإطلاق الكامل حسب خطة
@@ -4030,7 +4030,7 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
     return res.status(400).json({ error: 'cannot_review_self' });
   }
 
-  /* تقييم بعد تعامل: رسالة سابقة، أو مشترٍ يقيّم عبر إعلان يخص البائع */
+  /* تقييم بعد تعامل حقيقي فقط: رسالة مشترٍ↔بائع — لا اختصار «أي إعلان للبائع» */
   const targetId = String(b.targetId).slice(0, 60);
   const adId = b.adId ? String(b.adId).slice(0, 80) : '';
   let verifiedInteraction = false;
@@ -4043,20 +4043,11 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
       return sellerOk && buyerOk;
     });
   } catch (eMsg) { /* ignore */ }
-  if (!verifiedInteraction && reviewerIsBuyer && adId) {
-    try {
-      const ads = typeof readAds === 'function' ? readAds() : [];
-      const ad = ads.find((a) => a && String(a.id) === adId);
-      if (ad && String(ad.accountId || '') === targetId) {
-        verifiedInteraction = true;
-      }
-    } catch (eAd) { /* ignore */ }
-  }
   if (!verifiedInteraction) {
     return res.status(403).json({
       error: 'interaction_required',
       code: 'interaction_required',
-      message: 'التقييم متاح بعد تواصل موثّق مع البائع (رسالة أو إعلان مرتبط)',
+      message: 'التقييم متاح بعد تواصل موثّق مع البائع (رسالة مسجّلة على المنصة)',
     });
   }
 
@@ -4065,11 +4056,18 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
   if (list.some((r) => r.reviewerAccountId === reviewerAccountId)) {
     return res.status(409).json({ error: 'already_reviewed' });
   }
+  const stripReviewText = (s, max) => String(s == null ? '' : s)
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/[<>]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, max);
   const review = {
     id: genReviewId(),
     rating,
-    comment: String(b.comment == null ? '' : b.comment).trim().slice(0, 500),
-    reviewerName: String((b.reviewerName || reviewerName || '')).trim().slice(0, 60),
+    comment: stripReviewText(b.comment, 500),
+    /* الاسم من جلسة المصادقة فقط — تجاهل spoof من الجسم */
+    reviewerName: stripReviewText(reviewerName || 'زبون رزق', 60),
     reviewerAccountId,
     adId: adId || null,
     verifiedInteraction: true,
@@ -4094,7 +4092,12 @@ app.post('/api/reviews/:targetId/:reviewId/reply', reviewsLimiter, (req, res) =>
   }
   const owner = verifyAccountOwner(targetId, token);
   if (!owner) return res.status(401).json({ error: 'unauthorized', code: 'auth_required' });
-  const reply = String((req.body && req.body.reply) || '').trim().slice(0, 500);
+  const reply = String((req.body && req.body.reply) || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/[<>]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 500);
   if (!reply) return res.status(400).json({ error: 'reply_required' });
   const all = readReviews();
   const list = all[targetId] || [];

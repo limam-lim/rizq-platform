@@ -12,6 +12,7 @@ const {
   getTenderEntitlements,
   getSubscriptionStatus,
   isPaymentConfirmed,
+  hasFeature,
   ACTIVE_STATUSES,
 } = require('./entitlements');
 const repos = require('../db/repos');
@@ -276,6 +277,34 @@ function toPublicAccountGated(acc, gate) {
       docsChannel: ['whatsapp', 'email', 'both'].includes(acc.serviceDesk.docsChannel)
         ? acc.serviceDesk.docsChannel
         : 'whatsapp',
+    };
+  }
+  /* شارات عامة من الخادم — لا تعتمد على localStorage للزائر */
+  try {
+    const verifiedPlusActive = !!(acc.verifiedPlus && acc.verifiedPlusExpiresAt
+      && new Date(acc.verifiedPlusExpiresAt) > new Date());
+    let premium = false;
+    let priorityListing = false;
+    try {
+      const ents = getEntitlements(acc.id, acc.type || 'individual');
+      const active = ents && ACTIVE_STATUSES.includes(String(ents.subscriptionStatus || ''));
+      if (active) {
+        premium = hasFeature(ents, 'vip_badge');
+        priorityListing = hasFeature(ents, 'priority_listing') || !!(ents.limits && ents.limits.priorityListing);
+      }
+    } catch (eEnt) { /* ignore */ }
+    out.badges = {
+      verified: acc.status === 'approved',
+      premium: !!premium,
+      priorityListing: !!priorityListing,
+      verifiedPlus: verifiedPlusActive,
+    };
+  } catch (eB) {
+    out.badges = {
+      verified: acc.status === 'approved',
+      premium: false,
+      priorityListing: false,
+      verifiedPlus: false,
     };
   }
   return out;
