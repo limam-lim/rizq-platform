@@ -125,7 +125,7 @@ function _applyCorpLang(lang){
   if(activePanel && title){
     var pid = activePanel.id.replace('panel-','');
     var tbl = (lang === 'fr') ? panelTitlesFr : panelTitles;
-    if(tbl[pid]) title.textContent = tbl[pid];
+    if(tbl && tbl[pid]) title.textContent = tbl[pid];
   }
   // إصلاح #90: إعادة توليد المحتوى الديناميكي ليعكس اللغة الجديدة فوراً
   try{ if(typeof renderOverview==='function') renderOverview(); }catch(e){}
@@ -362,6 +362,27 @@ var DEMO_ACC = {
   }
 };
 
+/* يجب تعريف العناوين وباقات ADS قبل initCorpAccess() — demo=1 يستدعي
+   initDashboard() متزامناً عند السطر initCorpAccess() فيتصفّح script قبل
+   بلوغ التعريفات المتأخرة (var تكون undefined حتى التعيين). */
+var panelTitles = {
+  overview:'📊 نظرة عامة', inquiries:'📩 الاستفسارات', analytics:'📈 الإحصائيات',
+  products:'📦 المنتجات والإعلانات', team:'👥 الفريق', profile:'🏭 معلومات الشركة',
+  ads:'🎬 Rizq ADS', subscription:'💳 اشتراكي', mypayments:'💳 دفعاتي', settings:'⚙️ الإعدادات',
+  tenders:'📋 المناقصات', referral:'🎁 إحالة الأصدقاء', verifiedplus:'🛡️ شارة موثّق⁺'
+};
+var panelTitlesFr = {
+  overview:'📊 Vue d\'ensemble', inquiries:'📩 Demandes', analytics:'📈 Statistiques',
+  products:'📦 Produits et annonces', team:'👥 Équipe', profile:'🏭 Infos entreprise',
+  ads:'🎬 Rizq ADS', subscription:'💳 Mon abonnement', mypayments:'💳 Mes paiements', settings:'⚙️ Paramètres',
+  tenders:'📋 Appels d\'offres', referral:'🎁 Parrainage', verifiedplus:'🛡️ Badge Vérifié+'
+};
+var DEFAULT_ADS_PKGS = [
+  {id:'ads1',name:'باقة رزق ADS أساسية',price:2000,duration:7,views:'5,000',emoji:'🥉',color:'#3b82f6',features:['ظهور لكل زوار رزق','7 أيام نشاط','تقرير مشاهدات']},
+  {id:'ads2',name:'باقة رزق ADS برو',price:5000,duration:15,views:'15,000',emoji:'🥈',color:'#C9A84C',features:['أولوية الظهور','15 يوم نشاط','تقرير تفصيلي','دعم مخصص']},
+  {id:'ads3',name:'باقة رزق ADS ماسية',price:10000,duration:30,views:'50,000',emoji:'💎',color:'#7c3aed',features:['صدارة جميع الصفحات','30 يوم نشاط','إحصائيات حية','مدير حساب خاص','بنر + فيديو']}
+];
+
 function initCorpAccess(){
   var p = new URLSearchParams(location.search);
   var isDemoParam = p.get('demo') === '1';
@@ -537,7 +558,6 @@ function initDashboard(){
   if(typeof renderAnalyticsChart==='function') renderAnalyticsChart();
   if(typeof renderSubPanel==='function') renderSubPanel();
   if(typeof RizqInvoice!=='undefined' && typeof renderMyInvoices==='function') renderMyInvoices();
-  if(typeof renderAdsPackages==='function') renderAdsPackages();
   if(typeof loadProfile==='function') loadProfile();
   if(window.RizqStatusSummary && typeof RizqStatusSummary.render==='function'){
     RizqStatusSummary.render({ items: getProds(), itemType: 'catalog' });
@@ -554,12 +574,13 @@ function initDashboard(){
   // Activate overview tab in sidebar
   var defOvBtn = document.querySelector('.sb-item[onclick*="overview"]');
   if(defOvBtn) defOvBtn.classList.add('active');
-  // Deferred render for functions in later script blocks
+  // Deferred render for functions in later script blocks (+ ADS بعد اكتمال تعريف renderAds)
   setTimeout(function(){
     if(typeof renderTeam==='function') renderTeam();
     if(typeof renderAnalyticsChart==='function') renderAnalyticsChart();
     if(typeof renderServicesShowcase==='function') renderServicesShowcase();
     if(typeof loadProfile==='function') loadProfile();
+    try{ if(typeof renderAdsPackages==='function') renderAdsPackages(); }catch(eAds){}
   }, 0);
 }
 
@@ -619,18 +640,7 @@ function printQR(){
 }
 
 // ══ Panel Navigation ══
-var panelTitles = {
-  overview:'📊 نظرة عامة', inquiries:'📩 الاستفسارات', analytics:'📈 الإحصائيات',
-  products:'📦 المنتجات والإعلانات', team:'👥 الفريق', profile:'🏭 معلومات الشركة',
-  ads:'🎬 Rizq ADS', subscription:'💳 اشتراكي', mypayments:'💳 دفعاتي', settings:'⚙️ الإعدادات',
-  tenders:'📋 المناقصات', referral:'🎁 إحالة الأصدقاء', verifiedplus:'🛡️ شارة موثّق⁺'
-};
-var panelTitlesFr = {
-  overview:'📊 Vue d\'ensemble', inquiries:'📩 Demandes', analytics:'📈 Statistiques',
-  products:'📦 Produits et annonces', team:'👥 Équipe', profile:'🏭 Infos entreprise',
-  ads:'🎬 Rizq ADS', subscription:'💳 Mon abonnement', mypayments:'💳 Mes paiements', settings:'⚙️ Paramètres',
-  tenders:'📋 Appels d\'offres', referral:'🎁 Parrainage', verifiedplus:'🛡️ Badge Vérifié+'
-};
+/* panelTitles / panelTitlesFr معرّفان أعلى الملف قبل initCorpAccess */
 function showPanel(id, btn){
   document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
   document.querySelectorAll('.sb-item').forEach(function(i){i.classList.remove('active');});
@@ -640,7 +650,7 @@ function showPanel(id, btn){
   var title = document.getElementById('topbar-title');
   if(title){
     var tbl = (typeof _corpLang!=='undefined' && _corpLang==='fr') ? panelTitlesFr : panelTitles;
-    title.textContent = tbl[id]||panelTitles[id]||id;
+    title.textContent = (tbl && tbl[id]) || (panelTitles && panelTitles[id]) || id;
   }
   if(window.innerWidth<=768) closeSidebar();
   if(id==='inquiries'){
@@ -1912,7 +1922,7 @@ function deleteProd(i){
 }
 
 // ══ START ══
-verifyAccess();
+/* كان هنا verifyAccess() غير المعرّف — الوصول عبر initCorpAccess() أعلاه فقط */
 
 
 ;
@@ -2276,11 +2286,7 @@ function saveMyPayment(){
 // Render on panel open
 
   // ══ ADS SYSTEM ══
-  var DEFAULT_ADS_PKGS = [
-    {id:'ads1',name:'باقة رزق ADS أساسية',price:2000,duration:7,views:'5,000',emoji:'🥉',color:'#3b82f6',features:['ظهور لكل زوار رزق','7 أيام نشاط','تقرير مشاهدات']},
-    {id:'ads2',name:'باقة رزق ADS برو',price:5000,duration:15,views:'15,000',emoji:'🥈',color:'#C9A84C',features:['أولوية الظهور','15 يوم نشاط','تقرير تفصيلي','دعم مخصص']},
-    {id:'ads3',name:'باقة رزق ADS ماسية',price:10000,duration:30,views:'50,000',emoji:'💎',color:'#7c3aed',features:['صدارة جميع الصفحات','30 يوم نشاط','إحصائيات حية','مدير حساب خاص','بنر + فيديو']}
-  ];
+  /* DEFAULT_ADS_PKGS معرّف أعلى الملف قبل initCorpAccess */
 
   function getCampaignKey(){
     var acc=(typeof CORP_ACC!=='undefined'&&CORP_ACC)||{};
@@ -2312,7 +2318,9 @@ function saveMyPayment(){
   function renderAds(){
     var pkgs=[];
     try{pkgs=JSON.parse(localStorage.getItem('rizq_ads_packages')||'[]');}catch(e){}
-    if(!pkgs.length) pkgs=DEFAULT_ADS_PKGS;
+    var fallback = (typeof DEFAULT_ADS_PKGS !== 'undefined' && Array.isArray(DEFAULT_ADS_PKGS)) ? DEFAULT_ADS_PKGS : [];
+    if(!Array.isArray(pkgs) || !pkgs.length) pkgs=fallback;
+    if(!Array.isArray(pkgs)) pkgs=fallback;
     var grid=document.getElementById('ads-packages-grid');
     if(grid){
       grid.innerHTML=pkgs.map(function(p){

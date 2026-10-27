@@ -66,7 +66,8 @@ const DEMO_REQS=[
   {id:'DR3',name:'آمنة بنت عبدالله',service:'صياغة عقد',phone:'22236655443',msg:'عقد شراكة بين طرفين — مستعجل',time:'منذ يومين',read:true}
 ];
 
-let OFFICE=null, services=[], renewalFile=null;
+/* var لا let — تجنّب TDZ عندما تستدعي وحدات مبكرة typeof OFFICE قبل السطر */
+var OFFICE=null, services=[], renewalFile=null;
 const DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
 const DAYS_FR=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
 const DEF_HOURS=DAYS.map((d,i)=>({day:d,open:i!==5,from:'08:00',to:'17:00'}));
@@ -127,13 +128,35 @@ function _resolveRealAccessToken(acc){
   return Promise.resolve(null);
 }
 
+var TITLES = {
+  overview:'📊 نظرة عامة', requests:'📩 طلبات التواصل', messages:'💬 الرسائل',
+  services:'📋 خدماتي', profile:'🏢 معلومات المكتب',
+  hours:'🕐 ساعات العمل', photos:'📸 الصور',
+  subscription:'💳 اشتراكي', settings:'⚙️ الإعدادات',
+  mypayments:'🏦 طرق الدفع', agents:'🤖 الوكيل الذكي',
+  tenders:'📋 المناقصات', referral:'🎁 إحالة الأصدقاء',
+  verifiedplus:'🛡️ شارة موثّق⁺'
+};
+var TITLES_FR = {
+  overview:'📊 Vue d\'ensemble', requests:'📩 Demandes de contact', messages:'💬 Messages',
+  services:'📋 Mes services', profile:'🏢 Infos cabinet',
+  hours:'🕐 Horaires', photos:'📸 Photos',
+  subscription:'💳 Mon abonnement', settings:'⚙️ Paramètres',
+  mypayments:'🏦 Moyens de paiement', agents:'🤖 Agent IA',
+  tenders:'📋 Appels d\'offres', referral:'🎁 Parrainage',
+  verifiedplus:'🛡️ Badge Vérifié+'
+};
+
 function showPanel(id,el){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   const p=document.getElementById('panel-'+id);if(p)p.classList.add('active');
   document.querySelectorAll('.sb-item').forEach(n=>n.classList.remove('active'));
   if(el)el.classList.add('active');
   const t=document.getElementById('topbar-title');
-  if(t)t.textContent=(typeof _officeLang!=='undefined'&&_officeLang==='fr'?TITLES_FR[id]:TITLES[id])||'';
+  if(t){
+    var _ot = (typeof _officeLang!=='undefined'&&_officeLang==='fr') ? TITLES_FR : TITLES;
+    t.textContent = (_ot && _ot[id]) || (TITLES && TITLES[id]) || '';
+  }
   if(id==='overview')renderOverview();
   if(id==='requests'){ _rizqMergeRequestsFromBackend(); _rizqMergeServiceRequests(); loadOfficeServiceDeskForm(); renderRequests(); }
   if(id==='services'){ renderServices(); try{ mountOfficeListingContext(); }catch(eSvcCtx){} }

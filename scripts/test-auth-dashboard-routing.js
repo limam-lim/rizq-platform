@@ -44,7 +44,11 @@ function isOtpRateLimited(data) {
 
 async function verifyEmailOtp(email, name, phone) {
   /* رقم فريد لكل طلب لتجنّب cooldown على نفس الهاتف بين مرات التشغيل */
-  const phoneMr = String(phone || ('2' + String(Date.now()).slice(-7)));
+  /* موريتانيا: 8 أرقام تبدأ بـ 2/3/4 — فريد لكل طلب لتقليل cooldown */
+  let phoneMr = String(phone || '').replace(/\D/g, '').slice(-8);
+  if (!/^(2|3|4)\d{7}$/.test(phoneMr)) {
+    phoneMr = '4' + String(Date.now()).slice(-7);
+  }
   const send = await json('POST', '/api/otp/send', {
     channel: 'buyer',
     email,
@@ -76,7 +80,7 @@ async function registerAndLogin(type, extras) {
   const password = 'TestPass9!';
   const id = 'ACC_' + String(Date.now()).slice(0, 13) + String(Math.floor(Math.random() * 1e6)).padStart(6, '0');
   const clientDash = 'TK_CLIENTSHOULDNOTWIN';
-  const phone = String(20000000 + Math.floor(Math.random() * 79999999));
+  const phone = '4' + String(Math.floor(1000000 + Math.random() * 8999999));
   const payload = Object.assign({
     id,
     type,
@@ -242,9 +246,10 @@ async function main() {
   const buyersMe = await json('GET', '/api/buyers/me?id=x&token=y');
   assert(buyersMe.status === 410, 'buyers/me must be gone, got ' + buyersMe.status);
 
-  const storeAct = { activityId: 'st_cars_used', activity: 'بيع سيارات مستعملة', category: 'سيارات' };
+  /* st_cars_used خاص بالشركات (corp) — للمحل استخدم نشاط accountTypes:store */
+  const storeAct = { activityId: 'st_phones', activity: 'هواتف ذكية', category: 'إلكترونيات' };
   const officeAct = { activityId: 'of_law', activity: 'مكتب محاماة', category: 'خدمات' };
-  const corpAct = { activityId: 'st_cars_new', activity: 'بيع سيارات جديدة', category: 'سيارات' };
+  const corpAct = { activityId: 'st_cars_used', activity: 'بيع سيارات مستعملة', category: 'سيارات' };
   const estateAct = {
     activityId: 'es_agency',
     activity: 'مكتب / وكالة عقارية',
