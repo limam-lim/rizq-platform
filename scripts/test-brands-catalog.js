@@ -69,7 +69,12 @@ assert(fl.indexOf('rzq-brand-tile-logo') >= 0, 'filter tile logo');
 assert(fl.indexOf('carlogos.org') >= 0, 'filter uses real car logos');
 assert(fl.indexOf('الشعار فوق') < 0, 'no technical heading for visitors');
 
-assert(String(B.logoUrl(B.getById('toyota'))).indexOf('carlogos.org') >= 0, 'logoUrl toyota');
+/* الشعار الأساسي: Simple Icons (CORS-safe)؛ carlogos يبقى في سلسلة الاحتياط/الفلتر */
+assert(String(B.logoUrl(B.getById('toyota'))).indexOf('https://') === 0, 'logoUrl toyota https');
+assert(
+  /simple-icons|carlogos\.org|google\.com\/s2\/favicons/.test(String(B.logoUrl(B.getById('toyota')))),
+  'logoUrl toyota uses real remote asset'
+);
 assert(String(B.logoUrl(B.getById('nike'))).indexOf('https://') === 0, 'logoUrl nike remote');
 assert(src.indexOf('function symbolInner') < 0, 'no fake lookalike symbolInner');
 const bmwFallback = B.logoSvg(B.getById('bmw'), 72);
