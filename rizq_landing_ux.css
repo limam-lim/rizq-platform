@@ -705,7 +705,9 @@ body{
 .rizq-dual-cta-own,
 .nav-dd-cta,
 .hero-vid-cta-link:not(.hero-vid-cta-ghost),
-.hero-vid-badge{
+.hero-vid-badge,
+.rizq-styles-reshuffle,
+.hero-pills{
   background:#fff!important;
   color:#0D1B2A!important;
   border:1.5px solid rgba(15,35,71,.16)!important;
@@ -716,7 +718,8 @@ body{
 .landing-ads-browse-full:hover,
 .rizq-dual-cta-own:hover,
 .nav-dd-cta:hover,
-.hero-vid-cta-link:not(.hero-vid-cta-ghost):hover{
+.hero-vid-cta-link:not(.hero-vid-cta-ghost):hover,
+.rizq-styles-reshuffle:hover{
   background:#f5f8fc!important;
   box-shadow:0 8px 20px rgba(15,35,71,.14)!important;
 }
