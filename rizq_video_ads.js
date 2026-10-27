@@ -1105,6 +1105,16 @@
 
   function _startWithConfig(cfg) {
     config   = cfg || {};
+    /* امسح stub clean-light من الذاكرة المحلية حتى لا يعود بعد التحديث */
+    var _normPromo = normalizePlatformPromoUrl(config.platformPromoUrl || DEFAULT_PLATFORM_PROMO);
+    if (config.platformPromoUrl !== _normPromo) {
+      config.platformPromoUrl = _normPromo;
+      try {
+        var _stored = _loadLocalVideoAdsConfig();
+        _stored.platformPromoUrl = _normPromo;
+        localStorage.setItem('rizq_video_ads', JSON.stringify(_stored));
+      } catch (ePersist) { /* ignore */ }
+    }
     heroAds  = (config.hero  || []).filter(function (a) { return a.active !== false; });
     popupAds = (config.popup || []).filter(function (a) { return a.active !== false; });
     // strip جديد؛ إن لم يُعرَّف نعيد استخدام popup كمصدر للبطاقات (توافق)

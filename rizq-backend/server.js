@@ -1211,7 +1211,7 @@ app.get('/api/site-config', (req, res) => {
     videoAds: raw.videoAds ? {
       hero: raw.videoAds.hero,
       popup: raw.videoAds.popup,
-      platformPromoUrl: raw.videoAds.platformPromoUrl,
+      platformPromoUrl: sanitizePlatformPromoUrl(raw.videoAds.platformPromoUrl),
       platformPromoEnabled: raw.videoAds.platformPromoEnabled,
       adSlotSeconds: raw.videoAds.adSlotSeconds,
     } : undefined,
@@ -1290,6 +1290,14 @@ const SITE_SOCIAL_KEYS = [
  * الصف المعطّل أو بلا رابط صالح يبقى {enabled,url} لكن الواجهة العامة
  * تعرض فقط enabled + رابط آمن بمسار حساب (ليس جذر النطاق).
  */
+/** Stub clean-light (~9s) كسر الهيرو — أعد الترويج الكامل light.mp4 */
+function sanitizePlatformPromoUrl(url) {
+  const u = String(url || '').trim();
+  const fallback = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
+  if (!u || /rizq-platform-promo-clean-light\.mp4(\?|#|$)/i.test(u)) return fallback;
+  return u.slice(0, 500);
+}
+
 function sanitizeSiteSocial(raw) {
   const out = {};
   const src = raw && typeof raw === 'object' ? raw : {};
@@ -1601,9 +1609,11 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
       hero: sanitizeAdList(body.videoAds.hero),
       popup: sanitizeAdList(body.videoAds.popup),
       // فيديو المنصة المزروع: بداية حلقة الـ Hero وبعد انتهاء إعلانات المعلنين
-      platformPromoUrl: body.videoAds.platformPromoUrl != null
-        ? String(body.videoAds.platformPromoUrl || '').slice(0, 500)
-        : String(prevVideoAds.platformPromoUrl || defaultPromo).slice(0, 500),
+      platformPromoUrl: sanitizePlatformPromoUrl(
+        body.videoAds.platformPromoUrl != null
+          ? String(body.videoAds.platformPromoUrl || '').slice(0, 500)
+          : String(prevVideoAds.platformPromoUrl || defaultPromo).slice(0, 500)
+      ),
       platformPromoEnabled: body.videoAds.platformPromoEnabled != null
         ? body.videoAds.platformPromoEnabled !== false
         : prevVideoAds.platformPromoEnabled !== false,
