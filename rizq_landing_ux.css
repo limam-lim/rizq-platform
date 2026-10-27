@@ -688,12 +688,41 @@ body{
   font-weight:800;
 }
 .hero-cta-primary{
-  box-shadow:0 12px 36px rgba(201,168,76,.42),0 0 0 1px rgba(201,168,76,.35)!important;
+  background:#fff!important;
+  color:#0D1B2A!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.16),0 0 0 1px rgba(255,255,255,.55)!important;
   letter-spacing:.2px;
 }
 .hero-cta-primary:hover{
-  box-shadow:0 16px 44px rgba(201,168,76,.55),0 0 0 1px rgba(232,201,106,.5)!important;
+  background:#f5f8fc!important;
+  box-shadow:0 12px 28px rgba(0,0,0,.2)!important;
   transform:translateY(-3px)!important;
+}
+/* أزرار التحويل العامة — أبيض لا أصفر */
+.btn-primary,
+.btn-register,
+.landing-ads-browse-full,
+.rizq-dual-cta-own,
+.nav-dd-cta,
+.hero-vid-cta-link:not(.hero-vid-cta-ghost),
+.hero-vid-badge{
+  background:#fff!important;
+  color:#0D1B2A!important;
+  border:1.5px solid rgba(15,35,71,.16)!important;
+  box-shadow:0 4px 14px rgba(15,35,71,.1)!important;
+}
+.btn-primary:hover,
+.btn-register:hover,
+.landing-ads-browse-full:hover,
+.rizq-dual-cta-own:hover,
+.nav-dd-cta:hover,
+.hero-vid-cta-link:not(.hero-vid-cta-ghost):hover{
+  background:#f5f8fc!important;
+  box-shadow:0 8px 20px rgba(15,35,71,.14)!important;
+}
+.cta-section .btn-primary{
+  border-color:rgba(255,255,255,.85)!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.18)!important;
 }
 .hero-eyebrow{
   border-radius:12px!important; /* مستطيل بزوايا خفيفة بدل الكبسولة */

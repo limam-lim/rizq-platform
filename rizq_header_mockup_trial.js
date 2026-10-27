@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.83';
+    link.href = 'rizq_header_mockup_trial.css?v=5.85';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -1086,7 +1086,25 @@
       if (modelsNav) {
         modelsNav.hidden = false;
         modelsNav.removeAttribute('aria-hidden');
+        modelsNav.removeAttribute('hidden');
         modelsNav.style.removeProperty('display');
+        modelsNav.style.removeProperty('visibility');
+        modelsNav.style.removeProperty('width');
+        modelsNav.style.removeProperty('max-width');
+        modelsNav.style.removeProperty('margin');
+        modelsNav.style.removeProperty('padding');
+        modelsNav.style.removeProperty('overflow');
+        /* أعد نماذج إلى شريط الأقسام قبل «المزيد» على التابلت/الكمبيوتر */
+        var moreWrap = hdr.querySelector('nav.rmh-nav .rmh-more-wrap, nav.rmh-nav [data-rmh="more"]');
+        var bottomNav = hdr.querySelector('nav.rmh-nav:not(.rmh-nav-top)');
+        if (bottomNav && moreWrap && modelsNav.parentNode === bottomNav) {
+          try { bottomNav.insertBefore(modelsNav, moreWrap); } catch (eIns) {}
+        } else if (bottomNav && modelsNav.parentNode !== bottomNav) {
+          try {
+            if (moreWrap) bottomNav.insertBefore(modelsNav, moreWrap);
+            else bottomNav.appendChild(modelsNav);
+          } catch (eMv) {}
+        }
       }
       if (moreModels && moreModels.getAttribute('data-rmh-phone-only') === '1') {
         try { moreModels.parentNode.removeChild(moreModels); } catch (eRm) {}

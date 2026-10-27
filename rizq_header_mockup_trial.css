@@ -860,6 +860,24 @@ body.rizq-mockup-hdr-trial .aam-card{
 }
 .rmh-nav a[data-rmh="estate"]{min-width:78px}
 .rmh-nav a[data-rmh="models"]{min-width:72px}
+/* تابلت + كمبيوتر: زر نماذج ظاهر في مكانه في الكبسولة (لا يُخفى ولا يُضغط حتى يختفي) */
+@media(min-width:769px){
+  #rizq-mock-hdr nav.rmh-nav a[data-rmh="models"],
+  nav.rmh-nav a[data-rmh="models"]{
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+    flex:0 0 auto!important;
+    width:auto!important;
+    max-width:none!important;
+    min-width:72px!important;
+    margin:0!important;
+    padding:9px 10px 11px!important;
+    border:0!important;
+    overflow:visible!important;
+    pointer-events:auto!important;
+  }
+}
 .rmh-nav a .rmh-nav-ico{
   display:inline-flex;align-items:center;justify-content:center;
   width:22px;height:22px;line-height:1;opacity:.92;
@@ -1168,6 +1186,18 @@ body > .rizq-help-dd-menu a,
     font-size:clamp(9.5px,1vw,10.5px)!important;
     white-space:nowrap!important;
     max-width:none!important;
+  }
+  /* نماذج — ثابت ظاهر قبل المزيد على التابلت */
+  #rizq-mock-hdr .rmh-nav a[data-rmh="models"],
+  .rmh-nav a[data-rmh="models"]{
+    font-size:clamp(9.5px,1vw,10.5px)!important;
+    white-space:nowrap!important;
+    max-width:none!important;
+    flex:0 0 auto!important;
+    min-width:64px!important;
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
   }
   #rizq-mock-hdr .rmh-nav a .rmh-nav-ico,
   #rizq-mock-hdr .rmh-more-btn .rmh-nav-ico,
