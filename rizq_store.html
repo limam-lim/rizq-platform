@@ -648,10 +648,10 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   content:'✦';
   display:block;font-size:28px;color:var(--gold);line-height:1;margin-bottom:2px;
 }
-/* غرفة الطلبات + التقييمات — صف كامل تحت الشبكة يملأ فراغ التابلت/الكمبيوتر */
+/* غرفة الطلبات ثم التقييمات — بطاقتان أفقيتان بعرض كامل (طلب فوق، تقييم تحت) */
 .store-under-band{
   display:grid !important;
-  grid-template-columns:minmax(0,1.15fr) minmax(260px,0.85fr) !important;
+  grid-template-columns:1fr !important;
   gap:14px;
   margin:0;
   align-items:stretch;
@@ -668,17 +668,18 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 }
 #store-service-desk.store-desk-hz{
   margin:0;
-  padding:12px 12px 10px;
+  padding:14px 16px 12px;
   border-radius:14px;
   box-shadow:none;
   border:1px solid rgba(27,58,107,.08);
   background:#fff;
   height:auto;
-  min-height:100%;
+  min-height:0;
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
   min-width:0;
+  width:100%;
 }
 .store-desk-eyebrow{
   font-size:9.5px;letter-spacing:1.2px;font-weight:900;color:#C9A84C;margin-bottom:4px
@@ -688,8 +689,8 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 }
 .store-desk-form{
   display:grid!important;
-  grid-template-columns:1fr 1fr;
-  gap:7px 8px;
+  grid-template-columns:1fr 1fr 1fr 1fr;
+  gap:8px 10px;
   width:100%;
   flex:1 1 auto;
   align-content:start;
@@ -705,54 +706,66 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 }
 .store-desk-span2{grid-column:1/-1}
 .store-desk-actions{
-  grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,190px);
-  align-items:stretch;gap:10px;margin-top:4px
+  grid-column:1/-1;display:flex;flex-direction:row;flex-wrap:wrap;
+  align-items:center;gap:12px;margin-top:6px
 }
-.store-desk-note{margin:0;min-width:0}
+.store-desk-note{margin:0;min-width:0;flex:1 1 280px}
+#store-service-desk #rf-doc-upload.rzq-doc-zone{
+  display:flex!important;flex-direction:row!important;flex-wrap:wrap;align-items:center;
+  gap:10px 14px;padding:10px 12px!important
+}
+#store-service-desk #rf-doc-upload .rzq-doc-head{
+  display:flex!important;align-items:center!important;gap:10px;margin-bottom:0!important;flex:1 1 200px
+}
+#store-service-desk #rf-doc-upload .rzq-doc-pick{flex:0 0 auto;white-space:nowrap}
 #store-service-desk #store-req-submit,
 .store-desk-actions #store-req-submit{
-  width:100%;align-self:center;padding:12px 12px;border:none;border-radius:12px;
+  width:auto;min-width:200px;flex:0 0 auto;align-self:center;padding:12px 18px;border:none;border-radius:12px;
   background:linear-gradient(135deg,#0D1B2A,#1B3A6B);color:#fff;font-weight:800;font-size:12.5px;
   cursor:pointer;font-family:inherit;min-height:48px;letter-spacing:.2px
 }
 #reviews-section.store-reviews-hz{
   margin:0;
-  padding:12px 12px 10px;
+  padding:14px 16px 12px;
   background:#fff;
   border:1px solid rgba(27,58,107,.08);
   border-radius:14px;
   box-shadow:none;
   height:auto;
-  min-height:100%;
+  min-height:0;
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
   min-width:0;
+  width:100%;
 }
 #reviews-section .store-reviews-inner{
   background:transparent!important;border:none!important;border-radius:0!important;
   box-shadow:none!important;padding:0!important;flex:1 1 auto;
-  display:flex;flex-direction:column;
+  display:flex;flex-direction:row;flex-wrap:wrap;align-items:flex-start;gap:12px 18px;
 }
 #reviews-section .store-reviews-summary{
-  display:flex;align-items:flex-start;gap:12px;margin-bottom:8px;flex-wrap:wrap
+  display:flex;align-items:flex-start;gap:12px;margin-bottom:0;flex-wrap:wrap;
+  flex:1 1 220px;min-width:180px
 }
 #reviews-section .store-reviews-score{text-align:center;min-width:72px}
 #reviews-section #store-big-rating{font-size:28px;font-weight:900;color:var(--navy);line-height:1}
 #reviews-section #store-big-stars{color:#F5A623;font-size:14px;margin:3px 0}
 #reviews-section #store-big-count{font-size:11px;color:#6a7a8a}
-#reviews-section #reviews-list{flex:1 1 auto}
+#reviews-section #reviews-list{flex:1 1 280px;min-width:200px}
 #reviews-section .view-all-btn{
-  color:var(--navy);border-color:rgba(27,58,107,.2);background:#fff;font-size:12.5px;padding:9px 12px;margin-top:auto
+  color:var(--navy);border-color:rgba(27,58,107,.2);background:#fff;font-size:12.5px;padding:9px 12px;
+  margin-top:0;flex:0 0 auto;align-self:center;width:auto;min-width:160px
 }
 #reviews-section .view-all-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
-/* تابلت: أفقياً دائماً — لا فراغ أبيض بجانب العمود */
+/* تابلت: طلب فوق تقييم — بطاقتان بعرض كامل؛ نموذج الطلب أفقي */
 @media(max-width:1100px) and (min-width:701px){
   .store-under-band{
     gap:12px;padding:12px;
-    grid-template-columns:minmax(0,1.05fr) minmax(240px,0.95fr) !important;
+    grid-template-columns:1fr !important;
   }
-  .store-desk-actions{grid-template-columns:minmax(0,1fr) minmax(140px,170px)}
+  .store-desk-form{grid-template-columns:1fr 1fr}
+  .store-desk-actions{flex-direction:row;flex-wrap:wrap}
 }
 @media(max-width:700px){
   /* الشريط نفسه ينهار بـ contents في رحلة الجوال — لا تُبقِه grid فوق المنتجات */
@@ -760,8 +773,10 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   #reviews-section.store-reviews-hz{padding:12px 10px 10px;border-radius:12px;margin-bottom:8px}
   .store-desk-form{grid-template-columns:1fr}
   .store-desk-span2{grid-column:auto}
-  .store-desk-actions{grid-template-columns:1fr}
-  .store-desk-actions #store-req-submit{width:100%}
+  .store-desk-actions{flex-direction:column;align-items:stretch}
+  .store-desk-actions #store-req-submit{width:100%;min-width:0}
+  #reviews-section .store-reviews-inner{flex-direction:column}
+  #reviews-section .view-all-btn{width:100%}
 }
 .product-img{
   height:150px;
