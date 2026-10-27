@@ -668,7 +668,7 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 }
 #store-service-desk.store-desk-hz{
   margin:0;
-  padding:14px 16px 12px;
+  padding:12px 14px 10px;
   border-radius:14px;
   box-shadow:none;
   border:1px solid rgba(27,58,107,.08);
@@ -681,19 +681,31 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   min-width:0;
   width:100%;
 }
+/* شريط عنوان أفقي مضغوط */
+#store-service-desk.store-desk-hz .store-desk-eyebrow{
+  font-size:9.5px;letter-spacing:1.2px;font-weight:900;color:#C9A84C;margin:0 0 2px
+}
+#store-service-desk.store-desk-hz .info-card-title{
+  display:inline;margin:0!important;padding:0!important;border:none!important;font-size:15px
+}
+#store-service-desk.store-desk-hz .store-desk-hint{
+  display:inline;font-size:12px;color:#6a7a8a;margin:0 8px 0 0;line-height:1.4
+}
 .store-desk-eyebrow{
   font-size:9.5px;letter-spacing:1.2px;font-weight:900;color:#C9A84C;margin-bottom:4px
 }
 .store-desk-hint{
   font-size:11.5px;color:#6a7a8a;margin:0 0 8px;line-height:1.45
 }
+/* نموذج أفقي: صف حقول + صف موضوع/رسالة جنباً إلى جنب + صف إجراءات */
 .store-desk-form{
   display:grid!important;
-  grid-template-columns:1fr 1fr 1fr 1fr;
+  grid-template-columns:repeat(4,minmax(0,1fr));
   gap:8px 10px;
   width:100%;
   flex:1 1 auto;
   align-content:start;
+  margin-top:8px;
 }
 .store-desk-field{display:flex;flex-direction:column;gap:2px;min-width:0}
 .store-desk-field label{font-size:11px;font-weight:800;color:#0F2347}
@@ -702,27 +714,31 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
 .store-desk-field textarea.req-input{
   display:block;width:100%;margin:0;padding:8px 10px;
   border:1.5px solid #e2e8f5;border-radius:8px;font-size:12.5px;font-family:inherit;
-  box-sizing:border-box;min-height:36px;background:#fff;resize:vertical
+  box-sizing:border-box;min-height:36px;max-height:72px;background:#fff;resize:vertical
 }
-.store-desk-span2{grid-column:1/-1}
+/* الموضوع والرسالة جنباً إلى جنب — لا عمودان طويلان فوق بعض */
+.store-desk-span2{grid-column:span 2}
 .store-desk-actions{
-  grid-column:1/-1;display:flex;flex-direction:row;flex-wrap:wrap;
-  align-items:center;gap:12px;margin-top:6px
+  grid-column:1/-1;display:flex;flex-direction:row;flex-wrap:nowrap;
+  align-items:center;gap:12px;margin-top:4px
 }
-.store-desk-note{margin:0;min-width:0;flex:1 1 280px}
+.store-desk-note{margin:0;min-width:0;flex:1 1 auto}
 #store-service-desk #rf-doc-upload.rzq-doc-zone{
-  display:flex!important;flex-direction:row!important;flex-wrap:wrap;align-items:center;
-  gap:10px 14px;padding:10px 12px!important
+  display:flex!important;flex-direction:row!important;flex-wrap:nowrap;align-items:center;
+  gap:10px 14px;padding:8px 12px!important;min-height:0
 }
 #store-service-desk #rf-doc-upload .rzq-doc-head{
-  display:flex!important;align-items:center!important;gap:10px;margin-bottom:0!important;flex:1 1 200px
+  display:flex!important;align-items:center!important;gap:10px;margin-bottom:0!important;flex:1 1 auto;min-width:0
 }
-#store-service-desk #rf-doc-upload .rzq-doc-pick{flex:0 0 auto;white-space:nowrap}
+#store-service-desk #rf-doc-upload [data-desk="doc-hint"]{
+  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden
+}
+#store-service-desk #rf-doc-upload .rzq-doc-pick{flex:0 0 auto;white-space:nowrap;margin-top:0!important}
 #store-service-desk #store-req-submit,
 .store-desk-actions #store-req-submit{
   width:auto;min-width:200px;flex:0 0 auto;align-self:center;padding:12px 18px;border:none;border-radius:12px;
   background:linear-gradient(135deg,#0D1B2A,#1B3A6B);color:#fff;font-weight:800;font-size:12.5px;
-  cursor:pointer;font-family:inherit;min-height:48px;letter-spacing:.2px
+  cursor:pointer;font-family:inherit;min-height:44px;letter-spacing:.2px
 }
 #reviews-section.store-reviews-hz{
   margin:0;
@@ -758,23 +774,25 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   margin-top:0;flex:0 0 auto;align-self:center;width:auto;min-width:160px
 }
 #reviews-section .view-all-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
-/* تابلت: طلب فوق تقييم — بطاقتان بعرض كامل؛ نموذج الطلب أفقي */
+/* تابلت: طلب فوق تقييم؛ النموذج يبقى أفقياً بعرضين */
 @media(max-width:1100px) and (min-width:701px){
   .store-under-band{
     gap:12px;padding:12px;
     grid-template-columns:1fr !important;
   }
-  .store-desk-form{grid-template-columns:1fr 1fr}
+  .store-desk-form{grid-template-columns:1fr 1fr !important}
+  .store-desk-span2{grid-column:span 1}
   .store-desk-actions{flex-direction:row;flex-wrap:wrap}
 }
 @media(max-width:700px){
   /* الشريط نفسه ينهار بـ contents في رحلة الجوال — لا تُبقِه grid فوق المنتجات */
   #store-service-desk.store-desk-hz,
   #reviews-section.store-reviews-hz{padding:12px 10px 10px;border-radius:12px;margin-bottom:8px}
-  .store-desk-form{grid-template-columns:1fr}
+  .store-desk-form{grid-template-columns:1fr !important}
   .store-desk-span2{grid-column:auto}
-  .store-desk-actions{flex-direction:column;align-items:stretch}
+  .store-desk-actions{flex-direction:column;align-items:stretch;flex-wrap:wrap}
   .store-desk-actions #store-req-submit{width:100%;min-width:0}
+  #store-service-desk #rf-doc-upload.rzq-doc-zone{flex-wrap:wrap}
   #reviews-section .store-reviews-inner{flex-direction:column}
   #reviews-section .view-all-btn{width:100%}
 }
@@ -1646,7 +1664,7 @@ footer{
           </div>
           <div class="store-desk-field store-desk-span2">
             <label for="rf-msg">رسالتك للمحل</label>
-            <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" rows="2"></textarea>
+            <textarea class="req-input" id="rf-msg" placeholder="اكتب باختصار ماذا تحتاج…" rows="1"></textarea>
           </div>
           <div class="store-desk-actions">
             <div id="rf-doc-upload" data-desk="doc-upload" class="store-desk-note rzq-doc-zone">
