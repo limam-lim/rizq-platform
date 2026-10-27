@@ -2759,9 +2759,20 @@ function rizqShare(title, url) {
       window.STORE_FEATURED_PRODUCTS = {};
       products.forEach(function(p, i){ window.STORE_FEATURED_PRODUCTS[String(i+1)] = p; window.STORE_FEATURED_PRODUCTS[p.id] = p; });
       mountStorePromoVideo(acc);
-      /* بدون شريط تقني — النموذج يبدو كمحل حقيقي */
-      var oldRib = document.getElementById('rizq-demo-ribbon');
-      if(oldRib) oldRib.remove();
+      /* وسم دائم للنموذج — لا يختلط بالحساب الحقيقي */
+      try{
+        document.documentElement.setAttribute('data-rizq-demo','1');
+        if(!document.getElementById('rizq-demo-chip-style')){
+          var st=document.createElement('style'); st.id='rizq-demo-chip-style';
+          st.textContent='#rizq-demo-chip{position:fixed;z-index:9998;bottom:12px;inset-inline-start:12px;background:#1B3A6B;color:#e8c96a;font:800 11px/1.2 Cairo,sans-serif;padding:5px 10px;border-radius:999px;pointer-events:none}';
+          document.head.appendChild(st);
+        }
+        if(!document.getElementById('rizq-demo-chip')){
+          var chip=document.createElement('div'); chip.id='rizq-demo-chip'; chip.setAttribute('role','status');
+          chip.textContent=(localStorage.getItem('rizq_lang')==='fr')?'Démo Rizq':'نموذج رزق';
+          document.body.appendChild(chip);
+        }
+      }catch(eRib){}
       /* أبقِ ?demo=1 لربط صفحة المنتجات وإظهار كل الخدمات */
       try{ history.replaceState(null, '', 'rizq_store.html?demo=1&id=demo_store'); }catch(e2){}
       if(typeof window._rizqRenderStoreReviews === 'function') window._rizqRenderStoreReviews();

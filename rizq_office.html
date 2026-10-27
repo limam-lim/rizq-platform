@@ -2313,8 +2313,14 @@ function openMaps(){
           id = DEMO_LAW_ID;
           try{ history.replaceState(null, '', 'rizq_office.html?demo=1&id=demo_law'); }catch(eHist){}
           if(typeof window._rizqRenderOfficeReviews === 'function') window._rizqRenderOfficeReviews();
-          var oldRib = document.getElementById('rizq-demo-ribbon');
-          if(oldRib) oldRib.remove();
+          try{
+            document.documentElement.setAttribute('data-rizq-demo','1');
+            if(!document.getElementById('rizq-demo-chip')){
+              var chipEarly=document.createElement('div'); chipEarly.id='rizq-demo-chip'; chipEarly.setAttribute('role','status');
+              chipEarly.textContent=(localStorage.getItem('rizq_lang')==='fr')?'Démo Rizq':'نموذج رزق';
+              document.body.appendChild(chipEarly);
+            }
+          }catch(eRib2){}
         }
         function clearMock(ids){
           ids.forEach(function(fid){
@@ -2486,9 +2492,19 @@ function openMaps(){
               payBox.innerHTML = '';
             }
           })();
-          /* بدون شريط تقني — النموذج يبدو كمكتب حقيقي */
-          var oldRibOf = document.getElementById('rizq-demo-ribbon');
-          if(oldRibOf) oldRibOf.remove();
+          try{
+            document.documentElement.setAttribute('data-rizq-demo','1');
+            if(!document.getElementById('rizq-demo-chip-style')){
+              var stOf=document.createElement('style'); stOf.id='rizq-demo-chip-style';
+              stOf.textContent='#rizq-demo-chip{position:fixed;z-index:9998;bottom:12px;inset-inline-start:12px;background:#1B3A6B;color:#e8c96a;font:800 11px/1.2 Cairo,sans-serif;padding:5px 10px;border-radius:999px;pointer-events:none}';
+              document.head.appendChild(stOf);
+            }
+            if(!document.getElementById('rizq-demo-chip')){
+              var chipOf=document.createElement('div'); chipOf.id='rizq-demo-chip'; chipOf.setAttribute('role','status');
+              chipOf.textContent=(localStorage.getItem('rizq_lang')==='fr')?'Démo Rizq':'نموذج رزق';
+              document.body.appendChild(chipOf);
+            }
+          }catch(eRibOf){}
           if(window.RizqServiceDesk){
             RizqServiceDesk.enhanceOfficeForm({ desk: demoAcc.serviceDesk, accountName: demoAcc.name });
           }

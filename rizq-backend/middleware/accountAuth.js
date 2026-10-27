@@ -34,13 +34,58 @@ function extractDashToken(req) {
   return '';
 }
 
-/** يطابق accessToken أو dashToken لنفس الحساب (كلاهما يثبت الملكية). */
+function getAccessTokenTtlMs() {
+  const days = Number(process.env.ACCESS_TOKEN_TTL_DAYS || 14);
+  return Math.max(1, Number.isFinite(days) ? days : 14) * 86400000;
+}
+
+function getDashTokenTtlMs() {
+  const days = Number(process.env.DASH_TOKEN_TTL_DAYS || 30);
+  return Math.max(1, Number.isFinite(days) ? days : 30) * 86400000;
+}
+
+function _expiryStillValid(iso) {
+  if (!iso) return true; /* توكنات قديمة بلا expiry تبقى حتى أول تدوير */
+  const t = Date.parse(String(iso));
+  if (!Number.isFinite(t)) return true;
+  return t > Date.now();
+}
+
+function accessTokenStillValid(acc) {
+  return !!(acc && acc.accessToken && _expiryStillValid(acc.accessTokenExpiresAt));
+}
+
+function dashTokenStillValid(acc) {
+  return !!(acc && acc.dashToken && _expiryStillValid(acc.dashTokenExpiresAt));
+}
+
+/** يختم accessToken جديد + تاريخ انتهاء */
+function stampAccessToken(acc, genAccessToken) {
+  if (!acc || typeof genAccessToken !== 'function') return acc;
+  acc.accessToken = genAccessToken();
+  acc.accessTokenExpiresAt = new Date(Date.now() + getAccessTokenTtlMs()).toISOString();
+  return acc;
+}
+
+/** يختم dashToken جديد + تاريخ انتهاء */
+function stampDashToken(acc, genDashToken) {
+  if (!acc || typeof genDashToken !== 'function') return acc;
+  acc.dashToken = genDashToken();
+  acc.dashTokenExpiresAt = new Date(Date.now() + getDashTokenTtlMs()).toISOString();
+  return acc;
+}
+
+/** يطابق accessToken أو dashToken لنفس الحساب (كلاهما يثبت الملكية) مع احترام TTL. */
 function tokenMatchesAccount(acc, token) {
   if (!acc || !token) return false;
   const t = String(token).trim();
   if (!t) return false;
-  if (acc.accessToken && timingSafeEqualStr(t, acc.accessToken)) return true;
-  if (acc.dashToken && timingSafeEqualStr(t, acc.dashToken)) return true;
+  if (acc.accessToken && timingSafeEqualStr(t, acc.accessToken)) {
+    return accessTokenStillValid(acc);
+  }
+  if (acc.dashToken && timingSafeEqualStr(t, acc.dashToken)) {
+    return dashTokenStillValid(acc);
+  }
   return false;
 }
 
@@ -70,4 +115,10 @@ module.exports = {
   isAccountActive,
   activeOwnerMatches,
   isBrowserOrigin,
+  getAccessTokenTtlMs,
+  getDashTokenTtlMs,
+  accessTokenStillValid,
+  dashTokenStillValid,
+  stampAccessToken,
+  stampDashToken,
 };

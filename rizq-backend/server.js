@@ -25,7 +25,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { createAdminAuth } = require('./middleware/adminAuth');
-const { isProdEnv, extractAccountToken, extractDashToken, tokenMatchesAccount } = require('./middleware/accountAuth');
+const { isProdEnv, extractAccountToken, extractDashToken, tokenMatchesAccount, stampAccessToken, stampDashToken, accessTokenStillValid } = require('./middleware/accountAuth');
 const { timingSafeEqualStr } = require('./lib/secureCompare');
 const { normalizeDisplayName, normalizeEmailSafe, stripBidiControls } = require('./lib/sanitizeText');
 const { resolveAccountPhones, phoneMatchKey } = require('./lib/phoneNormalize');
@@ -39,7 +39,23 @@ const { storeReceipt } = require('./services/receiptStorage');
 
 const app = express();
 app.disable('x-powered-by');
-app.set('trust proxy', 1);
+/* Trust proxy: قابل للضبط عبر TRUST_PROXY (0/false يعطّل؛ رقم = hops؛ قائمة IPs مفصولة بفاصلة). */
+(function configureTrustProxy() {
+  const raw = String(process.env.TRUST_PROXY == null ? '' : process.env.TRUST_PROXY).trim();
+  if (!raw || raw === '1') {
+    app.set('trust proxy', 1);
+    return;
+  }
+  if (raw === '0' || /^false$/i.test(raw) || /^off$/i.test(raw)) {
+    app.set('trust proxy', false);
+    return;
+  }
+  if (/^\d+$/.test(raw)) {
+    app.set('trust proxy', Number(raw));
+    return;
+  }
+  app.set('trust proxy', raw.split(',').map((s) => s.trim()).filter(Boolean));
+})();
 
 // ── ضغط الاستجابات (gzip/Brotli حسب ما يدعمه المتصفح) ──────────────
 // خطوة خفّة حقيقية وقابلة للتنفيذ الآن (بخلاف CDN/Redis التي تحتاج نشراً
@@ -2390,6 +2406,9 @@ mountAccountsSessionRoutes(app, {
   extractDashToken,
   timingSafeEqualStr,
   tokenMatchesAccount,
+  stampAccessToken,
+  stampDashToken,
+  accessTokenStillValid,
   canAutoApproveAccountType,
   consumeBuyerVerificationByEmail,
   sendSellerResetOtp,
@@ -4030,24 +4049,52 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
     return res.status(400).json({ error: 'cannot_review_self' });
   }
 
-  /* تقييم بعد تعامل حقيقي فقط: رسالة مشترٍ↔بائع — لا اختصار «أي إعلان للبائع» */
+  /* تقييم بعد تعامل موثّق: ردّ البائع في الخيط، أو رسائل بمرور ≥24 ساعة، أو طلب خدمة مكتمل */
   const targetId = String(b.targetId).slice(0, 60);
   const adId = b.adId ? String(b.adId).slice(0, 80) : '';
+  const REVIEW_THREAD_MIN_AGE_MS = Math.max(
+    60 * 60 * 1000,
+    Number(process.env.REVIEW_THREAD_MIN_AGE_HOURS || 24) * 3600 * 1000
+  );
   let verifiedInteraction = false;
   try {
-    const msgs = readMessages();
-    verifiedInteraction = msgs.some((m) => {
+    const msgs = readMessages().filter((m) => {
       if (!m) return false;
-      const sellerOk = String(m.sellerAccountId || '') === targetId;
-      const buyerOk = String(m.buyerAccountId || '') === reviewerAccountId;
-      return sellerOk && buyerOk;
+      return String(m.sellerAccountId || '') === targetId
+        && String(m.buyerAccountId || '') === reviewerAccountId;
     });
+    if (msgs.length) {
+      const hasBuyer = msgs.some((m) => m.fromRole === 'buyer');
+      const hasSeller = msgs.some((m) => m.fromRole === 'seller');
+      if (hasBuyer && hasSeller) {
+        verifiedInteraction = true;
+      } else if (hasBuyer) {
+        const times = msgs.map((m) => Date.parse(String(m.createdAt || ''))).filter(Number.isFinite);
+        if (times.length && (Date.now() - Math.min(...times)) >= REVIEW_THREAD_MIN_AGE_MS) {
+          verifiedInteraction = true;
+        }
+      }
+    }
   } catch (eMsg) { /* ignore */ }
+  if (!verifiedInteraction) {
+    try {
+      const srs = (repos.serviceRequests && typeof repos.serviceRequests.list === 'function')
+        ? repos.serviceRequests.list()
+        : [];
+      verifiedInteraction = (srs || []).some((r) => {
+        if (!r) return false;
+        const sellerOk = String(r.accountId || r.sellerAccountId || '') === targetId;
+        const buyerOk = String(r.buyerAccountId || r.reviewerAccountId || '') === reviewerAccountId;
+        const done = /^(done|completed|closed|fulfilled|accepted)$/i.test(String(r.status || ''));
+        return sellerOk && buyerOk && done;
+      });
+    } catch (eSr) { /* ignore */ }
+  }
   if (!verifiedInteraction) {
     return res.status(403).json({
       error: 'interaction_required',
       code: 'interaction_required',
-      message: 'التقييم متاح بعد تواصل موثّق مع البائع (رسالة مسجّلة على المنصة)',
+      message: 'التقييم متاح بعد رد البائع على محادثة، أو مرور يوم على تواصل مسجّل، أو طلب خدمة مكتمل',
     });
   }
 
