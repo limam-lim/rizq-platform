@@ -12,10 +12,27 @@ const seedScript = path.join(backendRoot, 'scripts', 'seed-graduation-demo.js');
 
 function parseJsonBlob(text) {
   const s = String(text || '');
-  const start = s.indexOf('{');
-  const end = s.lastIndexOf('}');
-  if (start < 0 || end <= start) throw new Error('no JSON in output: ' + s.slice(0, 200));
-  return JSON.parse(s.slice(start, end + 1));
+  /* قد يطبع repos.js سطراً JSON قبل نتيجة البذرة — خذ آخر كائن فيه "ok" */
+  let lastGood = null;
+  let searchFrom = 0;
+  while (searchFrom < s.length) {
+    const okAt = s.indexOf('"ok"', searchFrom);
+    if (okAt < 0) break;
+    const start = s.lastIndexOf('{', okAt);
+    if (start < 0) {
+      searchFrom = okAt + 1;
+      continue;
+    }
+    for (let end = s.indexOf('}', okAt); end >= 0; end = s.indexOf('}', end + 1)) {
+      try {
+        const obj = JSON.parse(s.slice(start, end + 1));
+        if (obj && Object.prototype.hasOwnProperty.call(obj, 'ok')) lastGood = obj;
+      } catch (_) { /* keep scanning */ }
+    }
+    searchFrom = okAt + 1;
+  }
+  if (!lastGood) throw new Error('no JSON in output: ' + s.slice(0, 200));
+  return lastGood;
 }
 
 function run(args) {
