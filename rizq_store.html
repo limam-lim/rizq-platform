@@ -373,18 +373,27 @@ body.rzq-storefront-lb-on{overflow:hidden}
 }
 .content-grid{
   display:grid;
-  /* يمين = الموقع والتواصل | يسار = المنتجات + شريط الطلبات/التقييمات (RTL) */
-  grid-template-columns:minmax(300px,340px) minmax(0,1fr);
-  grid-template-areas:"side main";
-  gap:28px;
+  /* صف علوي: شريط المعلومات | المنتجات — صف سفلي: غرفة الطلبات + التقييمات بعرض الصفحة كاملاً */
+  grid-template-columns:minmax(280px,320px) minmax(0,1fr);
+  grid-template-areas:
+    "side main"
+    "band band";
+  gap:20px 24px;
   align-items:start;
 }
+.content-grid > aside#info-section{grid-area:side}
 .content-grid > .store-main-col{
   grid-area:main;
   min-width:0;
   display:flex;
   flex-direction:column;
   gap:14px;
+}
+.content-grid > #store-under-band,
+.content-grid > .store-under-band{
+  grid-area:band;
+  width:100%;
+  max-width:100%;
 }
 .content-grid > .store-main-col > main{
   min-width:0;
@@ -640,17 +649,17 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   content:'✦';
   display:block;font-size:28px;color:var(--gold);line-height:1;margin-bottom:2px;
 }
-/* غرفة الطلبات + التقييمات — شريط أفقي تحت المنتجات يملأ فراغ العمود بتناسق الواجهة */
+/* غرفة الطلبات + التقييمات — صف كامل تحت الشبكة يملأ فراغ التابلت/الكمبيوتر */
 .store-under-band{
-  display:grid;
-  grid-template-columns:1.08fr 0.92fr;
-  gap:12px;
+  display:grid !important;
+  grid-template-columns:minmax(0,1.15fr) minmax(260px,0.85fr) !important;
+  gap:14px;
   margin:0;
-  align-items:start;
+  align-items:stretch;
   width:100%;
   min-width:0;
   box-sizing:border-box;
-  padding:12px;
+  padding:14px;
   border-radius:20px;
   background:
     radial-gradient(ellipse at 90% 0%, rgba(201,168,76,.06), transparent 42%),
@@ -666,6 +675,7 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   border:1px solid rgba(27,58,107,.08);
   background:#fff;
   height:auto;
+  min-height:100%;
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
@@ -714,6 +724,7 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   border-radius:14px;
   box-shadow:none;
   height:auto;
+  min-height:100%;
   box-sizing:border-box;
   display:flex;
   flex-direction:column;
@@ -736,12 +747,20 @@ html[dir="ltr"] #info-section .info-card{direction:ltr!important}
   color:var(--navy);border-color:rgba(27,58,107,.2);background:#fff;font-size:12.5px;padding:9px 12px;margin-top:auto
 }
 #reviews-section .view-all-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
-/* تابلت + كمبيوتر: غرفة الطلبات والتقييمات أفقياً لملء الفراغ — العمود الواحد للهاتف فقط */
+/* تابلت: أفقياً دائماً — لا فراغ أبيض بجانب العمود */
 @media(max-width:1100px) and (min-width:701px){
-  .store-under-band{gap:12px;padding:12px}
+  .store-under-band{
+    gap:12px;padding:12px;
+    grid-template-columns:minmax(0,1.05fr) minmax(240px,0.95fr) !important;
+  }
+  .store-desk-actions{grid-template-columns:minmax(0,1fr) minmax(140px,170px)}
 }
 @media(max-width:700px){
-  .store-under-band{grid-template-columns:1fr;gap:12px;padding:12px;border-radius:16px}
+  .store-under-band{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:12px;padding:12px;border-radius:16px;
+  }
   #store-service-desk.store-desk-hz,
   #reviews-section.store-reviews-hz{padding:12px 10px 10px;border-radius:12px}
   .store-desk-form{grid-template-columns:1fr}
@@ -925,9 +944,15 @@ footer{
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
 /* ====== RESPONSIVE ====== */
-/* Tablet: keep 2-col when space allows, tighten hero — تحت 700px فقط رحلة الهاتف */
+/* Tablet: صف علوي مزدوج + شريط الطلبات/التقييمات بعرض كامل أفقياً */
 @media(max-width:1100px) and (min-width:701px){
-  .content-grid{grid-template-columns:minmax(260px,300px) minmax(0,1fr);gap:20px}
+  .content-grid{
+    grid-template-columns:minmax(240px,280px) minmax(0,1fr);
+    grid-template-areas:
+      "side main"
+      "band band";
+    gap:16px 18px;
+  }
   .main-wrap{padding:22px 16px 40px}
   .content-grid > .store-main-col > main{padding:16px}
   .store-name{font-size:26px}
@@ -949,6 +974,7 @@ footer{
   }
   .content-grid > aside#info-section,
   .content-grid > .store-main-col,
+  .content-grid > #store-under-band,
   #store-under-band{display:contents}
   .content-grid > aside#info-section{position:static;width:100%;max-width:100%}
   .content-grid .card,
@@ -1572,8 +1598,9 @@ footer{
       </div>
       <button type="button" class="store-load-more" id="store-load-more" onclick="window._rizqStoreShowMoreProducts && window._rizqStoreShowMoreProducts()">عرض 8 منتجات التالية</button>
     </main>
+    </div><!-- /.store-main-col -->
 
-    <!-- غرفة الطلبات + التقييمات — أفقيان تحت المنتجات يملآن الفراغ بتناسق الواجهة -->
+    <!-- صف كامل بعرض الشبكة: غرفة الطلبات | التقييمات — يملأ فراغ التابلت/الكمبيوتر -->
     <div class="store-under-band" id="store-under-band">
       <section class="info-card store-desk-hz" id="store-service-desk" style="border-top:3px solid var(--gold);display:flex!important" aria-label="غرفة الطلبات">
         <div class="store-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
@@ -1642,7 +1669,6 @@ footer{
         </div>
       </section>
     </div>
-    </div><!-- /.store-main-col -->
   </div>
 </div>
 

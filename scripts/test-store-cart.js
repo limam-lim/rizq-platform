@@ -44,6 +44,11 @@ assert(
   storeHtml.includes('store-under-band') && storeHtml.includes('max-width:700px'),
   'store desk+reviews stay side-by-side on tablet (stack only under 700px)'
 );
+assert(
+  /grid-template-areas:[\s\S]*?"band band"/.test(storeHtml) &&
+    storeHtml.includes('content-grid > #store-under-band'),
+  'under-band must span full content-grid width (band band) on tablet/desktop'
+);
 
 // Logic twin of withStoreId — GitHub project pages base path must not duplicate
 function withStoreIdTwin(href, storeId, pageUrl) {

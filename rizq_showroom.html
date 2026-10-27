@@ -290,24 +290,28 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 
 /* غرفة الطلبات + التقييمات — أفقي على تابلت/كمبيوتر لملء الفراغ */
 .showroom-under-band{
-  display:grid;
-  grid-template-columns:1.08fr 0.92fr;
-  gap:12px;
+  display:grid !important;
+  grid-template-columns:minmax(0,1.15fr) minmax(260px,0.85fr) !important;
+  gap:14px;
   margin:20px 0 8px;
   width:100%;
   min-width:0;
   box-sizing:border-box;
-  padding:12px;
+  padding:14px;
   border-radius:20px;
+  align-items:stretch;
   background:
     radial-gradient(ellipse at 90% 0%, rgba(201,168,76,.06), transparent 42%),
     linear-gradient(165deg,#ffffff 0%,#faf7f0 100%);
   border:1px solid rgba(27,58,107,.08);
   box-shadow:0 12px 40px rgba(15,35,65,.06);
 }
-/* تابلت + كمبيوتر: غرفة الطلبات والتقييمات أفقياً — بدون فراغ عمودي */
 @media(max-width:1100px) and (min-width:701px){
-  .showroom-under-band{gap:12px;padding:12px}
+  .showroom-under-band{
+    gap:12px;padding:12px;
+    grid-template-columns:minmax(0,1.05fr) minmax(240px,0.95fr) !important;
+  }
+  .showroom-desk-actions{grid-template-columns:minmax(0,1fr) minmax(140px,170px)}
 }
 #showroom-service-desk.showroom-desk-hz{
   margin:0;
@@ -385,7 +389,10 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 #reviews-section #rev-count-txt{font-size:12px;color:#6a7a8a}
 #reviews-section #reviews-list{flex:1 1 auto}
 @media(max-width:700px){
-  .showroom-under-band{grid-template-columns:1fr;padding:12px;border-radius:16px}
+  .showroom-under-band{
+    grid-template-columns:1fr !important;
+    padding:12px;border-radius:16px;
+  }
   #showroom-service-desk.showroom-desk-hz,
   #reviews-section.showroom-reviews-hz,
   #reviews-section.showroom-reviews-below{padding:12px 10px 10px;border-radius:12px}
