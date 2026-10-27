@@ -925,8 +925,8 @@ footer{
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 
 /* ====== RESPONSIVE ====== */
-/* Tablet: keep 2-col when space allows, tighten hero */
-@media(max-width:1100px) and (min-width:801px){
+/* Tablet: keep 2-col when space allows, tighten hero — تحت 700px فقط رحلة الهاتف */
+@media(max-width:1100px) and (min-width:701px){
   .content-grid{grid-template-columns:minmax(260px,300px) minmax(0,1fr);gap:20px}
   .main-wrap{padding:22px 16px 40px}
   .content-grid > .store-main-col > main{padding:16px}
@@ -934,7 +934,7 @@ footer{
   .action-btn{padding:9px 14px;font-size:12.5px}
 }
 
-@media(max-width:800px){
+@media(max-width:700px){
   /* رحلة الجوال: منتجات → تعريف → موقع → ساعات → استفسار → دفع → تقييمات */
   .content-grid{
     grid-template-columns:1fr;
