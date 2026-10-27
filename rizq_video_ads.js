@@ -113,8 +113,9 @@
   }
 
   // فيديو المنصة المزروع — بداية الحلقة وبعد انتهاء إعلانات المعلنين
-  /* نسخة نظيفة بلا عناوين كبيرة تغطي الأيقونات/الإعلانات على الشاشة الكبيرة */
-  var DEFAULT_PLATFORM_PROMO = '/rizq-assets/promo/rizq-platform-promo-clean-light.mp4';
+  /* light = الترويج الكامل العامل. clean-light كان ملفاً قصيراً رديئاً (~9ث) فكسر التشغيل.
+     طبقات النص فوق مساحة الفيديو تُمنع عبر CSS/paintMeta وليس بتبديل الملف. */
+  var DEFAULT_PLATFORM_PROMO = '/rizq-assets/promo/rizq-platform-promo-light.mp4';
   var DEFAULT_AD_SLOT_SEC = 25;
   var _heroAdvanceTimer = null;
   var _heroPlaylist = [];
@@ -133,8 +134,8 @@
 
   function normalizePlatformPromoUrl(url) {
     var u = String(url || '').trim() || DEFAULT_PLATFORM_PROMO;
-    /* استبدال النسخ ذات العناوين المحروقة التي تغطي الأيقونات */
-    if (/rizq-platform-promo(-light)?\.mp4(\?|#|$)/i.test(u)) {
+    /* إن وُجدت إشارة للـ stub القصير clean-light → أعد الترويج الكامل */
+    if (/rizq-platform-promo-clean-light\.mp4(\?|#|$)/i.test(u)) {
       return DEFAULT_PLATFORM_PROMO;
     }
     return u;
@@ -423,7 +424,7 @@
       { advertiser: 'مكاتب رزق', title: 'مكتب أعمالك', loc: 'موريتانيا', url: 'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4', active: true, demo: true },
       { advertiser: 'معارض رزق', title: 'معرضك الافتراضي', loc: 'كل الولايات', url: 'rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4', active: true, demo: true },
       { advertiser: 'رزق', title: 'واجهات المنصة', loc: 'Rizq ADS', url: 'rizq-assets/promo/rizq-public-interfaces-promo-light.mp4', active: true, demo: true },
-      { advertiser: 'رزق', title: 'منصة رزق', loc: 'موريتانيا', url: 'rizq-assets/promo/rizq-platform-promo-clean-light.mp4', active: true, demo: true },
+      { advertiser: 'رزق', title: 'منصة رزق', loc: 'موريتانيا', url: 'rizq-assets/promo/rizq-platform-promo-light.mp4', active: true, demo: true },
       { advertiser: 'رزق', title: 'وحدات المنصة', loc: 'شرح عملي', url: 'rizq-assets/promo/rizq-modules-promo-demo-light.mp4', active: true, demo: true }
     ].map(function (a) {
       return Object.assign({}, a, { url: resolvePromoUrl(a.url) });
