@@ -1257,6 +1257,18 @@ function boot() {
       document.getElementById('app-shell').style.display = '';
       var denied = document.getElementById('access-denied');
       if (denied) denied.style.display = 'none';
+      if (IS_DEMO) {
+        try {
+          document.documentElement.setAttribute('data-rizq-demo', '1');
+          if (!document.getElementById('rizq-demo-chip')) {
+            var chip = document.createElement('div');
+            chip.id = 'rizq-demo-chip';
+            chip.setAttribute('role', 'status');
+            chip.textContent = _t2('نموذج رزق', 'Démo Rizq');
+            document.body.appendChild(chip);
+          }
+        } catch (eDemo) {}
+      }
       if (window.RizqDash && RizqDash.applySubscriptionLock) {
         RizqDash.applySubscriptionLock(acc.id, document.getElementById('dash-root'), { isDemo: IS_DEMO });
       }

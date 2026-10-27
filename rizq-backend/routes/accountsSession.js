@@ -21,6 +21,9 @@ function mountAccountsSessionRoutes(app, deps) {
     extractDashToken,
     timingSafeEqualStr,
     tokenMatchesAccount,
+    stampAccessToken,
+    stampDashToken,
+    accessTokenStillValid,
     canAutoApproveAccountType,
     consumeBuyerVerificationByEmail,
     sendSellerResetOtp,
@@ -95,15 +98,19 @@ function mountAccountsSessionRoutes(app, deps) {
         error: 'الحساب لم تتم الموافقة عليه بعد',
       });
     }
-    if (!acc.dashToken) {
-      acc.dashToken = genDashToken();
-      const idx = list.findIndex((a) => a.id === acc.id);
-      if (idx !== -1) {
-        list[idx].dashToken = acc.dashToken;
-        writeAccounts(list);
-      }
+    /* تدوير الجلسة عند كل دخول ناجح + ختم TTL */
+    const idxLogin = list.findIndex((a) => a.id === acc.id);
+    if (typeof stampAccessToken === 'function') stampAccessToken(acc, genAccessToken);
+    else { acc.accessToken = genAccessToken(); }
+    if (typeof stampDashToken === 'function') stampDashToken(acc, genDashToken);
+    else { acc.dashToken = genDashToken(); }
+    acc.updatedAt = new Date().toISOString();
+    acc.lastLoginAt = acc.updatedAt;
+    if (idxLogin !== -1) {
+      list[idxLogin] = acc;
+      writeAccounts(list);
     }
-    const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, ...safeFields } = acc;
+    const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, accessTokenExpiresAt, dashTokenExpiresAt, ...safeFields } = acc;
     res.set('Cache-Control', 'no-store');
     res.json({
       ok: true,
@@ -111,6 +118,8 @@ function mountAccountsSessionRoutes(app, deps) {
         accessToken,
         dashToken,
         token: dashToken,
+        accessTokenExpiresAt: acc.accessTokenExpiresAt || null,
+        dashTokenExpiresAt: acc.dashTokenExpiresAt || null,
       }),
     });
   });
@@ -137,8 +146,10 @@ function mountAccountsSessionRoutes(app, deps) {
     if (!accessOk && !dashOk) {
       return res.status(401).json({ ok: false, code: 'unauthorized', error: 'unauthorized' });
     }
-    acc.accessToken = genAccessToken();
-    acc.dashToken = genDashToken();
+    if (typeof stampAccessToken === 'function') stampAccessToken(acc, genAccessToken);
+    else acc.accessToken = genAccessToken();
+    if (typeof stampDashToken === 'function') stampDashToken(acc, genDashToken);
+    else acc.dashToken = genDashToken();
     acc.updatedAt = new Date().toISOString();
     list[idx] = acc;
     writeAccounts(list);
@@ -279,8 +290,10 @@ function mountAccountsSessionRoutes(app, deps) {
     } catch (eHash) {
       return res.status(500).json({ ok: false, code: 'hash_failed', error: 'تعذّر حفظ كلمة المرور' });
     }
-    acc.accessToken = genAccessToken();
-    acc.dashToken = genDashToken();
+    if (typeof stampAccessToken === 'function') stampAccessToken(acc, genAccessToken);
+    else acc.accessToken = genAccessToken();
+    if (typeof stampDashToken === 'function') stampDashToken(acc, genDashToken);
+    else acc.dashToken = genDashToken();
     acc.passwordChangedAt = new Date().toISOString();
     acc.updatedAt = acc.passwordChangedAt;
     list[idx] = acc;
@@ -293,6 +306,8 @@ function mountAccountsSessionRoutes(app, deps) {
         accessToken,
         dashToken,
         token: dashToken,
+        accessTokenExpiresAt: acc.accessTokenExpiresAt || null,
+        dashTokenExpiresAt: acc.dashTokenExpiresAt || null,
       }),
     });
   });
@@ -341,8 +356,10 @@ function mountAccountsSessionRoutes(app, deps) {
       return res.status(500).json({ ok: false, code: 'hash_failed', error: 'تعذّر حفظ كلمة المرور' });
     }
     // إبطال الجلسات القديمة فور تغيير كلمة المرور
-    acc.accessToken = genAccessToken();
-    acc.dashToken = genDashToken();
+    if (typeof stampAccessToken === 'function') stampAccessToken(acc, genAccessToken);
+    else acc.accessToken = genAccessToken();
+    if (typeof stampDashToken === 'function') stampDashToken(acc, genDashToken);
+    else acc.dashToken = genDashToken();
     acc.passwordChangedAt = new Date().toISOString();
     acc.updatedAt = acc.passwordChangedAt;
     list[idx] = acc;
@@ -352,6 +369,8 @@ function mountAccountsSessionRoutes(app, deps) {
       accessToken: acc.accessToken,
       dashToken: acc.dashToken,
       token: acc.dashToken,
+      accessTokenExpiresAt: acc.accessTokenExpiresAt || null,
+      dashTokenExpiresAt: acc.dashTokenExpiresAt || null,
     });
   });
 
@@ -366,6 +385,7 @@ function mountAccountsSessionRoutes(app, deps) {
       || !acc.dashToken
       || !token
       || !timingSafeEqualStr(token, acc.dashToken)
+      || (typeof tokenMatchesAccount === 'function' && !tokenMatchesAccount(acc, token))
     ) {
       return res.status(401).json({ error: 'unauthorized' });
     }
@@ -384,18 +404,34 @@ function mountAccountsSessionRoutes(app, deps) {
       || !acc.dashToken
       || !token
       || !timingSafeEqualStr(token, acc.dashToken)
+      || (typeof tokenMatchesAccount === 'function' && !tokenMatchesAccount(acc, token))
     ) {
       return res.status(401).json({ error: 'unauthorized' });
     }
     // تدوير dashToken بعد كل تبادل ناجح — الرمز المسروق يصبح لمرة واحدة
-    // (العميل يحفظ dashToken الجديد من الاستجابة).
-    const newDash = genDashToken();
-    acc.dashToken = newDash;
+    if (typeof stampDashToken === 'function') stampDashToken(acc, genDashToken);
+    else acc.dashToken = genDashToken();
+    /* إن انتهت صلاحية accessToken أو كان مفقوداً — أصدر واحداً جديداً */
+    if (typeof accessTokenStillValid === 'function') {
+      if (!accessTokenStillValid(acc)) {
+        if (typeof stampAccessToken === 'function') stampAccessToken(acc, genAccessToken);
+        else acc.accessToken = genAccessToken();
+      }
+    } else if (!acc.accessToken) {
+      acc.accessToken = genAccessToken();
+    }
     acc.dashExchangedAt = new Date().toISOString();
     list[idx] = acc;
     writeAccounts(list);
     res.set('Cache-Control', 'no-store');
-    res.json({ ok: true, accessToken: acc.accessToken, dashToken: newDash, token: newDash });
+    res.json({
+      ok: true,
+      accessToken: acc.accessToken,
+      dashToken: acc.dashToken,
+      token: acc.dashToken,
+      accessTokenExpiresAt: acc.accessTokenExpiresAt || null,
+      dashTokenExpiresAt: acc.dashTokenExpiresAt || null,
+    });
   }
 
   app.post('/api/accounts/verify-dash/:id', verifyDashLimiter, handleVerifyDash);

@@ -1228,8 +1228,19 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
   window._rizqShowroomPaymentMethods = acc.paymentMethods;
   _acc = acc;
   _allItems = items;
-  var oldRib = document.getElementById('rizq-demo-ribbon');
-  if(oldRib) oldRib.remove();
+  try{
+    document.documentElement.setAttribute('data-rizq-demo','1');
+    if(!document.getElementById('rizq-demo-chip-style')){
+      var stSr=document.createElement('style'); stSr.id='rizq-demo-chip-style';
+      stSr.textContent='#rizq-demo-chip{position:fixed;z-index:9998;bottom:12px;inset-inline-start:12px;background:#1B3A6B;color:#e8c96a;font:800 11px/1.2 Cairo,sans-serif;padding:5px 10px;border-radius:999px;pointer-events:none}';
+      document.head.appendChild(stSr);
+    }
+    if(!document.getElementById('rizq-demo-chip')){
+      var chipSr=document.createElement('div'); chipSr.id='rizq-demo-chip'; chipSr.setAttribute('role','status');
+      chipSr.textContent=(localStorage.getItem('rizq_lang')==='fr')?'Démo Rizq':'نموذج رزق';
+      document.body.appendChild(chipSr);
+    }
+  }catch(eRibSr){}
   try{ history.replaceState(null, '', 'rizq_showroom.html?demo=1&id=demo-corp-001'); }catch(e2){}
   document.body.classList.remove('rizq-empty-showroom');
   // نموذج المعاينة: كل الخدمات ظاهرة (باقات، فيديو، طلبات…) — لا نخفي شيئاً

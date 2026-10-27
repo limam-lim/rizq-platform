@@ -244,6 +244,11 @@ html.rizq-dash-embed #sb-overlay,
 html.rizq-dash-embed #rizq-app-header,
 html.rizq-dash-embed .rizq-demo-ribbon,
 html.rizq-dash-embed [id*="demo-ribbon"]{display:none!important}
+#rizq-demo-chip{
+  position:fixed;z-index:9998;bottom:12px;inset-inline-start:12px;
+  background:#1B3A6B;color:#e8c96a;font:800 11px/1.2 Cairo,sans-serif;
+  padding:5px 10px;border-radius:999px;pointer-events:none
+}
 html.rizq-dash-embed .main{margin:0!important;width:100%!important;max-width:none!important}
 html.rizq-dash-embed .topbar{padding:8px 14px!important}
 html.rizq-dash-embed .content{padding:10px 12px!important}
