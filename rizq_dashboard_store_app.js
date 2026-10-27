@@ -1876,6 +1876,18 @@ function _rizqMergeHoursFromBackend(){
       }).catch(function(){});
   }catch(e){}
 }
+var DAYS_AR = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+var DAYS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+var DEFAULT_HOURS = [
+  { day:'الأحد', open:true, from:'09:00', to:'20:00' },
+  { day:'الإثنين', open:true, from:'09:00', to:'20:00' },
+  { day:'الثلاثاء', open:true, from:'09:00', to:'20:00' },
+  { day:'الأربعاء', open:true, from:'09:00', to:'20:00' },
+  { day:'الخميس', open:true, from:'09:00', to:'20:00' },
+  { day:'الجمعة', open:false, from:'09:00', to:'13:00' },
+  { day:'السبت', open:true, from:'10:00', to:'18:00' }
+];
+
 function renderHoursTable(){
   const saved = JSON.parse(localStorage.getItem('store_hours_'+SESSION_ID)||'null') || DEFAULT_HOURS;
   const el = document.getElementById('hours-table');

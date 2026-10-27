@@ -573,14 +573,37 @@
   function updateCartBadges() {
     var nAll = cartCountAll();
     var nScoped = cartCount();
-    /* شارة الهيدر / السلة العامة = المجموع الكامل */
-    _paintCartCountEls('#rizq-hdr-cart [data-rizq-cart-count], [data-rizq-cart-wrap] > [data-rizq-cart-count], #nav-cart-count', nAll);
+    var sellerPage = !!pageSellerScopeId();
+    /*
+     * سلة المحل/المعرض كما كانت: على صفحات البائع (?id=) شريط المحل و#nav-cart-count
+     * يعرضان عدّاد ذلك البائع فقط (wireStoreLinks يقيّد الروابط بـ ?id= بلا فصل عن العامة).
+     * خارج صفحات البائع تبقى شارة الهيدر = السلة العامة (المجموع).
+     */
+    if (sellerPage) {
+      _paintCartCountEls(
+        '#nav-cart-count, #ab-cart-count, #sr-cart-count, [data-rizq-seller-cart-count]',
+        nScoped
+      );
+      _paintCartCountEls(
+        '#rizq-hdr-cart [data-rizq-cart-count], [data-rizq-cart-wrap] > [data-rizq-cart-count]',
+        nScoped
+      );
+      document.querySelectorAll('[data-rizq-cart-wrap], #rizq-hdr-cart').forEach(function (el) {
+        el.classList.toggle('has-items', nScoped > 0);
+        el.setAttribute('aria-label', t('السلة (' + nScoped + ')', 'Panier (' + nScoped + ')'));
+        el.setAttribute('title', t('السلة (' + nScoped + ')', 'Panier (' + nScoped + ')'));
+      });
+      return;
+    }
+    _paintCartCountEls(
+      '#rizq-hdr-cart [data-rizq-cart-count], [data-rizq-cart-wrap] > [data-rizq-cart-count], #nav-cart-count',
+      nAll
+    );
     document.querySelectorAll('[data-rizq-cart-wrap], #rizq-hdr-cart').forEach(function (el) {
       el.classList.toggle('has-items', nAll > 0);
       el.setAttribute('aria-label', t('السلة العامة (' + nAll + ')', 'Panier général (' + nAll + ')'));
       el.setAttribute('title', t('السلة العامة (' + nAll + ')', 'Panier général (' + nAll + ')'));
     });
-    /* شريحة المحل/المعرض المحلية = مقيّدة بالبائع الحالي إن وُجد */
     _paintCartCountEls('#ab-cart-count, #sr-cart-count, [data-rizq-seller-cart-count]', nScoped);
   }
 

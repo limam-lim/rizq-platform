@@ -30,6 +30,20 @@ assert(
   !/return u\.pathname\.replace\(\/\\^\//.test(commerceJs),
   'withStoreId must not strip only leading slash from full pathname'
 );
+/* سلة المحل/المعرض كما كانت — بلا فصل isGeneralCartAnchor عن الروابط */
+assert(
+  !commerceJs.includes('isGeneralCartAnchor'),
+  'classic shop carts: wireStoreLinks must rewrite all cart links including header'
+);
+const uxJs = fs.readFileSync(path.join(__dirname, '..', 'rizq_ux_polish.js'), 'utf8');
+assert(
+  uxJs.includes('sellerPage') && uxJs.includes('#ab-cart-count, #sr-cart-count'),
+  'seller pages must paint shop cart badges with scoped count'
+);
+assert(
+  storeHtml.includes('store-under-band') && storeHtml.includes('max-width:700px'),
+  'store desk+reviews stay side-by-side on tablet (stack only under 700px)'
+);
 
 // Logic twin of withStoreId — GitHub project pages base path must not duplicate
 function withStoreIdTwin(href, storeId, pageUrl) {
