@@ -928,20 +928,24 @@ nav.scrolled {
 }
 
 /* ══════════════════════════════════
-   2. BOUTONS GOLD
+   2. BOUTONS — أبيض (كما طلب المستخدم)
 ══════════════════════════════════ */
 .btn-post, .btn-register, .btn-store,
-.btn-new-ad, .btn-h1 {
-  background: linear-gradient(135deg, var(--gold), var(--gold-l)) !important;
-  color: var(--bd) !important;
+.btn-new-ad, .btn-h1,
+.btn-primary {
+  background: #fff !important;
+  color: var(--bd, #0f2347) !important;
   font-weight: 800 !important;
-  border: none !important;
+  border: 1.5px solid rgba(15,35,71,.16) !important;
+  box-shadow: 0 4px 14px rgba(15,35,71,.1) !important;
   transition: all 0.3s !important;
 }
 .btn-post:hover, .btn-register:hover,
-.btn-store:hover, .btn-h1:hover {
+.btn-store:hover, .btn-h1:hover,
+.btn-primary:hover {
   transform: translateY(-2px) !important;
-  box-shadow: 0 8px 24px rgba(201,168,76,0.4) !important;
+  background: #f5f8fc !important;
+  box-shadow: 0 8px 22px rgba(15,35,71,.14) !important;
 }
 
 /* ══════════════════════════════════

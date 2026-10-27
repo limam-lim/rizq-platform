@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.83';
+    link.href = 'rizq_header_mockup_trial.css?v=5.88';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -603,24 +603,65 @@
 
   function wireLang() {
     var btn = document.getElementById('rmh-lang-btn');
-    var navLang = document.getElementById('nav-lang-btn');
     if (!btn) return;
-    btn.addEventListener('click', function () {
-      if (navLang) navLang.click();
-      else if (typeof toggleLang === 'function') toggleLang();
-      else if (typeof toggleLangPage === 'function') toggleLangPage();
-      else {
+    if (btn.getAttribute('data-rmh-lang-bound') === '1') return;
+    btn.setAttribute('data-rmh-lang-bound', '1');
+    if (!btn.classList.contains('btn-lang')) btn.classList.add('btn-lang');
+    if (!btn.classList.contains('btn-lang-primary')) btn.classList.add('btn-lang-primary');
+
+    /*
+     * تبديل واحد فقط في مرحلة capture ثم إيقاف الانتشار:
+     * - الرئيسية: لا rizq_i18n.js (shim بلا تفويض نقر) — كانت تعتمد على navLang.click()
+     * - الصفحات مع rizq_i18n.js: تفويض document + هذا المستمع كانا يبدّلان مرتين فيلغيان بعضهما
+     */
+    btn.addEventListener('click', function (e) {
+      try {
+        e.preventDefault();
+        e.stopPropagation();
+        if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
+      } catch (eStop) {}
+
+      if (typeof toggleLang === 'function') {
+        toggleLang();
+      } else if (window.RizqI18n && typeof window.RizqI18n.toggle === 'function') {
+        window.RizqI18n.toggle();
+      } else if (typeof toggleLangPage === 'function') {
+        toggleLangPage();
+      } else {
         var next = currentMockLang() === 'ar' ? 'fr' : 'ar';
-        try { localStorage.setItem('rizq_lang', next); } catch (e) {}
+        try { localStorage.setItem('rizq_lang', next); } catch (err) {}
         document.documentElement.lang = next;
+        document.documentElement.dir = next === 'fr' ? 'ltr' : 'rtl';
+        try {
+          if (document.body) {
+            document.body.classList.toggle('rizq-lang-fr', next === 'fr');
+            document.body.classList.toggle('rizq-lang-ar', next === 'ar');
+          }
+        } catch (eB) {}
         document.dispatchEvent(new CustomEvent('rizq:langchange', { bubbles: true, detail: { lang: next } }));
       }
       setTimeout(applyMockLang, 30);
       setTimeout(applyMockLang, 200);
-    });
+    }, true);
+
     document.addEventListener('rizq:langchange', function () {
       applyMockLang();
     });
+  }
+
+  /** حمّل محرك الترجمة إن غاب — حتى يعمل FR|AR على الصفحات بلا rizq_i18n.js */
+  function ensureI18nScripts() {
+    if (window.RizqI18n && typeof window.RizqI18n.toggle === 'function') return;
+    if (document.querySelector('script[src*="rizq_i18n.js"]')) return;
+    var head = document.head || document.documentElement;
+    if (!document.querySelector('script[src*="rizq_i18n_data.js"]')) {
+      var data = document.createElement('script');
+      data.src = 'rizq_i18n_data.js';
+      head.appendChild(data);
+    }
+    var eng = document.createElement('script');
+    eng.src = 'rizq_i18n.js?v=23.1';
+    head.appendChild(eng);
   }
 
   /* مفاتيح التبويب التي تتبع التمرير داخل الصفحة */
@@ -1086,7 +1127,25 @@
       if (modelsNav) {
         modelsNav.hidden = false;
         modelsNav.removeAttribute('aria-hidden');
+        modelsNav.removeAttribute('hidden');
         modelsNav.style.removeProperty('display');
+        modelsNav.style.removeProperty('visibility');
+        modelsNav.style.removeProperty('width');
+        modelsNav.style.removeProperty('max-width');
+        modelsNav.style.removeProperty('margin');
+        modelsNav.style.removeProperty('padding');
+        modelsNav.style.removeProperty('overflow');
+        /* أعد نماذج إلى شريط الأقسام قبل «المزيد» على التابلت/الكمبيوتر */
+        var moreWrap = hdr.querySelector('nav.rmh-nav .rmh-more-wrap, nav.rmh-nav [data-rmh="more"]');
+        var bottomNav = hdr.querySelector('nav.rmh-nav:not(.rmh-nav-top)');
+        if (bottomNav && moreWrap && modelsNav.parentNode === bottomNav) {
+          try { bottomNav.insertBefore(modelsNav, moreWrap); } catch (eIns) {}
+        } else if (bottomNav && modelsNav.parentNode !== bottomNav) {
+          try {
+            if (moreWrap) bottomNav.insertBefore(modelsNav, moreWrap);
+            else bottomNav.appendChild(modelsNav);
+          } catch (eMv) {}
+        }
       }
       if (moreModels && moreModels.getAttribute('data-rmh-phone-only') === '1') {
         try { moreModels.parentNode.removeChild(moreModels); } catch (eRm) {}
@@ -1275,10 +1334,56 @@
   }
 
   var __rmhBooted = false;
+  function ensureGoToAccount() {
+    if (typeof window.goToAccount === 'function') return;
+    window.goToAccount = function (e) {
+      try { if (e && e.preventDefault) e.preventDefault(); } catch (ePrev) {}
+      if (window.RizqAccount && typeof window.RizqAccount.open === 'function') {
+        return window.RizqAccount.open(e);
+      }
+      if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccountChoice === 'function') {
+        return window.RizqAuthGate.openAccountChoice();
+      }
+      if (window.RizqAuthGate && typeof window.RizqAuthGate.openAccount === 'function') {
+        return window.RizqAuthGate.openAccount();
+      }
+      try { location.href = 'rizq_landing_v8.html?openRegister=1'; } catch (eGo) {}
+    };
+  }
+
+  function ensureToolsInteractive() {
+    var hdr = document.getElementById('rizq-mock-hdr');
+    if (!hdr) return;
+    var tools = hdr.querySelector('.rmh-tools');
+    if (tools) {
+      tools.style.setProperty('pointer-events', 'auto', 'important');
+      tools.style.setProperty('z-index', '40', 'important');
+      tools.style.setProperty('position', 'relative', 'important');
+    }
+    ['rmh-lang-btn', 'rmh-cart-btn', 'rmh-help-btn'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.style.setProperty('pointer-events', 'auto', 'important');
+      el.style.setProperty('cursor', 'pointer', 'important');
+    });
+    var fav = hdr.querySelector('.rmh-fav-link');
+    if (fav) {
+      fav.style.setProperty('pointer-events', 'auto', 'important');
+      fav.style.setProperty('cursor', 'pointer', 'important');
+      if (!fav.getAttribute('href')) fav.setAttribute('href', 'rizq_favorites.html');
+    }
+    var cart = document.getElementById('rmh-cart-btn');
+    if (cart && cart.tagName === 'A' && !cart.getAttribute('href')) {
+      cart.setAttribute('href', 'rizq_cart.html');
+    }
+  }
+
   function bootMockHeader() {
     if (__rmhBooted) return;
     __rmhBooted = true;
     ensureMockCss();
+    ensureI18nScripts();
+    ensureGoToAccount();
     applyNavHrefs();
     markActiveFromPage();
     fillCategories();
@@ -1289,6 +1394,7 @@
     wireLang();
     applyMockLang();
     wireHelp();
+    ensureToolsInteractive();
     wireMore();
     wireNavActive();
     wireModelsModal();
