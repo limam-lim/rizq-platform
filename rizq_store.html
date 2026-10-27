@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
 <link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.82"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
-<link rel="stylesheet" href="rizq_product_detail.css?v=28.9"/>
+<link rel="stylesheet" href="rizq_product_detail.css?v=29.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.6"/>
 <link rel="preload" href="rizq_header.js?v=27.0" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
@@ -1269,7 +1269,7 @@ footer{
   <script src="rizq_ux_polish.js?v=23.3" defer></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=29.9" defer></script>
+  <script src="rizq_store_commerce.js?v=29.10" defer></script>
   <script src="rizq_map_preview.js?v=1.0" defer></script>
   <script src="rizq_pwa.js?v=31.20" defer></script>
   <script src="rizq_footer_toggle.js?v=23.1" defer></script>
@@ -1841,14 +1841,11 @@ function _renderWishUI(){
       var safeName = _qvEsc(p.name);
       var safeEmoji = _qvEsc(p.emoji);
       var safePrice = _qvEsc(p.price);
-      var idJs = JSON.stringify(String(p.id));
-      var nameJs = JSON.stringify(String(p.name == null ? '' : p.name));
-      var priceJs = JSON.stringify(String(p.price == null ? '' : p.price));
-      var emojiJs = JSON.stringify(String(p.emoji == null ? '' : p.emoji));
+      var safeId = _qvEsc(String(p.id == null ? '' : p.id));
       return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(201,168,76,.12)">'
         + '<div style="font-size:26px">'+safeEmoji+'</div>'
         + '<div style="flex:1"><div style="font-weight:700;color:#fff;font-size:13.5px">'+safeName+'</div><div style="color:#C9A84C;font-size:12.5px;font-weight:700">'+safePrice+'</div></div>'
-        + '<button type="button" onclick=\'toggleWish('+idJs+','+nameJs+','+priceJs+','+emojiJs+')\' style="background:none;border:none;color:rgba(255,255,255,.4);font-size:16px;cursor:pointer" aria-label="✕">✕</button>'
+        + '<button type="button" data-wish-remove="1" data-wish-id="'+safeId+'" style="background:none;border:none;color:rgba(255,255,255,.4);font-size:16px;cursor:pointer" aria-label="✕">✕</button>'
         + '</div>';
     }).join('') : '<p style="color:rgba(255,255,255,.55);font-size:13px;text-align:center;padding:20px 0">'+(
       (localStorage.getItem('rizq_lang')||'ar')==='fr'
@@ -1868,7 +1865,21 @@ window._wishAuthToggle = _wishAuthToggle;
 window.toggleWishPanel = toggleWishPanel;
 window._getWishList = _getWishList;
 window._renderWishUI = _renderWishUI;
-document.addEventListener('DOMContentLoaded', _renderWishUI);
+document.addEventListener('DOMContentLoaded', function(){
+  _renderWishUI();
+  var panel = document.getElementById('wish-panel-list');
+  if(panel && !panel.dataset.wishDelegated){
+    panel.dataset.wishDelegated = '1';
+    panel.addEventListener('click', function(e){
+      var btn = e.target && e.target.closest ? e.target.closest('[data-wish-remove][data-wish-id]') : null;
+      if(!btn || !panel.contains(btn)) return;
+      e.preventDefault();
+      var id = btn.getAttribute('data-wish-id') || '';
+      var row = (_getWishList() || []).find(function(p){ return String(p.id) === String(id); });
+      toggleWish(id, row && row.name, row && row.price, row && row.emoji);
+    });
+  }
+});
 
 /* ── تفاصيل منتج بهوية عرض الإعلان (لوحة فاخرة) ── */
 function openQuickView(id, name, price, emoji, cat){

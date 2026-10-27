@@ -21,7 +21,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
-<link rel="stylesheet" href="rizq_product_detail.css?v=28.9"/>
+<link rel="stylesheet" href="rizq_product_detail.css?v=29.0"/>
 <link rel="preload" href="rizq_header.js?v=27.0" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>المنتجات — متجر النور | Rizq</title>
@@ -523,7 +523,7 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_backend_config.js"></script>
   <script src="rizq_ad_cards.js?v=26.6" defer></script>
   <script src="rizq_store_topics.js?v=27.0" defer></script>
-  <script src="rizq_store_commerce.js?v=29.9" defer></script>
+  <script src="rizq_store_commerce.js?v=29.10" defer></script>
   <script src="rizq_site_banner.js" defer></script>
   <script src="rizq_i18n_data.js" defer></script>
   <script src="rizq_i18n.js" defer></script>
@@ -707,8 +707,44 @@ let currentPage = 1;
 let modalQty = 1;
 let selectedSidebarCats = [];
 
-function _wishlistIds(){ try{ var v=JSON.parse(localStorage.getItem('rizq_wishlist')||'[]'); return Array.isArray(v)?v:[]; }catch(e){ return []; } }
+function _productsWishKey(){
+  var sid = window._rizqProductsStoreId
+    || (window.RizqStoreCommerce && RizqStoreCommerce.storeIdFromUrl && RizqStoreCommerce.storeIdFromUrl())
+    || '';
+  sid = String(sid || '').trim();
+  return sid ? ('rizq_wishlist_' + sid) : 'rizq_wishlist';
+}
+function _wishlistEntries(){
+  try{
+    var v = JSON.parse(localStorage.getItem(_productsWishKey()) || '[]');
+    if (!Array.isArray(v)) return [];
+    return v;
+  }catch(e){ return []; }
+}
+function _wishlistIds(){
+  return _wishlistEntries().map(function(p){
+    if (p && typeof p === 'object') return String(p.id);
+    return String(p);
+  }).filter(Boolean);
+}
 function _wishlistHas(id){ return _wishlistIds().indexOf(String(id))!==-1; }
+function _saveWishlistIds(ids){
+  var key = _productsWishKey();
+  var prev = _wishlistEntries();
+  var byId = {};
+  prev.forEach(function(p){
+    if (p && typeof p === 'object' && p.id != null) byId[String(p.id)] = p;
+  });
+  var out = (ids || []).map(function(id){
+    id = String(id);
+    if (byId[id]) return byId[id];
+    var prod = (typeof allProducts !== 'undefined' ? allProducts : []).find(function(p){ return String(p.id) === id; });
+    return prod
+      ? { id: id, name: prod.name || '', price: prod.price || '', emoji: prod.emoji || '📦' }
+      : { id: id };
+  });
+  try{ localStorage.setItem(key, JSON.stringify(out)); }catch(e){}
+}
 
 function _pidAttr(id){
   return JSON.stringify(String(id));
@@ -955,7 +991,23 @@ function toggleFav(btn, id) {
   const i = ids.indexOf(sid);
   const added = i === -1;
   if (added) ids.push(sid); else ids.splice(i, 1);
-  try { localStorage.setItem('rizq_wishlist', JSON.stringify(ids)); } catch (e) {}
+  _saveWishlistIds(ids);
+  try{
+    var prod = _findProduct(sid);
+    var storeScope = window._rizqProductsStoreId
+      || (window.RizqStoreCommerce && RizqStoreCommerce.storeIdFromUrl && RizqStoreCommerce.storeIdFromUrl())
+      || '';
+    if (storeScope && window.RizqUx && typeof RizqUx.syncTypedFavorite === 'function') {
+      RizqUx.syncTypedFavorite('store:' + storeScope + ':' + sid, added, {
+        type: 'store',
+        title: prod ? (prod.name || '') : '',
+        price: prod ? (prod.price || '') : '',
+        emoji: prod ? (prod.emoji || '📦') : '📦',
+        sourceId: storeScope,
+        href: 'rizq_products.html?id=' + encodeURIComponent(storeScope)
+      });
+    }
+  }catch(eSync){}
   btn.classList.toggle('active', added);
   btn.textContent = added ? '❤' : '♡';
   if (typeof updateWishSideCount === 'function') updateWishSideCount();
