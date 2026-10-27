@@ -8,6 +8,18 @@ body.rizq-mockup-hdr-trial{
   --rizq-mock-hdr-gap: 12px;
   --rmh-navy: #0a1628;
   --rmh-navy-2: #0d1a2e;
+/* FOUC guard: never leave .rmh-nav as navy+default-blue-links during refresh */
+#rizq-mock-hdr nav.rmh-nav,
+nav.rmh-nav{
+  background-image:none!important;
+  background-color:var(--rmh-navy,#0a1628)!important;
+  color:#fff!important;
+}
+#rizq-mock-hdr nav.rmh-nav a,
+nav.rmh-nav a{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
   --rmh-gold: #C9A84C;
   --rmh-gold-2: #E8C96A;
   background:#eef1f5;

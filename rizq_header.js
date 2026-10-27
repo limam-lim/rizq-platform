@@ -1835,7 +1835,7 @@
   function ensureMockHeaderAssets() {
     try {
       if (isDashShell()) return;
-      var v = '5.82';
+      var v = '5.83';
       var cssWant = 'rizq_header_mockup_trial.css?v=' + v;
       var jsWant = 'rizq_header_mockup_trial.js?v=' + v;
       var l = document.querySelector('link[href*="rizq_header_mockup_trial.css"]');

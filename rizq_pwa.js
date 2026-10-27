@@ -239,7 +239,7 @@
       theme.name = 'theme-color';
       document.head.appendChild(theme);
     }
-    theme.content = '#0d1b2a';
+    theme.content = '#eef2f8'; /* match page bg — avoid dark flash on refresh */
     /* edge-to-edge Android: expose safe-area insets so bottom dock covers system nav */
     try {
       var vp = document.querySelector('meta[name="viewport"]');
