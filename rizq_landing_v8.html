@@ -2,6 +2,23 @@
 <html lang="ar" dir="rtl" data-rizq-strip="22.6">
 <head>
   <meta charset="UTF-8"/>
+<style id="rizq-nav-fouc-guard">
+/* Critical: before external CSS — prevent navy bar + blue link flash on refresh */
+html,body{background:#eef2f8}
+#rizq-mock-hdr{background:#0a1628;color:#fff}
+#rizq-mock-hdr nav.rmh-nav,nav.rmh-nav{
+  display:flex!important;flex-wrap:nowrap;align-items:center;gap:2px;
+  background:#0a1628!important;background-image:none!important;color:#fff!important;
+  overflow-x:auto;-webkit-overflow-scrolling:touch
+}
+#rizq-mock-hdr nav.rmh-nav a,nav.rmh-nav a{
+  color:#fff!important;-webkit-text-fill-color:#fff!important;text-decoration:none!important;
+  flex:0 0 auto;display:inline-flex!important;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;padding:6px 8px;font-size:11px;font-weight:700;line-height:1.15;white-space:nowrap;min-width:64px;box-sizing:border-box
+}
+#rizq-mock-hdr nav.rmh-nav a .rmh-nav-ico,nav.rmh-nav a .rmh-nav-ico{color:#E8C96A!important}
+</style>
+
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -13,7 +30,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="favicon-192.png?v=23.0">
 
 <meta name="description" content="رزق — سوق موريتانيا الإلكتروني. بيع واشترِ بأمان: عقارات، سيارات، ذهب، ماشية، إلكترونيات وأكثر."/>
-<meta name="theme-color" content="#0d1b2a"/>
+<meta name="theme-color" content="#eef2f8"/>
 <link rel="canonical" href="https://rizq.mr/"/>
 <meta property="og:title" content="رزق | Rizq — سوق موريتانيا الإلكتروني"/>
 <meta property="og:description" content="رزق — سوق موريتانيا الإلكتروني. بيع واشترِ بأمان: عقارات، سيارات، ذهب، ماشية، إلكترونيات وأكثر."/>
@@ -27,7 +44,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Noto+Naskh+Arabic:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="rizq_landing_ux.css?v=31.3"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=31.4"/>
 <!-- deploy: ad-card clip fix v27.5 -->
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.5"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.6"/>
@@ -45,12 +62,32 @@
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.82"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.83"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — الشريط القديم متوقف نهائياً */
 </script>
 <style id="rizq-mobile-header-critical">
+/* منع وميض التحديث: شريط .rmh-nav كحلي بنص أزرق المتصفح قبل اكتمال mockup CSS */
+#rizq-mock-hdr{
+  background:#0a1628;color:#fff;
+}
+#rizq-mock-hdr nav.rmh-nav,
+nav.rmh-nav{
+  display:flex!important;flex-wrap:nowrap;align-items:center;gap:2px;
+  background:#0a1628!important;background-image:none!important;
+  color:#fff!important;overflow-x:auto;-webkit-overflow-scrolling:touch;
+}
+#rizq-mock-hdr nav.rmh-nav a,
+nav.rmh-nav a{
+  color:#fff!important;-webkit-text-fill-color:#fff!important;
+  text-decoration:none!important;flex:0 0 auto;
+  display:inline-flex!important;flex-direction:column;align-items:center;justify-content:center;
+  gap:2px;padding:6px 8px;font-size:11px;font-weight:700;line-height:1.15;
+  white-space:nowrap;min-width:64px;box-sizing:border-box;
+}
+#rizq-mock-hdr nav.rmh-nav a .rmh-nav-ico,
+nav.rmh-nav a .rmh-nav-ico{color:#E8C96A!important}
 /* الشريط القديم لا يُعرض أبداً — حتى قبل اكتمال تحميل mockup CSS */
 html.rizq-app-nav #nav,
 html.rizq-app-nav #rizq-desk-nav,
@@ -5228,7 +5265,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     <script src="rizq_marquee_kit.js?v=1.3"></script>
     <script src="rizq_civic_ticker.js?v=1.3"></script>
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_header_mockup_trial.js?v=5.82" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.83" defer></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
@@ -5237,7 +5274,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_contact_gate.js"></script>
 <script src="rizq_dynamic_nav.js?v=23.5"></script>
 <script src="rizq_module_flags.js?v=1.2"></script>
-<script src="rizq_pwa.js?v=31.20" defer></script>
+<script src="rizq_pwa.js?v=31.21" defer></script>
 <script src="rizq_footer_toggle.js?v=23.8" defer></script>
 <script src="rizq_social_links.js?v=23.13" defer></script>
 <script src="rizq_account_route.js?v=23.0"></script>
