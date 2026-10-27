@@ -292,6 +292,9 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 .showroom-under-band{
   display:grid !important;
   grid-template-columns:minmax(0,1.15fr) minmax(260px,0.85fr) !important;
+  grid-template-areas:
+    "desk reviews"
+    "pay pay";
   gap:14px;
   margin:20px 0 8px;
   width:100%;
@@ -306,6 +309,9 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
   border:1px solid rgba(27,58,107,.08);
   box-shadow:0 12px 40px rgba(15,35,65,.06);
 }
+#showroom-service-desk.showroom-desk-hz{grid-area:desk}
+#reviews-section.showroom-reviews-hz{grid-area:reviews;min-height:100%}
+#showroom-under-band > #showroom-payment-methods{grid-area:pay;margin:0!important}
 @media(max-width:1100px) and (min-width:701px){
   .showroom-under-band{
     gap:12px;padding:12px;
@@ -391,6 +397,10 @@ body.rizq-empty-showroom .btn-browse{display:inline-flex!important}
 @media(max-width:700px){
   .showroom-under-band{
     grid-template-columns:1fr !important;
+    grid-template-areas:
+      "desk"
+      "pay"
+      "reviews";
     padding:12px;border-radius:16px;
   }
   #showroom-service-desk.showroom-desk-hz,
@@ -858,7 +868,13 @@ html[dir="ltr"] .sr-wish-btn{left:auto;right:10px}
         </div>
       </section>
 
-      <!-- التقييمات بجانب غرفة الطلبات (تابلت/كمبيوتر) -->
+      <!-- الدفع في الـ DOM قبل التقييمات (رحلة الهاتف) — بصرياً صف كامل تحت desk|reviews على التابلت -->
+      <div class="info-card" id="showroom-payment-methods" style="display:block">
+        <div class="info-card-title" id="sr-pay-title">🏦 طرق الدفع</div>
+        <div id="showroom-pay-box"></div>
+      </div>
+
+      <!-- التقييمات بجانب غرفة الطلبات (تابلت/كمبيوتر عبر grid-area) -->
       <section class="showroom-reviews-hz" id="reviews-section" aria-label="تقييمات الزبائن">
         <div class="info-card-title" style="margin-bottom:10px" id="reviews-title-lbl">⭐ تقييمات الزبائن</div>
         <div class="showroom-reviews-inner">
@@ -889,11 +905,6 @@ html[dir="ltr"] .sr-wish-btn{left:auto;right:10px}
           <div id="reviews-list"></div>
         </div>
       </section>
-    </div>
-
-    <div class="info-card" id="showroom-payment-methods" style="display:block;margin:16px 0 8px">
-      <div class="info-card-title" id="sr-pay-title">🏦 طرق الدفع</div>
-      <div id="showroom-pay-box"></div>
     </div>
 
 </main>
