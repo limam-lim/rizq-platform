@@ -20,7 +20,7 @@ function assert(cond, msg) {
 }
 
 async function main() {
-  const backupTenders = platformStore.readTenders();
+  const backupTenders = await platformStore.readTenders();
   const seededInvIds = ['inv_disc_test_0', 'inv_disc_test_1', 'inv_disc_test_2'];
 
   try {
@@ -50,7 +50,7 @@ async function main() {
         ownerPhone: '22111111',
       });
     }
-    platformStore.writeTenders(backupTenders.concat(seeded));
+    await platformStore.writeTenders(backupTenders.concat(seeded));
 
     for (let i = 0; i < seededInvIds.length; i++) {
       const id = seededInvIds[i];
@@ -106,7 +106,7 @@ async function main() {
 
     console.log('ALL DISCOVERY SECTION CHECKS PASSED');
   } finally {
-    platformStore.writeTenders(backupTenders);
+    await platformStore.writeTenders(backupTenders);
     for (const id of seededInvIds) {
       try { await repos.removeInvestment(id); } catch (_) {}
     }

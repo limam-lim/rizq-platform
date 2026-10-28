@@ -21,26 +21,26 @@ async function getAccountEntitlements(acc) {
   return await getEntitlements(acc.id, acc.type || 'individual');
 }
 
-function assertAccountFeature(acc, featureName) {
-  const ent = getAccountEntitlements(acc);
+async function assertAccountFeature(acc, featureName) {
+  const ent = await getAccountEntitlements(acc);
   assertSubscriptionActive(ent);
   assertFeature(ent, featureName);
   return ent;
 }
 
-function accountHasFeatureStrict(acc, featureName) {
+async function accountHasFeatureStrict(acc, featureName) {
   try {
-    assertAccountFeature(acc, featureName);
+    await assertAccountFeature(acc, featureName);
     return true;
   } catch (e) {
     return false;
   }
 }
 
-function accountHasAiAgentStrict(acc) {
+async function accountHasAiAgentStrict(acc) {
   if (!acc || acc.status !== 'approved' || acc.suspended) return false;
   try {
-    const ent = getAccountEntitlements(acc);
+    const ent = await getAccountEntitlements(acc);
     assertSubscriptionActive(ent);
     if (!isAiEligible(ent)) return false;
     return ent.features.includes('ai_agent_full');
@@ -49,8 +49,8 @@ function accountHasAiAgentStrict(acc) {
   }
 }
 
-function assertAiAgentAccess(acc, opts) {
-  const ent = assertAccountFeature(acc, 'ai_agent_full');
+async function assertAiAgentAccess(acc, opts) {
+  const ent = await assertAccountFeature(acc, 'ai_agent_full');
   if (!isAiEligible(ent)) {
     throw entitlementError('ai_payment_required', 'الوكيل الماسي يتطلب اشتراكاً مدفوعاً ومؤكداً — غير متاح في التجربة المجانية');
   }
@@ -59,7 +59,7 @@ function assertAiAgentAccess(acc, opts) {
     assertCallsChannel(ent);
   }
   try {
-    assertQuotaAvailable({
+    await assertQuotaAvailable({
       subscriberId: acc.phone || acc.whatsapp || acc.id,
       accountId: acc.id,
       channel,
@@ -67,7 +67,8 @@ function assertAiAgentAccess(acc, opts) {
       quotaLimits: ent.quotaLimits,
     });
   } catch (qErr) {
-    const err = entitlementError('quota_exhausted', qErr.message || getQuotaBlockReason(acc.phone || acc.id, acc.id, channel));
+    const reason = await getQuotaBlockReason(acc.phone || acc.id, acc.id, channel).catch(() => qErr.message);
+    const err = entitlementError('quota_exhausted', qErr.message || reason);
     err.details = qErr.details || {};
     throw err;
   }
@@ -93,23 +94,24 @@ function resolveAccessDenialMessage(ent) {
   }
 }
 
-function assertDiamondWidgetAccess(body, readAccountsFn, channel) {
+async function assertDiamondWidgetAccess(body, readAccountsFn, channel) {
   const profile = body && body.profile;
   const accountId = String(
     (profile && profile.accountId) || body.accountId || ''
   ).trim();
   if (!accountId || typeof readAccountsFn !== 'function') return null;
 
-  const acc = readAccountsFn().find((a) => a.id === accountId);
+  const list = await readAccountsFn();
+  const acc = (Array.isArray(list) ? list : []).find((a) => a.id === accountId);
   if (!acc) {
     const err = entitlementError('account_not_found', 'الحساب غير موجود');
     err.status = 404;
     throw err;
   }
   try {
-    assertAiAgentAccess(acc, { channel: channel || 'widget' });
+    await assertAiAgentAccess(acc, { channel: channel || 'widget' });
   } catch (e) {
-    const ent = getAccountEntitlements(acc);
+    const ent = await getAccountEntitlements(acc);
     if (e.code === 'quota_exhausted') throw e;
     e.message = resolveAccessDenialMessage(ent);
     throw e;
@@ -117,8 +119,8 @@ function assertDiamondWidgetAccess(body, readAccountsFn, channel) {
   return acc;
 }
 
-function assertApiIntegrationAccess(acc) {
-  const ent = assertAccountFeature(acc, 'api_erp_integration');
+async function assertApiIntegrationAccess(acc) {
+  const ent = await assertAccountFeature(acc, 'api_erp_integration');
   if (acc.type !== 'corp') {
     throw entitlementError('corp_only', 'تكامل API متاح لحسابات الشركات (الماسية Pro) فقط');
   }

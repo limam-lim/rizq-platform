@@ -112,14 +112,14 @@ async function main() {
   ok('GET /api/agent/status/:phone protected', agentPub.status === 401, 'status=' + agentPub.status);
 
   // ── 7. verify-dash POST + approved only ──
-  const backupTenders = platformStore.readTenders();
+  const backupTenders = await platformStore.readTenders();
   const { id, dashToken, accessToken, pending, approved } = seedTestAccount();
   let seededCatalogId = null;
   let seededTenderId = null;
   const tenderPkgKey = id + '::tender';
 
   try {
-    platformStore.upsertAccount(pending);
+    await platformStore.upsertAccount(pending);
 
     const dashPending = await req('POST', '/api/accounts/verify-dash/' + id, { dashToken }, { 'x-dash-token': dashToken });
     ok('verify-dash pending account → 401', dashPending.status === 401, 'status=' + dashPending.status);
@@ -130,7 +130,7 @@ async function main() {
     const entPending = await req('GET', '/api/entitlements/' + id, null, { 'x-account-token': accessToken });
     ok('entitlements pending account → 401', entPending.status === 401, 'status=' + entPending.status);
 
-    platformStore.upsertAccount(approved);
+    await platformStore.upsertAccount(approved);
 
     await repos.setPackage(id, {
       accountId: id,
@@ -235,14 +235,14 @@ async function main() {
 
   } finally {
     try {
-      platformStore.deleteAccount(id);
+      await platformStore.deleteAccount(id);
     } catch (e) { /* ignore cleanup */ }
     try {
-      if (seededCatalogId) platformStore.deleteCatalogItem(seededCatalogId);
+      if (seededCatalogId) await platformStore.deleteCatalogItem(seededCatalogId);
     } catch (e) { /* ignore cleanup */ }
     try {
-      if (seededTenderId) platformStore.deleteTender(seededTenderId);
-      else platformStore.writeTenders(backupTenders);
+      if (seededTenderId) await platformStore.deleteTender(seededTenderId);
+      else await platformStore.writeTenders(backupTenders);
     } catch (e) { /* ignore cleanup */ }
     try {
       await repos.packages.remove(id);
@@ -263,9 +263,9 @@ async function main() {
     const store = await repos.listOtp();
     const rec = store.find((x) => x.email === testEmail.toLowerCase());
     ok('OTP stored as hash not plaintext', !!(rec && rec.codeHash && !rec.code));
-    const bad = otp.verifyBuyerOtp(testEmail, '000000');
+    const bad = await otp.verifyBuyerOtp(testEmail, '000000');
     ok('OTP wrong code rejected', bad.ok === false);
-    const good = otp.verifyBuyerOtp(testEmail, '112233');
+    const good = await otp.verifyBuyerOtp(testEmail, '112233');
     ok('OTP correct code accepted', good.ok === true);
     const reg = await req('POST', '/api/auth/register', {
       name: 'OTP Sec User',
@@ -333,19 +333,19 @@ async function main() {
   // ── 16. Suspended verify-dash ──
   const sus = seedTestAccount();
   try {
-    platformStore.upsertAccount(Object.assign({}, sus.approved, { suspended: true }));
+    await platformStore.upsertAccount(Object.assign({}, sus.approved, { suspended: true }));
     const vSus = await req('POST', '/api/accounts/verify-dash/' + sus.id, { dashToken: sus.dashToken }, { 'x-dash-token': sus.dashToken });
     ok('verify-dash suspended → 401', vSus.status === 401);
     const exSus = await req('POST', '/api/accounts/exchange-dash-token/' + sus.id, { dashToken: sus.dashToken }, { 'x-dash-token': sus.dashToken });
     ok('exchange-dash-token suspended → 401', exSus.status === 401);
   } finally {
-    try { platformStore.deleteAccount(sus.id); } catch (e) { /* ignore */ }
+    try { await platformStore.deleteAccount(sus.id); } catch (e) { /* ignore */ }
   }
 
   // ── 17. visit-stats rejects query token ──
   const pkgAcc = seedTestAccount();
   try {
-    platformStore.upsertAccount(pkgAcc.approved);
+    await platformStore.upsertAccount(pkgAcc.approved);
     await repos.setPackage(pkgAcc.id, { accessToken: pkgAcc.accessToken, accountType: 'store', accountId: pkgAcc.id });
     const qTok = await req('GET', '/api/visit-stats/' + pkgAcc.id + '?token=' + encodeURIComponent(pkgAcc.accessToken));
     ok('visit-stats query token rejected', qTok.status === 401);
@@ -353,7 +353,7 @@ async function main() {
     ok('visit-stats header token accepted', hTok.status === 200 && hTok.body && hTok.body.ok, 'status=' + hTok.status);
   } finally {
     try {
-      platformStore.deleteAccount(pkgAcc.id);
+      await platformStore.deleteAccount(pkgAcc.id);
       await repos.packages.remove(pkgAcc.id);
     } catch (e) { /* ignore */ }
   }
@@ -361,7 +361,7 @@ async function main() {
   // ── 18. Admin list strips dashToken; approve reveals once ──
   const reveal = seedTestAccount();
   try {
-    platformStore.upsertAccount(reveal.pending);
+    await platformStore.upsertAccount(reveal.pending);
     const secret = process.env.BACKEND_SHARED_SECRET || '';
     if (secret) {
       const adminList = await req('GET', '/api/accounts/admin', null, { 'x-rizq-secret': secret });
@@ -376,7 +376,7 @@ async function main() {
       ok('approve response reveals dashToken once', true, 'SKIP — no BACKEND_SHARED_SECRET');
     }
   } finally {
-    try { platformStore.deleteAccount(reveal.id); } catch (e) { /* ignore */ }
+    try { await platformStore.deleteAccount(reveal.id); } catch (e) { /* ignore */ }
   }
 
   // ── 19. Leak / enumeration soft checks ──
@@ -422,7 +422,7 @@ async function main() {
     const otpSvc = require('../services/otpService');
     const poisonBackup = await repos.listOtp();
     const poisonEmail = 'poison_' + Date.now() + '@rizq.test';
-    const store = await repos.listOtp().slice();
+    const store = (await repos.listOtp()).slice();
     store.push({
       key: 'buyer:' + poisonEmail.toLowerCase(),
       channel: 'buyer',
@@ -433,7 +433,7 @@ async function main() {
       verified: false,
     });
     await repos.replaceOtpStore(store);
-    const poisoned = otpSvc.verifyBuyerOtp(poisonEmail, '999999');
+    const poisoned = await otpSvc.verifyBuyerOtp(poisonEmail, '999999');
     ok('OTP plaintext-only record rejected', !(poisoned && poisoned.ok));
     await repos.replaceOtpStore(poisonBackup);
   }
@@ -448,12 +448,12 @@ async function main() {
       kycSeed.pending.idImage = 'data:image/png;base64,aaa';
       kycSeed.pending.licenseImage = 'data:image/png;base64,bbb';
       try {
-        platformStore.upsertAccount(kycSeed.pending);
+        await platformStore.upsertAccount(kycSeed.pending);
         const adminList2 = await req('GET', '/api/accounts/admin', null, { 'x-rizq-secret': adminSecret });
         const row2 = (adminList2.body && adminList2.body.accounts || []).find((a) => a.id === kycSeed.id);
         ok('admin list keeps KYC images', !!(row2 && row2.idImage && row2.licenseImage && !row2.accessToken && !row2.dashToken));
       } finally {
-        try { platformStore.deleteAccount(kycSeed.id); } catch (e) { /* ignore */ }
+        try { await platformStore.deleteAccount(kycSeed.id); } catch (e) { /* ignore */ }
       }
     } else {
       ok('admin list keeps KYC images', true, 'SKIP — no BACKEND_SHARED_SECRET');

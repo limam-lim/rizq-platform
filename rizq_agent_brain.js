@@ -226,7 +226,7 @@ async function executeTool(toolName, toolInput, meta) {
 async function askAgent({ channel, message, context = {} }) {
   try {
     const ops = require('./rizq-backend/services/agentOps');
-    if (!ops.isAgentFamilyEnabled('brain')) {
+    if (!(await ops.isAgentFamilyEnabled('brain'))) {
       return {
         text: 'وكيل القنوات موقّف مؤقتاً من لوحة الإدارة. راسلوا direction@rizq.mr.',
         model: null,

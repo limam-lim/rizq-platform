@@ -160,6 +160,21 @@ function parsePlanJson(text) {
 }
 
 async function generatePlan(input, anthropicClient) {
+  try {
+    const ops = require('./agentOps');
+    const gate = await ops.assertAgentEnabled('investment');
+    if (!gate.ok) {
+      const err = new Error(gate.message || 'investment agent disabled');
+      err.status = 403;
+      err.code = gate.code || 'agent_family_disabled';
+      throw err;
+    }
+  } catch (eGate) {
+    if (eGate && eGate.code === 'agent_family_disabled') throw eGate;
+    if (eGate && eGate.status === 403) throw eGate;
+    /* agentOps optional load failure — continue */
+  }
+
   const lang = input && input.lang === 'fr' ? 'fr' : 'ar';
   const payload = {
     title: sanitizeText(input && input.title, 120),

@@ -84,7 +84,7 @@ function logTelegramSendFailure(method, chatId, err, extra) {
  * محادثات التنبيه/الموافقة فقط — لا تُضمَّن محادثات الزوار العشوائية
  * (_seenChatIds) وإلا أي من يراسل البوت يصبح قادراً على Approve باقات.
  */
-function buildAlertChatCandidates() {
+async function buildAlertChatCandidates() {
   const ids = [];
   const seen = new Set();
   const add = (raw) => {
@@ -94,7 +94,7 @@ function buildAlertChatCandidates() {
     ids.push(id);
   };
   add(ADMIN_CHAT_ID());
-  add(readPersistedAdminChat());
+  add(await readPersistedAdminChat());
   // SUBSCRIBER_ID إن كان رقم محادثة تيليجرام صريحاً فقط (وليس معرف مشترك نصي)
   const sub = String(SUBSCRIBER_ID() || '').trim();
   if (/^-?\d+$/.test(sub)) add(sub);
@@ -102,7 +102,7 @@ function buildAlertChatCandidates() {
 }
 
 /** هل يُسمح بتثبيت chat_id كأدمن؟ فقط إن طابق الإعداد أو قائمة سماح صريحة. */
-function canPromoteAdminChat(chatId) {
+async function canPromoteAdminChat(chatId) {
   const id = normalizeTelegramChatId(chatId);
   if (!id) return false;
   const configured = normalizeTelegramChatId(ADMIN_CHAT_ID());
@@ -113,7 +113,7 @@ function canPromoteAdminChat(chatId) {
     .filter(Boolean);
   if (allow.includes(id)) return true;
   // bootstrap مرة واحدة فقط عندما لا يوجد أدمن مُعدّ مسبقاً
-  if (!configured && !readPersistedAdminChat() && process.env.TELEGRAM_ALLOW_AUTO_ADMIN === '1') {
+  if (!configured && !(await readPersistedAdminChat()) && process.env.TELEGRAM_ALLOW_AUTO_ADMIN === '1') {
     return true;
   }
   return false;
@@ -164,7 +164,7 @@ async function fetchRecentPrivateChatIds(limit) {
 
 async function validateAdminChatAtStartup() {
   if (!isBotConfigured()) return { ok: false, reason: 'not_configured' };
-  const candidates = buildAlertChatCandidates();
+  const candidates = await buildAlertChatCandidates();
   let lastErr = null;
 
   for (let i = 0; i < candidates.length; i += 1) {
@@ -172,8 +172,8 @@ async function validateAdminChatAtStartup() {
     try {
       await telegramApi('getChat', { chat_id: chatId });
       const configured = normalizeTelegramChatId(ADMIN_CHAT_ID());
-      if (chatId !== configured && canPromoteAdminChat(chatId)) {
-        registerAdminChatId(chatId, { source: 'startup_auto_fix' });
+      if (chatId !== configured && (await canPromoteAdminChat(chatId))) {
+        await registerAdminChatId(chatId, { source: 'startup_auto_fix' });
         console.log('[telegram] admin chat auto-fixed →', chatId, '(was invalid:', configured || '(empty)', ')');
       } else if (chatId === configured) {
         console.log('[telegram] admin chat validated:', chatId);
@@ -181,7 +181,7 @@ async function validateAdminChatAtStartup() {
         console.warn('[telegram] candidate chat valid but not promoted (set TELEGRAM_ADMIN_CHAT_ID):', chatId);
         return { ok: true, chatId, autoFixed: false };
       }
-      return { ok: true, chatId, autoFixed: chatId !== configured && canPromoteAdminChat(chatId) };
+      return { ok: true, chatId, autoFixed: chatId !== configured && (await canPromoteAdminChat(chatId)) };
     } catch (e) {
       lastErr = e;
       if (chatId === normalizeTelegramChatId(ADMIN_CHAT_ID())) {
@@ -195,10 +195,10 @@ async function validateAdminChatAtStartup() {
   for (let j = 0; j < discovered.length; j += 1) {
     const chatId = String(discovered[j].id);
     if (candidates.includes(chatId)) continue;
-    if (!canPromoteAdminChat(chatId)) continue;
+    if (!(await canPromoteAdminChat(chatId))) continue;
     try {
       await telegramApi('getChat', { chat_id: chatId });
-      registerAdminChatId(chatId, {
+      await registerAdminChatId(chatId, {
         source: 'startup_discovered',
         title: discovered[j].title,
       });
@@ -222,7 +222,7 @@ async function validateAdminChatAtStartup() {
 
 async function sendMessageToAlertChats(text, meta) {
   meta = meta || {};
-  const candidates = buildAlertChatCandidates();
+  const candidates = await buildAlertChatCandidates();
   let lastErr = null;
 
   for (let i = 0; i < candidates.length; i += 1) {
@@ -245,10 +245,10 @@ async function sendMessageToAlertChats(text, meta) {
   for (let j = 0; j < discovered.length; j += 1) {
     const chatId = String(discovered[j].id);
     if (candidates.includes(chatId)) continue;
-    if (!canPromoteAdminChat(chatId)) continue;
+    if (!(await canPromoteAdminChat(chatId))) continue;
     try {
       const result = await telegramApi('sendMessage', { chat_id: chatId, text });
-      registerAdminChatId(chatId, { source: 'discovered_send', title: discovered[j].title });
+      await registerAdminChatId(chatId, { source: 'discovered_send', title: discovered[j].title });
       console.warn('[telegram-admin] alert delivered via allowlisted chat_id ' + chatId);
       return { result, chatId, via: 'discovered' };
     } catch (e) {
@@ -439,7 +439,7 @@ async function sendLeadEscalationAlert(lead) {
 
   console.log('[telegram-admin] lead alert dispatch (sync)', {
     leadId,
-    chatCandidates: buildAlertChatCandidates(),
+    chatCandidates: await buildAlertChatCandidates(),
     hasToken: diag.hasToken,
   });
 
@@ -532,8 +532,8 @@ async function editSubRequestMessage(chatId, messageId, text) {
   }
 }
 
-function isAuthorizedChat(chatId) {
-  return buildAlertChatCandidates().includes(String(chatId));
+async function isAuthorizedChat(chatId) {
+  return (await buildAlertChatCandidates()).includes(String(chatId));
 }
 
 function findSubRequestById(readSubRequests, requestId) {
@@ -712,8 +712,8 @@ async function handleIncomingMessage(message, deps) {
 
   if (text === '/start') {
     let promoted = false;
-    if (message.chat && message.chat.type === 'private' && canPromoteAdminChat(chatId)) {
-      registerAdminChatId(chatId, {
+    if (message.chat && message.chat.type === 'private' && (await canPromoteAdminChat(chatId))) {
+      await registerAdminChatId(chatId, {
         source: '/start',
         title: [message.from && message.from.first_name, message.from && message.from.username]
           .filter(Boolean).join(' '),
@@ -730,7 +730,7 @@ async function handleIncomingMessage(message, deps) {
     return { ok: true, action: 'welcome', chatIdRegistered: promoted ? chatId : null };
   }
 
-  if (isAuthorizedChat(chatId) && (
+  if ((await isAuthorizedChat(chatId)) && (
     text === '/leads' ||
     /(?:هل\s*(?:هناك|يوجد)\s*طلب|طلبات?\s*(?:جديد|معلق|pending)|عرض\s*الطلبات|pending\s*leads?)/i.test(text)
   )) {
@@ -777,7 +777,7 @@ async function handleIncomingMessage(message, deps) {
         message: text,
         context: {
           name: senderName,
-          isAdmin: isAuthorizedChat(chatId),
+          isAdmin: await isAuthorizedChat(chatId),
           history: session.history.slice(-TG_MAX_HISTORY),
         },
       });
@@ -815,7 +815,7 @@ async function handleCallbackQuery(callbackQuery, deps) {
   const chatId = callbackQuery.message && callbackQuery.message.chat && callbackQuery.message.chat.id;
   const messageId = callbackQuery.message && callbackQuery.message.message_id;
 
-  if (!isAuthorizedChat(chatId)) {
+  if (!(await isAuthorizedChat(chatId))) {
     await telegramApi('answerCallbackQuery', {
       callback_query_id: callbackQuery.id,
       text: 'غير مصرّح',

@@ -47,35 +47,40 @@ async function inspectAdForPublish(adData) {
 /**
  * Express middleware — يرفض المحتوى المحظور قبل writeAds()
  */
-function moderatorAdMiddleware(req, res, next) {
-  const b = req.body || {};
-  const draftId = (typeof b.id === 'string' && b.id.trim()) ? b.id.trim() : 'draft-' + Date.now();
+async function moderatorAdMiddleware(req, res, next) {
+  try {
+    const b = req.body || {};
+    const draftId = (typeof b.id === 'string' && b.id.trim()) ? b.id.trim() : 'draft-' + Date.now();
 
-  const decision = inspectAdForPublish({
-    id: draftId,
-    title: b.title,
-    desc: b.desc,
-    titleFr: b.titleFr,
-    descFr: b.descFr,
-    price: b.price,
-    category: b.category,
-    images: b.images,
-    video: b.video,
-    seller_trust_score: b.seller_trust_score,
-    accountType: b.accountType || b.account_type || b.section || 'individual',
-  });
-
-  if (decision.decision === 'reject') {
-    return res.status(422).json({
-      ok: false,
-      error: decision.message_ar || 'محتوى الإعلان مرفوض',
-      errorFr: decision.message_fr || '',
-      moderator: decision,
+    const decision = await inspectAdForPublish({
+      id: draftId,
+      title: b.title,
+      desc: b.desc,
+      titleFr: b.titleFr,
+      descFr: b.descFr,
+      price: b.price,
+      category: b.category,
+      images: b.images,
+      video: b.video,
+      seller_trust_score: b.seller_trust_score,
+      accountType: b.accountType || b.account_type || b.section || 'individual',
     });
-  }
 
-  req.moderatorDecision = decision;
-  next();
+    if (decision.decision === 'reject') {
+      return res.status(422).json({
+        ok: false,
+        error: decision.message_ar || 'محتوى الإعلان مرفوض',
+        errorFr: decision.message_fr || '',
+        moderator: decision,
+      });
+    }
+
+    req.moderatorDecision = decision;
+    return next();
+  } catch (err) {
+    console.error('[moderator] middleware error:', err && err.message);
+    return res.status(500).json({ ok: false, error: 'moderator_unavailable' });
+  }
 }
 
 module.exports = { inspectAdForPublish, moderatorAdMiddleware, syncModeratorStorage };

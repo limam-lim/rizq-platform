@@ -520,7 +520,7 @@ function applyOfficialLeadConfirmation(replyText, toolResultsRaw, lang) {
 async function handleWidgetChat(body) {
   try {
     const ops = require('./agentOps');
-    if (!ops.isAgentFamilyEnabled('widget')) {
+    if (!(await ops.isAgentFamilyEnabled('widget'))) {
       const err = new Error('وكيل الدردشة موقّف مؤقتاً من لوحة الإدارة');
       err.status = 503;
       err.code = 'agent_disabled';

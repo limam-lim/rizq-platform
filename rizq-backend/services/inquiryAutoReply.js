@@ -11,7 +11,7 @@ const { recordUsage } = require('../../rizq_quota_guard_agent');
 const { getSubscriberProfileByAccountId } = require('../../rizq_subscriber_agent');
 const RizqPrompts = require('../../rizq_ai_prompts');
 
-function accountHasAiAgent(acc) {
+async function accountHasAiAgent(acc) {
   return accountHasAiAgentStrict(acc);
 }
 
@@ -62,13 +62,22 @@ function buildChatHistory(messages) {
 
 async function maybeAutoReplyToInquiry({ sellerAccount, buyerMessage, threadKey, readMessagesFn, writeMessagesFn }) {
   if (!isAnthropicConfigured()) return null;
-  if (!accountHasAiAgent(sellerAccount)) return null;
+  if (!(await accountHasAiAgent(sellerAccount))) return null;
+
+  try {
+    const ops = require('./agentOps');
+    const gate = await ops.assertAgentEnabled('inquiry');
+    if (!gate.ok) {
+      console.warn('[inquiry-auto-reply] skip (ops):', gate.code);
+      return null;
+    }
+  } catch (eOps) { /* */ }
 
   const phone = sellerAccount.phone || sellerAccount.whatsapp || '';
   if (phone && !isActive(phone)) return null;
 
   try {
-    assertAiAgentAccess(sellerAccount, { channel: 'inquiry' });
+    await assertAiAgentAccess(sellerAccount, { channel: 'inquiry' });
   } catch (e) {
     console.warn('[inquiry-auto-reply] skip (access/quota):', e && (e.code || e.message));
     return null;

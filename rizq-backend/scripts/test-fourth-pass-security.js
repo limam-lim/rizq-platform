@@ -56,11 +56,11 @@ async function main() {
   const prevAdmin = process.env.TELEGRAM_ADMIN_CHAT_ID;
   process.env.TELEGRAM_ALLOW_AUTO_ADMIN = '0';
   process.env.TELEGRAM_ADMIN_CHAT_ID = '999001';
-  ok('canPromote random chat → false', canPromoteAdminChat('123456789') === false);
-  ok('canPromote configured chat → true', canPromoteAdminChat('999001') === true);
-  const cands = buildAlertChatCandidates();
+  ok('canPromote random chat → false', (await canPromoteAdminChat('123456789')) === false);
+  ok('canPromote configured chat → true', (await canPromoteAdminChat('999001')) === true);
+  const cands = await buildAlertChatCandidates();
   ok('alert candidates exclude arbitrary seen ids', !cands.includes('111222333'));
-  ok('isAuthorizedChat random → false', isAuthorizedChat('111222333') === false);
+  ok('isAuthorizedChat random → false', (await isAuthorizedChat('111222333')) === false);
   if (prevAllow === undefined) delete process.env.TELEGRAM_ALLOW_AUTO_ADMIN;
   else process.env.TELEGRAM_ALLOW_AUTO_ADMIN = prevAllow;
   if (prevAdmin === undefined) delete process.env.TELEGRAM_ADMIN_CHAT_ID;
@@ -72,7 +72,7 @@ async function main() {
   const attackerEmail = 'attacker_' + Date.now() + '@rizq.test';
   let victimTok = null;
   try {
-    const v = Buyer.registerOrLogin({
+    const v = await Buyer.registerOrLogin({
       name: 'Victim User',
       phone: victimPhone,
       email: victimEmail,
@@ -82,7 +82,7 @@ async function main() {
     victimTok = v.token;
     let blocked = false;
     try {
-      Buyer.registerOrLogin({
+      await Buyer.registerOrLogin({
         name: 'Attacker User',
         phone: victimPhone,
         email: attackerEmail,
@@ -93,7 +93,7 @@ async function main() {
       blocked = e.code === 'PHONE_IN_USE' || e.status === 409;
     }
     ok('buyer phone collision blocked', blocked);
-    const still = Buyer.findByEmail(victimEmail);
+    const still = await Buyer.findByEmail(victimEmail);
     ok('victim email unchanged', still && still.email === victimEmail);
     ok('victim token unchanged', still && still.token === victimTok);
   } catch (e) {
@@ -104,7 +104,7 @@ async function main() {
   const catId = 'acc_fp_cat_' + Date.now();
   const catTok = crypto.randomBytes(20).toString('hex');
   const repos = require('../db/repos');
-  platformStore.upsertAccount({
+  await platformStore.upsertAccount({
     id: catId, type: 'store', name: 'FP Cat', status: 'approved',
     accessToken: catTok, phone: '44119988',
   });
@@ -145,13 +145,13 @@ async function main() {
     }
   } finally {
     try { await repos.packages.remove(catId); } catch (e) { /* */ }
-    try { platformStore.deleteAccount(catId); } catch (e) { /* */ }
+    try { await platformStore.deleteAccount(catId); } catch (e) { /* */ }
   }
 
   // 5. seller_trust_score ignored
   const adAcc = 'acc_fp_ad_' + Date.now();
   const adTok = crypto.randomBytes(20).toString('hex');
-  platformStore.upsertAccount({
+  await platformStore.upsertAccount({
     id: adAcc, type: 'store', name: 'FP Ad', status: 'approved',
     accessToken: adTok, phone: '44223344',
   });
@@ -180,13 +180,13 @@ async function main() {
       'score=' + score + ' status=' + ad.status + ' err=' + (ad.body && ad.body.error));
   } finally {
     try { await repos.packages.remove(adAcc); } catch (e) { /* */ }
-    try { platformStore.deleteAccount(adAcc); } catch (e) { /* */ }
+    try { await platformStore.deleteAccount(adAcc); } catch (e) { /* */ }
   }
 
   // 6. Guest thread requires token
   const sellerId = 'acc_fp_msg_' + Date.now();
   const sellerTok = crypto.randomBytes(20).toString('hex');
-  platformStore.upsertAccount({
+  await platformStore.upsertAccount({
     id: sellerId, type: 'store', name: 'FP Msg', status: 'approved',
     accessToken: sellerTok, phone: '44334455',
   });
@@ -211,19 +211,19 @@ async function main() {
     ok('guest thread with token → 200', okRead.status === 200
       && okRead.body && Array.isArray(okRead.body.messages));
   } finally {
-    try { platformStore.deleteAccount(sellerId); } catch (e) { /* */ }
+    try { await platformStore.deleteAccount(sellerId); } catch (e) { /* */ }
   }
 
   // 7. Anonymous review blocked; seller cannot delete
   const revTarget = 'acc_fp_rev_' + Date.now();
   const revTok = crypto.randomBytes(20).toString('hex');
-  platformStore.upsertAccount({
+  await platformStore.upsertAccount({
     id: revTarget, type: 'store', name: 'FP Rev', status: 'approved',
     accessToken: revTok, phone: '44556677',
   });
   const reviewer = 'acc_fp_revr_' + Date.now();
   const reviewerTok = crypto.randomBytes(20).toString('hex');
-  platformStore.upsertAccount({
+  await platformStore.upsertAccount({
     id: reviewer, type: 'individual', name: 'Reviewer', status: 'approved',
     accessToken: reviewerTok, phone: '44667788',
   });
@@ -243,8 +243,8 @@ async function main() {
       null, { 'x-account-token': revTok });
     ok('seller cannot wipe review → 401', wipe.status === 401);
   } finally {
-    try { platformStore.deleteAccount(revTarget); } catch (e) { /* */ }
-    try { platformStore.deleteAccount(reviewer); } catch (e) { /* */ }
+    try { await platformStore.deleteAccount(revTarget); } catch (e) { /* */ }
+    try { await platformStore.deleteAccount(reviewer); } catch (e) { /* */ }
   }
 
   // 8. PDF path IDOR
@@ -295,7 +295,7 @@ async function main() {
   // 10. Agent toggle phone mismatch
   const togAcc = 'acc_fp_tog_' + Date.now();
   const togTok = crypto.randomBytes(20).toString('hex');
-  platformStore.upsertAccount({
+  await platformStore.upsertAccount({
     id: togAcc, type: 'store', name: 'FP Tog', status: 'approved',
     accessToken: togTok, phone: '', // empty phone — previously allowed IDOR
   });
@@ -309,7 +309,7 @@ async function main() {
       tog.status === 403,
       'status=' + tog.status + ' code=' + (tog.body && tog.body.code));
   } finally {
-    try { platformStore.deleteAccount(togAcc); } catch (e) { /* */ }
+    try { await platformStore.deleteAccount(togAcc); } catch (e) { /* */ }
   }
 
   const failed = results.filter((r) => !r.pass);

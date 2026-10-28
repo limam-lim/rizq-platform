@@ -87,19 +87,39 @@ function applyPromptCache(params) {
   return next;
 }
 
+/** مهلة مؤقتة لكل طلب Anthropic حتى بوابة LLM الموحّدة */
+function getAnthropicTimeoutMs() {
+  const n = Number(process.env.ANTHROPIC_TIMEOUT_MS);
+  return Number.isFinite(n) && n > 0 ? n : 30_000;
+}
+
+function getAnthropicMaxRetries() {
+  const n = Number(process.env.ANTHROPIC_MAX_RETRIES);
+  // إعادة محاولة واحدة إضافية بعد الفشل الأول (إجمالي محاولتين)
+  return Number.isFinite(n) && n >= 0 ? n : 1;
+}
+
+function requestOptions(extra) {
+  return Object.assign({
+    timeout: getAnthropicTimeoutMs(),
+    maxRetries: getAnthropicMaxRetries(),
+  }, extra || {});
+}
+
 async function createCachedMessage(client, params, options) {
   const prepared = applyPromptCache(params);
   const fast = getFastModel();
   const allowFallback = !!(options && options.fallbackToFast) && prepared.model && prepared.model !== fast;
   const activeClient = client || getAnthropicClient();
+  const reqOpts = requestOptions(options && options.requestOptions);
   try {
-    const response = await activeClient.messages.create(prepared);
+    const response = await activeClient.messages.create(prepared, reqOpts);
     return { response, model: prepared.model, fallback: false };
   } catch (err) {
     if (!allowFallback) throw err;
     console.warn('[claude] ' + prepared.model + ' فشل — تحويل احتياطي إلى ' + fast + ':', err && err.message);
     const retry = Object.assign({}, prepared, { model: fast });
-    const response = await activeClient.messages.create(retry);
+    const response = await activeClient.messages.create(retry, reqOpts);
     return { response, model: fast, fallback: true };
   }
 }
@@ -124,9 +144,15 @@ function getAnthropicClient() {
   const Anthropic = require('@anthropic-ai/sdk');
   const key = getAnthropicApiKey();
   const workspaceId = getAnthropicWorkspaceId();
-  const cacheToken = key + '|' + workspaceId;
+  const timeout = getAnthropicTimeoutMs();
+  const maxRetries = getAnthropicMaxRetries();
+  const cacheToken = key + '|' + workspaceId + '|' + timeout + '|' + maxRetries;
   if (!_cachedClient || _cachedKey !== cacheToken) {
-    const opts = { apiKey: key || 'missing-key' };
+    const opts = {
+      apiKey: key || 'missing-key',
+      timeout,
+      maxRetries,
+    };
     // مفاتيح Anthropic غير المقيّدة بـ workspace واحد تتطلب هذا الهيدر في كل طلب
     if (workspaceId) {
       opts.defaultHeaders = { 'anthropic-workspace-id': workspaceId };
@@ -151,6 +177,9 @@ module.exports = {
   resolveChatModel,
   applyPromptCache,
   createCachedMessage,
+  getAnthropicTimeoutMs,
+  getAnthropicMaxRetries,
+  requestOptions,
   DEFAULT_FAST,
   DEFAULT_ADVANCED,
 };
