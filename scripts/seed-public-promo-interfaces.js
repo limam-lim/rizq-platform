@@ -255,10 +255,8 @@ async function addCatalog(accountId, kind, items) {
   platformStore.writeTenders(tenders.concat(promoTenders));
 
   // غرفة الاستثمارات
-  const promoInv = ['INV_PROMO_001', 'INV_PROMO_002', 'INV_PROMO_003'];
-  for (let i = 0; i < promoInv.length; i++) {
-    const id = promoInv[i];
-    await repos.upsertInvestment({
+  ['INV_PROMO_001', 'INV_PROMO_002', 'INV_PROMO_003'].forEach((id, i) => {
+    repos.upsertInvestment({
       id,
       title: ['مشروع متجر حيوي', 'استثمار عقاري صغير', 'وحدة تصنيع خفيفة'][i],
       titleFr: ['Boutique urbaine', 'Petit immobilier', 'Atelier léger'][i],
@@ -273,7 +271,7 @@ async function addCatalog(accountId, kind, items) {
       publishedAt: new Date(Date.now() - i * 3600000).toISOString(),
       createdAt: new Date(Date.now() - i * 3600000).toISOString(),
     });
-  }
+  });
 
   console.log(JSON.stringify({
     ok: true,

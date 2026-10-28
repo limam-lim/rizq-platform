@@ -1,5 +1,7 @@
 # rizq-backend
 
+Backend requires PostgreSQL (`DATABASE_URL`). Render free is no longer a valid backend host; production target is Hetzner — see `docs/deploy/hetzner.md`.
+
 خادم خلفي صغير لمنصة رزق. الغرض الوحيد حالياً: تحليل صورة وصل الدفع عبر Claude Vision
 دون كشف مفتاح Claude API في كود الواجهة الأمامية الثابت (HTML/JS).
 
