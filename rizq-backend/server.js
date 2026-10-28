@@ -563,7 +563,7 @@ app.post('/api/agent/toggle', async (req, res) => {
     const acc = await verifyAccountOwner(String(accountId).slice(0, 60), token);
     if (acc) {
       try {
-        assertAiAgentAccess(acc, { channel: 'dashboard' });
+        await assertAiAgentAccess(acc, { channel: 'dashboard' });
       } catch (eAi) {
         return res.status(403).json({ ok: false, error: eAi.message || 'unauthorized', code: eAi.code });
       }
@@ -688,11 +688,12 @@ app.post('/api/translate', requireAdminPermission('ai-manager'), async (req, res
       '4) أعد JSON فقط بالشكل: {"translations":{"<key>":"<النص المترجم>", ...}} لكل عنصر بنفس المفتاح key المُعطى تماماً. ' +
       'النصوص:\n' + JSON.stringify(clean.map((it) => ({ key: it.key, text: it.text })));
 
-    const msg = await anthropic.messages.create({
+    const { createCachedMessage, requestOptions } = require('./config/anthropic');
+    const { response: msg } = await createCachedMessage(anthropic, {
       model: getAdvancedModel(),
       max_tokens: 2000,
       messages: [{ role: 'user', content: prompt }],
-    });
+    }, { requestOptions: requestOptions() });
 
     const raw = (msg.content || []).map((c) => c.text || '').join('');
     let parsed;
@@ -839,7 +840,7 @@ app.get('/api/telegram/status', requireAdminPermission('channels'), async (req, 
     } = require('./services/telegramAdmin');
     const { readPersistedAdminChat } = require('./services/telegramChatStore');
     const diag = getTelegramDiagnostics();
-    const persisted = readPersistedAdminChat();
+    const persisted = await readPersistedAdminChat();
     const discovered = await fetchRecentPrivateChatIds(15);
     const validation = diag.hasToken ? await validateAdminChatAtStartup() : { ok: false, reason: 'no_token' };
     res.json({
@@ -914,7 +915,7 @@ app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
         }
       }
       try {
-        assertAiAgentAccess(acc, { channel: 'widget' });
+        await assertAiAgentAccess(acc, { channel: 'widget' });
       } catch (e) {
         const ent = getAccountEntitlements(acc);
         const status = e.status && e.status >= 400 ? e.status : 403;
@@ -999,7 +1000,7 @@ app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
         }
       }
       try {
-        assertAiAgentAccess(acc, { channel: 'widget' });
+        await assertAiAgentAccess(acc, { channel: 'widget' });
       } catch (e) {
         const ent = getAccountEntitlements(acc);
         const status = e.status && e.status >= 400 ? e.status : 403;
@@ -1161,7 +1162,7 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
       return res.status(401).json({ ok: false, error: 'unauthorized' });
     }
     try {
-      assertAiAgentAccess(acc, { channel: 'dashboard' });
+      await assertAiAgentAccess(acc, { channel: 'dashboard' });
     } catch (e) {
       const ent = getAccountEntitlements(acc);
       const status = e.status && e.status >= 400 ? e.status : 403;
@@ -3085,22 +3086,22 @@ app.delete('/api/admin/agent-misses', requireAdminPermission('ai-manager'), (req
 });
 
 /** GET /api/admin/agents-ops — مركز تسيير الوكلاء */
-app.get('/api/admin/agents-ops', requireAdminPermission('ai-manager'), (req, res) => {
+app.get('/api/admin/agents-ops', requireAdminPermission('ai-manager'), async (req, res) => {
   try {
     const ops = require('./services/agentOps');
-    res.json(ops.buildDashboard());
+    res.json(await ops.buildDashboard());
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
 });
 
 /** PATCH /api/admin/agents-ops — تفعيل/إيقاف عائلات الوكلاء */
-app.patch('/api/admin/agents-ops', requireAdminPermission('ai-manager'), (req, res) => {
+app.patch('/api/admin/agents-ops', requireAdminPermission('ai-manager'), async (req, res) => {
   try {
     const ops = require('./services/agentOps');
     const admin = (req.adminUser && (req.adminUser.user || req.adminUser.name)) || 'admin';
-    const settings = ops.saveSettings(req.body || {}, admin);
-    res.json({ ok: true, settings, dashboard: ops.buildDashboard() });
+    const settings = await ops.saveSettings(req.body || {}, admin);
+    res.json({ ok: true, settings, dashboard: await ops.buildDashboard() });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }

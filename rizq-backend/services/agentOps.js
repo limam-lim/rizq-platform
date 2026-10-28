@@ -1,6 +1,7 @@
 /**
  * agentOps.js — تسيير مركزي لوكلاء رزق من لوحة الأدمن
  * إعدادات تشغيل عامة + ملخص حالة موحّد
+ * enabled/disabled يبقى مصدر الحقيقة الوحيد هنا.
  */
 'use strict';
 
@@ -24,13 +25,13 @@ function repos() {
   return _repos;
 }
 
-function getSettings() {
-  const raw = repos().agentOpsSettings.get('_root') || {};
+async function getSettings() {
+  const raw = (await repos().agentOpsSettings.get('_root')) || {};
   return Object.assign({}, DEFAULTS, raw);
 }
 
-function saveSettings(partial, adminUser) {
-  const cur = getSettings();
+async function saveSettings(partial, adminUser) {
+  const cur = await getSettings();
   const next = Object.assign({}, cur);
   Object.keys(DEFAULTS).forEach((k) => {
     if (k === 'updatedAt' || k === 'updatedBy') return;
@@ -38,12 +39,12 @@ function saveSettings(partial, adminUser) {
   });
   next.updatedAt = new Date().toISOString();
   next.updatedBy = adminUser ? String(adminUser).slice(0, 80) : cur.updatedBy;
-  repos().agentOpsSettings.upsert('_root', next);
+  await repos().agentOpsSettings.upsert('_root', next);
   return next;
 }
 
-function isAgentFamilyEnabled(family) {
-  const s = getSettings();
+async function isAgentFamilyEnabled(family) {
+  const s = await getSettings();
   switch (String(family || '')) {
     case 'widget': return s.widgetEnabled !== false;
     case 'brain': return s.brainEnabled !== false;
@@ -56,19 +57,37 @@ function isAgentFamilyEnabled(family) {
   }
 }
 
+/**
+ * بوابة موحّدة لكل نقاط دخول الوكلاء.
+ * @returns {{ ok: true } | { ok: false, error: string, code: string, family: string }}
+ */
+async function assertAgentEnabled(family) {
+  const slug = String(family || '').trim();
+  if (!slug) return { ok: true };
+  const enabled = await isAgentFamilyEnabled(slug);
+  if (enabled) return { ok: true };
+  return {
+    ok: false,
+    error: 'agent_family_disabled',
+    code: 'agent_family_disabled',
+    family: slug,
+    message: 'عائلة الوكيل موقوفة من مركز تسيير الوكلاء',
+  };
+}
+
 function facebookConfigured() {
   return !!(String(process.env.FACEBOOK_PAGE_ID || '').trim() &&
     String(process.env.FACEBOOK_PAGE_ACCESS_TOKEN || '').trim());
 }
 
-function buildDashboard() {
-  const settings = getSettings();
+async function buildDashboard() {
+  const settings = await getSettings();
   let misses = [];
   let missCount = 0;
   try {
     const aq = require('./agentQuality');
-    misses = aq.listAgentMisses(15);
-    missCount = aq.listAgentMisses(500).length;
+    misses = await aq.listAgentMisses(15);
+    missCount = (await aq.listAgentMisses(500)).length;
   } catch (e) { /* */ }
 
   let marketingStats = null;
@@ -174,6 +193,7 @@ module.exports = {
   getSettings,
   saveSettings,
   isAgentFamilyEnabled,
+  assertAgentEnabled,
   buildDashboard,
   facebookConfigured,
 };

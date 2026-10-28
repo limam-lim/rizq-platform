@@ -69,7 +69,7 @@ async function main() {
   // 4. Seed approved non-diamond account — widget with that id should 403
   const id = 'acc_subsec_' + Date.now();
   const accessToken = crypto.randomBytes(20).toString('hex');
-  platformStore.upsertAccount({
+  await platformStore.upsertAccount({
     id,
     type: 'store',
     name: 'Sub Sec Store',
@@ -112,7 +112,7 @@ async function main() {
       togOwner.status === 403,
       'status=' + togOwner.status);
   } finally {
-    try { platformStore.deleteAccount(id); } catch (e) { /* ignore */ }
+    try { await platformStore.deleteAccount(id); } catch (e) { /* ignore */ }
   }
 
   // 6. knowledge upload without token

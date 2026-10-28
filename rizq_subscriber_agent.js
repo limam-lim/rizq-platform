@@ -335,7 +335,7 @@ function buildSubscriberSystemPrompt(profile, channel) {
 async function askSubscriberAgent({ subscriberId, channel, message, context = {} }) {
   try {
     const ops = require('./rizq-backend/services/agentOps');
-    if (!ops.isAgentFamilyEnabled('subscriber')) {
+    if (!(await ops.isAgentFamilyEnabled('subscriber'))) {
       return {
         text: 'وكيل المنشأة موقّف مؤقتاً من إدارة المنصة.',
         channel,
@@ -416,7 +416,7 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
     };
   }
 
-  if (isQuotaBlocked(canonicalId, profile.accountId, channel)) {
+  if (await isQuotaBlocked(canonicalId, profile.accountId, channel)) {
     return {
       text: 'انتهت حصة الباقة الماسية لهذا الشهر. اشترِ شحناً إضافياً من لوحة التحكم أو جدّد الباقة.',
       channel,
@@ -427,7 +427,7 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
   }
 
   try {
-    assertQuotaAvailable({
+    await assertQuotaAvailable({
       subscriberId: canonicalId,
       accountId: profile.accountId || '',
       channel,

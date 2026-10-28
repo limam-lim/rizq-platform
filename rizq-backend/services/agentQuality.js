@@ -155,7 +155,7 @@ function repos() {
   return _repos;
 }
 
-function recordAgentMiss(entry) {
+async function recordAgentMiss(entry) {
   const now = new Date().toISOString();
   const row = {
     id: 'miss_' + Date.now().toString(36) + '_' + crypto.randomBytes(2).toString('hex'),
@@ -171,38 +171,44 @@ function recordAgentMiss(entry) {
     at: now,
   };
   if (!row.text) return null;
-  repos().agentMisses.upsert(row.id, row);
+  await repos().agentMisses.upsert(row.id, row);
   // احتفظ بآخر 500 فقط
-  const all = repos().agentMisses.list();
+  const all = await repos().agentMisses.list();
   if (all.length > 500) {
-    all
+    const doomed = all
+      .slice()
       .sort((a, b) => String(a.at || '').localeCompare(String(b.at || '')))
-      .slice(0, all.length - 500)
-      .forEach((old) => repos().agentMisses.remove(old.id));
+      .slice(0, all.length - 500);
+    for (const old of doomed) {
+      await repos().agentMisses.remove(old.id);
+    }
   }
   return row;
 }
 
-function listAgentMisses(limit) {
+async function listAgentMisses(limit) {
   const n = Math.min(Number(limit) || 100, 300);
-  return repos()
-    .agentMisses.list()
+  const all = await repos().agentMisses.list();
+  return all
     .slice()
     .sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')))
     .slice(0, n);
 }
 
-function clearAgentMisses() {
-  const ids = repos().agentMisses.list().map((r) => r.id);
-  ids.forEach((id) => repos().agentMisses.remove(id));
+async function clearAgentMisses() {
+  const all = await repos().agentMisses.list();
+  const ids = all.map((r) => r.id);
+  for (const id of ids) {
+    await repos().agentMisses.remove(id);
+  }
   return ids.length;
 }
 
-function maybeRecordWeakReply(opts) {
+async function maybeRecordWeakReply(opts) {
   opts = opts || {};
   try {
     const ops = require('./agentOps');
-    if (!ops.isAgentFamilyEnabled('quality')) return null;
+    if (!(await ops.isAgentFamilyEnabled('quality'))) return null;
   } catch (e) { /* */ }
   const reply = String(opts.reply || '');
   const message = String(opts.message || '');

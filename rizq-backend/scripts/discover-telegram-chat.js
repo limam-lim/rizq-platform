@@ -20,7 +20,7 @@ async function main() {
     process.exit(1);
   }
 
-  const persisted = readPersistedAdminChat();
+  const persisted = await readPersistedAdminChat();
   if (persisted) {
     try {
       await telegramApi('getChat', { chat_id: persisted });
@@ -49,7 +49,7 @@ async function main() {
     console.log('  chat_id=' + c.id + '  type=' + c.type + '  name=' + (c.title || '(unknown)'));
     try {
       await telegramApi('getChat', { chat_id: c.id });
-      registerAdminChatId(c.id, { source: 'discover_script', title: c.title });
+      await registerAdminChatId(c.id, { source: 'discover_script', title: c.title });
       console.log('');
       console.log('✅ TELEGRAM_ADMIN_CHAT_ID updated in .env →', c.id);
       process.exit(0);

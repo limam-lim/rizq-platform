@@ -282,7 +282,7 @@ async function mountAccountsManageRoutes(app, deps) {
       let diamondOk = false;
       try {
         const { assertAiAgentAccess } = require('../services/packageAccessGuard');
-        assertAiAgentAccess(acc, { channel: 'dashboard' });
+        await assertAiAgentAccess(acc, { channel: 'dashboard' });
         diamondOk = true;
       } catch (eAi) {
         diamondOk = false;

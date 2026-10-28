@@ -372,7 +372,7 @@ async function generateCreative(input) {
 async function createDraftCampaign(input, adminUser) {
   try {
     const ops = require('./agentOps');
-    if (!ops.isAgentFamilyEnabled('marketing')) {
+    if (!(await ops.isAgentFamilyEnabled('marketing'))) {
       const err = new Error('مدير التسويق موقّف من مركز تسيير الوكلاء');
       err.code = 'disabled';
       throw err;

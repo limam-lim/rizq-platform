@@ -64,11 +64,12 @@ async function main() {
     activatedBy: 'test',
     paymentConfirmed: true,
   });
-  const suspended = updatePackageStatus(id, 'suspended', { reason: 'test', requestedBy: 'admin' });
+  const suspended = await updatePackageStatus(id, 'suspended', { reason: 'test', requestedBy: 'admin' });
   ok('suspend package', suspended.ok && suspended.status === 'suspended');
-  const cancelled = updatePackageStatus(id, 'cancelled', { reason: 'test', requestedBy: 'account' });
+  const cancelled = await updatePackageStatus(id, 'cancelled', { reason: 'test', requestedBy: 'account' });
   ok('cancel package', cancelled.ok && cancelled.status === 'cancelled');
-  ok('record persists', getAccountRecord(id).status === 'cancelled');
+  const persisted = await getAccountRecord(id);
+  ok('record persists', persisted && persisted.status === 'cancelled');
 
   // 5) twilio middleware export
   ok('twilio middleware export', typeof validateTwilioSignature === 'function');

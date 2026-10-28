@@ -45,7 +45,7 @@ async function main() {
     activatedBy: 'admin',
   });
   ok('syncAccountPackage with days only', !!sync.ok);
-  const rec = getAccountRecord(id);
+  const rec = await getAccountRecord(id);
   ok('periodEnd derived from days', !!(rec && rec.periodEnd && new Date(rec.periodEnd) > Date.now()),
     rec && rec.periodEnd);
   ok('period ~30 days', !!(rec && Math.abs(new Date(rec.periodEnd) - Date.now() - 30 * 86400000) < 60000));
@@ -80,7 +80,7 @@ async function main() {
     const accId = 'acc_pay_' + Date.now();
     const accessToken = crypto.randomBytes(20).toString('hex');
     const dashToken = 'TK_' + crypto.randomBytes(8).toString('hex');
-    platformStore.upsertAccount({
+    await platformStore.upsertAccount({
       id: accId,
       type: 'store',
       name: 'Pay Test',

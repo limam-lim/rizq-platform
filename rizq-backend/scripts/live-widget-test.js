@@ -128,17 +128,17 @@ function runFallbackTests(activeAds) {
   return results;
 }
 
-function runModeratorTests() {
+async function runModeratorTests() {
   const results = [];
   const push = (name, pass, detail) => results.push({ name, pass, detail });
 
-  const clean = inspectAdForPublish({ title: 'ثلاجة LG', desc: 'نظيفة', price: '28000', category: 'appliances' });
+  const clean = await inspectAdForPublish({ title: 'ثلاجة LG', desc: 'نظيفة', price: '28000', category: 'appliances' });
   push('moderator clean ad', clean.decision === 'approve' || clean.decision === 'review_human', clean.decision);
 
-  const alcohol = inspectAdForPublish({ title: 'بيع خمر فرنسي', desc: 'زجاجة ويسكي', price: '5000', category: 'other' });
+  const alcohol = await inspectAdForPublish({ title: 'بيع خمر فرنسي', desc: 'زجاجة ويسكي', price: '5000', category: 'other' });
   push('moderator reject alcohol', alcohol.decision === 'reject', alcohol.decision + ' ' + (alcohol.codes && alcohol.codes[0] && alcohol.codes[0].code));
 
-  const fraud = inspectAdForPublish({
+  const fraud = await inspectAdForPublish({
     title: 'فرصة ذهبية',
     desc: 'تحويل مسبق ودفع أولاً قبل الاستلام western union',
     price: '1000',
@@ -146,7 +146,7 @@ function runModeratorTests() {
   });
   push('moderator reject fraud', fraud.decision === 'reject', fraud.decision);
 
-  const url = inspectAdForPublish({ title: 'منتج', desc: 'زور https://spam.com', price: '100', category: 'other' });
+  const url = await inspectAdForPublish({ title: 'منتج', desc: 'زور https://spam.com', price: '100', category: 'other' });
   push('moderator reject external URL', url.decision === 'reject', url.decision);
 
   return results;
@@ -206,7 +206,7 @@ async function main() {
   const sections = [
     ['Deterministic Tools', runToolTests(activeAds)],
     ['Local Fallback (7s path)', runFallbackTests(activeAds)],
-    ['Server Moderator', runModeratorTests()],
+    ['Server Moderator', await runModeratorTests()],
   ];
 
   if (DO_LIVE) {

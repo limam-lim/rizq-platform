@@ -98,7 +98,7 @@ async function main() {
   // verify API rejects duplicate email if we can plant account
   const id = 'acc_exh_' + Date.now();
   const tok = crypto.randomBytes(16).toString('hex');
-  platformStore.upsertAccount({
+  await platformStore.upsertAccount({
     id, type: 'individual', name: 'Exh Seller', status: 'approved',
     accessToken: tok, phone: phone1, email,
   });
@@ -110,13 +110,13 @@ async function main() {
     ok('duplicate seller email → 409', dup.status === 409 || (dup.body && dup.body.code === 'email_in_use'),
       'status=' + dup.status + ' code=' + (dup.body && dup.body.code));
   } finally {
-    try { platformStore.deleteAccount(id); } catch (e) { /* */ }
+    try { await platformStore.deleteAccount(id); } catch (e) { /* */ }
   }
 
   // 5. Agent channel flags without diamond
   const id2 = 'acc_exh2_' + Date.now();
   const tok2 = crypto.randomBytes(16).toString('hex');
-  platformStore.upsertAccount({
+  await platformStore.upsertAccount({
     id: id2, type: 'store', name: 'No Diamond', status: 'approved',
     accessToken: tok2, phone: '44110022', email: 'nodiam_' + Date.now() + '@rizq.test',
   });
@@ -127,7 +127,7 @@ async function main() {
     ok('widget_enabled without diamond → 403', flags.status === 403,
       'status=' + flags.status + ' code=' + (flags.body && flags.body.code));
   } finally {
-    try { platformStore.deleteAccount(id2); } catch (e) { /* */ }
+    try { await platformStore.deleteAccount(id2); } catch (e) { /* */ }
   }
 
   // 6. Ad boost public response redacted

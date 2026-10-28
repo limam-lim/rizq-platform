@@ -61,7 +61,7 @@ async function main() {
   // Seed tender + account for owner access (SQLite)
   const accessToken = crypto.randomBytes(20).toString('hex');
   const accountId = 'acc_tdoc_' + Date.now();
-  platformStore.upsertAccount({
+  await platformStore.upsertAccount({
     id: accountId,
     type: 'store',
     name: 'Doc Test Owner',
@@ -70,7 +70,7 @@ async function main() {
     accessToken,
   });
 
-  const tenders = platformStore.readTenders();
+  const tenders = await platformStore.readTenders();
   tenders.unshift({
     id: tenderId,
     ownerId: accountId,
@@ -89,7 +89,7 @@ async function main() {
     createdAt: new Date().toISOString(),
     bids: [],
   });
-  platformStore.writeTenders(tenders);
+  await platformStore.writeTenders(tenders);
 
   const ownerDoc = await fetch(BASE + '/api/tenders/' + tenderId + '/document', {
     headers: { 'x-account-id': accountId, 'x-account-token': accessToken },
@@ -102,8 +102,8 @@ async function main() {
   ok('pending tender not in public list', !pub);
 
   // Cleanup test tender + account
-  platformStore.writeTenders(platformStore.readTenders().filter((t) => t.id !== tenderId));
-  platformStore.writeAccounts(platformStore.readAccounts().filter((a) => a.id !== accountId));
+  await platformStore.writeTenders((await platformStore.readTenders()).filter((t) => t.id !== tenderId));
+  await platformStore.writeAccounts((await platformStore.readAccounts()).filter((a) => a.id !== accountId));
   if (abs && fs.existsSync(abs)) {
     try { fs.unlinkSync(abs); fs.rmdirSync(path.dirname(abs)); } catch (e) { /* ignore */ }
   }

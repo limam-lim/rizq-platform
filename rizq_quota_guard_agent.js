@@ -19,6 +19,17 @@ function storePath() {
     path.join(__dirname, 'rizq-backend', 'data', 'quota-usage.json');
 }
 
+let _repos = null;
+function getRepos() {
+  if (_repos) return _repos;
+  try {
+    _repos = require('./rizq-backend/db/repos');
+    return _repos;
+  } catch (e) {
+    return null;
+  }
+}
+
 /** أسعار Anthropic التقريبية — للتتبع الداخلي فقط */
 const RATES = {
   sonnet: { in: 3, out: 15, cacheRead: 0.30, cacheWrite: 3.75 },
@@ -57,15 +68,61 @@ function emptyRow(id, meta) {
   };
 }
 
-function _load() {
-  try {
-    return JSON.parse(fs.readFileSync(storePath(), 'utf8'));
-  } catch (e) {
-    return { subscribers: {}, topupRequests: [] };
-  }
+function _emptyStore() {
+  return { subscribers: {}, topupRequests: [] };
 }
 
-function _save(store) {
+function _readLegacyFile() {
+  try {
+    const raw = JSON.parse(fs.readFileSync(storePath(), 'utf8'));
+    if (raw && typeof raw === 'object') return raw;
+  } catch (e) { /* missing file ok */ }
+  return null;
+}
+
+/**
+ * مخزن الحصص في PostgreSQL (documents/quota_usage) — مع ترحيل لمرة واحدة من JSON.
+ * RIZQ_QUOTA_STORE=memory يسمح باختبارات العزل بدون DB.
+ */
+async function _load() {
+  if (process.env.RIZQ_QUOTA_STORE === 'memory' || process.env.RIZQ_QUOTA_MEMORY_ONLY === '1') {
+    if (!global.__rizqQuotaMemory) global.__rizqQuotaMemory = _emptyStore();
+    return global.__rizqQuotaMemory;
+  }
+  const r = getRepos();
+  if (r && r.quotaUsage) {
+    try {
+      let raw = await r.quotaUsage.get('_root');
+      if (!raw || typeof raw !== 'object') {
+        const legacy = _readLegacyFile();
+        raw = legacy || _emptyStore();
+        await r.quotaUsage.upsert('_root', raw);
+        if (legacy) console.log('[quota-guard] migrated quota-usage.json → PostgreSQL');
+      }
+      if (!raw.subscribers) raw.subscribers = {};
+      if (!Array.isArray(raw.topupRequests)) raw.topupRequests = [];
+      return raw;
+    } catch (e) {
+      console.error('[quota-guard] PG load failed, falling back to file:', e.message);
+    }
+  }
+  return _readLegacyFile() || _emptyStore();
+}
+
+async function _save(store) {
+  if (process.env.RIZQ_QUOTA_STORE === 'memory' || process.env.RIZQ_QUOTA_MEMORY_ONLY === '1') {
+    global.__rizqQuotaMemory = store;
+    return;
+  }
+  const r = getRepos();
+  if (r && r.quotaUsage) {
+    try {
+      await r.quotaUsage.upsert('_root', store);
+      return;
+    } catch (e) {
+      console.error('[quota-guard] PG save failed, falling back to file:', e.message);
+    }
+  }
   try {
     const dir = path.dirname(storePath());
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -317,14 +374,14 @@ function quotaError(message, dimension, snap) {
   return err;
 }
 
-function assertQuotaAvailable(opts) {
+async function assertQuotaAvailable(opts) {
   opts = opts || {};
   const subscriberId = String(opts.subscriberId || opts.accountId || '').trim();
   if (!subscriberId) return null;
-  const store = _load();
+  const store = await _load();
   const { row } = getOrCreate(store, subscriberId, opts);
   store.subscribers[row.subscriberId] = row;
-  _save(store);
+  await _save(store);
   const block = quotaBlockedState(row, opts.channel || 'widget', opts);
   if (block.blocked) {
     throw quotaError(block.reason, block.dimension, snapshotOf(row, opts));
@@ -332,8 +389,8 @@ function assertQuotaAvailable(opts) {
   return snapshotOf(row, opts);
 }
 
-function getQuotaBlockReason(subscriberId, accountId, channel) {
-  const snap = getSnapshot(subscriberId, accountId);
+async function getQuotaBlockReason(subscriberId, accountId, channel) {
+  const snap = await getSnapshot(subscriberId, accountId);
   const ch = String(channel || 'widget').toLowerCase();
   if (ch === 'call' && snap.callBlocked) return snap.blockReason;
   if (snap.textBlocked) return snap.blockReason;
@@ -345,9 +402,9 @@ async function recordUsage(opts) {
   const subscriberId = String(opts.subscriberId || opts.accountId || '').trim();
   if (!subscriberId) return null;
 
-  assertQuotaAvailable(opts);
+  await assertQuotaAvailable(opts);
 
-  const store = _load();
+  const store = await _load();
   const { row } = getOrCreate(store, subscriberId, opts);
   const usage = opts.usage || {};
   const msgAdd = opts.messages != null ? Number(opts.messages) : 1;
@@ -363,21 +420,21 @@ async function recordUsage(opts) {
   row.tokensCacheWrite += usage.cache_creation_input_tokens || 0;
   row.costUsd = Math.round(((row.costUsd || 0) + estimateUsd(opts.model, usage)) * 100000) / 100000;
   await maybeAlert(row, opts);
-  _save(store);
+  await _save(store);
   const snap = snapshotOf(row, opts);
   snap.quotaBlocked = quotaBlockedState(row, opts.channel, opts).blocked;
   return snap;
 }
 
-function getSnapshot(subscriberId, accountId, opts) {
-  const store = _load();
+async function getSnapshot(subscriberId, accountId, opts) {
+  const store = await _load();
   const found = findRow(store, subscriberId, accountId);
   if (!found) {
     return snapshotOf(emptyRow(subscriberId || accountId || 'unknown', { accountId: accountId || '' }), opts);
   }
   const row = _ensurePeriod(found.row);
   store.subscribers[found.key] = row;
-  _save(store);
+  await _save(store);
   return snapshotOf(row, opts);
 }
 
@@ -391,18 +448,18 @@ function selectDiamondModel() {
   return getAdvancedModel();
 }
 
-function isQuotaBlocked(subscriberId, accountId, channel, opts) {
-  const store = _load();
+async function isQuotaBlocked(subscriberId, accountId, channel, opts) {
+  const store = await _load();
   const found = findRow(store, subscriberId, accountId);
   if (!found) return false;
   return quotaBlockedState(_ensurePeriod(found.row), channel, opts).blocked;
 }
 
-function requestTopup({ subscriberId, accountId, businessName, phone, type }) {
+async function requestTopup({ subscriberId, accountId, businessName, phone, type }) {
   const topups = getTopupConfig();
   const kind = String(type || 'text').toLowerCase() === 'voice' ? 'voice' : 'text';
   const spec = topups[kind];
-  const store = _load();
+  const store = await _load();
   const key = String(subscriberId || accountId || '').trim();
   if (!key) return { ok: false, error: 'missing_id' };
   const { row } = getOrCreate(store, key, { accountId, businessName, phone });
@@ -425,12 +482,12 @@ function requestTopup({ subscriberId, accountId, businessName, phone, type }) {
   };
   store.topupRequests.unshift(req);
   row.topupRequests = [req].concat(row.topupRequests || []).slice(0, 10);
-  _save(store);
+  await _save(store);
   return { ok: true, request: req, topup: spec, snapshot: snapshotOf(row) };
 }
 
-function resolveTopup(requestId, status) {
-  const store = _load();
+async function resolveTopup(requestId, status) {
+  const store = await _load();
   const req = (store.topupRequests || []).find((a) => a.id === requestId);
   if (!req) return { ok: false, error: 'not_found' };
   if (req.status !== 'pending') return { ok: false, error: 'already_resolved', request: req };
@@ -450,12 +507,12 @@ function resolveTopup(requestId, status) {
     });
     store.subscribers[found.key] = row;
   }
-  _save(store);
+  await _save(store);
   return { ok: true, request: req, snapshot: found ? snapshotOf(found.row) : null };
 }
 
-function listAdminUsage(profiles) {
-  const store = _load();
+async function listAdminUsage(profiles) {
+  const store = await _load();
   const seen = {};
   const rows = [];
   function pushFrom(id, meta) {
@@ -480,6 +537,7 @@ function listAdminUsage(profiles) {
   rows.sort((a, b) => b.pct - a.pct);
   const pending = (store.topupRequests || []).filter((a) => a.status === 'pending');
   const totalCost = rows.reduce((s, r) => s + (r.costUsd || 0), 0);
+  await _save(store);
   return {
     period: currentPeriod(),
     limits: getQuotaConfig(),
@@ -499,10 +557,10 @@ function setupQuotaGuardAPI(app, requireSharedSecret, deps) {
   const getAccountRecord = deps.getAccountRecord || (() => null);
   const loadProfiles = deps.loadProfiles || (() => []);
 
-  function ownerOf(accountId, token) {
-    const acc = verifyAccountOwner(accountId, token);
+  async function ownerOf(accountId, token) {
+    const acc = await verifyAccountOwner(accountId, token);
     if (acc) return acc;
-    const rec = getAccountRecord(accountId);
+    const rec = await getAccountRecord(accountId);
     if (rec && rec.accessToken && token && token === rec.accessToken) {
       return { id: accountId, name: rec.businessName || rec.name || '', phone: rec.phone || '' };
     }
@@ -512,47 +570,47 @@ function setupQuotaGuardAPI(app, requireSharedSecret, deps) {
   app.get('/api/quota/admin', requireSharedSecret, async (req, res) => {
     try {
       const profiles = await loadProfiles();
-      res.json({ ok: true, ...listAdminUsage(profiles) });
+      res.json({ ok: true, ...(await listAdminUsage(profiles)) });
     } catch (err) {
       console.error('[quota/admin]', err.message);
       res.status(500).json({ ok: false, error: 'تعذّر قراءة الاستهلاك' });
     }
   });
 
-  app.post('/api/quota/admin/topups/:id/resolve', requireSharedSecret, (req, res) => {
+  app.post('/api/quota/admin/topups/:id/resolve', requireSharedSecret, async (req, res) => {
     const status = (req.body && req.body.status) || 'approved';
-    const out = resolveTopup(req.params.id, status);
+    const out = await resolveTopup(req.params.id, status);
     if (!out.ok) return res.status(404).json(out);
     res.json(out);
   });
 
-  app.post('/api/quota/admin/addons/:id/resolve', requireSharedSecret, (req, res) => {
-    const out = resolveTopup(req.params.id, (req.body && req.body.status) || 'approved');
+  app.post('/api/quota/admin/addons/:id/resolve', requireSharedSecret, async (req, res) => {
+    const out = await resolveTopup(req.params.id, (req.body && req.body.status) || 'approved');
     if (!out.ok) return res.status(404).json(out);
     res.json(out);
   });
 
-  app.get('/api/quota/mine/:accountId', (req, res) => {
+  app.get('/api/quota/mine/:accountId', async (req, res) => {
     const accountId = req.params.accountId;
     // في الإنتاج: رأس فقط — منع تسريب الرمز عبر Referer/سجلات
     const token = req.header('x-account-token')
       || ((process.env.NODE_ENV !== 'production' && process.env.RIZQ_ENV !== 'production') ? (req.query.token || '') : '');
-    const acc = ownerOf(accountId, token);
+    const acc = await ownerOf(accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
-    const snap = getSnapshot(acc.phone || accountId, accountId);
+    const snap = await getSnapshot(acc.phone || accountId, accountId);
     snap.businessName = snap.businessName || acc.name || '';
     res.json({ ok: true, usage: snap, topups: getTopupConfig() });
   });
 
-  app.post('/api/subscriber/quota/topup', (req, res) => {
+  app.post('/api/subscriber/quota/topup', async (req, res) => {
     const body = req.body || {};
     const accountId = String(body.accountId || '').trim();
     const isProd = process.env.NODE_ENV === 'production' || process.env.RIZQ_ENV === 'production';
     const token = req.header('x-account-token') || (!isProd ? (body.token || '') : '') || '';
-    const acc = ownerOf(accountId, token);
+    const acc = await ownerOf(accountId, token);
     if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
     const type = String(body.type || 'text').toLowerCase() === 'voice' ? 'voice' : 'text';
-    const out = requestTopup({
+    const out = await requestTopup({
       subscriberId: acc.phone || accountId,
       accountId,
       businessName: acc.name || '',
@@ -562,14 +620,14 @@ function setupQuotaGuardAPI(app, requireSharedSecret, deps) {
     res.json(out);
   });
 
-  app.post('/api/quota/mine/:accountId/addon', (req, res) => {
+  app.post('/api/quota/mine/:accountId/addon', async (req, res) => {
     const accountId = req.params.accountId;
     const token = req.header('x-account-token')
       || ((process.env.NODE_ENV !== 'production' && process.env.RIZQ_ENV !== 'production') ? (req.query.token || '') : '');
-    const acc = ownerOf(accountId, token);
+    const acc = await ownerOf(accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
     const type = (req.body && req.body.type) || 'text';
-    const out = requestTopup({
+    const out = await requestTopup({
       subscriberId: acc.phone || accountId,
       accountId,
       businessName: acc.name || '',

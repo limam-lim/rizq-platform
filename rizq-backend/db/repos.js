@@ -190,6 +190,11 @@ const agentOpsSettings = createCollection('agent_ops_settings', {
   onBackup: singletonBackup,
 });
 
+const quotaUsage = createCollection('quota_usage', {
+  backupFile: 'quota-usage.json',
+  onBackup: singletonBackup,
+});
+
 const secretsVault = createCollection('secrets_vault', {
   backupFile: 'secrets-vault.json',
   onBackup: singletonBackup,
@@ -454,6 +459,23 @@ async function migrateAllSecondaryStores() {
   await agentMisses.migrateFromArray(p('agent-misses.json'), 'id');
   await serviceRequests.migrateFromArray(p('service-requests.json'), 'id');
   await agentOpsSettings.migrateSingleton(p('agent-ops-settings.json'), '_root');
+  {
+    const legacyQuota = [
+      p('quota-usage.json'),
+      path.join(__dirname, '..', 'data', 'quota-usage.json'),
+      path.join(__dirname, '..', '..', 'rizq-backend', 'data', 'quota-usage.json'),
+    ];
+    if ((await quotaUsage.count()) === 0) {
+      for (const lp of legacyQuota) {
+        const raw = readLegacyJson(lp, null);
+        if (raw && typeof raw === 'object') {
+          await quotaUsage.migrateSingleton(lp, '_root');
+          console.log('[repos] migrated quota usage from', lp);
+          break;
+        }
+      }
+    }
+  }
   await secretsVault.migrateSingleton(p('secrets-vault.json'), '_root');
   await accountNotifications.migrateFromArray(p('account-notifications.json'), 'id');
   await weeklyOpsReports.migrateFromArray(p('weekly-ops-reports.json'), 'id');
@@ -528,6 +550,7 @@ module.exports = {
   marketingSettings,
   agentMisses,
   agentOpsSettings,
+  quotaUsage,
   secretsVault,
   serviceRequests,
   accountNotifications,
