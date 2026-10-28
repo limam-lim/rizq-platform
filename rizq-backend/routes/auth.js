@@ -24,9 +24,9 @@ router.post('/register', authLimiter, asyncHandler(async (req, res) => {
   const body = req.body || {};
   const email = String(body.email || '').trim().toLowerCase();
   if (!email) return sendError(res, 400, 'البريد الإلكتروني مطلوب', 'EMAIL_REQUIRED');
-  const ver = consumeBuyerVerificationByEmail(email);
+  const ver = await consumeBuyerVerificationByEmail(email);
   if (!ver.ok) return sendError(res, 403, ver.message, ver.error);
-  const result = Buyer.registerOrLogin(body);
+  const result = await Buyer.registerOrLogin(body);
   try { setBuyerSessionCookies(req, res, result.buyer && result.buyer.id, result.token); } catch (eC) { /* ignore */ }
   res.status(result.created ? 201 : 200).json({
     ok: true,
@@ -73,15 +73,15 @@ router.post('/login', authLimiter, asyncHandler(async (req, res) => {
 router.get('/me', asyncHandler(async (req, res) => {
   const { id, token } = extractBuyerCredentials(req);
   if (!id || !token) return sendError(res, 400, 'id و token مطلوبان', 'AUTH_REQUIRED');
-  const row = Buyer.findByIdAndToken(id, token);
+  const row = await Buyer.findByIdAndToken(id, token);
   if (!row) return sendError(res, 401, 'unauthorized', 'UNAUTHORIZED');
   res.json({ ok: true, buyer: Buyer.publicBuyer(row) });
 }));
 
 /** POST /api/auth/logout — إبطال توكن المشتري فوراً */
-router.post('/logout', requireBuyerAuth, (req, res) => {
+router.post('/logout', requireBuyerAuth, async (req, res) => {
   try {
-    if (req.buyer && req.buyer.id) Buyer.invalidateToken(req.buyer.id);
+    if (req.buyer && req.buyer.id) await Buyer.invalidateToken(req.buyer.id);
   } catch (e) { /* ignore */ }
   try { clearBuyerSessionCookies(req, res); } catch (eC) { /* ignore */ }
   res.set('Cache-Control', 'no-store');

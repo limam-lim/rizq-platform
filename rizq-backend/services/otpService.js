@@ -115,12 +115,12 @@ function isDemoOtpAllowed() {
   return !isProduction() && process.env.OTP_ALLOW_DEMO === 'true';
 }
 
-function readStore() {
-  return repos.listOtp();
+async function readStore() {
+  return await repos.listOtp();
 }
 
-function writeStore(list) {
-  repos.replaceOtpStore(Array.isArray(list) ? list : []);
+async function writeStore(list) {
+  await repos.replaceOtpStore(Array.isArray(list) ? list : []);
 }
 
 function normalizePhone(phone) {
@@ -234,7 +234,7 @@ async function sendOtp(phone, opts) {
 
   const code = generateCode();
   const now = Date.now();
-  const list = readStore().filter((x) => x.phone !== ph);
+  const list = (await readStore()).filter((x) => x.phone !== ph);
   list.push({
     phone: ph,
     email: email || '',
@@ -245,7 +245,7 @@ async function sendOtp(phone, opts) {
     verified: false,
     createdAt: new Date(now).toISOString(),
   });
-  writeStore(list);
+  await writeStore(list);
 
   const smsText = `رمز التحقق رزق: ${code}. صالح 5 دقائق.`;
   let sentViaSms = false;
@@ -281,14 +281,14 @@ async function sendOtp(phone, opts) {
   return out;
 }
 
-function verifyOtp(phone, code) {
+async function verifyOtp(phone, code) {
   const ph = normalizePhone(phone);
   const submitted = String(code || '').replace(/\D/g, '');
   if (submitted.length !== 6) {
     return { ok: false, error: 'invalid_code', message: 'رمز غير صحيح' };
   }
 
-  const list = readStore();
+  const list = await readStore();
   const idx = list.findIndex((x) => x.phone === ph);
   if (idx < 0) {
     return { ok: false, error: 'no_otp', message: 'لم يُرسَل رمز — اطلب رمزاً جديداً' };
@@ -297,32 +297,32 @@ function verifyOtp(phone, code) {
   const rec = list[idx];
   if (Date.now() > rec.expiresAt) {
     list.splice(idx, 1);
-    writeStore(list);
+    await writeStore(list);
     return { ok: false, error: 'expired', message: 'انتهت صلاحية الرمز — اطلب رمزاً جديداً' };
   }
 
   rec.attempts = (rec.attempts || 0) + 1;
   if (rec.attempts > MAX_ATTEMPTS) {
     list.splice(idx, 1);
-    writeStore(list);
+    await writeStore(list);
     return { ok: false, error: 'too_many_attempts', message: 'محاولات كثيرة — اطلب رمزاً جديداً' };
   }
 
   if (!codesMatch(submitted, rec)) {
-    writeStore(list);
+    await writeStore(list);
     return { ok: false, error: 'invalid_code', message: 'رمز غير صحيح' };
   }
 
   rec.verified = true;
   rec.verifiedUntil = Date.now() + VERIFY_WINDOW_MS;
   delete rec.code;
-  writeStore(list);
+  await writeStore(list);
   return { ok: true };
 }
 
-function consumeVerification(phone) {
+async function consumeVerification(phone) {
   const ph = normalizePhone(phone);
-  const list = readStore();
+  const list = await readStore();
   const idx = list.findIndex((x) => x.phone === ph && x.verified);
   if (idx < 0) {
     return { ok: false, error: 'otp_required', message: 'يجب التحقق من الهاتف برمز OTP أولاً' };
@@ -330,11 +330,11 @@ function consumeVerification(phone) {
   const rec = list[idx];
   if (Date.now() > (rec.verifiedUntil || rec.expiresAt)) {
     list.splice(idx, 1);
-    writeStore(list);
+    await writeStore(list);
     return { ok: false, error: 'otp_expired', message: 'انتهت صلاحية التحقق — أعد إرسال الرمز' };
   }
   list.splice(idx, 1);
-  writeStore(list);
+  await writeStore(list);
   return { ok: true, email: rec.email || '' };
 }
 
@@ -363,7 +363,7 @@ async function sendBuyerOtp(payload) {
   const code = generateCode();
   const now = Date.now();
   const key = buyerStoreKey(email);
-  const list = readStore().filter((x) => x.key !== key);
+  const list = (await readStore()).filter((x) => x.key !== key);
   list.push({
     key,
     channel: 'buyer',
@@ -378,7 +378,7 @@ async function sendBuyerOtp(payload) {
     verified: false,
     createdAt: new Date(now).toISOString(),
   });
-  writeStore(list);
+  await writeStore(list);
 
   let sentViaSms = false;
   if (isValidMauritanianPhone(mr) && process.env.TWILIO_SID && (process.env.TWILIO_TOKEN || process.env.TWILIO_AUTH_TOKEN) && process.env.RIZQ_TWILIO_NUMBER) {
@@ -408,14 +408,14 @@ async function sendBuyerOtp(payload) {
   return out;
 }
 
-function verifyBuyerOtp(email, code) {
+async function verifyBuyerOtp(email, code) {
   const em = normalizeEmail(email);
   const submitted = String(code || '').replace(/\D/g, '');
   if (!em || submitted.length !== 6) {
     return { ok: false, error: 'invalid_code', message: 'رمز غير صحيح' };
   }
 
-  const list = readStore();
+  const list = await readStore();
   const key = buyerStoreKey(em);
   const idx = list.findIndex((x) => x.key === key);
   if (idx < 0) {
@@ -425,32 +425,32 @@ function verifyBuyerOtp(email, code) {
   const rec = list[idx];
   if (Date.now() > rec.expiresAt) {
     list.splice(idx, 1);
-    writeStore(list);
+    await writeStore(list);
     return { ok: false, error: 'expired', message: 'انتهت صلاحية الرمز — اطلب رمزاً جديداً' };
   }
 
   rec.attempts = (rec.attempts || 0) + 1;
   if (rec.attempts > MAX_ATTEMPTS) {
     list.splice(idx, 1);
-    writeStore(list);
+    await writeStore(list);
     return { ok: false, error: 'too_many_attempts', message: 'محاولات كثيرة — اطلب رمزاً جديداً' };
   }
 
   if (!codesMatch(submitted, rec)) {
-    writeStore(list);
+    await writeStore(list);
     return { ok: false, error: 'invalid_code', message: 'رمز غير صحيح' };
   }
 
   rec.verified = true;
   rec.verifiedUntil = Date.now() + VERIFY_WINDOW_MS;
   delete rec.code;
-  writeStore(list);
+  await writeStore(list);
   return { ok: true };
 }
 
-function consumeBuyerVerificationByEmail(email) {
+async function consumeBuyerVerificationByEmail(email) {
   const em = normalizeEmail(email);
-  const list = readStore();
+  const list = await readStore();
   const key = buyerStoreKey(em);
   const idx = list.findIndex((x) => x.key === key && x.verified);
   if (idx < 0) {
@@ -459,11 +459,11 @@ function consumeBuyerVerificationByEmail(email) {
   const rec = list[idx];
   if (Date.now() > (rec.verifiedUntil || rec.expiresAt)) {
     list.splice(idx, 1);
-    writeStore(list);
+    await writeStore(list);
     return { ok: false, error: 'otp_expired', message: 'انتهت صلاحية التحقق — أعد إرسال الرمز' };
   }
   list.splice(idx, 1);
-  writeStore(list);
+  await writeStore(list);
   return { ok: true, email: em };
 }
 
@@ -494,7 +494,7 @@ async function sendSellerResetOtp(email, opts) {
   const code = generateCode();
   const now = Date.now();
   const key = sellerResetStoreKey(em);
-  const list = readStore().filter((x) => x.key !== key);
+  const list = (await readStore()).filter((x) => x.key !== key);
   list.push({
     key,
     channel: 'seller-reset',
@@ -506,7 +506,7 @@ async function sendSellerResetOtp(email, opts) {
     verified: false,
     createdAt: new Date(now).toISOString(),
   });
-  writeStore(list);
+  await writeStore(list);
 
   const mail = await sendOtpEmail(em, code, name, { purpose: 'reset' });
   const sentViaEmail = !!(mail && mail.ok);
@@ -520,14 +520,14 @@ async function sendSellerResetOtp(email, opts) {
   return out;
 }
 
-function verifySellerResetOtp(email, code) {
+async function verifySellerResetOtp(email, code) {
   const em = normalizeEmail(email);
   const submitted = String(code || '').replace(/\D/g, '');
   if (!em || submitted.length !== 6) {
     return { ok: false, error: 'invalid_code', message: 'رمز غير صحيح' };
   }
 
-  const list = readStore();
+  const list = await readStore();
   const key = sellerResetStoreKey(em);
   const idx = list.findIndex((x) => x.key === key);
   if (idx < 0) {
@@ -537,32 +537,32 @@ function verifySellerResetOtp(email, code) {
   const rec = list[idx];
   if (Date.now() > rec.expiresAt) {
     list.splice(idx, 1);
-    writeStore(list);
+    await writeStore(list);
     return { ok: false, error: 'expired', message: 'انتهت صلاحية الرمز — اطلب رمزاً جديداً' };
   }
 
   rec.attempts = (rec.attempts || 0) + 1;
   if (rec.attempts > MAX_ATTEMPTS) {
     list.splice(idx, 1);
-    writeStore(list);
+    await writeStore(list);
     return { ok: false, error: 'too_many_attempts', message: 'محاولات كثيرة — اطلب رمزاً جديداً' };
   }
 
   if (!codesMatch(submitted, rec)) {
-    writeStore(list);
+    await writeStore(list);
     return { ok: false, error: 'invalid_code', message: 'رمز غير صحيح' };
   }
 
   rec.verified = true;
   rec.verifiedUntil = Date.now() + VERIFY_WINDOW_MS;
   delete rec.code;
-  writeStore(list);
+  await writeStore(list);
   return { ok: true };
 }
 
-function consumeSellerResetVerification(email) {
+async function consumeSellerResetVerification(email) {
   const em = normalizeEmail(email);
-  const list = readStore();
+  const list = await readStore();
   const key = sellerResetStoreKey(em);
   const idx = list.findIndex((x) => x.key === key && x.verified);
   if (idx < 0) {
@@ -571,11 +571,11 @@ function consumeSellerResetVerification(email) {
   const rec = list[idx];
   if (Date.now() > (rec.verifiedUntil || rec.expiresAt)) {
     list.splice(idx, 1);
-    writeStore(list);
+    await writeStore(list);
     return { ok: false, error: 'otp_expired', message: 'انتهت صلاحية التحقق — أعد إرسال الرمز' };
   }
   list.splice(idx, 1);
-  writeStore(list);
+  await writeStore(list);
   return { ok: true, email: em };
 }
 

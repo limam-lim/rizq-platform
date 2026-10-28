@@ -51,12 +51,12 @@ function _memoryOnly() {
 const subscriberProfiles = new Map();
 let _memorySynced = false;
 
-function _syncFromStore() {
+async function _syncFromStore() {
   if (_memoryOnly()) return subscriberProfiles.size;
   const store = getSubscribersRepo();
   if (!store) return 0;
   try {
-    const map = store.asMap();
+    const map = await store.asMap();
     subscriberProfiles.clear();
     Object.keys(map).forEach((id) => {
       if (map[id]) subscriberProfiles.set(id, map[id]);
@@ -64,12 +64,12 @@ function _syncFromStore() {
     _memorySynced = true;
     return subscriberProfiles.size;
   } catch (e) {
-    console.error('⚠️ فشل قراءة مشتركي SQLite:', e.message);
+    console.error('⚠️ فشل قراءة مشتركي PostgreSQL:', e.message);
     return 0;
   }
 }
 
-function _persistToDisk() {
+async function _persistToDisk() {
   if (_memoryOnly()) return;
   const store = getSubscribersRepo();
   if (!store) return;
@@ -79,24 +79,28 @@ function _persistToDisk() {
       entries.push({ id: String(id), data: profile });
     }
     if (typeof store.replaceAll === 'function') {
-      store.replaceAll(entries);
+      await store.replaceAll(entries);
     } else {
-      entries.forEach((e) => store.upsert(e.id, e.data, { skipBackup: true }));
-      if (typeof store.writeBackup === 'function') store.writeBackup();
+      for (const e of entries) {
+        await store.upsert(e.id, e.data, { skipBackup: true });
+      }
+      if (typeof store.writeBackup === 'function') await store.writeBackup();
     }
   } catch (e) {
-    console.error('⚠️ فشل حفظ المشتركين في SQLite:', e.message);
+    console.error('⚠️ فشل حفظ المشتركين في PostgreSQL:', e.message);
   }
 }
 
-function _loadFromDisk() {
-  return _syncFromStore();
+async function _loadFromDisk() {
+  return await _syncFromStore();
 }
 
-// نحمّل أي مشتركين حقيقيين محفوظين مسبقاً فور تحميل الوحدة
-const _loadedFromDisk = _loadFromDisk();
-if (_loadedFromDisk > 0) {
-  console.log(`📂 تم تحميل ${_loadedFromDisk} مشترك حقيقي من SQLite (subscribers)`);
+/** Lazy warm of in-memory cache (call after db.ready) */
+async function ensureSubscribersLoaded() {
+  if (_memoryOnly() || _memorySynced) return subscriberProfiles.size;
+  const n = await _loadFromDisk();
+  if (n > 0) console.log(`📂 تم تحميل ${n} مشترك من PostgreSQL (subscribers)`);
+  return n;
 }
 
 /**
@@ -104,8 +108,8 @@ if (_loadedFromDisk > 0) {
  * @param {string} subscriberId  - معرّف فريد (رقم هاتف Twilio أو ID)
  * @param {object} profile       - بيانات المنشأة
  */
-function registerSubscriber(subscriberId, profile) {
-  _loadFromDisk();
+async function registerSubscriber(subscriberId, profile) {
+  await _loadFromDisk();
   const existing = subscriberProfiles.get(subscriberId) || null;
   subscriberProfiles.set(subscriberId, Object.assign({}, existing || {}, profile, {
     registeredAt: (existing && existing.registeredAt) || new Date().toISOString(),
@@ -113,7 +117,7 @@ function registerSubscriber(subscriberId, profile) {
       ? profile.dynamicKnowledge
       : (existing && existing.dynamicKnowledge) || null,
   }));
-  _persistToDisk();
+  await _persistToDisk();
   console.log(`✅ مشترك جديد: ${profile.businessName} [${subscriberId}]`);
 }
 
@@ -156,10 +160,10 @@ function _profilePhoneKeys(id, profile) {
  * - لا يختار «أول» مشترك أبداً.
  * @returns {{ subscriberId: string, profile: object } | null}
  */
-function resolveSubscriberProfile(rawId) {
+async function resolveSubscriberProfile(rawId) {
   const raw = String(rawId || '').trim();
   if (!raw) return null;
-  _loadFromDisk();
+  await _loadFromDisk();
 
   if (subscriberProfiles.has(raw)) {
     return { subscriberId: raw, profile: subscriberProfiles.get(raw) };
@@ -198,8 +202,8 @@ function resolveSubscriberProfile(rawId) {
  * ملاحظة أمان: للمطابقة عبر ForwardedFrom / واتساب استخدم resolveSubscriberProfile
  * (تطبيع + رفض الغموض). getSubscriberProfile يبقى بحثاً بالمفتاح الحرفي فقط.
  */
-function getSubscriberProfile(subscriberId) {
-  _loadFromDisk();
+async function getSubscriberProfile(subscriberId) {
+  await _loadFromDisk();
   if (!subscriberId) return null;
   return subscriberProfiles.get(subscriberId) || null;
 }
@@ -212,8 +216,8 @@ function getSubscriberProfile(subscriberId) {
  * يملكوه (null) وبالتالي لن يُعتبروا موثّقين فعلياً حتى يُعاد ربطهم من لوحة
  * الأدمن (حقل "الحساب الحقيقي المرتبط" الجديد في تبويب وكلاء الباقة الماسية).
  */
-function getAllSubscriberProfiles() {
-  _loadFromDisk();
+async function getAllSubscriberProfiles() {
+  await _loadFromDisk();
   const out = [];
   for (const [subscriberId, profile] of subscriberProfiles.entries()) {
     out.push({ subscriberId, accountId: (profile && profile.accountId) || null });
@@ -222,9 +226,9 @@ function getAllSubscriberProfiles() {
 }
 
 /** البحث عن مشترك بمعرّف الحساب — للعزل ورفع الملفات من الداشبورد */
-function getSubscriberProfileByAccountId(accountId) {
+async function getSubscriberProfileByAccountId(accountId) {
   if (!accountId) return null;
-  _loadFromDisk();
+  await _loadFromDisk();
   for (const [subscriberId, profile] of subscriberProfiles.entries()) {
     if (profile && profile.accountId === accountId) {
       return { subscriberId, profile };
@@ -236,24 +240,24 @@ function getSubscriberProfileByAccountId(accountId) {
 /**
  * تحديث dynamicKnowledge لمشترك محدد — معزول بـ subscriberId
  */
-function updateDynamicKnowledge(subscriberId, dynamicKnowledge) {
-  _loadFromDisk();
+async function updateDynamicKnowledge(subscriberId, dynamicKnowledge) {
+  await _loadFromDisk();
   const profile = subscriberProfiles.get(subscriberId);
   if (!profile) return false;
   subscriberProfiles.set(subscriberId, Object.assign({}, profile, {
     dynamicKnowledge,
     dynamicKnowledgeUpdatedAt: new Date().toISOString(),
   }));
-  _persistToDisk();
+  await _persistToDisk();
   return true;
 }
 
 /**
  * ربط حساب داشبورد بملف مشترك (هاتف أو accountId) — يُستخدم عند رفع المعرفة
  */
-function resolveSubscriberIdForAccount(acc) {
+async function resolveSubscriberIdForAccount(acc) {
   if (!acc) return null;
-  _loadFromDisk();
+  await _loadFromDisk();
   const byAcc = getSubscriberProfileByAccountId(acc.id);
   if (byAcc) return byAcc.subscriberId;
   const phone = String(acc.phone || acc.whatsapp || '').replace(/\D/g, '');
@@ -272,10 +276,10 @@ function upsertSubscriberInstructionsFromAccount(acc, customInstructions) {
   });
 }
 
-function upsertSubscriberProfileFromAccount(acc, patch) {
+async function upsertSubscriberProfileFromAccount(acc, patch) {
   const subscriberId = resolveSubscriberIdForAccount(acc);
   if (!subscriberId) return { ok: false, error: 'no_subscriber_id' };
-  _loadFromDisk();
+  await _loadFromDisk();
   const existing = subscriberProfiles.get(subscriberId) || {};
   const merged = Object.assign({}, existing, acc, patch || {});
   const personaKey = RizqPrompts.resolveBusinessType(Object.assign({}, merged, {
@@ -595,6 +599,7 @@ function loadDemoSubscribers() { /* mock subscribers removed — register real a
 
 // ── التصدير ─────────────────────────────────────────────────
 module.exports = {
+  ensureSubscribersLoaded,
   registerSubscriber,
   getSubscriberProfile,
   resolveSubscriberProfile,

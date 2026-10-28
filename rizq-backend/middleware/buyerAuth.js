@@ -1,6 +1,7 @@
 /**
  * مصادقة المشتري — Bearer / X-Buyer-Id + X-Buyer-Token / HttpOnly cookies
  * (لا query في الإنتاج)
+ * Buyer model is async (PostgreSQL).
  */
 const Buyer = require('../models/buyer');
 const { sendError } = require('./errors');
@@ -27,18 +28,22 @@ function extractBuyerCredentials(req) {
   return { id, token };
 }
 
-function requireBuyerAuth(req, res, next) {
-  const { id, token } = extractBuyerCredentials(req);
-  if (!id || !token) {
-    return sendError(res, 401, 'مصادقة مطلوبة — id و token', 'AUTH_REQUIRED');
+async function requireBuyerAuth(req, res, next) {
+  try {
+    const { id, token } = extractBuyerCredentials(req);
+    if (!id || !token) {
+      return sendError(res, 401, 'مصادقة مطلوبة — id و token', 'AUTH_REQUIRED');
+    }
+    const row = await Buyer.findByIdAndToken(id, token);
+    if (!row) {
+      return sendError(res, 401, 'جلسة غير صالحة', 'UNAUTHORIZED');
+    }
+    req.buyer = Buyer.publicBuyer(row);
+    req.buyerToken = row.token;
+    next();
+  } catch (err) {
+    next(err);
   }
-  const row = Buyer.findByIdAndToken(id, token);
-  if (!row) {
-    return sendError(res, 401, 'جلسة غير صالحة', 'UNAUTHORIZED');
-  }
-  req.buyer = Buyer.publicBuyer(row);
-  req.buyerToken = row.token;
-  next();
 }
 
 module.exports = { extractBuyerCredentials, requireBuyerAuth };

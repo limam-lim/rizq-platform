@@ -26,25 +26,26 @@ const SECTORS = [
   'commerce', 'services', 'technologie', 'immobilier', 'agriculture', 'industrie', 'energie', 'tourisme', 'education', 'sante', 'autre'
 ];
 
-function readInvestments() {
+async function readInvestments() {
+  const meta = (await repos.investments.get('_meta')) || {};
   return {
-    opportunities: repos.listInvestmentOpportunities(),
-    updatedAt: (repos.investments.get('_meta') || {}).updatedAt || null,
+    opportunities: await repos.listInvestmentOpportunities(),
+    updatedAt: meta.updatedAt || null,
   };
 }
 
-function writeInvestments(store) {
+async function writeInvestments(store) {
   const opps = (store && Array.isArray(store.opportunities)) ? store.opportunities : [];
   const entries = opps.filter((o) => o && o.id).map((o) => ({ id: String(o.id), data: o }));
   entries.push({ id: '_meta', data: { updatedAt: new Date().toISOString() } });
-  repos.investments.replaceAll(entries);
+  await repos.investments.replaceAll(entries);
 }
 
-function readEvents() {
-  return { events: repos.listInvestmentEvents() };
+async function readEvents() {
+  return { events: await repos.listInvestmentEvents() };
 }
 
-function pushEvent(type, meta) {
+async function pushEvent(type, meta) {
   const id = 'iev_' + crypto.randomBytes(6).toString('hex');
   const ev = {
     id,
@@ -52,11 +53,13 @@ function pushEvent(type, meta) {
     meta: meta && typeof meta === 'object' ? meta : {},
     at: new Date().toISOString(),
   };
-  repos.pushInvestmentEvent(ev);
+  await repos.pushInvestmentEvent(ev);
   // احتفظ بحد أقصى ~2000 حدث
-  const all = repos.listInvestmentEvents().sort((a, b) => String(b.at).localeCompare(String(a.at)));
+  const all = (await repos.listInvestmentEvents()).sort((a, b) => String(b.at).localeCompare(String(a.at)));
   if (all.length > 2000) {
-    all.slice(2000).forEach((e) => repos.investmentEvents.remove(String(e.id)));
+    for (const e of all.slice(2000)) {
+      await repos.investmentEvents.remove(String(e.id));
+    }
   }
   return readEvents();
 }
@@ -173,7 +176,7 @@ async function generatePlan(input, anthropicClient) {
     throw err;
   }
 
-  pushEvent('plan_request', {
+  await pushEvent('plan_request', {
     lang,
     sector: payload.sector || null,
     stage: payload.stage || null,
@@ -226,7 +229,7 @@ async function generatePlan(input, anthropicClient) {
     });
   } catch (eQ) { /* optional */ }
 
-  pushEvent('plan_ready', { lang, source });
+  await pushEvent('plan_ready', { lang, source });
   return { plan, source, lang };
 }
 
@@ -261,9 +264,9 @@ function isPublicStatus(status) {
   return status === 'approved' || status === 'published' || status === 'provisionally_approved';
 }
 
-function listPublic(opts) {
+async function listPublic(opts) {
   const unlock = !!(opts && opts.unlockContacts);
-  const store = readInvestments();
+  const store = await readInvestments();
   const list = store.opportunities
     .filter((o) => o && isPublicStatus(o.status))
     .sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')))
@@ -276,10 +279,10 @@ function listPublic(opts) {
  * unlockContacts=false: ملخص عام فقط (بدون وصف كامل ولا تواصل).
  * unlockContacts=true: وصف كامل + تواصل صاحب الفرصة.
  */
-function getPublicById(id, opts) {
+async function getPublicById(id, opts) {
   const unlock = !!(opts && opts.unlockContacts);
   const enterRoom = !!(opts && (opts.enterRoom || unlock));
-  const store = readInvestments();
+  const store = await readInvestments();
   const item = (store.opportunities || []).find((o) => o && o.id === id && isPublicStatus(o.status));
   if (!item) return null;
   const pub = toPublicOpportunity(item, unlock);
@@ -391,11 +394,11 @@ async function submitOpportunity(body) {
     provisionallyApprovedAt: auto ? new Date().toISOString() : null,
   };
 
-  const store = readInvestments();
+  const store = await readInvestments();
   store.opportunities.unshift(item);
   if (store.opportunities.length > 500) store.opportunities = store.opportunities.slice(0, 500);
-  writeInvestments(store);
-  pushEvent('opportunity_submit', {
+  await writeInvestments(store);
+  await pushEvent('opportunity_submit', {
     id: item.id,
     sector: item.sector,
     stage: item.stage,
@@ -406,7 +409,7 @@ async function submitOpportunity(body) {
     hasDocument: !!item.document,
   });
   if (auto) {
-    pushEvent('opportunity_provisional_approve', { id: item.id, tier: TIER.GREEN });
+    await pushEvent('opportunity_provisional_approve', { id: item.id, tier: TIER.GREEN });
   }
 
   const msgAr = auto
@@ -429,8 +432,8 @@ async function submitOpportunity(body) {
 }
 
 /** قرار بشري نهائي — ينقض أو يؤكد الموافقة المبدئية */
-function decideOpportunity(id, action, reviewer) {
-  const store = readInvestments();
+async function decideOpportunity(id, action, reviewer) {
+  const store = await readInvestments();
   const idx = store.opportunities.findIndex((o) => o && o.id === id);
   if (idx === -1) {
     const err = new Error('not_found');
@@ -457,13 +460,13 @@ function decideOpportunity(id, action, reviewer) {
   item.reviewedBy = String(reviewer || 'admin').slice(0, 80);
   item.humanOverride = true;
   store.opportunities[idx] = item;
-  writeInvestments(store);
-  pushEvent('opportunity_decision', { id, action: act, by: item.reviewedBy });
+  await writeInvestments(store);
+  await pushEvent('opportunity_decision', { id, action: act, by: item.reviewedBy });
   return { ok: true, opportunity: toPublicOpportunity(item, true) };
 }
 
-function listAdmin(opts) {
-  const store = readInvestments();
+async function listAdmin(opts) {
+  const store = await readInvestments();
   let list = store.opportunities.slice();
   const status = opts && opts.status;
   if (status) list = list.filter((o) => o && o.status === status);
@@ -489,9 +492,9 @@ function listAdmin(opts) {
   };
 }
 
-function buildDailyDigest() {
-  const store = readInvestments();
-  const events = readEvents().events || [];
+async function buildDailyDigest() {
+  const store = await readInvestments();
+  const events = (await readEvents()).events || [];
   const dayAgo = Date.now() - 24 * 60 * 60 * 1000;
   const recentEvents = events.filter((e) => e && e.at && Date.parse(e.at) >= dayAgo);
   const pending = store.opportunities.filter((o) => o && o.status === 'pending_review');
@@ -585,7 +588,7 @@ async function sendOpsDailyReport() {
       subject: '[Rizq] Investment room daily report — ' + new Date().toISOString().slice(0, 10),
       text: lines.join('\n'),
     });
-    pushEvent('ops_report_sent', { pending: digest.pendingReview, plans: digest.plansRequested });
+    await pushEvent('ops_report_sent', { pending: digest.pendingReview, plans: digest.plansRequested });
     return { ok: true, digest: { plansRequested: digest.plansRequested, opportunitiesSubmitted: digest.opportunitiesSubmitted, pendingReview: digest.pendingReview } };
   } catch (e) {
     console.error('[investments/ops-report]', e.message);
@@ -593,7 +596,7 @@ async function sendOpsDailyReport() {
   }
 }
 
-function startDailyOpsScheduler() {
+async function startDailyOpsScheduler() {
   if (process.env.INVESTMENT_OPS_REPORT !== '1' && process.env.INVESTMENT_OPS_REPORT !== 'true') {
     return { started: false, reason: 'disabled' };
   }

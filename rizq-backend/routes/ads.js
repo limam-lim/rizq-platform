@@ -53,7 +53,7 @@ function parseOptionalCoords(b, opts) {
  * @param {import('express').Application} app
  * @param {object} deps
  */
-function mountAdsRoutes(app, deps) {
+async function mountAdsRoutes(app, deps) {
   const {
     requireAdminAuth,
     requireAdminPermission,
@@ -82,7 +82,7 @@ function mountAdsRoutes(app, deps) {
   const requireAdsAdmin = typeof requireAdminPermission === 'function'
     ? requireAdminPermission('ads')
     : requireAdminAuth;
-  const isAdsAdmin = (req) => (typeof adminHasPermission === 'function'
+  const isAdsAdmin = async (req) => (typeof adminHasPermission === 'function'
     ? adminHasPermission(req, 'ads', 'moderation')
     : isAdminRequest(req));
 
@@ -90,9 +90,9 @@ function mountAdsRoutes(app, deps) {
    * withBoostFlag(ad) — يضيف علم boosted:true/false للإعلان حسب ad_boosts.json
    * (نفس المصدر الذي يقرأه GET /api/discovery/ending-soon).
    */
-  function withBoostFlag(ad) {
+  async function withBoostFlag(ad) {
     try {
-      const boosts = readAdBoosts();
+      const boosts = await readAdBoosts();
       const b = boosts[ad.id];
       const boosted = !!(b && b.endsAt && new Date(b.endsAt).getTime() > Date.now());
       return Object.assign({}, ad, { boosted });
@@ -126,7 +126,7 @@ function mountAdsRoutes(app, deps) {
    * عام — صاحب معرض/محل يرسل طلب نشر فيديو إعلاني عبر Rizq ADS.
    * رفع ملف الفيديو من المستخدم معطّل مؤقتاً (أ4 — قريباً / مسار HLS لاحقاً).
    */
-  app.post('/api/ads/submit', adsSubmitLimiter, (req, res) => {
+  app.post('/api/ads/submit', adsSubmitLimiter, async (req, res) => {
     const b = req.body || {};
     if (b.hasVideoFile || b.videoFileName || b.videoData || b.videoBase64) {
       return res.status(403).json({
@@ -138,7 +138,7 @@ function mountAdsRoutes(app, deps) {
       });
     }
     if (!b.title || !b.phone) return res.status(400).json({ error: 'العنوان ورقم التواصل مطلوبان' });
-    const requests = typeof readAdsRequests === 'function' ? readAdsRequests() : [];
+    const requests = typeof readAdsRequests === 'function' ? await readAdsRequests() : [];
     const id = 'ADREQ-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
     requests.push({
       id,
@@ -151,7 +151,7 @@ function mountAdsRoutes(app, deps) {
       status: 'pending_contact',
       createdAt: new Date().toISOString(),
     });
-    if (typeof writeAdsRequests === 'function') writeAdsRequests(requests);
+    if (typeof writeAdsRequests === 'function') await writeAdsRequests(requests);
     res.json({ ok: true, id });
   });
 
@@ -160,8 +160,8 @@ function mountAdsRoutes(app, deps) {
    * أدمين فقط (سرّ مشترك) — لائحة طلبات نشر فيديو الإعلانات الواردة فعلياً،
    * حتى يكون وعد "سيتواصل معك رزق" قابلاً للتنفيذ حقاً.
    */
-  app.get('/api/ads/requests', requireAdsAdmin, (req, res) => {
-    const list = typeof readAdsRequests === 'function' ? readAdsRequests() : [];
+  app.get('/api/ads/requests', requireAdsAdmin, async (req, res) => {
+    const list = typeof readAdsRequests === 'function' ? await readAdsRequests() : [];
     res.json({ ok: true, requests: list.slice().reverse() });
   });
 
@@ -170,7 +170,7 @@ function mountAdsRoutes(app, deps) {
    */
   app.post('/api/ads', adsPublishLimiter, moderatorAdMiddleware, async (req, res) => {
     try {
-    const pFlags = getPlatformFlags();
+    const pFlags = await getPlatformFlags();
     if (pFlags.platformOpen === false) return res.status(503).json({ error: 'المنصة مغلقة للصيانة حالياً' });
     if (pFlags.adsOpen === false) return res.status(403).json({ error: 'نشر الإعلانات مغلق حالياً' });
     const b = req.body || {};
@@ -180,11 +180,11 @@ function mountAdsRoutes(app, deps) {
       return res.status(401).json({ ok: false, error: 'unauthorized', code: 'account_required', message: 'نشر الإعلان يتطلب حساباً مسجّلاً' });
     }
     const token = extractAccountToken(req) || '';
-    const ownerAcc = verifyAccountOwner(String(b.accountId).slice(0, 60), token);
+    const ownerAcc = (await verifyAccountOwner(String(b.accountId)).slice(0, 60), token);
     if (!ownerAcc) return res.status(401).json({ ok: false, error: 'unauthorized' });
     const acc = ownerAcc;
-    const ent = getEntitlements(b.accountId, acc ? acc.type : 'individual');
-    const activeCount = readAds().filter((a) => a.accountId === b.accountId && a.status !== 'removed').length;
+    const ent = await getEntitlements(b.accountId, acc ? acc.type : 'individual');
+    const activeCount = (await readAds()).filter((a) => a.accountId === b.accountId && a.status !== 'removed').length;
     try {
       assertCanPostAd(ent, activeCount);
       if (Array.isArray(b.images) && b.images.length) assertPhotoCount(ent, b.images.length);
@@ -209,7 +209,7 @@ function mountAdsRoutes(app, deps) {
     if (!coords.ok) {
       return res.status(400).json({ ok: false, error: coords.error, message: coords.message });
     }
-    const list = readAds();
+    const list = await readAds();
     let id = (typeof b.id === 'string' && /^RZQ-\d{4}-\d{4,6}$/.test(b.id)) ? b.id : genAdId();
     while (list.some((a) => a.id === id)) id = genAdId(); // تفادي تصادم نادر في المعرّف
     const paidAcc = !!(acc && ['store', 'office', 'corp', 'estate'].includes(acc.type));
@@ -262,7 +262,7 @@ function mountAdsRoutes(app, deps) {
       updatedAt: new Date().toISOString(),
     };
     list.push(rec);
-    writeAds(list);
+    await writeAds(list);
     const out = { ok: true, id: rec.id, ad: rec };
     if (req.moderatorDecision) out.moderator = req.moderatorDecision;
     res.json(out);
@@ -276,10 +276,10 @@ function mountAdsRoutes(app, deps) {
    * GET /api/ads — تصفح عام (rizq_browse.html / rizq_search.html) — لا
    * يُرجع إلا status==='active' افتراضياً، مع فلاتر بسيطة + ترقيم صفحات.
    */
-  app.get('/api/ads', (req, res) => {
+  app.get('/api/ads', async (req, res) => {
     const q = req.query || {};
-    const viewerId = resolveOptionalAccountViewer(req);
-    let list = readAds().filter((a) => a.status === 'active' && !String(a.accountId || '').startsWith('acc_demo') && !/^RZQ-2026-1000\d$/i.test(String(a.id || '')));
+    const viewerId = await resolveOptionalAccountViewer(req);
+    let list = (await readAds()).filter((a) => a.status === 'active' && !String(a.accountId || '').startsWith('acc_demo') && !/^RZQ-2026-1000\d$/i.test(String(a.id || '')));
     if (q.category) list = list.filter((a) => a.category === q.category);
     if (q.subcat) list = list.filter((a) => a.subcat === q.subcat);
     if (q.brandId) list = list.filter((a) => String(a.brandId || '') === String(q.brandId));
@@ -300,7 +300,7 @@ function mountAdsRoutes(app, deps) {
     list = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     const limit = Math.max(1, Math.min(200, Number(q.limit) || 60));
     const offset = Math.max(0, Number(q.offset) || 0);
-    const accounts = readAccounts();
+    const accounts = await readAccounts();
     const page = list.slice(offset, offset + limit).map((ad) => {
       const seller = accounts.find((a) => a.id === ad.accountId);
       const gate = resolveContactGate(viewerId, ad.accountId, seller && seller.type);
@@ -314,13 +314,13 @@ function mountAdsRoutes(app, deps) {
    * (يستخدمه شريط "تابع التصفح" على الصفحة الرئيسية بدل استدعاء /api/ads/:id
    * مرة لكل إعلان شاهده الزائر). عام، لا يُرجع إلا status==='active'.
    */
-  app.get('/api/ads/batch', (req, res) => {
+  app.get('/api/ads/batch', async (req, res) => {
     const idsParam = String(req.query.ids || '');
     const ids = idsParam.split(',').map((s) => s.trim()).filter(Boolean).slice(0, 30);
     if (!ids.length) return res.json({ ok: true, ads: [] });
-    const viewerId = resolveOptionalAccountViewer(req);
-    const all = readAds();
-    const accounts = readAccounts();
+    const viewerId = await resolveOptionalAccountViewer(req);
+    const all = await readAds();
+    const accounts = await readAccounts();
     const found = ids
       .map((id) => all.find((a) => a.id === id && a.status === 'active'))
       .filter(Boolean)
@@ -333,32 +333,32 @@ function mountAdsRoutes(app, deps) {
   });
 
   /** GET /api/ads/mine — كل إعلانات حساب معيّن (كل الحالات)، لصاحبه فقط */
-  app.get('/api/ads/mine', (req, res) => {
+  app.get('/api/ads/mine', async (req, res) => {
     const accountId = req.query.accountId;
     const token = extractAccountToken(req) || '';
-    const acc = verifyAccountOwner(accountId, token);
+    const acc = await verifyAccountOwner(accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
-    const list = readAds().filter((a) => a.accountId === accountId);
+    const list = (await readAds()).filter((a) => a.accountId === accountId);
     res.json({ ok: true, ads: list });
   });
 
   /** GET /api/ads/admin — لوحة إشراف الأدمن (كل الحالات، كل الإعلانات) */
-  app.get('/api/ads/admin', requireAdsAdmin, (req, res) => {
-    res.json({ ok: true, ads: readAds() });
+  app.get('/api/ads/admin', requireAdsAdmin, async (req, res) => {
+    res.json({ ok: true, ads: await readAds() });
   });
 
   /** GET /api/ads/:id — تفاصيل إعلان واحد (صفحة التصفح rizq_browse.html?id=) */
-  app.get('/api/ads/:id', (req, res) => {
-    const ad = readAds().find((a) => a.id === req.params.id);
+  app.get('/api/ads/:id', async (req, res) => {
+    const ad = (await readAds()).find((a) => a.id === req.params.id);
     if (!ad) return res.status(404).json({ error: 'ad_not_found' });
-    const isAdmin = isAdsAdmin(req);
+    const isAdmin = await isAdsAdmin(req);
     const token = extractAccountToken(req) || '';
-    const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
+    const isOwner = !!(ad.accountId && await verifyAccountOwner(ad.accountId, token));
     if (ad.status !== 'active' && !isAdmin && !isOwner) {
       return res.status(404).json({ error: 'ad_not_found' });
     }
-    const viewerId = resolveOptionalAccountViewer(req);
-    const seller = readAccounts().find((a) => a.id === ad.accountId);
+    const viewerId = await resolveOptionalAccountViewer(req);
+    const seller = (await readAccounts()).find((a) => a.id === ad.accountId);
     const gate = resolveContactGate(viewerId, ad.accountId, seller && seller.type);
     res.json({ ok: true, ad: toPublicAdGated(withBoostFlag(ad), gate, seller), access: gate });
   });
@@ -370,13 +370,13 @@ function mountAdsRoutes(app, deps) {
    */
   app.patch('/api/ads/:id', async (req, res) => {
     try {
-    const list = readAds();
+    const list = await readAds();
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'ad_not_found' });
     const ad = list[idx];
-    const isAdmin = isAdsAdmin(req);
+    const isAdmin = await isAdsAdmin(req);
     const token = req.header('x-account-token') || '';
-    const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
+    const isOwner = !!(ad.accountId && await verifyAccountOwner(ad.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
     const b = req.body || {};
     const editable = ['title', 'desc', 'titleFr', 'descFr', 'price', 'originalPrice', 'subcat', 'wilaya', 'condition', 'brandId', 'brandName', 'brandNameFr', 'modelId', 'modelName', 'modelNameFr'];
@@ -401,11 +401,11 @@ function mountAdsRoutes(app, deps) {
     if (Object.prototype.hasOwnProperty.call(b, 'urgent')) ad.urgent = !!b.urgent;
     if (Array.isArray(b.images)) {
       const ownerAcc = ad.accountId
-        ? (readAccounts().find((a) => a.id === ad.accountId) || null)
+        ? ((await readAccounts()).find((a) => a.id === ad.accountId) || null)
         : null;
       const paidAcc = !!(ownerAcc && ['store', 'office', 'corp', 'estate'].includes(ownerAcc.type));
       const entUp = ad.accountId
-        ? getEntitlements(ad.accountId, ownerAcc ? ownerAcc.type : 'individual')
+        ? await getEntitlements(ad.accountId, ownerAcc ? ownerAcc.type : 'individual')
         : null;
       if (entUp && b.images.length) {
         try { assertPhotoCount(entUp, b.images.length); }
@@ -435,7 +435,7 @@ function mountAdsRoutes(app, deps) {
     }
     ad.updatedAt = new Date().toISOString();
     list[idx] = ad;
-    writeAds(list);
+    await writeAds(list);
     res.json({ ok: true, ad });
     } catch (err) {
       console.error('[ads/patch] image pipeline:', err.message);
@@ -447,18 +447,18 @@ function mountAdsRoutes(app, deps) {
    * DELETE /api/ads/:id — حذف ناعم (status='removed') وليس حذفاً نهائياً،
    * بنفس مبدأ عدم الحذف النهائي المتَّبع في بقية المنصة (المناقصات مثلاً).
    */
-  app.delete('/api/ads/:id', (req, res) => {
-    const list = readAds();
+  app.delete('/api/ads/:id', async (req, res) => {
+    const list = await readAds();
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'ad_not_found' });
     const ad = list[idx];
-    const isAdmin = isAdsAdmin(req);
+    const isAdmin = await isAdsAdmin(req);
     const token = req.header('x-account-token') || '';
-    const isOwner = !!(ad.accountId && verifyAccountOwner(ad.accountId, token));
+    const isOwner = !!(ad.accountId && await verifyAccountOwner(ad.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
     list[idx].status = 'removed';
     list[idx].updatedAt = new Date().toISOString();
-    writeAds(list);
+    await writeAds(list);
     res.json({ ok: true });
   });
 
@@ -466,15 +466,15 @@ function mountAdsRoutes(app, deps) {
    * POST /api/ads/admin/:id/decision — قرار إشراف الأدمن (موافقة/رفض) —
    * يحلّ محل syncRealAdReviewStatus المحلي بالكامل في rizq_admin.html.
    */
-  app.post('/api/ads/admin/:id/decision', requireAdsAdmin, (req, res) => {
+  app.post('/api/ads/admin/:id/decision', requireAdsAdmin, async (req, res) => {
     const action = (req.body || {}).action;
     if (!['approve', 'reject'].includes(action)) return res.status(400).json({ error: "action يجب أن يكون 'approve' أو 'reject'" });
-    const list = readAds();
+    const list = await readAds();
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'ad_not_found' });
     list[idx].status = action === 'approve' ? 'active' : 'rejected';
     list[idx].updatedAt = new Date().toISOString();
-    writeAds(list);
+    await writeAds(list);
     res.json({ ok: true, ad: list[idx] });
   });
 }

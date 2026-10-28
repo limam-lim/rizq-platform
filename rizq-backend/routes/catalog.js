@@ -12,7 +12,7 @@ function genCatalogId() {
  * @param {import('express').Application} app
  * @param {object} deps
  */
-function mountCatalogRoutes(app, deps) {
+async function mountCatalogRoutes(app, deps) {
   const {
     verifyAccountOwner,
     getEntitlements,
@@ -27,7 +27,7 @@ function mountCatalogRoutes(app, deps) {
     adminHasPermission,
   } = deps;
 
-  const isCatalogAdmin = (req) => (typeof adminHasPermission === 'function'
+  const isCatalogAdmin = async (req) => (typeof adminHasPermission === 'function'
     ? adminHasPermission(req, 'moderation', 'ads')
     : isAdminRequest(req));
 
@@ -38,14 +38,14 @@ function mountCatalogRoutes(app, deps) {
     try {
     const b = req.body || {};
     const token = req.header('x-account-token') || '';
-    const acc = verifyAccountOwner(b.accountId, token);
+    const acc = await verifyAccountOwner(b.accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
     if (!(b.name || b.title) || !String(b.name || b.title).trim()) return res.status(400).json({ error: 'الاسم مطلوب' });
     if (!['product', 'service'].includes(b.kind)) return res.status(400).json({ error: "kind يجب أن يكون 'product' أو 'service'" });
     // Normalize title → name for estate / legacy clients
     if (!b.name && b.title) b.name = b.title;
-    const ent = getEntitlements(b.accountId, acc.type);
-    const activeCount = readCatalog().filter((it) => it.accountId === b.accountId && it.status === 'active').length;
+    const ent = await getEntitlements(b.accountId, acc.type);
+    const activeCount = (await readCatalog()).filter((it) => it.accountId === b.accountId && it.status === 'active').length;
     const imageCount = Array.isArray(b.images) ? b.images.length : (b.image ? 1 : 0);
     try {
       assertCanAddCatalogItem(ent, activeCount);
@@ -80,7 +80,7 @@ function mountCatalogRoutes(app, deps) {
       }
     } catch (eMap) { /* merchant activities optional */ }
 
-    const list = readCatalog();
+    const list = await readCatalog();
     const id = genCatalogId();
     // images: مصفوفة (حتى 6) — الحقل الجديد للمعرض. image: الصورة الأولى
     // منها، يبقى محدَّثاً لتوافق أي كود قديم يقرأ item.image فقط. يدعم
@@ -178,7 +178,7 @@ function mountCatalogRoutes(app, deps) {
       updatedAt: new Date().toISOString(),
     };
     list.push(rec);
-    writeCatalog(list);
+    await writeCatalog(list);
     res.json({ ok: true, item: rec });
     } catch (err) {
       console.error('[catalog/post] image pipeline:', err.message);
@@ -187,9 +187,9 @@ function mountCatalogRoutes(app, deps) {
   });
 
   /** GET /api/catalog?accountId=...&kind=...&categoryId=...&subcat=... — عرض عام (active فقط) */
-  app.get('/api/catalog', (req, res) => {
+  app.get('/api/catalog', async (req, res) => {
     const q = req.query || {};
-    let list = readCatalog().filter((it) => it.status === 'active');
+    let list = (await readCatalog()).filter((it) => it.status === 'active');
     if (q.accountId) list = list.filter((it) => it.accountId === q.accountId);
     if (q.kind) list = list.filter((it) => it.kind === q.kind);
     if (q.categoryId || q.category) {
@@ -205,22 +205,22 @@ function mountCatalogRoutes(app, deps) {
   });
 
   /** GET /api/catalog/mine?accountId=... — كل عناصر صاحب الحساب (كل الحالات)، للوحة التحكم */
-  app.get('/api/catalog/mine', (req, res) => {
+  app.get('/api/catalog/mine', async (req, res) => {
     const accountId = req.query.accountId;
     const token = extractAccountToken(req) || '';
-    const acc = verifyAccountOwner(accountId, token);
+    const acc = await verifyAccountOwner(accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
-    const list = readCatalog().filter((it) => it.accountId === accountId && it.status !== 'removed');
+    const list = (await readCatalog()).filter((it) => it.accountId === accountId && it.status !== 'removed');
     res.json({ ok: true, items: list });
   });
 
   /** GET /api/catalog/:id — عام فقط للعناصر النشطة؛ المالك/الأدمن يريان الباقي */
-  app.get('/api/catalog/:id', (req, res) => {
-    const item = readCatalog().find((it) => it.id === req.params.id);
+  app.get('/api/catalog/:id', async (req, res) => {
+    const item = (await readCatalog()).find((it) => it.id === req.params.id);
     if (!item) return res.status(404).json({ error: 'item_not_found' });
-    const isAdmin = isCatalogAdmin(req);
+    const isAdmin = await isCatalogAdmin(req);
     const token = extractAccountToken(req) || '';
-    const isOwner = !!(item.accountId && verifyAccountOwner(item.accountId, token));
+    const isOwner = !!(item.accountId && await verifyAccountOwner(item.accountId, token));
     if (item.status !== 'active' && !isAdmin && !isOwner) {
       return res.status(404).json({ error: 'item_not_found' });
     }
@@ -230,13 +230,13 @@ function mountCatalogRoutes(app, deps) {
   /** PATCH /api/catalog/:id — تعديل من صاحب الحساب أو الأدمن */
   app.patch('/api/catalog/:id', async (req, res) => {
     try {
-    const list = readCatalog();
+    const list = await readCatalog();
     const idx = list.findIndex((it) => it.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'item_not_found' });
     const item = list[idx];
-    const isAdmin = isCatalogAdmin(req);
+    const isAdmin = await isCatalogAdmin(req);
     const token = req.header('x-account-token') || '';
-    const isOwner = !!(item.accountId && verifyAccountOwner(item.accountId, token));
+    const isOwner = !!(item.accountId && await verifyAccountOwner(item.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
     const b = req.body || {};
     const editable = ['name', 'nameFr', 'price', 'cat', 'topicId', 'desc', 'descFr', 'stock', 'variants', 'sku', 'unit', 'emoji', 'brandId', 'brandName', 'brandNameFr', 'modelId', 'modelName', 'modelNameFr', 'duration', 'cover', 'thumb', 'categoryId', 'category', 'categoryKey', 'subCategoryId', 'subcat', 'activityId'];
@@ -276,7 +276,7 @@ function mountCatalogRoutes(app, deps) {
     item.listingSource = 'dashboard_catalog';
     item.storeId = item.storeId || item.accountId;
     if (!item.accountType && isOwner) {
-      const ownerAcc = verifyAccountOwner(item.accountId, token);
+      const ownerAcc = await verifyAccountOwner(item.accountId, token);
       if (ownerAcc && ownerAcc.type) item.accountType = String(ownerAcc.type).slice(0, 24);
     }
     if (b.sizeStock === null) {
@@ -309,7 +309,7 @@ function mountCatalogRoutes(app, deps) {
     }
     item.updatedAt = new Date().toISOString();
     list[idx] = item;
-    writeCatalog(list);
+    await writeCatalog(list);
     res.json({ ok: true, item });
     } catch (err) {
       console.error('[catalog/patch] image pipeline:', err.message);
@@ -318,18 +318,18 @@ function mountCatalogRoutes(app, deps) {
   });
 
   /** DELETE /api/catalog/:id — حذف ناعم (status='removed') */
-  app.delete('/api/catalog/:id', (req, res) => {
-    const list = readCatalog();
+  app.delete('/api/catalog/:id', async (req, res) => {
+    const list = await readCatalog();
     const idx = list.findIndex((it) => it.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'item_not_found' });
     const item = list[idx];
-    const isAdmin = isCatalogAdmin(req);
+    const isAdmin = await isCatalogAdmin(req);
     const token = req.header('x-account-token') || '';
-    const isOwner = !!(item.accountId && verifyAccountOwner(item.accountId, token));
+    const isOwner = !!(item.accountId && await verifyAccountOwner(item.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
     list[idx].status = 'removed';
     list[idx].updatedAt = new Date().toISOString();
-    writeCatalog(list);
+    await writeCatalog(list);
     res.json({ ok: true });
   });
 }

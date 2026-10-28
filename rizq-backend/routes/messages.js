@@ -21,24 +21,24 @@ function threadBelongsToBuyer(threadKey, accountId) {
   return String(threadKey).endsWith('::acc:' + id);
 }
 
-function getGuestSecretRec(threadKey) {
+async function getGuestSecretRec(threadKey) {
   try {
-    return repos.guestThreadSecrets.get(threadKey) || null;
+    return (await repos.guestThreadSecrets.get(threadKey)) || null;
   } catch (e) {
     return null;
   }
 }
 
-function setGuestSecretRec(threadKey, rec) {
+async function setGuestSecretRec(threadKey, rec) {
   try {
-    repos.guestThreadSecrets.upsert(threadKey, rec);
+    await repos.guestThreadSecrets.upsert(threadKey, rec);
   } catch (e) {
     console.warn('[messages] guest secret persist failed:', e.message);
   }
 }
 
-function verifyGuestThreadToken(threadKey, token, phoneDigits) {
-  const rec = getGuestSecretRec(threadKey);
+async function verifyGuestThreadToken(threadKey, token, phoneDigits) {
+  const rec = await getGuestSecretRec(threadKey);
   if (!rec || !token) return false;
   const hash = crypto.createHash('sha256').update(String(token)).digest('hex');
   try {
@@ -57,11 +57,11 @@ function verifyGuestThreadToken(threadKey, token, phoneDigits) {
  * لا يُستبدَل رمز قائم أبداً — يمنع اختطاف المحادثة بمعرفة رقم الهاتف فقط.
  * الإصدار الأول ذرّي (insertIfAbsent) لمنع سباق سرقة الرمز.
  */
-function issueOrReuseGuestThreadToken(threadKey, phoneDigits, presentedToken) {
+async function issueOrReuseGuestThreadToken(threadKey, phoneDigits, presentedToken) {
   const ph = String(phoneDigits || '').replace(/\D/g, '');
-  const existing = getGuestSecretRec(threadKey);
+  const existing = await getGuestSecretRec(threadKey);
   if (existing) {
-    if (presentedToken && verifyGuestThreadToken(threadKey, presentedToken, ph)) {
+    if (presentedToken && await verifyGuestThreadToken(threadKey, presentedToken, ph)) {
       return String(presentedToken);
     }
     return null;
@@ -74,15 +74,15 @@ function issueOrReuseGuestThreadToken(threadKey, phoneDigits, presentedToken) {
     createdAt: Date.now(),
   };
   try {
-    const result = repos.guestThreadSecrets.insertIfAbsent(threadKey, rec);
+    const result = await repos.guestThreadSecrets.insertIfAbsent(threadKey, rec);
     if (result && result.inserted) return token;
   } catch (e) {
     console.warn('[messages] guest secret insertIfAbsent failed:', e.message);
-    setGuestSecretRec(threadKey, rec);
+    await setGuestSecretRec(threadKey, rec);
     return token;
   }
   // خسر السباق — صف موجود؛ لا نُرجع رمزاً جديداً
-  if (presentedToken && verifyGuestThreadToken(threadKey, presentedToken, ph)) {
+  if (presentedToken && await verifyGuestThreadToken(threadKey, presentedToken, ph)) {
     return String(presentedToken);
   }
   return null;
@@ -92,7 +92,7 @@ function issueOrReuseGuestThreadToken(threadKey, phoneDigits, presentedToken) {
  * @param {import('express').Application} app
  * @param {object} deps
  */
-function mountMessagesRoutes(app, deps) {
+async function mountMessagesRoutes(app, deps) {
   const {
     verifyAccountOwner,
     extractAccountToken,
@@ -117,14 +117,14 @@ function mountMessagesRoutes(app, deps) {
    * إن أُرسل buyerAccountId يجب أن يطابق x-account-token حقيقياً (لا يمكن
    * انتحال هوية مشترٍ آخر)؛ وإلا تُعامَل كرسالة زائر (guest) بمفتاح الهاتف.
    */
-  app.post('/api/messages', messagesLimiter, (req, res) => {
+  app.post('/api/messages', messagesLimiter, async (req, res) => {
     const b = req.body || {};
     if (!b.sellerAccountId) return res.status(400).json({ error: 'sellerAccountId مطلوب' });
     if (!b.body || !String(b.body).trim()) return res.status(400).json({ error: 'نص الرسالة مطلوب' });
     let buyerAccountId = null;
     if (b.buyerAccountId) {
       const token = req.header('x-account-token') || '';
-      const buyerAcc = verifyAccountOwner(b.buyerAccountId, token);
+      const buyerAcc = await verifyAccountOwner(b.buyerAccountId, token);
       if (!buyerAcc) return res.status(401).json({ error: 'unauthorized' });
       buyerAccountId = b.buyerAccountId;
     } else if (!b.buyerPhone || !String(b.buyerPhone).trim()) {
@@ -142,9 +142,9 @@ function mountMessagesRoutes(app, deps) {
         || (!isProdEnv() ? req.query.guestThreadToken : '')
         || ''
       ).trim();
-      const existing = getGuestSecretRec(threadKey);
+      const existing = await getGuestSecretRec(threadKey);
       if (existing) {
-        if (!presented || !verifyGuestThreadToken(threadKey, presented, phoneDigits)) {
+        if (!presented || !(await verifyGuestThreadToken(threadKey, presented, phoneDigits))) {
           return res.status(401).json({
             ok: false,
             error: 'guest_thread_token_required',
@@ -153,7 +153,7 @@ function mountMessagesRoutes(app, deps) {
         }
         guestTok = presented;
       } else {
-        guestTok = issueOrReuseGuestThreadToken(threadKey, phoneDigits, presented);
+        guestTok = await issueOrReuseGuestThreadToken(threadKey, phoneDigits, presented);
         if (!guestTok) {
           return res.status(401).json({
             ok: false,
@@ -164,7 +164,7 @@ function mountMessagesRoutes(app, deps) {
       }
     }
 
-    const list = readMessages();
+    const list = await readMessages();
     const rec = {
       id: 'MSG-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
       threadKey,
@@ -180,12 +180,12 @@ function mountMessagesRoutes(app, deps) {
       createdAt: new Date().toISOString(),
     };
     list.push(rec);
-    writeMessages(list);
+    await writeMessages(list);
     const out = { ok: true, threadKey, message: rec };
     if (!buyerAccountId && guestTok) out.guestThreadToken = guestTok;
     res.json(out);
 
-    const sellerAcc = readAccounts().find((a) => a.id === b.sellerAccountId);
+    const sellerAcc = (await readAccounts()).find((a) => a.id === b.sellerAccountId);
     if (sellerAcc && typeof maybeAutoReplyToInquiry === 'function') {
       setImmediate(() => {
         maybeAutoReplyToInquiry({
@@ -203,16 +203,16 @@ function mountMessagesRoutes(app, deps) {
    * POST /api/messages/reply — ردّ البائع (صاحب الحساب فقط، عبر x-account-token)
    * body: { sellerAccountId, threadKey, body }
    */
-  app.post('/api/messages/reply', messagesLimiter, (req, res) => {
+  app.post('/api/messages/reply', messagesLimiter, async (req, res) => {
     const b = req.body || {};
     const token = req.header('x-account-token') || '';
-    const seller = verifyAccountOwner(b.sellerAccountId, token);
+    const seller = await verifyAccountOwner(b.sellerAccountId, token);
     if (!seller) return res.status(401).json({ error: 'unauthorized' });
     if (!b.threadKey || b.threadKey.indexOf(b.sellerAccountId + '::') !== 0) {
       return res.status(400).json({ error: 'threadKey غير صالح' });
     }
     if (!b.body || !String(b.body).trim()) return res.status(400).json({ error: 'نص الرسالة مطلوب' });
-    const list = readMessages();
+    const list = await readMessages();
     const rec = {
       id: 'MSG-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
       threadKey: b.threadKey,
@@ -228,18 +228,18 @@ function mountMessagesRoutes(app, deps) {
       createdAt: new Date().toISOString(),
     };
     list.push(rec);
-    writeMessages(list);
+    await writeMessages(list);
     res.json({ ok: true, message: rec });
   });
 
   /** GET /api/messages/threads?accountId=...&token=... — صندوق وارد البائع: قائمة محادثات مجمّعة */
-  app.get('/api/messages/threads', (req, res) => {
+  app.get('/api/messages/threads', async (req, res) => {
     const accountId = req.query.accountId;
     const token = extractAccountToken(req) || '';
-    const acc = verifyAccountOwner(accountId, token);
+    const acc = await verifyAccountOwner(accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
-    const list = readMessages().filter((m) => m.sellerAccountId === accountId);
-    const accountsById = new Map(readAccounts().map((a) => [a.id, a]));
+    const list = (await readMessages()).filter((m) => m.sellerAccountId === accountId);
+    const accountsById = new Map((await readAccounts()).map((a) => [a.id, a]));
     const byThread = new Map();
     list.forEach((m) => {
       if (!byThread.has(m.threadKey)) byThread.set(m.threadKey, []);
@@ -268,12 +268,12 @@ function mountMessagesRoutes(app, deps) {
   });
 
   /** GET /api/messages/mine — صندوق وارد المشتري (تطابق حساب دقيق فقط — لا prefix) */
-  app.get('/api/messages/mine', (req, res) => {
+  app.get('/api/messages/mine', async (req, res) => {
     const accountId = req.query.accountId;
     const token = extractAccountToken(req) || '';
-    const acc = verifyAccountOwner(accountId, token);
+    const acc = await verifyAccountOwner(accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
-    const list = readMessages().filter((m) =>
+    const list = (await readMessages()).filter((m) =>
       m.buyerAccountId === accountId || threadBelongsToBuyer(m.threadKey, accountId)
     );
     const byThread = new Map();
@@ -291,39 +291,39 @@ function mountMessagesRoutes(app, deps) {
    * GET /api/messages/thread/:threadKey — كل رسائل محادثة واحدة.
    * البائع أو المشتري المسجّل أو الضيف برمز القراءة الصادر.
    */
-  app.get('/api/messages/thread/:threadKey', (req, res) => {
+  app.get('/api/messages/thread/:threadKey', async (req, res) => {
     const threadKey = req.params.threadKey;
     const sellerAccountId = threadKey.split('::')[0];
     const token = extractAccountToken(req) || '';
-    const asSeller = verifyAccountOwner(sellerAccountId, token);
+    const asSeller = await verifyAccountOwner(sellerAccountId, token);
     let asBuyer = null;
     const buyerMatch = /::acc:(.+)$/.exec(threadKey);
-    if (buyerMatch) asBuyer = verifyAccountOwner(buyerMatch[1], token);
+    if (buyerMatch) asBuyer = await verifyAccountOwner(buyerMatch[1], token);
     let asGuest = false;
     const guestMatch = /::guest:(\d+)$/.exec(threadKey);
     if (!asSeller && !asBuyer && guestMatch) {
       const phoneDigits = String(req.header('x-guest-phone') || (!isProdEnv() ? req.query.buyerPhone : '') || '').replace(/\D/g, '');
       const guestTok = String(req.header('x-guest-thread-token') || (!isProdEnv() ? req.query.guestThreadToken : '') || '');
-      if (phoneDigits && phoneDigits === guestMatch[1] && verifyGuestThreadToken(threadKey, guestTok, phoneDigits)) {
+      if (phoneDigits && phoneDigits === guestMatch[1] && await verifyGuestThreadToken(threadKey, guestTok, phoneDigits)) {
         asGuest = true;
       }
     }
     if (!asSeller && !asBuyer && !asGuest) return res.status(401).json({ error: 'unauthorized' });
-    const list = readMessages().filter((m) => m.threadKey === threadKey).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    const list = (await readMessages()).filter((m) => m.threadKey === threadKey).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
     res.json({ ok: true, messages: list });
   });
 
   /** PATCH /api/messages/thread/:threadKey/read — البائع يعلّم المحادثة كمقروءة */
-  app.patch('/api/messages/thread/:threadKey/read', (req, res) => {
+  app.patch('/api/messages/thread/:threadKey/read', async (req, res) => {
     const threadKey = req.params.threadKey;
     const sellerAccountId = threadKey.split('::')[0];
     const token = req.header('x-account-token') || '';
-    const acc = verifyAccountOwner(sellerAccountId, token);
+    const acc = await verifyAccountOwner(sellerAccountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
-    const list = readMessages();
+    const list = await readMessages();
     let changed = 0;
     list.forEach((m) => { if (m.threadKey === threadKey && m.fromRole === 'buyer' && !m.read) { m.read = true; changed++; } });
-    if (changed) writeMessages(list);
+    if (changed) await writeMessages(list);
     res.json({ ok: true, updated: changed });
   });
 }

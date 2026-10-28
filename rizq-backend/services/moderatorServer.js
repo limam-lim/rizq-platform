@@ -5,16 +5,16 @@
 const path = require('path');
 const repos = require('../db/repos');
 
-function readSiteConfig() {
+async function readSiteConfig() {
   try {
-    return repos.getSiteConfig() || {};
+    return await repos.getSiteConfig() || {};
   } catch (e) {
     return {};
   }
 }
 
-function syncModeratorStorage() {
-  const cfg = readSiteConfig();
+async function syncModeratorStorage() {
+  const cfg = await readSiteConfig();
   const store = {
     rizq_moderator_overrides: JSON.stringify(cfg.moderatorConfig || {}),
     rizq_section_rules: JSON.stringify(cfg.sectionRules || {}),
@@ -27,9 +27,9 @@ function syncModeratorStorage() {
 }
 
 let RizqAgent;
-function getAgent() {
+async function getAgent() {
   if (RizqAgent) return RizqAgent;
-  syncModeratorStorage();
+  await syncModeratorStorage();
   global.RizqModerator = require('../../rizq_moderator_config.js');
   RizqAgent = require('../../rizq_moderator_agent.js');
   return RizqAgent;
@@ -39,9 +39,9 @@ function getAgent() {
  * @param {object} adData — حقول الإعلان (title, desc, price, category, images, accountType...)
  * @returns {object} قرار المشرف { decision, message_ar, ... }
  */
-function inspectAdForPublish(adData) {
-  syncModeratorStorage();
-  return getAgent().inspect(adData || {});
+async function inspectAdForPublish(adData) {
+  await syncModeratorStorage();
+  return (await getAgent()).inspect(adData || {});
 }
 
 /**

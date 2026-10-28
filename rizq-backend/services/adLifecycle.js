@@ -65,27 +65,29 @@ function purgeAdMedia(adId, _uploadsDir) {
   return Number(result.bytesFreed) || 0;
 }
 
-function readAuditLog(_dataDir) {
-  return repos.maintenanceAudit.list();
+async function readAuditLog(_dataDir) {
+  return await repos.maintenanceAudit.list();
 }
 
-function appendAuditEntry(_dataDir, entry) {
+async function appendAuditEntry(_dataDir, entry) {
   const id = (entry && entry.id) || ('aud_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8));
   const rec = Object.assign({ id }, entry || {});
-  repos.maintenanceAudit.upsert(id, rec);
-  const all = repos.maintenanceAudit.list();
+  await repos.maintenanceAudit.upsert(id, rec);
+  const all = await repos.maintenanceAudit.list();
   if (all.length > MAX_AUDIT_ENTRIES) {
-    all
+    const excess = all
       .sort((a, b) => String(b.at || b.createdAt || b.runAt || '').localeCompare(String(a.at || a.createdAt || a.runAt || '')))
-      .slice(MAX_AUDIT_ENTRIES)
-      .forEach((e) => repos.maintenanceAudit.remove(String(e.id)));
+      .slice(MAX_AUDIT_ENTRIES);
+    for (const e of excess) {
+      await repos.maintenanceAudit.remove(String(e.id));
+    }
   }
 }
 
 /**
  * Run one maintenance pass.
  */
-function runAdLifecycleMaintenance(deps) {
+async function runAdLifecycleMaintenance(deps) {
   const {
     readAds,
     writeAds,
@@ -130,14 +132,14 @@ function runAdLifecycleMaintenance(deps) {
 
     const account = ad.accountId ? accountById[ad.accountId] : null;
     const pkgRecord = ad.accountId && getAccountRecord ? getAccountRecord(ad.accountId) : null;
-    const protectedGrace = isUnderPaidGrace(nowMs, account, pkgRecord);
+    const protectedGrace = await isUnderPaidGrace(nowMs, account, pkgRecord);
 
     if (ad.status === 'active') {
       if (protectedGrace) {
         summary.skippedPaidGrace++;
         continue;
       }
-      const since = adActiveSinceMs(ad);
+      const since = await adActiveSinceMs(ad);
       if (Number.isNaN(since)) continue;
       if (nowMs - since >= ACTIVE_LIFECYCLE_MS) {
         if (dryRun) {
@@ -159,7 +161,7 @@ function runAdLifecycleMaintenance(deps) {
         summary.skippedPaidGrace++;
         continue;
       }
-      const since = adArchivedSinceMs(ad);
+      const since = await adArchivedSinceMs(ad);
       if (Number.isNaN(since)) {
         if (!dryRun) {
           ad.archivedAt = ad.archivedAt || new Date(nowMs).toISOString();
@@ -173,7 +175,7 @@ function runAdLifecycleMaintenance(deps) {
           summary.wouldPurge++;
         } else {
           try {
-            summary.bytesFreed += purgeAdMedia(ad.id, adsUploadsDir);
+            summary.bytesFreed += await purgeAdMedia(ad.id, adsUploadsDir);
             ad.images = [];
             ad.status = 'removed';
             ad.mediaPurgedAt = new Date(nowMs).toISOString();
@@ -190,7 +192,7 @@ function runAdLifecycleMaintenance(deps) {
   }
 
   if (changed && !dryRun) writeAds(list);
-  appendAuditEntry(dataDir, summary);
+  await appendAuditEntry(dataDir, summary);
   return summary;
 }
 

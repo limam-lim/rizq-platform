@@ -37,8 +37,8 @@ function generatePlainApiKey() {
   return KEY_PREFIX + randomPart;
 }
 
-function isCorpDiamondProEntitled(accountId, accountType) {
-  const ent = getEntitlements(accountId, accountType || 'corp');
+async function isCorpDiamondProEntitled(accountId, accountType) {
+  const ent = await getEntitlements(accountId, accountType || 'corp');
   return ent.accountType === 'corp'
     && hasFeature(ent, 'api_erp_integration')
     && ent.subscriptionStatus !== 'expired'
@@ -47,10 +47,10 @@ function isCorpDiamondProEntitled(accountId, accountType) {
     && ent.subscriptionStatus !== 'no_subscription';
 }
 
-function verifyPlainKey(plainKey) {
+async function verifyPlainKey(plainKey) {
   const prefix = extractKeyPrefix(plainKey);
   if (!prefix) return null;
-  const row = CorpApiIntegration.findByPrefix(prefix);
+  const row = await CorpApiIntegration.findByPrefix(prefix);
   if (!row) return null;
   const expected = hashApiKey(plainKey);
   const a = Buffer.from(expected, 'hex');
@@ -59,13 +59,13 @@ function verifyPlainKey(plainKey) {
   return row;
 }
 
-function ensureApiKeyForCompany(companyId, accountType) {
+async function ensureApiKeyForCompany(companyId, accountType) {
   if (!companyId) return { ok: false, error: 'company_id_required' };
   if (!isCorpDiamondProEntitled(companyId, accountType)) {
     return { ok: false, error: 'not_entitled', code: 'PLAN_REQUIRED' };
   }
 
-  const existing = CorpApiIntegration.findByCompanyId(companyId);
+  const existing = await CorpApiIntegration.findByCompanyId(companyId);
   if (existing && existing.apiStatus === 'active') {
     return {
       ok: true,
@@ -77,7 +77,7 @@ function ensureApiKeyForCompany(companyId, accountType) {
   const plainKey = generatePlainApiKey();
   const prefix = extractKeyPrefix(plainKey);
   const now = new Date().toISOString();
-  const saved = CorpApiIntegration.upsert({
+  const saved = await CorpApiIntegration.upsert({
     companyId,
     apiKeyHash: hashApiKey(plainKey),
     apiKeyPrefix: prefix,
@@ -94,15 +94,15 @@ function ensureApiKeyForCompany(companyId, accountType) {
   };
 }
 
-function regenerateApiKey(companyId, accountType) {
+async function regenerateApiKey(companyId, accountType) {
   if (!isCorpDiamondProEntitled(companyId, accountType)) {
     return { ok: false, error: 'not_entitled', code: 'PLAN_REQUIRED' };
   }
   const plainKey = generatePlainApiKey();
   const prefix = extractKeyPrefix(plainKey);
-  const existing = CorpApiIntegration.findByCompanyId(companyId);
+  const existing = await CorpApiIntegration.findByCompanyId(companyId);
   const now = new Date().toISOString();
-  const saved = CorpApiIntegration.upsert({
+  const saved = await CorpApiIntegration.upsert({
     companyId,
     apiKeyHash: hashApiKey(plainKey),
     apiKeyPrefix: prefix,
@@ -118,10 +118,10 @@ function regenerateApiKey(companyId, accountType) {
   };
 }
 
-function getIntegrationStatus(companyId, accountType, opts) {
+async function getIntegrationStatus(companyId, accountType, opts) {
   opts = opts || {};
   const entitled = isCorpDiamondProEntitled(companyId, accountType);
-  const row = CorpApiIntegration.findByCompanyId(companyId);
+  const row = await CorpApiIntegration.findByCompanyId(companyId);
   if (!row) {
     return {
       ok: true,
@@ -137,32 +137,32 @@ function getIntegrationStatus(companyId, accountType, opts) {
   return { ok: true, entitled, hasKey: true, integration: view };
 }
 
-function suspendApiKey(companyId) {
-  const row = CorpApiIntegration.findByCompanyId(companyId);
+async function suspendApiKey(companyId) {
+  const row = await CorpApiIntegration.findByCompanyId(companyId);
   if (!row) return { ok: true, skipped: true };
-  CorpApiIntegration.updateStatus(companyId, 'suspended');
+  await CorpApiIntegration.updateStatus(companyId, 'suspended');
   return { ok: true, suspended: true };
 }
 
-function activateApiKey(companyId, accountType) {
+async function activateApiKey(companyId, accountType) {
   if (!isCorpDiamondProEntitled(companyId, accountType)) {
-    return suspendApiKey(companyId);
+    return await suspendApiKey(companyId);
   }
-  const row = CorpApiIntegration.findByCompanyId(companyId);
-  if (!row) return ensureApiKeyForCompany(companyId, accountType);
-  CorpApiIntegration.updateStatus(companyId, 'active');
+  const row = await CorpApiIntegration.findByCompanyId(companyId);
+  if (!row) return await ensureApiKeyForCompany(companyId, accountType);
+  await CorpApiIntegration.updateStatus(companyId, 'active');
   return {
     ok: true,
     activated: true,
-    integration: CorpApiIntegration.toPublicView(CorpApiIntegration.findByCompanyId(companyId)),
+    integration: CorpApiIntegration.toPublicView(await CorpApiIntegration.findByCompanyId(companyId)),
   };
 }
 
-function updateAllowedOriginIp(companyId, accountType, ipValue) {
+async function updateAllowedOriginIp(companyId, accountType, ipValue) {
   if (!isCorpDiamondProEntitled(companyId, accountType)) {
     return { ok: false, error: 'not_entitled', code: 'PLAN_REQUIRED' };
   }
-  const row = CorpApiIntegration.findByCompanyId(companyId);
+  const row = await CorpApiIntegration.findByCompanyId(companyId);
   if (!row) return { ok: false, error: 'no_api_key', code: 'NO_KEY' };
 
   let normalized = null;
@@ -175,7 +175,7 @@ function updateAllowedOriginIp(companyId, accountType, ipValue) {
     normalized = parts.join(',');
   }
 
-  const updated = CorpApiIntegration.updateAllowedIp(companyId, normalized);
+  const updated = await CorpApiIntegration.updateAllowedIp(companyId, normalized);
   return {
     ok: true,
     integration: CorpApiIntegration.toPublicView(updated),
@@ -196,7 +196,7 @@ function resolveClientIp(req) {
   return String(ip).replace(/^::ffff:/, '');
 }
 
-function authenticateApiKeyRequest(req) {
+async function authenticateApiKeyRequest(req) {
   const auth = req.header('authorization') || '';
   if (!auth.startsWith('Bearer ')) {
     return { ok: false, status: 401, code: 'AUTH_REQUIRED', error: 'Authorization: Bearer <rizq_live_...> مطلوب' };
@@ -206,7 +206,7 @@ function authenticateApiKeyRequest(req) {
     return { ok: false, status: 401, code: 'INVALID_KEY_FORMAT', error: 'صيغة مفتاح API غير صالحة' };
   }
 
-  const row = verifyPlainKey(plainKey);
+  const row = await verifyPlainKey(plainKey);
   if (!row) {
     return { ok: false, status: 401, code: 'INVALID_KEY', error: 'مفتاح API غير صالح' };
   }
@@ -219,7 +219,7 @@ function authenticateApiKeyRequest(req) {
     return { ok: false, status: 403, code: 'IP_NOT_ALLOWED', error: 'عنوان IP غير مصرح به لهذا المفتاح' };
   }
 
-  CorpApiIntegration.touchLastUsed(row.companyId);
+  await CorpApiIntegration.touchLastUsed(row.companyId);
   return {
     ok: true,
     integration: row,
@@ -228,15 +228,15 @@ function authenticateApiKeyRequest(req) {
   };
 }
 
-function onSubscriptionActivated(accountId, accountType, planType) {
+async function onSubscriptionActivated(accountId, accountType, planType) {
   if (accountType !== 'corp' || planType !== 'corp_diamond_pro') {
-    return suspendApiKey(accountId);
+    return await suspendApiKey(accountId);
   }
-  return ensureApiKeyForCompany(accountId, accountType);
+  return await ensureApiKeyForCompany(accountId, accountType);
 }
 
-function onSubscriptionExpired(accountId) {
-  return suspendApiKey(accountId);
+async function onSubscriptionExpired(accountId) {
+  return await suspendApiKey(accountId);
 }
 
 module.exports = {

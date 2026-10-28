@@ -10,7 +10,7 @@ const rateLimit = require('express-rate-limit');
  * @param {import('express').Application} app
  * @param {object} deps
  */
-function mountInvestmentsRoutes(app, deps) {
+async function mountInvestmentsRoutes(app, deps) {
   const {
     requireAdminAuth,
     requireAdminPermission,
@@ -28,16 +28,16 @@ function mountInvestmentsRoutes(app, deps) {
 
   const INVESTMENT_PACKAGE_NAME = 'باقة الاستثمار';
 
-  function resolveOptionalInvestViewer(req) {
+  async function resolveOptionalInvestViewer(req) {
     if (typeof resolveOptionalAccountViewer === 'function') {
-      return resolveOptionalAccountViewer(req);
+      return await resolveOptionalAccountViewer(req);
     }
     return null;
   }
 
-  function getInvestAccessForViewer(accountId) {
+  async function getInvestAccessForViewer(accountId) {
     if (typeof getInvestmentEntitlements === 'function') {
-      return getInvestmentEntitlements(accountId || null);
+      return await getInvestmentEntitlements(accountId || null);
     }
     return {
       subscribed: false,
@@ -69,10 +69,10 @@ function mountInvestmentsRoutes(app, deps) {
   });
 
   /** POST /api/investments/plan — يتطلب حساباً موثّقاً (منع استنزاف Claude عاماً) */
-  app.post('/api/investments/plan', investmentPlanLimiter, (req, res) => {
+  app.post('/api/investments/plan', investmentPlanLimiter, async (req, res) => {
     const token = (typeof extractAccountToken === 'function' ? extractAccountToken(req) : '') || req.header('x-account-token') || '';
     const accountId = String((req.body && req.body.accountId) || '').slice(0, 60);
-    if (!accountId || !verifyAccountOwner || !verifyAccountOwner(accountId, token)) {
+    if (!accountId || !verifyAccountOwner || !await verifyAccountOwner(accountId, token)) {
       return res.status(401).json({ ok: false, error: 'unauthorized', code: 'auth_required' });
     }
     return (async () => {
@@ -142,7 +142,7 @@ function mountInvestmentsRoutes(app, deps) {
     try {
       const token = (typeof extractAccountToken === 'function' ? extractAccountToken(req) : '') || req.header('x-account-token') || '';
       const accountId = String((req.body && req.body.accountId) || '').slice(0, 60);
-      if (!accountId || !verifyAccountOwner || !verifyAccountOwner(accountId, token)) {
+      if (!accountId || !verifyAccountOwner || !await verifyAccountOwner(accountId, token)) {
         return res.status(401).json({ ok: false, error: 'unauthorized', code: 'auth_required' });
       }
       const body = Object.assign({}, req.body || {}, { accountId, requireHumanReview: true });
@@ -264,9 +264,9 @@ function mountInvestmentsRoutes(app, deps) {
   /**
    * GET /api/investments/package/status/:id — حالة باقة الاستثمار لصاحب الحساب.
    */
-  app.get('/api/investments/package/status/:id', (req, res) => {
+  app.get('/api/investments/package/status/:id', async (req, res) => {
     const token = (typeof extractAccountToken === 'function' ? extractAccountToken(req) : '') || '';
-    const acc = verifyAccountOwner && verifyAccountOwner(req.params.id, token);
+    const acc = verifyAccountOwner && await verifyAccountOwner(req.params.id, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
     const ent = getInvestAccessForViewer(req.params.id);
     const rec = typeof getAccountRecord === 'function'

@@ -11,7 +11,7 @@
  * هذا الملف يحل الفجوة الجذرية: يستقبل نسخة من بيانات الباقة (الهاتف،
  * البريد، تاريخ الانتهاء...) من المتصفح لحظة كل تفعيل (عبر /api/account-
  * package/sync)، يولّد فاتورة حقيقية تصل فعلاً للمشترك (لوحة تحكمه +
- * واتساب + بريد)، ثم يفحص كل الحسابات كل ساعة عبر runLifecycleScan():
+ * واتساب + بريد)، ثم يفحص كل الحسابات كل ساعة عبر await runLifecycleScan():
  *   - تذكير قبل 3 أيام وقبل يوم واحد من الانتهاء (واتساب + بريد)
  *   - عند تجاوز periodEnd: إيقاف فوري (status='expired') + تخفيض صلاحيات
  *     يمكن لأي داشبورد التحقق منه فعلياً بدل الاعتماد على تخزينه المحلي فقط.
@@ -30,10 +30,10 @@ const repos = require('./db/repos');
 const REMINDER_WINDOWS_DAYS = [3, 1]; // نُذكّر عند تبقّي 3 أيام ويوم واحد
 
 // ── تخزين عبر repos (SQLite) — JSON للنسخ الاحتياطي فقط ───────────────
-function _load() {
-  return repos.listPackagesMap();
+async function _load() {
+  return await repos.listPackagesMap();
 }
-function _save(store) {
+async function _save(store) {
   const map = store && typeof store === 'object' ? store : {};
   const invoiceSeq = map.__invoiceSeq || 0;
   const entries = [];
@@ -42,7 +42,7 @@ function _save(store) {
     entries.push({ id: key, data: map[key] });
   });
   entries.push({ id: '__meta', data: { invoiceSeq } });
-  repos.packages.replaceAll(entries);
+  await repos.packages.replaceAll(entries);
 }
 
 function _genToken() { return crypto.randomBytes(20).toString('hex'); }
@@ -176,7 +176,7 @@ async function syncAccountPackage(opts) {
 
   const { mapPackageIdToPlanType, mapPackageNameToPlanType } = require('./services/entitlements');
   const launchMode = require('./config/launchMode');
-  const store = _load();
+  const store = await _load();
   const existing = store[opts.accountId] || {};
   const accessToken = existing.accessToken || _genToken();
   const accountType = opts.accountType || existing.accountType || 'individual';
@@ -274,7 +274,7 @@ async function syncAccountPackage(opts) {
       : (existing.invoices || []),
   };
   store[opts.accountId] = record;
-  _save(store);
+  await _save(store);
 
   try {
     const { onSubscriptionActivated, onSubscriptionExpired } = require('./services/apiIntegration');
@@ -309,12 +309,12 @@ async function syncAccountPackage(opts) {
 }
 
 /** طلب اشتراك جديد — pending حتى تأكيد الدفع من الأدمن */
-function createPendingPackageFromRequest(opts) {
+async function createPendingPackageFromRequest(opts) {
   opts = opts || {};
   if (!opts.accountId || !opts.pkgName) return { ok: false, error: 'accountId + pkgName مطلوبان' };
 
   const { mapPackageIdToPlanType, mapPackageNameToPlanType } = require('./services/entitlements');
-  const store = _load();
+  const store = await _load();
   const existing = store[opts.accountId] || {};
   const endMs = existing.periodEnd ? new Date(existing.periodEnd).getTime() : NaN;
   if (existing.paymentConfirmed && !Number.isNaN(endMs) && endMs > Date.now()
@@ -343,12 +343,12 @@ function createPendingPackageFromRequest(opts) {
     accessToken,
   });
   store[opts.accountId] = record;
-  _save(store);
+  await _save(store);
   return { ok: true, status: 'pending', accessToken: record.accessToken };
 }
 
-function getAccountRecord(accountId) {
-  const store = _load();
+async function getAccountRecord(accountId) {
+  const store = await _load();
   return store[accountId] || null;
 }
 
@@ -356,14 +356,14 @@ function getAccountRecord(accountId) {
  * تحديث حالة اشتراك بأمان (إلغاء / إيقاف / إعادة تفعيل) دون إعادة تفعيل دفع.
  * لا يحذف السجل — يحدّث status + subscriptionStatus فقط.
  */
-function updatePackageStatus(accountId, status, meta) {
+async function updatePackageStatus(accountId, status, meta) {
   meta = meta || {};
   const allowed = ['cancelled', 'suspended', 'active', 'expired', 'pending', 'expiring_soon'];
   const next = String(status || '').toLowerCase();
   if (!accountId || !allowed.includes(next)) {
     return { ok: false, error: 'invalid_status' };
   }
-  const store = _load();
+  const store = await _load();
   const existing = store[accountId];
   if (!existing) return { ok: false, error: 'no_package' };
 
@@ -400,15 +400,15 @@ function updatePackageStatus(accountId, status, meta) {
   }
 
   store[accountId] = patched;
-  _save(store);
+  await _save(store);
   return { ok: true, record: patched, status: next };
 }
 
 // ── يُستخدم فقط من نقطة الملخص اليومي (/api/admin/daily-digest) لعرض
 //    عدد الحسابات التي أوشكت باقتها على الانتهاء أو أُوقِفت فعلاً — لا
 //    تُستخدم في أي مسار عام (لا تُعيد accessToken الحساس، فقط الحالة). ──
-function getAllAccountPackageRecords() {
-  const store = _load();
+async function getAllAccountPackageRecords() {
+  const store = await _load();
   const out = {};
   Object.keys(store).forEach((id) => {
     const { accessToken, ...safe } = store[id] || {};
@@ -426,9 +426,9 @@ function getAllAccountPackageRecords() {
 // عبر علم referralBonusGranted) لأن هذا الملف لا يملك معرفة "من أحال من"،
 // فقط "كيف نمدّد باقة حساب موجود".
 const REFERRAL_BONUS_DAYS = 15;
-function applyReferralBonusDays(referrerAccountId, bonusDays) {
+async function applyReferralBonusDays(referrerAccountId, bonusDays) {
   if (!referrerAccountId) return { ok: false, error: 'no referrer id' };
-  const store = _load();
+  const store = await _load();
   const rec = store[referrerAccountId];
   // لا نمنح مكافأة إن لم يكن للمُحيل أي باقة مفعَّلة من قبل على الإطلاق —
   // لا يوجد "تاريخ انتهاء" منطقي نمدّده فوقه، ولا نريد إنشاء سجل باقة وهمي.
@@ -441,7 +441,7 @@ function applyReferralBonusDays(referrerAccountId, bonusDays) {
   }
   rec.referralBonusDaysTotal = (rec.referralBonusDaysTotal || 0) + days;
   store[referrerAccountId] = rec;
-  _save(store);
+  await _save(store);
   console.log('[RIZQ-REFERRAL] +' + days + ' يوم لحساب ' + referrerAccountId + ' (مكافأة إحالة) → ينتهي الآن ' + rec.periodEnd);
   return { ok: true, newPeriodEnd: rec.periodEnd };
 }
@@ -490,8 +490,8 @@ function isDiamondActive(accountId) {
 //    متصفح الأدمن غير مرئية للخادم إطلاقاً؛ المزامنة تحدث فقط عند تفعيل
 //    باقة، انظر syncAccountPackage). تُستخدَم لبثّ SMS ترويجي يدوي من
 //    الأدمن (broadcastSMS) — ليست قائمة بريدية تلقائية. ──────────────
-function getAllSubscribersWithPhone() {
-  const store = _load();
+async function getAllSubscribersWithPhone() {
+  const store = await _load();
   const out = [];
   for (const accountId of Object.keys(store)) {
     if (accountId === '__invoiceSeq') continue;
@@ -529,7 +529,7 @@ async function broadcastSMS(opts) {
 // ── الفحص الدوري — يُستدعى كل ساعة من server.js عبر setInterval ────────
 async function runLifecycleScan(accountsHelpers) {
   const { buildDowngradePatch } = require('./services/entitlements');
-  const store = _load();
+  const store = await _load();
   const now = Date.now();
   let changed = false;
 
@@ -570,7 +570,7 @@ async function runLifecycleScan(accountsHelpers) {
       const isTenderPkg = String(accountId).includes('::tender');
       if (isVideoPkg) {
         // إيقاف إعلانات الفيديو في الموقع عند انتهاء باقة ADS — لا نلمس accounts.json
-        _deactivateExpiredVideoAds(String(accountId).split('::')[0]);
+        (await _deactivateExpiredVideoAds(String(accountId)).split('::')[0]);
       } else if (!isTenderPkg) {
         _applyServerAccountDowngrade(accountId, rec, accountsHelpers, 'expired');
         try {
@@ -584,7 +584,7 @@ async function runLifecycleScan(accountsHelpers) {
     }
   }
 
-  if (changed) _save(store);
+  if (changed) await _save(store);
   return { ok: true, scannedAt: new Date(now).toISOString() };
 }
 
@@ -608,12 +608,12 @@ function _applyServerAccountDowngrade(accountId, rec, accountsHelpers, subscript
 }
 
 /** عند انتهاء باقة Rizq ADS — إيقاف إعلانات الحساب من hero/popup فوراً */
-function _deactivateExpiredVideoAds(baseAccountId) {
+async function _deactivateExpiredVideoAds(baseAccountId) {
   const id = String(baseAccountId || '').trim();
   if (!id) return;
   try {
     const repos = require('./db/repos');
-    const cfg = repos.getSiteConfig() || {};
+    const cfg = (await repos.getSiteConfig()) || {};
     const videoAds = (cfg.videoAds && typeof cfg.videoAds === 'object') ? Object.assign({}, cfg.videoAds) : null;
     if (!videoAds) return;
     let changed = false;
@@ -628,7 +628,7 @@ function _deactivateExpiredVideoAds(baseAccountId) {
       });
     });
     if (changed) {
-      repos.saveSiteConfig(Object.assign({}, cfg, { videoAds }));
+      await repos.saveSiteConfig(Object.assign({}, cfg, { videoAds }));
       console.log('[lifecycle] deactivated video ads for', id);
     }
   } catch (e) {
@@ -640,7 +640,7 @@ function _deactivateExpiredVideoAds(baseAccountId) {
 // accountsHelpers (اختياري): { readAccounts, writeAccounts } من server.js —
 // مطلوب فقط لتفعيل مكافأة الإحالة (تحتاج قراءة/كتابة accounts.json الذي لا
 // يملكه هذا الملف). إن لم يُمرَّر، تُستثنى منطقة الإحالة بصمت بلا أي كسر.
-function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
+async function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
   // مزامنة تفعيل/تجديد — تُستدعى من rizq_subscription_engine.js (activatePackage)
   // أو من admin.html عند موافقة الأدمن على طلب اشتراك. محمية بسرّ الأدمن
   // (نفس BACKEND_SHARED_SECRET المستخدم لبقية نقاط لوحة الأدمن).
@@ -686,7 +686,7 @@ function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
   // قراءة حالة/فواتير حساب — محمية بـ accessToken
   // للحساب الأساسي (أو توكن سجل الباقة نفسه). يدعم مفاتيح معزولة مثل
   // accountId::video و accountId::tender عبر التحقق من الحساب الأساسي.
-  app.get('/api/account-package/:id', (req, res) => {
+  app.get('/api/account-package/:id', async (req, res) => {
     const token = String(req.header('x-account-token') || '').trim();
     if (!token) return res.status(401).json({ error: 'unauthorized' });
     const { timingSafeEqualStr } = require('./lib/secureCompare');
@@ -718,11 +718,11 @@ function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
     try {
       const { getEntitlements, getMediaEntitlements, getTenderEntitlements } = require('./services/entitlements');
       if (String(req.params.id).includes('::video')) {
-        entitlements = getMediaEntitlements(baseId, rec);
+        entitlements = await getMediaEntitlements(baseId, rec);
       } else if (String(req.params.id).includes('::tender')) {
-        entitlements = getTenderEntitlements(baseId);
+        entitlements = await getTenderEntitlements(baseId);
       } else {
-        entitlements = getEntitlements(req.params.id, rec.accountType, rec);
+        entitlements = await getEntitlements(req.params.id, rec.accountType, rec);
       }
     } catch (e) { /* optional */ }
     res.json({ ok: true, account: safe, entitlements });

@@ -22,7 +22,7 @@ function adActiveSinceMs(ad) {
   return new Date(raw).getTime();
 }
 
-function pushNotification(accountId, note) {
+async function pushNotification(accountId, note) {
   if (!accountId) return null;
   const id = 'ntf_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
   const rec = Object.assign({
@@ -31,7 +31,7 @@ function pushNotification(accountId, note) {
     at: new Date().toISOString(),
     read: false,
   }, note || {});
-  repos.accountNotifications.upsert(id, rec);
+  await repos.accountNotifications.upsert(id, rec);
   return rec;
 }
 
@@ -135,7 +135,7 @@ async function runRenewalReminders(deps) {
       continue;
     }
     // ب1 — الاثنان معاً: إشعار داخل الحساب + بريد إلكتروني
-    const note = pushNotification(ad.accountId, {
+    const note = await pushNotification(ad.accountId, {
       type: 'ad_renewal_reminder',
       title,
       body,
@@ -275,7 +275,7 @@ async function runCleanups(deps) {
         continue;
       }
       acc.unverifiedWarnAt = new Date(nowMs).toISOString();
-      pushNotification(acc.id, {
+      await pushNotification(acc.id, {
         type: 'unverified_warning',
         title: 'تحذير: حساب بلا تحقق',
         body: 'لم يُستكمل التحقق من حسابك منذ أكثر من 90 يوماً. أكمل التحقق خلال 7 أيام وإلا سيُحذف الحساب.',
@@ -323,7 +323,7 @@ async function runCleanups(deps) {
 /**
  * ب4 — تقرير أسبوعي للسوبر أدمن
  */
-function buildWeeklyReport(parts) {
+async function buildWeeklyReport(parts) {
   const {
     lifecycle = {}, reminders = {}, cleanups = {}, nowMs = Date.now(),
   } = parts;
@@ -394,7 +394,7 @@ function buildWeeklyReport(parts) {
       node: process.version,
     },
   };
-  repos.weeklyOpsReports.upsert(report.id, report);
+  await repos.weeklyOpsReports.upsert(report.id, report);
   return report;
 }
 
@@ -430,7 +430,7 @@ async function runOpsHousekeepingPass(deps) {
   const forceWeekly = deps.forceWeekly === true;
   // أسبوعي صراحة فقط — ليس حسب يوم الأسبوع داخل الـ cron اليومي
   if (forceWeekly || trigger === 'weekly') {
-    weekly = buildWeeklyReport({ lifecycle, reminders, cleanups, nowMs });
+    weekly = await buildWeeklyReport({ lifecycle, reminders, cleanups, nowMs });
     const adminEmail = process.env.SUPER_ADMIN_EMAIL || process.env.OPS_REPORT_EMAIL;
     if (adminEmail && !launchMode.isMaintenanceDryRun()) {
       await sendEmailSafe(
@@ -447,16 +447,16 @@ async function runOpsHousekeepingPass(deps) {
   };
 }
 
-function listAccountNotifications(accountId, limit) {
-  const all = repos.accountNotifications.list() || [];
+async function listAccountNotifications(accountId, limit) {
+  const all = await repos.accountNotifications.list() || [];
   return all
     .filter((n) => n && n.accountId === String(accountId))
     .sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')))
     .slice(0, limit || 50);
 }
 
-function listWeeklyReports(limit) {
-  return (repos.weeklyOpsReports.list() || [])
+async function listWeeklyReports(limit) {
+  return (await repos.weeklyOpsReports.list() || [])
     .sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')))
     .slice(0, limit || 12);
 }

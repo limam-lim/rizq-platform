@@ -11,7 +11,7 @@ const rateLimit = require('express-rate-limit');
  * @param {import('express').Application} app
  * @param {object} deps
  */
-function mountAdminCoreRoutes(app, deps) {
+async function mountAdminCoreRoutes(app, deps) {
   const {
     requireAdminSession,
     requireAdminAuth,
@@ -32,19 +32,19 @@ function mountAdminCoreRoutes(app, deps) {
     backendRootDir,
   } = deps;
 
-  function cleanExpiredAdminSessions() {
+  async function cleanExpiredAdminSessions() {
     const now = Date.now();
-    for (const [tok, sess] of adminSessions) if (sess.expiresAt < now) adminSessions.delete(tok);
+    for (const [tok, sess] of await adminSessions.entries()) if (sess.expiresAt < now) await adminSessions.delete(tok);
   }
 
   /** إبطال كل جلسات عضو عند تغيير صلاحياته / كلمة السر / التعطيل */
-  function invalidateAdminSessionsForUser(user) {
+  async function invalidateAdminSessionsForUser(user) {
     const u = String(user || '').trim().toLowerCase();
     if (!u) return 0;
     let n = 0;
-    for (const [tok, sess] of adminSessions) {
+    for (const [tok, sess] of await adminSessions.entries()) {
       if (sess && String(sess.user || '').toLowerCase() === u) {
-        adminSessions.delete(tok);
+        await adminSessions.delete(tok);
         n += 1;
       }
     }
@@ -60,7 +60,7 @@ function mountAdminCoreRoutes(app, deps) {
   });
 
   app.post('/api/admin/login', adminLoginLimiter, async (req, res) => {
-    cleanExpiredAdminSessions();
+    await cleanExpiredAdminSessions();
     const { user, pass } = req.body || {};
     const u = String(user || '').trim().slice(0, 80);
     const p = String(pass || '').slice(0, 200);
@@ -75,10 +75,10 @@ function mountAdminCoreRoutes(app, deps) {
       acc = null;
     }
     if (!acc) return res.status(401).json({ error: '❌ بيانات غير صحيحة' });
-    adminTeamService.touchLogin(acc.user);
+    await adminTeamService.touchLogin(acc.user);
     const token = crypto.randomBytes(32).toString('hex');
     const permissions = adminTeamService.normalizePermissions(acc.permissions);
-    adminSessions.set(token, {
+    await adminSessions.set(token, {
       user: acc.user,
       name: acc.name,
       role: acc.legacyRole || 'staff',
@@ -118,8 +118,8 @@ function mountAdminCoreRoutes(app, deps) {
   });
 
   /** GET /api/admin/team — فريق الإدارة (يتطلب team.manage أو *) */
-  app.get('/api/admin/team', requireAdminPermission('team.manage'), (req, res) => {
-    res.json({ ok: true, team: adminTeamService.listTeamPublic(), max: adminTeamService.MAX_TEAM_MEMBERS });
+  app.get('/api/admin/team', requireAdminPermission('team.manage'), async (req, res) => {
+    res.json({ ok: true, team: await adminTeamService.listTeamPublic(), max: adminTeamService.MAX_TEAM_MEMBERS });
   });
 
   /** POST /api/admin/team — إضافة عضو */
@@ -150,7 +150,7 @@ function mountAdminCoreRoutes(app, deps) {
       const member = await adminTeamService.updateMember(req.params.id, req.body || {}, actorPerms);
       if (!member) return res.status(404).json({ error: 'member_not_found' });
       if (member._invalidateSessions) {
-        invalidateAdminSessionsForUser(member._invalidateUser || member.user);
+        await invalidateAdminSessionsForUser(member._invalidateUser || member.user);
         delete member._invalidateSessions;
         delete member._invalidateUser;
       }
@@ -168,14 +168,14 @@ function mountAdminCoreRoutes(app, deps) {
   /** DELETE /api/admin/team/:id — تعطيل عضو */
   app.delete('/api/admin/team/:id', requireAdminPermission('team.manage'), async (req, res) => {
     const selfId = req.adminUser && req.adminUser.user;
-    const target = adminTeamService.getMemberById(req.params.id);
+    const target = await adminTeamService.getMemberById(req.params.id);
     if (!target) return res.status(404).json({ error: 'member_not_found' });
     if (target.user === selfId) return res.status(400).json({ error: 'cannot_deactivate_self' });
-    if ((target.permissions || []).includes('*') && adminTeamService.readTeam().filter((m) => m.active !== false && (m.permissions || []).includes('*')).length <= 1) {
+    if ((target.permissions || []).includes('*') && (await adminTeamService.readTeam()).filter((m) => m.active !== false && (m.permissions || []).includes('*')).length <= 1) {
       return res.status(400).json({ error: 'last_super_admin', msg: 'لا يمكن تعطيل آخر Super Admin' });
     }
     const member = await adminTeamService.deactivateMember(req.params.id);
-    invalidateAdminSessionsForUser(target.user);
+    await invalidateAdminSessionsForUser(target.user);
     if (member) {
       delete member._invalidateSessions;
       delete member._invalidateUser;
@@ -195,9 +195,9 @@ function mountAdminCoreRoutes(app, deps) {
       // بعد تغيير كلمة السر: أبطل كل الجلسات الأخرى وأبقِ الجلسة الحالية فقط
       const keep = req.header('x-admin-token');
       const u = req.adminUser && req.adminUser.user;
-      for (const [tok, sess] of adminSessions) {
+      for (const [tok, sess] of await adminSessions.entries()) {
         if (sess && String(sess.user || '').toLowerCase() === String(u || '').toLowerCase() && tok !== keep) {
-          adminSessions.delete(tok);
+          await adminSessions.delete(tok);
         }
       }
       res.set('Cache-Control', 'no-store');
@@ -222,9 +222,9 @@ function mountAdminCoreRoutes(app, deps) {
     }
   });
 
-  app.post('/api/admin/logout', (req, res) => {
+  app.post('/api/admin/logout', async (req, res) => {
     const token = req.header('x-admin-token');
-    if (token) adminSessions.delete(token);
+    if (token) await adminSessions.delete(token);
     res.json({ ok: true });
   });
 
@@ -233,16 +233,16 @@ function mountAdminCoreRoutes(app, deps) {
   // حقيقية حتى تنطلق المنصة فعلياً على استضافة حقيقية وتستقبل مستخدمين —
   // قبل ذلك سيعيد دائماً أصفاراً لأن data/ فارغة. لا يغيّر أي بيانات، قراءة
   // فقط، ومحمي بنفس BACKEND_SHARED_SECRET العام لبقية نقاط لوحة الأدمن.
-  app.get('/api/admin/daily-digest', requireAdminPermission('overview'), (req, res) => {
+  app.get('/api/admin/daily-digest', requireAdminPermission('overview'), async (req, res) => {
     try {
-      const pendingAccounts = readAccounts().filter((a) => a.status === 'pending');
-      const pendingAds = readAds().filter((a) => a.status === 'pending');
-      const pendingSubRequests = readSubRequests().filter((r) => r.status === 'pending');
-      const pendingBizContacts = (typeof readAdsRequests === 'function' ? readAdsRequests() : [])
+      const pendingAccounts = (await readAccounts()).filter((a) => a.status === 'pending');
+      const pendingAds = (await readAds()).filter((a) => a.status === 'pending');
+      const pendingSubRequests = (await readSubRequests()).filter((r) => r.status === 'pending');
+      const pendingBizContacts = (typeof readAdsRequests === 'function' ? await readAdsRequests() : [])
         .filter((r) => r.status === 'pending_contact');
-      const pendingTenders = readTenders().filter((t) => t.status === 'pending_review');
+      const pendingTenders = (await readTenders()).filter((t) => t.status === 'pending_review');
 
-      const pkgRecords = getAllAccountPackageRecords();
+      const pkgRecords = await getAllAccountPackageRecords();
       const expiringSoon = [];
       const suspended = [];
       Object.keys(pkgRecords).forEach((accountId) => {

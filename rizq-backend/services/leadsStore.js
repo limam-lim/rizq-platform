@@ -8,11 +8,11 @@ const { nowIsoWithLocal } = require('./localTime');
 const { formatPendingLeadsList, timestampLine } = require('./telegramNotifyFormat');
 const repos = require('../db/repos');
 
-function readLeads() {
-  return repos.leads.list();
+async function readLeads() {
+  return await repos.leads.list();
 }
 
-function saveLead({
+async function saveLead({
   businessName,
   whatsapp,
   package: pkg,
@@ -47,31 +47,30 @@ function saveLead({
     telegramSent: false,
     telegramMessageId: null,
   };
-  repos.leads.upsert(id, rec);
+  await repos.leads.upsert(id, rec);
   console.log('[leads-store] saved', rec.id, rec.businessName, rec.whatsapp, '@', rec.createdAtLocal);
   return rec;
 }
 
-function patchLead(id, patch) {
-  const cur = repos.leads.get(String(id));
+async function patchLead(id, patch) {
+  const cur = await repos.leads.get(String(id));
   if (!cur) return null;
   const ts = nowIsoWithLocal();
   const next = Object.assign({}, cur, patch, { updatedAt: ts.iso, updatedAtLocal: ts.local });
-  repos.leads.upsert(String(id), next);
+  await repos.leads.upsert(String(id), next);
   return next;
 }
 
-function getPendingLeads() {
-  return readLeads()
-    .filter((l) => l.status === 'pending')
+async function getPendingLeads() {
+  return (await readLeads()).filter((l) => l.status === 'pending')
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
 
-function getLeadById(id) {
-  return repos.leads.get(String(id)) || null;
+async function getLeadById(id) {
+  return (await repos.leads.get(String(id))) || null;
 }
 
-function updateLeadStatus(id, status, adminNote) {
+async function updateLeadStatus(id, status, adminNote) {
   const allowed = ['pending', 'contacted', 'activated', 'rejected', 'closed'];
   if (!allowed.includes(status)) return null;
   return patchLead(id, {
@@ -80,11 +79,11 @@ function updateLeadStatus(id, status, adminNote) {
   });
 }
 
-function findRecentDuplicate(whatsapp, withinMs) {
+async function findRecentDuplicate(whatsapp, withinMs) {
   const norm = String(whatsapp || '').replace(/\D/g, '');
   if (!norm) return null;
   const since = Date.now() - (withinMs || 3600000);
-  return readLeads().find((l) => {
+  return (await readLeads()).find((l) => {
     if (l.status !== 'pending') return false;
     const w = String(l.whatsapp || '').replace(/\D/g, '');
     if (w !== norm) return false;
@@ -92,8 +91,8 @@ function findRecentDuplicate(whatsapp, withinMs) {
   }) || null;
 }
 
-function formatPendingLeadsForAdmin(leads) {
-  const pending = leads || getPendingLeads();
+async function formatPendingLeadsForAdmin(leads) {
+  const pending = leads || await getPendingLeads();
   return formatPendingLeadsList(pending, function (l) {
     return timestampLine(l);
   });
