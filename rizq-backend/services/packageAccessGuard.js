@@ -14,11 +14,11 @@ const {
   getQuotaBlockReason,
 } = require('../../rizq_quota_guard_agent');
 
-function getAccountEntitlements(acc) {
+async function getAccountEntitlements(acc) {
   if (!acc || !acc.id) {
-    return getEntitlements('', acc && acc.type ? acc.type : 'individual');
+    return await getEntitlements('', acc && acc.type ? acc.type : 'individual');
   }
-  return getEntitlements(acc.id, acc.type || 'individual');
+  return await getEntitlements(acc.id, acc.type || 'individual');
 }
 
 function assertAccountFeature(acc, featureName) {

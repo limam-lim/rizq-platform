@@ -78,10 +78,26 @@ async function fetchRateForCode(code) {
   }
 }
 
+function inferCurrencyCode(it) {
+  if (!it || typeof it !== 'object') return '';
+  if (it.code) return String(it.code).toUpperCase().slice(0, 6);
+  const unit = String(it.unit || '');
+  const fromUnit = unit.match(/\b([A-Z]{3})\b/);
+  if (fromUnit) return fromUnit[1];
+  const nameHint = String(it.name_fr || it.name || '');
+  const hit = DEFAULT_CURRENCIES.find((d) =>
+    (d.name && d.name === it.name) || (d.name_fr && d.name_fr === it.name_fr) || (d.name_fr && nameHint && d.name_fr === nameHint)
+  );
+  return hit ? hit.code : '';
+}
+
 function mergeCurrencyConfig(existingList) {
   const byCode = {};
   (Array.isArray(existingList) ? existingList : []).forEach((it) => {
-    if (it && it.code) byCode[String(it.code).toUpperCase()] = it;
+    if (!it) return;
+    const code = inferCurrencyCode(it);
+    if (!code) return;
+    byCode[code] = Object.assign({}, it, { code });
   });
   return DEFAULT_CURRENCIES.map((def) => {
     const prev = byCode[def.code] || {};
@@ -89,8 +105,14 @@ function mergeCurrencyConfig(existingList) {
   });
 }
 
+/** Ensure every currency row carries a stable ISO code (repairs legacy rows). */
+function ensureCurrencyCodes(list) {
+  const merged = mergeCurrencyConfig(list);
+  return sanitizeCurrencyList(merged.length ? merged : list);
+}
+
 function sanitizeCurrencyItem(it) {
-  const code = String(it.code || '').toUpperCase().slice(0, 6);
+  const code = String((it && it.code) || inferCurrencyCode(it) || '').toUpperCase().slice(0, 6);
   if (!code) return null;
   const divisor = Math.max(1, Math.min(10000, Number(it.divisor) || 1));
   const adjustPct = Math.max(-50, Math.min(50, Number(it.adjustPct) || 0));
@@ -189,10 +211,12 @@ function currencyToPriceBoardItem(it) {
 module.exports = {
   DEFAULT_CURRENCIES,
   mergeCurrencyConfig,
+  ensureCurrencyCodes,
   sanitizeCurrencyList,
   sanitizeCurrencyItem,
   refreshCurrencyRates,
   currencyToPriceBoardItem,
   displayPrice,
   buildUnit,
+  inferCurrencyCode,
 };

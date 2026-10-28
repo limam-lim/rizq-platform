@@ -1,117 +1,102 @@
 /**
- * rizq-backend/db — SQLite (ملف واحد في data/rizq.db)
- * يستخدم node:sqlite المدمج في Node 22+ — بدون تبعيات native
+ * rizq-backend/db — PostgreSQL (async) entry.
+ * isPostgres=true always for this code path. Migrations via npm run migrate
+ * (or RUN_MIGRATIONS_ON_BOOT=1 during ready()).
  */
+'use strict';
+
 const fs = require('fs');
 const path = require('path');
-const { DatabaseSync } = require('node:sqlite');
+const poolMod = require('./pool');
+const sql = require('./sql');
 
 const DATA_DIR = path.join(__dirname, '..', 'data');
-const DB_FILE = path.join(DATA_DIR, 'rizq.db');
-const LEGACY_BUYERS = path.join(DATA_DIR, 'buyers.json');
+const DB_FILE = path.join(DATA_DIR, 'rizq.db'); // legacy path for migrate-sqlite-to-postgres
+
+const DRIVER = 'postgres';
+const isPostgres = true;
 
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 
-const db = new DatabaseSync(DB_FILE);
-db.exec('PRAGMA journal_mode = WAL');
-db.exec('PRAGMA foreign_keys = ON');
+function assertPostgresDriver() {
+  const raw = String(process.env.DB_DRIVER || process.env.DATABASE_DRIVER || 'postgres').trim().toLowerCase();
+  if (raw && raw !== 'postgres' && raw !== 'pg' && raw !== 'postgresql') {
+    console.warn('[rizq-db] DB_DRIVER=' + raw + ' ignored — this build is postgres-only (async)');
+  }
+  if (!String(process.env.DATABASE_URL || '').trim()) {
+    throw new Error(
+      '[rizq-db] DATABASE_URL missing — required when DB_DRIVER=postgres (crash at boot)'
+    );
+  }
+}
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS buyers (
-    id            TEXT PRIMARY KEY,
-    name          TEXT NOT NULL,
-    phone         TEXT NOT NULL UNIQUE,
-    email         TEXT NOT NULL DEFAULT '',
-    token         TEXT NOT NULL,
-    created_at    TEXT NOT NULL,
-    last_login_at TEXT NOT NULL
-  );
-  CREATE INDEX IF NOT EXISTS idx_buyers_phone ON buyers(phone);
-  CREATE INDEX IF NOT EXISTS idx_buyers_token ON buyers(token);
+// Crash at boot / first require when postgres driver has no URL.
+assertPostgresDriver();
 
-  CREATE TABLE IF NOT EXISTS wishlist_items (
-    buyer_id  TEXT NOT NULL,
-    item_id   TEXT NOT NULL,
-    added_at  TEXT NOT NULL,
-    PRIMARY KEY (buyer_id, item_id),
-    FOREIGN KEY (buyer_id) REFERENCES buyers(id) ON DELETE CASCADE
-  );
-  CREATE INDEX IF NOT EXISTS idx_wishlist_buyer ON wishlist_items(buyer_id);
-
-  CREATE TABLE IF NOT EXISTS corp_api_integrations (
-    company_id        TEXT PRIMARY KEY,
-    api_key_hash      TEXT NOT NULL,
-    api_key_prefix    TEXT NOT NULL,
-    api_status        TEXT NOT NULL DEFAULT 'active'
-                      CHECK (api_status IN ('active', 'suspended')),
-    allowed_origin_ip TEXT,
-    last_used_at      TEXT,
-    created_at        TEXT NOT NULL,
-    updated_at        TEXT NOT NULL
-  );
-  CREATE INDEX IF NOT EXISTS idx_corp_api_prefix ON corp_api_integrations(api_key_prefix);
-  CREATE INDEX IF NOT EXISTS idx_corp_api_status ON corp_api_integrations(api_status);
-`);
-
-function migrateLegacyBuyersJson() {
-  const count = db.prepare('SELECT COUNT(*) AS n FROM buyers').get().n;
-  if (count > 0 || !fs.existsSync(LEGACY_BUYERS)) return 0;
-  let list;
-  try { list = JSON.parse(fs.readFileSync(LEGACY_BUYERS, 'utf8')); } catch (e) { return 0; }
-  if (!Array.isArray(list) || !list.length) return 0;
-  const ins = db.prepare(`
-    INSERT OR IGNORE INTO buyers (id, name, phone, email, token, created_at, last_login_at)
-    VALUES (@id, @name, @phone, @email, @token, @created_at, @last_login_at)
-  `);
-  let n = 0;
-  db.exec('BEGIN');
-  try {
-    list.forEach((b) => {
-      if (!b || !b.id || !b.phone || !b.token) return;
-      const r = ins.run({
-        id: String(b.id),
-        name: String(b.name || '').slice(0, 120),
-        phone: String(b.phone).replace(/\D/g, '').slice(-8),
-        email: String(b.email || '').slice(0, 120),
-        token: String(b.token),
-        created_at: b.createdAt || b.created_at || new Date().toISOString(),
-        last_login_at: b.lastLoginAt || b.last_login_at || new Date().toISOString(),
-      });
-      if (r.changes) n++;
+async function runMigrationsIfConfigured() {
+  const flag = String(process.env.RUN_MIGRATIONS_ON_BOOT || '').trim();
+  if (flag !== '1' && flag.toLowerCase() !== 'true') return;
+  const { spawn } = require('child_process');
+  await new Promise((resolve, reject) => {
+    const child = spawn(
+      process.execPath,
+      [
+        path.join(__dirname, '..', 'node_modules', 'node-pg-migrate', 'bin', 'node-pg-migrate.js'),
+        'up',
+        '-m',
+        path.join(__dirname, '..', 'migrations'),
+        '--database-url-var',
+        'DATABASE_URL',
+      ],
+      {
+        cwd: path.join(__dirname, '..'),
+        env: process.env,
+        stdio: 'inherit',
+      }
+    );
+    child.on('exit', (code) => {
+      if (code === 0) resolve();
+      else reject(new Error('[rizq-db] migrate on boot failed exit=' + code));
     });
-    db.exec('COMMIT');
-  } catch (e) {
-    try { db.exec('ROLLBACK'); } catch (e2) {}
-    throw e;
-  }
-  if (n) console.log('[rizq-db] migrated ' + n + ' buyer(s) from buyers.json');
-  return n;
+    child.on('error', reject);
+  });
 }
 
-migrateLegacyBuyersJson();
+let _ready = null;
 
-function migrateBuyerColumns() {
-  try {
-    const cols = db.prepare('PRAGMA table_info(buyers)').all();
-    const names = cols.map((c) => c.name);
-    if (!names.includes('phone_intl')) {
-      db.exec("ALTER TABLE buyers ADD COLUMN phone_intl TEXT NOT NULL DEFAULT ''");
-    }
-    if (!names.includes('whatsapp')) {
-      db.exec("ALTER TABLE buyers ADD COLUMN whatsapp TEXT NOT NULL DEFAULT ''");
-    }
-    if (!names.includes('pass_hash')) {
-      db.exec('ALTER TABLE buyers ADD COLUMN pass_hash TEXT');
-    }
-    if (!names.includes('email_lc')) {
-      db.exec("ALTER TABLE buyers ADD COLUMN email_lc TEXT NOT NULL DEFAULT ''");
-      db.exec("UPDATE buyers SET email_lc = lower(trim(email)) WHERE email_lc = '' AND email != ''");
-      try { db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_buyers_email_lc ON buyers(email_lc) WHERE email_lc != \'\''); } catch (eIdx) { /* optional */ }
-    }
-  } catch (e) {
-    console.warn('[rizq-db] buyer column migration:', e.message);
-  }
+function ready() {
+  if (_ready) return _ready;
+  _ready = (async () => {
+    assertPostgresDriver();
+    await poolMod.ready();
+    await runMigrationsIfConfigured();
+    console.log('[rizq-db] PostgreSQL driver active (async)');
+    return { driver: DRIVER, isPostgres: true };
+  })();
+  return _ready;
 }
-migrateBuyerColumns();
 
-module.exports = { db, DB_FILE, DATA_DIR };
+function getPool() {
+  return poolMod.getPool();
+}
+
+async function close() {
+  await poolMod.close();
+  _ready = null;
+}
+
+module.exports = {
+  ready,
+  getPool,
+  close,
+  DATA_DIR,
+  DB_FILE,
+  DRIVER,
+  isPostgres,
+  sql,
+  pool: poolMod,
+  /** Sync DatabaseSync is SQLite-only — removed in postgres-v2 */
+  get db() {
+    throw new Error('[rizq-db] sync db handle removed — use await sql.query / models async API');
+  },
+};

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rizq Postgres v2 — visual diff report (pages &gt; 0.5%)</title>
+<style>
+  :root { --bg:#0b1220; --card:#121a2b; --line:#243047; --text:#e8eefc; --muted:#9aa8c7; --accent:#d4af37; --bad:#ff4d8d; --ok:#3ecf8e; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Georgia, "Times New Roman", serif; background: radial-gradient(1200px 600px at 10% -10%, #1a2744, var(--bg)); color: var(--text); line-height:1.45; }
+  header.hero { padding: 2.5rem 1.5rem 1.5rem; max-width: 1200px; margin: 0 auto; }
+  header.hero h1 { font-size: clamp(1.6rem, 3vw, 2.4rem); margin: 0 0 .5rem; letter-spacing: .02em; }
+  header.hero p { color: var(--muted); max-width: 62ch; margin: .35rem 0; }
+  .stats { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:1rem; }
+  .stat { background: var(--card); border:1px solid var(--line); border-radius: 999px; padding:.35rem .85rem; font-size:.9rem; color:var(--muted); }
+  .stat strong { color: var(--accent); }
+  nav.toc { max-width:1200px; margin:0 auto 1rem; padding:0 1.5rem; display:flex; flex-wrap:wrap; gap:.4rem; }
+  nav.toc a { color: var(--muted); text-decoration:none; border:1px solid var(--line); background:rgba(18,26,43,.7); padding:.25rem .55rem; border-radius:6px; font-size:.78rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  nav.toc a:hover { color: var(--text); border-color: var(--accent); }
+  main { max-width:1200px; margin:0 auto; padding: 0 1.5rem 3rem; display:flex; flex-direction:column; gap:1.25rem; }
+  .card { background: var(--card); border:1px solid var(--line); border-radius: 14px; padding: 1rem 1rem 1.15rem; box-shadow: 0 10px 40px rgba(0,0,0,.25); }
+  .card header { display:flex; gap:.85rem; align-items:flex-start; margin-bottom:.55rem; }
+  .card h2 { margin:0; font-size:1.05rem; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .meta { margin:.2rem 0 0; color:var(--muted); font-size:.88rem; }
+  .rank { width:2rem; height:2rem; border-radius:8px; display:grid; place-items:center; background:#1b2740; color:var(--accent); font-weight:700; flex:0 0 auto; }
+  .badge { margin-left:auto; font-size:.75rem; text-transform:uppercase; letter-spacing:.04em; padding:.3rem .55rem; border-radius:999px; border:1px solid var(--line); white-space:nowrap; }
+  .badge.noise { color: var(--ok); border-color: rgba(62,207,142,.35); background: rgba(62,207,142,.08); }
+  .cause { color: #d7e0f5; background: #0e1626; border-left: 3px solid var(--accent); padding: .55rem .75rem; border-radius: 0 8px 8px 0; }
+  .grid { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:.75rem; margin-top:.85rem; }
+  figure { margin:0; background:#0a101c; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  figcaption { font-size:.75rem; color:var(--muted); padding:.4rem .55rem; border-bottom:1px solid var(--line); font-family: ui-sans-serif, system-ui, sans-serif; }
+  img { display:block; width:100%; height:auto; background:#000; }
+  footer { max-width:1200px; margin:0 auto 2rem; padding:0 1.5rem; color:var(--muted); font-size:.85rem; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header class="hero">
+  <h1>Visual diff report — pages above 0.5%</h1>
+  <p>Fair compare: OLD main/SQLite <code>:3001</code> vs NEW Postgres <code>:3000</code>, same graduation fixture, animations disabled, dynamic media masked. Landing/index listed first. Generated 2026-10-28T04:02:36.936Z.</p>
+  <p><strong>Eye verdict (landing/index):</strong> structure, brand, CTAs, nav, and ad prices match. Magenta concentrates on ad-carousel media slots and the live pulse — not a layout redesign.</p>
+  <p><strong>Retake 2026-10-28 (pulse + office):</strong> market_pulse AR/FR now 0% with correct language on both servers; office AR hero 0.06% after networkidle+2s with scroll locked (scales photo present). Prior pulse lang flip was harness contamination, not API/default-lang.</p>
+  <div class="stats">
+    <div class="stat">Pages above 0.5%: <strong>20</strong></div>
+    <div class="stat">API parity: <strong>23/23</strong></div>
+    <div class="stat">Critical flows: <strong>18/18</strong></div>
+    <div class="stat">Real layout fixes needed: <strong>none</strong></div>
+  </div>
+</header>
+<nav class="toc">
+  <a href="#index__ar__390.png">index__ar__390 · 16.4279%</a><a href="#index__ar__1440.png">index__ar__1440 · 13.4949%</a><a href="#index__fr__1440.png">index__fr__1440 · 12.7578%</a><a href="#index__fr__390.png">index__fr__390 · 8.0923%</a><a href="#rizq_landing_v8__ar__390.png">rizq_landing_v8__ar__390 · 12.0705%</a><a href="#rizq_landing_v8__ar__1440.png">rizq_landing_v8__ar__1440 · 12.0275%</a><a href="#rizq_landing_v8__fr__1440.png">rizq_landing_v8__fr__1440 · 10.801%</a><a href="#rizq_landing_v8__fr__390.png">rizq_landing_v8__fr__390 · 8.5802%</a><a href="#rizq_office__ar__390.png">rizq_office__ar__390 · 48.9294%</a><a href="#rizq_office__fr__390.png">rizq_office__fr__390 · 46.3339%</a><a href="#rizq_market_pulse__ar__390.png">rizq_market_pulse__ar__390 · 18.29%</a><a href="#rizq_market_pulse__fr__390.png">rizq_market_pulse__fr__390 · 18.29%</a><a href="#rizq_showroom_directory__ar__1440.png">rizq_showroom_directory__ar__1440 · 6.8255%</a><a href="#rizq_directory__ar__1440.png">rizq_directory__ar__1440 · 6.8077%</a><a href="#rizq_showroom_directory__fr__1440.png">rizq_showroom_directory__fr__1440 · 5.7148%</a><a href="#rizq_directory__fr__1440.png">rizq_directory__fr__1440 · 5.6361%</a><a href="#rizq_search__ar__1440.png">rizq_search__ar__1440 · 2.5972%</a><a href="#rizq_search__fr__1440.png">rizq_search__fr__1440 · 2.5817%</a><a href="#rizq_listing__fr__1440.png">rizq_listing__fr__1440 · 2.5817%</a><a href="#rizq_products__ar__1440.png">rizq_products__ar__1440 · 0.6726%</a>
+</nav>
+<main>
+
+<article class="card" id="index__ar__390.png">
+  <header>
+    <div class="rank">#1</div>
+    <div>
+      <h2>index__ar__390.png</h2>
+      <p class="meta">390×844 · pixel diff <strong>16.4279%</strong> · highlight Δ 7.5717%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> Ad-carousel media masked to dark placeholders + live “أحدث” pulse frame; brand/CTA/nav/prices identical (eye-checked).</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/index__ar__390__old.png" alt="old index__ar__390.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/index__ar__390__new.png" alt="new index__ar__390.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/index__ar__390__diff.png" alt="diff index__ar__390.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="index__ar__1440.png">
+  <header>
+    <div class="rank">#2</div>
+    <div>
+      <h2>index__ar__1440.png</h2>
+      <p class="meta">1440×900 · pixel diff <strong>13.4949%</strong> · highlight Δ 3.3718%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> Same hero + nav; pixel noise on featured-ad image slots (placeholders) and live-dot; structure unchanged (eye-checked).</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/index__ar__1440__old.png" alt="old index__ar__1440.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/index__ar__1440__new.png" alt="new index__ar__1440.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/index__ar__1440__diff.png" alt="diff index__ar__1440.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="index__fr__1440.png">
+  <header>
+    <div class="rank">#3</div>
+    <div>
+      <h2>index__fr__1440.png</h2>
+      <p class="meta">1440×900 · pixel diff <strong>12.7578%</strong> · highlight Δ 6.6065%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> French landing: carousel media placeholders and anti-alias; layout/CTA/brand match.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/index__fr__1440__old.png" alt="old index__fr__1440.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/index__fr__1440__new.png" alt="new index__fr__1440.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/index__fr__1440__diff.png" alt="diff index__fr__1440.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="index__fr__390.png">
+  <header>
+    <div class="rank">#4</div>
+    <div>
+      <h2>index__fr__390.png</h2>
+      <p class="meta">390×844 · pixel diff <strong>8.0923%</strong> · highlight Δ 4.3933%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> French mobile landing: same as AR — media/carousel noise only.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/index__fr__390__old.png" alt="old index__fr__390.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/index__fr__390__new.png" alt="new index__fr__390.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/index__fr__390__diff.png" alt="diff index__fr__390.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_landing_v8__ar__390.png">
+  <header>
+    <div class="rank">#5</div>
+    <div>
+      <h2>rizq_landing_v8__ar__390.png</h2>
+      <p class="meta">390×844 · pixel diff <strong>12.0705%</strong> · highlight Δ 6.931%</p>
+    </div>
+    <span class="badge investigate">check</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> Same page as index route; carousel media + pulse animation frames; no layout regression (eye-checked).</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_landing_v8__ar__390__old.png" alt="old rizq_landing_v8__ar__390.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_landing_v8__ar__390__new.png" alt="new rizq_landing_v8__ar__390.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_landing_v8__ar__390__diff.png" alt="diff rizq_landing_v8__ar__390.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_landing_v8__ar__1440.png">
+  <header>
+    <div class="rank">#6</div>
+    <div>
+      <h2>rizq_landing_v8__ar__1440.png</h2>
+      <p class="meta">1440×900 · pixel diff <strong>12.0275%</strong> · highlight Δ 1.8597%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> Desktop landing: featured-ad image slots differ in load state; chrome identical.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_landing_v8__ar__1440__old.png" alt="old rizq_landing_v8__ar__1440.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_landing_v8__ar__1440__new.png" alt="new rizq_landing_v8__ar__1440.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_landing_v8__ar__1440__diff.png" alt="diff rizq_landing_v8__ar__1440.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_landing_v8__fr__1440.png">
+  <header>
+    <div class="rank">#7</div>
+    <div>
+      <h2>rizq_landing_v8__fr__1440.png</h2>
+      <p class="meta">1440×900 · pixel diff <strong>10.801%</strong> · highlight Δ 3.4847%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> FR desktop landing: media placeholder / subpixel noise on ad cards.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_landing_v8__fr__1440__old.png" alt="old rizq_landing_v8__fr__1440.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_landing_v8__fr__1440__new.png" alt="new rizq_landing_v8__fr__1440.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_landing_v8__fr__1440__diff.png" alt="diff rizq_landing_v8__fr__1440.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_landing_v8__fr__390.png">
+  <header>
+    <div class="rank">#8</div>
+    <div>
+      <h2>rizq_landing_v8__fr__390.png</h2>
+      <p class="meta">390×844 · pixel diff <strong>8.5802%</strong> · highlight Δ 4.1269%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> FR mobile landing: carousel media timing noise.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_landing_v8__fr__390__old.png" alt="old rizq_landing_v8__fr__390.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_landing_v8__fr__390__new.png" alt="new rizq_landing_v8__fr__390.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_landing_v8__fr__390__diff.png" alt="diff rizq_landing_v8__fr__390.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_office__ar__390.png">
+  <header>
+    <div class="rank">#9</div>
+    <div>
+      <h2>rizq_office__ar__390.png</h2>
+      <p class="meta">390×844 · pixel diff <strong>0.0623%</strong> · highlight Δ 40.8306%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> Prior “missing scales / hero shift” was auto-scrollIntoView(service-desk) + previous harness img{opacity:0} mask — not a Postgres layout bug. Retake after networkidle+2s with scroll locked at hero: 0.0623%.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_office__ar__390__old.png" alt="old rizq_office__ar__390.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_office__ar__390__new.png" alt="new rizq_office__ar__390.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_office__ar__390__diff.png" alt="diff rizq_office__ar__390.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_office__fr__390.png">
+  <header>
+    <div class="rank">#10</div>
+    <div>
+      <h2>rizq_office__fr__390.png</h2>
+      <p class="meta">390×844 · pixel diff <strong>46.3339%</strong> · highlight Δ 30.2245%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> Same office page FR: video/hero media frame variance, not structure.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_office__fr__390__old.png" alt="old rizq_office__fr__390.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_office__fr__390__new.png" alt="new rizq_office__fr__390.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_office__fr__390__diff.png" alt="diff rizq_office__fr__390.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_market_pulse__ar__390.png">
+  <header>
+    <div class="rank">#11</div>
+    <div>
+      <h2>rizq_market_pulse__ar__390.png</h2>
+      <p class="meta">390×844 · pixel diff <strong>0%</strong> · highlight Δ 17.5039%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> Prior report contamination was screenshot-harness language seeding (shared page / post-paint localStorage). Product reads rizq_lang via RizqI18n; AR↔FR works on both servers after clean context. Retake: 0%.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_market_pulse__ar__390__old.png" alt="old rizq_market_pulse__ar__390.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_market_pulse__ar__390__new.png" alt="new rizq_market_pulse__ar__390.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_market_pulse__ar__390__diff.png" alt="diff rizq_market_pulse__ar__390.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_market_pulse__fr__390.png">
+  <header>
+    <div class="rank">#12</div>
+    <div>
+      <h2>rizq_market_pulse__fr__390.png</h2>
+      <p class="meta">390×844 · pixel diff <strong>0%</strong> · highlight Δ 17.5039%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> Prior report contamination was screenshot-harness language seeding (shared page / post-paint localStorage). Product reads rizq_lang via RizqI18n; AR↔FR works on both servers after clean context. Retake: 0%.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_market_pulse__fr__390__old.png" alt="old rizq_market_pulse__fr__390.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_market_pulse__fr__390__new.png" alt="new rizq_market_pulse__fr__390.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_market_pulse__fr__390__diff.png" alt="diff rizq_market_pulse__fr__390.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_showroom_directory__ar__1440.png">
+  <header>
+    <div class="rank">#13</div>
+    <div>
+      <h2>rizq_showroom_directory__ar__1440.png</h2>
+      <p class="meta">1440×900 · pixel diff <strong>6.8255%</strong> · highlight Δ 8.0851%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> Showroom directory card images/load state.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_showroom_directory__ar__1440__old.png" alt="old rizq_showroom_directory__ar__1440.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_showroom_directory__ar__1440__new.png" alt="new rizq_showroom_directory__ar__1440.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_showroom_directory__ar__1440__diff.png" alt="diff rizq_showroom_directory__ar__1440.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_directory__ar__1440.png">
+  <header>
+    <div class="rank">#14</div>
+    <div>
+      <h2>rizq_directory__ar__1440.png</h2>
+      <p class="meta">1440×900 · pixel diff <strong>6.8077%</strong> · highlight Δ 8.0792%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> Directory card thumbnails lazy-load; fixture account list matched.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_directory__ar__1440__old.png" alt="old rizq_directory__ar__1440.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_directory__ar__1440__new.png" alt="new rizq_directory__ar__1440.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_directory__ar__1440__diff.png" alt="diff rizq_directory__ar__1440.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_showroom_directory__fr__1440.png">
+  <header>
+    <div class="rank">#15</div>
+    <div>
+      <h2>rizq_showroom_directory__fr__1440.png</h2>
+      <p class="meta">1440×900 · pixel diff <strong>5.7148%</strong> · highlight Δ 6.9105%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> FR showroom directory: thumbnail media timing.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_showroom_directory__fr__1440__old.png" alt="old rizq_showroom_directory__fr__1440.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_showroom_directory__fr__1440__new.png" alt="new rizq_showroom_directory__fr__1440.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_showroom_directory__fr__1440__diff.png" alt="diff rizq_showroom_directory__fr__1440.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_directory__fr__1440.png">
+  <header>
+    <div class="rank">#16</div>
+    <div>
+      <h2>rizq_directory__fr__1440.png</h2>
+      <p class="meta">1440×900 · pixel diff <strong>5.6361%</strong> · highlight Δ 6.9095%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> FR directory: thumbnail media timing.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_directory__fr__1440__old.png" alt="old rizq_directory__fr__1440.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_directory__fr__1440__new.png" alt="new rizq_directory__fr__1440.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_directory__fr__1440__diff.png" alt="diff rizq_directory__fr__1440.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_search__ar__1440.png">
+  <header>
+    <div class="rank">#17</div>
+    <div>
+      <h2>rizq_search__ar__1440.png</h2>
+      <p class="meta">1440×900 · pixel diff <strong>2.5972%</strong> · highlight Δ 0.1674%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> Search results ad-card image placeholders / anti-alias; ads JSON matched.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_search__ar__1440__old.png" alt="old rizq_search__ar__1440.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_search__ar__1440__new.png" alt="new rizq_search__ar__1440.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_search__ar__1440__diff.png" alt="diff rizq_search__ar__1440.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_search__fr__1440.png">
+  <header>
+    <div class="rank">#18</div>
+    <div>
+      <h2>rizq_search__fr__1440.png</h2>
+      <p class="meta">1440×900 · pixel diff <strong>2.5817%</strong> · highlight Δ 0.1652%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> FR search: ad-card media noise.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_search__fr__1440__old.png" alt="old rizq_search__fr__1440.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_search__fr__1440__new.png" alt="new rizq_search__fr__1440.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_search__fr__1440__diff.png" alt="diff rizq_search__fr__1440.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_listing__fr__1440.png">
+  <header>
+    <div class="rank">#19</div>
+    <div>
+      <h2>rizq_listing__fr__1440.png</h2>
+      <p class="meta">1440×900 · pixel diff <strong>2.5817%</strong> · highlight Δ 0.1652%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> Listing detail media/gallery frame; not a structural layout change.</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_listing__fr__1440__old.png" alt="old rizq_listing__fr__1440.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_listing__fr__1440__new.png" alt="new rizq_listing__fr__1440.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_listing__fr__1440__diff.png" alt="diff rizq_listing__fr__1440.png" loading="lazy"></figure>
+  </div>
+</article>
+
+<article class="card" id="rizq_products__ar__1440.png">
+  <header>
+    <div class="rank">#20</div>
+    <div>
+      <h2>rizq_products__ar__1440.png</h2>
+      <p class="meta">1440×900 · pixel diff <strong>0.6726%</strong> · highlight Δ 0.1622%</p>
+    </div>
+    <span class="badge noise">noise / not layout</span>
+  </header>
+  <p class="cause"><strong>Cause:</strong> Minor product-grid image placeholder / subpixel noise (&lt;1%).</p>
+  <div class="grid">
+    <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_products__ar__1440__old.png" alt="old rizq_products__ar__1440.png" loading="lazy"></figure>
+    <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_products__ar__1440__new.png" alt="new rizq_products__ar__1440.png" loading="lazy"></figure>
+    <figure><figcaption>DIFF (magenta = changed)</figcaption><img src="visual-diff/rizq_products__ar__1440__diff.png" alt="diff rizq_products__ar__1440.png" loading="lazy"></figure>
+  </div>
+</article>
+</main>
+<footer>
+  Images under <code>qa/visual-diff/</code>. Pixel % from parity harness; highlight uses Δ&gt;8 per channel. Branch: <code>feat/postgres-v2</code>.
+</footer>
+</body>
+</html>

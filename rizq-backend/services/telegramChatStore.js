@@ -6,9 +6,9 @@ const repos = require('../db/repos');
 
 const ENV_FILE = path.join(__dirname, '..', '.env');
 
-function readPersistedAdminChat() {
+async function readPersistedAdminChat() {
   try {
-    const raw = repos.getTelegramChat();
+    const raw = await repos.getTelegramChat();
     const chatId = String(raw && raw.chatId || '').trim();
     return chatId || null;
   } catch (e) {
@@ -17,7 +17,7 @@ function readPersistedAdminChat() {
   }
 }
 
-function writePersistedAdminChat(chatId, meta) {
+async function writePersistedAdminChat(chatId, meta) {
   meta = meta || {};
   const payload = {
     chatId: String(chatId),
@@ -25,7 +25,7 @@ function writePersistedAdminChat(chatId, meta) {
     source: meta.source || 'unknown',
     title: meta.title || '',
   };
-  repos.saveTelegramChat(payload);
+  await repos.saveTelegramChat(payload);
   return payload;
 }
 
@@ -51,11 +51,11 @@ function updateEnvAdminChatId(chatId) {
   }
 }
 
-function registerAdminChatId(chatId, meta) {
+async function registerAdminChatId(chatId, meta) {
   meta = meta || {};
   const id = String(chatId || '').trim();
   if (!id) return null;
-  const record = writePersistedAdminChat(id, meta);
+  const record = await writePersistedAdminChat(id, meta);
   const envUpdated = updateEnvAdminChatId(id);
   console.log('[telegram-chat-store] admin chat registered', {
     chatId: id,

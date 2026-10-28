@@ -1,6 +1,8 @@
 /**
- * rizq_visit_tracker.js — عدّاد زيارات حقيقي (SQLite عبر repos)
+ * rizq_visit_tracker.js — عدّاد زيارات حقيقي (PostgreSQL عبر repos)
  */
+'use strict';
+
 const repos = require('./db/repos');
 
 const SOURCES = ['direct', 'whatsapp', 'facebook', 'google', 'other'];
@@ -19,9 +21,9 @@ function _bucketSource(referrer) {
   return 'other';
 }
 
-function trackVisit(accountId, referrer) {
+async function trackVisit(accountId, referrer) {
   if (!accountId) return { ok: false, error: 'accountId مطلوب' };
-  const rec = repos.getVisitStats(accountId) || { total: 0, byDay: {}, bySource: {} };
+  const rec = (await repos.getVisitStats(accountId)) || { total: 0, byDay: {}, bySource: {} };
   const day = _todayKey();
   const source = _bucketSource(referrer);
 
@@ -34,12 +36,12 @@ function trackVisit(accountId, referrer) {
   const cutoff = new Date(Date.now() - KEEP_DAYS * 86400000).toISOString().slice(0, 10);
   Object.keys(rec.byDay).forEach((d) => { if (d < cutoff) delete rec.byDay[d]; });
 
-  repos.setVisitStats(accountId, rec);
+  await repos.setVisitStats(accountId, rec);
   return { ok: true };
 }
 
-function getVisitStats(accountId) {
-  const rec = repos.getVisitStats(accountId);
+async function getVisitStats(accountId) {
+  const rec = await repos.getVisitStats(accountId);
   if (!rec) return { total: 0, last90: [], monthTotal: 0, bySource: {} };
 
   const days = [];
@@ -61,35 +63,43 @@ function getVisitStats(accountId) {
 }
 
 function setupVisitTrackingAPI(app, trackVisitLimiter, getAccountRecord, getMainAccount) {
-  app.post('/api/track-visit', trackVisitLimiter, (req, res) => {
-    const { accountId, referrer } = req.body || {};
-    const result = trackVisit(String(accountId || '').slice(0, 40), referrer);
-    if (!result.ok) return res.status(400).json(result);
-    res.json({ ok: true });
+  app.post('/api/track-visit', trackVisitLimiter, async (req, res) => {
+    try {
+      const { accountId, referrer } = req.body || {};
+      const result = await trackVisit(String(accountId || '').slice(0, 40), referrer);
+      if (!result.ok) return res.status(400).json(result);
+      return res.json({ ok: true });
+    } catch (err) {
+      return res.status(500).json({ ok: false, error: 'track_failed' });
+    }
   });
 
-  app.get('/api/visit-stats/:id', (req, res) => {
-    const id = req.params.id;
-    // رأس فقط — لا نقبل ?token= (يمنع تسريب التوكن في السجلات/المراجع)
-    const token = String(req.header('x-account-token') || '').trim();
-    const mainAcc = getMainAccount ? getMainAccount(id) : null;
-    const pkgRec = getAccountRecord ? getAccountRecord(id) : null;
-    if (!mainAcc && !pkgRec) return res.status(404).json({ error: 'account_not_found' });
-    if (!token) return res.status(401).json({ error: 'unauthorized' });
-    const { timingSafeEqualStr } = require('./lib/secureCompare');
-    const { activeOwnerMatches } = require('./middleware/accountAuth');
-    // حساب معلّق/غير معتمد: لا إحصائيات حتى لو بقي توكن قديم عند العميل
-    if (mainAcc) {
-      if (!activeOwnerMatches(mainAcc, token)) {
-        return res.status(401).json({ error: 'unauthorized' });
+  app.get('/api/visit-stats/:id', async (req, res) => {
+    try {
+      const id = req.params.id;
+      // رأس فقط — لا نقبل ?token= (يمنع تسريب التوكن في السجلات/المراجع)
+      const token = String(req.header('x-account-token') || '').trim();
+      const mainAcc = getMainAccount ? await getMainAccount(id) : null;
+      const pkgRec = getAccountRecord ? await getAccountRecord(id) : null;
+      if (!mainAcc && !pkgRec) return res.status(404).json({ error: 'account_not_found' });
+      if (!token) return res.status(401).json({ error: 'unauthorized' });
+      const { timingSafeEqualStr } = require('./lib/secureCompare');
+      const { activeOwnerMatches } = require('./middleware/accountAuth');
+      // حساب معلّق/غير معتمد: لا إحصائيات حتى لو بقي توكن قديم عند العميل
+      if (mainAcc) {
+        if (!activeOwnerMatches(mainAcc, token)) {
+          return res.status(401).json({ error: 'unauthorized' });
+        }
+      } else {
+        const validToken = (pkgRec && pkgRec.accessToken) || null;
+        if (!validToken || !timingSafeEqualStr(token, validToken)) {
+          return res.status(401).json({ error: 'unauthorized' });
+        }
       }
-    } else {
-      const validToken = (pkgRec && pkgRec.accessToken) || null;
-      if (!validToken || !timingSafeEqualStr(token, validToken)) {
-        return res.status(401).json({ error: 'unauthorized' });
-      }
+      return res.json({ ok: true, stats: await getVisitStats(id) });
+    } catch (err) {
+      return res.status(500).json({ ok: false, error: 'stats_failed' });
     }
-    res.json({ ok: true, stats: getVisitStats(id) });
   });
 }
 

@@ -8,6 +8,11 @@
     "start": "node server.js",
     "dev": "node server.js",
     "backup": "node scripts/run-backup.js",
+    "migrate": "node -r dotenv/config node_modules/node-pg-migrate/bin/node-pg-migrate.js up -m migrations --database-url-var DATABASE_URL",
+    "migrate:down": "node -r dotenv/config node_modules/node-pg-migrate/bin/node-pg-migrate.js down -m migrations --database-url-var DATABASE_URL",
+    "migrate:sqlite-to-pg": "node -r dotenv/config scripts/migrate-sqlite-to-postgres.js",
+    "fixture:sqlite": "node scripts/build-sqlite-migration-fixture.js",
+    "test:pg-repos": "node -r dotenv/config scripts/test-pg-repos.js",
     "test:backup": "node scripts/test-backup-restore.js",
     "test:lifecycle": "node scripts/test-ad-lifecycle.js",
     "test:ops": "node scripts/test-ops-housekeeping.js",
@@ -36,9 +41,12 @@
     "exceljs": "^4.4.0",
     "express": "^4.19.2",
     "express-rate-limit": "^7.4.0",
+    "ioredis": "^6.0.0",
     "node-cron": "^4.6.0",
+    "node-pg-migrate": "^9.0.0",
     "nodemailer": "^10.1.7",
     "pdf-parse": "^1.1.1",
+    "pg": "^8.23.1",
     "sharp": "^0.35.5",
     "tar": "^7.4.3",
     "twilio": "^5.13.1"
@@ -51,6 +59,6 @@
     "uuid": "^11.1.1"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   }
 }

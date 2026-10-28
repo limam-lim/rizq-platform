@@ -132,7 +132,7 @@ async function main() {
 
     platformStore.upsertAccount(approved);
 
-    repos.setPackage(id, {
+    await repos.setPackage(id, {
       accountId: id,
       accountType: 'store',
       status: 'active',
@@ -196,7 +196,7 @@ async function main() {
     const staticReceiptAsset = await req('GET', '/uploads/receipts/ACC_t_sub_t_deadbeef.jpg');
     ok('receipt static assets blocked', staticReceiptAsset.status === 403, 'status=' + staticReceiptAsset.status);
 
-    repos.setPackage(tenderPkgKey, {
+    await repos.setPackage(tenderPkgKey, {
       accountId: tenderPkgKey,
       accountType: 'store',
       status: 'active',
@@ -245,14 +245,14 @@ async function main() {
       else platformStore.writeTenders(backupTenders);
     } catch (e) { /* ignore cleanup */ }
     try {
-      repos.packages.remove(id);
-      repos.packages.remove(tenderPkgKey);
+      await repos.packages.remove(id);
+      await repos.packages.remove(tenderPkgKey);
     } catch (e) { /* ignore cleanup */ }
   }
 
   // ── 9. OTP hashing (unit) ──
   const otp = require('../services/otpService');
-  const backupOtp = repos.listOtp();
+  const backupOtp = await repos.listOtp();
   process.env.OTP_ALLOW_DEMO = 'true';
   process.env.OTP_DEMO_CODE = '112233';
   const testEmail = 'otpsec_' + Date.now() + '@rizq.test';
@@ -260,7 +260,7 @@ async function main() {
   try {
     const sent = await otp.sendBuyerOtp({ email: testEmail, name: 'OTP Sec', phoneMr: testPhone });
     ok('sendBuyerOtp', sent.ok === true);
-    const store = repos.listOtp();
+    const store = await repos.listOtp();
     const rec = store.find((x) => x.email === testEmail.toLowerCase());
     ok('OTP stored as hash not plaintext', !!(rec && rec.codeHash && !rec.code));
     const bad = otp.verifyBuyerOtp(testEmail, '000000');
@@ -277,7 +277,7 @@ async function main() {
     ok('POST /api/auth/register after OTP', (reg.status === 200 || reg.status === 201) && reg.body && reg.body.ok && reg.body.token,
       reg.body ? JSON.stringify({ status: reg.status, error: reg.body.error, message: reg.body.message }) : 'status=' + reg.status);
   } finally {
-    repos.replaceOtpStore(backupOtp);
+    await repos.replaceOtpStore(backupOtp);
   }
 
   // ── 10. Site config public read + no secrets ──
@@ -346,7 +346,7 @@ async function main() {
   const pkgAcc = seedTestAccount();
   try {
     platformStore.upsertAccount(pkgAcc.approved);
-    repos.setPackage(pkgAcc.id, { accessToken: pkgAcc.accessToken, accountType: 'store', accountId: pkgAcc.id });
+    await repos.setPackage(pkgAcc.id, { accessToken: pkgAcc.accessToken, accountType: 'store', accountId: pkgAcc.id });
     const qTok = await req('GET', '/api/visit-stats/' + pkgAcc.id + '?token=' + encodeURIComponent(pkgAcc.accessToken));
     ok('visit-stats query token rejected', qTok.status === 401);
     const hTok = await req('GET', '/api/visit-stats/' + pkgAcc.id, null, { 'x-account-token': pkgAcc.accessToken });
@@ -354,7 +354,7 @@ async function main() {
   } finally {
     try {
       platformStore.deleteAccount(pkgAcc.id);
-      repos.packages.remove(pkgAcc.id);
+      await repos.packages.remove(pkgAcc.id);
     } catch (e) { /* ignore */ }
   }
 
@@ -420,9 +420,9 @@ async function main() {
 
   {
     const otpSvc = require('../services/otpService');
-    const poisonBackup = repos.listOtp();
+    const poisonBackup = await repos.listOtp();
     const poisonEmail = 'poison_' + Date.now() + '@rizq.test';
-    const store = repos.listOtp().slice();
+    const store = await repos.listOtp().slice();
     store.push({
       key: 'buyer:' + poisonEmail.toLowerCase(),
       channel: 'buyer',
@@ -432,10 +432,10 @@ async function main() {
       attempts: 0,
       verified: false,
     });
-    repos.replaceOtpStore(store);
+    await repos.replaceOtpStore(store);
     const poisoned = otpSvc.verifyBuyerOtp(poisonEmail, '999999');
     ok('OTP plaintext-only record rejected', !(poisoned && poisoned.ok));
-    repos.replaceOtpStore(poisonBackup);
+    await repos.replaceOtpStore(poisonBackup);
   }
 
   ok('site-config exposes demoDashboardAllowed', !!(pub && typeof pub.demoDashboardAllowed === 'boolean'));

@@ -46,7 +46,7 @@ function getAccountInfo(accountId, readAccounts) {
   return list.find((a) => a.id === accountId) || null;
 }
 
-function activateVideoAdOnServer(req) {
+async function activateVideoAdOnServer(req) {
   if (!req.videoUrl) return { ok: true, skipped: true, reason: 'no_video_url' };
   const cfg = readSiteConfigRaw();
   const prev = (cfg.videoAds && typeof cfg.videoAds === 'object') ? cfg.videoAds : {};
@@ -114,7 +114,7 @@ function activateVideoAdOnServer(req) {
     .slice(0, 50);
 
   const next = Object.assign({}, cfg, { videoAds });
-  repos.saveSiteConfig(next);
+  await repos.saveSiteConfig(next);
   return { ok: true, slot: target, planType: plan.planType };
 }
 
@@ -287,7 +287,7 @@ async function activateSubRequest(req, deps) {
         isTrial,
       });
       if (!result.ok) return result;
-      const adResult = activateVideoAdOnServer(Object.assign({}, req, {
+      const adResult = await activateVideoAdOnServer(Object.assign({}, req, {
         pkg: (pkgDef && pkgDef.name) || req.pkg,
         packageId,
       }));

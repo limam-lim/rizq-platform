@@ -33,13 +33,13 @@ function normalizeModule(moduleOrType) {
 
 const { redactContactPatterns } = require('./contactLeakGuard');
 
-function getSellerContactEligibility(targetAccountId, accountTypeHint) {
+async function getSellerContactEligibility(targetAccountId, accountTypeHint) {
   if (!targetAccountId) {
     return { canExpose: false, reason: 'no_account', isTrial: false, isExpired: false, subscriptionStatus: 'no_subscription' };
   }
-  const rec = getAccountRecord(targetAccountId);
+  const rec = await getAccountRecord(targetAccountId);
   const type = (rec && (rec.accountType || rec.type)) || accountTypeHint || 'individual';
-  const ent = getEntitlements(targetAccountId, type, rec || undefined);
+  const ent = await getEntitlements(targetAccountId, type, rec || undefined);
   const status = ent.subscriptionStatus || 'no_subscription';
   const accStatus = String((rec && rec.status) || '').toLowerCase();
   const suspended = !!(rec && (rec.suspended || status === 'suspended' || accStatus === 'suspended'));
@@ -65,9 +65,9 @@ function getSellerContactEligibility(targetAccountId, accountTypeHint) {
   /* فترة الإطلاق المجانية: حساب موثّق أو قيد المراجعة في الأقسام المفتوحة يُعامل كباقة فعّالة */
   try {
     const launchMode = require('../config/launchMode');
-    if (launchMode.isLaunchFreePeriodActive()) {
+    if (await launchMode.isLaunchFreePeriodActive()) {
       const envOpen = launchMode.getEnvOpenSectionFlags();
-      const cfg = repos.getSiteConfig() || {};
+      const cfg = await repos.getSiteConfig() || {};
       const flags = Object.assign(
         { individual: true, store: true, office: true, corp: true, estate: true, tenders: true, investments: true, videoAds: true },
         envOpen || cfg.moduleFlags || {}
@@ -118,14 +118,14 @@ function getSellerContactEligibility(targetAccountId, accountTypeHint) {
   };
 }
 
-function getViewerContactEligibility(viewerAccountId, module) {
+async function getViewerContactEligibility(viewerAccountId, module) {
   if (!viewerAccountId) {
     return { canUnlock: false, reason: 'unauthenticated', subscriptionStatus: 'no_subscription' };
   }
   const mod = normalizeModule(module);
   /* المناقصات: تبقى على منطق باقة الزائر */
   if (mod === 'tender') {
-    const te = getTenderEntitlements(viewerAccountId);
+    const te = await getTenderEntitlements(viewerAccountId);
     return {
       canUnlock: !!te.canUnlockContacts,
       reason: te.canUnlockContacts ? 'active' : (te.isTrial ? 'trial' : te.subscriptionStatus),
@@ -138,8 +138,8 @@ function getViewerContactEligibility(viewerAccountId, module) {
    * يكفي أن يكون للزائر حساب مسجّل على المنصة لفتح التواصل
    * (شرط أن يكون للتاجر باقة أو تجربة نشطة — يُفحص في resolveContactGate).
    */
-  const rec = getAccountRecord(viewerAccountId);
-  const ent = getEntitlements(viewerAccountId, rec && rec.accountType, rec || undefined);
+  const rec = await getAccountRecord(viewerAccountId);
+  const ent = await getEntitlements(viewerAccountId, rec && rec.accountType, rec || undefined);
   return {
     canUnlock: true,
     reason: 'authenticated',
@@ -157,10 +157,10 @@ function getViewerContactEligibility(viewerAccountId, module) {
  *   و (2) الزائر مسجّل الدخول بحساب على المنصة
  * النماذج/الديمو تُستثنى على الواجهة فقط.
  */
-function resolveContactGate(viewerAccountId, targetAccountId, module, accountTypeHint) {
+async function resolveContactGate(viewerAccountId, targetAccountId, module, accountTypeHint) {
   const mod = normalizeModule(module);
-  const seller = getSellerContactEligibility(targetAccountId, accountTypeHint);
-  const viewer = getViewerContactEligibility(viewerAccountId, mod);
+  const seller = await getSellerContactEligibility(targetAccountId, accountTypeHint);
+  const viewer = await getViewerContactEligibility(viewerAccountId, mod);
 
   let contactsUnlocked = false;
   if (mod === 'tender') {
@@ -252,7 +252,7 @@ const ACCOUNT_PUBLIC_SAFE = [
   'seller_trust_score', 'reviewCount', 'reviewAverage', 'id_verified',
 ];
 
-function toPublicAccountGated(acc, gate) {
+async function toPublicAccountGated(acc, gate) {
   if (!acc) return null;
   const out = {};
   ACCOUNT_PUBLIC_SAFE.forEach((k) => { if (acc[k] !== undefined) out[k] = acc[k]; });
@@ -286,7 +286,7 @@ function toPublicAccountGated(acc, gate) {
     let premium = false;
     let priorityListing = false;
     try {
-      const ents = getEntitlements(acc.id, acc.type || 'individual');
+      const ents = await getEntitlements(acc.id, acc.type || 'individual');
       const active = ents && ACTIVE_STATUSES.includes(String(ents.subscriptionStatus || ''));
       if (active) {
         premium = hasFeature(ents, 'vip_badge');
@@ -344,16 +344,16 @@ function toPublicAdGated(ad, gate, sellerAccount) {
   });
 }
 
-function _readFomoLog() {
-  return repos.contactFomo.asMap();
+async function _readFomoLog() {
+  return await repos.contactFomo.asMap();
 }
 
-function _writeFomoLog(log) {
+async function _writeFomoLog(log) {
   // يُستدعى عادة بعد تحديث مفتاح واحد — خزّن ذرياً
   const map = log && typeof log === 'object' ? log : {};
-  Object.keys(map).forEach((key) => {
-    repos.contactFomo.upsert(String(key), map[key]);
-  });
+  for (const key of Object.keys(map)) {
+    await repos.contactFomo.upsert(String(key), map[key]);
+  }
 }
 
 function _normalizePhoneE164(phone) {
@@ -367,19 +367,19 @@ async function notifyContactAttemptFomo(targetAccountId, module, opts) {
   opts = opts || {};
   if (!targetAccountId) return { ok: false, error: 'no_target' };
 
-  const log = _readFomoLog();
+  const log = await _readFomoLog();
   const key = String(targetAccountId);
   const last = log[key] ? Number(log[key]) : 0;
   if (Date.now() - last < FOMO_COOLDOWN_MS) {
     return { ok: false, error: 'cooldown', skipped: true };
   }
 
-  const pkgRec = getAccountRecord(targetAccountId);
+  const pkgRec = await getAccountRecord(targetAccountId);
   let accPhone = pkgRec && pkgRec.accountPhone;
   let accEmail = pkgRec && pkgRec.accountEmail;
   if (!accPhone || !accEmail) {
     try {
-      const acc = repos.accounts.getById(targetAccountId);
+      const acc = await repos.accounts.getById(targetAccountId);
       if (acc) {
         accPhone = accPhone || acc.phone;
         accEmail = accEmail || acc.email;
@@ -402,14 +402,14 @@ async function notifyContactAttemptFomo(targetAccountId, module, opts) {
   const delivered = !!(results.sms && results.sms.ok) || !!(results.whatsapp && results.whatsapp.ok);
   if (delivered) {
     log[key] = Date.now();
-    _writeFomoLog(log);
+    await _writeFomoLog(log);
   }
 
   return { ok: delivered, notified: delivered, results, message: msg, module: normalizeModule(module) };
 }
 
-function canSellerExposeContacts(accountId, accountType) {
-  return getSellerContactEligibility(accountId, accountType).canExpose;
+async function canSellerExposeContacts(accountId, accountType) {
+  return (await getSellerContactEligibility(accountId, accountType)).canExpose;
 }
 
 module.exports = {

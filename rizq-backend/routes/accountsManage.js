@@ -11,7 +11,7 @@ const { resolveAccountPhones } = require('../lib/phoneNormalize');
  * @param {import('express').Application} app
  * @param {object} deps
  */
-function mountAccountsManageRoutes(app, deps) {
+async function mountAccountsManageRoutes(app, deps) {
   const {
     requireAdminAuth,
     requireAdminPermission,
@@ -107,13 +107,17 @@ function mountAccountsManageRoutes(app, deps) {
    * بحقول آمنة فقط. تستخدمه صفحات المحل/المكتب/الشركة العامة + شريط "آخر
    * المحلات/المكاتب/المعارض" بالرئيسية بدل قراءة localStorage المحلي.
    */
-  app.get('/api/accounts/public', (req, res) => {
+  app.get('/api/accounts/public', async (req, res) => {
     res.set('Cache-Control', 'public, max-age=30');
-    const viewerId = resolveOptionalAccountViewer(req);
-    const list = readAccounts().filter((a) => a.status === 'approved' && !a.suspended && !String(a.id || '').startsWith('acc_demo'));
+    const viewerId = await resolveOptionalAccountViewer(req);
+    const list = (await readAccounts()).filter((a) => a.status === 'approved' && !a.suspended && !String(a.id || '').startsWith('acc_demo'));
+    const accounts = [];
+    for (const acc of list) {
+      accounts.push(await toPublicAccountForViewer(acc, viewerId));
+    }
     res.json({
       ok: true,
-      accounts: list.map((acc) => toPublicAccountForViewer(acc, viewerId)),
+      accounts,
       viewerId: viewerId || null,
     });
   });
@@ -122,14 +126,14 @@ function mountAccountsManageRoutes(app, deps) {
    * GET /api/accounts/public/:id — حساب موافَق واحد بحقول عامة فقط
    * (منها thumb) لصفحة الملف الشخصي، دون تنزيل قائمة الحسابات كلها.
    */
-  app.get('/api/accounts/public/:id', (req, res) => {
+  app.get('/api/accounts/public/:id', async (req, res) => {
     res.set('Cache-Control', 'public, max-age=30');
-    const viewerId = resolveOptionalAccountViewer(req);
-    const acc = readAccounts().find((a) => a && a.id === req.params.id);
+    const viewerId = await resolveOptionalAccountViewer(req);
+    const acc = (await readAccounts()).find((a) => a && a.id === req.params.id);
     if (!acc || acc.status !== 'approved' || acc.suspended || String(acc.id || '').startsWith('acc_demo')) {
       return res.status(404).json({ ok: false, error: 'account_not_found' });
     }
-    res.json({ ok: true, account: toPublicAccountForViewer(acc, viewerId) });
+    res.json({ ok: true, account: await toPublicAccountForViewer(acc, viewerId) });
   });
 
   /**
@@ -137,8 +141,8 @@ function mountAccountsManageRoutes(app, deps) {
    * صاحب الحساب حالة طلبه (pending/approved/rejected) + كل بياناته لملء
    * لوحة تحكمه، من أي جهاز يملك فيه هذا التوكن (وليس فقط الجهاز الذي سجّل منه).
    */
-  app.get('/api/accounts/mine/:id', (req, res) => {
-    const list = readAccounts();
+  app.get('/api/accounts/mine/:id', async (req, res) => {
+    const list = await readAccounts();
     const acc = list.find((a) => a.id === req.params.id);
     if (!acc) return res.status(404).json({ error: 'account_not_found' });
     const token = extractAccountToken(req);
@@ -153,8 +157,8 @@ function mountAccountsManageRoutes(app, deps) {
    * مدفوعين فعلاً (referralBonusGranted=true فقط — التسجيل وحده لا يُحتسب)،
    * + إجمالي أيام المكافأة المكتسبة. يغذّي بطاقة "برنامج الإحالة" بالداشبورد.
    */
-  app.get('/api/accounts/mine/:id/referrals', (req, res) => {
-    const list = readAccounts();
+  app.get('/api/accounts/mine/:id/referrals', async (req, res) => {
+    const list = await readAccounts();
     const acc = list.find((a) => a.id === req.params.id);
     if (!acc) return res.status(404).json({ error: 'account_not_found' });
     const token = extractAccountToken(req);
@@ -170,7 +174,7 @@ function mountAccountsManageRoutes(app, deps) {
    * لا يمكن تعديل status/accessToken/id عبر هذا المسار أبداً.
    */
   app.patch('/api/accounts/mine/:id', async (req, res) => {
-    const list = readAccounts();
+    const list = await readAccounts();
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
     const acc = list[idx];
@@ -311,7 +315,7 @@ function mountAccountsManageRoutes(app, deps) {
     }
     acc.updatedAt = new Date().toISOString();
     list[idx] = acc;
-    writeAccounts(list);
+    await writeAccounts(list);
     // مزامنة ملف الوكيل الهاتفي عند تغيير رقم المحل/المكتب/المعرض
     if (typeof upsertSubscriberProfileFromAccount === 'function'
       && (b.phone !== undefined || b.phoneIntl !== undefined || b.whatsapp !== undefined || b.name !== undefined)) {
@@ -326,8 +330,8 @@ function mountAccountsManageRoutes(app, deps) {
    * GET /api/accounts/admin — أدمين فقط (سرّ مشترك) — كل الحسابات بكل
    * حقولها (عدا accessToken) لطابور المراجعة في rizq_admin.html.
    */
-  app.get('/api/accounts/admin', requireAccountsAdmin, (req, res) => {
-    res.json({ ok: true, accounts: readAccounts().map(adminView).reverse() });
+  app.get('/api/accounts/admin', requireAccountsAdmin, async (req, res) => {
+    res.json({ ok: true, accounts: (await readAccounts()).map(adminView).reverse() });
   });
 
   /**
@@ -337,7 +341,7 @@ function mountAccountsManageRoutes(app, deps) {
    * بـrizq_admin.html، الذي كان يعدّل بيانات وهمية محلية فقط سابقاً.
    */
   app.patch('/api/accounts/admin/:id', requireAccountsAdmin, async (req, res) => {
-    const list = readAccounts();
+    const list = await readAccounts();
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
     const acc = list[idx];
@@ -406,7 +410,7 @@ function mountAccountsManageRoutes(app, deps) {
     if (b.storeTopics !== undefined) acc.storeTopics = sanitizeStoreTopics(b.storeTopics);
     acc.updatedAt = new Date().toISOString();
     list[idx] = acc;
-    writeAccounts(list);
+    await writeAccounts(list);
     res.json({ ok: true, account: adminView(acc) });
   });
 
@@ -417,13 +421,13 @@ function mountAccountsManageRoutes(app, deps) {
    * GET /api/accounts/public إن كانت موافقة.
    * عند approve: تُحذف صورة الهوية فوراً من accounts.json ويُثبَّت id_verified فقط.
    */
-  app.post('/api/accounts/admin/:id/decision', requireAccountsAdmin, (req, res) => {
+  app.post('/api/accounts/admin/:id/decision', requireAccountsAdmin, async (req, res) => {
     const body = req.body || {};
     const action = body.action;
     if (!['approve', 'reject', 'suspend', 'reactivate'].includes(action)) {
       return res.status(400).json({ error: "action يجب أن يكون 'approve' أو 'reject' أو 'suspend' أو 'reactivate'" });
     }
-    const list = readAccounts();
+    const list = await readAccounts();
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
 
@@ -439,7 +443,7 @@ function mountAccountsManageRoutes(app, deps) {
         list[idx].dashToken = typeof genDashToken === 'function' ? genDashToken() : list[idx].dashToken;
         list[idx].accessToken = typeof genAccessToken === 'function' ? genAccessToken() : list[idx].accessToken;
       }
-      writeAccounts(list);
+      await writeAccounts(list);
       return res.json({ ok: true, account: adminView(list[idx]) });
     }
 
@@ -459,7 +463,7 @@ function mountAccountsManageRoutes(app, deps) {
       // التزام قانوني: بعد الموافقة تُحذف صورة الهوية من الخادم — ويبقى NNI + id_verified.
       purgeAccountIdDocument(list[idx]);
     }
-    writeAccounts(list);
+    await writeAccounts(list);
     const safe = adminView(list[idx]);
     // كشف لمرة واحدة بعد الموافقة — الأدمن يحتاج dashToken لرابط لوحة المشترك
     if (action === 'approve' && list[idx].dashToken) {
@@ -477,11 +481,11 @@ function mountAccountsManageRoutes(app, deps) {
    * من الأدمن مباشرة (منح/سحب استثنائي بلا طلب شراء). مستقلة تماماً عن status
    * (التوثيق المجاني) وعن package (باقة الحساب العامة) — لا تُعدِّل أياً منهما.
    */
-  app.post('/api/accounts/admin/:id/verified-plus', requireAccountsAdmin, (req, res) => {
+  app.post('/api/accounts/admin/:id/verified-plus', requireAccountsAdmin, async (req, res) => {
     const body = req.body || {};
     const action = body.action;
     if (action !== 'grant' && action !== 'revoke') return res.status(400).json({ error: "action يجب أن يكون 'grant' أو 'revoke'" });
-    const list = readAccounts();
+    const list = await readAccounts();
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
     if (action === 'grant') {
@@ -492,7 +496,7 @@ function mountAccountsManageRoutes(app, deps) {
       list[idx].verifiedPlus = false;
       list[idx].verifiedPlusExpiresAt = null;
     }
-    writeAccounts(list);
+    await writeAccounts(list);
     res.json({ ok: true, account: adminView(list[idx]) });
   });
 }

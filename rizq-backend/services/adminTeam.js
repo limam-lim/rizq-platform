@@ -21,13 +21,13 @@ function genAdminId() {
   return 'adm_' + Date.now() + '_' + crypto.randomBytes(3).toString('hex');
 }
 
-function readTeam() {
-  return repos.adminTeam.list();
+async function readTeam() {
+  return await repos.adminTeam.list();
 }
 
-function writeTeam(list) {
+async function writeTeam(list) {
   const rows = Array.isArray(list) ? list : [];
-  repos.adminTeam.replaceAll(rows.map((m) => ({
+  await repos.adminTeam.replaceAll(rows.map((m) => ({
     id: String(m.id || genAdminId()),
     data: m,
   })));
@@ -50,8 +50,8 @@ function publicMember(row) {
   };
 }
 
-function seedFromLegacyAccounts(legacyAccounts) {
-  const existing = readTeam();
+async function seedFromLegacyAccounts(legacyAccounts) {
+  const existing = await readTeam();
   if (existing.length) return existing;
   const now = new Date().toISOString();
   const seeded = (legacyAccounts || []).map((acc) => ({
@@ -68,7 +68,7 @@ function seedFromLegacyAccounts(legacyAccounts) {
     updatedAt: now,
     legacyRole: acc.role || 'staff',
   }));
-  if (seeded.length) writeTeam(seeded);
+  if (seeded.length) await writeTeam(seeded);
   return seeded;
 }
 
@@ -79,7 +79,7 @@ function seedFromLegacyAccounts(legacyAccounts) {
  * مهم: لا نستبدل passHash الموجود عند كل إقلاع — وإلا تلغى كلمة السر
  * التي غيّرها الأدمن من اللوحة. لإعادة فرض هاش .env استخدم SUPER_ADMIN_FORCE_PASS_HASH=1.
  */
-function ensureOwnerSuperAdmin(ownerSpec) {
+async function ensureOwnerSuperAdmin(ownerSpec) {
   const email = String(
     (ownerSpec && ownerSpec.email) || process.env.SUPER_ADMIN_EMAIL || ''
   ).trim().toLowerCase();
@@ -88,11 +88,11 @@ function ensureOwnerSuperAdmin(ownerSpec) {
   ).trim();
   const name = String((ownerSpec && ownerSpec.name) || process.env.SUPER_ADMIN_NAME || 'M. LIMAM').trim() || 'M. LIMAM';
   const user = String((ownerSpec && ownerSpec.user) || email).trim().toLowerCase() || email;
-  if (!email || !envPassHash || !envPassHash.startsWith('$2')) return readTeam();
+  if (!email || !envPassHash || !envPassHash.startsWith('$2')) return await readTeam();
 
   const forcePass = String(process.env.SUPER_ADMIN_FORCE_PASS_HASH || '').trim() === '1'
     || !!(ownerSpec && ownerSpec.forcePassHash);
-  const list = readTeam();
+  const list = await readTeam();
   const now = new Date().toISOString();
   let idx = list.findIndex((m) => {
     const e = String(m.email || '').toLowerCase();
@@ -146,7 +146,7 @@ function ensureOwnerSuperAdmin(ownerSpec) {
     }
   });
 
-  writeTeam(list);
+  await writeTeam(list);
   return list;
 }
 
@@ -173,7 +173,7 @@ async function changeOwnPassword(loginUser, currentPass, newPass) {
     err.code = 'same_password';
     throw err;
   }
-  const list = readTeam();
+  const list = await readTeam();
   const idx = list.findIndex((m) => {
     if (m.active === false) return false;
     const loginU = String(m.user || '').trim().toLowerCase();
@@ -195,14 +195,14 @@ async function changeOwnPassword(loginUser, currentPass, newPass) {
   row.passHash = await bcrypt.hash(next, 12);
   row.updatedAt = new Date().toISOString();
   list[idx] = row;
-  writeTeam(list);
+  await writeTeam(list);
   return publicMember(row);
 }
 
 async function authenticate(user, pass) {
   const u = String(user || '').trim().toLowerCase();
   if (!u || !pass) return null;
-  const row = readTeam().find((m) => {
+  const row = (await readTeam()).find((m) => {
     if (m.active === false) return false;
     const loginUser = String(m.user || '').trim().toLowerCase();
     const loginEmail = String(m.email || '').trim().toLowerCase();
@@ -214,24 +214,24 @@ async function authenticate(user, pass) {
   return row;
 }
 
-function touchLogin(user) {
-  const list = readTeam();
+async function touchLogin(user) {
+  const list = await readTeam();
   const idx = list.findIndex((m) => m.user === user);
   if (idx === -1) return;
   list[idx].lastLoginAt = new Date().toISOString();
-  writeTeam(list);
+  await writeTeam(list);
 }
 
-function listTeamPublic() {
-  return readTeam().filter((m) => m.active !== false).map(publicMember);
+async function listTeamPublic() {
+  return (await readTeam()).filter((m) => m.active !== false).map(publicMember);
 }
 
-function getMemberById(id) {
-  return readTeam().find((m) => m.id === id) || null;
+async function getMemberById(id) {
+  return (await readTeam()).find((m) => m.id === id) || null;
 }
 
-function assertTeamCapacity() {
-  const active = readTeam().filter((m) => m.active !== false);
+async function assertTeamCapacity() {
+  const active = (await readTeam()).filter((m) => m.active !== false);
   if (active.length >= MAX_TEAM_MEMBERS) {
     const err = new Error('team_limit_reached');
     err.code = 'team_limit_reached';
@@ -241,7 +241,7 @@ function assertTeamCapacity() {
 }
 
 async function createMember(payload, actorUser, actorPerms) {
-  assertTeamCapacity();
+  await assertTeamCapacity();
   const user = String(payload.user || '').trim().toLowerCase();
   const name = String(payload.name || '').trim();
   const pass = String(payload.pass || '');
@@ -250,7 +250,7 @@ async function createMember(payload, actorUser, actorPerms) {
     err.code = 'missing_fields';
     throw err;
   }
-  if (readTeam().some((m) => m.user === user && m.active !== false)) {
+  if ((await readTeam()).some((m) => m.user === user && m.active !== false)) {
     const err = new Error('user_exists');
     err.code = 'user_exists';
     throw err;
@@ -272,14 +272,14 @@ async function createMember(payload, actorUser, actorPerms) {
     updatedAt: now,
     createdBy: actorUser || null,
   };
-  const list = readTeam();
+  const list = await readTeam();
   list.push(member);
-  writeTeam(list);
+  await writeTeam(list);
   return publicMember(member);
 }
 
 async function updateMember(id, payload, actorPerms) {
-  const list = readTeam();
+  const list = await readTeam();
   const idx = list.findIndex((m) => m.id === id);
   if (idx === -1) return null;
   const row = list[idx];
@@ -295,7 +295,7 @@ async function updateMember(id, payload, actorPerms) {
     // منع إسقاط آخر Super
     const wasSuper = (row.permissions || []).includes('*');
     if (wasSuper && !next.includes('*')) {
-      const supers = readTeam().filter((m) => m.active !== false && (m.permissions || []).includes('*'));
+      const supers = (await readTeam()).filter((m) => m.active !== false && (m.permissions || []).includes('*'));
       if (supers.length <= 1) {
         const err = new Error('last_super_admin');
         err.code = 'last_super_admin';
@@ -318,7 +318,7 @@ async function updateMember(id, payload, actorPerms) {
   }
   row.updatedAt = new Date().toISOString();
   list[idx] = row;
-  writeTeam(list);
+  await writeTeam(list);
   const pub = publicMember(row);
   if (permsChanged || passChanged || deactivated) {
     pub._invalidateSessions = true;
@@ -328,7 +328,7 @@ async function updateMember(id, payload, actorPerms) {
 }
 
 async function deactivateMember(id) {
-  return updateMember(id, { active: false });
+  return await updateMember(id, { active: false });
 }
 
 module.exports = {

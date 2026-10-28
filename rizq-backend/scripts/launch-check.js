@@ -116,10 +116,10 @@ function envPresent() {
   return { missing, storage, ok: missing.length === 0 };
 }
 
-function launchDateEmpty() {
+async function launchDateEmpty() {
   try {
     const launchMode = require('../config/launchMode');
-    const s = launchMode.getLaunchSettings();
+    const s = await launchMode.getLaunchSettings();
     return {
       launchDate: s.launchDate || '',
       empty: !s.launchDate,
@@ -129,7 +129,7 @@ function launchDateEmpty() {
   } catch (e) {
     // fallback site-config
     try {
-      const cfg = require('../db/repos').getSiteConfig() || {};
+      const cfg = (await require('../db/repos').getSiteConfig()) || {};
       return { launchDate: cfg.launchDate || '', empty: !cfg.launchDate };
     } catch (e2) {
       return { error: e.message, empty: false };
@@ -158,7 +158,7 @@ function countDemo() {
   };
 }
 
-function main() {
+async function main() {
   console.log('══ launch-check (read-only) ══\n');
   let passed = 0;
   let total = 0;
@@ -228,7 +228,7 @@ function main() {
     env.storage.LOCAL_ROOT
   );
 
-  const launch = launchDateEmpty();
+  const launch = await launchDateEmpty();
   check(
     'launchDate empty (dry-run maintenance)',
     launch.empty === true,
@@ -249,4 +249,7 @@ function main() {
   process.exit(0);
 }
 
-main();
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

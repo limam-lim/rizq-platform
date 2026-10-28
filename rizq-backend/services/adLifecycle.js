@@ -34,11 +34,11 @@ function isPaidParticipant(account, pkgRecord) {
   return false;
 }
 
-function getPaidGraceDeadlineMs(account, pkgRecord, nowMs) {
+async function getPaidGraceDeadlineMs(account, pkgRecord, nowMs) {
   return launchMode.getProtectedUntilMs(account, pkgRecord, nowMs);
 }
 
-function isUnderPaidGrace(nowMs, account, pkgRecord) {
+async function isUnderPaidGrace(nowMs, account, pkgRecord) {
   return launchMode.isUnderProtection(nowMs, account, pkgRecord);
 }
 
@@ -65,27 +65,29 @@ function purgeAdMedia(adId, _uploadsDir) {
   return Number(result.bytesFreed) || 0;
 }
 
-function readAuditLog(_dataDir) {
-  return repos.maintenanceAudit.list();
+async function readAuditLog(_dataDir) {
+  return await repos.maintenanceAudit.list();
 }
 
-function appendAuditEntry(_dataDir, entry) {
+async function appendAuditEntry(_dataDir, entry) {
   const id = (entry && entry.id) || ('aud_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8));
   const rec = Object.assign({ id }, entry || {});
-  repos.maintenanceAudit.upsert(id, rec);
-  const all = repos.maintenanceAudit.list();
+  await repos.maintenanceAudit.upsert(id, rec);
+  const all = await repos.maintenanceAudit.list();
   if (all.length > MAX_AUDIT_ENTRIES) {
-    all
+    const excess = all
       .sort((a, b) => String(b.at || b.createdAt || b.runAt || '').localeCompare(String(a.at || a.createdAt || a.runAt || '')))
-      .slice(MAX_AUDIT_ENTRIES)
-      .forEach((e) => repos.maintenanceAudit.remove(String(e.id)));
+      .slice(MAX_AUDIT_ENTRIES);
+    for (const e of excess) {
+      await repos.maintenanceAudit.remove(String(e.id));
+    }
   }
 }
 
 /**
  * Run one maintenance pass.
  */
-function runAdLifecycleMaintenance(deps) {
+async function runAdLifecycleMaintenance(deps) {
   const {
     readAds,
     writeAds,
@@ -97,14 +99,14 @@ function runAdLifecycleMaintenance(deps) {
     trigger = 'manual',
   } = deps;
 
-  const settings = launchMode.getLaunchSettings();
+  const settings = await launchMode.getLaunchSettings();
   const dryRun = settings.maintenanceDryRun === true;
 
-  const accounts = readAccounts();
+  const accounts = (await Promise.resolve(readAccounts())) || [];
   const accountById = {};
   accounts.forEach((a) => { accountById[a.id] = a; });
 
-  const list = readAds();
+  const list = (await Promise.resolve(readAds())) || [];
   let changed = false;
   const summary = {
     runAt: new Date(nowMs).toISOString(),
@@ -114,7 +116,7 @@ function runAdLifecycleMaintenance(deps) {
     launchDate: settings.launchDate || null,
     freeDays: settings.freeDays,
     freeUntil: settings.freeUntil || null,
-    freePeriodActive: launchMode.isLaunchFreePeriodActive(nowMs),
+    freePeriodActive: await launchMode.isLaunchFreePeriodActive(nowMs),
     archived: 0,
     mediaPurged: 0,
     bytesFreed: 0,
@@ -129,8 +131,10 @@ function runAdLifecycleMaintenance(deps) {
     if (!ad || !ad.id) continue;
 
     const account = ad.accountId ? accountById[ad.accountId] : null;
-    const pkgRecord = ad.accountId && getAccountRecord ? getAccountRecord(ad.accountId) : null;
-    const protectedGrace = isUnderPaidGrace(nowMs, account, pkgRecord);
+    const pkgRecord = ad.accountId && getAccountRecord
+      ? await Promise.resolve(getAccountRecord(ad.accountId))
+      : null;
+    const protectedGrace = await isUnderPaidGrace(nowMs, account, pkgRecord);
 
     if (ad.status === 'active') {
       if (protectedGrace) {
@@ -189,8 +193,8 @@ function runAdLifecycleMaintenance(deps) {
     }
   }
 
-  if (changed && !dryRun) writeAds(list);
-  appendAuditEntry(dataDir, summary);
+  if (changed && !dryRun) await Promise.resolve(writeAds(list));
+  await appendAuditEntry(dataDir, summary);
   return summary;
 }
 

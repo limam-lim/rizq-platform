@@ -1,0 +1,28 @@
+# PostgreSQL async data layer ready (no deasync).
+# Callers in server.js / routes still need await — do NOT mass-edit server.js yet.
+#
+# Converted modules (async/await + pg.Pool):
+#   db/pool.js
+#   db/sql.js          — query / queryOne / execute / withTransaction only
+#   db/index.js        — ready(), getPool(), isPostgres=true
+#   db/docStore.js     — createCollection methods all async
+#   db/platformStore.js — all methods async
+#   db/repos.js        — helpers + accounts/ads/catalog/tenders facades async
+#   models/buyer.js
+#   models/wishlist.js
+#   models/corpApiIntegration.js
+#   services/adminSessionStore.js  — get/set/delete/clear/entries/size async
+#   lib/redis.js
+#   lib/rateLimitRedis.js
+#   lib/awaitAll.js
+#   services/cacheService.js
+#   services/sessionStore.js
+#
+# Boot:
+#   await require('./db').ready()
+#   # optional: RUN_MIGRATIONS_ON_BOOT=1  OR  npm run migrate
+#   await require('./db/repos').migrateAllSecondaryStores()
+#   await require('./db/platformStore').migrateAllPlatformStores()
+#   await require('./lib/redis').ready()
+#
+# Migration: 1761619200000_init-schema.js

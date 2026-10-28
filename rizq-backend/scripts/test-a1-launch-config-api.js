@@ -2,6 +2,9 @@
 /** A1: launch-config save rules (past confirm + audit) via repos + launchMode */
 'use strict';
 
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env'), override: true });
+
+const db = require('../db');
 const repos = require('../db/repos');
 const launchMode = require('../config/launchMode');
 
@@ -10,15 +13,8 @@ function ok(name, pass, detail) {
   return pass;
 }
 
-let passed = 0;
-let total = 0;
-function check(name, pass, detail) {
-  total++;
-  if (ok(name, pass, detail)) passed++;
-}
-
-function saveLaunch(body) {
-  const current = repos.getSiteConfig() || {};
+async function saveLaunch(body) {
+  const current = (await repos.getSiteConfig()) || {};
   const prevDate = launchMode.parseYmd(current.launchDate) || '';
   const prevDays = launchMode.normalizeFreeDays(
     current.freeDays != null && current.freeDays !== '' ? current.freeDays : launchMode.DEFAULT_FREE_DAYS
@@ -48,39 +44,58 @@ function saveLaunch(body) {
     new: { launchDate: nextDate || null, freeDays: nextDays, freeUntil: nextUntil },
   });
   next.launchAudit = list.slice(0, 80);
-  repos.saveSiteConfig(next);
-  return { status: 200, ok: true, launch: launchMode.publicLaunchConfig({}), stored: { launchDate: nextDate, freeDays: nextDays }, audit: next.launchAudit };
+  await repos.saveSiteConfig(next);
+  return {
+    status: 200,
+    ok: true,
+    launch: await launchMode.publicLaunchConfig({}),
+    stored: { launchDate: nextDate, freeDays: nextDays },
+    audit: next.launchAudit,
+  };
 }
 
-const snap = Object.assign({}, repos.getSiteConfig() || {});
+async function main() {
+  await db.ready();
+  let passed = 0;
+  let total = 0;
+  function check(name, pass, detail) {
+    total++;
+    if (ok(name, pass, detail)) passed++;
+  }
 
-try {
-  // clear first
-  let r = saveLaunch({ launchDate: '', freeDays: 90 });
-  check('clear launchDate ok', r.status === 200 && r.launch.maintenanceDryRun === true);
+  const snap = Object.assign({}, (await repos.getSiteConfig()) || {});
 
-  r = saveLaunch({ launchDate: '2020-01-01', freeDays: 30 });
-  check('past freeUntil needs confirm', r.status === 409 && r.error === 'needs_confirm_past');
+  try {
+    let r = await saveLaunch({ launchDate: '', freeDays: 90 });
+    check('clear launchDate ok', r.status === 200 && r.launch.maintenanceDryRun === true);
 
-  r = saveLaunch({ launchDate: '2020-01-01', freeDays: 30, confirmPast: true });
-  check('past with confirm saves', r.status === 200 && r.stored.launchDate === '2020-01-01');
-  check('audit written', Array.isArray(r.audit) && r.audit[0] && r.audit[0].by === 'test-super');
+    r = await saveLaunch({ launchDate: '2020-01-01', freeDays: 30 });
+    check('past freeUntil needs confirm', r.status === 409 && r.error === 'needs_confirm_past');
 
-  r = saveLaunch({ launchDate: '2026-10-01', freeDays: 90 });
-  check('future launch computes freeUntil', r.status === 200 && r.launch.freeUntil === '2026-12-30');
-  check('not dry-run', r.launch.maintenanceDryRun === false);
-  check('daysRemaining present', r.launch.daysRemaining != null);
-} finally {
-  // restore previous site-config snapshot fields we care about
-  const cur = repos.getSiteConfig() || {};
-  const restored = Object.assign({}, cur, {
-    launchDate: snap.launchDate || '',
-    freeDays: snap.freeDays != null ? snap.freeDays : 90,
-    launchAudit: snap.launchAudit || [],
-  });
-  if (!snap.launchFreeUntil) delete restored.launchFreeUntil;
-  repos.saveSiteConfig(restored);
+    r = await saveLaunch({ launchDate: '2020-01-01', freeDays: 30, confirmPast: true });
+    check('past with confirm saves', r.status === 200 && r.stored.launchDate === '2020-01-01');
+    check('audit written', Array.isArray(r.audit) && r.audit[0] && r.audit[0].by === 'test-super');
+
+    r = await saveLaunch({ launchDate: '2026-10-01', freeDays: 90 });
+    check('future launch computes freeUntil', r.status === 200 && r.launch.freeUntil === '2026-12-30');
+    check('not dry-run', r.launch.maintenanceDryRun === false);
+    check('daysRemaining present', r.launch.daysRemaining != null);
+  } finally {
+    const cur = (await repos.getSiteConfig()) || {};
+    const restored = Object.assign({}, cur, {
+      launchDate: snap.launchDate || '',
+      freeDays: snap.freeDays != null ? snap.freeDays : 90,
+      launchAudit: snap.launchAudit || [],
+    });
+    if (!snap.launchFreeUntil) delete restored.launchFreeUntil;
+    await repos.saveSiteConfig(restored);
+  }
+
+  console.log('\n' + passed + '/' + total + ' checks passed\n');
+  process.exit(passed === total ? 0 : 1);
 }
 
-console.log('\n' + passed + '/' + total + ' checks passed\n');
-process.exit(passed === total ? 0 : 1);
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

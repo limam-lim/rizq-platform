@@ -79,7 +79,7 @@ function sanitizeRequestForOwner(row) {
  * @param {import('express').Application} app
  * @param {object} deps
  */
-function mountServiceRequestRoutes(app, deps) {
+async function mountServiceRequestRoutes(app, deps) {
   const {
     verifyAccountOwner,
     extractAccountToken,
@@ -113,13 +113,13 @@ function mountServiceRequestRoutes(app, deps) {
    *       service?, message?, source?, templateName?, paymentPreference?,
    *       attachment? | attachments? (data-URL صورة/PDF)
    */
-  app.post('/api/service-requests', createLimiter, (req, res) => {
+  app.post('/api/service-requests', createLimiter, async (req, res) => {
     const b = req.body || {};
     const accountId = clip(b.accountId, 60);
     if (!accountId) {
       return res.status(400).json({ ok: false, error: 'accountId_required', code: 'accountId_required' });
     }
-    const accounts = typeof readAccounts === 'function' ? readAccounts() : [];
+    const accounts = typeof readAccounts === 'function' ? await readAccounts() : [];
     const acc = accounts.find((a) => a && a.id === accountId);
     if (!acc || (acc.status && acc.status !== 'approved' && acc.status !== 'active')) {
       return res.status(404).json({ ok: false, error: 'account_not_found', code: 'account_not_found' });
@@ -207,10 +207,10 @@ function mountServiceRequestRoutes(app, deps) {
   });
 
   /** GET /api/service-requests/mine?accountId= — لصاحب الحساب فقط */
-  app.get('/api/service-requests/mine', (req, res) => {
+  app.get('/api/service-requests/mine', async (req, res) => {
     const accountId = clip(req.query.accountId, 60);
     const token = extractAccountToken(req) || '';
-    if (!accountId || !verifyAccountOwner(accountId, token)) {
+    if (!accountId || !await verifyAccountOwner(accountId, token)) {
       return res.status(401).json({ ok: false, error: 'unauthorized' });
     }
     const status = clip(req.query.status, 32);
@@ -227,13 +227,13 @@ function mountServiceRequestRoutes(app, deps) {
   });
 
   /** GET /api/service-requests/:id/attachments/:attId — تحميل محمي للمالك */
-  app.get('/api/service-requests/:id/attachments/:attId', (req, res) => {
+  app.get('/api/service-requests/:id/attachments/:attId', async (req, res) => {
     const id = clip(req.params.id, 80);
     const attId = clip(req.params.attId, 80);
     const row = serviceRequests.get(id);
     if (!row) return res.status(404).json({ ok: false, error: 'not_found' });
     const token = extractAccountToken(req) || '';
-    if (!verifyAccountOwner(row.accountId, token)) {
+    if (!await verifyAccountOwner(row.accountId, token)) {
       return res.status(401).json({ ok: false, error: 'unauthorized' });
     }
     const atts = Array.isArray(row.attachments) ? row.attachments : [];
@@ -252,12 +252,12 @@ function mountServiceRequestRoutes(app, deps) {
   });
 
   /** PATCH /api/service-requests/:id — تحديث الحالة من المالك */
-  app.patch('/api/service-requests/:id', (req, res) => {
+  app.patch('/api/service-requests/:id', async (req, res) => {
     const id = clip(req.params.id, 80);
     const row = serviceRequests.get(id);
     if (!row) return res.status(404).json({ ok: false, error: 'not_found' });
     const token = extractAccountToken(req) || '';
-    if (!verifyAccountOwner(row.accountId, token)) {
+    if (!await verifyAccountOwner(row.accountId, token)) {
       return res.status(401).json({ ok: false, error: 'unauthorized' });
     }
     const b = req.body || {};

@@ -3,21 +3,21 @@
  */
 const repos = require('../db/repos');
 
-function readAll() {
-  return repos.agentStatus.asMap();
+async function readAll() {
+  return await repos.agentStatus.asMap();
 }
 
-function setActive(phone, active) {
+async function setActive(phone, active) {
   const key = String(phone || '').replace(/\D/g, '').slice(-8);
   if (!key) return null;
   const rec = { active: !!active, updatedAt: new Date().toISOString() };
-  repos.agentStatus.upsert(key, rec);
+  await repos.agentStatus.upsert(key, rec);
   return rec;
 }
 
-function isActive(phone) {
+async function isActive(phone) {
   const key = String(phone || '').replace(/\D/g, '').slice(-8);
-  const rec = repos.agentStatus.get(key);
+  const rec = await repos.agentStatus.get(key);
   if (!rec) return true;
   return !!rec.active;
 }

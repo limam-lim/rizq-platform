@@ -1,0 +1,67 @@
+# Local infra only — PostgreSQL 16 + Redis 7 (no api/nginx).
+#
+# Required:
+#   POSTGRES_PASSWORD
+#   REDIS_PASSWORD
+# Optional:
+#   POSTGRES_USER (set explicitly; compose will fail if missing)
+#   POSTGRES_DB
+#
+# Usage:
+#   export POSTGRES_USER=rizq POSTGRES_DB=rizq
+#   export POSTGRES_PASSWORD="$(cat /tmp/rizq-pg-pass.txt)"
+#   export REDIS_PASSWORD="$(cat /tmp/rizq-redis-pass.txt)"
+#   docker compose -f docker-compose.dev.yml up -d
+
+name: rizq-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?POSTGRES_DB required}
+      POSTGRES_USER: ${POSTGRES_USER:?POSTGRES_USER required}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD required}
+    volumes:
+      - rizq_dev_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [rizq_dev_net]
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --maxmemory
+      - 128mb
+      - --maxmemory-policy
+      - allkeys-lru
+      - --requirepass
+      - ${REDIS_PASSWORD:?REDIS_PASSWORD required}
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?REDIS_PASSWORD required}
+    volumes:
+      - rizq_dev_redis:/data
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [rizq_dev_net]
+
+volumes:
+  rizq_dev_postgres:
+  rizq_dev_redis:
+
+networks:
+  rizq_dev_net:
+    driver: bridge

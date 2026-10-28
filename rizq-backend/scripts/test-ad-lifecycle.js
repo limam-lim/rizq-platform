@@ -83,22 +83,22 @@ async function run() {
 
   // With launchDate set — freeUntil+60 protects store/estate/office without periodEnd
   launchMode.setLaunchSettingsForTests({ launchDate: '2026-10-01', freeDays: 90 });
-  check('store protected via freeUntil+60', isUnderPaidGrace(now, { type: 'store' }, null));
-  check('estate protected via freeUntil+60', isUnderPaidGrace(now, { type: 'estate' }, { periodEnd: null }));
-  check('office protected via freeUntil+60 (no Infinity)', isUnderPaidGrace(now, { type: 'office' }, null));
+  check('store protected via freeUntil+60', await isUnderPaidGrace(now, { type: 'store' }, null));
+  check('estate protected via freeUntil+60', await isUnderPaidGrace(now, { type: 'estate' }, { periodEnd: null }));
+  check('office protected via freeUntil+60 (no Infinity)', await isUnderPaidGrace(now, { type: 'office' }, null));
 
   const periodEnd = '2026-11-01T00:00:00.000Z';
   check(
     'periodEnd+60 still protects',
-    isUnderPaidGrace(now, { type: 'store' }, { periodEnd })
+    await isUnderPaidGrace(now, { type: 'store' }, { periodEnd })
   );
   check(
     'periodEnd+60 expired after grace',
-    !isUnderPaidGrace(
+    !(await isUnderPaidGrace(
       Date.parse(periodEnd) + 61 * MS_DAY,
       { type: 'store' },
       { periodEnd }
-    )
+    ))
   );
 
   // Dry-run when launchDate empty
@@ -109,7 +109,7 @@ async function run() {
     [],
     {}
   );
-  const rDry = runAdLifecycleMaintenance(makeDeps(now));
+  const rDry = await runAdLifecycleMaintenance(makeDeps(now));
   const afterDry = makeDeps(now).readAds()[0];
   check('dry-run does not archive', rDry.dryRun === true && afterDry.status === 'active' && rDry.wouldArchive >= 1, 'would=' + rDry.wouldArchive);
   check('dry-run archived count 0', rDry.archived === 0);
@@ -121,7 +121,7 @@ async function run() {
     [],
     {}
   );
-  const r1 = runAdLifecycleMaintenance(makeDeps(now));
+  const r1 = await runAdLifecycleMaintenance(makeDeps(now));
   check('archives unprotected ad', r1.archived === 1 && makeDeps(now).readAds()[0].status === 'archived');
 
   // Store during free+grace skipped
@@ -130,7 +130,7 @@ async function run() {
     [{ id: 's1', type: 'store' }],
     {}
   );
-  const r2 = runAdLifecycleMaintenance(makeDeps(now));
+  const r2 = await runAdLifecycleMaintenance(makeDeps(now));
   check('skips store under freeUntil+60', r2.skippedPaidGrace >= 1 && makeDeps(now).readAds()[0].status === 'active');
 
   // Estate same
@@ -139,17 +139,17 @@ async function run() {
     [{ id: 'e1', type: 'estate' }],
     { e1: { periodEnd: null } }
   );
-  const r3 = runAdLifecycleMaintenance(makeDeps(now));
+  const r3 = await runAdLifecycleMaintenance(makeDeps(now));
   check('skips estate under freeUntil+60', r3.skippedPaidGrace >= 1 && makeDeps(now).readAds()[0].status === 'active');
 
   // After freeUntil+60 — store archives
-  const afterGrace = launchMode.freeUntilEndMs(launchMode.getLaunchFreeUntil()) + 61 * MS_DAY;
+  const afterGrace = launchMode.freeUntilEndMs(await launchMode.getLaunchFreeUntil()) + 61 * MS_DAY;
   setupFixture(
     [{ id: 'AD_STORE_FREE', accountId: 's2', status: 'active', title: 'late', createdAt: isoDaysAgo(45, afterGrace) }],
     [{ id: 's2', type: 'store' }],
     {}
   );
-  const r4 = runAdLifecycleMaintenance(makeDeps(afterGrace));
+  const r4 = await runAdLifecycleMaintenance(makeDeps(afterGrace));
   check('archives store after freeUntil+60', r4.archived === 1 && makeDeps(afterGrace).readAds()[0].status === 'archived');
 
   // Purge via objectStorage
@@ -165,7 +165,7 @@ async function run() {
     [],
     {}
   );
-  const r5 = runAdLifecycleMaintenance(makeDeps(now));
+  const r5 = await runAdLifecycleMaintenance(makeDeps(now));
   const purged = makeDeps(now).readAds()[0];
   check('purges media via objectStorage', r5.mediaPurged === 1 && purged.status === 'removed' && !fs.existsSync(path.join(ROOT, 'uploads', 'ads', 'AD_PURGE')));
   check('deletePrefix available', typeof objectStorage.deletePrefixSync === 'function');
@@ -173,7 +173,7 @@ async function run() {
   touchMedia('AD_PURGE2');
   check('purgeAdMedia works', purgeAdMedia('AD_PURGE2') > 0);
 
-  const audit = readAuditLog(TMP_DATA);
+  const audit = await readAuditLog(TMP_DATA);
   check('audit has test runs', Array.isArray(audit) && audit.some((e) => e && e.trigger === 'test'));
 
   cleanup();

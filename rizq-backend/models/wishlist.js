@@ -1,7 +1,9 @@
 /**
- * Wishlist — معرّفات إعلانات/منتجات محفوظة لكل مشترٍ
+ * Wishlist — async PostgreSQL
  */
-const { db } = require('../db');
+'use strict';
+
+const sql = require('../db/sql');
 
 const MAX_ITEMS = 500;
 
@@ -18,45 +20,50 @@ function normalizeIds(raw) {
   return out.slice(0, MAX_ITEMS);
 }
 
-function listIds(buyerId) {
-  return db.prepare(`
-    SELECT item_id FROM wishlist_items
-    WHERE buyer_id = ?
-    ORDER BY added_at DESC
-  `).all(buyerId).map((r) => r.item_id);
+async function listIds(buyerId) {
+  const rows = await sql.query(
+    `SELECT item_id FROM wishlist_items
+     WHERE buyer_id = ?
+     ORDER BY added_at DESC`,
+    [buyerId]
+  );
+  return rows.map((r) => r.item_id);
 }
 
-function replaceAll(buyerId, ids) {
+async function replaceAll(buyerId, ids) {
   const clean = normalizeIds(ids);
-  const tx = db.transaction((bid, items) => {
-    db.prepare('DELETE FROM wishlist_items WHERE buyer_id = ?').run(bid);
-    const ins = db.prepare(`
-      INSERT INTO wishlist_items (buyer_id, item_id, added_at) VALUES (?, ?, ?)
-    `);
+  await sql.withTransaction(async (tx) => {
+    await tx.execute('DELETE FROM wishlist_items WHERE buyer_id = ?', [buyerId]);
     const now = new Date().toISOString();
-    items.forEach((itemId) => ins.run(bid, itemId, now));
+    for (const itemId of clean) {
+      await tx.execute(
+        `INSERT INTO wishlist_items (buyer_id, item_id, added_at) VALUES (?, ?, ?)
+         ON CONFLICT (buyer_id, item_id) DO UPDATE SET added_at = EXCLUDED.added_at`,
+        [buyerId, itemId, now]
+      );
+    }
   });
-  tx(buyerId, clean);
   return clean;
 }
 
-function mergeIds(buyerId, ids) {
+async function mergeIds(buyerId, ids) {
   const incoming = normalizeIds(ids);
-  const existing = new Set(listIds(buyerId));
+  const existing = new Set(await listIds(buyerId));
   const now = new Date().toISOString();
-  const ins = db.prepare(`
-    INSERT OR IGNORE INTO wishlist_items (buyer_id, item_id, added_at) VALUES (?, ?, ?)
-  `);
-  incoming.forEach((itemId) => {
+  for (const itemId of incoming) {
     if (!existing.has(itemId)) {
-      ins.run(buyerId, itemId, now);
+      await sql.execute(
+        `INSERT INTO wishlist_items (buyer_id, item_id, added_at) VALUES (?, ?, ?)
+         ON CONFLICT (buyer_id, item_id) DO NOTHING`,
+        [buyerId, itemId, now]
+      );
       existing.add(itemId);
     }
-  });
+  }
   return listIds(buyerId);
 }
 
-function addItem(buyerId, itemId) {
+async function addItem(buyerId, itemId) {
   const id = String(itemId).trim().slice(0, 80);
   if (!id) {
     const err = new Error('item_id مطلوب');
@@ -64,15 +71,19 @@ function addItem(buyerId, itemId) {
     err.code = 'ITEM_REQUIRED';
     throw err;
   }
-  db.prepare(`
-    INSERT OR REPLACE INTO wishlist_items (buyer_id, item_id, added_at) VALUES (?, ?, ?)
-  `).run(buyerId, id, new Date().toISOString());
+  const now = new Date().toISOString();
+  await sql.execute(
+    `INSERT INTO wishlist_items (buyer_id, item_id, added_at) VALUES (?, ?, ?)
+     ON CONFLICT (buyer_id, item_id) DO UPDATE SET added_at = EXCLUDED.added_at`,
+    [buyerId, id, now]
+  );
   return listIds(buyerId);
 }
 
-function removeItem(buyerId, itemId) {
-  db.prepare('DELETE FROM wishlist_items WHERE buyer_id = ? AND item_id = ?').run(
-    buyerId, String(itemId).trim().slice(0, 80)
+async function removeItem(buyerId, itemId) {
+  await sql.execute(
+    'DELETE FROM wishlist_items WHERE buyer_id = ? AND item_id = ?',
+    [buyerId, String(itemId).trim().slice(0, 80)]
   );
   return listIds(buyerId);
 }

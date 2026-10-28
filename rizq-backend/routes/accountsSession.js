@@ -10,7 +10,7 @@ const rateLimit = require('express-rate-limit');
  * @param {import('express').Application} app
  * @param {object} deps
  */
-function mountAccountsSessionRoutes(app, deps) {
+async function mountAccountsSessionRoutes(app, deps) {
   const {
     bcrypt,
     readAccounts,
@@ -75,7 +75,7 @@ function mountAccountsSessionRoutes(app, deps) {
       return res.status(400).json({ ok: false, code: 'invalid', error: 'بيانات الدخول غير صحيحة' });
     }
     const dummyHash = '$2a$10$Cr7J1rfztqkXC9ZpESd5qO2PLvx6D3SJKxfBjfX3DXVMuu3YBVDYy';
-    const list = readAccounts();
+    const list = await readAccounts();
     const acc = list.find((a) => String(a.email || '').trim().toLowerCase() === email);
     let ok = false;
     try {
@@ -108,7 +108,7 @@ function mountAccountsSessionRoutes(app, deps) {
     acc.lastLoginAt = acc.updatedAt;
     if (idxLogin !== -1) {
       list[idxLogin] = acc;
-      writeAccounts(list);
+      await writeAccounts(list);
     }
     const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, accessTokenExpiresAt, dashTokenExpiresAt, ...safeFields } = acc;
     res.set('Cache-Control', 'no-store');
@@ -125,7 +125,7 @@ function mountAccountsSessionRoutes(app, deps) {
   });
 
   /** POST /api/accounts/logout — إبطال توكنات البائع فوراً (تدوير access + dash) */
-  app.post('/api/accounts/logout', sellerLoginLimiter, (req, res) => {
+  app.post('/api/accounts/logout', sellerLoginLimiter, async (req, res) => {
     res.set('Cache-Control', 'no-store');
     const b = req.body || {};
     const id = String(b.id || b.accountId || '').slice(0, 60);
@@ -135,7 +135,7 @@ function mountAccountsSessionRoutes(app, deps) {
     if (!id || !token) {
       return res.status(400).json({ ok: false, code: 'missing', error: 'معرّف الحساب والتوكن مطلوبان' });
     }
-    const list = readAccounts();
+    const list = await readAccounts();
     const idx = list.findIndex((a) => a && a.id === id);
     if (idx < 0) {
       return res.json({ ok: true });
@@ -152,12 +152,12 @@ function mountAccountsSessionRoutes(app, deps) {
     else acc.dashToken = genDashToken();
     acc.updatedAt = new Date().toISOString();
     list[idx] = acc;
-    writeAccounts(list);
+    await writeAccounts(list);
     res.json({ ok: true });
   });
 
   /** POST /api/accounts/activate-by-otp */
-  app.post('/api/accounts/activate-by-otp', accountsRegisterLimiter, (req, res) => {
+  app.post('/api/accounts/activate-by-otp', accountsRegisterLimiter, async (req, res) => {
     res.set('Cache-Control', 'no-store');
     const b = req.body || {};
     const id = String(b.id || '').slice(0, 60);
@@ -165,7 +165,7 @@ function mountAccountsSessionRoutes(app, deps) {
     if (!id || !token) {
       return res.status(400).json({ ok: false, code: 'missing', error: 'معرّف الحساب والتوكن مطلوبان' });
     }
-    const list = readAccounts();
+    const list = await readAccounts();
     const idx = list.findIndex((a) => a.id === id);
     if (idx < 0) return res.status(404).json({ ok: false, code: 'not_found', error: 'الحساب غير موجود' });
     const acc = list[idx];
@@ -194,7 +194,7 @@ function mountAccountsSessionRoutes(app, deps) {
     if (!email) {
       return res.status(400).json({ ok: false, code: 'email_required', error: 'البريد مطلوب للتفعيل' });
     }
-    const ver = consumeBuyerVerificationByEmail(email);
+    const ver = await consumeBuyerVerificationByEmail(email);
     if (!ver.ok) {
       return res.status(403).json({
         ok: false,
@@ -209,7 +209,7 @@ function mountAccountsSessionRoutes(app, deps) {
     acc.dashToken = genDashToken();
     if (acc.idImage) purgeAccountIdDocument(acc);
     list[idx] = acc;
-    writeAccounts(list);
+    await writeAccounts(list);
     const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, ...safeFields } = acc;
     res.json({
       ok: true,
@@ -225,7 +225,7 @@ function mountAccountsSessionRoutes(app, deps) {
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ ok: false, code: 'invalid_email', error: 'بريد إلكتروني غير صالح' });
     }
-    const acc = readAccounts().find((a) => String(a.email || '').trim().toLowerCase() === email);
+    const acc = (await readAccounts()).find((a) => String(a.email || '').trim().toLowerCase() === email);
     const accountExists = !!(acc && !acc.suspended && acc.email);
     try {
       const result = await sendSellerResetOtp(email, {
@@ -264,7 +264,7 @@ function mountAccountsSessionRoutes(app, deps) {
       return res.status(400).json({ ok: false, code: 'weak_password', error: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل' });
     }
 
-    const list = readAccounts();
+    const list = await readAccounts();
     const idx = list.findIndex((a) => String(a.email || '').trim().toLowerCase() === email);
     if (idx < 0) {
       // لا نكشف وجود الحساب — نفس رسالة رمز غير صالح
@@ -297,7 +297,7 @@ function mountAccountsSessionRoutes(app, deps) {
     acc.passwordChangedAt = new Date().toISOString();
     acc.updatedAt = acc.passwordChangedAt;
     list[idx] = acc;
-    writeAccounts(list);
+    await writeAccounts(list);
 
     const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, ...safeFields } = acc;
     res.json({
@@ -315,7 +315,7 @@ function mountAccountsSessionRoutes(app, deps) {
   /** POST /api/accounts/mine/:id/password */
   app.post('/api/accounts/mine/:id/password', sellerLoginLimiter, async (req, res) => {
     res.set('Cache-Control', 'no-store');
-    const list = readAccounts();
+    const list = await readAccounts();
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx < 0) return res.status(404).json({ ok: false, error: 'account_not_found' });
     const acc = list[idx];
@@ -363,7 +363,7 @@ function mountAccountsSessionRoutes(app, deps) {
     acc.passwordChangedAt = new Date().toISOString();
     acc.updatedAt = acc.passwordChangedAt;
     list[idx] = acc;
-    writeAccounts(list);
+    await writeAccounts(list);
     res.json({
       ok: true,
       accessToken: acc.accessToken,
@@ -374,8 +374,8 @@ function mountAccountsSessionRoutes(app, deps) {
     });
   });
 
-  function handleVerifyDash(req, res) {
-    const list = readAccounts();
+  async function handleVerifyDash(req, res) {
+    const list = await readAccounts();
     const acc = list.find((a) => a.id === req.params.id);
     if (!acc) return res.status(404).json({ error: 'account_not_found' });
     const token = extractDashToken(req);
@@ -392,8 +392,8 @@ function mountAccountsSessionRoutes(app, deps) {
     res.json({ ok: true, account: stripToken(acc) });
   }
 
-  function handleExchangeDashToken(req, res) {
-    const list = readAccounts();
+  async function handleExchangeDashToken(req, res) {
+    const list = await readAccounts();
     const idx = list.findIndex((a) => a.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
     const acc = list[idx];
@@ -422,7 +422,7 @@ function mountAccountsSessionRoutes(app, deps) {
     }
     acc.dashExchangedAt = new Date().toISOString();
     list[idx] = acc;
-    writeAccounts(list);
+    await writeAccounts(list);
     res.set('Cache-Control', 'no-store');
     res.json({
       ok: true,

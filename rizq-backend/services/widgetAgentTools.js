@@ -7,10 +7,10 @@ const { getLivePackagesForAI, normalizeCatalogKey } = require('./packageCatalogL
 const { handleLeadEscalation } = require('./leadEscalation');
 const repos = require('../db/repos');
 
-function readAds() { return repos.ads.list(); }
-function readAccounts() { return repos.accounts.list(); }
-function readReviews() { return repos.reviews.asMap(); }
-function readAdBoosts() { return repos.adBoosts.asMap(); }
+async function readAds() { return await repos.ads.list(); }
+async function readAccounts() { return await repos.accounts.list(); }
+async function readReviews() { return await repos.reviews.asMap(); }
+async function readAdBoosts() { return await repos.adBoosts.asMap(); }
 
 const ACCOUNT_PUBLIC = [
   'id', 'type', 'name', 'city', 'address', 'desc', 'promo_video', 'promo_video_extra', 'category',
@@ -18,8 +18,8 @@ const ACCOUNT_PUBLIC = [
   'facebook', 'thumb', 'cover', 'tagline', 'status', 'approvedAt', 'createdAt',
 ];
 
-function isBoosted(adId) {
-  const b = readAdBoosts()[adId];
+async function isBoosted(adId) {
+  const b = await readAdBoosts()[adId];
   return !!(b && b.endsAt && new Date(b.endsAt).getTime() > Date.now());
 }
 
@@ -56,8 +56,8 @@ function publicAccount(acc) {
   return out;
 }
 
-function reviewStats(targetId) {
-  const list = readReviews()[targetId] || [];
+async function reviewStats(targetId) {
+  const list = await readReviews()[targetId] || [];
   if (!list.length) return { count: 0, average: 0 };
   const sum = list.reduce((s, r) => s + (Number(r.rating) || 0), 0);
   return { count: list.length, average: Math.round((sum / list.length) * 10) / 10 };
@@ -171,19 +171,19 @@ const WIDGET_TOOLS = [
   },
 ];
 
-function executeWidgetToolSync(toolName, input, meta) {
+async function executeWidgetToolSync(toolName, input, meta) {
   meta = meta || {};
   switch (toolName) {
     case 'get_ad_details': {
       const id = String((input || {}).ad_id || '').trim();
-      const ad = readAds().find((a) => String(a.id) === id);
+      const ad = (await readAds()).find((a) => String(a.id) === id);
       if (!ad) return { ok: false, error: 'ad_not_found', ad_id: id };
       if (ad.status !== 'active') return { ok: false, error: 'ad_not_active', status: ad.status };
       return { ok: true, ad: publicAd(ad) };
     }
     case 'search_ads': {
       const q = input || {};
-      let list = readAds().filter((a) => a.status === 'active');
+      let list = (await readAds()).filter((a) => a.status === 'active');
       if (q.category) list = list.filter((a) => a.category === q.category);
       if (q.wilaya) list = list.filter((a) => a.wilaya === q.wilaya);
       if (q.search) {
@@ -196,7 +196,7 @@ function executeWidgetToolSync(toolName, input, meta) {
     }
     case 'get_seller_profile': {
       const accId = String((input || {}).account_id || '').trim();
-      const acc = readAccounts().find((a) => a.id === accId && a.status === 'approved' && !a.suspended);
+      const acc = (await readAccounts()).find((a) => a.id === accId && a.status === 'approved' && !a.suspended);
       if (!acc) return { ok: false, error: 'seller_not_found', account_id: accId };
       return { ok: true, seller: publicAccount(acc) };
     }
@@ -205,7 +205,7 @@ function executeWidgetToolSync(toolName, input, meta) {
       const stats = reviewStats(accId);
       let trust = null;
       if (input.ad_id) {
-        const ad = readAds().find((a) => String(a.id) === String(input.ad_id));
+        const ad = (await readAds()).find((a) => String(a.id) === String(input.ad_id));
         if (ad) trust = ad.seller_trust_score;
       }
       return { ok: true, account_id: accId, reviews: stats, seller_trust_score: trust };

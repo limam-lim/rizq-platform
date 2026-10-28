@@ -38,7 +38,7 @@ const externalLimiter = rateLimit({
   message: { ok: false, error: 'تجاوزت حد طلبات API — حاول لاحقاً', code: 'RATE_LIMIT' },
 });
 
-function setupIntegrationAPI(app, deps) {
+async function setupIntegrationAPI(app, deps) {
   deps = deps || {};
   const {
     verifyAccountOwner,
@@ -53,8 +53,8 @@ function setupIntegrationAPI(app, deps) {
     throw new Error('setupIntegrationAPI requires app + verifyAccountOwner');
   }
 
-  function ownerGuard(accountId, token) {
-    const acc = verifyAccountOwner(accountId, token);
+  async function ownerGuard(accountId, token) {
+    const acc = await verifyAccountOwner(accountId, token);
     if (!acc) return { ok: false, status: 401, error: 'unauthorized' };
     if (acc.type !== 'corp') {
       return { ok: false, status: 403, error: 'متاح لحسابات الشركات فقط', code: 'CORP_ONLY' };
@@ -123,11 +123,12 @@ function setupIntegrationAPI(app, deps) {
 
   /** GET /api/integration/admin/list — admin overview (shared secret) */
   if (typeof requireSharedSecret === 'function') {
-    app.get('/api/integration/admin/list', requireSharedSecret, (req, res) => {
-      const rows = CorpApiIntegration.listAll().map((row) => {
-        const acc = typeof readAccounts === 'function'
-          ? readAccounts().find((a) => a.id === row.companyId)
-          : null;
+    app.get('/api/integration/admin/list', requireSharedSecret, async (req, res) => {
+      const all = await CorpApiIntegration.listAll();
+      const accounts = typeof readAccounts === 'function' ? await readAccounts() : [];
+      const byId = new Map((accounts || []).map((a) => [a.id, a]));
+      const rows = all.map((row) => {
+        const acc = byId.get(row.companyId) || null;
         return {
           companyId: row.companyId,
           companyName: acc ? (acc.name || acc.id) : row.companyId,
@@ -169,14 +170,14 @@ function setupIntegrationAPI(app, deps) {
     '/api/v1/integration/catalog',
     ...v1,
     requireIntegrationPayload('catalogQuery'),
-    asyncHandler((req, res) => {
+    asyncHandler(async (req, res) => {
       if (typeof readCatalog !== 'function') {
         return sendError(res, 503, 'الخدمة غير متاحة', 'SERVICE_UNAVAILABLE');
       }
       const q = req.sanitizedBody || {};
       const limit = Math.min(q.limit || 50, 100);
       const offset = q.offset || 0;
-      let items = readCatalog().filter(
+      let items = (await readCatalog()).filter(
         (it) => it.accountId === req.apiCompanyId && it.status === 'active'
       );
       if (q.kind) items = items.filter((it) => it.kind === q.kind);
@@ -210,7 +211,7 @@ function setupIntegrationAPI(app, deps) {
     ...v1,
     rejectNonJsonContent,
     requireIntegrationPayload('inquiry'),
-    asyncHandler((req, res) => {
+    asyncHandler(async (req, res) => {
       if (typeof readMessages !== 'function' || typeof writeMessages !== 'function') {
         return sendError(res, 503, 'الخدمة غير متاحة', 'SERVICE_UNAVAILABLE');
       }
@@ -219,7 +220,7 @@ function setupIntegrationAPI(app, deps) {
       const companyId = req.apiCompanyId;
       const guestPhone = String(b.guestPhone).replace(/\D/g, '').slice(-15);
       const threadKey = companyId + '::erp:guest:' + guestPhone;
-      const list = readMessages();
+      const list = await readMessages();
       const rec = {
         id: 'ERP-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
         threadKey,
@@ -238,7 +239,7 @@ function setupIntegrationAPI(app, deps) {
         createdAt: new Date().toISOString(),
       };
       list.push(rec);
-      writeMessages(list);
+      await writeMessages(list);
 
       res.status(201).json({
         ok: true,

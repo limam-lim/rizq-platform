@@ -121,7 +121,7 @@ async function liveTests() {
 
   // Guest secret persists in SQLite (survives process Map wipe / restart)
   const repos = require('../db/repos');
-  const persisted = repos.guestThreadSecrets.get(threadKey);
+  const persisted = await repos.guestThreadSecrets.get(threadKey);
   ok('guest thread secret persisted to SQLite', !!(persisted && persisted.hash && persisted.phoneDigits === phone.replace(/\D/g, '')));
 
   // messages/mine must not match accountId as prefix of another buyer's id

@@ -3,11 +3,11 @@
  */
 const repos = require('../db/repos');
 
-function readTickets() {
-  return repos.supportTickets.list();
+async function readTickets() {
+  return await repos.supportTickets.list();
 }
 
-function saveTicket({ source, type, summary, adId, contact, meta }) {
+async function saveTicket({ source, type, summary, adId, contact, meta }) {
   const id = 'RZQ-' + Date.now().toString(36).toUpperCase();
   const rec = {
     id,
@@ -20,12 +20,12 @@ function saveTicket({ source, type, summary, adId, contact, meta }) {
     status: 'open',
     createdAt: new Date().toISOString(),
   };
-  repos.supportTickets.upsert(id, rec);
+  await repos.supportTickets.upsert(id, rec);
   return rec;
 }
 
-function updateTicketStatus(id, status, adminNote) {
-  const cur = repos.supportTickets.get(String(id));
+async function updateTicketStatus(id, status, adminNote) {
+  const cur = await repos.supportTickets.get(String(id));
   if (!cur) return null;
   const allowed = ['open', 'in_progress', 'resolved', 'closed'];
   if (!allowed.includes(status)) return null;
@@ -34,7 +34,7 @@ function updateTicketStatus(id, status, adminNote) {
     updatedAt: new Date().toISOString(),
   });
   if (adminNote) next.adminNote = String(adminNote).slice(0, 500);
-  repos.supportTickets.upsert(String(id), next);
+  await repos.supportTickets.upsert(String(id), next);
   return next;
 }
 

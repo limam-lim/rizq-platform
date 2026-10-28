@@ -21,7 +21,7 @@ function genBidId() {
  * @param {import('express').Application} app
  * @param {object} deps
  */
-function mountTendersRoutes(app, deps) {
+async function mountTendersRoutes(app, deps) {
   const {
     requireAdminAuth,
     requireAdminPermission,
@@ -49,16 +49,16 @@ function mountTendersRoutes(app, deps) {
   const TENDER_ACTIVE_STATUSES = ['active', 'expiring_soon'];
   const TENDER_REQUIRES_PACKAGE = true;
 
-  function resolveOptionalTenderViewer(req) {
-    return resolveOptionalAccountViewer(req);
+  async function resolveOptionalTenderViewer(req) {
+    return await resolveOptionalAccountViewer(req);
   }
 
-  function getTenderAccessForViewer(accountId) {
-    return getTenderEntitlements(accountId || null);
+  async function getTenderAccessForViewer(accountId) {
+    return await getTenderEntitlements(accountId || null);
   }
 
-  function hasTenderPaidAccess(accountId) {
-    const ent = getTenderEntitlements(accountId);
+  async function hasTenderPaidAccess(accountId) {
+    const ent = await getTenderEntitlements(accountId);
     return !!(ent && ent.canSubmitProposals && ent.subscribed);
   }
 
@@ -69,8 +69,8 @@ function mountTendersRoutes(app, deps) {
 
   // redactContactPatterns imported via deps from contactGate.js
 
-  function resolveTenderOwnerContacts(t) {
-    const owner = readAccounts().find((a) => a.id === t.ownerId) || {};
+  async function resolveTenderOwnerContacts(t) {
+    const owner = (await readAccounts()).find((a) => a.id === t.ownerId) || {};
     const phone = String(t.ownerPhone || owner.phone || '').trim();
     const email = String(t.ownerEmail || owner.email || '').trim();
     const whatsapp = String(t.ownerWhatsApp || owner.whatsapp || phone || '').trim();
@@ -88,8 +88,8 @@ function mountTendersRoutes(app, deps) {
     return (list || []).filter(isTenderPubliclyOpen);
   }
 
-  function TENDER_PUBLIC_ACCESS_FALLBACK() {
-    return getTenderEntitlements(null);
+  async function TENDER_PUBLIC_ACCESS_FALLBACK() {
+    return await getTenderEntitlements(null);
   }
 
   function toPublicTender(t, access, viewerId) {
@@ -169,10 +169,10 @@ function mountTendersRoutes(app, deps) {
     fs.createReadStream(absPath).pipe(res);
   }
 
-  function canAccessTenderAsset(req, t, viewerId, access, assetKey) {
+  async function canAccessTenderAsset(req, t, viewerId, access, assetKey) {
     if (!t) return false;
     const token = extractAccountToken(req) || '';
-    if (viewerId && verifyAccountOwner(viewerId, token)) {
+    if (viewerId && await verifyAccountOwner(viewerId, token)) {
       if (t.ownerId === viewerId) return true;
       if (access && access.canUnlockContacts && isTenderPubliclyOpen(t)) return true;
     }
@@ -234,7 +234,7 @@ function mountTendersRoutes(app, deps) {
     try {
     const b = req.body || {};
     const token = req.header('x-account-token') || '';
-    const acc = verifyAccountOwner(b.accountId, token);
+    const acc = await verifyAccountOwner(b.accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
     if (!hasTenderPaidAccess(b.accountId)) {
       return res.status(403).json({ error: 'tender_package_required', msg: 'تحتاج باقة مدفوعة فعّالة لنشر مناقصة — الباقة التجريبية للتصفّح فقط' });
@@ -296,9 +296,9 @@ function mountTendersRoutes(app, deps) {
       approvedAt: auto ? new Date().toISOString() : null,
       approvedBy: auto ? 'tenders_agent' : null,
     });
-    const list = readTenders();
+    const list = await readTenders();
     list.unshift(tender);
-    writeTenders(list);
+    await writeTenders(list);
     setImmediate(() => {
       try {
         const { sendTelegramAdminNotification } = require('../services/telegramAdmin');
@@ -341,8 +341,8 @@ function mountTendersRoutes(app, deps) {
    * يعرض عدد المناقصات المفتوحة + عيّنات آمنة (فئة/مدينة/موعد) مرتّبة بالأحدث.
    * نفس عتبة الاكتشاف على الرئيسية: أقل من 3 → واجهة "كن أول من…".
    */
-  app.get('/api/tenders/public-stats', (req, res) => {
-    const openList = filterPublicOpenTenders(readTenders())
+  app.get('/api/tenders/public-stats', async (req, res) => {
+    const openList = filterPublicOpenTenders(await readTenders())
       .slice()
       .sort((a, b) => {
         const ta = new Date(a.createdAt || a.submittedAt || a.deadline || 0).getTime();
@@ -372,11 +372,11 @@ function mountTendersRoutes(app, deps) {
    * الزائر/التجريبي يرى العنوان والوصف والمتطلبات؛ أرقام التواصل مخفية/مُشفّرة.
    * المشترك المدفوع يكشف التواصل ويمكنه تقديم العروض. يدعم ?cat=&city=
    */
-  app.get('/api/tenders', (req, res) => {
+  app.get('/api/tenders', async (req, res) => {
     const viewerId = resolveOptionalTenderViewer(req);
     const access = getTenderAccessForViewer(viewerId);
     const { cat, city } = req.query || {};
-    let list = filterPublicOpenTenders(readTenders());
+    let list = filterPublicOpenTenders(await readTenders());
     if (cat) list = list.filter((t) => t.category === cat);
     if (city) list = list.filter((t) => t.city === city);
     res.json({
@@ -398,16 +398,16 @@ function mountTendersRoutes(app, deps) {
    * accountId صالحين، وباقة "غرفة المناقصات" فعّالة. لا يمكن لصاحب المناقصة
    * تقديم عرض على مناقصته هو نفسها. العرض لا يظهر لأي أحد إلا صاحب المناقصة.
    */
-  app.post('/api/tenders/:id/bids', tenderBidLimiter, (req, res) => {
+  app.post('/api/tenders/:id/bids', tenderBidLimiter, async (req, res) => {
     const b = req.body || {};
     const token = req.header('x-account-token') || '';
-    const acc = verifyAccountOwner(b.accountId, token);
+    const acc = await verifyAccountOwner(b.accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
     if (!hasTenderPaidAccess(b.accountId)) {
       return res.status(403).json({ error: 'tender_package_required', msg: 'تحتاج باقة مدفوعة فعّالة لتقديم عرض — الباقة التجريبية للتصفّح فقط' });
     }
     const bidderAccess = getTenderAccessForViewer(b.accountId);
-    const list = readTenders();
+    const list = await readTenders();
     const idx = list.findIndex((t) => t.id === req.params.id && t.status !== 'removed');
     if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
     const t = list[idx];
@@ -446,7 +446,7 @@ function mountTendersRoutes(app, deps) {
       });
     }
     list[idx] = t;
-    writeTenders(list);
+    await writeTenders(list);
     res.json({ ok: true });
   });
 
@@ -454,12 +454,12 @@ function mountTendersRoutes(app, deps) {
    * GET /api/tenders/mine — مناقصاتي (اللي نشرتها أنا) + كل العروض المقدَّمة
    * عليها كاملة. يتطلب x-account-token + accountId مطابقين.
    */
-  app.get('/api/tenders/mine', (req, res) => {
+  app.get('/api/tenders/mine', async (req, res) => {
     const accountId = req.query.accountId || '';
     const token = extractAccountToken(req) || '';
-    const acc = verifyAccountOwner(accountId, token);
+    const acc = await verifyAccountOwner(accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
-    const mine = readTenders().filter((t) => t.ownerId === accountId && t.status !== 'removed');
+    const mine = (await readTenders()).filter((t) => t.ownerId === accountId && t.status !== 'removed');
     res.json({ ok: true, tenders: mine });
   });
 
@@ -467,17 +467,17 @@ function mountTendersRoutes(app, deps) {
    * GET /api/tenders/admin — أدمين فقط (سرّ مشترك) — كل المناقصات بكل حقولها
    * (بما فيها العروض) لأغراض المراجعة/إزالة السبام.
    */
-  app.get('/api/tenders/admin', requireAdminPermission('tenders'), (req, res) => {
-    res.json({ ok: true, tenders: readTenders() });
+  app.get('/api/tenders/admin', requireAdminPermission('tenders'), async (req, res) => {
+    res.json({ ok: true, tenders: await readTenders() });
   });
 
   /**
    * GET /api/tenders/:id/document — تحميل ملف PDF للمناقصة (مشتركون مدفوعون أو صاحب المناقصة)
    */
-  app.get('/api/tenders/:id/document', tenderAssetLimiter, (req, res) => {
+  app.get('/api/tenders/:id/document', tenderAssetLimiter, async (req, res) => {
     const viewerId = resolveOptionalTenderViewer(req);
     const access = getTenderAccessForViewer(viewerId);
-    const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
+    const t = (await readTenders()).find((x) => x.id === req.params.id && x.status !== 'removed');
     if (!t || !t.document) return res.status(404).json({ error: 'document_not_found' });
     if (!canAccessTenderAsset(req, t, viewerId, access, 'doc:0')) {
       return res.status(403).json({
@@ -492,10 +492,10 @@ function mountTendersRoutes(app, deps) {
   /**
    * GET /api/tenders/:id/images/:index — صورة مرجعية (مشتركون أو صاحب المناقصة)
    */
-  app.get('/api/tenders/:id/images/:index', tenderAssetLimiter, (req, res) => {
+  app.get('/api/tenders/:id/images/:index', tenderAssetLimiter, async (req, res) => {
     const viewerId = resolveOptionalTenderViewer(req);
     const access = getTenderAccessForViewer(viewerId);
-    const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
+    const t = (await readTenders()).find((x) => x.id === req.params.id && x.status !== 'removed');
     if (!t) return res.status(404).json({ error: 'tender_not_found' });
     const assetKey = 'img:' + req.params.index;
     if (!canAccessTenderAsset(req, t, viewerId, access, assetKey)) {
@@ -511,8 +511,8 @@ function mountTendersRoutes(app, deps) {
   /**
    * GET /api/tenders/admin/:id/document — أدمين — مراجعة ملف PDF
    */
-  app.get('/api/tenders/admin/:id/document', requireAdminPermission('tenders'), (req, res) => {
-    const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
+  app.get('/api/tenders/admin/:id/document', requireAdminPermission('tenders'), async (req, res) => {
+    const t = (await readTenders()).find((x) => x.id === req.params.id && x.status !== 'removed');
     if (!t || !t.document) return res.status(404).json({ error: 'document_not_found' });
     return streamTenderDocumentFile(t, res);
   });
@@ -520,8 +520,8 @@ function mountTendersRoutes(app, deps) {
   /**
    * GET /api/tenders/admin/:id/images/:index — أدمين — مراجعة صورة
    */
-  app.get('/api/tenders/admin/:id/images/:index', requireAdminPermission('tenders'), (req, res) => {
-    const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
+  app.get('/api/tenders/admin/:id/images/:index', requireAdminPermission('tenders'), async (req, res) => {
+    const t = (await readTenders()).find((x) => x.id === req.params.id && x.status !== 'removed');
     if (!t) return res.status(404).json({ error: 'tender_not_found' });
     return streamTenderImageFile(t, req.params.index, res);
   });
@@ -539,10 +539,10 @@ function mountTendersRoutes(app, deps) {
    * المسارات الثابتة الأكثر تحديداً (mine/admin) — قاعدة عامة في Express: أي
    * مسار به معامل (:id) يجب أن يُسجَّل دائماً بعد كل المسارات الثابتة المشابهة.
    */
-  app.get('/api/tenders/:id', (req, res) => {
+  app.get('/api/tenders/:id', async (req, res) => {
     const viewerId = resolveOptionalTenderViewer(req);
     const access = getTenderAccessForViewer(viewerId);
-    const t = readTenders().find((x) => x.id === req.params.id && x.status !== 'removed');
+    const t = (await readTenders()).find((x) => x.id === req.params.id && x.status !== 'removed');
     if (!t || !isTenderPubliclyOpen(t)) return res.status(404).json({ error: 'tender_not_found' });
     res.json({
       ok: true,
@@ -561,11 +561,11 @@ function mountTendersRoutes(app, deps) {
   /**
    * POST /api/tenders/admin/:id/reject — أدمين — رفض مناقصة مع سبب (لا تُعرض علناً)
    */
-  app.post('/api/tenders/admin/:id/reject', requireAdminPermission('tenders'), (req, res) => {
+  app.post('/api/tenders/admin/:id/reject', requireAdminPermission('tenders'), async (req, res) => {
     const b = req.body || {};
     const reason = String(b.reason || b.msg || '').trim().slice(0, 500);
     if (!reason) return res.status(400).json({ error: 'reason_required', msg: 'سبب الرفض مطلوب' });
-    const list = readTenders();
+    const list = await readTenders();
     const idx = list.findIndex((t) => t.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
     if (list[idx].status === 'removed') return res.status(400).json({ error: 'tender_removed' });
@@ -573,7 +573,7 @@ function mountTendersRoutes(app, deps) {
     list[idx].rejectReason = reason;
     list[idx].rejectedAt = new Date().toISOString();
     list[idx].rejectedBy = (req.adminUser && req.adminUser.name) || (req.adminUser && req.adminUser.user) || 'admin';
-    writeTenders(list);
+    await writeTenders(list);
     res.json({ ok: true, tender: list[idx] });
   });
 
@@ -582,20 +582,20 @@ function mountTendersRoutes(app, deps) {
    * الواجهات العامة (سبام/محتوى مخالف) دون حذف السجل فعلياً (نفس مبدأ عدم
    * الحذف النهائي المتَّبع في بقية المنصة).
    */
-  app.post('/api/tenders/admin/:id/remove', requireAdminPermission('tenders'), (req, res) => {
-    const list = readTenders();
+  app.post('/api/tenders/admin/:id/remove', requireAdminPermission('tenders'), async (req, res) => {
+    const list = await readTenders();
     const idx = list.findIndex((t) => t.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
     list[idx].status = 'removed';
-    writeTenders(list);
+    await writeTenders(list);
     res.json({ ok: true });
   });
 
   /**
    * POST /api/tenders/admin/:id/approve — أدمين فقط — يُفعّل مناقصة pending_review
    */
-  app.post('/api/tenders/admin/:id/approve', requireAdminPermission('tenders'), (req, res) => {
-    const list = readTenders();
+  app.post('/api/tenders/admin/:id/approve', requireAdminPermission('tenders'), async (req, res) => {
+    const list = await readTenders();
     const idx = list.findIndex((t) => t.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
     if (list[idx].status === 'removed') return res.status(400).json({ error: 'tender_removed' });
@@ -604,7 +604,7 @@ function mountTendersRoutes(app, deps) {
     list[idx].approvedBy = (req.adminUser && req.adminUser.name) || (req.adminUser && req.adminUser.user) || 'admin';
     list[idx].humanOverride = true;
     list[idx].provisionalAutoApproved = false;
-    writeTenders(list);
+    await writeTenders(list);
     res.json({ ok: true, tender: list[idx] });
   });
 
@@ -659,11 +659,11 @@ function mountTendersRoutes(app, deps) {
    * الحقيقي في accounts.json — نفس نمط /api/accounts/mine/:id). لا يستخدم
    * سرّ الأدمن العام لأن هذه النقطة تُستدعى من داشبورد المشترك مباشرة.
    */
-  app.get('/api/tenders/package/status/:id', (req, res) => {
+  app.get('/api/tenders/package/status/:id', async (req, res) => {
     const token = extractAccountToken(req) || '';
-    const acc = verifyAccountOwner(req.params.id, token);
+    const acc = await verifyAccountOwner(req.params.id, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
-    const ent = getTenderEntitlements(req.params.id);
+    const ent = await getTenderEntitlements(req.params.id);
     const rec = getAccountRecord(req.params.id + '::tender');
     const safeRec = rec ? (() => { const { accessToken, ...rest } = rec; return rest; })() : null;
     res.json({

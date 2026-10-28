@@ -111,16 +111,16 @@ function decryptJson(blob) {
   return JSON.parse(dec.toString('utf8'));
 }
 
-function readVaultStore() {
-  return repos().secretsVault.get('_root') || { blob: null, custom: [], meta: {} };
+async function readVaultStore() {
+  return (await repos().secretsVault.get('_root')) || { blob: null, custom: [], meta: {} };
 }
 
-function writeVaultStore(store) {
-  repos().secretsVault.upsert('_root', store && typeof store === 'object' ? store : { blob: null, custom: [], meta: {} });
+async function writeVaultStore(store) {
+  await repos().secretsVault.upsert('_root', store && typeof store === 'object' ? store : { blob: null, custom: [], meta: {} });
 }
 
-function loadSecretsMap() {
-  const store = readVaultStore();
+async function loadSecretsMap() {
+  const store = await readVaultStore();
   try {
     return decryptJson(store.blob) || {};
   } catch (e) {
@@ -226,9 +226,9 @@ function syncEnvFile(map, clearedKeys) {
   return envPath;
 }
 
-function getPublicStatus() {
-  const map = loadSecretsMap();
-  const store = readVaultStore();
+async function getPublicStatus() {
+  const map = await loadSecretsMap();
+  const store = await readVaultStore();
   const groups = SECRET_SLOTS.map((g) => ({
     group: g.group,
     groupLabelAr: g.groupLabelAr,
@@ -291,10 +291,10 @@ function getPublicStatus() {
  * body.values: { KEY: "value" } — فارغ = تجاهل؛ "__CLEAR__" = حذف من الخزنة
  * body.addCustomKey: "MY_NEW_KEY"
  */
-function saveSecrets(body, adminUser) {
+async function saveSecrets(body, adminUser) {
   const values = (body && body.values && typeof body.values === 'object') ? body.values : {};
-  const map = loadSecretsMap();
-  const store = readVaultStore();
+  const map = await loadSecretsMap();
+  const store = await readVaultStore();
   const custom = Array.isArray(store.custom) ? store.custom.slice() : [];
   const changed = [];
   const cleared = [];
@@ -346,7 +346,7 @@ function saveSecrets(body, adminUser) {
     changedCount: changed.length,
     clearedCount: cleared.length,
   };
-  writeVaultStore(store);
+  await writeVaultStore(store);
 
   const applied = applySecretsToEnv(map, cleared);
   let envPath = null;
@@ -362,13 +362,13 @@ function saveSecrets(body, adminUser) {
     cleared,
     applied,
     envSynced: !!envPath,
-    status: getPublicStatus(),
+    status: await getPublicStatus(),
   };
 }
 
-function loadAndApplyOnBoot() {
+async function loadAndApplyOnBoot() {
   try {
-    const map = loadSecretsMap();
+    const map = await loadSecretsMap();
     const applied = applySecretsToEnv(map);
     if (applied.length) {
       console.log('[secretsVault] applied ' + applied.length + ' secret(s) from vault to process.env');

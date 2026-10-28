@@ -246,11 +246,11 @@ function mapMediaPackageToPlanType(rec) {
  * صلاحيات Rizq ADS / الفيديو الإعلاني لحساب (من سجل الباقة النشط).
  * المفتاح المعزول accountId::video — مستقل عن باقة الحساب العامة.
  */
-function getMediaEntitlements(accountId, accountRecordOverride) {
+async function getMediaEntitlements(accountId, accountRecordOverride) {
   const id = String(accountId || '');
   const rec = accountRecordOverride
-    || getAccountRecord(id.includes('::video') ? id : (id + '::video'))
-    || getAccountRecord(id);
+    || (await getAccountRecord(id.includes('::video')) ? id : (id + '::video'))
+    || (await getAccountRecord(id));
   const planType = mapMediaPackageToPlanType(rec);
   if (!rec || !planType) {
     return {
@@ -317,8 +317,8 @@ function countActiveMediaVideos(accountId, videoAds) {
  * بوابة حصة فيديوهات الباقة قبل إضافة إعلان جديد.
  * @returns {{ ok: true } | { ok: false, code, message, limit, current }}
  */
-function assertCanAddMediaVideo(accountId, videoAds, accountRecordOverride) {
-  const media = getMediaEntitlements(accountId, accountRecordOverride);
+async function assertCanAddMediaVideo(accountId, videoAds, accountRecordOverride) {
+  const media = await getMediaEntitlements(accountId, accountRecordOverride);
   if (!media.subscribed || !media.canUploadVideo) {
     return entitlementError('media_not_subscribed', 'لا توجد باقة Rizq ADS نشطة — اشترك أولاً');
   }
@@ -425,8 +425,8 @@ function mapTenderPackageToPlanType(rec) {
  * صلاحيات غرفة المناقصات لحساب (أو زائر بلا حساب).
  * التصفح متاح للجميع؛ كشف التواصل وتقديم العروض للمشتركين المدفوعين فقط.
  */
-function getTenderEntitlements(accountId) {
-  const rec = accountId ? getAccountRecord(String(accountId) + '::tender') : null;
+async function getTenderEntitlements(accountId) {
+  const rec = accountId ? await getAccountRecord(String(accountId) + '::tender') : null;
   if (!rec) {
     return Object.assign({ accountId: accountId || null }, TENDER_PUBLIC_ACCESS);
   }
@@ -549,8 +549,8 @@ function mapInvestmentPackageToPlanType(rec) {
  * صلاحيات غرفة الاستثمارات لحساب (أو زائر بلا حساب).
  * الدليل عام؛ غرفة التفاصيل للمشتركين؛ كشف التواصل للمدفوعين فقط.
  */
-function getInvestmentEntitlements(accountId) {
-  const rec = accountId ? getAccountRecord(String(accountId) + '::investment') : null;
+async function getInvestmentEntitlements(accountId) {
+  const rec = accountId ? await getAccountRecord(String(accountId) + '::investment') : null;
   if (!rec) {
     return Object.assign({ accountId: accountId || null }, INVESTMENT_PUBLIC_ACCESS);
   }
@@ -718,8 +718,8 @@ function resolvePlanDefinition(planType, accountType) {
  * @param {string} [accountType='individual']
  * @param {object} [accountRecordOverride]
  */
-function getEntitlements(accountId, accountType, accountRecordOverride) {
-  const rec = accountRecordOverride || getAccountRecord(accountId);
+async function getEntitlements(accountId, accountType, accountRecordOverride) {
+  const rec = accountRecordOverride || (await getAccountRecord(accountId));
   const subscriptionStatus = getSubscriptionStatus(rec);
   const type = rec && rec.accountType ? rec.accountType : accountType;
 
@@ -749,13 +749,13 @@ function getEntitlements(accountId, accountType, accountRecordOverride) {
     features = features.filter((f) => !AI_PAID_FEATURES.includes(f));
   }
 
-  const quotaLimits = aiPaidActive ? resolveQuotaLimitsForAccount(rec) : null;
+  const quotaLimits = aiPaidActive ? await resolveQuotaLimitsForAccount(rec) : null;
 
   // ب3 — حدود الرفع من site-config.uploadLimits حسب نوع الحساب
   let uploadLim = { maxPhotosPerAd: plan.maxPhotosPerItem || 5, maxImageBytes: 3 * 1024 * 1024 };
   try {
     const uploadLimits = require('./uploadLimits');
-    const siteCfg = require('../db/repos').getSiteConfig() || {};
+    const siteCfg = (await require('../db/repos').getSiteConfig()) || {};
     uploadLim = uploadLimits.getLimitsForAccountType(type, siteCfg);
   } catch (e) { /* defaults above */ }
   const planPhotos = plan.maxPhotosPerItem || 5;

@@ -1,9 +1,11 @@
 /**
- * Buyer (مشتري سريع) — Schema + عمليات DB
+ * Buyer (مشتري سريع) — async PostgreSQL model
  */
+'use strict';
+
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const { db } = require('../db');
+const sql = require('../db/sql');
 const { normalizeDisplayName, normalizeEmailSafe } = require('../lib/sanitizeText');
 
 const MR_PHONE_RE = /^(2[0-9]|3[0-9]|4[0-9])\d{6}$/;
@@ -52,24 +54,27 @@ function publicBuyer(row) {
   };
 }
 
-function findById(id) {
-  return db.prepare('SELECT * FROM buyers WHERE id = ?').get(id);
+async function findById(id) {
+  return sql.queryOne('SELECT * FROM buyers WHERE id = ?', [id]);
 }
 
-function findByPhone(phone) {
+async function findByPhone(phone) {
   const mr = normalizePhone(phone);
   if (!MR_PHONE_RE.test(mr)) return null;
-  return db.prepare('SELECT * FROM buyers WHERE phone = ?').get(mr);
+  return sql.queryOne('SELECT * FROM buyers WHERE phone = ?', [mr]);
 }
 
-function findByEmail(email) {
+async function findByEmail(email) {
   const em = normalizeEmailSafe(email);
   if (!em) return null;
-  return db.prepare('SELECT * FROM buyers WHERE lower(email) = ? OR email_lc = ?').get(em, em);
+  return sql.queryOne(
+    'SELECT * FROM buyers WHERE lower(email) = ? OR email_lc = ?',
+    [em, em]
+  );
 }
 
-function findByIdAndToken(id, token) {
-  const row = db.prepare('SELECT * FROM buyers WHERE id = ?').get(id);
+async function findByIdAndToken(id, token) {
+  const row = await findById(id);
   if (!row || !row.token || !token) return null;
   try {
     const { timingSafeEqualStr } = require('../lib/secureCompare');
@@ -80,23 +85,21 @@ function findByIdAndToken(id, token) {
   return row;
 }
 
-/** إبطال جلسة المشتري (logout) — تدوير التوكن إلى قيمة جديدة غير معروفة للعميل */
-function invalidateToken(id) {
-  const row = findById(id);
+async function invalidateToken(id) {
+  const row = await findById(id);
   if (!row) return false;
   const token = genBuyerToken();
-  db.prepare('UPDATE buyers SET token = ? WHERE id = ?').run(token, id);
+  await sql.execute('UPDATE buyers SET token = ? WHERE id = ?', [token, id]);
   return true;
 }
 
 function hashPassword(password) {
   const pw = String(password || '');
-  /* موحّد مع البائعين: ≥8 أحرف */
   if (pw.length < 8 || pw.length > 128) return null;
   return bcrypt.hashSync(pw, BCRYPT_ROUNDS);
 }
 
-function registerOrLogin(payload) {
+async function registerOrLogin(payload) {
   const cleanName = normalizeDisplayName(payload.name, 120);
   const cleanEmail = normalizeEmailSafe(payload.email);
   const mr = normalizePhone(payload.phone || payload.phoneMr);
@@ -129,7 +132,6 @@ function registerOrLogin(payload) {
     err.code = 'WHATSAPP_REQUIRED';
     throw err;
   }
-  /* كلمة المرور اختيارية بعد OTP (Guest Gate) — إن وُجدت يجب ≥8 */
   if (password && !passHash) {
     const err = new Error('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
     err.status = 400;
@@ -141,10 +143,9 @@ function registerOrLogin(payload) {
   const now = new Date().toISOString();
   const token = genBuyerToken();
 
-  // تطابق بالبريد فقط بعد OTP — لا نربط بحساب موجود عبر الهاتف وحده
-  let row = findByEmail(cleanEmail);
+  let row = await findByEmail(cleanEmail);
   if (row) {
-    const phoneOwner = MR_PHONE_RE.test(mr) ? findByPhone(mr) : null;
+    const phoneOwner = MR_PHONE_RE.test(mr) ? await findByPhone(mr) : null;
     if (phoneOwner && phoneOwner.id !== row.id) {
       const err = new Error('رقم الهاتف مرتبط بحساب آخر');
       err.status = 409;
@@ -152,24 +153,26 @@ function registerOrLogin(payload) {
       throw err;
     }
     if (passHash) {
-      db.prepare(`
-        UPDATE buyers SET name = ?, email = ?, email_lc = ?, phone = ?, phone_intl = ?, whatsapp = ?,
-          pass_hash = ?, token = ?, last_login_at = ?
-        WHERE id = ?
-      `).run(cleanName, cleanEmail, cleanEmail, primaryPhone, intl, wa, passHash, token, now, row.id);
+      await sql.execute(
+        `UPDATE buyers SET name = ?, email = ?, email_lc = ?, phone = ?, phone_intl = ?, whatsapp = ?,
+          pass_hash = ?, token = ?, last_login_at = ?, updated_at_ts = NOW()
+        WHERE id = ?`,
+        [cleanName, cleanEmail, cleanEmail, primaryPhone, intl, wa, passHash, token, now, row.id]
+      );
     } else {
-      db.prepare(`
-        UPDATE buyers SET name = ?, email = ?, email_lc = ?, phone = ?, phone_intl = ?, whatsapp = ?,
-          token = ?, last_login_at = ?
-        WHERE id = ?
-      `).run(cleanName, cleanEmail, cleanEmail, primaryPhone, intl, wa, token, now, row.id);
+      await sql.execute(
+        `UPDATE buyers SET name = ?, email = ?, email_lc = ?, phone = ?, phone_intl = ?, whatsapp = ?,
+          token = ?, last_login_at = ?, updated_at_ts = NOW()
+        WHERE id = ?`,
+        [cleanName, cleanEmail, cleanEmail, primaryPhone, intl, wa, token, now, row.id]
+      );
     }
-    row = findById(row.id);
+    row = await findById(row.id);
     return { buyer: publicBuyer(row), token, created: false };
   }
 
   if (MR_PHONE_RE.test(mr)) {
-    const phoneOwner = findByPhone(mr);
+    const phoneOwner = await findByPhone(mr);
     if (phoneOwner) {
       const err = new Error('رقم الهاتف مسجّل مسبقاً — سجّل دخولك بنفس البريد المرتبط');
       err.status = 409;
@@ -179,11 +182,12 @@ function registerOrLogin(payload) {
   }
 
   const id = genBuyerId();
-  db.prepare(`
-    INSERT INTO buyers (id, name, phone, phone_intl, whatsapp, email, email_lc, pass_hash, token, created_at, last_login_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(id, cleanName, primaryPhone, intl, wa, cleanEmail, cleanEmail, passHash, token, now, now);
-  row = findById(id);
+  await sql.execute(
+    `INSERT INTO buyers (id, name, phone, phone_intl, whatsapp, email, email_lc, pass_hash, token, created_at, last_login_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [id, cleanName, primaryPhone, intl, wa, cleanEmail, cleanEmail, passHash, token, now, now]
+  );
+  row = await findById(id);
   return { buyer: publicBuyer(row), token, created: true };
 }
 
@@ -197,7 +201,7 @@ async function loginByEmailPassword(email, password) {
     throw err;
   }
   const dummyHash = '$2a$10$Cr7J1rfztqkXC9ZpESd5qO2PLvx6D3SJKxfBjfX3DXVMuu3YBVDYy';
-  const row = findByEmail(em);
+  const row = await findByEmail(em);
   let ok = false;
   try {
     ok = row && row.pass_hash ? await bcrypt.compare(pw, row.pass_hash) : await bcrypt.compare(pw, dummyHash);
@@ -212,15 +216,14 @@ async function loginByEmailPassword(email, password) {
   }
   const token = genBuyerToken();
   const now = new Date().toISOString();
-  db.prepare('UPDATE buyers SET token = ?, last_login_at = ? WHERE id = ?').run(token, now, row.id);
-  const updated = findById(row.id);
+  await sql.execute(
+    'UPDATE buyers SET token = ?, last_login_at = ?, updated_at_ts = NOW() WHERE id = ?',
+    [token, now, row.id]
+  );
+  const updated = await findById(row.id);
   return { buyer: publicBuyer(updated), token };
 }
 
-/**
- * دخول بالهاتف وحده — معطّل لأسباب أمنية (كان يعيد التوكن الحالي بلا OTP/كلمة مرور).
- * أبقِ الدالة لتجنب كسر require، وارفض دائماً.
- */
 function loginByPhone() {
   const err = new Error('دخول الهاتف غير متاح — استخدم البريد وكلمة المرور أو OTP');
   err.status = 403;

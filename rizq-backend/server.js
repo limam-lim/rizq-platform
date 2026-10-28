@@ -8,10 +8,12 @@
 require('dotenv').config({ path: require('path').join(__dirname, '.env'), override: true });
 process.env.TZ = process.env.RIZQ_TIMEZONE || process.env.MAINTENANCE_CRON_TZ || 'Africa/Nouakchott';
 const { ensureAnthropicEnv, getAnthropicApiKey, isAnthropicConfigured, getAgentModel, getAdvancedModel } = require('./config/anthropic');
-require('./db');
-try { require('./services/secretsVault').loadAndApplyOnBoot(); } catch (eVaultBoot) { console.warn('[secretsVault] boot:', eVaultBoot && eVaultBoot.message); }
+const db = require('./db');
 ensureAnthropicEnv();
 const repos = require('./db/repos');
+const platformStore = require('./db/platformStore');
+const redis = require('./lib/redis');
+const { getOrCreateHybridStore, warmRateLimitStores } = require('./lib/rateLimitRedis');
 const authRouter = require('./routes/auth');
 const wishlistRouter = require('./routes/wishlist');
 const BuyerModel = require('./models/buyer');
@@ -32,7 +34,7 @@ const { resolveAccountPhones, phoneMatchKey } = require('./lib/phoneNormalize');
 const { installAdminPanelGate } = require('./middleware/adminPanelGate');
 const { registerSubscriber, getSubscriberProfile, getAllSubscriberProfiles, getSubscriberProfileByAccountId, upsertSubscriberKnowledgeFromAccount, upsertSubscriberInstructionsFromAccount, upsertSubscriberProfileFromAccount } = require('../rizq_subscriber_agent');
 const { normalizeAccountActivityFields, loadCatalog } = require('./services/merchantActivities');
-const { refreshCurrencyRates, sanitizeCurrencyList, mergeCurrencyConfig } = require('./services/currencyRates');
+const { refreshCurrencyRates, sanitizeCurrencyList, mergeCurrencyConfig, ensureCurrencyCodes } = require('./services/currencyRates');
 const { parseKnowledgeFile, formatDynamicKnowledgeForPrompt } = require('./services/dynamicKnowledge');
 const { recordUsage, setupQuotaGuardAPI } = require('../rizq_quota_guard_agent');
 const { storeReceipt } = require('./services/receiptStorage');
@@ -141,8 +143,8 @@ const ADS_REQUESTS_FILE = path.join(DATA_DIR, 'ads-requests.json');
 // الأدمن بضغطة زر بلا أي تعديل كود أو إعادة نشر. ──
 const launchMode = require('./config/launchMode');
 const DEFAULT_MODULE_FLAGS = { individual: true, store: true, office: true, corp: true, estate: true, tenders: true, investments: true, videoAds: true };
-function getModuleFlags() {
-  const cfg = repos.getSiteConfig();
+async function getModuleFlags() {
+  const cfg = await repos.getSiteConfig();
   const envOpen = launchMode.getEnvOpenSectionFlags();
   /* إن وُجد RIZQ_OPEN_SECTIONS فهو مصدر الحقيقة للأقسام المفتوحة عند الإطلاق */
   const base = envOpen
@@ -160,8 +162,8 @@ const DEFAULT_PLATFORM_FLAGS = {
   vpnBlock: false,
   sessionTimeoutMin: 60,
 };
-function getPlatformFlags() {
-  const cfg = repos.getSiteConfig();
+async function getPlatformFlags() {
+  const cfg = await repos.getSiteConfig();
   const flags = Object.assign({}, DEFAULT_PLATFORM_FLAGS, cfg.platformFlags || {});
   /* قفل إنتاج: لا يمكن تعطيل OTP عبر site-config */
   if (isProdEnv()) flags.otpRequired = true;
@@ -182,8 +184,8 @@ const DEFAULT_SECTION_RULES = {
   investments: { extraBannedKeywords: [], escalateAlways: true, requiredDocsNote: 'مراجعة أوّلية للفرصة الاستثمارية — بلا ضمان عائد، وثائق المشروع عند الحاجة' },
   videoAds:    { extraBannedKeywords: [], escalateAlways: true, requiredDocsNote: 'حساب مفتوح أصلاً (فرد/محل) — مراجعة الفيديو قبل النشر العام' },
 };
-function getSectionRules() {
-  const cfg = repos.getSiteConfig();
+async function getSectionRules() {
+  const cfg = await repos.getSiteConfig();
   const stored = (cfg.sectionRules && typeof cfg.sectionRules === 'object') ? cfg.sectionRules : {};
   const out = {};
   Object.keys(DEFAULT_SECTION_RULES).forEach((key) => {
@@ -200,10 +202,10 @@ function forbidUploadPath(error, msg, msgFr) {
 }
 function gateUploadByStatus(resolveEntity, allowedStatuses, error) {
   const allowed = new Set(allowedStatuses);
-  return function _gateUpload(req, res, next) {
+  return async function _gateUpload(req, res, next) {
     try {
       const entityId = String(req.path || '').split('/').filter(Boolean)[0] || '';
-      const entity = entityId ? resolveEntity(entityId) : null;
+      const entity = entityId ? await Promise.resolve(resolveEntity(entityId)) : null;
       const st = String((entity && entity.status) || '');
       if (!entity || !allowed.has(st)) {
         return res.status(403).json({ error: error, msg: 'الوسائط غير متاحة' });
@@ -240,12 +242,12 @@ app.use('/uploads/kyc', forbidUploadPath(
   'Documents d\'identité protégés — admin / titulaire uniquement'
 ));
 app.use('/uploads/ads', gateUploadByStatus(
-  (adId) => repos.ads.getById(adId),
+  async (adId) => await repos.ads.getById(adId),
   ['active', 'approved', 'published'],
   'ad_media_forbidden'
 ));
 app.use('/uploads/catalog', gateUploadByStatus(
-  (itemId) => repos.catalog.list().find((c) => c && c.id === itemId) || null,
+  async (itemId) => (await repos.catalog.list()).find((c) => c && c.id === itemId) || null,
   ['active'],
   'catalog_media_forbidden'
 ));
@@ -311,11 +313,13 @@ app.use(cors({
 // الإنتاج يبقى صارماً (60 / 15 دقيقة). يمكن تجاوز السقف بـ API_RATE_LIMIT_MAX.
 const API_RATE_MAX = Number(process.env.API_RATE_LIMIT_MAX)
   || (isProdEnv() ? 60 : 5000);
+const API_RATE_WINDOW_MS = 15 * 60 * 1000;
 app.use('/api/', rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: API_RATE_WINDOW_MS,
   max: API_RATE_MAX,
   standardHeaders: true,
   legacyHeaders: false,
+  store: getOrCreateHybridStore(API_RATE_WINDOW_MS),
   skip: (req) => {
     // مسارات القراءة العامة للواجهة — لا تُحسب ضد حد الحماية من الاستهلاك العشوائي
     // ملاحظة: عند mount على /api/ يكون req.path نسبياً (/site-config) وليس /api/site-config
@@ -357,13 +361,9 @@ const ADMIN_ACCOUNTS = OWNER_SUPER_ADMIN.passHash && OWNER_SUPER_ADMIN.passHash.
   : [];
 const ADMIN_SESSION_TTL_MS = 12 * 60 * 60 * 1000; // 12 ساعة
 const { createAdminSessionStore } = require('./services/adminSessionStore');
-const adminSessions = createAdminSessionStore(); // SQLite — يبقى بعد إعادة التشغيل
+const adminSessions = createAdminSessionStore(); // PostgreSQL — يبقى بعد إعادة التشغيل
 const adminTeamService = require('./services/adminTeam');
 const { hasAdminPermission, PANEL_PERMISSION_MAP } = require('./services/adminPermissions');
-if (ADMIN_ACCOUNTS.length) adminTeamService.seedFromLegacyAccounts(ADMIN_ACCOUNTS);
-if (OWNER_SUPER_ADMIN.passHash && OWNER_SUPER_ADMIN.passHash.startsWith('$2') && OWNER_SUPER_ADMIN.email) {
-  adminTeamService.ensureOwnerSuperAdmin(OWNER_SUPER_ADMIN);
-}
 const { requireAdminSession, requireAdminAuth, requireAdminPermission, requireSuperAdmin, requireSharedSecret } = createAdminAuth({
   adminSessions,
   hasAdminPermission,
@@ -378,10 +378,10 @@ function isBrowserLikeRequest(req) {
 }
 
 /** يحلّ هوية الأدمن من الجلسة أو السرّ الخادمي */
-function resolveAdminUser(req) {
+async function resolveAdminUser(req) {
   const adminTok = req.header('x-admin-token');
   if (adminTok) {
-    const sess = adminSessions.get(adminTok);
+    const sess = await adminSessions.get(adminTok);
     if (sess && sess.expiresAt >= Date.now()) return sess;
   }
   const got = req.header('x-rizq-secret');
@@ -393,13 +393,13 @@ function resolveAdminUser(req) {
   return null;
 }
 
-function isAdminRequest(req) {
-  return !!resolveAdminUser(req);
+async function isAdminRequest(req) {
+  return !!(await resolveAdminUser(req));
 }
 
 /** فحص صلاحية RBAC لمسارات تستخدم isAdminRequest بدل middleware */
-function adminHasPermission(req, ...keys) {
-  const u = resolveAdminUser(req);
+async function adminHasPermission(req, ...keys) {
+  const u = await resolveAdminUser(req);
   if (!u) return false;
   return hasAdminPermission(u.permissions || [], keys.length ? keys : ['*']);
 }
@@ -536,7 +536,7 @@ function verifyAgentToggleSecret(secret) {
 }
 
 /** POST /api/agent/toggle — لوحات التحكم (Diamond) — تفعيل/إيقاف الوكيل الهاتفي */
-app.post('/api/agent/toggle', (req, res) => {
+app.post('/api/agent/toggle', async (req, res) => {
   const b = req.body || {};
   const subscriberPhone = b.subscriberPhone;
   const active = b.active;
@@ -555,7 +555,7 @@ app.post('/api/agent/toggle', (req, res) => {
     }
   }
   if (!authorized && accountId && token) {
-    const acc = verifyAccountOwner(String(accountId).slice(0, 60), token);
+    const acc = await verifyAccountOwner(String(accountId).slice(0, 60), token);
     if (acc) {
       try {
         assertAiAgentAccess(acc, { channel: 'dashboard' });
@@ -899,11 +899,11 @@ app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
     if (accountId) {
       let acc = null;
       if (token) {
-        acc = verifyAccountOwner(accountId, token);
+        acc = await verifyAccountOwner(accountId, token);
         if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
       } else {
         // زائر عام على صفحة التاجر — نثق بالخادم فقط لا بـ profile العميل
-        acc = readAccounts().find((a) => a.id === accountId) || null;
+        acc = (await readAccounts()).find((a) => a.id === accountId) || null;
         if (!acc || acc.status !== 'approved' || acc.suspended) {
           return res.status(403).json({ ok: false, error: 'الوكيل غير متاح', code: 'merchant_inactive' });
         }
@@ -985,10 +985,10 @@ app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
     if (accountId) {
       let acc = null;
       if (token) {
-        acc = verifyAccountOwner(accountId, token);
+        acc = await verifyAccountOwner(accountId, token);
         if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
       } else {
-        acc = readAccounts().find((a) => a.id === accountId) || null;
+        acc = (await readAccounts()).find((a) => a.id === accountId) || null;
         if (!acc || acc.status !== 'approved' || acc.suspended) {
           return res.status(403).json({ ok: false, error: 'الوكيل غير متاح', code: 'merchant_inactive' });
         }
@@ -1151,7 +1151,7 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
     }
     // التحقق من الملكية قبل كشف وجود الحساب (منع تعداد الحسابات)
     const token = extractAccountToken(req) || req.header('x-account-token') || '';
-    const acc = verifyAccountOwner(accountId, token);
+    const acc = await verifyAccountOwner(accountId, token);
     if (!acc) {
       return res.status(401).json({ ok: false, error: 'unauthorized' });
     }
@@ -1207,21 +1207,27 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
  * إعادة تحميل نفس الإعداد عند كل تنقل بين الصفحات على شبكة ضعيفة — أي
  * تعديل من الأدمن يظهر للزوار الجدد في أقل من دقيقة كحد أقصى.
  */
-app.get('/api/site-config', (req, res) => {
+app.get('/api/site-config', async (req, res) => {
   // Short cache so admin package/announcement edits reach visitors quickly.
   res.set('Cache-Control', 'public, max-age=10');
-  const raw = repos.getSiteConfig() || {};
-  const moduleFlags = getModuleFlags();
+  const raw = (await repos.getSiteConfig()) || {};
+  const moduleFlags = await getModuleFlags();
   const publicCfg = {
     moduleFlags,
-    launch: launchMode.publicLaunchConfig(moduleFlags),
-    platformFlags: getPlatformFlags(),
-    sectionRules: getSectionRules(),
+    launch: await launchMode.publicLaunchConfig(moduleFlags),
+    platformFlags: await getPlatformFlags(),
+    sectionRules: await getSectionRules(),
     otp: getPublicOtpConfig(),
     demoDashboardAllowed: !isProdEnv(),
     production: isProdEnv(),
     packages: raw.packages || undefined,
-    prices: raw.prices || undefined,
+    prices: raw.prices
+      ? Object.assign({}, raw.prices, {
+          currencies: Array.isArray(raw.prices.currencies)
+            ? ensureCurrencyCodes(raw.prices.currencies)
+            : raw.prices.currencies,
+        })
+      : undefined,
     promoVideo: raw.promoVideo ? {
       ...raw.promoVideo,
       url: sanitizePlatformPromoUrl(raw.promoVideo.url),
@@ -1352,9 +1358,9 @@ function sanitizeSiteSocial(raw) {
  *   -- يُدمَج مفتاحاً بمفتاح (لا يمسح أقساماً أخرى محفوظة سابقاً)
  *   -- قيمة نصية فارغة "" لمفتاح ما = إعادته للنص الافتراضي (حذف الـ override)
  */
-app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) => {
+app.post('/api/site-config', requireAdminPermission('siteconfig'), async (req, res) => {
   const body = req.body || {};
-  const current = repos.getSiteConfig();
+  const current = await repos.getSiteConfig();
   const next = Object.assign({}, current);
 
   if (body.promoVideo && typeof body.promoVideo === 'object') {
@@ -1672,7 +1678,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     // بمفتاح لكل قسم (لا يمسح قواعد أقسام أخرى محفوظة سابقاً)، بنفس مبدأ
     // moduleFlags أعلاه. راجع DEFAULT_SECTION_RULES/getSectionRules أعلاه. ──
     const SECTION_KEYS = ['individual', 'store', 'office', 'corp', 'tenders', 'investments', 'videoAds'];
-    const existingRules = getSectionRules(); // يبدأ من القيم الحالية (افتراضية+محفوظة) لا من الصفر
+    const existingRules = await getSectionRules(); // يبدأ من القيم الحالية (افتراضية+محفوظة) لا من الصفر
     SECTION_KEYS.forEach((key) => {
       if (!(key in body.sectionRules) || typeof body.sectionRules[key] !== 'object') return;
       const incoming = body.sectionRules[key];
@@ -1777,7 +1783,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
     };
   }
 
-  repos.saveSiteConfig(next);
+  await repos.saveSiteConfig(next);
   if (body.packages) {
     try {
       const pkgCfg = require('../rizq_packages_config');
@@ -1797,7 +1803,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), (req, res) =>
  */
 app.post('/api/currency-rates/refresh', requireAdminPermission('prices'), async (req, res) => {
   try {
-    const current = repos.getSiteConfig();
+    const current = await repos.getSiteConfig();
     const existing = (current.prices && current.prices.currencies) || [];
     const result = await refreshCurrencyRates(existing, { onlyEnabled: true });
     const next = Object.assign({}, current);
@@ -1808,7 +1814,7 @@ app.post('/api/currency-rates/refresh', requireAdminPermission('prices'), async 
       currenciesUpdatedAt: result.updatedAt,
       updatedAt: new Date().toISOString(),
     });
-    repos.saveSiteConfig(next);
+    await repos.saveSiteConfig(next);
     res.json({ ok: true, currencies: result.currencies, errors: result.errors, updatedAt: result.updatedAt, config: next });
   } catch (err) {
     console.error('[currency-rates] refresh failed:', err.message);
@@ -1822,11 +1828,13 @@ async function autoRefreshCurrencyRatesIfStale() {
   if (_currencyRefreshRunning) return;
   _currencyRefreshRunning = true;
   try {
-    const current = repos.getSiteConfig();
+    const current = await repos.getSiteConfig();
     const prices = current.prices || {};
     const last = prices.currenciesUpdatedAt || prices.updatedAt;
     const stale = !last || (Date.now() - new Date(last).getTime() > CURRENCY_AUTO_REFRESH_MS);
-    if (!stale && Array.isArray(prices.currencies) && prices.currencies.length) return;
+    const list = Array.isArray(prices.currencies) ? prices.currencies : [];
+    const missingCodes = list.length > 0 && list.some((c) => !c || !c.code);
+    if (!stale && list.length && !missingCodes) return;
     const merged = mergeCurrencyConfig(prices.currencies);
     const result = await refreshCurrencyRates(merged, { onlyEnabled: true });
     const next = Object.assign({}, current);
@@ -1835,7 +1843,7 @@ async function autoRefreshCurrencyRatesIfStale() {
       currenciesUpdatedAt: result.updatedAt,
       updatedAt: new Date().toISOString(),
     });
-    repos.saveSiteConfig(next);
+    await repos.saveSiteConfig(next);
     if (result.errors && result.errors.length) {
       console.warn('[currency-rates] partial refresh:', result.errors.map((e) => e.code).join(', '));
     } else {
@@ -1875,22 +1883,21 @@ function normalizeAccountPaymentMethods(arr) {
   })).filter((m) => m.bank || m.type === 'cash' || m.type === 'instore');
 }
 
-const platformStore = require('./db/platformStore');
-function readAccounts() { return repos.accounts.list(); }
-function writeAccounts(list) { return repos.accounts.replaceAll(list); }
+async function readAccounts() { return await repos.accounts.list(); }
+async function writeAccounts(list) { return await repos.accounts.replaceAll(list); }
 
 const { sanitizeKycDataUrl } = require('./lib/sanitizeKyc');
 
 /** إعادة حساب درجة ثقة البائع من متوسط التقييمات (0–100) */
-function recomputeSellerTrustScore(targetId) {
+async function recomputeSellerTrustScore(targetId) {
   try {
-    const all = readReviews();
+    const all = await readReviews();
     const list = all[targetId] || [];
     if (!list.length) return;
     const sum = list.reduce((s, r) => s + (Number(r.rating) || 0), 0);
     const avg = sum / list.length;
     const score = Math.max(0, Math.min(100, Math.round(avg * 20)));
-    const accounts = readAccounts();
+    const accounts = await readAccounts();
     const idx = accounts.findIndex((a) => a && a.id === targetId);
     if (idx < 0) return;
     accounts[idx] = Object.assign({}, accounts[idx], {
@@ -1898,7 +1905,7 @@ function recomputeSellerTrustScore(targetId) {
       reviewCount: list.length,
       reviewAverage: Math.round(avg * 10) / 10,
     });
-    writeAccounts(accounts);
+    await writeAccounts(accounts);
   } catch (e) { /* ignore */ }
 }
 
@@ -1955,11 +1962,11 @@ function assertNniAssignable(list, rawNni, excludeId, acc) {
   return { ok: true, nni };
 }
 
-function resolveOptionalAccountViewer(req) {
+async function resolveOptionalAccountViewer(req) {
   const accountId = req.header('x-account-id') || '';
   const token = extractAccountToken(req);
   if (!accountId || !token) return null;
-  const acc = readAccounts().find((a) => a.id === accountId);
+  const acc = (await readAccounts()).find((a) => a.id === accountId);
   return (acc
     && acc.status === 'approved'
     && !acc.suspended
@@ -1982,14 +1989,14 @@ const ACCOUNT_PUBLIC_FIELDS = [
   'activityId', 'activity', 'storeTopics',
   'facebook', 'thumb', 'cover', 'tagline', 'status', 'approvedAt', 'createdAt',
 ];
-function toPublicAccount(acc) {
+async function toPublicAccount(acc) {
   const viewerId = null;
-  const gate = resolveContactGate(viewerId, acc && acc.id, acc && acc.type);
-  return toPublicAccountGated(acc, gate);
+  const gate = await resolveContactGate(viewerId, acc && acc.id, acc && acc.type);
+  return await toPublicAccountGated(acc, gate);
 }
-function toPublicAccountForViewer(acc, viewerAccountId) {
-  const gate = resolveContactGate(viewerAccountId, acc && acc.id, acc && acc.type);
-  return toPublicAccountGated(acc, gate);
+async function toPublicAccountForViewer(acc, viewerAccountId) {
+  const gate = await resolveContactGate(viewerAccountId, acc && acc.id, acc && acc.type);
+  return await toPublicAccountGated(acc, gate);
 }
 // نفس السجل بدون accessToken فقط (للأدمن أو لصاحب الحساب نفسه — كل الحقول
 // عدا سرّ الوصول)
@@ -2085,7 +2092,7 @@ app.get('/api/accounts/nni-available', accountsRegisterLimiter, (req, res) => {
  */
 app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
   const b = req.body || {};
-  const pFlags = getPlatformFlags();
+  const pFlags = await getPlatformFlags();
   if (pFlags.platformOpen === false) return res.status(503).json({ error: 'المنصة مغلقة للصيانة حالياً' });
   if (pFlags.registrationOpen === false) return res.status(403).json({ error: 'التسجيل مغلق حالياً' });
   if (!b.name || !b.type) return res.status(400).json({ error: 'name و type مطلوبان' });
@@ -2097,7 +2104,7 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
   if (!ALLOWED_ACCOUNT_TYPES.includes(reqType)) {
     return res.status(400).json({ ok: false, error: 'نوع الحساب غير مدعوم', code: 'invalid_type' });
   }
-  const flags = getModuleFlags();
+  const flags = await getModuleFlags();
   // estate يستخدم علم office إن لم يُعرَّف علم مستقل
   const flagKey = (reqType === 'estate' && !Object.prototype.hasOwnProperty.call(flags, 'estate'))
     ? 'office'
@@ -2142,7 +2149,7 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     }
   }
 
-  const list = readAccounts();
+  const list = await readAccounts();
   // نقبل معرّفاً يُرسله العميل (نفس ACC_<timestamp> المُولَّد محلياً في
   // rizq_landing_v8.html) حتى يبقى معرّف الحساب موحّداً بين localStorage
   // والخادم — بدون هذا، لا يمكن لداشبورد الأدمن مطابقة الحساب المسجَّل محلياً
@@ -2199,7 +2206,7 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
   }
   const passHash = sellerPassword ? bcrypt.hashSync(sellerPassword, 10) : null;
   // فرد/محل: تفعيل فوري بعد إثبات ملكية البريد (أو الهاتف) بـ OTP عند otpRequired
-  const platformFlags = getPlatformFlags();
+  const platformFlags = await getPlatformFlags();
   let autoApproved = false;
   let otpGate = null;
   if (canAutoApproveAccountType(reqType) && sellerEmail && sellerPassword.length >= 8) {
@@ -2286,8 +2293,8 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     verifiedPlus: false,
     verifiedPlusExpiresAt: null,
     /* شريك مؤسس — محلات وعقارات المسجّلة قبل نهاية الفترة المجانية */
-    foundingPartner: launchMode.shouldMarkFoundingPartner(reqType),
-    foundingDiscountPercent: launchMode.shouldMarkFoundingPartner(reqType)
+    foundingPartner: await launchMode.shouldMarkFoundingPartner(reqType),
+    foundingDiscountPercent: (await launchMode.shouldMarkFoundingPartner(reqType))
       ? launchMode.getFoundingDiscountPercent()
       : undefined,
     passHash: passHash || undefined,
@@ -2323,11 +2330,11 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
   }
 
   list.push(acc);
-  writeAccounts(list);
+  await writeAccounts(list);
   if (autoApproved && canAutoApproveAccountType(reqType) && acc.idImage) {
     const idx = list.length - 1;
     purgeAccountIdDocument(list[idx]);
-    writeAccounts(list);
+    await writeAccounts(list);
   }
   const regOut = {
     ok: true,
@@ -2531,10 +2538,10 @@ app.get('/api/buyers/me', (req, res) => {
 // /api/accounts با�ضبط � إرسا� عا�& + �&راجعة أد�&�`�  بسر� �&شترْ.
 // �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 const SUB_REQUESTS_FILE = path.join(DATA_DIR, 'sub-requests.json');
-function readSubRequests() { return repos.subRequests.list(); }
-function writeSubRequests(list) {
+async function readSubRequests() { return await repos.subRequests.list(); }
+async function writeSubRequests(list) {
   const rows = Array.isArray(list) ? list : [];
-  repos.subRequests.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+  await repos.subRequests.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
 }
 
 const subRequestsLimiter = rateLimit({
@@ -2551,12 +2558,12 @@ const subRequestsLimiter = rateLimit({
  * داشبورده. نقبل معرّفاً من العميل (sub_<timestamp>) ليطابق نفس السجل
  * المحلي المعروض في rizq_admin.html بعد المزامنة.
  */
-app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
+app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
   const b = req.body || {};
   const pkgRef = b.pkg || b.packageId || b.pkgId || b.pkgName;
   if (!pkgRef || !b.accountId) return res.status(400).json({ error: 'pkg و accountId مطلوبان' });
   const token = req.header('x-account-token') || '';
-  const owner = verifyAccountOwner(String(b.accountId).slice(0, 60), token);
+  const owner = await verifyAccountOwner(String(b.accountId).slice(0, 60), token);
   if (!owner) return res.status(401).json({ ok: false, error: 'unauthorized' });
   /* سعر الخادم هو المرجع — لا نثق بسعر العميل للمعاملات */
   let catalogPkg = null;
@@ -2589,7 +2596,7 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
       message: 'سعر الباقة غير مضبوط — حدّده السوبر أدمن من لوحة إدارة الباقات أولاً',
     });
   }
-  const list = readSubRequests();
+  const list = await readSubRequests();
   const clientId = typeof b.id === 'string' && /^sub_\d{10,20}$/.test(b.id) ? b.id : null;
   const id = clientId && !list.some((r) => r.id === clientId)
     ? clientId : ('sub_' + Date.now() + '_' + crypto.randomBytes(3).toString('hex'));
@@ -2639,10 +2646,10 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
     adTitle: b.adTitle ? String(b.adTitle).slice(0, 200) : null,
   };
   list.push(rec);
-  writeSubRequests(list);
+  await writeSubRequests(list);
   if (rec.category === 'package' && rec.accountId) {
     try {
-      const accRow = readAccounts().find((a) => a.id === rec.accountId);
+      const accRow = (await readAccounts()).find((a) => a.id === rec.accountId);
       createPendingPackageFromRequest({
         accountId: rec.accountId,
         accountName: rec.account || accRow?.name || rec.accountId,
@@ -2683,12 +2690,12 @@ app.post('/api/sub-requests', subRequestsLimiter, (req, res) => {
  * GET /api/sub-requests/admin — أدمين فقط (سرّ مشترك) — قائمة كل الطلبات
  * ليراها أي جهاز أدمن، وليس فقط جهاز المشترك الذي أرسل الطلب.
  */
-app.get('/api/sub-requests/admin', requireAdminPermission('payments'), (req, res) => {
+app.get('/api/sub-requests/admin', requireAdminPermission('payments'), async (req, res) => {
   let loadReceiptDataUrl = null;
   try {
     loadReceiptDataUrl = require('./services/telegramAdmin').loadReceiptDataUrl;
   } catch (_) { /* optional */ }
-  const requests = readSubRequests().reverse().map((r) => {
+  const requests = (await readSubRequests()).reverse().map((r) => {
     const copy = Object.assign({}, r);
     if (!copy.receiptImage && copy.receiptPath && typeof loadReceiptDataUrl === 'function') {
       try { copy.receiptImage = loadReceiptDataUrl(copy); } catch (_) { copy.receiptImage = null; }
@@ -2705,7 +2712,7 @@ app.get('/api/sub-requests/admin', requireAdminPermission('payments'), (req, res
 app.post('/api/sub-requests/admin/:id/decision', requireAdminPermission('payments'), async (req, res) => {
   const action = (req.body || {}).action;
   if (action !== 'approve' && action !== 'reject') return res.status(400).json({ error: 'action يجب أن يكون approve أو reject' });
-  const list = readSubRequests();
+  const list = await readSubRequests();
   const idx = list.findIndex((r) => r.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'request_not_found' });
   const row = list[idx];
@@ -2714,7 +2721,7 @@ app.post('/api/sub-requests/admin/:id/decision', requireAdminPermission('payment
     list[idx].status = 'rejected';
     list[idx].reviewedAt = new Date().toISOString();
     list[idx].reviewedVia = 'admin_api';
-    writeSubRequests(list);
+    await writeSubRequests(list);
     return res.json({ ok: true, request: list[idx] });
   }
 
@@ -2745,7 +2752,7 @@ app.post('/api/sub-requests/admin/:id/decision', requireAdminPermission('payment
     list[idx].reviewedAt = new Date().toISOString();
     list[idx].reviewedVia = 'admin_api';
     list[idx].paymentConfirmed = true;
-    writeSubRequests(list);
+    await writeSubRequests(list);
     return res.json({ ok: true, request: list[idx], activation });
   } catch (e) {
     console.error('[sub-requests/decision]', e.message);
@@ -2773,15 +2780,15 @@ const {
 setupPackageLifecycleAPI(app, requireAdminPermission('payments'), { readAccounts, writeAccounts });
 
 /** GET /api/entitlements/:accountId — صلاحيات الحساب (محمي بـ x-account-token) */
-app.get('/api/entitlements/:accountId', (req, res) => {
+app.get('/api/entitlements/:accountId', async (req, res) => {
   const accountId = req.params.accountId;
   const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(accountId, token);
+  const acc = await verifyAccountOwner(accountId, token);
   if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const ent = getEntitlements(accountId, acc.type);
-  const media = getMediaEntitlements(accountId);
-  const tender = getTenderEntitlements(accountId);
-  const investment = getInvestmentEntitlements(accountId);
+  const ent = await getEntitlements(accountId, acc.type);
+  const media = await getMediaEntitlements(accountId);
+  const tender = await getTenderEntitlements(accountId);
+  const investment = await getInvestmentEntitlements(accountId);
   res.json({ ok: true, entitlements: ent, media, tender, investment });
 });
 
@@ -2789,13 +2796,13 @@ app.get('/api/entitlements/:accountId', (req, res) => {
  * GET /api/pay-methods — أرقام/رموز التحويل الكاملة لصاحب حساب معتمد فقط.
  * الواجهة العامة (/api/site-config) تعرض الاسم والتعليمات بلا code.
  */
-app.get('/api/pay-methods', (req, res) => {
+app.get('/api/pay-methods', async (req, res) => {
   const accountId = String(req.query.accountId || req.header('x-account-id') || '').trim().slice(0, 60);
   const token = extractAccountToken(req) || '';
-  if (!accountId || !verifyAccountOwner(accountId, token)) {
+  if (!accountId || !await verifyAccountOwner(accountId, token)) {
     return res.status(401).json({ ok: false, error: 'unauthorized' });
   }
-  const raw = repos.getSiteConfig() || {};
+  const raw = (await repos.getSiteConfig()) || {};
   const list = Array.isArray(raw.bankCodes) ? raw.bankCodes : [];
   res.set('Cache-Control', 'no-store');
   res.json({
@@ -2819,7 +2826,7 @@ const videoAdsEventLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: 'too_many_events' },
 });
-app.post('/api/video-ads/event', videoAdsEventLimiter, (req, res) => {
+app.post('/api/video-ads/event', videoAdsEventLimiter, async (req, res) => {
   try {
     const body = req.body || {};
     const accountId = String(body.accountId || '').trim().slice(0, 60);
@@ -2828,7 +2835,7 @@ app.post('/api/video-ads/event', videoAdsEventLimiter, (req, res) => {
       return res.status(400).json({ ok: false, error: 'invalid_event' });
     }
     // رفض معرّفات عشوائية — فقط معلن موجود فعلياً في قائمة العرض النشطة
-    const cfg = repos.getSiteConfig() || {};
+    const cfg = (await repos.getSiteConfig()) || {};
     const videoAds = (cfg.videoAds && typeof cfg.videoAds === 'object') ? cfg.videoAds : {};
     const activeAdv = ['hero', 'popup'].some((slot) =>
       (Array.isArray(videoAds[slot]) ? videoAds[slot] : []).some(
@@ -2869,7 +2876,7 @@ app.post('/api/video-ads/event', videoAdsEventLimiter, (req, res) => {
     row.updatedAt = new Date().toISOString();
     stats[accountId] = row;
     const nextVideoAds = Object.assign({}, videoAds, { stats });
-    repos.saveSiteConfig(Object.assign({}, cfg, { videoAds: nextVideoAds }));
+    await repos.saveSiteConfig(Object.assign({}, cfg, { videoAds: nextVideoAds }));
     res.json({ ok: true, stats: { impressions: row.impressions, clicks: row.clicks } });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
@@ -2877,16 +2884,16 @@ app.post('/api/video-ads/event', videoAdsEventLimiter, (req, res) => {
 });
 
 /** GET /api/video-ads/stats/:accountId — إحصائيات معلن (محمي بمالك الحساب) */
-app.get('/api/video-ads/stats/:accountId', (req, res) => {
+app.get('/api/video-ads/stats/:accountId', async (req, res) => {
   const accountId = req.params.accountId;
   const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(accountId, token);
+  const acc = await verifyAccountOwner(accountId, token);
   if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const media = getMediaEntitlements(accountId);
+  const media = await getMediaEntitlements(accountId);
   if (!media.subscribed || !media.basicStats) {
     return res.status(403).json({ ok: false, error: 'stats_not_available', media });
   }
-  const cfg = repos.getSiteConfig() || {};
+  const cfg = (await repos.getSiteConfig()) || {};
   const statsAll = (cfg.videoAds && cfg.videoAds.stats) || {};
   const row = statsAll[accountId] || { impressions: 0, clicks: 0 };
   res.json({
@@ -2912,12 +2919,12 @@ const contactGateLimiter = rateLimit({
 });
 
 /** GET /api/contact-gate/status — حالة بوابة التواصل لحساب مستهدف */
-app.get('/api/contact-gate/status', (req, res) => {
+app.get('/api/contact-gate/status', async (req, res) => {
   const targetAccountId = String(req.query.targetAccountId || '').trim();
   const module = normalizeModule(req.query.module || req.query.type || 'individual');
   if (!targetAccountId) return res.status(400).json({ ok: false, error: 'targetAccountId_required' });
-  const viewerId = resolveOptionalAccountViewer(req);
-  const gate = resolveContactGate(viewerId, targetAccountId, module);
+  const viewerId = await resolveOptionalAccountViewer(req);
+  const gate = await resolveContactGate(viewerId, targetAccountId, module);
   res.json({ ok: true, access: gate });
 });
 
@@ -2928,8 +2935,8 @@ app.post('/api/contact-gate/attempt', contactGateLimiter, async (req, res) => {
     const targetAccountId = String(body.targetAccountId || '').trim();
     const module = normalizeModule(body.module || body.type || 'individual');
     if (!targetAccountId) return res.status(400).json({ ok: false, error: 'targetAccountId_required' });
-    const viewerId = resolveOptionalAccountViewer(req);
-    const gate = resolveContactGate(viewerId, targetAccountId, module);
+    const viewerId = await resolveOptionalAccountViewer(req);
+    const gate = await resolveContactGate(viewerId, targetAccountId, module);
     let fomo = { ok: false, skipped: true };
     if (gate.fomoEligible) {
       fomo = await notifyContactAttemptFomo(targetAccountId, module, { lang: body.lang });
@@ -2953,8 +2960,8 @@ const trackVisitLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: 'عدد كبير جداً من الطلبات — حاول مرة أخرى بعد قليل' },
 });
-function _getMainAccountById(id) {
-  const list = readAccounts();
+async function _getMainAccountById(id) {
+  const list = await readAccounts();
   return list.find((a) => a.id === id) || null;
 }
 setupVisitTrackingAPI(app, trackVisitLimiter, getAccountRecord, _getMainAccountById);
@@ -2967,9 +2974,9 @@ const trackContactLimiter = rateLimit({
   legacyHeaders: false,
   message: { error: 'عدد كبير جداً من الطلبات — حاول مرة أخرى بعد قليل' },
 });
-function _findAdOwnerAccountId(adId) {
+async function _findAdOwnerAccountId(adId) {
   try {
-    const ads = typeof readAds === 'function' ? readAds() : [];
+    const ads = typeof readAds === 'function' ? await readAds() : [];
     const ad = (ads || []).find((a) => a && String(a.id) === String(adId));
     return ad && (ad.accountId || ad.sellerId || ad.ownerId) || null;
   } catch (e) {
@@ -3002,7 +3009,7 @@ mountAdminCoreRoutes(app, {
   readAccounts,
   readAds,
   readSubRequests,
-  readAdsRequests: () => repos.adsRequests.list(),
+  readAdsRequests: async () => await repos.adsRequests.list(),
   readTenders,
   getAllAccountPackageRecords,
   readAuditLog,
@@ -3106,10 +3113,10 @@ function appendLaunchAudit(cfg, entry) {
  * GET /api/admin/launch-config — إعدادات الإطلاق + سجل التدقيق (سوبر أدمن)
  * POST /api/admin/launch-config — حفظ launchDate + freeDays مع تدقيق وتأكيد الماضي
  */
-app.get('/api/admin/launch-config', requireSuperAdmin, (req, res) => {
+app.get('/api/admin/launch-config', requireSuperAdmin, async (req, res) => {
   try {
-    const cfg = repos.getSiteConfig() || {};
-    const launch = launchMode.publicLaunchConfig(getModuleFlags());
+    const cfg = (await repos.getSiteConfig()) || {};
+    const launch = await launchMode.publicLaunchConfig(await getModuleFlags());
     res.json({
       ok: true,
       launch,
@@ -3160,10 +3167,10 @@ app.post('/api/admin/ops-housekeeping', requireSuperAdmin, async (req, res) => {
 });
 
 /** GET /api/account/:accountId/notifications — إشعارات الحساب (ب1) */
-app.get('/api/account/:accountId/notifications', (req, res) => {
+app.get('/api/account/:accountId/notifications', async (req, res) => {
   const accountId = String(req.params.accountId || '').slice(0, 60);
   const token = extractAccountToken(req) || '';
-  if (!accountId || !verifyAccountOwner(accountId, token)) {
+  if (!accountId || !await verifyAccountOwner(accountId, token)) {
     return res.status(401).json({ ok: false, error: 'unauthorized' });
   }
   try {
@@ -3176,38 +3183,38 @@ app.get('/api/account/:accountId/notifications', (req, res) => {
 });
 
 /** POST /api/account/:accountId/notifications/:id/read */
-app.post('/api/account/:accountId/notifications/:id/read', (req, res) => {
+app.post('/api/account/:accountId/notifications/:id/read', async (req, res) => {
   const accountId = String(req.params.accountId || '').slice(0, 60);
   const noteId = String(req.params.id || '').slice(0, 80);
   const token = extractAccountToken(req) || '';
-  if (!accountId || !verifyAccountOwner(accountId, token)) {
+  if (!accountId || !await verifyAccountOwner(accountId, token)) {
     return res.status(401).json({ ok: false, error: 'unauthorized' });
   }
   try {
-    const note = repos.accountNotifications.get(noteId);
+    const note = await repos.accountNotifications.get(noteId);
     if (!note || String(note.accountId) !== accountId) {
       return res.status(404).json({ ok: false, error: 'not_found' });
     }
     note.read = true;
     note.readAt = new Date().toISOString();
-    repos.accountNotifications.upsert(noteId, note);
+    await repos.accountNotifications.upsert(noteId, note);
     res.json({ ok: true, notification: note });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
 });
 
-app.post('/api/admin/launch-config', requireSuperAdmin, (req, res) => {
+app.post('/api/admin/launch-config', requireSuperAdmin, async (req, res) => {
   try {
     const body = req.body || {};
-    const current = repos.getSiteConfig() || {};
+    const current = (await repos.getSiteConfig()) || {};
     const prevDate = launchMode.parseYmd(current.launchDate) || '';
     const prevDays = launchMode.normalizeFreeDays(
       current.freeDays != null && current.freeDays !== '' ? current.freeDays : launchMode.DEFAULT_FREE_DAYS
     );
     const prevUntil = prevDate
       ? launchMode.addDaysYmd(prevDate, prevDays)
-      : (launchMode.getLaunchFreeUntil() || '');
+      : ((await launchMode.getLaunchFreeUntil()) || '');
 
     let nextDate = prevDate;
     if (Object.prototype.hasOwnProperty.call(body, 'launchDate')) {
@@ -3264,8 +3271,8 @@ app.post('/api/admin/launch-config', requireSuperAdmin, (req, res) => {
       confirmPast: inPast === true,
     });
 
-    repos.saveSiteConfig(next);
-    const launch = launchMode.publicLaunchConfig(getModuleFlags());
+    await repos.saveSiteConfig(next);
+    const launch = await launchMode.publicLaunchConfig(await getModuleFlags());
     res.json({
       ok: true,
       launch,
@@ -3303,10 +3310,10 @@ app.put('/api/admin/secrets-vault', requireSuperAdmin, (req, res) => {
 // من لوحة التحكم قبل القرار. لا علاقة لهذا بالتسجيل الفعلي في الحساب — مجرد
 // نية اهتمام (لا تحتاج مصادقة، لكن محدودة المعدل لمنع الإغراق). ──────────
 const INTEREST_FILE = path.join(DATA_DIR, 'section-interest.json');
-function readInterest() { return repos.sectionInterest.list(); }
-function writeInterest(list) {
+async function readInterest() { return await repos.sectionInterest.list(); }
+async function writeInterest(list) {
   const rows = Array.isArray(list) ? list : [];
-  repos.sectionInterest.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+  await repos.sectionInterest.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
 }
 const INTEREST_SECTIONS = ['office', 'corp', 'tenders', 'investments', 'videoAds', 'store', 'estate', 'individual'];
 
@@ -3323,7 +3330,7 @@ const interestLimiter = rateLimit({
  * عام — يسجّل اهتمام زائر بقسم مغلق.
  * body: { section, contact?, name?, phone?, activityType? }
  */
-app.post('/api/section-interest', interestLimiter, (req, res) => {
+app.post('/api/section-interest', interestLimiter, async (req, res) => {
   const b = req.body || {};
   const section = String(b.section || '').trim();
   const name = String(b.name || '').trim().slice(0, 80);
@@ -3336,7 +3343,7 @@ app.post('/api/section-interest', interestLimiter, (req, res) => {
   if (!contact || contact.length < 6) {
     return res.status(400).json({ error: 'الرجاء إدخال رقم هاتف أو بريد إلكتروني صالح' });
   }
-  const list = readInterest();
+  const list = await readInterest();
   list.push({
     id: 'int_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
     section,
@@ -3346,7 +3353,7 @@ app.post('/api/section-interest', interestLimiter, (req, res) => {
     activityType: activityType || undefined,
     createdAt: new Date().toISOString(),
   });
-  writeInterest(list);
+  await writeInterest(list);
   res.json({ ok: true });
 });
 
@@ -3355,8 +3362,8 @@ app.post('/api/section-interest', interestLimiter, (req, res) => {
  * أدمين فقط — عدد التسجيلات لكل قسم مغلق + آخر المسجّلين، ليقرر الأدمن
  * أي قسم يفتحه تالياً بناءً على بيانات حقيقية لا تخميناً.
  */
-app.get('/api/section-interest/admin', requireAdminPermission('analytics'), (req, res) => {
-  const list = readInterest();
+app.get('/api/section-interest/admin', requireAdminPermission('analytics'), async (req, res) => {
+  const list = await readInterest();
   const bySection = {};
   INTEREST_SECTIONS.forEach((s) => { bySection[s] = { count: 0, items: [] }; });
   list.forEach((it) => {
@@ -3407,8 +3414,8 @@ app.post('/api/broadcast-sms', requireAdminPermission('announcements'), async (r
 // عام (GET /api/tenders أو GET /api/tenders/:id) — فقط صاحب المناقصة (عبر
 // GET /api/tenders/mine بتوكنه الخاص) أو الأدمن يراها.
 const TENDERS_FILE = path.join(DATA_DIR, 'tenders.json');
-function readTenders() { return repos.tenders.list(); }
-function writeTenders(list) { return repos.tenders.replaceAll(list); }
+async function readTenders() { return await repos.tenders.list(); }
+async function writeTenders(list) { return await repos.tenders.replaceAll(list); }
 
 /**
  * saveTenderImages(tenderId, images) — صور مرجعية اختيارية لما يحتاجه
@@ -3421,9 +3428,9 @@ const TENDER_UPLOADS_DIR = path.join(__dirname, 'uploads', 'tenders');
 if (!fs.existsSync(TENDER_UPLOADS_DIR)) fs.mkdirSync(TENDER_UPLOADS_DIR, { recursive: true });
 
 // يثبت أن accountId + token يطابقان حساباً حقيقياً في accounts.json، ويُعيده
-function verifyAccountOwner(accountId, token) {
+async function verifyAccountOwner(accountId, token) {
   if (!accountId || !token) return null;
-  const acc = readAccounts().find((a) => a.id === accountId);
+  const acc = (await readAccounts()).find((a) => a.id === accountId);
   // suspended=true (تعليق من الأدمن) يمنع صاحب الحساب من أي فعل يتطلب هذا
   // التحقق — نشر إعلان، تعديل الكتالوج، تعديل الملف الشخصي، إلخ — بغض
   // النظر عن صحة توكنه. هذا هو التطبيق الفعلي الوحيد لمعنى "تعليق مستخدم".
@@ -3437,10 +3444,10 @@ const RizqPromptsServer = require('../rizq_ai_prompts');
  * GET /api/subscriber/knowledge/mine/:accountId — معرفة ديناميكية للمالك (Diamond)
  * POST /api/subscriber/knowledge/upload — رفع Excel/CSV → dynamicKnowledge (معزول per subscriberId)
  */
-app.get('/api/subscriber/knowledge/mine/:accountId', (req, res) => {
+app.get('/api/subscriber/knowledge/mine/:accountId', async (req, res) => {
   const accountId = String(req.params.accountId || '').trim();
   const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(accountId, token);
+  const acc = await verifyAccountOwner(accountId, token);
   if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
   const ent = getAccountEntitlements(acc);
   if (!accountHasAiAgent(acc)) {
@@ -3460,7 +3467,7 @@ app.get('/api/subscriber/knowledge/mine/:accountId', (req, res) => {
   });
 });
 
-app.post('/api/subscriber/knowledge/instructions', (req, res) => {
+app.post('/api/subscriber/knowledge/instructions', async (req, res) => {
   const b = req.body || {};
   const accountId = String(b.accountId || '').trim();
   const token = extractAccountToken(req) || '';
@@ -3468,7 +3475,7 @@ app.post('/api/subscriber/knowledge/instructions', (req, res) => {
   if (!accountId) {
     return res.status(400).json({ ok: false, error: 'accountId مطلوب' });
   }
-  const acc = verifyAccountOwner(accountId, token);
+  const acc = await verifyAccountOwner(accountId, token);
   if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
   if (!accountHasAiAgent(acc)) {
     const ent = getAccountEntitlements(acc);
@@ -3496,7 +3503,7 @@ app.post('/api/subscriber/knowledge/upload', async (req, res) => {
   if (!accountId || !fileName || !fileDataBase64) {
     return res.status(400).json({ ok: false, error: 'accountId, fileName, fileDataBase64 مطلوبة' });
   }
-  const acc = verifyAccountOwner(accountId, token);
+  const acc = await verifyAccountOwner(accountId, token);
   if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
   const entUp = getAccountEntitlements(acc);
   if (!accountHasAiAgent(acc)) {
@@ -3616,8 +3623,8 @@ mountInvestmentsRoutes(app, {
 // images/...) حتى لا تحتاج الواجهة لتغيير جوهري، فقط استبدال
 // localStorage.setItem بطلب fetch حقيقي.
 const ADS_FILE = path.join(DATA_DIR, 'ads.json');
-function readAds() { return repos.ads.list(); }
-function writeAds(list) { return repos.ads.replaceAll(list); }
+async function readAds() { return await repos.ads.list(); }
+async function writeAds(list) { return await repos.ads.replaceAll(list); }
 
 // صور الإعلانات تُكتب كملفات حقيقية على القرص (لا base64 داخل ads.json) —
 // قرار مبرَّر: كود publishAd() في rizq_post.html يحتوي أصلاً على منطق
@@ -3650,10 +3657,10 @@ mountAdsRoutes(app, {
   isAdminRequest,
   adminHasPermission,
   readAccounts,
-  readAdsRequests: () => repos.adsRequests.list(),
-  writeAdsRequests: (list) => {
+  readAdsRequests: async () => await repos.adsRequests.list(),
+  writeAdsRequests: async (list) => {
     const rows = Array.isArray(list) ? list : [];
-    repos.adsRequests.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+    await repos.adsRequests.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
   },
   readAds,
   writeAds,
@@ -3667,10 +3674,10 @@ mountAdsRoutes(app, {
 // (بلا تسجيل دخول) يمكنه إرسال بلاغ عن إعلان محدد، ويراجعه الأدمن هنا.
 // ══════════════════════════════════════════════════════════════════
 const REPORTS_FILE = path.join(DATA_DIR, 'reports.json');
-function readReports() { return repos.reports.list(); }
-function writeReports(list) {
+async function readReports() { return await repos.reports.list(); }
+async function writeReports(list) {
   const rows = Array.isArray(list) ? list : [];
-  repos.reports.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+  await repos.reports.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
 }
 function genReportId() { return 'RPT-' + Date.now() + '-' + Math.floor(Math.random() * 10000); }
 
@@ -3690,13 +3697,13 @@ const reportsLimiter = rateLimit({
  * نُخزِّن لقطة من عنوان الإعلان وaccountId صاحبه وقت الإبلاغ حتى تبقى
  * البيانات مفيدة للأدمن حتى لو تغيّر الإعلان لاحقاً.
  */
-app.post('/api/reports', reportsLimiter, (req, res) => {
+app.post('/api/reports', reportsLimiter, async (req, res) => {
   const b = req.body || {};
   if (!b.adId || typeof b.adId !== 'string') return res.status(400).json({ error: 'adId مطلوب' });
   if (!REPORT_REASONS.includes(b.reason)) return res.status(400).json({ error: 'reason غير صالح' });
-  const ad = readAds().find((a) => a.id === b.adId);
+  const ad = (await readAds()).find((a) => a.id === b.adId);
   if (!ad) return res.status(404).json({ error: 'ad_not_found' });
-  const list = readReports();
+  const list = await readReports();
   const rec = {
     id: genReportId(),
     adId: ad.id,
@@ -3709,13 +3716,13 @@ app.post('/api/reports', reportsLimiter, (req, res) => {
     createdAt: new Date().toISOString(),
   };
   list.push(rec);
-  writeReports(list);
+  await writeReports(list);
   res.json({ ok: true, id: rec.id });
 });
 
 /** GET /api/reports/admin — أدمين فقط — كل البلاغات (المعلّقة أولاً، الأحدث أولاً) */
-app.get('/api/reports/admin', requireAdminPermission('reports'), (req, res) => {
-  const list = readReports().sort((a, b) => {
+app.get('/api/reports/admin', requireAdminPermission('reports'), async (req, res) => {
+  const list = (await readReports()).sort((a, b) => {
     if (a.status !== b.status) return a.status === 'pending' ? -1 : 1;
     return new Date(b.createdAt) - new Date(a.createdAt);
   });
@@ -3723,13 +3730,13 @@ app.get('/api/reports/admin', requireAdminPermission('reports'), (req, res) => {
 });
 
 /** POST /api/reports/admin/:id/resolve — أدمين فقط — يُعلِّم البلاغ كمحلول */
-app.post('/api/reports/admin/:id/resolve', requireAdminPermission('reports'), (req, res) => {
-  const list = readReports();
+app.post('/api/reports/admin/:id/resolve', requireAdminPermission('reports'), async (req, res) => {
+  const list = await readReports();
   const idx = list.findIndex((r) => r.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'report_not_found' });
   list[idx].status = 'resolved';
   list[idx].resolvedAt = new Date().toISOString();
-  writeReports(list);
+  await writeReports(list);
   res.json({ ok: true, report: list[idx] });
 });
 
@@ -3764,10 +3771,10 @@ app.patch('/api/support-tickets/admin/:id', requireAdminPermission('users'), (re
 // admin/:id/decision (action='suspend')�R �ا � ُْرِ�ر�!ا ب� � ستدع�`�!ا �&باشرة.
 // �"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"��"�
 const DEACTIVATION_REQUESTS_FILE = path.join(DATA_DIR, 'deactivation-requests.json');
-function readDeactivationRequests() { return repos.deactivationRequests.list(); }
-function writeDeactivationRequests(list) {
+async function readDeactivationRequests() { return await repos.deactivationRequests.list(); }
+async function writeDeactivationRequests(list) {
   const rows = Array.isArray(list) ? list : [];
-  repos.deactivationRequests.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+  await repos.deactivationRequests.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
 }
 function genDeactivationRequestId() { return 'DEACT-' + Date.now() + '-' + Math.floor(Math.random() * 10000); }
 
@@ -3785,12 +3792,12 @@ const deactivationRequestsLimiter = rateLimit({
  * body: {accountId, reason?}. لا يُعطِّل الحساب فوراً — يُنشئ طلباً معلَّقاً
  * فقط. طلب معلَّق واحد كحد أقصى لكل حساب (لا تراكم عند نقرات متكررة).
  */
-app.post('/api/deactivation-requests', deactivationRequestsLimiter, (req, res) => {
+app.post('/api/deactivation-requests', deactivationRequestsLimiter, async (req, res) => {
   const b = req.body || {};
   const token = req.header('x-account-token') || '';
-  const acc = verifyAccountOwner(b.accountId, token);
+  const acc = await verifyAccountOwner(b.accountId, token);
   if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const list = readDeactivationRequests();
+  const list = await readDeactivationRequests();
   const existing = list.find((r) => r.accountId === acc.id && r.status === 'pending');
   if (existing) return res.json({ ok: true, id: existing.id, alreadyPending: true });
   const rec = {
@@ -3803,13 +3810,13 @@ app.post('/api/deactivation-requests', deactivationRequestsLimiter, (req, res) =
     createdAt: new Date().toISOString(),
   };
   list.push(rec);
-  writeDeactivationRequests(list);
+  await writeDeactivationRequests(list);
   res.json({ ok: true, id: rec.id });
 });
 
 /** GET /api/deactivation-requests/admin — أدمين فقط — المعلّقة أولاً، الأحدث أولاً */
-app.get('/api/deactivation-requests/admin', requireAdminPermission('accounts'), (req, res) => {
-  const list = readDeactivationRequests().sort((a, b) => {
+app.get('/api/deactivation-requests/admin', requireAdminPermission('accounts'), async (req, res) => {
+  const list = (await readDeactivationRequests()).sort((a, b) => {
     if (a.status !== b.status) return a.status === 'pending' ? -1 : 1;
     return new Date(b.createdAt) - new Date(a.createdAt);
   });
@@ -3822,25 +3829,25 @@ app.get('/api/deactivation-requests/admin', requireAdminPermission('accounts'), 
  * (suspended=true، نفس أثر action='suspend' بمسار القرار الإداري
  * للحسابات) بالإضافة لتعليم الطلب كمحلول. reject: يُعلِّم الطلب كمحلول فقط.
  */
-app.post('/api/deactivation-requests/admin/:id/resolve', requireAdminPermission('accounts'), (req, res) => {
+app.post('/api/deactivation-requests/admin/:id/resolve', requireAdminPermission('accounts'), async (req, res) => {
   const action = (req.body || {}).action;
   if (!['approve', 'reject'].includes(action)) return res.status(400).json({ error: "action يجب أن يكون 'approve' أو 'reject'" });
-  const list = readDeactivationRequests();
+  const list = await readDeactivationRequests();
   const idx = list.findIndex((r) => r.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'request_not_found' });
   list[idx].status = 'resolved';
   list[idx].decision = action;
   list[idx].resolvedAt = new Date().toISOString();
-  writeDeactivationRequests(list);
+  await writeDeactivationRequests(list);
   if (action === 'approve') {
-    const accs = readAccounts();
+    const accs = await readAccounts();
     const aidx = accs.findIndex((a) => a.id === list[idx].accountId);
     if (aidx !== -1) {
       accs[aidx].suspended = true;
       accs[aidx].suspendedAt = new Date().toISOString();
       accs[aidx].dashToken = genDashToken();
       accs[aidx].accessToken = genAccessToken();
-      writeAccounts(accs);
+      await writeAccounts(accs);
     }
   }
   res.json({ ok: true, request: list[idx] });
@@ -3856,14 +3863,14 @@ app.post('/api/deactivation-requests/admin/:id/resolve', requireAdminPermission(
 // يربطه بصاحبه) بدل ثلاثة أنظمة منفصلة، لأن الشكل والمنطق (ownership +
 // CRUD) متطابق تماماً بين الثلاثة.
 const CATALOG_FILE = path.join(DATA_DIR, 'catalog.json');
-function readCatalog() { return repos.catalog.list(); }
-function writeCatalog(list) { return repos.catalog.replaceAll(list); }
+async function readCatalog() { return await repos.catalog.list(); }
+async function writeCatalog(list) { return await repos.catalog.replaceAll(list); }
 
 const HOURS_FILE = path.join(DATA_DIR, 'business-hours.json');
-function readAllHours() { return repos.businessHours.asMap(); }
-function writeAllHours(obj) {
+async function readAllHours() { return await repos.businessHours.asMap(); }
+async function writeAllHours(obj) {
   const map = obj && typeof obj === 'object' ? obj : {};
-  repos.businessHours.replaceAll(Object.keys(map).map((k) => ({ id: k, data: map[k] })));
+  (await repos.businessHours.replaceAll(Object.keys(map)).map((k) => ({ id: k, data: map[k] })));
 }
 
 // نفس منطق حفظ صور الإعلانات كملفات حقيقية بدل base64 داخل catalog.json
@@ -3895,10 +3902,10 @@ mountCatalogRoutes(app, {
  * أوقات العمل — سجلّ واحد لكل حساب (وليس قائمة). POST يحفظ/يحدّث (صاحب
  * الحساب فقط)، GET عام (تعرضه صفحة المتجر/المكتب/الشركة العامة).
  */
-app.post('/api/business-hours', (req, res) => {
+app.post('/api/business-hours', async (req, res) => {
   const b = req.body || {};
   const token = req.header('x-account-token') || '';
-  const acc = verifyAccountOwner(b.accountId, token);
+  const acc = await verifyAccountOwner(b.accountId, token);
   if (!acc) return res.status(401).json({ error: 'unauthorized' });
   if (!b.hours || typeof b.hours !== 'object' || Array.isArray(b.hours)) {
     return res.status(400).json({ error: 'hours مطلوب' });
@@ -3921,14 +3928,14 @@ app.post('/api/business-hours', (req, res) => {
       };
     }
   }
-  const all = readAllHours();
+  const all = await readAllHours();
   all[b.accountId] = { hours: clean, updatedAt: new Date().toISOString() };
-  writeAllHours(all);
+  await writeAllHours(all);
   res.json({ ok: true });
 });
 
-app.get('/api/business-hours/:accountId', (req, res) => {
-  const all = readAllHours();
+app.get('/api/business-hours/:accountId', async (req, res) => {
+  const all = await readAllHours();
   const rec = all[req.params.accountId];
   if (!rec) return res.json({ ok: true, hours: null });
   res.json({ ok: true, hours: rec.hours, updatedAt: rec.updatedAt });
@@ -3949,10 +3956,10 @@ app.get('/api/business-hours/:accountId', (req, res) => {
 // كل الرسائل تُجمَّع بمفتاح "محادثة" واحد لكل (بائع + مشتري)، سواء كان
 // المشتري ضيفاً (بمفتاح مبني على رقم هاتفه) أو صاحب حساب حقيقي.
 const MESSAGES_FILE = path.join(DATA_DIR, 'messages.json');
-function readMessages() { return repos.messages.list(); }
-function writeMessages(list) {
+async function readMessages() { return await repos.messages.list(); }
+async function writeMessages(list) {
   const rows = Array.isArray(list) ? list : [];
-  repos.messages.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+  await repos.messages.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
 }
 
 /**
@@ -3986,10 +3993,10 @@ mountServiceRequestRoutes(app, {
 // حتى تبقى واجهة rizq_reviews_engine.js قابلة للاستبدال بطبقة fetch رقيقة
 // بلا تغيير جوهري في بقية الملفات المستهلِكة لها (task #245).
 const REVIEWS_FILE = path.join(DATA_DIR, 'reviews.json');
-function readReviews() { return repos.reviews.asMap(); }
-function writeReviews(obj) {
+async function readReviews() { return await repos.reviews.asMap(); }
+async function writeReviews(obj) {
   const map = obj && typeof obj === 'object' ? obj : {};
-  repos.reviews.replaceAll(Object.keys(map).map((k) => ({ id: k, data: map[k] })));
+  (await repos.reviews.replaceAll(Object.keys(map)).map((k) => ({ id: k, data: map[k] })));
 }
 function genReviewId() { return 'RV-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); }
 
@@ -4006,7 +4013,7 @@ const reviewsLimiter = rateLimit({
  * مصادقة: (1) حساب بائع x-account-token + reviewerAccountId
  * أو (2) مشتري Guest Gate عبر X-Buyer-Id + Bearer/X-Buyer-Token.
  */
-app.post('/api/reviews', reviewsLimiter, (req, res) => {
+app.post('/api/reviews', reviewsLimiter, async (req, res) => {
   const b = req.body || {};
   if (!b.targetId) return res.status(400).json({ error: 'targetId مطلوب' });
   const rating = typeof b.rating === 'number' ? b.rating : parseFloat(b.rating);
@@ -4039,7 +4046,7 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
     if (!accountId || !token) {
       return res.status(401).json({ error: 'unauthorized', code: 'auth_required' });
     }
-    const reviewerAcc = verifyAccountOwner(accountId, token);
+    const reviewerAcc = await verifyAccountOwner(accountId, token);
     if (!reviewerAcc) return res.status(401).json({ error: 'unauthorized', code: 'auth_required' });
     reviewerAccountId = accountId;
     reviewerName = String(reviewerAcc.name || reviewerAcc.businessName || '').trim().slice(0, 60);
@@ -4058,7 +4065,7 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
   );
   let verifiedInteraction = false;
   try {
-    const msgs = readMessages().filter((m) => {
+    const msgs = (await readMessages()).filter((m) => {
       if (!m) return false;
       return String(m.sellerAccountId || '') === targetId
         && String(m.buyerAccountId || '') === reviewerAccountId;
@@ -4079,7 +4086,7 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
   if (!verifiedInteraction) {
     try {
       const srs = (repos.serviceRequests && typeof repos.serviceRequests.list === 'function')
-        ? repos.serviceRequests.list()
+        ? await repos.serviceRequests.list()
         : [];
       verifiedInteraction = (srs || []).some((r) => {
         if (!r) return false;
@@ -4098,7 +4105,7 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
     });
   }
 
-  const all = readReviews();
+  const all = await readReviews();
   const list = all[targetId] || [];
   if (list.some((r) => r.reviewerAccountId === reviewerAccountId)) {
     return res.status(409).json({ error: 'already_reviewed' });
@@ -4124,20 +4131,20 @@ app.post('/api/reviews', reviewsLimiter, (req, res) => {
   };
   list.unshift(review);
   all[targetId] = list;
-  writeReviews(all);
-  recomputeSellerTrustScore(targetId);
+  await writeReviews(all);
+  await recomputeSellerTrustScore(targetId);
   res.json({ ok: true, review });
 });
 
 /** POST /api/reviews/:targetId/:reviewId/reply — رد البائع على تقييم */
-app.post('/api/reviews/:targetId/:reviewId/reply', reviewsLimiter, (req, res) => {
+app.post('/api/reviews/:targetId/:reviewId/reply', reviewsLimiter, async (req, res) => {
   const targetId = String(req.params.targetId || '').slice(0, 60);
   const reviewId = String(req.params.reviewId || '').slice(0, 60);
   const token = req.header('x-account-token') || extractAccountToken(req) || '';
   if (!targetId || !reviewId || !token) {
     return res.status(401).json({ error: 'unauthorized', code: 'auth_required' });
   }
-  const owner = verifyAccountOwner(targetId, token);
+  const owner = await verifyAccountOwner(targetId, token);
   if (!owner) return res.status(401).json({ error: 'unauthorized', code: 'auth_required' });
   const reply = String((req.body && req.body.reply) || '')
     .replace(/<[^>]*>/g, ' ')
@@ -4146,7 +4153,7 @@ app.post('/api/reviews/:targetId/:reviewId/reply', reviewsLimiter, (req, res) =>
     .trim()
     .slice(0, 500);
   if (!reply) return res.status(400).json({ error: 'reply_required' });
-  const all = readReviews();
+  const all = await readReviews();
   const list = all[targetId] || [];
   const idx = list.findIndex((r) => r && r.id === reviewId);
   if (idx < 0) return res.status(404).json({ error: 'review_not_found' });
@@ -4155,13 +4162,13 @@ app.post('/api/reviews/:targetId/:reviewId/reply', reviewsLimiter, (req, res) =>
     sellerReplyAt: new Date().toISOString(),
   });
   all[targetId] = list;
-  writeReviews(all);
+  await writeReviews(all);
   res.json({ ok: true, review: list[idx] });
 });
 
 /** GET /api/reviews/:targetId — أحدث تقييم أولاً (عام؛ بدون reviewerAccountId) */
-app.get('/api/reviews/:targetId', (req, res) => {
-  const all = readReviews();
+app.get('/api/reviews/:targetId', async (req, res) => {
+  const all = await readReviews();
   const list = (all[req.params.targetId] || []).slice()
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .map((r) => ({
@@ -4178,8 +4185,8 @@ app.get('/api/reviews/:targetId', (req, res) => {
 });
 
 /** GET /api/reviews/:targetId/stats — {count, average} بلا قسمة على صفر (عام) */
-app.get('/api/reviews/:targetId/stats', (req, res) => {
-  const all = readReviews();
+app.get('/api/reviews/:targetId/stats', async (req, res) => {
+  const all = await readReviews();
   const list = all[req.params.targetId] || [];
   const count = list.length;
   if (!count) return res.json({ ok: true, count: 0, average: 0 });
@@ -4191,14 +4198,14 @@ app.get('/api/reviews/:targetId/stats', (req, res) => {
  * DELETE /api/reviews/:targetId/:reviewId — حذف تقييم للأدمن فقط
  * (البائع لا يمسح تقييمات الزبائن — كان يسمح بمسح السلبي).
  */
-app.delete('/api/reviews/:targetId/:reviewId', requireAdminPermission('moderation'), (req, res) => {
-  const all = readReviews();
+app.delete('/api/reviews/:targetId/:reviewId', requireAdminPermission('moderation'), async (req, res) => {
+  const all = await readReviews();
   const list = all[req.params.targetId] || [];
   const next = list.filter((r) => r.id !== req.params.reviewId);
   if (next.length === list.length) return res.status(404).json({ error: 'review_not_found' });
   all[req.params.targetId] = next;
-  writeReviews(all);
-  recomputeSellerTrustScore(String(req.params.targetId || ''));
+  await writeReviews(all);
+  await recomputeSellerTrustScore(String(req.params.targetId || ''));
   res.json({ ok: true });
 });
 
@@ -4210,21 +4217,21 @@ app.delete('/api/reviews/:targetId/:reviewId', requireAdminPermission('moderatio
 // (بلا أرقام هواتف) لصفحة المعرض العامة مستقبلاً إن رغب Limam بعرضها.
 // ══════════════════════════════════════════════════════════════════
 const TEAM_FILE = path.join(DATA_DIR, 'team.json');
-function readTeam() { return repos.corpTeam.list(); }
-function writeTeam(list) {
+async function readTeam() { return await repos.corpTeam.list(); }
+async function writeTeam(list) {
   const rows = Array.isArray(list) ? list : [];
-  repos.corpTeam.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+  await repos.corpTeam.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
 }
 function genTeamId() { return 'TM-' + Date.now() + '-' + Math.floor(Math.random() * 10000); }
 
 /** POST /api/team — إضافة عضو فريق (صاحب الحساب فقط) */
-app.post('/api/team', (req, res) => {
+app.post('/api/team', async (req, res) => {
   const b = req.body || {};
   const token = req.header('x-account-token') || '';
-  const acc = verifyAccountOwner(b.accountId, token);
+  const acc = await verifyAccountOwner(b.accountId, token);
   if (!acc) return res.status(401).json({ error: 'unauthorized' });
   if (!b.name || !String(b.name).trim()) return res.status(400).json({ error: 'الاسم مطلوب' });
-  const list = readTeam();
+  const list = await readTeam();
   const rec = {
     id: genTeamId(),
     accountId: b.accountId,
@@ -4236,42 +4243,42 @@ app.post('/api/team', (req, res) => {
     createdAt: new Date().toISOString(),
   };
   list.push(rec);
-  writeTeam(list);
+  await writeTeam(list);
   res.json({ ok: true, member: rec });
 });
 
 /** GET /api/team?accountId=... — عرض عام (بلا هاتف) لصفحة المعرض العامة */
-app.get('/api/team', (req, res) => {
+app.get('/api/team', async (req, res) => {
   const accountId = String(req.query.accountId || '').trim();
   if (!accountId) {
     return res.status(400).json({ ok: false, error: 'accountId_required' });
   }
-  const list = readTeam().filter((m) => m.status === 'active' && m.accountId === accountId);
+  const list = (await readTeam()).filter((m) => m.status === 'active' && m.accountId === accountId);
   res.json({ ok: true, members: list.map((m) => ({ id: m.id, name: m.name, role: m.role, emoji: m.emoji })) });
 });
 
 /** GET /api/team/mine?accountId=... — كل بيانات الفريق (بما فيها الهاتف) لصاحب الحساب فقط */
-app.get('/api/team/mine', (req, res) => {
+app.get('/api/team/mine', async (req, res) => {
   const accountId = req.query.accountId;
   const token = extractAccountToken(req) || '';
-  const acc = verifyAccountOwner(accountId, token);
+  const acc = await verifyAccountOwner(accountId, token);
   if (!acc) return res.status(401).json({ error: 'unauthorized' });
-  const list = readTeam().filter((m) => m.accountId === accountId && m.status !== 'removed');
+  const list = (await readTeam()).filter((m) => m.accountId === accountId && m.status !== 'removed');
   res.json({ ok: true, members: list });
 });
 
 /** DELETE /api/team/:id — حذف ناعم (صاحب الحساب أو الأدمن) */
-app.delete('/api/team/:id', (req, res) => {
-  const list = readTeam();
+app.delete('/api/team/:id', async (req, res) => {
+  const list = await readTeam();
   const idx = list.findIndex((m) => m.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: 'member_not_found' });
   const member = list[idx];
-  const isAdmin = isAdminRequest(req);
+  const isAdmin = await isAdminRequest(req);
   const token = req.header('x-account-token') || '';
-  const isOwner = !!(member.accountId && verifyAccountOwner(member.accountId, token));
+  const isOwner = !!(member.accountId && await verifyAccountOwner(member.accountId, token));
   if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
   list[idx].status = 'removed';
-  writeTeam(list);
+  await writeTeam(list);
   res.json({ ok: true });
 });
 
@@ -4286,24 +4293,24 @@ app.delete('/api/team/:id', (req, res) => {
 // الحالي المستخدم في browse/search/listing — إضافة صرفة فقط.
 // ══════════════════════════════════════════════════════════════════
 const AD_BOOSTS_FILE = path.join(DATA_DIR, 'ad_boosts.json');
-function readAdBoosts() { return repos.adBoosts.asMap(); }
-function writeAdBoosts(obj) {
+async function readAdBoosts() { return await repos.adBoosts.asMap(); }
+async function writeAdBoosts(obj) {
   const map = obj && typeof obj === 'object' ? obj : {};
-  repos.adBoosts.replaceAll(Object.keys(map).map((k) => ({ id: k, data: map[k] })));
+  (await repos.adBoosts.replaceAll(Object.keys(map)).map((k) => ({ id: k, data: map[k] })));
 }
 
 /** POST /api/ad-boosts — الأدمن فقط، بعد موافقته الفعلية على طلب "مميزة" */
-app.post('/api/ad-boosts', requireAdminPermission('payments'), (req, res) => {
+app.post('/api/ad-boosts', requireAdminPermission('payments'), async (req, res) => {
   const b = req.body || {};
   if (!b.accountId || !b.adId) return res.status(400).json({ error: 'accountId و adId مطلوبان' });
-  const ad = readAds().find((a) => a.id === b.adId);
+  const ad = (await readAds()).find((a) => a.id === b.adId);
   if (!ad || ad.accountId !== b.accountId) {
     return res.status(400).json({ error: 'ad_ownership_mismatch' });
   }
   const days = Number(b.days) > 0 ? Number(b.days) : 3;
   const now = new Date();
   const ends = new Date(now.getTime() + days * 86400000);
-  const all = readAdBoosts();
+  const all = await readAdBoosts();
   all[b.adId] = {
     adId: b.adId,
     accountId: b.accountId,
@@ -4311,13 +4318,13 @@ app.post('/api/ad-boosts', requireAdminPermission('payments'), (req, res) => {
     endsAt: ends.toISOString(),
     price: Number(b.price) || 0,
   };
-  writeAdBoosts(all);
+  await writeAdBoosts(all);
   res.json({ ok: true, boost: all[b.adId] });
 });
 
 /** GET /api/ad-boosts/:adId — عام، هل هذا الإعلان مثبَّت الآن؟ (بدون بيانات دفع) */
-app.get('/api/ad-boosts/:adId', (req, res) => {
-  const all = readAdBoosts();
+app.get('/api/ad-boosts/:adId', async (req, res) => {
+  const all = await readAdBoosts();
   const b = all[req.params.adId];
   const active = !!(b && b.endsAt && new Date(b.endsAt) > new Date());
   res.json({ ok: true, active, boosted: active, endsAt: active ? b.endsAt : null });
@@ -4457,15 +4464,15 @@ app.post('/api/telegram/setup-webhook', requireAdminPermission('channels'), asyn
  * GET /api/discovery/platform-stats — أرقام حية صادقة لشريط الإحصائيات تحت إعلان الفيديو.
  * لا أرقام وهمية: قبل الإطلاق الحقيقي تبقى أصفار النشاط ظاهرة كما هي.
  */
-app.get('/api/discovery/platform-stats', (req, res) => {
+app.get('/api/discovery/platform-stats', async (req, res) => {
   try {
-    const adsActive = readAds().filter((a) =>
+    const adsActive = (await readAds()).filter((a) =>
       a && a.status === 'active'
       && !String(a.accountId || '').startsWith('acc_demo')
       && !/^RZQ-2026-1000\d$/i.test(String(a.id || ''))
     ).length;
 
-    const businesses = readAccounts().filter((a) =>
+    const businesses = (await readAccounts()).filter((a) =>
       a && a.status === 'approved' && !a.suspended
       && !String(a.id || '').startsWith('acc_demo')
       && (a.type === 'store' || a.type === 'office' || a.type === 'corp')
@@ -4475,7 +4482,7 @@ app.get('/api/discovery/platform-stats', (req, res) => {
     businesses.forEach((a) => { if (byType[a.type] != null) byType[a.type] += 1; });
 
     const now = Date.now();
-    const tendersOpen = readTenders().filter((t) => {
+    const tendersOpen = (await readTenders()).filter((t) => {
       if (!t || (t.status !== 'open' && t.status !== 'provisionally_approved')) return false;
       const deadlineMs = new Date(t.deadline).getTime();
       return !Number.isNaN(deadlineMs) && deadlineMs > now;
@@ -4509,13 +4516,13 @@ app.get('/api/discovery/platform-stats', (req, res) => {
 });
 
 /** GET /api/discovery/ending-soon?hours=48 — إعلانات مثبّتة + مناقصات مفتوحة قاربت الانتهاء */
-app.get('/api/discovery/ending-soon', (req, res) => {
+app.get('/api/discovery/ending-soon', async (req, res) => {
   const hours = Number(req.query.hours) > 0 ? Number(req.query.hours) : 48;
   const now = Date.now();
   const windowMs = hours * 3600 * 1000;
 
-  const boosts = readAdBoosts();
-  const ads = readAds();
+  const boosts = await readAdBoosts();
+  const ads = await readAds();
   const boostedAds = Object.values(boosts)
     .filter((b) => {
       const endsMs = new Date(b.endsAt).getTime();
@@ -4539,7 +4546,7 @@ app.get('/api/discovery/ending-soon', (req, res) => {
     .filter(Boolean)
     .sort((a, b2) => new Date(a.endsAt) - new Date(b2.endsAt));
 
-  const tenders = readTenders().filter((t) => {
+  const tenders = (await readTenders()).filter((t) => {
     if (t.status === 'removed') return false;
     const deadlineMs = new Date(t.deadline).getTime();
     return !Number.isNaN(deadlineMs) && deadlineMs > now && deadlineMs - now <= windowMs;
@@ -4557,28 +4564,26 @@ app.get('/api/discovery/ending-soon', (req, res) => {
 });
 
 /** GET /api/discovery/top-sellers?limit=8&minReviews=2 — بائعون موثوقون فعلياً حسب تقييمات حقيقية */
-app.get('/api/discovery/top-sellers', (req, res) => {
+app.get('/api/discovery/top-sellers', async (req, res) => {
   const limit = Math.min(Number(req.query.limit) > 0 ? Number(req.query.limit) : 8, 30);
   const minReviews = Number(req.query.minReviews) >= 0 ? Number(req.query.minReviews) : 2;
-  const allReviews = readReviews();
-  const accounts = readAccounts().filter((a) => a.status === 'approved');
+  const allReviews = await readReviews();
+  const accounts = (await readAccounts()).filter((a) => a.status === 'approved');
 
-  const ranked = Object.keys(allReviews)
-    .map((targetId) => {
-      const list = allReviews[targetId] || [];
-      const count = list.length;
-      if (count < minReviews) return null;
-      const sum = list.reduce((s, r) => s + (Number(r.rating) || 0), 0);
-      const average = Math.round((sum / count) * 10) / 10;
-      const acc = accounts.find((a) => a.id === targetId);
-      if (!acc) return null; // فقط حسابات معتمَدة وموجودة فعلاً (لا حسابات محذوفة/مرفوضة)
-      return Object.assign({ count, average }, toPublicAccount(acc));
-    })
-    .filter(Boolean)
-    .sort((a, b) => (b.average - a.average) || (b.count - a.count))
-    .slice(0, limit);
+  const ranked = [];
+  for (const targetId of Object.keys(allReviews)) {
+    const list = allReviews[targetId] || [];
+    const count = list.length;
+    if (count < minReviews) continue;
+    const sum = list.reduce((s, r) => s + (Number(r.rating) || 0), 0);
+    const average = Math.round((sum / count) * 10) / 10;
+    const acc = accounts.find((a) => a.id === targetId);
+    if (!acc) continue; // فقط حسابات معتمَدة وموجودة فعلاً (لا حسابات محذوفة/مرفوضة)
+    ranked.push(Object.assign({ count, average }, await toPublicAccount(acc)));
+  }
+  ranked.sort((a, b) => (b.average - a.average) || (b.count - a.count));
 
-  res.json({ ok: true, sellers: ranked });
+  res.json({ ok: true, sellers: ranked.slice(0, limit) });
 });
 
 // ── Corp Diamond Pro API integration (ERP/PMS) — rizq_live_* keys ─────────
@@ -4665,39 +4670,85 @@ function assertProductionSecrets() {
 }
 assertProductionSecrets();
 
-app.listen(PORT, HOST, async () => {
-  console.log('[rizq-backend] running on http://' + HOST + ':' + PORT + '/');
-  console.log('[rizq-backend] agent model (Sonnet only): ' + getAgentModel());
-  if (isAnthropicConfigured()) {
-    const k = getAnthropicApiKey();
-    console.log('[rizq-backend] Claude key: READY (len=' + k.length + ', prefix=' + k.slice(0, 7) + '…)');
-  } else {
-    console.warn('[rizq-backend] Claude key: MISSING — set ANTHROPIC_API_KEY in rizq-backend/.env (uncommented) then restart');
-  }
-  await logTelegramEnvStatus();
-  if (isTelegramAdminConfigured()) {
-    console.log('[telegram-admin] subscription alerts enabled');
-  }
-  if (shouldUseTelegramPolling()) {
-    const { getTelegramDeps } = require('./services/telegramDeps');
-    startTelegramPolling(getTelegramDeps).then((out) => {
-      if (out && out.ok) console.log('[telegram-polling] listening for messages…');
-    }).catch((err) => {
-      console.error('[telegram-polling] start failed:', err.message);
-    });
-  }
-  autoRefreshCurrencyRatesIfStale().catch(function () {});
-  setInterval(function () {
-    autoRefreshCurrencyRatesIfStale().catch(function () {});
-  }, CURRENCY_AUTO_REFRESH_MS);
+async function boot() {
+  await db.ready();
   try {
-    const invSched = investmentRoom.startDailyOpsScheduler();
-    if (invSched && invSched.started) {
-      console.log('[investments] daily ops report scheduler started');
-    }
-  } catch (e) {
-    console.warn('[investments] scheduler:', e && e.message);
+    const redisSt = await redis.ready();
+    console.log('[rizq-backend] redis backend=', (redisSt && redisSt.backend) || redis.backend());
+    await warmRateLimitStores();
+  } catch (eRedis) {
+    console.warn('[rizq-backend] redis ready failed — memory fallback:', eRedis && eRedis.message);
+    try { await warmRateLimitStores(); } catch (eWarm) { /* memory already */ }
   }
+  try {
+    await require('./services/secretsVault').loadAndApplyOnBoot();
+  } catch (eVaultBoot) {
+    console.warn('[secretsVault] boot:', eVaultBoot && eVaultBoot.message);
+  }
+  try {
+    await platformStore.migrateAllPlatformStores();
+  } catch (ePlat) {
+    console.warn('[rizq-backend] platformStore migrate:', ePlat && ePlat.message);
+  }
+  try {
+    await repos.migrateAllSecondaryStores();
+  } catch (eSec) {
+    console.warn('[rizq-backend] secondary stores migrate:', eSec && eSec.message);
+  }
+  try {
+    if (ADMIN_ACCOUNTS.length) await adminTeamService.seedFromLegacyAccounts(ADMIN_ACCOUNTS);
+    if (OWNER_SUPER_ADMIN.passHash && OWNER_SUPER_ADMIN.passHash.startsWith('$2') && OWNER_SUPER_ADMIN.email) {
+      await adminTeamService.ensureOwnerSuperAdmin(OWNER_SUPER_ADMIN);
+    }
+  } catch (eTeam) {
+    console.warn('[rizq-backend] admin team seed:', eTeam && eTeam.message);
+  }
+  try {
+    const { ensureSubscribersLoaded } = require('../rizq_subscriber_agent');
+    if (typeof ensureSubscribersLoaded === 'function') await ensureSubscribersLoaded();
+  } catch (eSub) {
+    console.warn('[rizq-backend] subscribers warm:', eSub && eSub.message);
+  }
+
+  app.listen(PORT, HOST, async () => {
+    console.log('[rizq-backend] running on http://' + HOST + ':' + PORT + '/');
+    console.log('[rizq-backend] agent model (Sonnet only): ' + getAgentModel());
+    if (isAnthropicConfigured()) {
+      const k = getAnthropicApiKey();
+      console.log('[rizq-backend] Claude key: READY (len=' + k.length + ', prefix=' + k.slice(0, 7) + '…)');
+    } else {
+      console.warn('[rizq-backend] Claude key: MISSING — set ANTHROPIC_API_KEY in rizq-backend/.env (uncommented) then restart');
+    }
+    await logTelegramEnvStatus();
+    if (isTelegramAdminConfigured()) {
+      console.log('[telegram-admin] subscription alerts enabled');
+    }
+    if (shouldUseTelegramPolling()) {
+      const { getTelegramDeps } = require('./services/telegramDeps');
+      startTelegramPolling(getTelegramDeps).then((out) => {
+        if (out && out.ok) console.log('[telegram-polling] listening for messages…');
+      }).catch((err) => {
+        console.error('[telegram-polling] start failed:', err.message);
+      });
+    }
+    autoRefreshCurrencyRatesIfStale().catch(function () {});
+    setInterval(function () {
+      autoRefreshCurrencyRatesIfStale().catch(function () {});
+    }, CURRENCY_AUTO_REFRESH_MS);
+    try {
+      const invSched = investmentRoom.startDailyOpsScheduler();
+      if (invSched && invSched.started) {
+        console.log('[investments] daily ops report scheduler started');
+      }
+    } catch (e) {
+      console.warn('[investments] scheduler:', e && e.message);
+    }
+  });
+}
+
+boot().catch((err) => {
+  console.error('[FATAL] boot failed:', err && err.stack ? err.stack : err);
+  process.exit(1);
 });
 
 process.on('SIGINT', () => { stopTelegramPolling(); process.exit(0); });

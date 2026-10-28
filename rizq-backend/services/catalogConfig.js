@@ -45,16 +45,16 @@ const DIAMOND_TIER_IDS = {
   pro: ['diamond_pro', 'st-diam-pro', 'of-diam-pro', 'cp-diam-pro', 'cp-diam'],
 };
 
-function readSiteConfigRaw() {
+async function readSiteConfigRaw() {
   try {
-    return repos.getSiteConfig() || {};
+    return await repos.getSiteConfig() || {};
   } catch (e) {
     return {};
   }
 }
 
-function getQuotaConfig() {
-  const cfg = readSiteConfigRaw();
+async function getQuotaConfig() {
+  const cfg = await readSiteConfigRaw();
   const live = (cfg.quotaConfig && typeof cfg.quotaConfig === 'object') ? cfg.quotaConfig : {};
   return {
     diamond_standard: Object.assign({}, DEFAULT_QUOTA_CONFIG.diamond_standard, live.diamond_standard || {}),
@@ -62,8 +62,8 @@ function getQuotaConfig() {
   };
 }
 
-function getTopupConfig() {
-  const cfg = readSiteConfigRaw();
+async function getTopupConfig() {
+  const cfg = await readSiteConfigRaw();
   const live = (cfg.quotaTopups && typeof cfg.quotaTopups === 'object') ? cfg.quotaTopups : {};
   return {
     text: Object.assign({}, DEFAULT_TOPUP_CONFIG.text, live.text || {}),
@@ -71,8 +71,8 @@ function getTopupConfig() {
   };
 }
 
-function getAllCatalogPackages() {
-  const cfg = readSiteConfigRaw();
+async function getAllCatalogPackages() {
+  const cfg = await readSiteConfigRaw();
   const pkgs = (cfg.packages && typeof cfg.packages === 'object') ? cfg.packages : {};
   const out = [];
   Object.keys(pkgs).forEach((cat) => {
@@ -98,12 +98,12 @@ function resolvePackageBoostDays(ref) {
   return null;
 }
 
-function findCatalogPackage(ref) {
+async function findCatalogPackage(ref) {
   if (!ref) return null;
   const id = typeof ref === 'string' ? ref : String(ref.id || ref.packageId || '');
   const name = typeof ref === 'object' ? String(ref.pkgName || ref.name || '').trim() : '';
   const category = typeof ref === 'object' ? String(ref.category || ref._catalog || '').trim() : '';
-  const all = getAllCatalogPackages();
+  const all = await getAllCatalogPackages();
   const inCat = category
     ? all.filter((p) => String(p._catalog || '') === category)
     : all;
@@ -154,9 +154,9 @@ function isDiamondPackageRef(ref) {
   return !!resolveDiamondTier(ref);
 }
 
-function getTierQuotaLimits(tierKey, pkgOverride) {
+async function getTierQuotaLimits(tierKey, pkgOverride) {
   const tier = tierKey || 'diamond_standard';
-  const cfg = getQuotaConfig();
+  const cfg = await getQuotaConfig();
   const base = cfg[tier] || cfg.diamond_standard;
   const pkg = pkgOverride || null;
   return {
@@ -168,17 +168,19 @@ function getTierQuotaLimits(tierKey, pkgOverride) {
   };
 }
 
-function resolveQuotaLimitsForAccount(rec) {
+async function resolveQuotaLimitsForAccount(rec) {
   if (!rec) {
     return getTierQuotaLimits('diamond_standard');
   }
+  // resolveDiamondTier is sync over ref fields; do not pass an unawaited
+  // findCatalogPackage Promise into getTierQuotaLimits.
   const tier = resolveDiamondTier({
     id: rec.packageId || rec.pkgId,
     pkgName: rec.pkgName,
     planType: rec.planType,
     diamondTier: rec.diamondTier,
   }) || 'diamond_standard';
-  const pkg = findCatalogPackage(rec.packageId || rec.pkgId || rec.pkgName);
+  const pkg = await findCatalogPackage(rec.packageId || rec.pkgId || rec.pkgName);
   return getTierQuotaLimits(tier, pkg);
 }
 
