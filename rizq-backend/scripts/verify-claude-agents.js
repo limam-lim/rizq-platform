@@ -38,27 +38,27 @@ check('RIZQ_API_SECRET configured', !!(process.env.RIZQ_API_SECRET || '').trim()
 check('agent model', !!getAgentModel(), getAgentModel());
 check('advanced model', !!getAdvancedModel(), getAdvancedModel());
 
-/** مسارات Claude الفعلية — يجب أن تمر عبر config/anthropic */
+/** مسارات Claude الفعلية — يجب أن تمر عبر llmGateway → config/anthropic */
 const CLAUDE_CODE_PATHS = [
   {
     rel: 'rizq_subscriber_agent.js',
     base: ROOT,
-    must: [/rizq-backend\/config\/anthropic/, /getAnthropicApiKey\s*\(/, /isAnthropicConfigured\s*\(/],
+    must: [/services\/llmGateway/, /isAnthropicConfigured\s*\(/],
   },
   {
     rel: 'rizq_agent_brain.js',
     base: ROOT,
-    must: [/rizq-backend\/config\/anthropic/, /getAnthropicApiKey\s*\(/, /isAnthropicConfigured\s*\(/],
+    must: [/services\/llmGateway/, /isAnthropicConfigured\s*\(/],
   },
   {
     rel: 'services/widgetChat.js',
     base: BACKEND,
-    must: [/config\/anthropic/, /getAnthropicApiKey\s*\(/, /isAnthropicConfigured\s*\(/],
+    must: [/llmGateway/, /isAnthropicConfigured\s*\(/],
   },
   {
     rel: 'services/receiptVision.js',
     base: BACKEND,
-    must: [/config\/anthropic/, /getAnthropicApiKey\s*\(/],
+    must: [/llmGateway/, /getAdvancedModel|config\/anthropic/],
   },
   {
     rel: 'services/inquiryAutoReply.js',
@@ -73,17 +73,22 @@ const CLAUDE_CODE_PATHS = [
   {
     rel: 'server.js',
     base: BACKEND,
-    must: [/config\/anthropic/, /getAnthropicApiKey\s*\(/, /isAnthropicConfigured\s*\(/, /\/api\/admin\/agents-health/],
+    must: [/config\/anthropic/, /llmGateway|getAnthropicApiKey\s*\(/, /isAnthropicConfigured\s*\(/, /\/api\/admin\/agents-health/],
   },
   {
     rel: 'services/investmentRoom.js',
     base: BACKEND,
-    must: [/config\/anthropic|getAgentModel|createCachedMessage/, /isAnthropicConfigured|getAnthropicApiKey/],
+    must: [/llmGateway/, /isAnthropicConfigured/],
   },
   {
     rel: 'services/marketingAgent.js',
     base: BACKEND,
-    must: [/config\/anthropic/, /getAnthropicApiKey\s*\(/, /isAnthropicConfigured\s*\(/],
+    must: [/llmGateway/, /isAnthropicConfigured\s*\(/],
+  },
+  {
+    rel: 'services/llmGateway.js',
+    base: BACKEND,
+    must: [/createCachedMessage/, /getAnthropicClient/, /redactPii/, /wrapUntrusted/],
   },
   {
     rel: 'services/agentQuality.js',

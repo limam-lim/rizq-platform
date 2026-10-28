@@ -4,7 +4,8 @@
 const { WIDGET_TOOLS, executeWidgetTool, resolvePageContextFacts } = require('./widgetAgentTools');
 const { maybeAutoNotifyLead } = require('./leadEscalation');
 const { detectUserLanguage, normalizeUiLang, getLangLabel, pickLang } = require('./widgetLang');
-const { getAnthropicApiKey, isAnthropicConfigured, getAgentModel, getAnthropicClient, createCachedMessage } = require('../config/anthropic');
+const { getAnthropicApiKey, isAnthropicConfigured, getAgentModel } = require('../config/anthropic');
+const llm = require('./llmGateway');
 const { buildLiveCatalogPolicyBlock, buildDiamondTiersPromptBlock } = require('../../rizq_packages_config');
 const {
   buildDiamondCompletionFooter,
@@ -657,7 +658,11 @@ async function handleWidgetChat(body) {
       createParams.tool_choice = { type: 'tool', name: 'get_packages_info' };
     }
 
-    const created = await createCachedMessage(getAnthropicClient(), createParams);
+    const created = await llm.complete({
+      agent: 'widget',
+      params: createParams,
+      wrapUserInput: true,
+    });
     response = created.response;
     lastModel = created.model || lastModel;
     const u = response.usage || {};

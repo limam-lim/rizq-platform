@@ -1,12 +1,7 @@
 'use strict';
 
-const Anthropic = require('@anthropic-ai/sdk');
-const {
-  getAdvancedModel,
-  getAnthropicApiKey,
-  getAnthropicClient,
-  createCachedMessage,
-} = require('../config/anthropic');
+const { getAdvancedModel } = require('../config/anthropic');
+const llm = require('./llmGateway');
 
 /**
  * تحليل صورة وصل دفع عبر Claude Vision — نفس منطق POST /api/verify-receipt
@@ -22,7 +17,6 @@ async function analyzeReceiptImage(imageBase64, opts = {}) {
   const [, mediaType, b64] = match;
   const pkgName = opts.pkgName || '';
   const expectedPrice = opts.expectedPrice;
-  const client = opts.anthropic || getAnthropicClient() || new Anthropic({ apiKey: getAnthropicApiKey() });
 
   const prompt =
     'هذه صورة وصل دفع لمنصة إعلانات موريتانية. استخرج منها فقط: التاريخ، المبلغ، ' +
@@ -34,16 +28,22 @@ async function analyzeReceiptImage(imageBase64, opts = {}) {
     '{"date":"","amount":"","reference":"","bankOrOperator":"","plausibilityLevel":"clear|low|medium|high","notes":["..."]}';
 
   try {
-    const { response: msg } = await createCachedMessage(client, {
-      model: getAdvancedModel(),
-      max_tokens: 500,
-      messages: [{
-        role: 'user',
-        content: [
-          { type: 'image', source: { type: 'base64', media_type: mediaType, data: b64 } },
-          { type: 'text', text: prompt },
-        ],
-      }],
+    const { response: msg } = await llm.complete({
+      agent: 'receipt_vision',
+      client: opts.anthropic,
+      wrapUserInput: true,
+      // Image bytes stay; accompanying instruction text still gets delimiters.
+      params: {
+        model: getAdvancedModel(),
+        max_tokens: 500,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: b64 } },
+            { type: 'text', text: prompt },
+          ],
+        }],
+      },
     });
 
     const text = (msg.content || []).map((c) => c.text || '').join('');

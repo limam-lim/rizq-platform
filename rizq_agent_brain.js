@@ -20,8 +20,8 @@ if (!process.env.ANTHROPIC_API_KEY && process.env.CLAUDE_API_KEY) {
   process.env.ANTHROPIC_API_KEY = process.env.CLAUDE_API_KEY;
 }
 
-const Anthropic = require('@anthropic-ai/sdk');
-const { getAnthropicApiKey, isAnthropicConfigured, getAdvancedModel, createCachedMessage } = require('./rizq-backend/config/anthropic');
+const { isAnthropicConfigured, getAdvancedModel } = require('./rizq-backend/config/anthropic');
+const llm = require('./rizq-backend/services/llmGateway');
 const {
   getPackagesForTool,
   buildLiveCatalogPolicyBlock,
@@ -76,11 +76,6 @@ ${buildDiamondTiersPromptBlock()}
 
 📋 عند سؤال الإدارة عن الطلبات المعلّقة: استدعِ get_pending_leads واقرأ من النتيجة فقط — لا تخترع.`;
 }
-
-// ── إعداد العميل ──────────────────────────────────────
-const client = new Anthropic({
-  apiKey: getAnthropicApiKey()
-});
 
 // ── أدوات الوكيل (Tools) ───────────────────────────────
 const AGENT_TOOLS = [
@@ -296,7 +291,11 @@ async function askAgent({ channel, message, context = {} }) {
     if (loops === 1 && packageFlow) {
       createParams.tool_choice = { type: 'tool', name: 'get_packages_info' };
     }
-    const created = await createCachedMessage(client, createParams);
+    const created = await llm.complete({
+      agent: 'brain',
+      params: createParams,
+      wrapUserInput: true,
+    });
     response = created.response;
 
     // لو انتهى بنص → رجّعه
