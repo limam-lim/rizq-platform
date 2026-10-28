@@ -1,24 +1,15 @@
 /**
- * جلسات الأدمن — SQLite بدل Map في الذاكرة فقط.
- * يبقى واجهة Map-like متوافقة مع adminAuth / adminCore.
+ * Admin sessions — async Map-like API over PostgreSQL.
+ * get / set / delete / clear / entries / size are all async.
  */
 'use strict';
 
-const { db } = require('../db');
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS admin_sessions (
-    token      TEXT PRIMARY KEY,
-    data       TEXT NOT NULL,
-    expires_at INTEGER NOT NULL
-  );
-  CREATE INDEX IF NOT EXISTS idx_admin_sessions_exp ON admin_sessions(expires_at);
-`);
+const sql = require('../db/sql');
 
 function rowToSess(row) {
   if (!row) return undefined;
   try {
-    const data = JSON.parse(row.data);
+    const data = typeof row.data === 'object' ? row.data : JSON.parse(row.data);
     if (!data || typeof data !== 'object') return undefined;
     data.expiresAt = Number(row.expires_at) || data.expiresAt;
     return data;
@@ -29,49 +20,61 @@ function rowToSess(row) {
 
 function createAdminSessionStore() {
   const api = {
-    get(token) {
+    async get(token) {
       if (!token) return undefined;
-      const row = db.prepare('SELECT token, data, expires_at FROM admin_sessions WHERE token = ?').get(String(token));
+      const row = await sql.queryOne(
+        'SELECT token, data, expires_at FROM admin_sessions WHERE token = ?',
+        [String(token)]
+      );
       const sess = rowToSess(row);
       if (!sess) return undefined;
       if (sess.expiresAt && sess.expiresAt < Date.now()) {
-        api.delete(token);
+        await api.delete(token);
         return undefined;
       }
       return sess;
     },
-    set(token, sess) {
+    async set(token, sess) {
       if (!token || !sess) return api;
       const expiresAt = Number(sess.expiresAt) || (Date.now() + 12 * 60 * 60 * 1000);
-      db.prepare(
-        'INSERT INTO admin_sessions (token, data, expires_at) VALUES (?, ?, ?) '
-        + 'ON CONFLICT(token) DO UPDATE SET data = excluded.data, expires_at = excluded.expires_at'
-      ).run(String(token), JSON.stringify(sess), expiresAt);
+      await sql.execute(
+        `INSERT INTO admin_sessions (token, data, expires_at) VALUES (?, ?::jsonb, ?)
+         ON CONFLICT (token) DO UPDATE SET
+           data = EXCLUDED.data,
+           expires_at = EXCLUDED.expires_at,
+           updated_at_ts = NOW()`,
+        [String(token), JSON.stringify(sess), expiresAt]
+      );
       return api;
     },
-    delete(token) {
+    async delete(token) {
       if (!token) return false;
-      const info = db.prepare('DELETE FROM admin_sessions WHERE token = ?').run(String(token));
+      const info = await sql.execute(
+        'DELETE FROM admin_sessions WHERE token = ?',
+        [String(token)]
+      );
       return info.changes > 0;
     },
-    clear() {
-      db.prepare('DELETE FROM admin_sessions').run();
+    async clear() {
+      await sql.execute('DELETE FROM admin_sessions');
     },
-    /** توافق for...of مع Map: [token, sess] */
-    [Symbol.iterator]() {
-      const rows = db.prepare('SELECT token, data, expires_at FROM admin_sessions').all();
-      const entries = [];
+    async entries() {
+      const rows = await sql.query('SELECT token, data, expires_at FROM admin_sessions');
+      const out = [];
       for (const row of rows) {
         const sess = rowToSess(row);
-        if (sess) entries.push([row.token, sess]);
+        if (sess) out.push([row.token, sess]);
       }
-      return entries[Symbol.iterator]();
+      return out;
     },
-    forEach(fn) {
-      for (const [tok, sess] of api) fn(sess, tok, api);
+    async forEach(fn) {
+      const entries = await api.entries();
+      for (const [tok, sess] of entries) {
+        await fn(sess, tok, api);
+      }
     },
-    get size() {
-      const row = db.prepare('SELECT COUNT(*) AS n FROM admin_sessions').get();
+    async size() {
+      const row = await sql.queryOne('SELECT COUNT(*)::int AS n FROM admin_sessions');
       return row ? Number(row.n) || 0 : 0;
     },
   };

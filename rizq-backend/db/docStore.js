@@ -1,54 +1,18 @@
 /**
- * Document store — طبقة تخزين موحّدة فوق SQLite.
- * كل مجموعة (collection) = كيان منطقي. العمليات ذرّية فقط.
- * ملفات JSON إن وُجدت = نسخ احتياطي / ترحيل لمرة واحدة — ليست مصدر تشغيل.
+ * Document store — async PostgreSQL (pg.Pool).
+ * All createCollection methods return Promises.
  */
 'use strict';
 
 const fs = require('fs');
 const path = require('path');
-const { db, DATA_DIR } = require('./index');
+const { DATA_DIR } = require('./index');
+const sql = require('./sql');
 const { scrubSecretsForBackup } = require('../lib/scrubSecrets');
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS documents (
-    collection TEXT NOT NULL,
-    id         TEXT NOT NULL,
-    data       TEXT NOT NULL,
-    updated_at TEXT NOT NULL,
-    PRIMARY KEY (collection, id)
-  );
-  CREATE INDEX IF NOT EXISTS idx_documents_collection ON documents(collection);
-`);
-
-const stmtGet = db.prepare(
-  'SELECT data FROM documents WHERE collection = ? AND id = ?'
-);
-const stmtList = db.prepare(
-  'SELECT id, data FROM documents WHERE collection = ?'
-);
-const stmtUpsert = db.prepare(`
-  INSERT INTO documents (collection, id, data, updated_at)
-  VALUES (@collection, @id, @data, @updated_at)
-  ON CONFLICT(collection, id) DO UPDATE SET
-    data = excluded.data,
-    updated_at = excluded.updated_at
-`);
-const stmtInsertIgnore = db.prepare(`
-  INSERT OR IGNORE INTO documents (collection, id, data, updated_at)
-  VALUES (@collection, @id, @data, @updated_at)
-`);
-const stmtRemove = db.prepare(
-  'DELETE FROM documents WHERE collection = ? AND id = ?'
-);
-const stmtClear = db.prepare(
-  'DELETE FROM documents WHERE collection = ?'
-);
-const stmtCount = db.prepare(
-  'SELECT COUNT(*) AS n FROM documents WHERE collection = ?'
-);
-
 function safeParse(raw, fallback) {
+  if (raw == null) return fallback;
+  if (typeof raw === 'object') return raw;
   try {
     const v = JSON.parse(raw);
     return v == null ? fallback : v;
@@ -57,16 +21,12 @@ function safeParse(raw, fallback) {
   }
 }
 
-function runInTransaction(fn) {
-  db.exec('BEGIN');
-  try {
-    const result = fn();
-    db.exec('COMMIT');
-    return result;
-  } catch (e) {
-    try { db.exec('ROLLBACK'); } catch (e2) { /* ignore */ }
-    throw e;
-  }
+function encodeData(data) {
+  return typeof data === 'string' ? data : JSON.stringify(data);
+}
+
+async function runInTransaction(fn) {
+  return sql.withTransaction(fn);
 }
 
 function readLegacyJson(file, fallback) {
@@ -104,178 +64,195 @@ function createCollection(collection, opts) {
     : null;
   const onBackup = opts && typeof opts.onBackup === 'function' ? opts.onBackup : null;
 
-  function get(id) {
+  async function get(id) {
     const key = String(id || '');
     if (!key) return null;
-    const row = stmtGet.get(name, key);
+    const row = await sql.queryOne(
+      'SELECT data FROM documents WHERE collection = ? AND id = ?',
+      [name, key]
+    );
     return row ? safeParse(row.data, null) : null;
   }
 
-  function list() {
-    return stmtList.all(name).map((r) => safeParse(r.data, null)).filter((x) => x != null);
+  async function list() {
+    const rows = await sql.query(
+      'SELECT data FROM documents WHERE collection = ?',
+      [name]
+    );
+    return rows.map((r) => safeParse(r.data, null)).filter((x) => x != null);
   }
 
-  function listEntries() {
-    return stmtList.all(name).map((r) => ({
-      id: r.id,
-      data: safeParse(r.data, null),
-    })).filter((e) => e.data != null);
+  async function listEntries() {
+    const rows = await sql.query(
+      'SELECT id, data FROM documents WHERE collection = ?',
+      [name]
+    );
+    return rows
+      .map((r) => ({ id: r.id, data: safeParse(r.data, null) }))
+      .filter((e) => e.data != null);
   }
 
-  function asMap() {
+  async function asMap() {
     const out = {};
-    stmtList.all(name).forEach((r) => {
-      const data = safeParse(r.data, null);
-      if (data != null) out[r.id] = data;
-    });
+    const entries = await listEntries();
+    entries.forEach((e) => { out[e.id] = e.data; });
     return out;
   }
 
-  function count() {
-    return stmtCount.get(name).n;
+  async function count() {
+    const row = await sql.queryOne(
+      'SELECT COUNT(*)::int AS n FROM documents WHERE collection = ?',
+      [name]
+    );
+    return Number(row && row.n) || 0;
   }
 
-  function writeBackup() {
+  async function writeBackup() {
     if (!backupFile) return;
     try {
-      const payload = onBackup ? onBackup(listEntries()) : list();
+      const entries = await listEntries();
+      const payload = onBackup ? onBackup(entries) : await list();
       backupJson(backupFile, payload);
     } catch (e) {
       console.warn('[doc-store] backup build failed:', name, e && e.message);
     }
   }
 
-  function upsert(id, data, opts) {
+  async function upsert(id, data, opts) {
     const key = String(id || '');
     if (!key) return null;
     const now = new Date().toISOString();
-    stmtUpsert.run({
-      collection: name,
-      id: key,
-      data: JSON.stringify(data),
-      updated_at: now,
-    });
-    if (!(opts && opts.skipBackup)) writeBackup();
+    await sql.execute(
+      `INSERT INTO documents (collection, id, data, updated_at)
+       VALUES (?, ?, ?::jsonb, ?)
+       ON CONFLICT (collection, id) DO UPDATE SET
+         data = EXCLUDED.data,
+         updated_at = EXCLUDED.updated_at,
+         updated_at_ts = NOW()`,
+      [name, key, encodeData(data), now]
+    );
+    if (!(opts && opts.skipBackup)) await writeBackup();
     return data;
   }
 
-  /** إدراج ذرّي فقط إن لم يوجد الصف — يمنع سباق إصدار الرموز */
-  function insertIfAbsent(id, data, opts) {
+  async function insertIfAbsent(id, data, opts) {
     const key = String(id || '');
     if (!key) return { inserted: false, data: null };
     const now = new Date().toISOString();
-    const r = stmtInsertIgnore.run({
-      collection: name,
-      id: key,
-      data: JSON.stringify(data),
-      updated_at: now,
-    });
+    const r = await sql.execute(
+      `INSERT INTO documents (collection, id, data, updated_at)
+       VALUES (?, ?, ?::jsonb, ?)
+       ON CONFLICT (collection, id) DO NOTHING`,
+      [name, key, encodeData(data), now]
+    );
     if (r.changes > 0) {
-      if (!(opts && opts.skipBackup)) writeBackup();
+      if (!(opts && opts.skipBackup)) await writeBackup();
       return { inserted: true, data };
     }
-    return { inserted: false, data: get(key) };
+    return { inserted: false, data: await get(key) };
   }
 
-  function remove(id, opts) {
+  async function remove(id, opts) {
     const key = String(id || '');
     if (!key) return false;
-    const r = stmtRemove.run(name, key);
-    if (r.changes && !(opts && opts.skipBackup)) writeBackup();
+    const r = await sql.execute(
+      'DELETE FROM documents WHERE collection = ? AND id = ?',
+      [name, key]
+    );
+    if (r.changes && !(opts && opts.skipBackup)) await writeBackup();
     return r.changes > 0;
   }
 
-  function upsertMany(entries) {
-    runInTransaction(() => {
-      (entries || []).forEach((e) => {
-        if (!e || e.id == null) return;
-        stmtUpsert.run({
-          collection: name,
-          id: String(e.id),
-          data: JSON.stringify(e.data),
-          updated_at: new Date().toISOString(),
-        });
-      });
+  async function upsertMany(entries) {
+    await runInTransaction(async (tx) => {
+      for (const e of entries || []) {
+        if (!e || e.id == null) continue;
+        await tx.execute(
+          `INSERT INTO documents (collection, id, data, updated_at)
+           VALUES (?, ?, ?::jsonb, ?)
+           ON CONFLICT (collection, id) DO UPDATE SET
+             data = EXCLUDED.data,
+             updated_at = EXCLUDED.updated_at,
+             updated_at_ts = NOW()`,
+          [name, String(e.id), encodeData(e.data), new Date().toISOString()]
+        );
+      }
     });
-    writeBackup();
+    await writeBackup();
   }
 
-  /** استبدال مجموعة كاملة داخل معاملة واحدة (ترحيل/تنظيف داخلي فقط — ليس لمسارات API) */
-  function replaceAll(entries) {
-    runInTransaction(() => {
-      stmtClear.run(name);
-      (entries || []).forEach((e) => {
-        if (!e || e.id == null) return;
-        stmtUpsert.run({
-          collection: name,
-          id: String(e.id),
-          data: JSON.stringify(e.data),
-          updated_at: new Date().toISOString(),
-        });
-      });
+  async function replaceAll(entries) {
+    await runInTransaction(async (tx) => {
+      await tx.execute('DELETE FROM documents WHERE collection = ?', [name]);
+      for (const e of entries || []) {
+        if (!e || e.id == null) continue;
+        await tx.execute(
+          `INSERT INTO documents (collection, id, data, updated_at)
+           VALUES (?, ?, ?::jsonb, ?)`,
+          [name, String(e.id), encodeData(e.data), new Date().toISOString()]
+        );
+      }
     });
-    writeBackup();
+    await writeBackup();
   }
 
-  /** ترحيل لمرة واحدة فقط — لا يُستدعى من مسارات API */
-  function migrateFromArray(fileOrData, idField) {
-    if (count() > 0) return 0;
+  async function migrateFromArray(fileOrData, idField) {
+    if ((await count()) > 0) return 0;
     const field = idField || 'id';
     const listData = typeof fileOrData === 'string'
       ? readLegacyJson(fileOrData, [])
       : (Array.isArray(fileOrData) ? fileOrData : []);
     if (!Array.isArray(listData) || !listData.length) return 0;
     let n = 0;
-    runInTransaction(() => {
-      listData.forEach((item, i) => {
-        if (!item || typeof item !== 'object') return;
+    await runInTransaction(async (tx) => {
+      for (let i = 0; i < listData.length; i++) {
+        const item = listData[i];
+        if (!item || typeof item !== 'object') continue;
         const id = String(item[field] != null ? item[field] : ('auto_' + i));
-        stmtUpsert.run({
-          collection: name,
-          id,
-          data: JSON.stringify(item),
-          updated_at: String(item.updatedAt || item.createdAt || new Date().toISOString()),
-        });
+        await tx.execute(
+          `INSERT INTO documents (collection, id, data, updated_at)
+           VALUES (?, ?, ?::jsonb, ?)
+           ON CONFLICT (collection, id) DO NOTHING`,
+          [name, id, encodeData(item), String(item.updatedAt || item.createdAt || new Date().toISOString())]
+        );
         n++;
-      });
+      }
     });
     if (n) console.log('[doc-store] migrated ' + n + ' row(s) → ' + name);
     return n;
   }
 
-  /** ترحيل خريطة { key: value } */
-  function migrateFromMap(fileOrData) {
-    if (count() > 0) return 0;
+  async function migrateFromMap(fileOrData) {
+    if ((await count()) > 0) return 0;
     const map = typeof fileOrData === 'string'
       ? readLegacyJson(fileOrData, {})
       : (fileOrData && typeof fileOrData === 'object' ? fileOrData : {});
     const keys = Object.keys(map || {});
     if (!keys.length) return 0;
     let n = 0;
-    runInTransaction(() => {
-      keys.forEach((key) => {
-        stmtUpsert.run({
-          collection: name,
-          id: String(key),
-          data: JSON.stringify(map[key]),
-          updated_at: new Date().toISOString(),
-        });
+    await runInTransaction(async (tx) => {
+      for (const key of keys) {
+        await tx.execute(
+          `INSERT INTO documents (collection, id, data, updated_at)
+           VALUES (?, ?, ?::jsonb, ?)
+           ON CONFLICT (collection, id) DO NOTHING`,
+          [name, String(key), encodeData(map[key]), new Date().toISOString()]
+        );
         n++;
-      });
+      }
     });
     if (n) console.log('[doc-store] migrated ' + n + ' map key(s) → ' + name);
     return n;
   }
 
-  /** ترحيل كائن وحيد (مثل site-config) */
-  function migrateSingleton(fileOrData, singletonId) {
+  async function migrateSingleton(fileOrData, singletonId) {
     const sid = singletonId || '_root';
-    if (get(sid)) return 0;
+    if (await get(sid)) return 0;
     const obj = typeof fileOrData === 'string'
       ? readLegacyJson(fileOrData, null)
       : fileOrData;
     if (!obj || typeof obj !== 'object') return 0;
-    upsert(sid, obj);
+    await upsert(sid, obj);
     console.log('[doc-store] migrated singleton → ' + name);
     return 1;
   }

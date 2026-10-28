@@ -1,11 +1,11 @@
 /**
- * مستودعات المنصة الموحّدة — الواجهة الوحيدة لمسارات API والخدمات.
- * عمليات ذرّية: get / upsert / remove / list — بلا إعادة كتابة عشوائية للقائمة كاملة من الـ API.
+ * Unified platform repos — async API over documents + typed tables.
+ * Call await migrateAllSecondaryStores() after db.ready() (not at require-time).
  */
 'use strict';
 
 const path = require('path');
-const { createCollection, DATA_DIR } = require('./docStore');
+const { createCollection, DATA_DIR, readLegacyJson } = require('./docStore');
 const platformStore = require('./platformStore');
 
 function arrayBackup(entries) {
@@ -62,7 +62,6 @@ const messages = createCollection('messages', {
   onBackup: arrayBackup,
 });
 
-/** أسرار قراءة محادثات الضيوف — id = threadKey، data = { hash, phoneDigits, createdAt } */
 const guestThreadSecrets = createCollection('guest_thread_secrets', {
   backupFile: 'guest-thread-secrets.json',
   onBackup: mapBackup,
@@ -201,138 +200,132 @@ const serviceRequests = createCollection('service_requests', {
   onBackup: arrayBackup,
 });
 
-/** إشعارات داخل الحساب (تذكير تجديد، تحذير بلا تحقق، …) */
 const accountNotifications = createCollection('account_notifications', {
   backupFile: 'account-notifications.json',
   onBackup: arrayBackup,
 });
 
-/** تقارير العمليات الأسبوعية للسوبر أدمن */
 const weeklyOpsReports = createCollection('weekly_ops_reports', {
   backupFile: 'weekly-ops-reports.json',
   onBackup: arrayBackup,
 });
 
-/* ── Helpers خاصّة بالأشكال ──────────────────────────────── */
+/* ── Helpers ─────────────────────────────────────────────── */
 
-function getSiteConfig() {
-  return siteConfig.get('_root') || {};
+async function getSiteConfig() {
+  return (await siteConfig.get('_root')) || {};
 }
 
-function saveSiteConfig(cfg) {
+async function saveSiteConfig(cfg) {
   return siteConfig.upsert('_root', cfg && typeof cfg === 'object' ? cfg : {});
 }
 
-function getTelegramChat() {
-  return telegramAdminChat.get('_root') || null;
+async function getTelegramChat() {
+  return (await telegramAdminChat.get('_root')) || null;
 }
 
-function saveTelegramChat(obj) {
+async function saveTelegramChat(obj) {
   return telegramAdminChat.upsert('_root', obj && typeof obj === 'object' ? obj : {});
 }
 
-function listInvestmentOpportunities() {
-  return investments.listEntries()
-    .filter((e) => e.id !== '_meta')
-    .map((e) => e.data);
+async function listInvestmentOpportunities() {
+  const entries = await investments.listEntries();
+  return entries.filter((e) => e.id !== '_meta').map((e) => e.data);
 }
 
-function upsertInvestment(opp) {
+async function upsertInvestment(opp) {
   if (!opp || !opp.id) return null;
-  investments.upsert(String(opp.id), opp);
-  investments.upsert('_meta', { updatedAt: new Date().toISOString() });
+  await investments.upsert(String(opp.id), opp);
+  await investments.upsert('_meta', { updatedAt: new Date().toISOString() });
   return opp;
 }
 
-function removeInvestment(id) {
-  const ok = investments.remove(String(id));
-  if (ok) investments.upsert('_meta', { updatedAt: new Date().toISOString() });
+async function removeInvestment(id) {
+  const ok = await investments.remove(String(id));
+  if (ok) await investments.upsert('_meta', { updatedAt: new Date().toISOString() });
   return ok;
 }
 
-function listInvestmentEvents() {
+async function listInvestmentEvents() {
   return investmentEvents.list();
 }
 
-function pushInvestmentEvent(ev) {
+async function pushInvestmentEvent(ev) {
   if (!ev || !ev.id) return null;
   return investmentEvents.upsert(String(ev.id), ev);
 }
 
-/** مراجعات: القيمة مخزّنة كمصفوفة تحت مفتاح الهدف */
-function getReviewsFor(targetId) {
-  const row = reviews.get(String(targetId || ''));
+async function getReviewsFor(targetId) {
+  const row = await reviews.get(String(targetId || ''));
   return Array.isArray(row) ? row : [];
 }
 
-function setReviewsFor(targetId, list) {
+async function setReviewsFor(targetId, list) {
   return reviews.upsert(String(targetId), Array.isArray(list) ? list : []);
 }
 
-function getHoursFor(accountId) {
-  return businessHours.get(String(accountId || '')) || null;
+async function getHoursFor(accountId) {
+  return (await businessHours.get(String(accountId || ''))) || null;
 }
 
-function setHoursFor(accountId, hours) {
+async function setHoursFor(accountId, hours) {
   return businessHours.upsert(String(accountId), hours);
 }
 
-function getVisitStats(accountId) {
-  return visits.get(String(accountId || '')) || null;
+async function getVisitStats(accountId) {
+  return (await visits.get(String(accountId || ''))) || null;
 }
 
-function setVisitStats(accountId, stats) {
+async function setVisitStats(accountId, stats) {
   return visits.upsert(String(accountId), stats);
 }
 
-function getContactStats(accountId) {
-  return contactClicks.get(String(accountId || '')) || null;
+async function getContactStats(accountId) {
+  return (await contactClicks.get(String(accountId || ''))) || null;
 }
 
-function setContactStats(accountId, stats) {
+async function setContactStats(accountId, stats) {
   return contactClicks.upsert(String(accountId), stats);
 }
 
-function getAdBoost(adId) {
-  return adBoosts.get(String(adId || '')) || null;
+async function getAdBoost(adId) {
+  return (await adBoosts.get(String(adId || ''))) || null;
 }
 
-function setAdBoost(adId, boost) {
+async function setAdBoost(adId, boost) {
   return adBoosts.upsert(String(adId), boost);
 }
 
-function removeAdBoost(adId) {
+async function removeAdBoost(adId) {
   return adBoosts.remove(String(adId));
 }
 
-function getPackage(accountId) {
-  return packages.get(String(accountId || '')) || null;
+async function getPackage(accountId) {
+  return (await packages.get(String(accountId || ''))) || null;
 }
 
-function setPackage(accountId, rec) {
+async function setPackage(accountId, rec) {
   return packages.upsert(String(accountId), rec);
 }
 
-function getPackageMeta() {
-  return packages.get('__meta') || { invoiceSeq: 0 };
+async function getPackageMeta() {
+  return (await packages.get('__meta')) || { invoiceSeq: 0 };
 }
 
-function setPackageMeta(meta) {
+async function setPackageMeta(meta) {
   return packages.upsert('__meta', meta && typeof meta === 'object' ? meta : { invoiceSeq: 0 });
 }
 
-function listPackagesMap() {
-  const map = packages.asMap();
+async function listPackagesMap() {
+  const map = await packages.asMap();
   delete map.__meta;
-  // توافق مع الشكل القديم (__invoiceSeq على الجذر)
-  const meta = packages.get('__meta');
+  const meta = await packages.get('__meta');
   if (meta && typeof meta.invoiceSeq === 'number') {
     map.__invoiceSeq = meta.invoiceSeq;
   }
   return map;
 }
 
-/** OTP: المفتاح = phone أو key المركّب */
 function otpKeyOf(rec) {
   if (!rec) return null;
   if (rec.key) return String(rec.key);
@@ -341,156 +334,148 @@ function otpKeyOf(rec) {
   return null;
 }
 
-function listOtp() {
+async function listOtp() {
   return otp.list();
 }
 
-function upsertOtp(rec) {
+async function upsertOtp(rec) {
   const key = otpKeyOf(rec);
   if (!key) return null;
   const withKey = Object.assign({}, rec, { key: rec.key || key });
   return otp.upsert(key, withKey);
 }
 
-function removeOtp(keyOrRec) {
+async function removeOtp(keyOrRec) {
   if (typeof keyOrRec === 'string') return otp.remove(keyOrRec);
   const key = otpKeyOf(keyOrRec);
   return key ? otp.remove(key) : false;
 }
 
-function replaceOtpStore(list) {
+async function replaceOtpStore(list) {
   const entries = (list || []).map((rec, i) => {
     const key = otpKeyOf(rec) || ('legacy_' + i);
     return { id: key, data: Object.assign({}, rec, { key: rec.key || key }) };
   });
-  otp.replaceAll(entries);
+  await otp.replaceAll(entries);
 }
 
-/* ── ترحيل لمرة واحدة ─────────────────────────────────────── */
-
-function migrateAllSecondaryStores() {
+async function migrateAllSecondaryStores() {
   const p = (f) => path.join(DATA_DIR, f);
 
-  // packages: خريطة — انقل __invoiceSeq إلى __meta
-  if (packages.count() === 0) {
-    const raw = require('./docStore').readLegacyJson(p('account-packages.json'), {});
+  if ((await packages.count()) === 0) {
+    const raw = readLegacyJson(p('account-packages.json'), {});
     if (raw && typeof raw === 'object') {
       const invoiceSeq = raw.__invoiceSeq || 0;
       delete raw.__invoiceSeq;
-      packages.migrateFromMap(raw);
-      if (invoiceSeq) packages.upsert('__meta', { invoiceSeq });
+      await packages.migrateFromMap(raw);
+      if (invoiceSeq) await packages.upsert('__meta', { invoiceSeq });
     }
   }
 
-  otp.migrateFromArray(p('otp-store.json'), 'key');
-  // OTP قديم بلا key — أعِد الترحيل بمفتاح مشتق إن لزم
-  if (otp.count() === 0) {
-    const legacy = require('./docStore').readLegacyJson(p('otp-store.json'), []);
+  await otp.migrateFromArray(p('otp-store.json'), 'key');
+  if ((await otp.count()) === 0) {
+    const legacy = readLegacyJson(p('otp-store.json'), []);
     if (Array.isArray(legacy) && legacy.length) {
-      legacy.forEach((rec, i) => {
+      for (let i = 0; i < legacy.length; i++) {
+        const rec = legacy[i];
         const key = otpKeyOf(rec) || ('legacy_' + i);
-        otp.upsert(key, Object.assign({}, rec, { key }));
-      });
+        await otp.upsert(key, Object.assign({}, rec, { key }));
+      }
       console.log('[repos] migrated otp rows with derived keys');
     }
   }
 
-  adminTeam.migrateFromArray(p('admin-team.json'), 'id');
-  subRequests.migrateFromArray(p('sub-requests.json'), 'id');
-  siteConfig.migrateSingleton(p('site-config.json'), '_root');
+  await adminTeam.migrateFromArray(p('admin-team.json'), 'id');
+  await subRequests.migrateFromArray(p('sub-requests.json'), 'id');
+  await siteConfig.migrateSingleton(p('site-config.json'), '_root');
 
-  adBoosts.migrateFromMap(p('ad_boosts.json'));
-  messages.migrateFromArray(p('messages.json'), 'id');
-  guestThreadSecrets.migrateFromMap(p('guest-thread-secrets.json'));
-  reviews.migrateFromMap(p('reviews.json'));
-  leads.migrateFromArray(p('leads.json'), 'id');
-  supportTickets.migrateFromArray(p('support-tickets.json'), 'id');
-  reports.migrateFromArray(p('reports.json'), 'id');
-  deactivationRequests.migrateFromArray(p('deactivation-requests.json'), 'id');
-  adsRequests.migrateFromArray(p('ads-requests.json'), 'id');
+  await adBoosts.migrateFromMap(p('ad_boosts.json'));
+  await messages.migrateFromArray(p('messages.json'), 'id');
+  await guestThreadSecrets.migrateFromMap(p('guest-thread-secrets.json'));
+  await reviews.migrateFromMap(p('reviews.json'));
+  await leads.migrateFromArray(p('leads.json'), 'id');
+  await supportTickets.migrateFromArray(p('support-tickets.json'), 'id');
+  await reports.migrateFromArray(p('reports.json'), 'id');
+  await deactivationRequests.migrateFromArray(p('deactivation-requests.json'), 'id');
+  await adsRequests.migrateFromArray(p('ads-requests.json'), 'id');
 
-  if (investments.count() === 0) {
-    const inv = require('./docStore').readLegacyJson(p('investments.json'), null);
+  if ((await investments.count()) === 0) {
+    const inv = readLegacyJson(p('investments.json'), null);
     if (inv && Array.isArray(inv.opportunities)) {
-      inv.opportunities.forEach((opp) => {
-        if (opp && opp.id) investments.upsert(String(opp.id), opp);
-      });
-      investments.upsert('_meta', { updatedAt: inv.updatedAt || new Date().toISOString() });
+      for (const opp of inv.opportunities) {
+        if (opp && opp.id) await investments.upsert(String(opp.id), opp);
+      }
+      await investments.upsert('_meta', { updatedAt: inv.updatedAt || new Date().toISOString() });
       if (inv.opportunities.length) {
         console.log('[repos] migrated ' + inv.opportunities.length + ' investment(s)');
       }
     }
   }
 
-  if (investmentEvents.count() === 0) {
-    const evFile = require('./docStore').readLegacyJson(p('investment-events.json'), null);
+  if ((await investmentEvents.count()) === 0) {
+    const evFile = readLegacyJson(p('investment-events.json'), null);
     const events = (evFile && Array.isArray(evFile.events)) ? evFile.events
       : (Array.isArray(evFile) ? evFile : []);
-    events.forEach((ev, i) => {
+    for (let i = 0; i < events.length; i++) {
+      const ev = events[i];
       const id = (ev && ev.id) ? String(ev.id) : ('ev_' + i);
-      investmentEvents.upsert(id, Object.assign({}, ev, { id }));
-    });
+      await investmentEvents.upsert(id, Object.assign({}, ev, { id }));
+    }
     if (events.length) console.log('[repos] migrated ' + events.length + ' investment event(s)');
   }
 
-  agentStatus.migrateFromMap(p('agent-status.json'));
-  visits.migrateFromMap(p('visits.json'));
-  contactClicks.migrateFromMap(p('contact-clicks.json'));
-  businessHours.migrateFromMap(p('business-hours.json'));
-  corpTeam.migrateFromArray(p('team.json'), 'id');
-  sectionInterest.migrateFromArray(p('section-interest.json'), 'id');
-  telegramAdminChat.migrateSingleton(p('telegram-admin-chat.json'), '_root');
-  contactFomo.migrateFromMap(p('contact-fomo-log.json'));
-  maintenanceAudit.migrateFromArray(p('maintenance-audit.json'), 'id');
+  await agentStatus.migrateFromMap(p('agent-status.json'));
+  await visits.migrateFromMap(p('visits.json'));
+  await contactClicks.migrateFromMap(p('contact-clicks.json'));
+  await businessHours.migrateFromMap(p('business-hours.json'));
+  await corpTeam.migrateFromArray(p('team.json'), 'id');
+  await sectionInterest.migrateFromArray(p('section-interest.json'), 'id');
+  await telegramAdminChat.migrateSingleton(p('telegram-admin-chat.json'), '_root');
+  await contactFomo.migrateFromMap(p('contact-fomo-log.json'));
+  await maintenanceAudit.migrateFromArray(p('maintenance-audit.json'), 'id');
 
-  // ملف المشتركين الماسيين — كان JSON مشتركاً بين عمليات منفصلة
-  if (subscribers.count() === 0) {
+  if ((await subscribers.count()) === 0) {
     const legacyPaths = [
       p('rizq_subscribers_store.json'),
       path.join(__dirname, '..', '..', 'rizq_subscribers_store.json'),
     ];
     for (const lp of legacyPaths) {
-      const raw = require('./docStore').readLegacyJson(lp, null);
+      const raw = readLegacyJson(lp, null);
       if (raw && typeof raw === 'object' && !Array.isArray(raw) && Object.keys(raw).length) {
-        subscribers.migrateFromMap(lp);
+        await subscribers.migrateFromMap(lp);
         console.log('[repos] migrated subscribers from', lp);
         break;
       }
     }
   }
 
-  marketingCampaigns.migrateFromArray(p('marketing-campaigns.json'), 'id');
-  marketingSettings.migrateSingleton(p('marketing-settings.json'), '_root');
-  agentMisses.migrateFromArray(p('agent-misses.json'), 'id');
-  serviceRequests.migrateFromArray(p('service-requests.json'), 'id');
-  agentOpsSettings.migrateSingleton(p('agent-ops-settings.json'), '_root');
-  secretsVault.migrateSingleton(p('secrets-vault.json'), '_root');
-  accountNotifications.migrateFromArray(p('account-notifications.json'), 'id');
-  weeklyOpsReports.migrateFromArray(p('weekly-ops-reports.json'), 'id');
+  await marketingCampaigns.migrateFromArray(p('marketing-campaigns.json'), 'id');
+  await marketingSettings.migrateSingleton(p('marketing-settings.json'), '_root');
+  await agentMisses.migrateFromArray(p('agent-misses.json'), 'id');
+  await serviceRequests.migrateFromArray(p('service-requests.json'), 'id');
+  await agentOpsSettings.migrateSingleton(p('agent-ops-settings.json'), '_root');
+  await secretsVault.migrateSingleton(p('secrets-vault.json'), '_root');
+  await accountNotifications.migrateFromArray(p('account-notifications.json'), 'id');
+  await weeklyOpsReports.migrateFromArray(p('weekly-ops-reports.json'), 'id');
 
   return {
-    packages: packages.count(),
-    otp: otp.count(),
-    adminTeam: adminTeam.count(),
-    messages: messages.count(),
-    siteConfig: siteConfig.count(),
-    marketingCampaigns: marketingCampaigns.count(),
-    accountNotifications: accountNotifications.count(),
-    weeklyOpsReports: weeklyOpsReports.count(),
+    packages: await packages.count(),
+    otp: await otp.count(),
+    adminTeam: await adminTeam.count(),
+    messages: await messages.count(),
+    siteConfig: await siteConfig.count(),
+    marketingCampaigns: await marketingCampaigns.count(),
+    accountNotifications: await accountNotifications.count(),
+    weeklyOpsReports: await weeklyOpsReports.count(),
   };
 }
 
-const migrated = migrateAllSecondaryStores();
-console.log('[repos] secondary stores ready', JSON.stringify(migrated));
-
 module.exports = {
-  // platform (typed tables)
   accounts: {
     getById: (id) => platformStore.getAccountById(id),
     getByEmail: (email) => platformStore.getAccountByEmail(email),
     upsert: (acc) => platformStore.upsertAccount(acc),
     list: () => platformStore.readAccounts(),
-    /** @deprecated استخدم upsert — بقي للتوافق مع مسارات قديمة تكتب القائمة */
     replaceAll: (list) => platformStore.writeAccounts(list),
   },
   ads: {
