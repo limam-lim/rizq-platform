@@ -43,6 +43,10 @@
 
 require('dotenv').config();
 
+process.on('unhandledRejection', (err) => {
+  console.error('[call-handler] unhandledRejection:', err && err.stack ? err.stack : err);
+});
+
 const express    = require('express');
 const bodyParser = require('body-parser');
 const twilio     = require('twilio');
@@ -138,7 +142,7 @@ async function _refreshDiamondStatuses() {
     return;
   }
   try {
-    const profiles = getAllSubscriberProfiles();
+    const profiles = await getAllSubscriberProfiles();
     const withAccount = profiles.filter((p) => p.accountId);
     if (!withAccount.length) return;
     const resp = await axios.post(
@@ -161,20 +165,20 @@ _refreshDiamondStatuses();
 setInterval(_refreshDiamondStatuses, DIAMOND_REFRESH_MS);
 
 // هل هذا الرقم (subscriberPhone) يملك فعلاً باقة ماسية موثّقة من الخادم؟
-function isVerifiedDiamondSubscriber(subscriberPhone) {
+async function isVerifiedDiamondSubscriber(subscriberPhone) {
   if (!subscriberPhone) return false;
   if (diamondStatus.get(subscriberPhone) === true) return true;
   // جرّب المفتاح الكانوني إن وُجد تطابق بعد التطبيع
-  const resolved = resolveSubscriberProfile(subscriberPhone);
+  const resolved = await resolveSubscriberProfile(subscriberPhone);
   if (resolved && diamondStatus.get(resolved.subscriberId) === true) return true;
   return false;
 }
 
 /** هل وكيل هذا الرقم مفعّل؟ (افتراضياً مفعّل إن لم يُوقف صراحة) */
-function isAgentToggledOn(subscriberPhone) {
+async function isAgentToggledOn(subscriberPhone) {
   if (!subscriberPhone) return false;
   if (agentStatus.get(subscriberPhone) === false) return false;
-  const resolved = resolveSubscriberProfile(subscriberPhone);
+  const resolved = await resolveSubscriberProfile(subscriberPhone);
   if (resolved && agentStatus.get(resolved.subscriberId) === false) return false;
   return true;
 }
@@ -183,13 +187,13 @@ function isAgentToggledOn(subscriberPhone) {
  * عزل المكالمة: ForwardedFrom → مشترك واحد + ماسي موثّق + مفعّل.
  * أي فشل → null → مسار مدير رزق العام.
  */
-function resolveActiveCallTenant(forwardedFrom) {
+async function resolveActiveCallTenant(forwardedFrom) {
   if (!forwardedFrom) return null;
-  const resolved = resolveSubscriberProfile(forwardedFrom);
+  const resolved = await resolveSubscriberProfile(forwardedFrom);
   if (!resolved) return null;
   const { subscriberId, profile } = resolved;
-  if (!isAgentToggledOn(subscriberId)) return null;
-  if (!isVerifiedDiamondSubscriber(subscriberId)) return null;
+  if (!(await isAgentToggledOn(subscriberId))) return null;
+  if (!(await isVerifiedDiamondSubscriber(subscriberId))) return null;
   return { subscriberId, profile };
 }
 
@@ -223,7 +227,7 @@ function twiGather(text, action, digits = '1', timeout = 10) {
 //    To            = رقم رزق Twilio
 //    ForwardedFrom = رقم المشترك الأصلي (المفتاح!)
 // ══════════════════════════════════════════════════════════
-app.post('/api/call', requireTwilioSignature, (req, res) => {
+app.post('/api/call', requireTwilioSignature, async (req, res) => {
   const caller        = req.body.From          || '';
   const callSid       = req.body.CallSid       || '';
   const forwardedFrom = req.body.ForwardedFrom || ''; // رقم المشترك
@@ -234,10 +238,10 @@ app.post('/api/call', requireTwilioSignature, (req, res) => {
   console.log(`   SID   : ${callSid}`);
 
   // ── عزل صارم: ForwardedFrom فقط → مشترك واحد أو مسار المنصة ──
-  const tenant = resolveActiveCallTenant(forwardedFrom);
-  const looseMatch = forwardedFrom ? resolveSubscriberProfile(forwardedFrom) : null;
-  const isToggledOn = forwardedFrom ? isAgentToggledOn(forwardedFrom) : false;
-  const isDiamondVerified = forwardedFrom ? isVerifiedDiamondSubscriber(forwardedFrom) : false;
+  const tenant = await resolveActiveCallTenant(forwardedFrom);
+  const looseMatch = forwardedFrom ? await resolveSubscriberProfile(forwardedFrom) : null;
+  const isToggledOn = forwardedFrom ? await isAgentToggledOn(forwardedFrom) : false;
+  const isDiamondVerified = forwardedFrom ? await isVerifiedDiamondSubscriber(forwardedFrom) : false;
 
   callLog.unshift({
     sid          : callSid,
@@ -348,7 +352,7 @@ app.post('/api/call/subscriber-input', requireTwilioSignature, async (req, res) 
     return res.send(twiml.toString());
   }
 
-  const tenant = resolveActiveCallTenant(session.subscriberPhone || forwardedNow);
+  const tenant = await resolveActiveCallTenant(session.subscriberPhone || forwardedNow);
   if (!tenant) {
     console.warn('⚠️ subscriber-input بلا مستأجر نشط — تحويل لمسار المنصة');
     twiml.redirect('/api/call/rizq-input?Digits=' + encodeURIComponent(digit === 'timeout' ? 'timeout' : digit));
@@ -482,7 +486,7 @@ const { requireSatelliteSecret, timingSafeEqualStr } = require('./rizq-backend/l
 //  POST /api/agent/toggle
 //  { subscriberPhone, active: true|false, secret: 'xxx' }
 // ══════════════════════════════════════════════════════════
-app.post('/api/agent/toggle', (req, res) => {
+app.post('/api/agent/toggle', async (req, res) => {
   const { subscriberPhone, active } = req.body || {};
   // رأس فقط — لا body/query حتى لا يتسرب السر في السجلات أو Referer
   const expectedSecret = process.env.RIZQ_API_SECRET || process.env.BACKEND_SHARED_SECRET || '';
@@ -493,11 +497,11 @@ app.post('/api/agent/toggle', (req, res) => {
 
   if(!subscriberPhone) return res.status(400).json({ ok: false, error: 'subscriberPhone مطلوب' });
 
-  const resolved = resolveSubscriberProfile(subscriberPhone);
+  const resolved = await resolveSubscriberProfile(subscriberPhone);
   const canonical = resolved ? resolved.subscriberId : subscriberPhone;
   agentStatus.set(canonical, !!active);
   if (canonical !== subscriberPhone) agentStatus.set(subscriberPhone, !!active);
-  const profile = resolved ? resolved.profile : getSubscriberProfile(subscriberPhone);
+  const profile = resolved ? resolved.profile : await getSubscriberProfile(subscriberPhone);
 
   console.log(`${active ? '🟢' : '🔴'} وكيل "${profile?.businessName || canonical}": ${active ? 'مفعّل' : 'موقوف'}`);
 
@@ -514,12 +518,12 @@ app.post('/api/agent/toggle', (req, res) => {
 });
 
 // ── API: حالة وكيل مشترك ────────────────────────────────
-app.get('/api/agent/status/:phone', requireSatelliteSecret, (req, res) => {
+app.get('/api/agent/status/:phone', requireSatelliteSecret, async (req, res) => {
   const phone   = req.params.phone;
-  const resolved = resolveSubscriberProfile(phone);
+  const resolved = await resolveSubscriberProfile(phone);
   const canonical = resolved ? resolved.subscriberId : phone;
-  const profile = resolved ? resolved.profile : getSubscriberProfile(phone);
-  const active  = isAgentToggledOn(canonical);
+  const profile = resolved ? resolved.profile : await getSubscriberProfile(phone);
+  const active  = await isAgentToggledOn(canonical);
   res.json({
     phone: canonical,
     active,

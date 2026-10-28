@@ -7,6 +7,9 @@
  */
 require('dotenv').config({ path: require('path').join(__dirname, '.env'), override: true });
 process.env.TZ = process.env.RIZQ_TIMEZONE || process.env.MAINTENANCE_CRON_TZ || 'Africa/Nouakchott';
+process.on('unhandledRejection', (err) => {
+  console.error('[rizq-backend] unhandledRejection:', err && err.stack ? err.stack : err);
+});
 const { ensureAnthropicEnv, getAnthropicApiKey, isAnthropicConfigured, getAgentModel, getAdvancedModel } = require('./config/anthropic');
 const db = require('./db');
 ensureAnthropicEnv();

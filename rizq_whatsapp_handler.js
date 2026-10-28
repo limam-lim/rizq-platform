@@ -230,19 +230,19 @@ app.post('/api/whatsapp', async (req, res) => {
     const receivingPhoneId = value?.metadata?.phone_number_id || '';
     const receivingPhone   = value?.metadata?.display_phone_number || '';
 
-    function resolveWhatsAppTenant() {
+    async function resolveWhatsAppTenant() {
       if (receivingPhone) {
-        const byDisplay = resolveSubscriberProfile(receivingPhone);
+        const byDisplay = await resolveSubscriberProfile(receivingPhone);
         if (byDisplay) return byDisplay;
       }
       if (receivingPhoneId) {
-        const byId = resolveSubscriberProfile(receivingPhoneId);
+        const byId = await resolveSubscriberProfile(receivingPhoneId);
         if (byId) return byId;
       }
       return null;
     }
 
-    const tenant = resolveWhatsAppTenant();
+    const tenant = await resolveWhatsAppTenant();
 
     let replyText = 'شكراً لرسالتكم. سأرد عليكم قريباً إن شاء الله.';
     let replyMode = 'platform';

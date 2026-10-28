@@ -319,9 +319,7 @@ async function mountAccountsManageRoutes(app, deps) {
     // مزامنة ملف الوكيل الهاتفي عند تغيير رقم المحل/المكتب/المعرض
     if (typeof upsertSubscriberProfileFromAccount === 'function'
       && (b.phone !== undefined || b.phoneIntl !== undefined || b.whatsapp !== undefined || b.name !== undefined)) {
-      try {
-        upsertSubscriberProfileFromAccount(acc, {});
-      } catch (eUpsert) { /* اختياري — لا يفشل الحفظ */ }
+      await upsertSubscriberProfileFromAccount(acc, {}).catch(() => {});
     }
     res.json({ ok: true, account: stripToken(acc) });
   });
