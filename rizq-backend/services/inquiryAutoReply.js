@@ -15,14 +15,14 @@ function accountHasAiAgent(acc) {
   return accountHasAiAgentStrict(acc);
 }
 
-function buildProfileFromAccount(acc) {
+async function buildProfileFromAccount(acc) {
   const personaKey = RizqPrompts.resolveBusinessType({
     businessName: acc.name,
     businessType: acc.type,
     activity: acc.activity || acc.desc,
   });
   const personaDef = RizqPrompts.getPersonaDef(personaKey);
-  const row = getSubscriberProfileByAccountId(acc.id);
+  const row = await getSubscriberProfileByAccountId(acc.id);
   const dynamicKnowledge = row && row.profile && row.profile.dynamicKnowledge
     ? row.profile.dynamicKnowledge
     : null;
@@ -87,7 +87,7 @@ async function maybeAutoReplyToInquiry({ sellerAccount, buyerMessage, threadKey,
     message: buyerMessage.body,
     lang: 'ar',
     uiLang: 'ar',
-    profile: buildProfileFromAccount(sellerAccount),
+    profile: await buildProfileFromAccount(sellerAccount),
     history: buildChatHistory(threadMsgs.slice(0, -1)),
     pageContext,
   });

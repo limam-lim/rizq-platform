@@ -91,7 +91,7 @@ async function upsertPromoAccount(def) {
     packageStatus: 'active',
     packageExpiresAt: new Date(Date.now() + 90 * 86400000).toISOString(),
   };
-  platformStore.upsertAccount(acc);
+  await platformStore.upsertAccount(acc);
   return { acc, thumbUrl };
 }
 
@@ -122,7 +122,7 @@ async function addCatalog(accountId, kind, items) {
       createdAt: NOW,
       updatedAt: NOW,
     };
-    platformStore.upsertCatalogItem(rec);
+    await platformStore.upsertCatalogItem(rec);
     out.push(rec);
   }
   return out;
@@ -204,7 +204,7 @@ async function addCatalog(accountId, kind, items) {
   ]);
 
   // غرفة المناقصات — صفوف ترويجية ظاهرة للزائر
-  const tenders = platformStore.readTenders().filter((t) => !String(t.id || '').startsWith('TND_PROMO_'));
+  const tenders = (await platformStore.readTenders()).filter((t) => !String(t.id || '').startsWith('TND_PROMO_'));
   const promoTenders = [
     {
       id: 'TND_PROMO_001',
@@ -252,11 +252,13 @@ async function addCatalog(accountId, kind, items) {
       ownerName: 'جهة ترويجية',
     },
   ];
-  platformStore.writeTenders(tenders.concat(promoTenders));
+  await platformStore.writeTenders(tenders.concat(promoTenders));
 
   // غرفة الاستثمارات
-  ['INV_PROMO_001', 'INV_PROMO_002', 'INV_PROMO_003'].forEach((id, i) => {
-    repos.upsertInvestment({
+  const promoInv = ['INV_PROMO_001', 'INV_PROMO_002', 'INV_PROMO_003'];
+  for (let i = 0; i < promoInv.length; i++) {
+    const id = promoInv[i];
+    await repos.upsertInvestment({
       id,
       title: ['مشروع متجر حيوي', 'استثمار عقاري صغير', 'وحدة تصنيع خفيفة'][i],
       titleFr: ['Boutique urbaine', 'Petit immobilier', 'Atelier léger'][i],
@@ -271,7 +273,7 @@ async function addCatalog(accountId, kind, items) {
       publishedAt: new Date(Date.now() - i * 3600000).toISOString(),
       createdAt: new Date(Date.now() - i * 3600000).toISOString(),
     });
-  });
+  }
 
   console.log(JSON.stringify({
     ok: true,

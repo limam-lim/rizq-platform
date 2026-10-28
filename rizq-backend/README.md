@@ -2,6 +2,8 @@
 
 Backend requires PostgreSQL (`DATABASE_URL`). Render free is no longer a valid backend host; production target is Hetzner — see `docs/deploy/hetzner.md`.
 
+**Frontend vs backend (repo-root files):** “Frontend files” means only assets the browser loads (`<script src>` in HTML, CSS, images, i18n). A `.js` file at the repo root that is `require()`’d by `rizq-backend` (for example `rizq_subscriber_agent.js`) is **backend**, even if it sits next to browser scripts. Do not revert server-required root modules when restoring pre-Postgres frontend parity.
+
 خادم خلفي صغير لمنصة رزق. الغرض الوحيد حالياً: تحليل صورة وصل الدفع عبر Claude Vision
 دون كشف مفتاح Claude API في كود الواجهة الأمامية الثابت (HTML/JS).
 

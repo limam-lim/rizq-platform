@@ -509,9 +509,10 @@ function setupQuotaGuardAPI(app, requireSharedSecret, deps) {
     return null;
   }
 
-  app.get('/api/quota/admin', requireSharedSecret, (req, res) => {
+  app.get('/api/quota/admin', requireSharedSecret, async (req, res) => {
     try {
-      res.json({ ok: true, ...listAdminUsage(loadProfiles()) });
+      const profiles = await loadProfiles();
+      res.json({ ok: true, ...listAdminUsage(profiles) });
     } catch (err) {
       console.error('[quota/admin]', err.message);
       res.status(500).json({ ok: false, error: 'تعذّر قراءة الاستهلاك' });

@@ -467,7 +467,7 @@ app.get('/api/help-guide', (req, res) => {
  * مباشرة registerSubscriber() من نفس وحدة rizq_subscriber_agent.js التي
  * يقرأها خادما المكالمات/واتساب (ملف rizq_subscribers_store.json المشترك).
  */
-app.post('/api/subscriber/register', requireAdminPermission('subscriber-agents'), (req, res) => {
+app.post('/api/subscriber/register', requireAdminPermission('subscriber-agents'), async (req, res) => {
   const { subscriberId, ...profile } = req.body || {};
   if (!subscriberId || !profile.businessName) {
     return res.status(400).json({ error: 'subscriberId + businessName مطلوبان' });
@@ -486,7 +486,7 @@ app.post('/api/subscriber/register', requireAdminPermission('subscriber-agents')
       phone: profile.phone ? String(profile.phone).replace(/[^\d+]/g, '').slice(0, 20) : undefined,
       activity: profile.activity ? stripBidiControls(String(profile.activity)).normalize('NFC').slice(0, 200) : undefined,
     };
-    registerSubscriber(safeId, safeProfile);
+    await registerSubscriber(safeId, safeProfile);
     res.json({ ok: true, message: 'تم تسجيل ' + safeProfile.businessName });
   } catch (err) {
     console.error('[subscriber/register] error:', err.message);
@@ -494,8 +494,8 @@ app.post('/api/subscriber/register', requireAdminPermission('subscriber-agents')
   }
 });
 
-app.get('/api/subscriber/:id', requireAdminPermission('subscriber-agents'), (req, res) => {
-  const profile = getSubscriberProfile(req.params.id);
+app.get('/api/subscriber/:id', requireAdminPermission('subscriber-agents'), async (req, res) => {
+  const profile = await getSubscriberProfile(req.params.id);
   if (!profile) return res.status(404).json({ error: 'subscriber_not_found' });
   // لا نُعيد حقولاً داخلية حساسة إن وُجدت
   const {
@@ -505,18 +505,20 @@ app.get('/api/subscriber/:id', requireAdminPermission('subscriber-agents'), (req
   res.json({ ok: true, profile: safe });
 });
 
-app.get('/api/subscribers', requireAdminPermission('subscriber-agents'), (req, res) => {
+app.get('/api/subscribers', requireAdminPermission('subscriber-agents'), async (req, res) => {
   try {
-    const list = getAllSubscriberProfiles().map((row) => {
-      const p = getSubscriberProfile(row.subscriberId) || {};
-      return {
+    const rows = await getAllSubscriberProfiles();
+    const list = [];
+    for (const row of rows) {
+      const p = (await getSubscriberProfile(row.subscriberId)) || {};
+      list.push({
         id: row.subscriberId,
         accountId: row.accountId || null,
         name: p.businessName || '',
         type: p.businessType || '',
         plan: p.plan || '',
-      };
-    });
+      });
+    }
     res.json({ ok: true, count: list.length, subscribers: list });
   } catch (err) {
     res.status(500).json({ ok: false, error: 'تعذّر جلب القائمة' });
@@ -577,7 +579,7 @@ app.post('/api/agent/toggle', async (req, res) => {
   if (!subscriberPhone) return res.status(400).json({ ok: false, error: 'subscriberPhone required' });
   const row = setActive(subscriberPhone, active);
   let profile = null;
-  try { profile = getSubscriberProfile(subscriberPhone); } catch (e) { /* optional */ }
+  try { profile = await getSubscriberProfile(subscriberPhone); } catch (e) { /* optional */ }
   res.json({
     ok: true,
     phone: subscriberPhone,
@@ -591,10 +593,10 @@ app.post('/api/agent/toggle', async (req, res) => {
 });
 
 /** GET /api/agent/status/:phone — محمي (لا كشف عام لحالة الوكلاء) */
-app.get('/api/agent/status/:phone', requireAdminPermission('subscriber-agents'), (req, res) => {
+app.get('/api/agent/status/:phone', requireAdminPermission('subscriber-agents'), async (req, res) => {
   const phone = req.params.phone;
   let profile = null;
-  try { profile = getSubscriberProfile(phone); } catch (e) { /* optional */ }
+  try { profile = await getSubscriberProfile(phone); } catch (e) { /* optional */ }
   res.json({
     ok: true,
     phone,
@@ -3453,7 +3455,7 @@ app.get('/api/subscriber/knowledge/mine/:accountId', async (req, res) => {
   if (!accountHasAiAgent(acc)) {
     return res.status(403).json({ ok: false, error: resolveAccessDenialMessage(ent), code: ent.subscriptionStatus });
   }
-  const row = getSubscriberProfileByAccountId(accountId);
+  const row = await getSubscriberProfileByAccountId(accountId);
   const prof = row && row.profile ? row.profile : null;
   const dk = prof && prof.dynamicKnowledge ? prof.dynamicKnowledge : null;
   res.json({
@@ -3482,7 +3484,7 @@ app.post('/api/subscriber/knowledge/instructions', async (req, res) => {
     return res.status(403).json({ ok: false, error: resolveAccessDenialMessage(ent), code: ent.subscriptionStatus });
   }
 
-  const upsert = upsertSubscriberInstructionsFromAccount(acc, customInstructions);
+  const upsert = await upsertSubscriberInstructionsFromAccount(acc, customInstructions);
   if (!upsert.ok) {
     return res.status(500).json({ ok: false, error: upsert.error || 'save_failed' });
   }
@@ -3530,7 +3532,7 @@ app.post('/api/subscriber/knowledge/upload', async (req, res) => {
     return res.status(400).json({ ok: false, error: parsed.error || 'parse_failed', detail: parsed.detail });
   }
 
-  const upsert = upsertSubscriberKnowledgeFromAccount(acc, parsed.dynamicKnowledge);
+  const upsert = await upsertSubscriberKnowledgeFromAccount(acc, parsed.dynamicKnowledge);
   if (!upsert.ok) {
     return res.status(500).json({ ok: false, error: upsert.error || 'save_failed' });
   }
@@ -3547,17 +3549,20 @@ app.post('/api/subscriber/knowledge/upload', async (req, res) => {
 setupQuotaGuardAPI(app, requireAdminPermission('quota-guard'), {
   verifyAccountOwner,
   getAccountRecord,
-  loadProfiles: () => {
+  loadProfiles: async () => {
     try {
-      return getAllSubscriberProfiles().map((p) => {
-        const prof = getSubscriberProfile(p.subscriberId) || {};
-        return {
+      const rows = await getAllSubscriberProfiles();
+      const out = [];
+      for (const p of rows) {
+        const prof = (await getSubscriberProfile(p.subscriberId)) || {};
+        out.push({
           subscriberId: p.subscriberId,
           accountId: p.accountId,
           businessName: prof.businessName || '',
           phone: p.subscriberId,
-        };
-      });
+        });
+      }
+      return out;
     } catch (e) {
       return [];
     }

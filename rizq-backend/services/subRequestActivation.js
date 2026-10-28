@@ -323,7 +323,7 @@ async function activateSubRequest(req, deps) {
 
     if (!isTrial && isDiamondPackageRef(req.pkg) && accountPhone && typeof registerSubscriber === 'function') {
       try {
-        registerSubscriber(String(accountPhone).replace(/[^0-9+]/g, '').slice(0, 40), {
+        await registerSubscriber(String(accountPhone).replace(/[^0-9+]/g, '').slice(0, 40), {
           businessName: accountName,
           accountId: req.accountId,
           plan: 'diamond',
