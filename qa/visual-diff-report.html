@@ -39,6 +39,7 @@
   <h1>Visual diff report — pages above 0.5%</h1>
   <p>Fair compare: OLD main/SQLite <code>:3001</code> vs NEW Postgres <code>:3000</code>, same graduation fixture, animations disabled, dynamic media masked. Landing/index listed first. Generated 2026-10-28T04:02:36.936Z.</p>
   <p><strong>Eye verdict (landing/index):</strong> structure, brand, CTAs, nav, and ad prices match. Magenta concentrates on ad-carousel media slots and the live pulse — not a layout redesign.</p>
+  <p><strong>Retake 2026-10-28 (pulse + office):</strong> market_pulse AR/FR now 0% with correct language on both servers; office AR hero 0.06% after networkidle+2s with scroll locked (scales photo present). Prior pulse lang flip was harness contamination, not API/default-lang.</p>
   <div class="stats">
     <div class="stat">Pages above 0.5%: <strong>20</strong></div>
     <div class="stat">API parity: <strong>23/23</strong></div>
@@ -192,11 +193,11 @@
     <div class="rank">#9</div>
     <div>
       <h2>rizq_office__ar__390.png</h2>
-      <p class="meta">390×844 · pixel diff <strong>48.9294%</strong> · highlight Δ 40.8306%</p>
+      <p class="meta">390×844 · pixel diff <strong>0.0623%</strong> · highlight Δ 40.8306%</p>
     </div>
     <span class="badge noise">noise / not layout</span>
   </header>
-  <p class="cause"><strong>Cause:</strong> Office profile content same (Justice Law Office); hero/video thumbnail frame + background media differ between captures.</p>
+  <p class="cause"><strong>Cause:</strong> Prior “missing scales / hero shift” was auto-scrollIntoView(service-desk) + previous harness img{opacity:0} mask — not a Postgres layout bug. Retake after networkidle+2s with scroll locked at hero: 0.0623%.</p>
   <div class="grid">
     <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_office__ar__390__old.png" alt="old rizq_office__ar__390.png" loading="lazy"></figure>
     <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_office__ar__390__new.png" alt="new rizq_office__ar__390.png" loading="lazy"></figure>
@@ -226,11 +227,11 @@
     <div class="rank">#11</div>
     <div>
       <h2>rizq_market_pulse__ar__390.png</h2>
-      <p class="meta">390×844 · pixel diff <strong>18.29%</strong> · highlight Δ 17.5039%</p>
+      <p class="meta">390×844 · pixel diff <strong>0%</strong> · highlight Δ 17.5039%</p>
     </div>
     <span class="badge noise">noise / not layout</span>
   </header>
-  <p class="cause"><strong>Cause:</strong> Market pulse charts/ticker/media timing; currency API codes now match after backend repair.</p>
+  <p class="cause"><strong>Cause:</strong> Prior report contamination was screenshot-harness language seeding (shared page / post-paint localStorage). Product reads rizq_lang via RizqI18n; AR↔FR works on both servers after clean context. Retake: 0%.</p>
   <div class="grid">
     <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_market_pulse__ar__390__old.png" alt="old rizq_market_pulse__ar__390.png" loading="lazy"></figure>
     <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_market_pulse__ar__390__new.png" alt="new rizq_market_pulse__ar__390.png" loading="lazy"></figure>
@@ -243,11 +244,11 @@
     <div class="rank">#12</div>
     <div>
       <h2>rizq_market_pulse__fr__390.png</h2>
-      <p class="meta">390×844 · pixel diff <strong>18.29%</strong> · highlight Δ 17.5039%</p>
+      <p class="meta">390×844 · pixel diff <strong>0%</strong> · highlight Δ 17.5039%</p>
     </div>
     <span class="badge noise">noise / not layout</span>
   </header>
-  <p class="cause"><strong>Cause:</strong> FR market pulse: same ticker/chart animation noise.</p>
+  <p class="cause"><strong>Cause:</strong> Prior report contamination was screenshot-harness language seeding (shared page / post-paint localStorage). Product reads rizq_lang via RizqI18n; AR↔FR works on both servers after clean context. Retake: 0%.</p>
   <div class="grid">
     <figure><figcaption>OLD (SQLite :3001)</figcaption><img src="visual-diff/rizq_market_pulse__fr__390__old.png" alt="old rizq_market_pulse__fr__390.png" loading="lazy"></figure>
     <figure><figcaption>NEW (Postgres :3000)</figcaption><img src="visual-diff/rizq_market_pulse__fr__390__new.png" alt="new rizq_market_pulse__fr__390.png" loading="lazy"></figure>
