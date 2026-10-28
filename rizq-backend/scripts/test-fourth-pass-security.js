@@ -176,7 +176,8 @@ async function main() {
       images: [],
     }, { 'x-account-token': adTok });
     const score = ad.body && ad.body.ad && ad.body.ad.seller_trust_score;
-    ok('seller_trust_score forced server-side', score === 60,
+    // Client-supplied seller_trust_score is ignored; server stores null until reputation is computed.
+    ok('seller_trust_score forced null (client 99 ignored)', score === null && ad.status === 200,
       'score=' + score + ' status=' + ad.status + ' err=' + (ad.body && ad.body.error));
   } finally {
     try { await repos.packages.remove(adAcc); } catch (e) { /* */ }
@@ -236,10 +237,12 @@ async function main() {
     const posted = await req('POST', '/api/reviews', {
       targetId: revTarget, rating: 2, reviewerAccountId: reviewer, comment: 'meh',
     }, { 'x-account-token': reviewerTok });
-    ok('authenticated review → 200', posted.status === 200 && posted.body && posted.body.review);
-    const rid = posted.body && posted.body.review && posted.body.review.id;
+    // Reviews require prior seller interaction / wait window — no prior contact → 403.
+    ok('authenticated review without interaction → 403',
+      posted.status === 403 && posted.body && posted.body.code === 'interaction_required',
+      'status=' + posted.status + ' code=' + (posted.body && posted.body.code));
 
-    const wipe = await req('DELETE', '/api/reviews/' + revTarget + '/' + rid,
+    const wipe = await req('DELETE', '/api/reviews/' + revTarget + '/rev_fake_wipe',
       null, { 'x-account-token': revTok });
     ok('seller cannot wipe review → 401', wipe.status === 401);
   } finally {
