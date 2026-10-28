@@ -108,7 +108,7 @@ async function main() {
     id: catId, type: 'store', name: 'FP Cat', status: 'approved',
     accessToken: catTok, phone: '44119988',
   });
-  repos.setPackage(catId, {
+  await repos.setPackage(catId, {
     accountId: catId,
     accountType: 'store',
     status: 'active',
@@ -144,7 +144,7 @@ async function main() {
       ok('owner cannot self-activate catalog', false, 'no item');
     }
   } finally {
-    try { repos.packages.remove(catId); } catch (e) { /* */ }
+    try { await repos.packages.remove(catId); } catch (e) { /* */ }
     try { platformStore.deleteAccount(catId); } catch (e) { /* */ }
   }
 
@@ -155,7 +155,7 @@ async function main() {
     id: adAcc, type: 'store', name: 'FP Ad', status: 'approved',
     accessToken: adTok, phone: '44223344',
   });
-  repos.setPackage(adAcc, {
+  await repos.setPackage(adAcc, {
     accountId: adAcc,
     accountType: 'store',
     status: 'active',
@@ -179,7 +179,7 @@ async function main() {
     ok('seller_trust_score forced server-side', score === 60,
       'score=' + score + ' status=' + ad.status + ' err=' + (ad.body && ad.body.error));
   } finally {
-    try { repos.packages.remove(adAcc); } catch (e) { /* */ }
+    try { await repos.packages.remove(adAcc); } catch (e) { /* */ }
     try { platformStore.deleteAccount(adAcc); } catch (e) { /* */ }
   }
 

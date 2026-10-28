@@ -98,20 +98,30 @@ function normalizeFreeDays(raw) {
   return Math.min(3650, Math.round(n));
 }
 
-function readSiteConfigSafe() {
+async function readSiteConfigSafe() {
   try {
     const repos = require('../db/repos');
-    return repos.getSiteConfig() || {};
+    return (await repos.getSiteConfig()) || {};
   } catch (e) {
     return {};
   }
+}
+
+function _settingsFromParts(launchDate, freeDays, freeUntil, source) {
+  return {
+    launchDate,
+    freeDays,
+    freeUntil,
+    source,
+    maintenanceDryRun: !launchDate,
+  };
 }
 
 /**
  * إعدادات الإطلاق المحسوبة لحظياً من site-config.
  * launchDate فارغ ⇒ maintenanceDryRun=true و freeUntil من البيئة إن وُجدت.
  */
-function getLaunchSettings() {
+async function getLaunchSettings() {
   if (_testOverride && typeof _testOverride === 'object') {
     const launchDate = parseYmd(_testOverride.launchDate);
     const freeDays = normalizeFreeDays(
@@ -129,16 +139,10 @@ function getLaunchSettings() {
       freeUntil = parseYmd(process.env.RIZQ_LAUNCH_FREE_UNTIL);
       source = freeUntil ? 'env' : 'none';
     }
-    return {
-      launchDate,
-      freeDays,
-      freeUntil,
-      source,
-      maintenanceDryRun: !launchDate,
-    };
+    return _settingsFromParts(launchDate, freeDays, freeUntil, source);
   }
 
-  const cfg = readSiteConfigSafe();
+  const cfg = await readSiteConfigSafe();
   const launchDate = parseYmd(cfg.launchDate);
   const freeDays = normalizeFreeDays(
     cfg.freeDays != null && cfg.freeDays !== '' ? cfg.freeDays : DEFAULT_FREE_DAYS
@@ -152,21 +156,15 @@ function getLaunchSettings() {
     freeUntil = parseYmd(process.env.RIZQ_LAUNCH_FREE_UNTIL);
     source = freeUntil ? 'env' : 'none';
   }
-  return {
-    launchDate,
-    freeDays,
-    freeUntil,
-    source,
-    maintenanceDryRun: !launchDate,
-  };
+  return _settingsFromParts(launchDate, freeDays, freeUntil, source);
 }
 
-function getLaunchFreeUntil() {
-  return getLaunchSettings().freeUntil;
+async function getLaunchFreeUntil() {
+  return (await getLaunchSettings()).freeUntil;
 }
 
-function isMaintenanceDryRun() {
-  return getLaunchSettings().maintenanceDryRun === true;
+async function isMaintenanceDryRun() {
+  return (await getLaunchSettings()).maintenanceDryRun === true;
 }
 
 function setLaunchSettingsForTests(value) {
@@ -177,8 +175,8 @@ function getEnvOpenSectionFlags() {
   return parseOpenSections(process.env.RIZQ_OPEN_SECTIONS);
 }
 
-function isLaunchFreePeriodActive(nowMs) {
-  const until = getLaunchFreeUntil();
+async function isLaunchFreePeriodActive(nowMs) {
+  const until = await getLaunchFreeUntil();
   if (!until) return false;
   const end = freeUntilEndMs(until);
   if (end == null) return false;
@@ -186,8 +184,8 @@ function isLaunchFreePeriodActive(nowMs) {
   return now <= end;
 }
 
-function daysRemaining(nowMs) {
-  const end = freeUntilEndMs(getLaunchFreeUntil());
+async function daysRemaining(nowMs) {
+  const end = freeUntilEndMs(await getLaunchFreeUntil());
   if (end == null) return null;
   const now = typeof nowMs === 'number' ? nowMs : Date.now();
   if (now > end) return 0;
@@ -212,19 +210,19 @@ function isOpenModule(flags, moduleKey) {
  * الباقة التجريبية تظهر فقط بعد انتهاء الفترة المجانية (ووجود launchDate)،
  * وخلال مهلة المطالبة (7 أيام من freeUntil).
  */
-function isTrialOfferVisible(nowMs) {
-  const settings = getLaunchSettings();
+async function isTrialOfferVisible(nowMs) {
+  const settings = await getLaunchSettings();
   if (!settings.launchDate) return false;
-  if (isLaunchFreePeriodActive(nowMs)) return false;
+  if (await isLaunchFreePeriodActive(nowMs)) return false;
   const freeEnd = freeUntilEndMs(settings.freeUntil);
   if (freeEnd == null) return false;
   const now = typeof nowMs === 'number' ? nowMs : Date.now();
   return now <= freeEnd + TRIAL_CLAIM_WINDOW_DAYS * MS_DAY;
 }
 
-function publicLaunchConfig(moduleFlags, nowMs) {
-  const settings = getLaunchSettings();
-  const freeActive = isLaunchFreePeriodActive(nowMs);
+async function publicLaunchConfig(moduleFlags, nowMs) {
+  const settings = await getLaunchSettings();
+  const freeActive = await isLaunchFreePeriodActive(nowMs);
   const open = [];
   const closed = [];
   const flags = moduleFlags || {};
@@ -237,21 +235,21 @@ function publicLaunchConfig(moduleFlags, nowMs) {
     freeDays: settings.freeDays,
     freeUntil: settings.freeUntil || null,
     freePeriodActive: freeActive,
-    daysRemaining: daysRemaining(nowMs),
+    daysRemaining: await daysRemaining(nowMs),
     maintenanceDryRun: settings.maintenanceDryRun,
     source: settings.source,
     openSections: open,
     closedSections: closed,
     foundingDiscountPercent: getFoundingDiscountPercent(),
     paidGraceDays: PAID_GRACE_DAYS,
-    trialOfferVisible: isTrialOfferVisible(nowMs),
+    trialOfferVisible: await isTrialOfferVisible(nowMs),
     trialDurationDays: TRIAL_DURATION_DAYS,
     trialClaimWindowDays: TRIAL_CLAIM_WINDOW_DAYS,
   };
 }
 
-function shouldMarkFoundingPartner(accountType, createdAtIso) {
-  if (!isLaunchFreePeriodActive(createdAtIso ? Date.parse(createdAtIso) : Date.now())) return false;
+async function shouldMarkFoundingPartner(accountType, createdAtIso) {
+  if (!(await isLaunchFreePeriodActive(createdAtIso ? Date.parse(createdAtIso) : Date.now()))) return false;
   const t = String(accountType || '').toLowerCase();
   return t === 'store' || t === 'estate';
 }
@@ -270,10 +268,10 @@ function hasConcretePeriodEnd(pkgRecord) {
  * لا Infinity ولا حساب من «الآن».
  * @returns {number|null} epoch ms or null (غير محمي)
  */
-function getProtectedUntilMs(account, pkgRecord, nowMs) {
+async function getProtectedUntilMs(account, pkgRecord, nowMs) {
   void nowMs;
   const type = account && account.type;
-  const freeEnd = freeUntilEndMs(getLaunchFreeUntil());
+  const freeEnd = freeUntilEndMs(await getLaunchFreeUntil());
   const graceMs = PAID_GRACE_DAYS * MS_DAY;
 
   if (type && PAID_ACCOUNT_TYPES.has(type)) {
@@ -297,8 +295,8 @@ function getProtectedUntilMs(account, pkgRecord, nowMs) {
   return null;
 }
 
-function isUnderProtection(nowMs, account, pkgRecord) {
-  const until = getProtectedUntilMs(account, pkgRecord, nowMs);
+async function isUnderProtection(nowMs, account, pkgRecord) {
+  const until = await getProtectedUntilMs(account, pkgRecord, nowMs);
   if (until == null) return false;
   const now = typeof nowMs === 'number' ? nowMs : Date.now();
   return now < until;

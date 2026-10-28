@@ -45,7 +45,7 @@ function plan() {
   return { accounts, ads, catalog };
 }
 
-function main() {
+async function main() {
   const { accounts, ads, catalog } = plan();
   const summary = {
     mode: confirm ? 'confirm' : 'dry-run',
@@ -92,12 +92,12 @@ function main() {
   // نظّف وسوم أسعار الديمو من site-config إن وُجدت (لا تمس الباقي)
   try {
     const repos = require('../db/repos');
-    const cfg = repos.getSiteConfig() || {};
+    const cfg = (await repos.getSiteConfig()) || {};
     if (cfg.prices && (cfg.prices.is_demo || cfg.prices.graduationDemoPrices)) {
       delete cfg.prices.is_demo;
       delete cfg.prices.isDemo;
       delete cfg.prices.graduationDemoPrices;
-      repos.saveSiteConfig(cfg);
+      await repos.saveSiteConfig(cfg);
       summary.pricesFlagsCleared = true;
     }
   } catch (e) { /* ignore */ }
@@ -112,4 +112,7 @@ function main() {
   }, null, 2));
 }
 
-main();
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

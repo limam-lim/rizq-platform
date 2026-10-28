@@ -65,7 +65,7 @@ async function getSellerContactEligibility(targetAccountId, accountTypeHint) {
   /* فترة الإطلاق المجانية: حساب موثّق أو قيد المراجعة في الأقسام المفتوحة يُعامل كباقة فعّالة */
   try {
     const launchMode = require('../config/launchMode');
-    if (launchMode.isLaunchFreePeriodActive()) {
+    if (await launchMode.isLaunchFreePeriodActive()) {
       const envOpen = launchMode.getEnvOpenSectionFlags();
       const cfg = await repos.getSiteConfig() || {};
       const flags = Object.assign(

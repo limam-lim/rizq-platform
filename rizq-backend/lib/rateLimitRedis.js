@@ -6,14 +6,15 @@
 const redis = require('./redis');
 
 class MemoryHitStore {
-  constructor() {
+  constructor(windowMs) {
     this.hits = new Map();
+    this.windowMs = windowMs || 60_000;
   }
   async increment(key) {
     const now = Date.now();
     let row = this.hits.get(key);
     if (!row || row.resetTime <= now) {
-      row = { totalHits: 0, resetTime: now + 60_000 };
+      row = { totalHits: 0, resetTime: now + this.windowMs };
     }
     row.totalHits += 1;
     this.hits.set(key, row);
@@ -64,6 +65,7 @@ class RedisHitStore {
 }
 
 let _store = null;
+const _hybrids = new Map();
 
 async function getRateLimitStore(windowMs) {
   if (_store) return _store;
@@ -72,7 +74,7 @@ async function getRateLimitStore(windowMs) {
     _store = new RedisHitStore(redis.getClient(), windowMs);
     console.log('[rate-limit] using Redis store');
   } else {
-    _store = new MemoryHitStore();
+    _store = new MemoryHitStore(windowMs);
     console.log('[rate-limit] using in-memory store (Redis unavailable)');
   }
   return _store;
@@ -80,9 +82,78 @@ async function getRateLimitStore(windowMs) {
 
 function createRateLimitStoreSyncFallback(windowMs) {
   // For express-rate-limit init before ready(): memory first, upgrade later via getRateLimitStore
-  const mem = new MemoryHitStore();
-  mem.windowMs = windowMs;
-  return mem;
+  return new MemoryHitStore(windowMs);
+}
+
+/**
+ * Hybrid store: memory at construction, upgrades to Redis after redis.ready().
+ * Safe to pass into express-rate-limit before boot completes.
+ */
+function createHybridRateLimitStore(windowMs) {
+  const ms = windowMs || 60_000;
+  let inner = new MemoryHitStore(ms);
+  let upgraded = false;
+  let upgradePromise = null;
+
+  async function ensureUpgraded() {
+    if (upgraded) return inner;
+    if (upgradePromise) return upgradePromise;
+    upgradePromise = (async () => {
+      try {
+        const st = await redis.ready();
+        if (st.ok && redis.getClient()) {
+          inner = new RedisHitStore(redis.getClient(), ms);
+          console.log('[rate-limit] hybrid upgraded to Redis (windowMs=' + ms + ')');
+        } else {
+          console.log('[rate-limit] hybrid staying in-memory (windowMs=' + ms + ')');
+        }
+      } catch (e) {
+        console.warn('[rate-limit] hybrid upgrade failed — memory:', e && e.message);
+      }
+      upgraded = true;
+      return inner;
+    })();
+    return upgradePromise;
+  }
+
+  return {
+    windowMs: ms,
+    async increment(key) {
+      await ensureUpgraded();
+      return inner.increment(key);
+    },
+    async decrement(key) {
+      await ensureUpgraded();
+      return inner.decrement(key);
+    },
+    async resetKey(key) {
+      await ensureUpgraded();
+      return inner.resetKey(key);
+    },
+    async shutdown() {
+      return inner.shutdown();
+    },
+    ready: ensureUpgraded,
+  };
+}
+
+function getOrCreateHybridStore(windowMs) {
+  const ms = windowMs || 60_000;
+  const key = String(ms);
+  if (!_hybrids.has(key)) {
+    _hybrids.set(key, createHybridRateLimitStore(ms));
+  }
+  return _hybrids.get(key);
+}
+
+/** Warm all known hybrid stores (call after redis.ready() during boot). */
+async function warmRateLimitStores() {
+  const stores = Array.from(_hybrids.values());
+  if (!stores.length) {
+    // Ensure at least the default API window is warmed
+    stores.push(getOrCreateHybridStore(15 * 60 * 1000));
+  }
+  await Promise.all(stores.map((s) => s.ready()));
 }
 
 module.exports = {
@@ -90,4 +161,7 @@ module.exports = {
   RedisHitStore,
   getRateLimitStore,
   createRateLimitStoreSyncFallback,
+  createHybridRateLimitStore,
+  getOrCreateHybridStore,
+  warmRateLimitStores,
 };

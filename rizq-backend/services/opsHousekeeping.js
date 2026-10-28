@@ -89,7 +89,7 @@ async function runRenewalReminders(deps) {
   const {
     readAds, writeAds, readAccounts, getAccountRecord, nowMs = Date.now(),
   } = deps;
-  const dryRun = launchMode.isMaintenanceDryRun();
+  const dryRun = await launchMode.isMaintenanceDryRun();
   const summary = {
     reminded: 0,
     wouldRemind: 0,
@@ -101,18 +101,20 @@ async function runRenewalReminders(deps) {
     dryRun,
     errors: [],
   };
-  const accounts = readAccounts() || [];
+  const accounts = (await Promise.resolve(readAccounts())) || [];
   const byId = {};
   accounts.forEach((a) => { byId[a.id] = a; });
-  const list = readAds() || [];
+  const list = (await Promise.resolve(readAds())) || [];
   let changed = false;
 
   for (let i = 0; i < list.length; i++) {
     const ad = list[i];
     if (!ad || ad.status !== 'active') continue;
     const account = ad.accountId ? byId[ad.accountId] : null;
-    const pkg = ad.accountId && getAccountRecord ? getAccountRecord(ad.accountId) : null;
-    if (launchMode.isUnderProtection(nowMs, account, pkg)) {
+    const pkg = ad.accountId && getAccountRecord
+      ? await Promise.resolve(getAccountRecord(ad.accountId))
+      : null;
+    if (await launchMode.isUnderProtection(nowMs, account, pkg)) {
       summary.skippedProtected++;
       continue;
     }
@@ -178,7 +180,7 @@ async function runRenewalReminders(deps) {
     changed = true;
     summary.reminded++;
   }
-  if (changed) writeAds(list);
+  if (changed) await Promise.resolve(writeAds(list));
   return summary;
 }
 
@@ -189,7 +191,7 @@ async function runCleanups(deps) {
   const {
     readAds, writeAds, readAccounts, writeAccounts, getAccountRecord, nowMs = Date.now(),
   } = deps;
-  const dryRun = launchMode.isMaintenanceDryRun();
+  const dryRun = await launchMode.isMaintenanceDryRun();
   const summary = {
     dryRun,
     soldPurged: 0, wouldSoldPurge: 0, bytesFreed: 0,
@@ -200,10 +202,10 @@ async function runCleanups(deps) {
     errors: [],
   };
 
-  const accounts = readAccounts() || [];
+  const accounts = (await Promise.resolve(readAccounts())) || [];
   const byId = {};
   accounts.forEach((a) => { byId[a.id] = a; });
-  const list = readAds() || [];
+  const list = (await Promise.resolve(readAds())) || [];
   let adsChanged = false;
   let accountsChanged = false;
 
@@ -211,8 +213,10 @@ async function runCleanups(deps) {
     const ad = list[i];
     if (!ad || !ad.id) continue;
     const account = ad.accountId ? byId[ad.accountId] : null;
-    const pkg = ad.accountId && getAccountRecord ? getAccountRecord(ad.accountId) : null;
-    const protectedGrace = launchMode.isUnderProtection(nowMs, account, pkg);
+    const pkg = ad.accountId && getAccountRecord
+      ? await Promise.resolve(getAccountRecord(ad.accountId))
+      : null;
+    const protectedGrace = await launchMode.isUnderProtection(nowMs, account, pkg);
 
     // مباع — حذف وسائط بعد 7 أيام
     if (ad.status === 'sold') {
@@ -315,8 +319,10 @@ async function runCleanups(deps) {
     summary.unverifiedDeleted++;
   }
 
-  if (adsChanged) writeAds(list);
-  if (accountsChanged && typeof writeAccounts === 'function') writeAccounts(accounts);
+  if (adsChanged) await Promise.resolve(writeAds(list));
+  if (accountsChanged && typeof writeAccounts === 'function') {
+    await Promise.resolve(writeAccounts(accounts));
+  }
   return summary;
 }
 
@@ -327,8 +333,8 @@ async function buildWeeklyReport(parts) {
   const {
     lifecycle = {}, reminders = {}, cleanups = {}, nowMs = Date.now(),
   } = parts;
-  const dryRun = launchMode.isMaintenanceDryRun();
-  const settings = launchMode.getLaunchSettings();
+  const dryRun = await launchMode.isMaintenanceDryRun();
+  const settings = await launchMode.getLaunchSettings();
   let uploadsBytes = 0;
   try {
     const fs = require('fs');
@@ -408,20 +414,21 @@ async function runOpsHousekeepingPass(deps) {
   const weeklyOnly = deps.weeklyOnly === true;
   const { runAdLifecycleMaintenance } = require('./adLifecycle');
 
+  const dryRunDefault = await launchMode.isMaintenanceDryRun();
   let lifecycle = {
     archived: 0, mediaPurged: 0, bytesFreed: 0,
-    wouldArchive: 0, wouldPurge: 0, skippedPaidGrace: 0, dryRun: launchMode.isMaintenanceDryRun(),
+    wouldArchive: 0, wouldPurge: 0, skippedPaidGrace: 0, dryRun: dryRunDefault,
   };
   let reminders = {
-    reminded: 0, wouldRemind: 0, emailed: 0, notified: 0, dryRun: launchMode.isMaintenanceDryRun(),
+    reminded: 0, wouldRemind: 0, emailed: 0, notified: 0, dryRun: dryRunDefault,
   };
   let cleanups = {
-    dryRun: launchMode.isMaintenanceDryRun(),
+    dryRun: dryRunDefault,
     soldPurged: 0, draftsRemoved: 0, unverifiedWarned: 0, unverifiedDeleted: 0, bytesFreed: 0,
   };
 
   if (!weeklyOnly) {
-    lifecycle = runAdLifecycleMaintenance(Object.assign({}, deps, { nowMs, trigger }));
+    lifecycle = await runAdLifecycleMaintenance(Object.assign({}, deps, { nowMs, trigger }));
     reminders = await runRenewalReminders(Object.assign({}, deps, { nowMs }));
     cleanups = await runCleanups(Object.assign({}, deps, { nowMs }));
   }
@@ -432,7 +439,7 @@ async function runOpsHousekeepingPass(deps) {
   if (forceWeekly || trigger === 'weekly') {
     weekly = await buildWeeklyReport({ lifecycle, reminders, cleanups, nowMs });
     const adminEmail = process.env.SUPER_ADMIN_EMAIL || process.env.OPS_REPORT_EMAIL;
-    if (adminEmail && !launchMode.isMaintenanceDryRun()) {
+    if (adminEmail && !(await launchMode.isMaintenanceDryRun())) {
       await sendEmailSafe(
         adminEmail,
         'رزق — تقرير العمليات الأسبوعي',
@@ -442,7 +449,7 @@ async function runOpsHousekeepingPass(deps) {
   }
   return {
     lifecycle, reminders, cleanups, weekly,
-    dryRun: launchMode.isMaintenanceDryRun(),
+    dryRun: await launchMode.isMaintenanceDryRun(),
     trigger,
   };
 }

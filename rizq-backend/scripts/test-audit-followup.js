@@ -57,9 +57,9 @@ async function main() {
     console.log('(skip live — server down)');
   } else {
     // Seed bank codes with a secret code
-    const cfg = repos.getSiteConfig() || {};
+    const cfg = await repos.getSiteConfig() || {};
     const secretCode = 'SECRET-BANK-' + crypto.randomBytes(4).toString('hex');
-    repos.saveSiteConfig(Object.assign({}, cfg, {
+    await repos.saveSiteConfig(Object.assign({}, cfg, {
       bankCodes: [{
         id: 'bc_audit_1',
         type: 'bank',

@@ -34,11 +34,11 @@ function isPaidParticipant(account, pkgRecord) {
   return false;
 }
 
-function getPaidGraceDeadlineMs(account, pkgRecord, nowMs) {
+async function getPaidGraceDeadlineMs(account, pkgRecord, nowMs) {
   return launchMode.getProtectedUntilMs(account, pkgRecord, nowMs);
 }
 
-function isUnderPaidGrace(nowMs, account, pkgRecord) {
+async function isUnderPaidGrace(nowMs, account, pkgRecord) {
   return launchMode.isUnderProtection(nowMs, account, pkgRecord);
 }
 
@@ -99,14 +99,14 @@ async function runAdLifecycleMaintenance(deps) {
     trigger = 'manual',
   } = deps;
 
-  const settings = launchMode.getLaunchSettings();
+  const settings = await launchMode.getLaunchSettings();
   const dryRun = settings.maintenanceDryRun === true;
 
-  const accounts = readAccounts();
+  const accounts = (await Promise.resolve(readAccounts())) || [];
   const accountById = {};
   accounts.forEach((a) => { accountById[a.id] = a; });
 
-  const list = readAds();
+  const list = (await Promise.resolve(readAds())) || [];
   let changed = false;
   const summary = {
     runAt: new Date(nowMs).toISOString(),
@@ -116,7 +116,7 @@ async function runAdLifecycleMaintenance(deps) {
     launchDate: settings.launchDate || null,
     freeDays: settings.freeDays,
     freeUntil: settings.freeUntil || null,
-    freePeriodActive: launchMode.isLaunchFreePeriodActive(nowMs),
+    freePeriodActive: await launchMode.isLaunchFreePeriodActive(nowMs),
     archived: 0,
     mediaPurged: 0,
     bytesFreed: 0,
@@ -131,7 +131,9 @@ async function runAdLifecycleMaintenance(deps) {
     if (!ad || !ad.id) continue;
 
     const account = ad.accountId ? accountById[ad.accountId] : null;
-    const pkgRecord = ad.accountId && getAccountRecord ? getAccountRecord(ad.accountId) : null;
+    const pkgRecord = ad.accountId && getAccountRecord
+      ? await Promise.resolve(getAccountRecord(ad.accountId))
+      : null;
     const protectedGrace = await isUnderPaidGrace(nowMs, account, pkgRecord);
 
     if (ad.status === 'active') {
@@ -139,7 +141,7 @@ async function runAdLifecycleMaintenance(deps) {
         summary.skippedPaidGrace++;
         continue;
       }
-      const since = await adActiveSinceMs(ad);
+      const since = adActiveSinceMs(ad);
       if (Number.isNaN(since)) continue;
       if (nowMs - since >= ACTIVE_LIFECYCLE_MS) {
         if (dryRun) {
@@ -161,7 +163,7 @@ async function runAdLifecycleMaintenance(deps) {
         summary.skippedPaidGrace++;
         continue;
       }
-      const since = await adArchivedSinceMs(ad);
+      const since = adArchivedSinceMs(ad);
       if (Number.isNaN(since)) {
         if (!dryRun) {
           ad.archivedAt = ad.archivedAt || new Date(nowMs).toISOString();
@@ -175,7 +177,7 @@ async function runAdLifecycleMaintenance(deps) {
           summary.wouldPurge++;
         } else {
           try {
-            summary.bytesFreed += await purgeAdMedia(ad.id, adsUploadsDir);
+            summary.bytesFreed += purgeAdMedia(ad.id, adsUploadsDir);
             ad.images = [];
             ad.status = 'removed';
             ad.mediaPurgedAt = new Date(nowMs).toISOString();
@@ -191,7 +193,7 @@ async function runAdLifecycleMaintenance(deps) {
     }
   }
 
-  if (changed && !dryRun) writeAds(list);
+  if (changed && !dryRun) await Promise.resolve(writeAds(list));
   await appendAuditEntry(dataDir, summary);
   return summary;
 }

@@ -52,8 +52,9 @@ async function main() {
     }
     platformStore.writeTenders(backupTenders.concat(seeded));
 
-    seededInvIds.forEach((id, i) => {
-      repos.upsertInvestment({
+    for (let i = 0; i < seededInvIds.length; i++) {
+      const id = seededInvIds[i];
+      await repos.upsertInvestment({
         id,
         title: 'فرصة اكتشاف ' + i,
         sector: ['تجارة', 'عقارات', 'زراعة'][i],
@@ -65,7 +66,7 @@ async function main() {
         status: 'approved',
         publishedAt: new Date(now - i * 7200000).toISOString(),
       });
-    });
+    }
 
     const tStats = await req('/api/tenders/public-stats');
     assert(tStats.j.ok === true, 'tenders stats ok');
@@ -107,7 +108,7 @@ async function main() {
   } finally {
     platformStore.writeTenders(backupTenders);
     for (const id of seededInvIds) {
-      try { repos.removeInvestment(id); } catch (_) {}
+      try { await repos.removeInvestment(id); } catch (_) {}
     }
   }
 }

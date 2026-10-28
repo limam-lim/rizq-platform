@@ -13,6 +13,7 @@ ensureAnthropicEnv();
 const repos = require('./db/repos');
 const platformStore = require('./db/platformStore');
 const redis = require('./lib/redis');
+const { getOrCreateHybridStore, warmRateLimitStores } = require('./lib/rateLimitRedis');
 const authRouter = require('./routes/auth');
 const wishlistRouter = require('./routes/wishlist');
 const BuyerModel = require('./models/buyer');
@@ -241,7 +242,7 @@ app.use('/uploads/kyc', forbidUploadPath(
   'Documents d\'identité protégés — admin / titulaire uniquement'
 ));
 app.use('/uploads/ads', gateUploadByStatus(
-  async (adId) => repos.ads.getById(adId),
+  async (adId) => await repos.ads.getById(adId),
   ['active', 'approved', 'published'],
   'ad_media_forbidden'
 ));
@@ -312,11 +313,13 @@ app.use(cors({
 // الإنتاج يبقى صارماً (60 / 15 دقيقة). يمكن تجاوز السقف بـ API_RATE_LIMIT_MAX.
 const API_RATE_MAX = Number(process.env.API_RATE_LIMIT_MAX)
   || (isProdEnv() ? 60 : 5000);
+const API_RATE_WINDOW_MS = 15 * 60 * 1000;
 app.use('/api/', rateLimit({
-  windowMs: 15 * 60 * 1000,
+  windowMs: API_RATE_WINDOW_MS,
   max: API_RATE_MAX,
   standardHeaders: true,
   legacyHeaders: false,
+  store: getOrCreateHybridStore(API_RATE_WINDOW_MS),
   skip: (req) => {
     // مسارات القراءة العامة للواجهة — لا تُحسب ضد حد الحماية من الاستهلاك العشوائي
     // ملاحظة: عند mount على /api/ يكون req.path نسبياً (/site-config) وليس /api/site-config
@@ -1211,7 +1214,7 @@ app.get('/api/site-config', async (req, res) => {
   const moduleFlags = await getModuleFlags();
   const publicCfg = {
     moduleFlags,
-    launch: launchMode.publicLaunchConfig(moduleFlags),
+    launch: await launchMode.publicLaunchConfig(moduleFlags),
     platformFlags: await getPlatformFlags(),
     sectionRules: await getSectionRules(),
     otp: getPublicOtpConfig(),
@@ -2282,8 +2285,8 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     verifiedPlus: false,
     verifiedPlusExpiresAt: null,
     /* شريك مؤسس — محلات وعقارات المسجّلة قبل نهاية الفترة المجانية */
-    foundingPartner: launchMode.shouldMarkFoundingPartner(reqType),
-    foundingDiscountPercent: launchMode.shouldMarkFoundingPartner(reqType)
+    foundingPartner: await launchMode.shouldMarkFoundingPartner(reqType),
+    foundingDiscountPercent: (await launchMode.shouldMarkFoundingPartner(reqType))
       ? launchMode.getFoundingDiscountPercent()
       : undefined,
     passHash: passHash || undefined,
@@ -3105,7 +3108,7 @@ function appendLaunchAudit(cfg, entry) {
 app.get('/api/admin/launch-config', requireSuperAdmin, async (req, res) => {
   try {
     const cfg = (await repos.getSiteConfig()) || {};
-    const launch = launchMode.publicLaunchConfig(await getModuleFlags());
+    const launch = await launchMode.publicLaunchConfig(await getModuleFlags());
     res.json({
       ok: true,
       launch,
@@ -3203,7 +3206,7 @@ app.post('/api/admin/launch-config', requireSuperAdmin, async (req, res) => {
     );
     const prevUntil = prevDate
       ? launchMode.addDaysYmd(prevDate, prevDays)
-      : (launchMode.getLaunchFreeUntil() || '');
+      : ((await launchMode.getLaunchFreeUntil()) || '');
 
     let nextDate = prevDate;
     if (Object.prototype.hasOwnProperty.call(body, 'launchDate')) {
@@ -3261,7 +3264,7 @@ app.post('/api/admin/launch-config', requireSuperAdmin, async (req, res) => {
     });
 
     await repos.saveSiteConfig(next);
-    const launch = launchMode.publicLaunchConfig(await getModuleFlags());
+    const launch = await launchMode.publicLaunchConfig(await getModuleFlags());
     res.json({
       ok: true,
       launch,
@@ -4666,8 +4669,10 @@ async function boot() {
   try {
     const redisSt = await redis.ready();
     console.log('[rizq-backend] redis backend=', (redisSt && redisSt.backend) || redis.backend());
+    await warmRateLimitStores();
   } catch (eRedis) {
     console.warn('[rizq-backend] redis ready failed — memory fallback:', eRedis && eRedis.message);
+    try { await warmRateLimitStores(); } catch (eWarm) { /* memory already */ }
   }
   try {
     await require('./services/secretsVault').loadAndApplyOnBoot();

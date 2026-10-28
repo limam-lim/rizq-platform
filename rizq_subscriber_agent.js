@@ -28,7 +28,7 @@ const RizqPrompts = require('./rizq_ai_prompts');
 const { formatDynamicKnowledgeForPrompt } = require('./rizq-backend/services/dynamicKnowledge');
 
 // ══════════════════════════════════════════════════════════════
-//  قاعدة بيانات المشتركين — SQLite عبر repos.subscribers
+//  قاعدة بيانات المشتركين — PostgreSQL عبر repos.subscribers
 //  (ملف JSON القديم يُرحَّل مرة واحدة؛ النسخ الاحتياطية تُكتب عبر docStore)
 // ══════════════════════════════════════════════════════════════
 let _repos = null;

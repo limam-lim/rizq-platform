@@ -61,7 +61,7 @@ function clearGraduation() {
   return { accountsRemoved: accRemoved, adsRemoved: adRemoved };
 }
 
-function seed() {
+async function seed() {
   const fixture = loadFixture();
   const now = new Date().toISOString();
   let accountsUpserted = 0;
@@ -113,14 +113,14 @@ function seed() {
   // وسّم أسعار نبضة السوق التجريبية إن وُجدت
   try {
     const repos = require('../db/repos');
-    const cfg = repos.getSiteConfig() || {};
+    const cfg = (await repos.getSiteConfig()) || {};
     if (cfg.prices && typeof cfg.prices === 'object') {
       cfg.prices = Object.assign({}, cfg.prices, {
         is_demo: true,
         isDemo: true,
         graduationDemoPrices: true,
       });
-      repos.saveSiteConfig(cfg);
+      await repos.saveSiteConfig(cfg);
     }
   } catch (e) { /* ignore */ }
 
@@ -163,7 +163,7 @@ function seed() {
   };
 }
 
-function main() {
+async function main() {
   if (process.env.NODE_ENV === 'production' && process.env.RIZQ_ALLOW_GRADUATION_SEED !== '1') {
     console.error('Refusing to seed/clear graduation demo while NODE_ENV=production (set RIZQ_ALLOW_GRADUATION_SEED=1 to override).');
     process.exit(2);
@@ -173,8 +173,11 @@ function main() {
     console.log(JSON.stringify({ ok: true, action: 'clear', ...result }, null, 2));
     return;
   }
-  const result = seed();
+  const result = await seed();
   console.log(JSON.stringify({ ok: true, action: 'seed', ...result }, null, 2));
 }
 
-main();
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

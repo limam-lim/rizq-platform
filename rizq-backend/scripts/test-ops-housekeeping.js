@@ -116,7 +116,7 @@ async function run() {
 
   // ── dry-run (launchDate empty) ───────────────────────────
   launchMode.setLaunchSettingsForTests({ launchDate: '', freeDays: 90 });
-  check('dry-run active', launchMode.isMaintenanceDryRun() === true);
+  check('dry-run active', (await launchMode.isMaintenanceDryRun()) === true);
 
   const sinceRem = new Date(now - (FREE_AD_ACTIVE_MS - 2 * MS_DAY)).toISOString(); // ~2d left
   const soldAt = new Date(now - 8 * MS_DAY).toISOString();
@@ -157,7 +157,7 @@ async function run() {
 
   // ── real run with launchDate set (no dry-run) ────────────
   launchMode.setLaunchSettingsForTests({ launchDate: '2026-10-01', freeDays: 90 });
-  check('not dry-run', launchMode.isMaintenanceDryRun() === false);
+  check('not dry-run', (await launchMode.isMaintenanceDryRun()) === false);
 
   // protect store account from cleanup
   const adsLive = [

@@ -33,7 +33,7 @@ function _viewerFingerprint(req, viewerId) {
   return 'a:' + crypto.createHash('sha256').update(ip + '|' + ua + '|' + pepper).digest('hex').slice(0, 40);
 }
 
-function trackContactClick(accountId, opts) {
+async function trackContactClick(accountId, opts) {
   opts = opts || {};
   const type = String(opts.type || '').toLowerCase();
   if (!CONTACT_TYPES.includes(type)) {
@@ -52,7 +52,7 @@ function trackContactClick(accountId, opts) {
   }
   _dedupe.set(dedupeKey, now + DEDUPE_TTL_MS);
 
-  const rec = repos.getContactStats(accountId) || {
+  const rec = (await repos.getContactStats(accountId)) || {
     total: 0,
     byDay: {},
     byType: { call: 0, whatsapp: 0, email: 0 },
@@ -80,12 +80,12 @@ function trackContactClick(accountId, opts) {
     Object.keys(rec.byAd).forEach((id) => { if (!keep.has(id)) delete rec.byAd[id]; });
   }
 
-  repos.setContactStats(accountId, rec);
+  await repos.setContactStats(accountId, rec);
   return { ok: true, counted: true };
 }
 
-function getContactStats(accountId) {
-  const rec = repos.getContactStats(accountId);
+async function getContactStats(accountId) {
+  const rec = await repos.getContactStats(accountId);
   if (!rec) {
     return {
       total: 0,
@@ -119,7 +119,7 @@ function getContactStats(accountId) {
 }
 
 function setupContactTrackingAPI(app, limiter, getAccountRecord, getMainAccount, findAdOwner) {
-  app.post('/api/contact-click', limiter, (req, res) => {
+  app.post('/api/contact-click', limiter, async (req, res) => {
     try {
       const b = req.body || {};
       const targetAccountId = String(b.targetAccountId || b.accountId || '').slice(0, 40);
@@ -134,14 +134,14 @@ function setupContactTrackingAPI(app, limiter, getAccountRecord, getMainAccount,
         return res.json({ ok: true, counted: false, reason: 'demo' });
       }
 
-      const mainAcc = getMainAccount ? getMainAccount(targetAccountId) : null;
-      const pkgRec = getAccountRecord ? getAccountRecord(targetAccountId) : null;
+      const mainAcc = getMainAccount ? await getMainAccount(targetAccountId) : null;
+      const pkgRec = getAccountRecord ? await getAccountRecord(targetAccountId) : null;
       if (!mainAcc && !pkgRec) {
         return res.json({ ok: true, counted: false, reason: 'unknown_account' });
       }
 
       if (adId && typeof findAdOwner === 'function') {
-        const owner = findAdOwner(adId);
+        const owner = await findAdOwner(adId);
         if (owner && owner !== targetAccountId) {
           return res.json({ ok: true, counted: false, reason: 'ad_mismatch' });
         }
@@ -154,7 +154,7 @@ function setupContactTrackingAPI(app, limiter, getAccountRecord, getMainAccount,
       }
 
       const viewerKey = _viewerFingerprint(req, viewerId || null);
-      const result = trackContactClick(targetAccountId, {
+      const result = await trackContactClick(targetAccountId, {
         type,
         adId,
         viewerKey,
@@ -168,26 +168,30 @@ function setupContactTrackingAPI(app, limiter, getAccountRecord, getMainAccount,
     }
   });
 
-  app.get('/api/contact-click/stats', (req, res) => {
-    const id = String(req.header('x-account-id') || req.query.accountId || '').trim().slice(0, 40);
-    const token = String(req.header('x-account-token') || '').trim();
-    if (!id || !token) return res.status(401).json({ error: 'unauthorized' });
-    const mainAcc = getMainAccount ? getMainAccount(id) : null;
-    const pkgRec = getAccountRecord ? getAccountRecord(id) : null;
-    if (!mainAcc && !pkgRec) return res.status(404).json({ error: 'account_not_found' });
-    const { timingSafeEqualStr } = require('./lib/secureCompare');
-    const { activeOwnerMatches } = require('./middleware/accountAuth');
-    if (mainAcc) {
-      if (!activeOwnerMatches(mainAcc, token)) {
-        return res.status(401).json({ error: 'unauthorized' });
+  app.get('/api/contact-click/stats', async (req, res) => {
+    try {
+      const id = String(req.header('x-account-id') || req.query.accountId || '').trim().slice(0, 40);
+      const token = String(req.header('x-account-token') || '').trim();
+      if (!id || !token) return res.status(401).json({ error: 'unauthorized' });
+      const mainAcc = getMainAccount ? await getMainAccount(id) : null;
+      const pkgRec = getAccountRecord ? await getAccountRecord(id) : null;
+      if (!mainAcc && !pkgRec) return res.status(404).json({ error: 'account_not_found' });
+      const { timingSafeEqualStr } = require('./lib/secureCompare');
+      const { activeOwnerMatches } = require('./middleware/accountAuth');
+      if (mainAcc) {
+        if (!activeOwnerMatches(mainAcc, token)) {
+          return res.status(401).json({ error: 'unauthorized' });
+        }
+      } else {
+        const validToken = (pkgRec && pkgRec.accessToken) || null;
+        if (!validToken || !timingSafeEqualStr(token, validToken)) {
+          return res.status(401).json({ error: 'unauthorized' });
+        }
       }
-    } else {
-      const validToken = (pkgRec && pkgRec.accessToken) || null;
-      if (!validToken || !timingSafeEqualStr(token, validToken)) {
-        return res.status(401).json({ error: 'unauthorized' });
-      }
+      return res.json({ ok: true, stats: await getContactStats(id) });
+    } catch (err) {
+      return res.status(500).json({ ok: false, error: 'stats_failed' });
     }
-    res.json({ ok: true, stats: getContactStats(id) });
   });
 }
 

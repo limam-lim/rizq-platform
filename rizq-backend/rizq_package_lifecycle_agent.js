@@ -187,7 +187,7 @@ async function syncAccountPackage(opts) {
 
   /* تجربة واحدة لكل هوية + ظهور فقط بعد الفترة المجانية وخلال مهلة 7 أيام */
   if (isTrial && opts.activatedBy !== 'admin') {
-    if (!launchMode.isTrialOfferVisible()) {
+    if (!(await launchMode.isTrialOfferVisible())) {
       return { ok: false, error: 'trial_not_available', msg: 'الباقة التجريبية غير متاحة حالياً' };
     }
     const phoneKey = String(opts.accountPhone || existing.accountPhone || '').replace(/\D/g, '');
