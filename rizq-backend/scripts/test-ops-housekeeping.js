@@ -2,10 +2,13 @@
 /** B1–B4: renewal reminders, cleanups, uploadLimits, weekly report (+ dry-run) */
 'use strict';
 
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env'), override: true });
+
 const fs = require('fs');
 const path = require('path');
 const launchMode = require('../config/launchMode');
 const uploadLimits = require('../services/uploadLimits');
+const db = require('../db');
 const repos = require('../db/repos');
 const {
   MS_DAY,
@@ -43,7 +46,7 @@ function touchMedia(adId) {
   fs.writeFileSync(path.join(dir, '0.webp'), 'ops-media-' + adId);
 }
 
-function cleanup() {
+async function cleanup() {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* ignore */ }
   ['AD_REM', 'AD_SOLD', 'AD_DRAFT', 'AD_PROT'].forEach((id) => {
     try { fs.rmSync(path.join(ADS_UP, id), { recursive: true, force: true }); } catch (e) { /* ignore */ }
@@ -51,19 +54,19 @@ function cleanup() {
   launchMode.setLaunchSettingsForTests(undefined);
   // wipe test notifications/reports by id prefix
   try {
-    (repos.accountNotifications.list() || []).forEach((n) => {
+    for (const n of ((await repos.accountNotifications.list()) || [])) {
       if (n && String(n.meta && n.meta.adId || '').startsWith('AD_')) {
-        repos.accountNotifications.remove(n.id);
+        await repos.accountNotifications.remove(n.id);
       }
       if (n && n.type === 'unverified_warning' && String(n.accountId || '').startsWith('acc_uv_')) {
-        repos.accountNotifications.remove(n.id);
+        await repos.accountNotifications.remove(n.id);
       }
-    });
+    }
   } catch (e) { /* ignore */ }
   try {
-    (repos.weeklyOpsReports.list() || []).forEach((r) => {
-      if (r && String(r.id || '').startsWith('ops_')) repos.weeklyOpsReports.remove(r.id);
-    });
+    for (const r of ((await repos.weeklyOpsReports.list()) || [])) {
+      if (r && String(r.id || '').startsWith('ops_')) await repos.weeklyOpsReports.remove(r.id);
+    }
   } catch (e) { /* ignore */ }
 }
 
@@ -88,7 +91,8 @@ function makeDeps(nowMs, ads, accounts, pkgs) {
 }
 
 async function run() {
-  cleanup();
+  await db.ready();
+  await cleanup();
   let passed = 0;
   let total = 0;
   function check(name, pass, detail) {
@@ -191,7 +195,7 @@ async function run() {
 
   const rem = await runRenewalReminders(deps);
   check('B1 reminded', rem.reminded >= 1, JSON.stringify(rem));
-  const notes = (repos.accountNotifications.list() || []).filter((n) => n.accountId === 'acc_ind' && n.type === 'ad_renewal_reminder');
+  const notes = ((await repos.accountNotifications.list()) || []).filter((n) => n.accountId === 'acc_ind' && n.type === 'ad_renewal_reminder');
   check('B1 notification stored', notes.length >= 1);
   check('B1 notified count', rem.notified >= 1);
   check('B1 email attempted', rem.emailAttempted >= 1);
@@ -224,7 +228,7 @@ async function run() {
   check('B2 account gone', !deps.readAccounts().some((a) => a.id === 'acc_uv_1'));
 
   // ── B4 weekly report ─────────────────────────────────────
-  const report = buildWeeklyReport({
+  const report = await buildWeeklyReport({
     lifecycle: { archived: 1, mediaPurged: 1, bytesFreed: 100 },
     reminders: rem,
     cleanups: clean,
@@ -233,7 +237,7 @@ async function run() {
   check('B4 report id', !!report.id && report.id.startsWith('ops_'));
   check('B4 has health', report.health && report.health.rssMB > 0);
   check('B4 has storage', typeof report.storage.uploadsBytes === 'number');
-  check('B4 persisted', (repos.weeklyOpsReports.get(report.id) || {}).id === report.id);
+  check('B4 persisted', ((await repos.weeklyOpsReports.get(report.id)) || {}).id === report.id);
 
   // daily cron must NOT emit weekly even on Monday morning
   const mondayMs = Date.parse('2026-10-26T03:00:00.000Z'); // Monday
@@ -263,13 +267,13 @@ async function run() {
   // window edge: reminder only within 3 days
   check('REMIND window 3d', REMIND_BEFORE_MS === 3 * MS_DAY);
 
-  cleanup();
+  await cleanup();
   console.log('\n' + passed + '/' + total + ' checks passed\n');
   process.exit(passed === total ? 0 : 1);
 }
 
-run().catch((e) => {
+run().catch(async (e) => {
   console.error(e);
-  cleanup();
+  try { await cleanup(); } catch (e2) { /* ignore */ }
   process.exit(1);
 });

@@ -199,7 +199,7 @@ function forbidUploadPath(error, msg, msgFr) {
     res.status(403).json({ error: error, msg: msg, msg_fr: msgFr });
   };
 }
-async function gateUploadByStatus(resolveEntity, allowedStatuses, error) {
+function gateUploadByStatus(resolveEntity, allowedStatuses, error) {
   const allowed = new Set(allowedStatuses);
   return async function _gateUpload(req, res, next) {
     try {
