@@ -34,14 +34,20 @@ const LANGS = ['ar', 'fr'];
 const SIZES = [{ w: 390, h: 844, label: '390' }, { w: 1440, h: 900, label: '1440' }];
 
 const MASK_CSS = `
-*{animation:none!important;transition:none!important;caret-color:transparent!important}
+*{animation:none!important;transition:none!important;caret-color:transparent!important;
+  scroll-behavior:auto!important}
+html,body{overflow:hidden!important}
+/* Kill external webfont variance between servers */
+*{font-family:Arial,Helvetica,sans-serif!important;font-synthesis:none!important;
+  -webkit-font-smoothing:none!important;text-rendering:geometricPrecision!important}
 .rizq-live-dot,.live-dot,[class*="pulse"],[class*="ticker"],[class*="marquee"],
-[class*="carousel"] img,[class*="ad-card"] img,[class*="card"] img,img,
-[data-ticker],.civic-ticker,.rizq-civic-ticker,
-video,iframe,canvas{visibility:hidden!important}
-[class*="clock"],[class*="countdown"],time{visibility:hidden!important}
-/* neutralize external image layout flicker */
-img{opacity:0!important}
+[class*="carousel"],[data-ticker],.civic-ticker,.rizq-civic-ticker,
+video,iframe,canvas,[class*="clock"],[class*="countdown"],time,
+.rizq-intro-video,#rizqIntroVideo,.promo-video,[class*="promo-video"]{
+  display:none!important;visibility:hidden!important
+}
+/* Neutralize media layout without leaving empty aspect boxes of different sizes */
+img,picture,svg{opacity:0!important;visibility:hidden!important}
 `;
 
 async function shoot(browser, base, outDir) {
@@ -55,13 +61,16 @@ async function shoot(browser, base, outDir) {
         try {
           await page.setViewport({ width: sz.w, height: sz.h, deviceScaleFactor: 1 });
           await page.goto(`${base}/${file}?lang=${lang}`, { waitUntil: 'networkidle2', timeout: 60000 });
-          await page.evaluate((l, css) => {
+          await page.evaluate((l) => {
             try {
               localStorage.setItem('rizq_lang', l);
               localStorage.setItem('lang', l);
               document.documentElement.lang = l;
               document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
             } catch (e) {}
+          }, lang);
+          await page.reload({ waitUntil: 'networkidle2', timeout: 60000 });
+          await page.evaluate((css) => {
             const s = document.createElement('style');
             s.textContent = css;
             document.documentElement.appendChild(s);
@@ -71,8 +80,10 @@ async function shoot(browser, base, outDir) {
                 el.style.visibility = 'hidden';
               }
             });
-          }, lang, MASK_CSS);
-          await sleep(300);
+            // Stabilize lazy sections: force show static content only
+            window.scrollTo(0, 0);
+          }, MASK_CSS);
+          await sleep(800);
           await page.screenshot({ path: outPath, fullPage: false });
           manifest.push({ name, ok: true });
           process.stdout.write('.');
