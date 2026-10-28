@@ -168,17 +168,19 @@ async function getTierQuotaLimits(tierKey, pkgOverride) {
   };
 }
 
-function resolveQuotaLimitsForAccount(rec) {
+async function resolveQuotaLimitsForAccount(rec) {
   if (!rec) {
     return getTierQuotaLimits('diamond_standard');
   }
+  // resolveDiamondTier is sync over ref fields; do not pass an unawaited
+  // findCatalogPackage Promise into getTierQuotaLimits.
   const tier = resolveDiamondTier({
     id: rec.packageId || rec.pkgId,
     pkgName: rec.pkgName,
     planType: rec.planType,
     diamondTier: rec.diamondTier,
   }) || 'diamond_standard';
-  const pkg = findCatalogPackage(rec.packageId || rec.pkgId || rec.pkgName);
+  const pkg = await findCatalogPackage(rec.packageId || rec.pkgId || rec.pkgName);
   return getTierQuotaLimits(tier, pkg);
 }
 

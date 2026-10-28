@@ -111,9 +111,13 @@ async function mountAccountsManageRoutes(app, deps) {
     res.set('Cache-Control', 'public, max-age=30');
     const viewerId = await resolveOptionalAccountViewer(req);
     const list = (await readAccounts()).filter((a) => a.status === 'approved' && !a.suspended && !String(a.id || '').startsWith('acc_demo'));
+    const accounts = [];
+    for (const acc of list) {
+      accounts.push(await toPublicAccountForViewer(acc, viewerId));
+    }
     res.json({
       ok: true,
-      accounts: list.map((acc) => toPublicAccountForViewer(acc, viewerId)),
+      accounts,
       viewerId: viewerId || null,
     });
   });
@@ -129,7 +133,7 @@ async function mountAccountsManageRoutes(app, deps) {
     if (!acc || acc.status !== 'approved' || acc.suspended || String(acc.id || '').startsWith('acc_demo')) {
       return res.status(404).json({ ok: false, error: 'account_not_found' });
     }
-    res.json({ ok: true, account: toPublicAccountForViewer(acc, viewerId) });
+    res.json({ ok: true, account: await toPublicAccountForViewer(acc, viewerId) });
   });
 
   /**

@@ -10,6 +10,7 @@
  * ولا يستخدم بادئة acc_demo (تُستبعد من الـ API العام).
  * لا تشغّل هذا السكربت في الإنتاج الحقيقي.
  */
+require('dotenv').config({ path: require('path').join(__dirname, '..', '.env') });
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -18,6 +19,7 @@ const ROOT = path.join(__dirname, '..');
 const FIXTURE = path.join(ROOT, 'fixtures', 'graduation-demo.json');
 const clear = process.argv.includes('--clear');
 
+const db = require('../db');
 const store = require('../db/platformStore');
 
 function loadFixture() {
@@ -43,21 +45,21 @@ function isDemoRecord(rec) {
     || String(rec.id || '').indexOf('acc_demo') === 0;
 }
 
-function clearGraduation() {
-  const accounts = store.readAccounts();
-  const ads = store.readAds();
+async function clearGraduation() {
+  const accounts = (await store.readAccounts()) || [];
+  const ads = (await store.readAds()) || [];
   let accRemoved = 0;
   let adRemoved = 0;
-  accounts.forEach((a) => {
+  for (const a of accounts) {
     if (a && isDemoRecord(a)) {
-      if (store.deleteAccount(a.id)) accRemoved++;
+      if (await store.deleteAccount(a.id)) accRemoved++;
     }
-  });
-  ads.forEach((ad) => {
+  }
+  for (const ad of ads) {
     if (ad && isDemoRecord(ad)) {
-      if (store.deleteAd(ad.id)) adRemoved++;
+      if (await store.deleteAd(ad.id)) adRemoved++;
     }
-  });
+  }
   return { accountsRemoved: accRemoved, adsRemoved: adRemoved };
 }
 
@@ -67,7 +69,8 @@ async function seed() {
   let accountsUpserted = 0;
   let adsUpserted = 0;
 
-  fixture.accounts.forEach((row, idx) => {
+  for (let idx = 0; idx < fixture.accounts.length; idx++) {
+    const row = fixture.accounts[idx];
     const approvedAt = new Date(Date.now() - (idx + 1) * 3 * 3600000).toISOString();
     const acc = Object.assign({}, row, {
       is_demo: true,
@@ -84,11 +87,12 @@ async function seed() {
         ? new Date(Date.now() + 180 * 86400000).toISOString()
         : undefined
     });
-    store.upsertAccount(acc);
+    await store.upsertAccount(acc);
     accountsUpserted++;
-  });
+  }
 
-  fixture.ads.forEach((row, idx) => {
+  for (let idx = 0; idx < fixture.ads.length; idx++) {
+    const row = fixture.ads[idx];
     const createdAt = new Date(Date.now() - (idx + 1) * 2 * 3600000).toISOString();
     const ad = Object.assign({
       views: 40 + idx * 7,
@@ -106,9 +110,9 @@ async function seed() {
       updatedAt: now,
       sellerName: (fixture.accounts.find((a) => a.id === row.accountId) || {}).name || ''
     });
-    store.upsertAd(ad);
+    await store.upsertAd(ad);
     adsUpserted++;
-  });
+  }
 
   // وسّم أسعار نبضة السوق التجريبية إن وُجدت
   try {
@@ -126,10 +130,11 @@ async function seed() {
 
   // ضمان is_demo على أي سجل تخرج قديم خارج الـ fixture
   let backfilled = 0;
-  (store.readAccounts() || []).forEach((a) => {
-    if (!a || !isDemoRecord(a)) return;
-    if (a.is_demo === true && a.isDemo === true && a.graduationDemo === true) return;
-    store.upsertAccount(Object.assign({}, a, {
+  const accounts = (await store.readAccounts()) || [];
+  for (const a of accounts) {
+    if (!a || !isDemoRecord(a)) continue;
+    if (a.is_demo === true && a.isDemo === true && a.graduationDemo === true) continue;
+    await store.upsertAccount(Object.assign({}, a, {
       is_demo: true,
       isDemo: true,
       graduationDemo: true,
@@ -137,11 +142,12 @@ async function seed() {
       updatedAt: now,
     }));
     backfilled++;
-  });
-  (store.readAds() || []).forEach((ad) => {
-    if (!ad || !isDemoRecord(ad)) return;
-    if (ad.is_demo === true && ad.isDemo === true && ad.graduationDemo === true) return;
-    store.upsertAd(Object.assign({}, ad, {
+  }
+  const ads = (await store.readAds()) || [];
+  for (const ad of ads) {
+    if (!ad || !isDemoRecord(ad)) continue;
+    if (ad.is_demo === true && ad.isDemo === true && ad.graduationDemo === true) continue;
+    await store.upsertAd(Object.assign({}, ad, {
       is_demo: true,
       isDemo: true,
       graduationDemo: true,
@@ -149,7 +155,7 @@ async function seed() {
       updatedAt: now,
     }));
     backfilled++;
-  });
+  }
 
   return {
     accountsUpserted,
@@ -164,12 +170,13 @@ async function seed() {
 }
 
 async function main() {
+  await db.ready();
   if (process.env.NODE_ENV === 'production' && process.env.RIZQ_ALLOW_GRADUATION_SEED !== '1') {
     console.error('Refusing to seed/clear graduation demo while NODE_ENV=production (set RIZQ_ALLOW_GRADUATION_SEED=1 to override).');
     process.exit(2);
   }
   if (clear) {
-    const result = clearGraduation();
+    const result = await clearGraduation();
     console.log(JSON.stringify({ ok: true, action: 'clear', ...result }, null, 2));
     return;
   }

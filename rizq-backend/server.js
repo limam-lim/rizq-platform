@@ -34,7 +34,7 @@ const { resolveAccountPhones, phoneMatchKey } = require('./lib/phoneNormalize');
 const { installAdminPanelGate } = require('./middleware/adminPanelGate');
 const { registerSubscriber, getSubscriberProfile, getAllSubscriberProfiles, getSubscriberProfileByAccountId, upsertSubscriberKnowledgeFromAccount, upsertSubscriberInstructionsFromAccount, upsertSubscriberProfileFromAccount } = require('../rizq_subscriber_agent');
 const { normalizeAccountActivityFields, loadCatalog } = require('./services/merchantActivities');
-const { refreshCurrencyRates, sanitizeCurrencyList, mergeCurrencyConfig } = require('./services/currencyRates');
+const { refreshCurrencyRates, sanitizeCurrencyList, mergeCurrencyConfig, ensureCurrencyCodes } = require('./services/currencyRates');
 const { parseKnowledgeFile, formatDynamicKnowledgeForPrompt } = require('./services/dynamicKnowledge');
 const { recordUsage, setupQuotaGuardAPI } = require('../rizq_quota_guard_agent');
 const { storeReceipt } = require('./services/receiptStorage');
@@ -555,7 +555,7 @@ app.post('/api/agent/toggle', async (req, res) => {
     }
   }
   if (!authorized && accountId && token) {
-    const acc = (await verifyAccountOwner(String(accountId)).slice(0, 60), token);
+    const acc = await verifyAccountOwner(String(accountId).slice(0, 60), token);
     if (acc) {
       try {
         assertAiAgentAccess(acc, { channel: 'dashboard' });
@@ -1221,7 +1221,13 @@ app.get('/api/site-config', async (req, res) => {
     demoDashboardAllowed: !isProdEnv(),
     production: isProdEnv(),
     packages: raw.packages || undefined,
-    prices: raw.prices || undefined,
+    prices: raw.prices
+      ? Object.assign({}, raw.prices, {
+          currencies: Array.isArray(raw.prices.currencies)
+            ? ensureCurrencyCodes(raw.prices.currencies)
+            : raw.prices.currencies,
+        })
+      : undefined,
     promoVideo: raw.promoVideo ? {
       ...raw.promoVideo,
       url: sanitizePlatformPromoUrl(raw.promoVideo.url),
@@ -1826,7 +1832,9 @@ async function autoRefreshCurrencyRatesIfStale() {
     const prices = current.prices || {};
     const last = prices.currenciesUpdatedAt || prices.updatedAt;
     const stale = !last || (Date.now() - new Date(last).getTime() > CURRENCY_AUTO_REFRESH_MS);
-    if (!stale && Array.isArray(prices.currencies) && prices.currencies.length) return;
+    const list = Array.isArray(prices.currencies) ? prices.currencies : [];
+    const missingCodes = list.length > 0 && list.some((c) => !c || !c.code);
+    if (!stale && list.length && !missingCodes) return;
     const merged = mergeCurrencyConfig(prices.currencies);
     const result = await refreshCurrencyRates(merged, { onlyEnabled: true });
     const next = Object.assign({}, current);
@@ -1981,14 +1989,14 @@ const ACCOUNT_PUBLIC_FIELDS = [
   'activityId', 'activity', 'storeTopics',
   'facebook', 'thumb', 'cover', 'tagline', 'status', 'approvedAt', 'createdAt',
 ];
-function toPublicAccount(acc) {
+async function toPublicAccount(acc) {
   const viewerId = null;
-  const gate = resolveContactGate(viewerId, acc && acc.id, acc && acc.type);
-  return toPublicAccountGated(acc, gate);
+  const gate = await resolveContactGate(viewerId, acc && acc.id, acc && acc.type);
+  return await toPublicAccountGated(acc, gate);
 }
-function toPublicAccountForViewer(acc, viewerAccountId) {
-  const gate = resolveContactGate(viewerAccountId, acc && acc.id, acc && acc.type);
-  return toPublicAccountGated(acc, gate);
+async function toPublicAccountForViewer(acc, viewerAccountId) {
+  const gate = await resolveContactGate(viewerAccountId, acc && acc.id, acc && acc.type);
+  return await toPublicAccountGated(acc, gate);
 }
 // نفس السجل بدون accessToken فقط (للأدمن أو لصاحب الحساب نفسه — كل الحقول
 // عدا سرّ الوصول)
@@ -2555,7 +2563,7 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
   const pkgRef = b.pkg || b.packageId || b.pkgId || b.pkgName;
   if (!pkgRef || !b.accountId) return res.status(400).json({ error: 'pkg و accountId مطلوبان' });
   const token = req.header('x-account-token') || '';
-  const owner = (await verifyAccountOwner(String(b.accountId)).slice(0, 60), token);
+  const owner = await verifyAccountOwner(String(b.accountId).slice(0, 60), token);
   if (!owner) return res.status(401).json({ ok: false, error: 'unauthorized' });
   /* سعر الخادم هو المرجع — لا نثق بسعر العميل للمعاملات */
   let catalogPkg = null;
@@ -2916,7 +2924,7 @@ app.get('/api/contact-gate/status', async (req, res) => {
   const module = normalizeModule(req.query.module || req.query.type || 'individual');
   if (!targetAccountId) return res.status(400).json({ ok: false, error: 'targetAccountId_required' });
   const viewerId = await resolveOptionalAccountViewer(req);
-  const gate = resolveContactGate(viewerId, targetAccountId, module);
+  const gate = await resolveContactGate(viewerId, targetAccountId, module);
   res.json({ ok: true, access: gate });
 });
 
@@ -2928,7 +2936,7 @@ app.post('/api/contact-gate/attempt', contactGateLimiter, async (req, res) => {
     const module = normalizeModule(body.module || body.type || 'individual');
     if (!targetAccountId) return res.status(400).json({ ok: false, error: 'targetAccountId_required' });
     const viewerId = await resolveOptionalAccountViewer(req);
-    const gate = resolveContactGate(viewerId, targetAccountId, module);
+    const gate = await resolveContactGate(viewerId, targetAccountId, module);
     let fomo = { ok: false, skipped: true };
     if (gate.fomoEligible) {
       fomo = await notifyContactAttemptFomo(targetAccountId, module, { lang: body.lang });
@@ -4562,22 +4570,20 @@ app.get('/api/discovery/top-sellers', async (req, res) => {
   const allReviews = await readReviews();
   const accounts = (await readAccounts()).filter((a) => a.status === 'approved');
 
-  const ranked = Object.keys(allReviews)
-    .map((targetId) => {
-      const list = allReviews[targetId] || [];
-      const count = list.length;
-      if (count < minReviews) return null;
-      const sum = list.reduce((s, r) => s + (Number(r.rating) || 0), 0);
-      const average = Math.round((sum / count) * 10) / 10;
-      const acc = accounts.find((a) => a.id === targetId);
-      if (!acc) return null; // فقط حسابات معتمَدة وموجودة فعلاً (لا حسابات محذوفة/مرفوضة)
-      return Object.assign({ count, average }, toPublicAccount(acc));
-    })
-    .filter(Boolean)
-    .sort((a, b) => (b.average - a.average) || (b.count - a.count))
-    .slice(0, limit);
+  const ranked = [];
+  for (const targetId of Object.keys(allReviews)) {
+    const list = allReviews[targetId] || [];
+    const count = list.length;
+    if (count < minReviews) continue;
+    const sum = list.reduce((s, r) => s + (Number(r.rating) || 0), 0);
+    const average = Math.round((sum / count) * 10) / 10;
+    const acc = accounts.find((a) => a.id === targetId);
+    if (!acc) continue; // فقط حسابات معتمَدة وموجودة فعلاً (لا حسابات محذوفة/مرفوضة)
+    ranked.push(Object.assign({ count, average }, await toPublicAccount(acc)));
+  }
+  ranked.sort((a, b) => (b.average - a.average) || (b.count - a.count));
 
-  res.json({ ok: true, sellers: ranked });
+  res.json({ ok: true, sellers: ranked.slice(0, limit) });
 });
 
 // ── Corp Diamond Pro API integration (ERP/PMS) — rizq_live_* keys ─────────

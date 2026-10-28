@@ -180,7 +180,7 @@ async function mountAdsRoutes(app, deps) {
       return res.status(401).json({ ok: false, error: 'unauthorized', code: 'account_required', message: 'نشر الإعلان يتطلب حساباً مسجّلاً' });
     }
     const token = extractAccountToken(req) || '';
-    const ownerAcc = (await verifyAccountOwner(String(b.accountId)).slice(0, 60), token);
+    const ownerAcc = await verifyAccountOwner(String(b.accountId).slice(0, 60), token);
     if (!ownerAcc) return res.status(401).json({ ok: false, error: 'unauthorized' });
     const acc = ownerAcc;
     const ent = await getEntitlements(b.accountId, acc ? acc.type : 'individual');
@@ -301,11 +301,13 @@ async function mountAdsRoutes(app, deps) {
     const limit = Math.max(1, Math.min(200, Number(q.limit) || 60));
     const offset = Math.max(0, Number(q.offset) || 0);
     const accounts = await readAccounts();
-    const page = list.slice(offset, offset + limit).map((ad) => {
+    const slice = list.slice(offset, offset + limit);
+    const page = [];
+    for (const ad of slice) {
       const seller = accounts.find((a) => a.id === ad.accountId);
-      const gate = resolveContactGate(viewerId, ad.accountId, seller && seller.type);
-      return toPublicAdGated(withBoostFlag(ad), gate, seller);
-    });
+      const gate = await resolveContactGate(viewerId, ad.accountId, seller && seller.type);
+      page.push(toPublicAdGated(await withBoostFlag(ad), gate, seller));
+    }
     res.json({ ok: true, total: list.length, ads: page });
   });
 
@@ -321,14 +323,14 @@ async function mountAdsRoutes(app, deps) {
     const viewerId = await resolveOptionalAccountViewer(req);
     const all = await readAds();
     const accounts = await readAccounts();
-    const found = ids
-      .map((id) => all.find((a) => a.id === id && a.status === 'active'))
-      .filter(Boolean)
-      .map((ad) => {
-        const seller = accounts.find((a) => a.id === ad.accountId);
-        const gate = resolveContactGate(viewerId, ad.accountId, seller && seller.type);
-        return toPublicAdGated(withBoostFlag(ad), gate, seller);
-      });
+    const found = [];
+    for (const id of ids) {
+      const ad = all.find((a) => a.id === id && a.status === 'active');
+      if (!ad) continue;
+      const seller = accounts.find((a) => a.id === ad.accountId);
+      const gate = await resolveContactGate(viewerId, ad.accountId, seller && seller.type);
+      found.push(toPublicAdGated(await withBoostFlag(ad), gate, seller));
+    }
     res.json({ ok: true, ads: found });
   });
 
@@ -359,8 +361,8 @@ async function mountAdsRoutes(app, deps) {
     }
     const viewerId = await resolveOptionalAccountViewer(req);
     const seller = (await readAccounts()).find((a) => a.id === ad.accountId);
-    const gate = resolveContactGate(viewerId, ad.accountId, seller && seller.type);
-    res.json({ ok: true, ad: toPublicAdGated(withBoostFlag(ad), gate, seller), access: gate });
+    const gate = await resolveContactGate(viewerId, ad.accountId, seller && seller.type);
+    res.json({ ok: true, ad: toPublicAdGated(await withBoostFlag(ad), gate, seller), access: gate });
   });
 
   /**

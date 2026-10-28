@@ -749,7 +749,7 @@ async function getEntitlements(accountId, accountType, accountRecordOverride) {
     features = features.filter((f) => !AI_PAID_FEATURES.includes(f));
   }
 
-  const quotaLimits = aiPaidActive ? resolveQuotaLimitsForAccount(rec) : null;
+  const quotaLimits = aiPaidActive ? await resolveQuotaLimitsForAccount(rec) : null;
 
   // ب3 — حدود الرفع من site-config.uploadLimits حسب نوع الحساب
   let uploadLim = { maxPhotosPerAd: plan.maxPhotosPerItem || 5, maxImageBytes: 3 * 1024 * 1024 };

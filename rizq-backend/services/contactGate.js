@@ -37,7 +37,7 @@ async function getSellerContactEligibility(targetAccountId, accountTypeHint) {
   if (!targetAccountId) {
     return { canExpose: false, reason: 'no_account', isTrial: false, isExpired: false, subscriptionStatus: 'no_subscription' };
   }
-  const rec = getAccountRecord(targetAccountId);
+  const rec = await getAccountRecord(targetAccountId);
   const type = (rec && (rec.accountType || rec.type)) || accountTypeHint || 'individual';
   const ent = await getEntitlements(targetAccountId, type, rec || undefined);
   const status = ent.subscriptionStatus || 'no_subscription';
@@ -138,7 +138,7 @@ async function getViewerContactEligibility(viewerAccountId, module) {
    * يكفي أن يكون للزائر حساب مسجّل على المنصة لفتح التواصل
    * (شرط أن يكون للتاجر باقة أو تجربة نشطة — يُفحص في resolveContactGate).
    */
-  const rec = getAccountRecord(viewerAccountId);
+  const rec = await getAccountRecord(viewerAccountId);
   const ent = await getEntitlements(viewerAccountId, rec && rec.accountType, rec || undefined);
   return {
     canUnlock: true,
@@ -160,7 +160,7 @@ async function getViewerContactEligibility(viewerAccountId, module) {
 async function resolveContactGate(viewerAccountId, targetAccountId, module, accountTypeHint) {
   const mod = normalizeModule(module);
   const seller = await getSellerContactEligibility(targetAccountId, accountTypeHint);
-  const viewer = getViewerContactEligibility(viewerAccountId, mod);
+  const viewer = await getViewerContactEligibility(viewerAccountId, mod);
 
   let contactsUnlocked = false;
   if (mod === 'tender') {
@@ -374,7 +374,7 @@ async function notifyContactAttemptFomo(targetAccountId, module, opts) {
     return { ok: false, error: 'cooldown', skipped: true };
   }
 
-  const pkgRec = getAccountRecord(targetAccountId);
+  const pkgRec = await getAccountRecord(targetAccountId);
   let accPhone = pkgRec && pkgRec.accountPhone;
   let accEmail = pkgRec && pkgRec.accountEmail;
   if (!accPhone || !accEmail) {
