@@ -61,7 +61,7 @@ function mountAdminCoreRoutes(app, deps) {
 
   app.post('/api/admin/login', adminLoginLimiter, async (req, res) => {
     await cleanExpiredAdminSessions();
-    const { user, pass } = req.body || {};
+    const { user, pass, otp } = req.body || {};
     const u = String(user || '').trim().slice(0, 80);
     const p = String(pass || '').slice(0, 200);
     if (!u || !p) return res.status(400).json({ error: 'يرجى تعبئة الحقلين' });
@@ -75,6 +75,32 @@ function mountAdminCoreRoutes(app, deps) {
       acc = null;
     }
     if (!acc) return res.status(401).json({ error: '❌ بيانات غير صحيحة' });
+    // ── التحقق بخطوتين (TOTP) — مُطفأ حتى يفعّله صاحب الحساب ──
+    try {
+      const twoFactor = require('../services/adminTwoFactor');
+      const need = await twoFactor.loginRequirement(acc);
+      if (need.enrollmentRequired) {
+        return res.status(403).json({ ok: false, code: 'totp_enrollment_required', error: 'فعّل التحقق بخطوتين لهذا الحساب أولاً' });
+      }
+      if (need.required) {
+        const code = String(otp || '').trim().slice(0, 20);
+        if (!code) {
+          res.set('Cache-Control', 'no-store');
+          return res.status(401).json({ ok: false, code: 'totp_required', error: 'أدخل رمز التحقق من تطبيق Authenticator' });
+        }
+        const v = await twoFactor.verifyLogin(acc, code);
+        if (!v.ok) {
+          return res.status(401).json({ ok: false, code: 'totp_invalid', error: '❌ رمز التحقق غير صحيح أو مستعمل' });
+        }
+        if (v.method === 'recovery') {
+          console.warn('[admin/login] recovery code used by', acc.user, '— left:', v.recoveryLeft);
+        }
+      }
+    } catch (e2fa) {
+      // فشل داخلي في 2FA: نرفض الدخول (fail-closed) بدل تجاوز الحماية
+      console.error('[admin/login] 2fa check failed:', e2fa && e2fa.message);
+      return res.status(503).json({ ok: false, code: 'totp_unavailable', error: 'تعذّر التحقق بخطوتين — حاول لاحقاً' });
+    }
     await adminTeamService.touchLogin(acc.user);
     const token = crypto.randomBytes(32).toString('hex');
     const permissions = adminTeamService.normalizePermissions(acc.permissions);
