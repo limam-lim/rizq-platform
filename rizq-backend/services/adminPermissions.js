@@ -34,7 +34,12 @@ const PERMISSION_DEFS = [
   { key: 'moderator-config', group: 'ai', panel: 'moderator-config', labelAr: 'إعدادات المراقب الآلي', labelFr: 'Config. modérateur IA' },
   { key: 'marketing', group: 'ai', panel: 'marketing', labelAr: 'مدير التسويق', labelFr: 'Marketing Manager' },
   { key: 'team.manage', group: 'system', panel: 'team', labelAr: 'إدارة فريق العمل (إضافة/تعديل)', labelFr: 'Gérer l\'équipe admin' },
+  // حسّاسة: عرض وثائق الهوية (KYC) — لا تُمنح ضمن أي دور أو قالب تلقائياً؛ يمنحها السوبر يدوياً فقط
+  { key: 'kyc.view', group: 'system', sensitive: true, labelAr: '🪪 عرض وثائق الهوية (KYC) — مُسجَّل', labelFr: '🪪 Voir pièces d\'identité (KYC) — journalisé' },
 ];
+
+/** صلاحيات لا تدخل في أي دور/قالب تلقائياً — تُمنح يدوياً من السوبر فقط */
+const MANUAL_ONLY_PERMISSIONS = ['*', 'team.manage', 'kyc.view'];
 
 const PERMISSION_PRESETS = {
   tender_reviewer: {
@@ -70,7 +75,7 @@ const PERMISSION_PRESETS = {
   deputy_admin: {
     labelAr: '🟣 نائب مدير (كل شيء ما عدا فريق الإدارة)',
     labelFr: '🟣 Admin adjoint',
-    permissions: PERMISSION_DEFS.map((p) => p.key).filter((k) => k !== '*' && k !== 'team.manage'),
+    permissions: PERMISSION_DEFS.map((p) => p.key).filter((k) => MANUAL_ONLY_PERMISSIONS.indexOf(k) === -1),
   },
 };
 
@@ -124,7 +129,8 @@ function hasAdminPermission(userPerms, required) {
 function permissionsForLegacyRole(role) {
   if (role === 'super') return ['*'];
   if (role === 'admin') {
-    return PERMISSION_DEFS.map((p) => p.key).filter((k) => k !== '*');
+    // team.manage كان ضمن هذا الدور سابقاً — نبقيه كما هو؛ kyc.view يُستثنى (يدوي فقط)
+    return PERMISSION_DEFS.map((p) => p.key).filter((k) => k !== '*' && k !== 'kyc.view');
   }
   if (role === 'moderator') {
     return ['overview', 'users', 'ads', 'reports', 'moderation', 'tenders', 'accounts',
@@ -146,4 +152,5 @@ module.exports = {
   filterGrantablePermissions,
   hasAdminPermission,
   permissionsForLegacyRole,
+  MANUAL_ONLY_PERMISSIONS,
 };

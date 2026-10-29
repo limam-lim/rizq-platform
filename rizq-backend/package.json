@@ -32,7 +32,8 @@
     "purge:demo:confirm": "node scripts/purge-demo.js --confirm",
     "launch:check": "node scripts/launch-check.js",
     "test:await": "node scripts/check-unawaited-async.js",
-    "test:async-regressions": "node -r dotenv/config scripts/test-async-regressions.js"
+    "test:async-regressions": "node -r dotenv/config scripts/test-async-regressions.js",
+    "test:kyc": "node -r dotenv/config scripts/test-kyc-access.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",

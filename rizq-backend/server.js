@@ -1928,6 +1928,14 @@ async function recomputeSellerTrustScore(targetId) {
  */
 function purgeAccountIdDocument(acc) {
   if (!acc || typeof acc !== 'object') return acc;
+  // حذف فعلي للملف من التخزين (كان يُحذف الرابط فقط ويبقى الملف على القرص)
+  const idPaths = [acc.idImage, acc.id_image].filter((v) => typeof v === 'string' && v);
+  if (idPaths.length) {
+    const { deleteKycFiles } = require('./services/kycAccess');
+    idPaths.forEach((p) => {
+      deleteKycFiles(p, acc.id).catch((e) => console.warn('[kyc] purge id file:', e && e.message));
+    });
+  }
   delete acc.idImage;
   delete acc.id_image;
   acc.id_verified = true;
@@ -2034,22 +2042,6 @@ function stripToken(acc) {
   return safe;
 }
 
-/** اقرأ مسار KYC الخاص كـ data-URL لردّ الأدمن فقط (الملف غير عام) */
-function kycPathToDataUrl(relUrl) {
-  try {
-    const u = String(relUrl || '');
-    if (!u.startsWith('/uploads/kyc/')) return u;
-    const key = u.replace(/^\/+/, '');
-    const abs = path.join(__dirname, key);
-    const root = path.join(__dirname, 'uploads', 'kyc') + path.sep;
-    if (!abs.startsWith(root)) return '';
-    if (!fs.existsSync(abs)) return '';
-    const buf = fs.readFileSync(abs);
-    if (!buf.length || buf.length > 3_500_000) return '';
-    return 'data:image/webp;base64,' + buf.toString('base64');
-  } catch (e) { return ''; }
-}
-
 /** نسخة أدمن: تحتفظ بوثائق KYC للمراجعة، بلا أسرار وصول */
 function toAdminAccount(acc) {
   if (!acc) return null;
@@ -2061,13 +2053,9 @@ function toAdminAccount(acc) {
     ...safe
   } = acc;
   delete safe.password;
-  ['idImage', 'licenseImage', 'activityImage2', 'id_image', 'activity_image2'].forEach((k) => {
-    if (safe[k] && String(safe[k]).startsWith('/uploads/kyc/')) {
-      const data = kycPathToDataUrl(safe[k]);
-      if (data) safe[k] = data;
-    }
-  });
-  return safe;
+  // لا تُضمَّن صور KYC في ردود الأدمن إطلاقاً — أعلام وجود فقط؛
+  // العرض عبر GET /api/admin/kyc/:accountId/:doc (صلاحية kyc.view + سجل تدقيق)
+  return require('./services/kycAccess').redactKycForAdmin(safe);
 }
 
 const accountsRegisterLimiter = rateLimit({
@@ -2083,6 +2071,63 @@ const accountsRegisterLimiter = rateLimit({
  * يتحقق من صيغة الرقم فقط. لا يكشف إن كان الرقم مستخدماً (تخفيف تعداد).
  * الفحص الحقيقي للتكرار يحدث عند POST /api/accounts.
  */
+/**
+ * GET /api/admin/kyc/:accountId/:doc — عرض وثيقة KYC واحدة لحساب واحد عند الطلب.
+ * doc ∈ id | license | activity2. يتطلب صلاحية 'kyc.view' (يدوية، لا تُمنح تلقائياً)
+ * + جلسة أدمن بشرية (لا السرّ المشترك). كل محاولة تُسجَّل في kyc_access_audit.
+ */
+const kycViewLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 40,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { ok: false, error: 'too_many_kyc_requests' },
+});
+// requireAdminAuth (لا requireAdminPermission) حتى تُسجَّل محاولات الرفض بالصلاحية أيضاً
+app.get('/api/admin/kyc/:accountId/:doc', kycViewLimiter, requireAdminAuth, async (req, res) => {
+  const kyc = require('./services/kycAccess');
+  const accountId = String(req.params.accountId || '').slice(0, 80);
+  const doc = String(req.params.doc || '').slice(0, 20);
+  res.setHeader('Cache-Control', 'no-store, private');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  if (!req.adminUser || req.adminUser.user === 'server') {
+    await kyc.recordKycAccess(req, accountId, doc, 'denied_no_human_session');
+    return res.status(403).json({ ok: false, error: 'human_admin_session_required' });
+  }
+  if (!hasAdminPermission((req.adminUser && req.adminUser.permissions) || [], kyc.KYC_PERMISSION)) {
+    await kyc.recordKycAccess(req, accountId, doc, 'denied_no_permission');
+    return res.status(403).json({ ok: false, error: 'admin_forbidden', required: [kyc.KYC_PERMISSION] });
+  }
+  if (!kyc.KYC_DOCS[doc]) {
+    await kyc.recordKycAccess(req, accountId, doc, 'denied_invalid_doc');
+    return res.status(400).json({ ok: false, error: 'invalid_doc', allowed: Object.keys(kyc.KYC_DOCS) });
+  }
+  const acc = (await readAccounts()).find((a) => a && a.id === accountId);
+  if (!acc) {
+    await kyc.recordKycAccess(req, accountId, doc, 'not_found_account');
+    return res.status(404).json({ ok: false, error: 'account_not_found' });
+  }
+  const out = kyc.readKycDocument(acc, doc);
+  if (!out.ok) {
+    await kyc.recordKycAccess(req, accountId, doc, 'not_found_doc');
+    return res.status(out.status || 404).json({ ok: false, error: out.error });
+  }
+  await kyc.recordKycAccess(req, accountId, doc, 'viewed', { reason: req.query.reason });
+  res.setHeader('Content-Type', out.contentType);
+  res.setHeader('Content-Disposition', 'inline; filename="kyc-' + doc + '.webp"');
+  res.setHeader('Content-Security-Policy', "default-src 'none'; img-src 'self'; style-src 'none'; sandbox");
+  res.send(out.buffer);
+});
+
+/** GET /api/admin/kyc-audit?accountId=&limit= — سجل من عرض وثائق الهوية ومتى */
+app.get('/api/admin/kyc-audit', requireAdminPermission('kyc.view'), async (req, res) => {
+  const kyc = require('./services/kycAccess');
+  res.setHeader('Cache-Control', 'no-store, private');
+  res.json({ ok: true, entries: await kyc.listKycAccess({ limit: req.query.limit, accountId: req.query.accountId }) });
+});
+
 app.get('/api/accounts/nni-available', accountsRegisterLimiter, (req, res) => {
   const nni = normalizeNni(req.query.nni);
   if (!nni || !NNI_RE.test(nni)) {
