@@ -9,8 +9,8 @@ const crypto = require('crypto');
 const {
   isAnthropicConfigured,
   getAgentModel,
-  createCachedMessage,
 } = require('../config/anthropic');
+const llm = require('./llmGateway');
 const {
   scoreInvestmentOpportunity,
   shouldAutoApprove,
@@ -201,18 +201,24 @@ async function generatePlan(input, anthropicClient) {
   let plan = null;
   let source = 'local';
 
-  if (anthropicClient && isAnthropicConfigured()) {
+  if (isAnthropicConfigured()) {
     try {
       const userMsg = lang === 'fr'
         ? ('Prépare le dossier d\'investissement:\n' + JSON.stringify(payload, null, 2))
         : ('جهّز ملف الاستثمار:\n' + JSON.stringify(payload, null, 2));
-      const { response } = await createCachedMessage(anthropicClient, {
-        model: getAgentModel(),
-        max_tokens: 1400,
-        temperature: 0.35,
-        system: buildSystemPrompt(lang),
-        messages: [{ role: 'user', content: userMsg }],
-      }, { fallbackToFast: true });
+      const { response } = await llm.complete({
+        agent: 'investment',
+        client: anthropicClient || undefined,
+        fallbackToFast: true,
+        wrapUserInput: true,
+        params: {
+          model: getAgentModel(),
+          max_tokens: 1400,
+          temperature: 0.35,
+          system: buildSystemPrompt(lang),
+          messages: [{ role: 'user', content: userMsg }],
+        },
+      });
       const text = (response.content || [])
         .filter((b) => b && b.type === 'text')
         .map((b) => b.text)

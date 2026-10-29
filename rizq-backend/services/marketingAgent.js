@@ -8,13 +8,11 @@
 'use strict';
 
 const crypto = require('crypto');
-const Anthropic = require('@anthropic-ai/sdk');
 const {
-  getAnthropicApiKey,
   isAnthropicConfigured,
   getAgentModel,
-  createCachedMessage,
 } = require('../config/anthropic');
+const llm = require('./llmGateway');
 const cfg = require('../../rizq_marketing_agent_config');
 
 let _repos = null;
@@ -22,8 +20,6 @@ function repos() {
   if (!_repos) _repos = require('../db/repos');
   return _repos;
 }
-
-const client = new Anthropic({ apiKey: getAnthropicApiKey() });
 
 /* ── إعدادات تشغيل مخزّنة ─────────────────────────────────── */
 
@@ -340,12 +336,16 @@ async function generateCreative(input) {
     return fallbackCreative(input);
   }
   try {
-    const { response } = await createCachedMessage(client, {
-      model: getAgentModel(),
-      max_tokens: 1800,
-      temperature: 0.85,
-      system: buildSystemPrompt(),
-      messages: [{ role: 'user', content: buildUserPrompt(input) }],
+    const { response } = await llm.complete({
+      agent: 'marketing',
+      wrapUserInput: true,
+      params: {
+        model: getAgentModel(),
+        max_tokens: 1800,
+        temperature: 0.85,
+        system: buildSystemPrompt(),
+        messages: [{ role: 'user', content: buildUserPrompt(input) }],
+      },
     });
     const text = (response.content || [])
       .filter((b) => b.type === 'text')

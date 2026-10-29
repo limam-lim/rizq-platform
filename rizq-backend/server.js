@@ -688,12 +688,18 @@ app.post('/api/translate', requireAdminPermission('ai-manager'), async (req, res
       '4) أعد JSON فقط بالشكل: {"translations":{"<key>":"<النص المترجم>", ...}} لكل عنصر بنفس المفتاح key المُعطى تماماً. ' +
       'النصوص:\n' + JSON.stringify(clean.map((it) => ({ key: it.key, text: it.text })));
 
-    const { createCachedMessage, requestOptions } = require('./config/anthropic');
-    const { response: msg } = await createCachedMessage(anthropic, {
-      model: getAdvancedModel(),
-      max_tokens: 2000,
-      messages: [{ role: 'user', content: prompt }],
-    }, { requestOptions: requestOptions() });
+    const llm = require('./services/llmGateway');
+    const { response: msg } = await llm.complete({
+      agent: 'translate',
+      // Admin UI strings — keep numbers/prices intact; still wrap as untrusted data.
+      skipRedaction: true,
+      wrapUserInput: true,
+      params: {
+        model: getAdvancedModel(),
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: prompt }],
+      },
+    });
 
     const raw = (msg.content || []).map((c) => c.text || '').join('');
     let parsed;

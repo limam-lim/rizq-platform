@@ -364,12 +364,11 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
   const profile = resolved.profile;
 
   const {
-    getAnthropicApiKey,
     isAnthropicConfigured,
     getAdvancedModel,
     isDiamondProfile,
-    createCachedMessage,
   } = require('./rizq-backend/config/anthropic');
+  const llm = require('./rizq-backend/services/llmGateway');
 
   // لو الباقة ليست ماسية → رفض الخدمة (الوكيل المتخصص للماسي فقط)
   if (!isDiamondProfile(profile)) {
@@ -405,7 +404,6 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
 
   const systemPrompt = buildSubscriberSystemPrompt(profile, channel) + isolationFence;
 
-  const Anthropic = require('@anthropic-ai/sdk');
   const { assertQuotaAvailable, recordUsage, isQuotaBlocked } = require('./rizq_quota_guard_agent');
   if (!isAnthropicConfigured()) {
     return {
@@ -443,7 +441,6 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
     };
   }
 
-  const client = new Anthropic({ apiKey: getAnthropicApiKey() });
   const MODEL = getAdvancedModel();
 
   const channelInstructions = {
@@ -462,11 +459,15 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
 
   messages.push({ role: 'user', content: userContent });
 
-  const created = await createCachedMessage(client, {
-    model     : MODEL,
-    max_tokens: channel === 'call' ? 250 : 800,
-    system    : fullSystem,
-    messages  : messages
+  const created = await llm.complete({
+    agent: 'subscriber',
+    wrapUserInput: true,
+    params: {
+      model     : MODEL,
+      max_tokens: channel === 'call' ? 250 : 800,
+      system    : fullSystem,
+      messages  : messages,
+    },
   });
   const response = created.response;
 
