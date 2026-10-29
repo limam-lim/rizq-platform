@@ -215,6 +215,9 @@ const weeklyOpsReports = createCollection('weekly_ops_reports', {
   onBackup: arrayBackup,
 });
 
+/** سجل تدقيق عرض وثائق KYC — بلا ملف JSON احتياطي (يحوي IP؛ يبقى في Postgres فقط) */
+const kycAccessAudit = createCollection('kyc_access_audit', {});
+
 /* ── Helpers ─────────────────────────────────────────────── */
 
 async function getSiteConfig() {
@@ -555,6 +558,7 @@ module.exports = {
   serviceRequests,
   accountNotifications,
   weeklyOpsReports,
+  kycAccessAudit,
 
   getSiteConfig,
   saveSiteConfig,
