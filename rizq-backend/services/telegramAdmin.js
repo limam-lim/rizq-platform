@@ -576,7 +576,7 @@ async function processNewSubRequest(requestId, deps) {
   let serverExpectedPrice = Number(req.expectedPrice) || Number(req.price) || 0;
   try {
     const { findCatalogPackage } = require('./catalogConfig');
-    const catalogPkg = findCatalogPackage({ pkgName: req.pkg, name: req.pkg, id: req.pkg });
+    const catalogPkg = await findCatalogPackage({ pkgName: req.pkg, name: req.pkg, id: req.pkg });
     if (catalogPkg && Number(catalogPkg.price) > 0) {
       serverExpectedPrice = Number(catalogPkg.price);
     }
@@ -737,7 +737,7 @@ async function handleIncomingMessage(message, deps) {
     /(?:هل\s*(?:هناك|يوجد)\s*طلب|طلبات?\s*(?:جديد|معلق|pending)|عرض\s*الطلبات|pending\s*leads?)/i.test(text)
   )) {
     const { getPendingLeads, formatPendingLeadsForAdmin } = require('./leadEscalation');
-    const adminReply = formatPendingLeadsForAdmin(getPendingLeads());
+    const adminReply = String((await formatPendingLeadsForAdmin(await getPendingLeads())) || '');
     await telegramApi('sendMessage', {
       chat_id: chatId,
       text: adminReply.slice(0, 4096),

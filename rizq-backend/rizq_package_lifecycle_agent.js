@@ -182,7 +182,7 @@ async function syncAccountPackage(opts) {
   const accountType = opts.accountType || existing.accountType || 'individual';
   const planType = mapPackageIdToPlanType(opts.packageId, accountType)
     || mapPackageNameToPlanType(opts.pkgName, accountType, opts.packageId);
-  const diamondTier = resolveDiamondTier({ id: opts.packageId, pkgName: opts.pkgName, planType });
+  const diamondTier = await resolveDiamondTier({ id: opts.packageId, pkgName: opts.pkgName, planType });
   const isTrial = opts.isTrial === true || isTrialPackage(opts.pkgName, opts.price);
 
   /* تجربة واحدة لكل هوية + ظهور فقط بعد الفترة المجانية وخلال مهلة 7 أيام */
@@ -279,9 +279,9 @@ async function syncAccountPackage(opts) {
   try {
     const { onSubscriptionActivated, onSubscriptionExpired } = require('./services/apiIntegration');
     if (paymentConfirmed && planType === 'corp_diamond_pro' && accountType === 'corp') {
-      onSubscriptionActivated(opts.accountId, accountType, planType);
+      await onSubscriptionActivated(opts.accountId, accountType, planType);
     } else if (!paymentConfirmed || planType !== 'corp_diamond_pro' || accountType !== 'corp') {
-      onSubscriptionExpired(opts.accountId);
+      await onSubscriptionExpired(opts.accountId);
     }
   } catch (apiErr) {
     console.warn('[syncAccountPackage] api integration:', apiErr.message);
@@ -382,7 +382,7 @@ async function updatePackageStatus(accountId, status, meta) {
     patched.cancelRequestedBy = String(meta.requestedBy || 'system').slice(0, 40);
     try {
       const { onSubscriptionExpired } = require('./services/apiIntegration');
-      onSubscriptionExpired(accountId);
+      await onSubscriptionExpired(accountId);
     } catch (apiErr) {
       console.warn('[updatePackageStatus] api integration:', apiErr.message);
     }
@@ -458,9 +458,9 @@ async function applyReferralBonusDays(referrerAccountId, bonusDays) {
 // وتُبنى فوق نفس account-packages.json المُغذّى فعلياً من كل تفعيل حقيقي.
 const DIAMOND_ACTIVE_STATUSES = ['active', 'expiring_soon'];
 
-function isPackageAccessActive(accountId) {
+async function isPackageAccessActive(accountId) {
   if (!accountId) return false;
-  const rec = getAccountRecord(accountId);
+  const rec = await getAccountRecord(accountId);
   if (!rec) return false;
   const { getSubscriptionStatus, isPaymentConfirmed } = require('./services/entitlements');
   const status = getSubscriptionStatus(rec);
@@ -473,9 +473,9 @@ function isPackageAccessActive(accountId) {
   return DIAMOND_ACTIVE_STATUSES.includes(rec.status) || status === 'active' || status === 'expiring_soon';
 }
 
-function isDiamondActive(accountId) {
-  if (!isPackageAccessActive(accountId)) return false;
-  const rec = getAccountRecord(accountId);
+async function isDiamondActive(accountId) {
+  if (!(await isPackageAccessActive(accountId))) return false;
+  const rec = await getAccountRecord(accountId);
   if (!rec) return false;
   if (rec.isTrial || isTrialPackage(rec.pkgName, rec.price)) return false;
   const { isPaymentConfirmed } = require('./services/entitlements');
@@ -511,7 +511,7 @@ async function broadcastSMS(opts) {
   const message = String(opts.message || '').trim();
   if (!message) return { ok: false, error: 'message مطلوب' };
 
-  let recipients = getAllSubscribersWithPhone();
+  let recipients = (await getAllSubscribersWithPhone()) || [];
   if (opts.filterStatus && opts.filterStatus !== 'all') {
     recipients = recipients.filter((r) => r.status === opts.filterStatus);
   }
@@ -570,12 +570,12 @@ async function runLifecycleScan(accountsHelpers) {
       const isTenderPkg = String(accountId).includes('::tender');
       if (isVideoPkg) {
         // إيقاف إعلانات الفيديو في الموقع عند انتهاء باقة ADS — لا نلمس accounts.json
-        (await _deactivateExpiredVideoAds(String(accountId)).split('::')[0]);
+        await _deactivateExpiredVideoAds(String(accountId).split('::')[0]);
       } else if (!isTenderPkg) {
-        _applyServerAccountDowngrade(accountId, rec, accountsHelpers, 'expired');
+        await _applyServerAccountDowngrade(accountId, rec, accountsHelpers, 'expired');
         try {
           const { onSubscriptionExpired } = require('./services/apiIntegration');
-          onSubscriptionExpired(accountId);
+          await onSubscriptionExpired(accountId);
         } catch (apiErr) {
           console.warn('[lifecycle] api key suspend:', apiErr.message);
         }
@@ -588,10 +588,10 @@ async function runLifecycleScan(accountsHelpers) {
   return { ok: true, scannedAt: new Date(now).toISOString() };
 }
 
-function _applyServerAccountDowngrade(accountId, rec, accountsHelpers, subscriptionStatus) {
+async function _applyServerAccountDowngrade(accountId, rec, accountsHelpers, subscriptionStatus) {
   if (!accountsHelpers || typeof accountsHelpers.readAccounts !== 'function') return;
   try {
-    const accounts = accountsHelpers.readAccounts();
+    const accounts = await accountsHelpers.readAccounts();
     const idx = accounts.findIndex((a) => a.id === accountId);
     if (idx < 0) return;
     accounts[idx].planType = 'free';
@@ -601,7 +601,7 @@ function _applyServerAccountDowngrade(accountId, rec, accountsHelpers, subscript
     if (subscriptionStatus === 'expired' || subscriptionStatus === 'suspended') {
       accounts[idx].expired_pkg = accounts[idx].package || rec.pkgName;
     }
-    accountsHelpers.writeAccounts(accounts);
+    await accountsHelpers.writeAccounts(accounts);
   } catch (e) {
     console.error('[lifecycle-downgrade] accounts.json:', e.message);
   }
@@ -658,16 +658,16 @@ async function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelper
         const accountId = String(rawAccountId || '').split('::')[0];
         const price = Number((req.body || {}).price) || 0;
         if (price > 0 && accountId && accountsHelpers && typeof accountsHelpers.readAccounts === 'function') {
-          const accounts = accountsHelpers.readAccounts();
+          const accounts = await accountsHelpers.readAccounts();
           const idx = accounts.findIndex((a) => a.id === accountId);
           if (idx > -1) {
             const acc = accounts[idx];
             if (acc.referredBy && !acc.referralBonusGranted) {
-              const bonus = applyReferralBonusDays(acc.referredBy, REFERRAL_BONUS_DAYS);
-              if (bonus.ok) {
+              const bonus = await applyReferralBonusDays(acc.referredBy, REFERRAL_BONUS_DAYS);
+              if (bonus && bonus.ok) {
                 acc.referralBonusGranted = true;
                 accounts[idx] = acc;
-                accountsHelpers.writeAccounts(accounts);
+                await accountsHelpers.writeAccounts(accounts);
               }
             }
           }
@@ -695,15 +695,15 @@ async function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelper
     let mainAcc = null;
     if (accountsHelpers && typeof accountsHelpers.readAccounts === 'function') {
       try {
-        mainAcc = accountsHelpers.readAccounts().find((a) => a && a.id === baseId) || null;
+        mainAcc = (await accountsHelpers.readAccounts()).find((a) => a && a.id === baseId) || null;
       } catch (e) { /* ignore */ }
     }
     // حساب معلّق/غير معتمد: لا فواتير حتى مع توكن سجل الباقة القديم
     if (mainAcc && !isAccountActive(mainAcc)) {
       return res.status(401).json({ error: 'unauthorized' });
     }
-    const rec = getAccountRecord(req.params.id);
-    const mainRec = getAccountRecord(baseId);
+    const rec = await getAccountRecord(req.params.id);
+    const mainRec = await getAccountRecord(baseId);
     // الملكية أولاً — ثم 404 إن لم يوجد سجل (لا تعداد بدون توكن صالح)
     const pkgTokenOk = !!(rec && rec.accessToken && timingSafeEqualStr(token, rec.accessToken));
     const ownerOk = pkgTokenOk
@@ -733,10 +733,12 @@ async function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelper
   // localStorage) دورياً ليعرف أي مشتركين مسجَّلين لديه فعلاً باقة ماسية
   // نشطة قبل تفعيل أي رد شخصي بشخصية المنشأة. محمي بسرّ الأدمن العام لأنه
   // يُستدعى من خادم موثوق (لا من متصفح الزوار).
-  app.post('/api/account-package/diamond-status-batch', requireSharedSecret, (req, res) => {
+  app.post('/api/account-package/diamond-status-batch', requireSharedSecret, async (req, res) => {
     const ids = Array.isArray((req.body || {}).accountIds) ? req.body.accountIds.slice(0, 300) : [];
     const statuses = {};
-    ids.forEach((id) => { statuses[String(id)] = isDiamondActive(id); });
+    for (const id of ids) {
+      try { statuses[String(id)] = await isDiamondActive(id); } catch (e) { statuses[String(id)] = false; }
+    }
     res.json({ ok: true, statuses });
   });
 }
