@@ -85,7 +85,8 @@ async function main() {
   ok('complete agent tag', out.agent === 'widget');
   ok('request timeout set', sawOpts && sawOpts.timeout === 30_000);
   ok('request maxRetries set', sawOpts && sawOpts.maxRetries === 1);
-  ok('user content redacted in flight', JSON.stringify(sawParams.messages).includes('[PHONE]'));
+  ok('user content redacted in flight',
+    /\[PHONE(_\d+)?\]/.test(JSON.stringify(sawParams.messages)) && !JSON.stringify(sawParams.messages).includes('44112233'));
   ok('user content delimited', JSON.stringify(sawParams.messages).includes('UNTRUSTED_INPUT'));
   const sysBlob = Array.isArray(sawParams.system)
     ? sawParams.system.map((b) => (typeof b === 'string' ? b : (b && b.text) || '')).join('\n')

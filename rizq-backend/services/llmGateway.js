@@ -47,24 +47,100 @@ function _pushCall(rec) {
   }
 }
 
-/** تنقيح هواتف / بريد / NNI من نص يُرسل للنموذج */
-function redactPii(text) {
+/**
+ * كلمات تدل على أن الرقم «سعر» لا «هاتف» (أسعار العقار/السيارات غالباً 8 أرقام تبدأ بـ 2/3/4).
+ * PRICE_BEFORE: قبل الرقم مباشرة (≤ 15 حرفاً). PRICE_AFTER: عملة بعد الرقم مباشرة (≤ 8 أحرف).
+ * PHONE_CUE: إن وُجد قبل الرقم فهو هاتف دائماً (يتغلّب على قرينة السعر).
+ */
+const PRICE_BEFORE = /(سعر|السعر|بسعر|ثمن|الثمن|بثمن|إيجار|ايجار|الإيجار|prix|price|tarif|loyer|co[uû]t)/i;
+const PRICE_AFTER = /^[\s:.,\-]*(أوقية|اوقية|أوقيه|اوقيه|أوقيات|MRU|MRO|UM|ouguiya|ouguiyas|مليون|million)/i;
+const PHONE_CUE = /(رقم|هاتف|الهاتف|جوال|واتس|واتساب|اتصل|تلفون|تليفون|whatsapp|t[ée]l|phone|num[ée]ro|appel)/i;
+
+function _isPriceContext(full, offset, len) {
+  if (typeof full !== 'string' || typeof offset !== 'number') return false;
+  const before = full.slice(Math.max(0, offset - 20), offset);
+  if (PHONE_CUE.test(before)) return false;
+  const nearBefore = full.slice(Math.max(0, offset - 15), offset);
+  const after = full.slice(offset + len, offset + len + 12);
+  return PRICE_BEFORE.test(nearBefore) || PRICE_AFTER.test(after);
+}
+
+/**
+ * vault (اختياري، لكل طلب فقط): يستبدل القيمة الحقيقية برمز ثابت [PHONE_1] ويحفظ الأصل
+ * في الذاكرة لإعادته قبل تنفيذ الأدوات وقبل الرد على المستخدم. لا يُسجَّل ولا يُرسل للمزوّد.
+ * بدون vault: السلوك القديم ([PHONE] / [EMAIL] / [NNI]).
+ */
+function _mask(kind, value, vault) {
+  if (!vault) return '[' + kind + ']';
+  const key = kind + '|' + value;
+  if (vault.byValue.has(key)) return vault.byValue.get(key);
+  vault.counters[kind] = (vault.counters[kind] || 0) + 1;
+  const token = '[' + kind + '_' + vault.counters[kind] + ']';
+  vault.byValue.set(key, token);
+  vault.byToken.set(token, value);
+  return token;
+}
+
+function createPiiVault() {
+  return { byValue: new Map(), byToken: new Map(), counters: {} };
+}
+
+/** تنقيح هواتف / بريد / NNI من نص يُرسل للنموذج (الأسعار لا تُمس) */
+function redactPii(text, vault) {
   if (text == null) return text;
   if (typeof text !== 'string') return text;
   let s = text;
+  const phoneOrPrice = (m, ...rest) => {
+    const full = rest[rest.length - 1];
+    const offset = rest[rest.length - 2];
+    if (_isPriceContext(full, offset, m.length)) return m;
+    return _mask('PHONE', m, vault);
+  };
   // emails
-  s = s.replace(/[\w.+-]+@[\w-]+\.[\w.-]+/gi, '[EMAIL]');
+  s = s.replace(/[\w.+-]+@[\w-]+\.[\w.-]+/gi, (m) => _mask('EMAIL', m, vault));
   // +222 / 00222 Mauritania
-  s = s.replace(/(?:\+?222|00222)[\s.\-/]*(?:[\d٠-٩][\s.\-/]*){6,10}/g, '[PHONE]');
-  // local 8-digit MR mobiles continuous (2/3/4 + 7 digits)
-  s = s.replace(/\b[234][\d٠-٩]{7}\b/g, '[PHONE]');
-  // local 8-digit MR mobiles with separators
-  s = s.replace(/\b(?:2|3|4)[\s.\-/]?[\d٠-٩]{2}[\s.\-/]?[\d٠-٩]{2}[\s.\-/]?[\d٠-٩]{2}[\s.\-/]?[\d٠-٩]{2}\b/g, '[PHONE]');
+  s = s.replace(/(?:\+?222|00222)[\s.\-/]*(?:[\d٠-٩][\s.\-/]*){6,10}/g, (m) => _mask('PHONE', m, vault));
+  // local 8-digit MR mobiles continuous (2/3/4 + 7 digits) — except prices
+  s = s.replace(/\b[234][\d٠-٩]{7}\b/g, phoneOrPrice);
+  // local 8-digit MR mobiles with separators: 4 pairs "36 12 34 56" / "3 61 23 45 6"-style
+  s = s.replace(/\b[234][\d٠-٩][\s.\-/][\d٠-٩]{2}[\s.\-/][\d٠-٩]{2}[\s.\-/][\d٠-٩]{2}\b/g, phoneOrPrice);
+  s = s.replace(/\b(?:2|3|4)[\s.\-/]?[\d٠-٩]{2}[\s.\-/]?[\d٠-٩]{2}[\s.\-/]?[\d٠-٩]{2}[\s.\-/]?[\d٠-٩]{2}\b/g, phoneOrPrice);
+  // 4+4 grouping "3612 3456"
+  s = s.replace(/\b[234][\d٠-٩]{3}[\s.\-/][\d٠-٩]{4}\b/g, phoneOrPrice);
   // intl-ish +CC …
-  s = s.replace(/\+\d{1,3}[\s.\-/]*(?:[\d٠-٩][\s.\-/]*){6,12}/g, '[PHONE]');
-  // NNI-like 10–15 digit runs (avoid short prices)
-  s = s.replace(/\b\d{10,15}\b/g, '[NNI]');
+  s = s.replace(/\+\d{1,3}[\s.\-/]*(?:[\d٠-٩][\s.\-/]*){6,12}/g, (m) => _mask('PHONE', m, vault));
+  // NNI-like 10–15 digit runs (prices in old ouguiya can be long — keep them in price context)
+  s = s.replace(/\b\d{10,15}\b/g, (m, offset, full) => (
+    _isPriceContext(full, offset, m.length) ? m : _mask('NNI', m, vault)
+  ));
   return s;
+}
+
+/** إعادة القيم الحقيقية مكان الرموز (نص، مصفوفة، كائن) — للاستخدام بعد رد النموذج فقط */
+function restorePii(value, vault) {
+  if (!vault || !vault.byToken || vault.byToken.size === 0) return value;
+  if (typeof value === 'string') {
+    return value.replace(/\[(PHONE|EMAIL|NNI)_\d+\]/g, (t) => (vault.byToken.has(t) ? vault.byToken.get(t) : t));
+  }
+  if (Array.isArray(value)) return value.map((v) => restorePii(v, vault));
+  if (value && typeof value === 'object') {
+    const out = {};
+    Object.keys(value).forEach((k) => { out[k] = restorePii(value[k], vault); });
+    return out;
+  }
+  return value;
+}
+
+/** إخفاء القيم داخل كائن (مثل tool_use.input في سجل المحادثة) */
+function _maskDeep(value, vault) {
+  if (typeof value === 'string') return redactPii(value, vault);
+  if (Array.isArray(value)) return value.map((v) => _maskDeep(v, vault));
+  if (value && typeof value === 'object') {
+    const out = {};
+    Object.keys(value).forEach((k) => { out[k] = _maskDeep(value[k], vault); });
+    return out;
+  }
+  return value;
 }
 
 function wrapUntrusted(text, label) {
@@ -82,7 +158,7 @@ function isAlreadyWrapped(text) {
 function sanitizeText(text, opts) {
   opts = opts || {};
   let s = String(text == null ? '' : text);
-  if (!opts.skipRedaction) s = redactPii(s);
+  if (!opts.skipRedaction) s = redactPii(s, opts.vault);
   if (opts.wrap && !isAlreadyWrapped(s)) s = wrapUntrusted(s, opts.label || 'user');
   return s;
 }
@@ -97,12 +173,20 @@ function sanitizeContentBlock(block, opts) {
   }
   // image / tool_use / tool_result: leave structure; redact string tool_result content lightly
   if (block.type === 'tool_result' && typeof block.content === 'string' && !opts.skipRedaction) {
-    return Object.assign({}, block, { content: redactPii(block.content) });
+    return Object.assign({}, block, { content: redactPii(block.content, opts.vault) });
   }
   if (block.type === 'tool_result' && Array.isArray(block.content)) {
     return Object.assign({}, block, {
-      content: block.content.map((c) => sanitizeContentBlock(c, { skipRedaction: opts.skipRedaction, wrap: false })),
+      content: block.content.map((c) => sanitizeContentBlock(c, {
+        skipRedaction: opts.skipRedaction,
+        wrap: false,
+        vault: opts.vault,
+      })),
     });
+  }
+  // tool_use في سجل المحادثة يحمل قيماً حقيقية (أُعيدت بعد الرد السابق) — تُخفى قبل الإرسال
+  if (block.type === 'tool_use' && block.input && !opts.skipRedaction && opts.vault) {
+    return Object.assign({}, block, { input: _maskDeep(block.input, opts.vault) });
   }
   return block;
 }
@@ -121,6 +205,7 @@ function sanitizeMessages(messages, opts) {
           skipRedaction: opts.skipRedaction,
           wrap,
           label: opts.userLabel || 'user_message',
+          vault: opts.vault,
         }),
       });
     }
@@ -130,6 +215,7 @@ function sanitizeMessages(messages, opts) {
           skipRedaction: opts.skipRedaction,
           wrap: wrap && b && b.type === 'text',
           label: opts.userLabel || 'user_message',
+          vault: opts.vault,
         })),
       });
     }
@@ -187,10 +273,13 @@ async function complete(args) {
   }
 
   const started = Date.now();
+  // خزنة لهذا الطلب فقط: تُنشأ هنا، لا تُسجَّل، لا تُرسل، وتُرمى بعد الرد
+  const vault = args.skipRedaction ? null : createPiiVault();
   const params = sanitizeParams(args.params || {}, {
     skipRedaction: !!args.skipRedaction,
     wrapUserInput: args.wrapUserInput !== false,
     userLabel: args.userLabel,
+    vault,
   });
   const model = params.model || getAgentModel();
   params.model = model;
@@ -216,8 +305,23 @@ async function complete(args) {
       max_retries: getAnthropicMaxRetries(),
     };
     _pushCall(rec);
+    // إعادة القيم الحقيقية: نص الرد للمستخدم + مدخلات الأدوات (tool_use.input) قبل تنفيذها
+    let response = out.response;
+    if (vault && response && Array.isArray(response.content)) {
+      response = Object.assign({}, response, {
+        content: response.content.map((b) => {
+          if (b && b.type === 'text' && typeof b.text === 'string') {
+            return Object.assign({}, b, { text: restorePii(b.text, vault) });
+          }
+          if (b && b.type === 'tool_use' && b.input) {
+            return Object.assign({}, b, { input: restorePii(b.input, vault) });
+          }
+          return b;
+        }),
+      });
+    }
     return {
-      response: out.response,
+      response,
       model: out.model,
       fallback: out.fallback,
       agent,
@@ -247,6 +351,8 @@ async function complete(args) {
 module.exports = {
   complete,
   redactPii,
+  restorePii,
+  createPiiVault,
   wrapUntrusted,
   sanitizeText,
   sanitizeMessages,
