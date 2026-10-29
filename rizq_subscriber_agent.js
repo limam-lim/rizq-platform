@@ -384,7 +384,7 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
   if (profile.accountId) {
     try {
       const { isDiamondActive } = require('./rizq-backend/rizq_package_lifecycle_agent');
-      if (!isDiamondActive(profile.accountId)) {
+      if (!(await isDiamondActive(profile.accountId))) {
         return {
           text: 'انتهت باقتك الماسية أو لم يُؤكَّد الدفع بعد — جدّد الاشتراك لاستعادة الوكيل الذكي.',
           channel,
@@ -492,7 +492,7 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
         scrubbedClaim: true,
         force: true,
         tier: 'diamond',
-      });
+      }).catch(() => {});
     }
   } catch (eQ) { /* optional */ }
 

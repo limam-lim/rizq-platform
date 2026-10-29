@@ -457,8 +457,8 @@ async function getTenderEntitlements(accountId) {
   };
 }
 
-function resolveTenderPlanFromRef(ref) {
-  const pkg = findCatalogPackage(ref);
+async function resolveTenderPlanFromRef(ref) {
+  const pkg = await findCatalogPackage(ref);
   const pkgName = typeof ref === 'string' ? ref : String((ref && ref.pkgName) || (ref && ref.name) || '');
   const price = pkg ? pkg.price : (ref && ref.price);
   const pseudo = {
@@ -581,8 +581,8 @@ async function getInvestmentEntitlements(accountId) {
   };
 }
 
-function resolveInvestmentPlanFromRef(ref) {
-  const pkg = findCatalogPackage(ref);
+async function resolveInvestmentPlanFromRef(ref) {
+  const pkg = await findCatalogPackage(ref);
   const pkgName = typeof ref === 'string' ? ref : String((ref && ref.pkgName) || (ref && ref.name) || '');
   const price = pkg ? pkg.price : (ref && ref.price);
   const pseudo = {

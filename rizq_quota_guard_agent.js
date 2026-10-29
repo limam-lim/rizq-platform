@@ -164,7 +164,7 @@ function findRow(store, subscriberId, accountId) {
   return null;
 }
 
-function resolveRowLimits(row, opts) {
+async function resolveRowLimits(row, opts) {
   if (opts && opts.quotaLimits) {
     return {
       messages: opts.quotaLimits.messages + (row.topupMessages || 0),
@@ -177,9 +177,9 @@ function resolveRowLimits(row, opts) {
   let accountRec = null;
   try {
     const { getAccountRecord } = require('./rizq-backend/rizq_package_lifecycle_agent');
-    accountRec = getAccountRecord(row.accountId);
+    accountRec = await getAccountRecord(row.accountId);
   } catch (e) { /* optional */ }
-  const base = resolveQuotaLimitsForAccount(Object.assign({}, accountRec || {}, {
+  const base = await resolveQuotaLimitsForAccount(Object.assign({}, accountRec || {}, {
     diamondTier: tier,
     accountId: row.accountId,
   }));
@@ -195,16 +195,16 @@ function totalTokens(row) {
   return (row.tokensIn || 0) + (row.tokensOut || 0) + (row.tokensCacheRead || 0) + (row.tokensCacheWrite || 0);
 }
 
-function ratios(row, opts) {
-  const lim = resolveRowLimits(row, opts);
+async function ratios(row, opts) {
+  const lim = await resolveRowLimits(row, opts);
   return {
     messages: lim.messages ? (row.messages || 0) / lim.messages : 0,
     minutes: lim.minutes ? (row.minutes || 0) / lim.minutes : (row.minutes > 0 ? Infinity : 0),
   };
 }
 
-function overallPct(row, opts) {
-  const r = ratios(row, opts);
+async function overallPct(row, opts) {
+  const r = await ratios(row, opts);
   return Math.round(Math.max(r.messages, r.minutes) * 1000) / 10;
 }
 
@@ -212,8 +212,8 @@ function isTextChannel(channel) {
   return !channel || channel === 'call';
 }
 
-function quotaBlockedState(row, channel, opts) {
-  const lim = resolveRowLimits(row, opts);
+async function quotaBlockedState(row, channel, opts) {
+  const lim = await resolveRowLimits(row, opts);
   const ch = String(channel || 'widget').toLowerCase();
   if (ch === 'call') {
     if (!lim.audioAccess || lim.minutes <= 0) {
@@ -245,12 +245,12 @@ function estimateCallMinutes(text) {
   return Math.round((secs / 60) * 100) / 100;
 }
 
-function snapshotOf(row, opts) {
-  const lim = resolveRowLimits(row, opts);
-  const pct = overallPct(row, opts);
-  const r = ratios(row, opts);
-  const textBlock = quotaBlockedState(row, 'widget', opts);
-  const callBlock = quotaBlockedState(row, 'call', opts);
+async function snapshotOf(row, opts) {
+  const lim = await resolveRowLimits(row, opts);
+  const pct = await overallPct(row, opts);
+  const r = await ratios(row, opts);
+  const textBlock = await quotaBlockedState(row, 'widget', opts);
+  const callBlock = await quotaBlockedState(row, 'call', opts);
   return {
     subscriberId: row.subscriberId,
     accountId: row.accountId || '',
@@ -275,7 +275,7 @@ function snapshotOf(row, opts) {
     callBlocked: callBlock.blocked,
     blockReason: textBlock.blocked ? textBlock.reason : (callBlock.blocked ? callBlock.reason : null),
     alertLevel: row.alertLevel || 0,
-    topups: getTopupConfig(),
+    topups: await getTopupConfig(),
     pendingTopup: (row.topupRequests || []).some((a) => a.status === 'pending'),
     events: (row.events || []).slice(0, 8),
   };
@@ -307,9 +307,9 @@ async function _sendWhatsApp(to, text) {
   }
 }
 
-function alertMessage(level, snap) {
+async function alertMessage(level, snap) {
   const name = snap.businessName || 'منشأتك';
-  const topups = getTopupConfig();
+  const topups = await getTopupConfig();
   if (level >= 100) {
     return (
       '💎 رزق — انتهت الحصة\n' +
@@ -328,7 +328,7 @@ function alertMessage(level, snap) {
 }
 
 async function maybeAlert(row, opts) {
-  const pct = overallPct(row, opts);
+  const pct = await overallPct(row, opts);
   let level = row.alertLevel || 0;
   if (pct < 80) level = 0;
   let fired = 0;
@@ -339,8 +339,8 @@ async function maybeAlert(row, opts) {
     return row;
   }
   row.alertLevel = fired;
-  const snap = snapshotOf(row, opts);
-  const text = alertMessage(fired, snap);
+  const snap = await snapshotOf(row, opts);
+  const text = await alertMessage(fired, snap);
   row.events = [{ at: new Date().toISOString(), level: fired, pct: snap.pct, text }].concat(row.events || []).slice(0, 20);
   const wa = await _sendWhatsApp(row.phone || row.subscriberId, text);
   if (!wa.ok) {
@@ -382,9 +382,9 @@ async function assertQuotaAvailable(opts) {
   const { row } = getOrCreate(store, subscriberId, opts);
   store.subscribers[row.subscriberId] = row;
   await _save(store);
-  const block = quotaBlockedState(row, opts.channel || 'widget', opts);
+  const block = await quotaBlockedState(row, opts.channel || 'widget', opts);
   if (block.blocked) {
-    throw quotaError(block.reason, block.dimension, snapshotOf(row, opts));
+    throw quotaError(block.reason, block.dimension, await snapshotOf(row, opts));
   }
   return snapshotOf(row, opts);
 }
@@ -421,8 +421,8 @@ async function recordUsage(opts) {
   row.costUsd = Math.round(((row.costUsd || 0) + estimateUsd(opts.model, usage)) * 100000) / 100000;
   await maybeAlert(row, opts);
   await _save(store);
-  const snap = snapshotOf(row, opts);
-  snap.quotaBlocked = quotaBlockedState(row, opts.channel, opts).blocked;
+  const snap = await snapshotOf(row, opts);
+  snap.quotaBlocked = (await quotaBlockedState(row, opts.channel, opts)).blocked;
   return snap;
 }
 
@@ -452,11 +452,11 @@ async function isQuotaBlocked(subscriberId, accountId, channel, opts) {
   const store = await _load();
   const found = findRow(store, subscriberId, accountId);
   if (!found) return false;
-  return quotaBlockedState(_ensurePeriod(found.row), channel, opts).blocked;
+  return (await quotaBlockedState(_ensurePeriod(found.row), channel, opts)).blocked;
 }
 
 async function requestTopup({ subscriberId, accountId, businessName, phone, type }) {
-  const topups = getTopupConfig();
+  const topups = await getTopupConfig();
   const kind = String(type || 'text').toLowerCase() === 'voice' ? 'voice' : 'text';
   const spec = topups[kind];
   const store = await _load();
@@ -466,7 +466,7 @@ async function requestTopup({ subscriberId, accountId, businessName, phone, type
   store.topupRequests = Array.isArray(store.topupRequests) ? store.topupRequests : [];
   const pending = (store.topupRequests || []).concat(row.topupRequests || [])
     .find((a) => a.status === 'pending' && a.type === kind && (a.accountId === row.accountId || a.subscriberId === row.subscriberId));
-  if (pending) return { ok: true, already: true, request: pending, snapshot: snapshotOf(row) };
+  if (pending) return { ok: true, already: true, request: pending, snapshot: await snapshotOf(row) };
   const req = {
     id: 'TOPUP-' + Date.now(),
     type: kind,
@@ -483,7 +483,7 @@ async function requestTopup({ subscriberId, accountId, businessName, phone, type
   store.topupRequests.unshift(req);
   row.topupRequests = [req].concat(row.topupRequests || []).slice(0, 10);
   await _save(store);
-  return { ok: true, request: req, topup: spec, snapshot: snapshotOf(row) };
+  return { ok: true, request: req, topup: spec, snapshot: await snapshotOf(row) };
 }
 
 async function resolveTopup(requestId, status) {
@@ -498,7 +498,8 @@ async function resolveTopup(requestId, status) {
     const row = _ensurePeriod(found.row);
     if (req.type === 'voice') row.topupMinutes = (row.topupMinutes || 0) + Number(req.amount || 0);
     else row.topupMessages = (row.topupMessages || 0) + Number(req.amount || 0);
-    row.alertLevel = overallPct(row) >= 100 ? 100 : overallPct(row) >= 80 ? 80 : 0;
+    const pctNow = await overallPct(row);
+    row.alertLevel = pctNow >= 100 ? 100 : pctNow >= 80 ? 80 : 0;
     (row.topupRequests || []).forEach((a) => {
       if (a.id === requestId) {
         a.status = req.status;
@@ -508,40 +509,40 @@ async function resolveTopup(requestId, status) {
     store.subscribers[found.key] = row;
   }
   await _save(store);
-  return { ok: true, request: req, snapshot: found ? snapshotOf(found.row) : null };
+  return { ok: true, request: req, snapshot: found ? await snapshotOf(found.row) : null };
 }
 
 async function listAdminUsage(profiles) {
   const store = await _load();
   const seen = {};
   const rows = [];
-  function pushFrom(id, meta) {
+  async function pushFrom(id, meta) {
     const { row } = getOrCreate(store, id, meta);
     if (seen[row.subscriberId]) return;
     seen[row.subscriberId] = true;
-    rows.push(snapshotOf(row));
+    rows.push(await snapshotOf(row));
   }
-  (profiles || []).forEach((p) => {
+  for (const p of (profiles || [])) {
     const id = p.subscriberId || p.id;
-    if (!id) return;
-    pushFrom(id, {
+    if (!id) continue;
+    await pushFrom(id, {
       accountId: p.accountId || '',
       businessName: p.businessName || p.name || '',
       phone: p.phone || p.subscriberId || '',
       diamondTier: p.diamondTier,
     });
-  });
-  Object.keys(store.subscribers || {}).forEach((id) => {
-    if (!seen[id]) rows.push(snapshotOf(_ensurePeriod(store.subscribers[id])));
-  });
+  }
+  for (const id of Object.keys(store.subscribers || {})) {
+    if (!seen[id]) rows.push(await snapshotOf(_ensurePeriod(store.subscribers[id])));
+  }
   rows.sort((a, b) => b.pct - a.pct);
   const pending = (store.topupRequests || []).filter((a) => a.status === 'pending');
   const totalCost = rows.reduce((s, r) => s + (r.costUsd || 0), 0);
   await _save(store);
   return {
     period: currentPeriod(),
-    limits: getQuotaConfig(),
-    topups: getTopupConfig(),
+    limits: await getQuotaConfig(),
+    topups: await getTopupConfig(),
     count: rows.length,
     over80: rows.filter((r) => r.pct >= 80).length,
     blocked: rows.filter((r) => r.quotaBlocked).length,
@@ -599,7 +600,7 @@ function setupQuotaGuardAPI(app, requireSharedSecret, deps) {
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
     const snap = await getSnapshot(acc.phone || accountId, accountId);
     snap.businessName = snap.businessName || acc.name || '';
-    res.json({ ok: true, usage: snap, topups: getTopupConfig() });
+    res.json({ ok: true, usage: snap, topups: await getTopupConfig() });
   });
 
   app.post('/api/subscriber/quota/topup', async (req, res) => {

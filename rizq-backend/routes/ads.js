@@ -53,7 +53,7 @@ function parseOptionalCoords(b, opts) {
  * @param {import('express').Application} app
  * @param {object} deps
  */
-async function mountAdsRoutes(app, deps) {
+function mountAdsRoutes(app, deps) {
   const {
     requireAdminAuth,
     requireAdminPermission,

@@ -199,12 +199,12 @@ async function executeTool(toolName, toolInput, meta) {
 
     case 'get_pending_leads': {
       const { getPendingLeads, formatPendingLeadsForAdmin } = require('./rizq-backend/services/leadEscalation');
-      const pending = getPendingLeads();
+      const pending = (await getPendingLeads()) || [];
       return {
         source: 'leads.json',
         count: pending.length,
         leads: pending.slice(0, 20),
-        formatted: formatPendingLeadsForAdmin(pending),
+        formatted: await formatPendingLeadsForAdmin(pending),
       };
     }
 
@@ -368,7 +368,7 @@ async function askAgent({ channel, message, context = {} }) {
         grounded: false,
         scrubbedClaim: polished.scrubbedClaim,
         reason: polished.scrubbedClaim ? 'forbidden_claim' : 'package_ungrounded',
-      });
+      }).catch(() => {});
     } else if (polished.scrubbedClaim || (qualityMeta && !qualityMeta.pass)) {
       aq.maybeRecordWeakReply({
         message,
@@ -378,7 +378,7 @@ async function askAgent({ channel, message, context = {} }) {
         lang: 'ar',
         scrubbedClaim: polished.scrubbedClaim,
         force: !!polished.scrubbedClaim,
-      });
+      }).catch(() => {});
     }
   } catch (eQ) { /* optional */ }
 

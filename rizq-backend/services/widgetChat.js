@@ -575,7 +575,7 @@ async function handleWidgetChat(body) {
     };
   }
 
-  const pageFacts = resolvePageContextFacts(pageContext);
+  const pageFacts = await resolvePageContextFacts(pageContext);
   const catalogHint = inferCatalogFromConversation(text, body.history, pageContext, body.catalogHint);
   const packageFlow = isPackagePricingQuery(text);
   // Prefer live catalog from disk every pricing turn (avoid stale in-memory defaults).
@@ -775,7 +775,7 @@ async function handleWidgetChat(body) {
         lang: detectedLang,
         grounded: false,
         reason: 'ungrounded_widget',
-      });
+      }).catch(() => {});
     }
     const claim = aq.stripForbiddenClaims(validated.reply, detectedLang);
     if (claim.scrubbed) {
@@ -789,7 +789,7 @@ async function handleWidgetChat(body) {
         lang: detectedLang,
         scrubbedClaim: true,
         force: true,
-      });
+      }).catch(() => {});
     }
   } catch (eQ) { /* optional */ }
 

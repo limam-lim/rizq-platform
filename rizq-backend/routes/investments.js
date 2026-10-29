@@ -10,7 +10,7 @@ const rateLimit = require('express-rate-limit');
  * @param {import('express').Application} app
  * @param {object} deps
  */
-async function mountInvestmentsRoutes(app, deps) {
+function mountInvestmentsRoutes(app, deps) {
   const {
     requireAdminAuth,
     requireAdminPermission,
@@ -87,11 +87,11 @@ async function mountInvestmentsRoutes(app, deps) {
   });
 
   /** GET /api/investments — فرص منشورة (بما فيها الموافقة المبدئية) */
-  app.get('/api/investments', (req, res) => {
+  app.get('/api/investments', async (req, res) => {
     try {
-      const viewerId = resolveOptionalInvestViewer(req);
-      const access = getInvestAccessForViewer(viewerId);
-      const pub = investmentRoom.listPublic({ unlockContacts: !!access.canUnlockContacts });
+      const viewerId = await resolveOptionalInvestViewer(req);
+      const access = (await getInvestAccessForViewer(viewerId)) || {};
+      const pub = await investmentRoom.listPublic({ unlockContacts: !!access.canUnlockContacts });
       res.json(Object.assign({}, pub, {
         access: {
           contactsUnlocked: !!access.canUnlockContacts,
@@ -111,9 +111,9 @@ async function mountInvestmentsRoutes(app, deps) {
    * GET /api/investments/public-stats — عام، بلا تواصل حسّاس.
    * نفس خوارزمية اكتشاف الرئيسية: عدد + عيّنات مرتّبة بالأحدث، عتبة 3.
    */
-  app.get('/api/investments/public-stats', (req, res) => {
+  app.get('/api/investments/public-stats', async (req, res) => {
     try {
-      const pub = investmentRoom.listPublic({ unlockContacts: false });
+      const pub = (await investmentRoom.listPublic({ unlockContacts: false })) || {};
       const list = Array.isArray(pub.opportunities) ? pub.opportunities : [];
       const teasers = list.slice(0, 20).map((o) => ({
         id: o.id,
@@ -160,9 +160,9 @@ async function mountInvestmentsRoutes(app, deps) {
   });
 
   /** GET /api/admin/investments — قائمة كاملة للأدمن (بما فيها المعلّقة) */
-  app.get('/api/admin/investments', requireInvAdmin, (req, res) => {
+  app.get('/api/admin/investments', requireInvAdmin, async (req, res) => {
     try {
-      res.json(investmentRoom.listAdmin({
+      res.json(await investmentRoom.listAdmin({
         status: req.query.status || null,
         tier: req.query.tier || null,
       }));
@@ -172,11 +172,11 @@ async function mountInvestmentsRoutes(app, deps) {
   });
 
   /** POST /api/admin/investments/:id/decision — نقض/تأكيد الموافقة المبدئية */
-  app.post('/api/admin/investments/:id/decision', requireInvAdmin, (req, res) => {
+  app.post('/api/admin/investments/:id/decision', requireInvAdmin, async (req, res) => {
     try {
       const action = (req.body && req.body.action) || '';
       const reviewer = (req.adminUser && (req.adminUser.name || req.adminUser.user)) || 'admin';
-      const out = investmentRoom.decideOpportunity(req.params.id, action, reviewer);
+      const out = await investmentRoom.decideOpportunity(req.params.id, action, reviewer);
       res.json(out);
     } catch (err) {
       const status = err.status && err.status >= 400 ? err.status : 500;
@@ -185,9 +185,9 @@ async function mountInvestmentsRoutes(app, deps) {
   });
 
   /** GET /api/admin/investments/daily-report — ملخص تشغيلي (أدمن فقط) */
-  app.get('/api/admin/investments/daily-report', requireInvAdmin, (req, res) => {
+  app.get('/api/admin/investments/daily-report', requireInvAdmin, async (req, res) => {
     try {
-      const digest = investmentRoom.buildDailyDigest();
+      const digest = await investmentRoom.buildDailyDigest();
       res.json({ ok: true, digest, opsConfigured: !!investmentRoom.opsEmail() });
     } catch (err) {
       res.status(500).json({ ok: false, error: 'digest_failed' });
@@ -268,9 +268,9 @@ async function mountInvestmentsRoutes(app, deps) {
     const token = (typeof extractAccountToken === 'function' ? extractAccountToken(req) : '') || '';
     const acc = verifyAccountOwner && await verifyAccountOwner(req.params.id, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
-    const ent = getInvestAccessForViewer(req.params.id);
+    const ent = (await getInvestAccessForViewer(req.params.id)) || {};
     const rec = typeof getAccountRecord === 'function'
-      ? getAccountRecord(req.params.id + '::investment')
+      ? await getAccountRecord(req.params.id + '::investment')
       : null;
     const safeRec = rec ? (() => { const { accessToken, ...rest } = rec; return rest; })() : null;
     res.json({
@@ -291,13 +291,13 @@ async function mountInvestmentsRoutes(app, deps) {
    * الدخول الكامل يتطلب باقة فعّالة؛ كشف التواصل يتطلب باقة مدفوعة.
    * يُسجَّل بعد المسارات الثابتة (package/status، admin، …).
    */
-  app.get('/api/investments/:id', (req, res) => {
+  app.get('/api/investments/:id', async (req, res) => {
     try {
-      const viewerId = resolveOptionalInvestViewer(req);
-      const access = getInvestAccessForViewer(viewerId);
+      const viewerId = await resolveOptionalInvestViewer(req);
+      const access = (await getInvestAccessForViewer(viewerId)) || {};
       const enterRoom = !!access.canEnterDetailRoom || !!access.subscribed;
       const unlock = !!access.canUnlockContacts;
-      const opportunity = investmentRoom.getPublicById(req.params.id, {
+      const opportunity = await investmentRoom.getPublicById(req.params.id, {
         enterRoom,
         unlockContacts: unlock,
       });

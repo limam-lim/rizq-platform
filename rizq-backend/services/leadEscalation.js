@@ -295,7 +295,7 @@ async function dispatchTelegramLeadAlert(leadPayload, meta, leadId) {
     };
   }
   if (leadId) {
-    patchLead(leadId, {
+    await patchLead(leadId, {
       telegramSent: telegram.sent,
       telegramMessageId: telegram.messageId || null,
       telegramError: telegram.error || null,
@@ -325,7 +325,7 @@ async function createLeadAndNotify(input, meta) {
   lead.businessName = extractBusinessNameFromMeta(enrichMeta, lead);
   lead = enrichLeadWithLivePricing(lead, meta.lang || 'ar', enrichMeta);
 
-  const dup = findRecentDuplicate(lead.whatsapp, 3600000);
+  const dup = await findRecentDuplicate(lead.whatsapp, 3600000);
   if (dup) {
     console.log('[lead-escalation] duplicate pending lead', dup.id, 'telegramSent:', !!dup.telegramSent);
     const resolved = resolveLeadPackageQuote(lead, enrichMeta, meta.lang || 'ar');
@@ -346,7 +346,7 @@ async function createLeadAndNotify(input, meta) {
       || String(dup.package || '') !== String(dupLead.package || '')
     );
     if (dupQuote && dup.id) {
-      patchLead(dup.id, {
+      await patchLead(dup.id, {
         package: dupLead.package,
         packageId: dupLead.packageId,
         packagePrice: dupLead.packagePrice,
@@ -392,7 +392,7 @@ async function createLeadAndNotify(input, meta) {
     });
   }
 
-  const saved = saveLead({
+  const saved = await saveLead({
     businessName: lead.businessName || 'غير محدد',
     whatsapp: lead.whatsapp,
     package: lead.package || 'غير محددة',
@@ -415,7 +415,7 @@ async function createLeadAndNotify(input, meta) {
   });
 
   const summary = buildLeadSummary(meta.kind || 'lead', lead);
-  saveTicket({
+  await saveTicket({
     source: meta.source || meta.channel || 'lead-api',
     type: meta.kind || 'subscription',
     summary,

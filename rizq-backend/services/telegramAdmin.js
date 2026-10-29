@@ -536,16 +536,17 @@ async function isAuthorizedChat(chatId) {
   return (await buildAlertChatCandidates()).includes(String(chatId));
 }
 
-function findSubRequestById(readSubRequests, requestId) {
-  const list = typeof readSubRequests === 'function' ? readSubRequests() : [];
-  const idx = list.findIndex((r) => r.id === requestId);
+async function findSubRequestById(readSubRequests, requestId) {
+  const raw = typeof readSubRequests === 'function' ? await readSubRequests() : [];
+  const list = Array.isArray(raw) ? raw : [];
+  const idx = list.findIndex((r) => r && r.id === requestId);
   if (idx === -1) return { idx: -1, list, req: null };
   return { idx, list, req: list[idx] };
 }
 
-function patchSubRequest(list, idx, patch, writeSubRequests) {
+async function patchSubRequest(list, idx, patch, writeSubRequests) {
   list[idx] = Object.assign({}, list[idx], patch);
-  writeSubRequests(list);
+  await writeSubRequests(list);
   return list[idx];
 }
 
@@ -558,12 +559,13 @@ async function processNewSubRequest(requestId, deps) {
   const { readSubRequests, writeSubRequests, anthropic, readAccounts } = deps;
   if (typeof readSubRequests !== 'function' || typeof writeSubRequests !== 'function') return;
 
-  const { idx, list, req } = findSubRequestById(readSubRequests, requestId);
+  const { idx, list, req } = await findSubRequestById(readSubRequests, requestId);
   if (idx === -1 || !req) return;
   if (req.status !== 'pending') return;
 
-  const accRow = typeof readAccounts === 'function'
-    ? readAccounts().find((a) => a.id === req.accountId)
+  const accList = typeof readAccounts === 'function' ? await readAccounts() : [];
+  const accRow = Array.isArray(accList)
+    ? accList.find((a) => a && a.id === req.accountId) || null
     : null;
   req._phone = (accRow && accRow.phone) || '';
   req._accountPhone = (accRow && accRow.phone) || '';
@@ -574,7 +576,7 @@ async function processNewSubRequest(requestId, deps) {
   let serverExpectedPrice = Number(req.expectedPrice) || Number(req.price) || 0;
   try {
     const { findCatalogPackage } = require('./catalogConfig');
-    const catalogPkg = findCatalogPackage({ pkgName: req.pkg, name: req.pkg, id: req.pkg });
+    const catalogPkg = await findCatalogPackage({ pkgName: req.pkg, name: req.pkg, id: req.pkg });
     if (catalogPkg && Number(catalogPkg.price) > 0) {
       serverExpectedPrice = Number(catalogPkg.price);
     }
@@ -624,16 +626,16 @@ async function processNewSubRequest(requestId, deps) {
     provisionalAt: score.provisionalAt,
     provisionalBy: score.provisionalBy,
   };
-  patchSubRequest(list, idx, patch, writeSubRequests);
+  await patchSubRequest(list, idx, patch, writeSubRequests);
 
   let autoActivated = false;
   // موافقة تلقائية فقط إن شغّل الرؤية فعلاً وأعاد أخضر — بلا ثقة بعميل
   if (visionRan && shouldAutoApprove(score.provisionalTier)) {
-    const fresh = findSubRequestById(readSubRequests, requestId);
+    const fresh = await findSubRequestById(readSubRequests, requestId);
     if (fresh.idx !== -1 && fresh.req && fresh.req.status === 'pending') {
       const activation = await activateSubRequest(fresh.req, deps);
       if (activation && activation.ok) {
-        patchSubRequest(fresh.list, fresh.idx, {
+        await patchSubRequest(fresh.list, fresh.idx, {
           status: 'approved',
           reviewedAt: new Date().toISOString(),
           reviewedVia: 'agent_provisional',
@@ -651,7 +653,7 @@ async function processNewSubRequest(requestId, deps) {
   if (!isConfigured()) return;
 
   try {
-    const latest = findSubRequestById(readSubRequests, requestId);
+    const latest = await findSubRequestById(readSubRequests, requestId);
     const notifyReq = latest.req || req;
     notifyReq._phone = req._phone;
     notifyReq._accountPhone = req._accountPhone;
@@ -662,7 +664,7 @@ async function processNewSubRequest(requestId, deps) {
       autoApproved: autoActivated,
     });
     if (msg && msg.message_id && latest.idx !== -1) {
-      patchSubRequest(latest.list, latest.idx, {
+      await patchSubRequest(latest.list, latest.idx, {
         telegramChatId: String(msg.chat?.id || ADMIN_CHAT_ID()),
         telegramMessageId: msg.message_id,
       }, writeSubRequests);
@@ -735,7 +737,7 @@ async function handleIncomingMessage(message, deps) {
     /(?:هل\s*(?:هناك|يوجد)\s*طلب|طلبات?\s*(?:جديد|معلق|pending)|عرض\s*الطلبات|pending\s*leads?)/i.test(text)
   )) {
     const { getPendingLeads, formatPendingLeadsForAdmin } = require('./leadEscalation');
-    const adminReply = formatPendingLeadsForAdmin(getPendingLeads());
+    const adminReply = String((await formatPendingLeadsForAdmin(await getPendingLeads())) || '');
     await telegramApi('sendMessage', {
       chat_id: chatId,
       text: adminReply.slice(0, 4096),
@@ -825,7 +827,7 @@ async function handleCallbackQuery(callbackQuery, deps) {
   }
 
   const { readSubRequests, writeSubRequests } = deps;
-  const { idx, list, req } = findSubRequestById(readSubRequests, requestId);
+  const { idx, list, req } = await findSubRequestById(readSubRequests, requestId);
 
   if (idx === -1 || !req) {
     await telegramApi('answerCallbackQuery', {
@@ -846,7 +848,7 @@ async function handleCallbackQuery(callbackQuery, deps) {
   }
 
   if (action === 'reject') {
-    patchSubRequest(list, idx, {
+    await patchSubRequest(list, idx, {
       status: 'rejected',
       reviewedAt: new Date().toISOString(),
       reviewedVia: 'telegram',
@@ -868,7 +870,7 @@ async function handleCallbackQuery(callbackQuery, deps) {
     return { ok: false, reason: 'activation_failed', error: activation.error };
   }
 
-  patchSubRequest(list, idx, {
+  await patchSubRequest(list, idx, {
     status: 'approved',
     reviewedAt: new Date().toISOString(),
     reviewedVia: 'telegram',

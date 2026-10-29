@@ -30,7 +30,9 @@
     "seed:graduation:clear": "node scripts/seed-graduation-demo.js --clear",
     "purge:demo": "node scripts/purge-demo.js",
     "purge:demo:confirm": "node scripts/purge-demo.js --confirm",
-    "launch:check": "node scripts/launch-check.js"
+    "launch:check": "node scripts/launch-check.js",
+    "test:await": "node scripts/check-unawaited-async.js",
+    "test:async-regressions": "node -r dotenv/config scripts/test-async-regressions.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
@@ -60,5 +62,9 @@
   },
   "engines": {
     "node": ">=22"
+  },
+  "devDependencies": {
+    "acorn": "^8.14.0",
+    "acorn-walk": "^8.3.4"
   }
 }

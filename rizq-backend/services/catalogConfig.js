@@ -89,8 +89,8 @@ async function getAllCatalogPackages() {
   return out;
 }
 
-function resolvePackageBoostDays(ref) {
-  const pkg = findCatalogPackage(ref);
+async function resolvePackageBoostDays(ref) {
+  const pkg = await findCatalogPackage(ref);
   if (pkg && pkg.boostDays) return Math.max(1, Number(pkg.boostDays) || 3);
   if (pkg && pkg.id && String(pkg.id).indexOf('boost') !== -1) return 3;
   const name = typeof ref === 'string' ? ref : String((ref && ref.pkgName) || (ref && ref.name) || '');
@@ -122,10 +122,10 @@ async function findCatalogPackage(ref) {
   return null;
 }
 
-function resolveDiamondTier(ref) {
+async function resolveDiamondTier(ref) {
   const pkg = typeof ref === 'object' && ref !== null && !ref.pkgName && !ref.name && !ref.id
     ? null
-    : findCatalogPackage(ref) || (typeof ref === 'object' ? ref : null);
+    : (await findCatalogPackage(ref)) || (typeof ref === 'object' ? ref : null);
 
   const id = String((pkg && pkg.id) || (typeof ref === 'string' ? ref : ref && ref.id) || ref && ref.planType || '').toLowerCase();
   const explicit = String((pkg && pkg.diamondTier) || (ref && ref.diamondTier) || '').toLowerCase();
@@ -150,8 +150,8 @@ function resolveDiamondTier(ref) {
   return 'diamond_standard';
 }
 
-function isDiamondPackageRef(ref) {
-  return !!resolveDiamondTier(ref);
+async function isDiamondPackageRef(ref) {
+  return !!(await resolveDiamondTier(ref));
 }
 
 async function getTierQuotaLimits(tierKey, pkgOverride) {
@@ -172,14 +172,13 @@ async function resolveQuotaLimitsForAccount(rec) {
   if (!rec) {
     return getTierQuotaLimits('diamond_standard');
   }
-  // resolveDiamondTier is sync over ref fields; do not pass an unawaited
-  // findCatalogPackage Promise into getTierQuotaLimits.
-  const tier = resolveDiamondTier({
+  // resolveDiamondTier is async (catalog lookup) — always await it.
+  const tier = (await resolveDiamondTier({
     id: rec.packageId || rec.pkgId,
     pkgName: rec.pkgName,
     planType: rec.planType,
     diamondTier: rec.diamondTier,
-  }) || 'diamond_standard';
+  })) || 'diamond_standard';
   const pkg = await findCatalogPackage(rec.packageId || rec.pkgId || rec.pkgName);
   return getTierQuotaLimits(tier, pkg);
 }

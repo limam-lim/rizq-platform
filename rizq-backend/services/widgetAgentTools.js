@@ -18,12 +18,17 @@ const ACCOUNT_PUBLIC = [
   'facebook', 'thumb', 'cover', 'tagline', 'status', 'approvedAt', 'createdAt',
 ];
 
-async function isBoosted(adId) {
-  const b = await readAdBoosts()[adId];
+async function loadBoostsMap() {
+  try { return (await readAdBoosts()) || {}; } catch (e) { return {}; }
+}
+
+/** boosts: map from loadBoostsMap() (sync check — avoid one DB read per ad) */
+function isBoosted(adId, boosts) {
+  const b = boosts ? boosts[adId] : null;
   return !!(b && b.endsAt && new Date(b.endsAt).getTime() > Date.now());
 }
 
-function publicAd(ad) {
+function publicAd(ad, boosts) {
   if (!ad) return null;
   return {
     id: ad.id,
@@ -39,7 +44,7 @@ function publicAd(ad) {
     accountId: ad.accountId || '',
     seller_trust_score: ad.seller_trust_score,
     status: ad.status,
-    boosted: isBoosted(ad.id),
+    boosted: isBoosted(ad.id, boosts && typeof boosts === 'object' ? boosts : null),
     stockQty: ad.stockQty,
     hasPhone: !!(ad.phone && String(ad.phone).trim()),
     hasWhatsapp: !!(ad.whatsapp && String(ad.whatsapp).trim()),
@@ -57,7 +62,7 @@ function publicAccount(acc) {
 }
 
 async function reviewStats(targetId) {
-  const list = await readReviews()[targetId] || [];
+  const list = (await readReviews())[targetId] || [];
   if (!list.length) return { count: 0, average: 0 };
   const sum = list.reduce((s, r) => s + (Number(r.rating) || 0), 0);
   return { count: list.length, average: Math.round((sum / list.length) * 10) / 10 };
@@ -179,7 +184,7 @@ async function executeWidgetToolSync(toolName, input, meta) {
       const ad = (await readAds()).find((a) => String(a.id) === id);
       if (!ad) return { ok: false, error: 'ad_not_found', ad_id: id };
       if (ad.status !== 'active') return { ok: false, error: 'ad_not_active', status: ad.status };
-      return { ok: true, ad: publicAd(ad) };
+      return { ok: true, ad: publicAd(ad, await loadBoostsMap()) };
     }
     case 'search_ads': {
       const q = input || {};
@@ -192,7 +197,8 @@ async function executeWidgetToolSync(toolName, input, meta) {
       }
       list = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       const limit = Math.max(1, Math.min(10, Number(q.limit) || 5));
-      return { ok: true, total: list.length, ads: list.slice(0, limit).map(publicAd) };
+      const boosts = await loadBoostsMap();
+      return { ok: true, total: list.length, ads: list.slice(0, limit).map((a) => publicAd(a, boosts)) };
     }
     case 'get_seller_profile': {
       const accId = String((input || {}).account_id || '').trim();
@@ -202,7 +208,7 @@ async function executeWidgetToolSync(toolName, input, meta) {
     }
     case 'get_seller_reputation': {
       const accId = String((input || {}).account_id || '').trim();
-      const stats = reviewStats(accId);
+      const stats = await reviewStats(accId);
       let trust = null;
       if (input.ad_id) {
         const ad = (await readAds()).find((a) => String(a.id) === String(input.ad_id));
@@ -218,7 +224,7 @@ async function executeWidgetToolSync(toolName, input, meta) {
       return getLivePackagesForAI(lang, { catalog });
     }
     case 'create_support_ticket': {
-      const rec = saveTicket({
+      const rec = await saveTicket({
         source: 'widget',
         type: (input || {}).type,
         summary: (input || {}).summary,
@@ -265,7 +271,7 @@ async function executeWidgetTool(toolName, input, meta) {
 }
 
 /** تحميل سياق الصفحة من الخادم (تحقق من DB) */
-function resolvePageContextFacts(pageContext) {
+async function resolvePageContextFacts(pageContext) {
   const facts = { ads: [], sellers: [] };
   if (!pageContext || typeof pageContext !== 'object') return facts;
 
@@ -274,19 +280,19 @@ function resolvePageContextFacts(pageContext) {
   if (pageContext.urlAdId) adIds.push(String(pageContext.urlAdId));
 
   const seen = new Set();
-  adIds.forEach((id) => {
-    if (!id || seen.has(id)) return;
+  for (const id of adIds) {
+    if (!id || seen.has(id)) continue;
     seen.add(id);
-    const r = executeWidgetToolSync('get_ad_details', { ad_id: id });
+    const r = await executeWidgetToolSync('get_ad_details', { ad_id: id });
     if (r.ok && r.ad) {
       facts.ads.push(r.ad);
       if (r.ad.accountId) {
-        const seller = executeWidgetToolSync('get_seller_profile', { account_id: r.ad.accountId });
-        const rep = executeWidgetToolSync('get_seller_reputation', { account_id: r.ad.accountId, ad_id: r.ad.id });
+        const seller = await executeWidgetToolSync('get_seller_profile', { account_id: r.ad.accountId });
+        const rep = await executeWidgetToolSync('get_seller_reputation', { account_id: r.ad.accountId, ad_id: r.ad.id });
         if (seller.ok) facts.sellers.push(Object.assign({}, seller.seller, { reputation: rep }));
       }
     }
-  });
+  }
   return facts;
 }
 

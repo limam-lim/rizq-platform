@@ -10,7 +10,7 @@ const rateLimit = require('express-rate-limit');
  * @param {import('express').Application} app
  * @param {object} deps
  */
-async function mountMarketingRoutes(app, deps) {
+function mountMarketingRoutes(app, deps) {
   const { requireAdminPermission } = deps;
   const marketing = require('../services/marketingAgent');
 

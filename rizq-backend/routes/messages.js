@@ -92,7 +92,7 @@ async function issueOrReuseGuestThreadToken(threadKey, phoneDigits, presentedTok
  * @param {import('express').Application} app
  * @param {object} deps
  */
-async function mountMessagesRoutes(app, deps) {
+function mountMessagesRoutes(app, deps) {
   const {
     verifyAccountOwner,
     extractAccountToken,

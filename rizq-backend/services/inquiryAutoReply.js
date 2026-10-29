@@ -74,7 +74,8 @@ async function maybeAutoReplyToInquiry({ sellerAccount, buyerMessage, threadKey,
   } catch (eOps) { /* */ }
 
   const phone = sellerAccount.phone || sellerAccount.whatsapp || '';
-  if (phone && !isActive(phone)) return null;
+  // kill switch per subscriber phone — isActive is async (DB-backed)
+  if (phone && !(await isActive(phone))) return null;
 
   try {
     await assertAiAgentAccess(sellerAccount, { channel: 'inquiry' });
@@ -83,7 +84,7 @@ async function maybeAutoReplyToInquiry({ sellerAccount, buyerMessage, threadKey,
     return null;
   }
 
-  const all = readMessagesFn();
+  const all = (await readMessagesFn()) || [];
   const threadMsgs = all
     .filter((m) => m.threadKey === threadKey)
     .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
@@ -135,8 +136,10 @@ async function maybeAutoReplyToInquiry({ sellerAccount, buyerMessage, threadKey,
     createdAt: new Date().toISOString(),
   };
 
-  all.push(rec);
-  writeMessagesFn(all);
+  // re-read just before writing: the AI call is slow and new messages may have arrived meanwhile
+  const latest = (await readMessagesFn()) || [];
+  latest.push(rec);
+  await writeMessagesFn(latest);
   console.log('[inquiry-auto-reply]', sellerAccount.id, threadKey, rec.body.slice(0, 80) + '…');
   return rec;
 }

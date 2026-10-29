@@ -23,8 +23,8 @@ const PLAUSIBILITY_AR = {
   unreviewed: 'لم يُراجع',
 };
 
-function resolvePackageDurationDays(pkgName) {
-  const pkg = findCatalogPackage(pkgName);
+async function resolvePackageDurationDays(pkgName) {
+  const pkg = await findCatalogPackage(pkgName);
   if (pkg && pkg.durationDays) return Math.max(1, Number(pkg.durationDays) || 30);
   return 30;
 }
@@ -41,14 +41,15 @@ function computeActivationPeriod(days, existingRecord) {
   return { periodStart: now.toISOString(), periodEnd: ends.toISOString(), now };
 }
 
-function getAccountInfo(accountId, readAccounts) {
-  const list = typeof readAccounts === 'function' ? readAccounts() : [];
-  return list.find((a) => a.id === accountId) || null;
+async function getAccountInfo(accountId, readAccounts) {
+  const raw = typeof readAccounts === 'function' ? await readAccounts() : [];
+  const list = Array.isArray(raw) ? raw : [];
+  return list.find((a) => a && a.id === accountId) || null;
 }
 
 async function activateVideoAdOnServer(req) {
   if (!req.videoUrl) return { ok: true, skipped: true, reason: 'no_video_url' };
-  const cfg = readSiteConfigRaw();
+  const cfg = (await readSiteConfigRaw()) || {};
   const prev = (cfg.videoAds && typeof cfg.videoAds === 'object') ? cfg.videoAds : {};
   const videoAds = {
     hero: prev.hero || [],
@@ -59,7 +60,7 @@ async function activateVideoAdOnServer(req) {
     stats: prev.stats && typeof prev.stats === 'object' ? prev.stats : {},
   };
 
-  const pkgDef = findCatalogPackage(req.pkg);
+  const pkgDef = await findCatalogPackage(req.pkg);
   const packageId = (pkgDef && pkgDef.id) || req.packageId || null;
   const plan = resolveMediaPlanFromPackageRef(req.pkg, packageId, req.price);
   const target = plan.heroPlacement ? 'hero' : 'popup';
@@ -70,7 +71,7 @@ async function activateVideoAdOnServer(req) {
     (videoAds[slot] || []).some((a) => req.accountId && a.accountId === req.accountId)
   );
   if (!existingAnywhere && req.accountId) {
-    const gate = assertCanAddMediaVideo(req.accountId, videoAds);
+    const gate = await assertCanAddMediaVideo(req.accountId, videoAds);
     // عند أول تفعيل مباشرة بعد sync قد لا يكون السجل جاهزاً — نستخدم خطة الباقة كحد
     if (!gate.ok && gate.code === 'media_video_quota') {
       return { ok: false, error: gate.code, message: gate.message, limit: gate.limit };
@@ -118,19 +119,19 @@ async function activateVideoAdOnServer(req) {
   return { ok: true, slot: target, planType: plan.planType };
 }
 
-function maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts) {
+async function maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts) {
   try {
     const price = Number(req.price) || 0;
     if (price <= 0 || !accRow || !accRow.referredBy || accRow.referralBonusGranted) return;
     if (typeof readAccounts !== 'function' || typeof writeAccounts !== 'function') return;
     const { applyReferralBonusDays, REFERRAL_BONUS_DAYS } = require('../rizq_package_lifecycle_agent');
-    const bonus = applyReferralBonusDays(accRow.referredBy, REFERRAL_BONUS_DAYS || 15);
-    if (!bonus.ok) return;
-    const list = readAccounts();
+    const bonus = await applyReferralBonusDays(accRow.referredBy, REFERRAL_BONUS_DAYS || 15);
+    if (!bonus || !bonus.ok) return;
+    const list = await readAccounts();
     const idx = list.findIndex((a) => a.id === req.accountId);
     if (idx > -1) {
       list[idx].referralBonusGranted = true;
-      writeAccounts(list);
+      await writeAccounts(list);
     }
   } catch (refErr) {
     console.warn('[subRequestActivation] referral bonus:', refErr.message);
@@ -159,19 +160,19 @@ async function activateSubRequest(req, deps) {
     return { ok: false, error: 'syncAccountPackage_missing' };
   }
 
-  const accRow = getAccountInfo(req.accountId, readAccounts);
+  const accRow = await getAccountInfo(req.accountId, readAccounts);
   const accountName = req.account || accRow?.name || req.accountId;
   const accountPhone = accRow?.phone || '';
   const accountEmail = accRow?.email || '';
   const accountType = accRow?.type || 'individual';
-  const days = resolvePackageDurationDays(req.pkg);
+  const days = await resolvePackageDurationDays(req.pkg);
   const category = req.category || 'package';
 
   try {
     if (category === 'tender') {
-      const pkgDef = findCatalogPackage(req.pkg);
+      const pkgDef = await findCatalogPackage(req.pkg);
       const isTrial = isTrialPackage(req.pkg, req.price);
-      const { periodStart, periodEnd, now } = computeActivationPeriod(days, getAccountRecord(req.accountId + '::tender'));
+      const { periodStart, periodEnd, now } = computeActivationPeriod(days, await getAccountRecord(req.accountId + '::tender'));
       const result = await syncAccountPackage({
         accountId: req.accountId + '::tender',
         accountName,
@@ -190,14 +191,14 @@ async function activateSubRequest(req, deps) {
         isTrial,
       });
       if (!result.ok) return result;
-      maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts);
+      await maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts);
       return { ok: true, category, result, accountName };
     }
 
     if (category === 'investment') {
-      const pkgDef = findCatalogPackage(req.pkg);
+      const pkgDef = await findCatalogPackage(req.pkg);
       const isTrial = isTrialPackage(req.pkg, req.price);
-      const { periodStart, periodEnd, now } = computeActivationPeriod(days, getAccountRecord(req.accountId + '::investment'));
+      const { periodStart, periodEnd, now } = computeActivationPeriod(days, await getAccountRecord(req.accountId + '::investment'));
       const result = await syncAccountPackage({
         accountId: req.accountId + '::investment',
         accountName,
@@ -216,7 +217,7 @@ async function activateSubRequest(req, deps) {
         isTrial,
       });
       if (!result.ok) return result;
-      maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts);
+      await maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts);
       return { ok: true, category, result, accountName };
     }
 
@@ -224,13 +225,13 @@ async function activateSubRequest(req, deps) {
       if (typeof readAccounts !== 'function' || typeof writeAccounts !== 'function') {
         return { ok: false, error: 'accounts_io_missing' };
       }
-      const list = readAccounts();
+      const list = await readAccounts();
       const idx = list.findIndex((a) => a.id === req.accountId);
       if (idx === -1) return { ok: false, error: 'account_not_found' };
-      const grantDays = resolvePackageDurationDays(req.pkg) || 365;
+      const grantDays = (await resolvePackageDurationDays(req.pkg)) || 365;
       list[idx].verifiedPlus = true;
       list[idx].verifiedPlusExpiresAt = new Date(Date.now() + grantDays * 86400000).toISOString();
-      writeAccounts(list);
+      await writeAccounts(list);
       return { ok: true, category, verifiedPlusExpiresAt: list[idx].verifiedPlusExpiresAt, accountName };
     }
 
@@ -239,10 +240,10 @@ async function activateSubRequest(req, deps) {
       if (typeof readAdBoosts !== 'function' || typeof writeAdBoosts !== 'function') {
         return { ok: false, error: 'ad_boosts_io_missing' };
       }
-      const boostDays = resolvePackageBoostDays(req.pkg) || 3;
+      const boostDays = (await resolvePackageBoostDays(req.pkg)) || 3;
       const now = new Date();
       const ends = new Date(now.getTime() + boostDays * 86400000);
-      const all = readAdBoosts();
+      const all = (await readAdBoosts()) || {};
       all[req.adId] = {
         adId: req.adId,
         accountId: req.accountId,
@@ -250,23 +251,23 @@ async function activateSubRequest(req, deps) {
         endsAt: ends.toISOString(),
         price: Number(req.price) || 0,
       };
-      writeAdBoosts(all);
+      await writeAdBoosts(all);
       return { ok: true, category, boost: all[req.adId], accountName };
     }
 
     // باقة Rizq ADS / الفيديو — معزولة بمفتاح accountId::video (مثل المناقصات)
     // حتى لا تستبدل باقة الحساب العامة (محل/مكتب/فرد).
     if (category === 'video') {
-      const pkgDef = findCatalogPackage(req.pkg);
+      const pkgDef = await findCatalogPackage(req.pkg);
       const packageId = (pkgDef && pkgDef.id) || req.packageId || null;
       const isVidId = !!(packageId && /^vid-/.test(String(packageId)));
       // رفض تفعيل أسماء باقات غير فيديو عبر فئة video (حماية من منح ماسية بالخطأ)
-      if (!isVidId && (isDiamondPackageRef(req.pkg) || !/فيديو|video|rizq\s*ads|إعلان/i.test(String(req.pkg || '')))) {
+      if (!isVidId && ((await isDiamondPackageRef(req.pkg)) || !/فيديو|video|rizq\s*ads|إعلان/i.test(String(req.pkg || '')))) {
         return { ok: false, error: 'invalid_video_package', message: 'باقة الفيديو غير صالحة' };
       }
       const { periodStart, periodEnd, now } = computeActivationPeriod(
         days,
-        getAccountRecord(req.accountId + '::video')
+        await getAccountRecord(req.accountId + '::video')
       );
       const isTrial = isTrialPackage(req.pkg, req.price);
       const result = await syncAccountPackage({
@@ -294,12 +295,12 @@ async function activateSubRequest(req, deps) {
       if (adResult && adResult.ok === false) {
         return { ok: false, error: adResult.error || 'video_slot_failed', message: adResult.message, category };
       }
-      maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts);
+      await maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts);
       return { ok: true, category, result, adResult, accountName, isolated: true };
     }
 
     // package (default) — باقات الحساب العامة فقط
-    const existingPkg = getAccountRecord(req.accountId);
+    const existingPkg = await getAccountRecord(req.accountId);
     const { periodStart, periodEnd, now } = computeActivationPeriod(days, existingPkg);
     const isTrial = isTrialPackage(req.pkg, req.price);
 
@@ -321,7 +322,7 @@ async function activateSubRequest(req, deps) {
     });
     if (!result.ok) return result;
 
-    if (!isTrial && isDiamondPackageRef(req.pkg) && accountPhone && typeof registerSubscriber === 'function') {
+    if (!isTrial && (await isDiamondPackageRef(req.pkg)) && accountPhone && typeof registerSubscriber === 'function') {
       try {
         await registerSubscriber(String(accountPhone).replace(/[^0-9+]/g, '').slice(0, 40), {
           businessName: accountName,
@@ -338,7 +339,7 @@ async function activateSubRequest(req, deps) {
       } catch (e) { /* best-effort */ }
     }
 
-    maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts);
+    await maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts);
 
     return { ok: true, category, result, accountName };
   } catch (err) {

@@ -11,7 +11,7 @@ const rateLimit = require('express-rate-limit');
  * @param {import('express').Application} app
  * @param {object} deps
  */
-async function mountAdminCoreRoutes(app, deps) {
+function mountAdminCoreRoutes(app, deps) {
   const {
     requireAdminSession,
     requireAdminAuth,
@@ -252,7 +252,7 @@ async function mountAdminCoreRoutes(app, deps) {
         if (rec.status === 'suspended') suspended.push({ accountId, periodEnd: rec.periodEnd || null });
       });
 
-      const maintenanceAudit = readAuditLog(DATA_DIR);
+      const maintenanceAudit = (await readAuditLog(DATA_DIR)) || [];
       const lastMaintenance = maintenanceAudit[0] || null;
       const lastBackup = readLatestBackupMeta(backendRootDir);
 
