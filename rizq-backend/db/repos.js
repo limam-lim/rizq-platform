@@ -218,6 +218,9 @@ const weeklyOpsReports = createCollection('weekly_ops_reports', {
 /** سجل تدقيق عرض وثائق KYC — بلا ملف JSON احتياطي (يحوي IP؛ يبقى في Postgres فقط) */
 const kycAccessAudit = createCollection('kyc_access_audit', {});
 
+/** 2FA للأدمن — المفتاح مشفّر AES-GCM (ADMIN_2FA_KEY)؛ بلا ملف JSON احتياطي */
+const adminTwoFactor = createCollection('admin_two_factor', {});
+
 /* ── Helpers ─────────────────────────────────────────────── */
 
 async function getSiteConfig() {
@@ -559,6 +562,7 @@ module.exports = {
   accountNotifications,
   weeklyOpsReports,
   kycAccessAudit,
+  adminTwoFactor,
 
   getSiteConfig,
   saveSiteConfig,

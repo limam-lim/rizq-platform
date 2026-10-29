@@ -2995,11 +2995,24 @@ async function doLogin(){
   if(btn) btn.disabled = true;
   try{
     const loginUrl = _adminBackendBase()+'/api/admin/login';
-    const res = await fetch(loginUrl, {
+    let res = await fetch(loginUrl, {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ user:u, pass:p })
     });
-    const data = await res.json().catch(()=>({}));
+    let data = await res.json().catch(()=>({}));
+    // التحقق بخطوتين: الخادم يطلب رمز Authenticator بعد كلمة سر صحيحة
+    for (let _2fa = 0; _2fa < 3 && data && (data.code === 'totp_required' || data.code === 'totp_invalid'); _2fa++) {
+      const otp = window.prompt(
+        (data.code === 'totp_invalid' ? RizqI18n.t2('❌ رمز غير صحيح — ','❌ Code incorrect — ') : '') +
+        RizqI18n.t2('أدخل رمز التحقق (6 أرقام) من تطبيق Authenticator — أو رمزاً احتياطياً','Entrez le code à 6 chiffres de votre application Authenticator — ou un code de secours')
+      );
+      if (otp === null || !String(otp).trim()) { err.textContent = RizqI18n.t2('أُلغي الدخول — رمز التحقق مطلوب','Connexion annulée — code requis'); return; }
+      res = await fetch(loginUrl, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ user:u, pass:p, otp:String(otp).trim() })
+      });
+      data = await res.json().catch(()=>({}));
+    }
     if(!res.ok || !data.ok){
       if (res.status === 429) {
         err.textContent = RizqI18n.t2(data.error||'محاولات كثيرة — انتظر دقيقة ثم أعد المحاولة','Trop de tentatives — attendez une minute puis réessayez');

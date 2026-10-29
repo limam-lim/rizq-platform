@@ -33,7 +33,9 @@
     "launch:check": "node scripts/launch-check.js",
     "test:await": "node scripts/check-unawaited-async.js",
     "test:async-regressions": "node -r dotenv/config scripts/test-async-regressions.js",
-    "test:kyc": "node -r dotenv/config scripts/test-kyc-access.js"
+    "test:kyc": "node -r dotenv/config scripts/test-kyc-access.js",
+    "test:2fa": "node -r dotenv/config scripts/test-admin-2fa.js",
+    "admin:2fa": "node scripts/admin-2fa.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
