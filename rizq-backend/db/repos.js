@@ -503,6 +503,7 @@ module.exports = {
     getById: (id) => platformStore.getAccountById(id),
     getByEmail: (email) => platformStore.getAccountByEmail(email),
     upsert: (acc) => platformStore.upsertAccount(acc),
+    update: (id, fn) => platformStore.updateAccount(id, fn),
     list: () => platformStore.readAccounts(),
     replaceAll: (list) => platformStore.writeAccounts(list),
   },

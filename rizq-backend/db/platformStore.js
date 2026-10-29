@@ -9,6 +9,71 @@ const { DATA_DIR } = require('./index');
 const sql = require('./sql');
 const { scrubSecretsForBackup } = require('../lib/scrubSecrets');
 
+/* ══ كتابة آمنة متزامنة (diff-write) ═══════════════════════════════════════
+ * كانت write*(list) تمسح الجدول كله ثم تعيد كتابة القائمة: طلبان متزامنان
+ * (دخولان، إعلانان، تسجيلان) يمحو أحدهما عمل الآخر — وقد يُحذف حساب جديد.
+ * الآن: كل كائن مقروء يحمل بصمته + مجموعة المعرّفات التي رآها القارئ.
+ *   - يُكتب فقط ما تغيّر فعلاً عن ما قُرئ (أو الجديد).
+ *   - يُحذف فقط ما رآه هذا القارئ ثم أزاله عمداً من القائمة.
+ *   - ما أضافه غيره بعد القراءة لا يُمس أبداً.
+ */
+const _readMeta = new WeakMap(); // object → { enc, seen:Set<id> }
+const _arraySeen = new WeakMap(); // array  → Set<id> (للقوائم التي أصبحت فارغة)
+
+/** مصفوفة تحمل أثر القراءة عبر filter/slice/concat (حذف آخر عنصر يبقى مفهوماً) */
+class TrackedArray extends Array {
+  static get [Symbol.species]() { return Array; }
+  filter(...a) { const r = TrackedArray.from(super.filter(...a)); _arraySeen.set(r, _arraySeen.get(this)); return r; }
+  slice(...a) { const r = TrackedArray.from(super.slice(...a)); _arraySeen.set(r, _arraySeen.get(this)); return r; }
+  concat(...a) { const r = TrackedArray.from(super.concat(...a)); _arraySeen.set(r, _arraySeen.get(this)); return r; }
+}
+
+function trackRead(input, idOf) {
+  const list = input instanceof TrackedArray ? input : TrackedArray.from(input);
+  const seen = new Set();
+  list.forEach((o) => { const id = idOf(o); if (id) seen.add(id); });
+  list.forEach((o) => { if (o && typeof o === 'object') _readMeta.set(o, { enc: JSON.stringify(o), seen }); });
+  _arraySeen.set(list, seen);
+  return list;
+}
+
+async function diffWrite(table, list, rowFn, upsertFn, idOf) {
+  const rows = Array.isArray(list) ? list : [];
+  const keep = new Set();
+  const seen = new Set();
+  let tracked = false;
+  const arrSeen = _arraySeen.get(list);
+  if (arrSeen) { tracked = true; arrSeen.forEach((id) => seen.add(id)); }
+  rows.forEach((o) => {
+    const id = idOf(o);
+    if (id) keep.add(id);
+    const m = o && typeof o === 'object' ? _readMeta.get(o) : null;
+    if (m) { tracked = true; m.seen.forEach((x) => seen.add(x)); }
+  });
+  let written = 0;
+  await sql.withTransaction(async (tx) => {
+    if (tracked) {
+      const toDelete = [...seen].filter((id) => !keep.has(id));
+      for (const id of toDelete) await tx.execute('DELETE FROM ' + table + ' WHERE id = ?', [id]);
+    } else if (rows.length === 0) {
+      // قائمة بلا أي أثر قراءة: لا نعرف ما رآه الكاتب — لا نحذف شيئاً (الأمان قبل كل شيء)
+      console.warn('[platform-store] ' + table + ': untracked empty write ignored (no rows deleted)');
+    }
+    for (const o of rows) {
+      const m = o && typeof o === 'object' ? _readMeta.get(o) : null;
+      const enc = JSON.stringify(o);
+      if (m && m.enc === enc) continue; // لم يتغيّر — لا نكتب فوق نسخة أحدث لدى غيرنا
+      const row = rowFn(o);
+      if (row) { await upsertFn(row, tx); written++; }
+    }
+  });
+  // بعد الكتابة: القائمة نفسها تصبح "مقروءة" بحالتها الجديدة (لكتابات لاحقة بنفس الكائنات)
+  trackRead(rows, idOf);
+  return written;
+}
+
+const _idOf = (o) => String((o && o.id) || '');
+
 function safeParse(raw, fallback) {
   if (raw == null) return fallback;
   if (typeof raw === 'object') return raw;
@@ -167,20 +232,34 @@ async function migrateAccountsFromJson() {
 
 async function readAccounts() {
   const rows = await sql.query('SELECT data FROM accounts');
-  return rows.map((r) => safeParse(r.data, null)).filter(Boolean);
+  return trackRead(rows.map((r) => safeParse(r.data, null)).filter(Boolean), _idOf);
 }
 
 async function writeAccounts(list) {
   const rows = Array.isArray(list) ? list : [];
-  await sql.withTransaction(async (tx) => {
-    await tx.execute('DELETE FROM accounts');
-    for (const acc of rows) {
-      const row = accountRow(acc);
-      if (row) await upsertAccountSql(row, tx);
-    }
-  });
+  await diffWrite('accounts', rows, accountRow, upsertAccountSql, _idOf);
   backupJson(path.join(DATA_DIR, 'accounts.json'), rows);
   return rows;
+}
+
+/**
+ * تحديث ذرّي لحساب واحد بقفل صف (SELECT … FOR UPDATE): جهازان لنفس الحساب
+ * يدخلان معاً لا يمحو أحدهما جلسة الآخر. fn(acc) تعدّل الكائن وتعيد قيمة اختيارية.
+ * يعيد { acc, result } أو null إن لم يوجد الحساب.
+ */
+async function updateAccount(id, fn) {
+  const key = String(id || '');
+  if (!key) return null;
+  return sql.withTransaction(async (tx) => {
+    const rows = await tx.query('SELECT data FROM accounts WHERE id = ? FOR UPDATE', [key]);
+    const acc = rows && rows[0] ? safeParse(rows[0].data, null) : null;
+    if (!acc) return null;
+    const result = await fn(acc);
+    if (result === false) return { acc, result };
+    const row = accountRow(acc);
+    if (row) await upsertAccountSql(row, tx);
+    return { acc, result };
+  });
 }
 
 async function getAccountById(id) {
@@ -232,18 +311,12 @@ async function migrateAdsFromJson() {
 
 async function readAds() {
   const rows = await sql.query('SELECT data FROM ads');
-  return rows.map((r) => safeParse(r.data, null)).filter(Boolean);
+  return trackRead(rows.map((r) => safeParse(r.data, null)).filter(Boolean), _idOf);
 }
 
 async function writeAds(list) {
   const rows = Array.isArray(list) ? list : [];
-  await sql.withTransaction(async (tx) => {
-    await tx.execute('DELETE FROM ads');
-    for (const ad of rows) {
-      const row = adRow(ad);
-      if (row) await upsertAdSql(row, tx);
-    }
-  });
+  await diffWrite('ads', rows, adRow, upsertAdSql, _idOf);
   backupJson(path.join(DATA_DIR, 'ads.json'), rows);
   return rows;
 }
@@ -287,18 +360,12 @@ async function migrateCatalogFromJson() {
 
 async function readCatalog() {
   const rows = await sql.query('SELECT data FROM catalog_items');
-  return rows.map((r) => safeParse(r.data, null)).filter(Boolean);
+  return trackRead(rows.map((r) => safeParse(r.data, null)).filter(Boolean), _idOf);
 }
 
 async function writeCatalog(list) {
   const rows = Array.isArray(list) ? list : [];
-  await sql.withTransaction(async (tx) => {
-    await tx.execute('DELETE FROM catalog_items');
-    for (const item of rows) {
-      const row = catalogRow(item);
-      if (row) await upsertCatalogSql(row, tx);
-    }
-  });
+  await diffWrite('catalog_items', rows, catalogRow, upsertCatalogSql, _idOf);
   backupJson(path.join(DATA_DIR, 'catalog.json'), rows);
   return rows;
 }
@@ -337,18 +404,12 @@ async function migrateTendersFromJson() {
 
 async function readTendersStore() {
   const rows = await sql.query('SELECT data FROM tenders');
-  return rows.map((r) => safeParse(r.data, null)).filter(Boolean);
+  return trackRead(rows.map((r) => safeParse(r.data, null)).filter(Boolean), _idOf);
 }
 
 async function writeTendersStore(list) {
   const rows = Array.isArray(list) ? list : [];
-  await sql.withTransaction(async (tx) => {
-    await tx.execute('DELETE FROM tenders');
-    for (const t of rows) {
-      const row = tenderRow(t);
-      if (row) await upsertTenderSql(row, tx);
-    }
-  });
+  await diffWrite('tenders', rows, tenderRow, upsertTenderSql, _idOf);
   backupJson(path.join(DATA_DIR, 'tenders.json'), rows);
   return rows;
 }
@@ -382,6 +443,7 @@ module.exports = {
   getAccountById,
   getAccountByEmail,
   upsertAccount,
+  updateAccount,
   deleteAccount,
   readAds,
   writeAds,

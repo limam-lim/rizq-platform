@@ -35,6 +35,9 @@ function mountAccountsSessionRoutes(app, deps) {
     stripToken,
   } = deps;
 
+  const repos = require('../db/repos');
+  const sessionsLib = require('../middleware/accountAuth');
+
   const ownerTokenOk = (acc, token) => {
     if (typeof tokenMatchesAccount === 'function') return tokenMatchesAccount(acc, token);
     return !!(token && timingSafeEqualStr(token, acc.accessToken));
@@ -98,28 +101,29 @@ function mountAccountsSessionRoutes(app, deps) {
         error: 'الحساب لم تتم الموافقة عليه بعد',
       });
     }
-    /* تدوير الجلسة عند كل دخول ناجح + ختم TTL */
-    const idxLogin = list.findIndex((a) => a.id === acc.id);
-    if (typeof stampAccessToken === 'function') stampAccessToken(acc, genAccessToken);
-    else { acc.accessToken = genAccessToken(); }
-    if (typeof stampDashToken === 'function') stampDashToken(acc, genDashToken);
-    else { acc.dashToken = genDashToken(); }
-    acc.updatedAt = new Date().toISOString();
-    acc.lastLoginAt = acc.updatedAt;
-    if (idxLogin !== -1) {
-      list[idxLogin] = acc;
-      await writeAccounts(list);
+    /* جلسة جهاز جديدة — لا تُخرج الأجهزة الأخرى (هاتف + حاسوب + لوحي معاً).
+       تحديث ذرّي بقفل صف: دخولان متزامنان لا يمحو أحدهما الآخر. */
+    const upd = await repos.accounts.update(acc.id, (a) => {
+      if (a.suspended || a.status !== 'approved') return false;
+      const s = sessionsLib.createDeviceSession(a, genAccessToken, genDashToken, { ua: req.header('user-agent') });
+      a.updatedAt = new Date().toISOString();
+      a.lastLoginAt = a.updatedAt;
+      return s;
+    });
+    if (!upd || upd.result === false || !upd.result) {
+      return res.status(403).json({ ok: false, code: 'not_approved', error: 'الحساب لم تتم الموافقة عليه بعد' });
     }
-    const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, accessTokenExpiresAt, dashTokenExpiresAt, ...safeFields } = acc;
+    const sess = upd.result;
+    const { accessToken: _at, passHash: _ph, dashToken: _dt, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, sessions: _sessions, prevDashHash: _pdh, prevDashUntil: _pdu, accessTokenExpiresAt: _ate, dashTokenExpiresAt: _dte, ...safeFields } = upd.acc;
     res.set('Cache-Control', 'no-store');
     res.json({
       ok: true,
       account: Object.assign(safeFields, {
-        accessToken,
-        dashToken,
-        token: dashToken,
-        accessTokenExpiresAt: acc.accessTokenExpiresAt || null,
-        dashTokenExpiresAt: acc.dashTokenExpiresAt || null,
+        accessToken: sess.accessToken,
+        dashToken: sess.dashToken,
+        token: sess.dashToken,
+        accessTokenExpiresAt: sess.accessTokenExpiresAt,
+        dashTokenExpiresAt: sess.dashTokenExpiresAt,
       }),
     });
   });
@@ -135,25 +139,37 @@ function mountAccountsSessionRoutes(app, deps) {
     if (!id || !token) {
       return res.status(400).json({ ok: false, code: 'missing', error: 'معرّف الحساب والتوكن مطلوبان' });
     }
-    const list = await readAccounts();
-    const idx = list.findIndex((a) => a && a.id === id);
-    if (idx < 0) {
-      return res.json({ ok: true });
-    }
-    const acc = list[idx];
-    const accessOk = !!(acc.accessToken && timingSafeEqualStr(acc.accessToken, token));
-    const dashOk = !!(acc.dashToken && timingSafeEqualStr(acc.dashToken, token));
-    if (!accessOk && !dashOk) {
-      return res.status(401).json({ ok: false, code: 'unauthorized', error: 'unauthorized' });
-    }
-    if (typeof stampAccessToken === 'function') stampAccessToken(acc, genAccessToken);
-    else acc.accessToken = genAccessToken();
-    if (typeof stampDashToken === 'function') stampDashToken(acc, genDashToken);
-    else acc.dashToken = genDashToken();
-    acc.updatedAt = new Date().toISOString();
-    list[idx] = acc;
-    await writeAccounts(list);
-    res.json({ ok: true });
+    // خروج من هذا الجهاز فقط — الأجهزة الأخرى تبقى داخلة. ?all=1 / {all:true} = من كل الأجهزة
+    const everywhere = b.all === true || String(req.query.all || '') === '1';
+    let unauthorized = false;
+    const upd = await repos.accounts.update(id, (acc) => {
+      const accessOk = !!(acc.accessToken && timingSafeEqualStr(acc.accessToken, token));
+      const dashOk = !!(acc.dashToken && timingSafeEqualStr(acc.dashToken, token));
+      const sessOk = !!sessionsLib.findSessionByToken(acc, token);
+      if (!accessOk && !dashOk && !sessOk) { unauthorized = true; return false; }
+      if (everywhere) {
+        sessionsLib.revokeAllSessions(acc);
+        if (typeof stampAccessToken === 'function') stampAccessToken(acc, genAccessToken);
+        else acc.accessToken = genAccessToken();
+        if (typeof stampDashToken === 'function') stampDashToken(acc, genDashToken);
+        else acc.dashToken = genDashToken();
+      } else if (sessOk) {
+        sessionsLib.revokeSessionByToken(acc, token);
+      } else {
+        // رمز أساسي (جهاز التسجيل): تدويره يُخرج هذا الجهاز فقط
+        if (typeof stampAccessToken === 'function') stampAccessToken(acc, genAccessToken);
+        else acc.accessToken = genAccessToken();
+        if (typeof stampDashToken === 'function') stampDashToken(acc, genDashToken);
+        else acc.dashToken = genDashToken();
+        delete acc.prevDashHash;
+        delete acc.prevDashUntil;
+      }
+      acc.updatedAt = new Date().toISOString();
+      return true;
+    });
+    if (!upd) return res.json({ ok: true });
+    if (unauthorized) return res.status(401).json({ ok: false, code: 'unauthorized', error: 'unauthorized' });
+    res.json({ ok: true, everywhere });
   });
 
   /** POST /api/accounts/activate-by-otp */
@@ -176,7 +192,7 @@ function mountAccountsSessionRoutes(app, deps) {
       return res.status(403).json({ ok: false, code: 'suspended', error: 'الحساب معلّق' });
     }
     if (acc.status === 'approved' && acc.dashToken) {
-      const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, ...safeFields } = acc;
+      const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, sessions: _sessions, prevDashHash: _pdh, prevDashUntil: _pdu, ...safeFields } = acc;
       return res.json({
         ok: true,
         already: true,
@@ -210,7 +226,7 @@ function mountAccountsSessionRoutes(app, deps) {
     if (acc.idImage) purgeAccountIdDocument(acc);
     list[idx] = acc;
     await writeAccounts(list);
-    const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, ...safeFields } = acc;
+    const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, sessions: _sessions, prevDashHash: _pdh, prevDashUntil: _pdu, ...safeFields } = acc;
     res.json({
       ok: true,
       autoApproved: true,
@@ -290,6 +306,8 @@ function mountAccountsSessionRoutes(app, deps) {
     } catch (eHash) {
       return res.status(500).json({ ok: false, code: 'hash_failed', error: 'تعذّر حفظ كلمة المرور' });
     }
+    // كلمة مرور جديدة = خروج من كل الأجهزة (هاتف مسروق، جلسة منسية)
+    sessionsLib.revokeAllSessions(acc);
     if (typeof stampAccessToken === 'function') stampAccessToken(acc, genAccessToken);
     else acc.accessToken = genAccessToken();
     if (typeof stampDashToken === 'function') stampDashToken(acc, genDashToken);
@@ -299,7 +317,7 @@ function mountAccountsSessionRoutes(app, deps) {
     list[idx] = acc;
     await writeAccounts(list);
 
-    const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, ...safeFields } = acc;
+    const { accessToken, passHash: _ph, dashToken, idImage, licenseImage, id_image, activityImage2, activity_image2, receiptImage, password, sessions: _sessions, prevDashHash: _pdh, prevDashUntil: _pdu, ...safeFields } = acc;
     res.json({
       ok: true,
       account: Object.assign(safeFields, {
@@ -355,7 +373,8 @@ function mountAccountsSessionRoutes(app, deps) {
     } catch (eHash) {
       return res.status(500).json({ ok: false, code: 'hash_failed', error: 'تعذّر حفظ كلمة المرور' });
     }
-    // إبطال الجلسات القديمة فور تغيير كلمة المرور
+    // إبطال الجلسات القديمة فور تغيير كلمة المرور — على كل الأجهزة
+    sessionsLib.revokeAllSessions(acc);
     if (typeof stampAccessToken === 'function') stampAccessToken(acc, genAccessToken);
     else acc.accessToken = genAccessToken();
     if (typeof stampDashToken === 'function') stampDashToken(acc, genDashToken);
@@ -375,17 +394,14 @@ function mountAccountsSessionRoutes(app, deps) {
   });
 
   async function handleVerifyDash(req, res) {
-    const list = await readAccounts();
-    const acc = list.find((a) => a.id === req.params.id);
+    const acc = await repos.accounts.getById(req.params.id);
     if (!acc) return res.status(404).json({ error: 'account_not_found' });
     const token = extractDashToken(req);
     if (
       acc.suspended
       || acc.status !== 'approved'
-      || !acc.dashToken
       || !token
-      || !timingSafeEqualStr(token, acc.dashToken)
-      || (typeof tokenMatchesAccount === 'function' && !tokenMatchesAccount(acc, token))
+      || !sessionsLib.dashTokenMatches(acc, token)
     ) {
       return res.status(401).json({ error: 'unauthorized' });
     }
@@ -393,44 +409,44 @@ function mountAccountsSessionRoutes(app, deps) {
   }
 
   async function handleExchangeDashToken(req, res) {
-    const list = await readAccounts();
-    const idx = list.findIndex((a) => a.id === req.params.id);
-    if (idx === -1) return res.status(404).json({ error: 'account_not_found' });
-    const acc = list[idx];
     const token = extractDashToken(req);
-    if (
-      acc.suspended
-      || acc.status !== 'approved'
-      || !acc.dashToken
-      || !token
-      || !timingSafeEqualStr(token, acc.dashToken)
-      || (typeof tokenMatchesAccount === 'function' && !tokenMatchesAccount(acc, token))
-    ) {
-      return res.status(401).json({ error: 'unauthorized' });
-    }
-    // تدوير dashToken بعد كل تبادل ناجح — الرمز المسروق يصبح لمرة واحدة
-    if (typeof stampDashToken === 'function') stampDashToken(acc, genDashToken);
-    else acc.dashToken = genDashToken();
-    /* إن انتهت صلاحية accessToken أو كان مفقوداً — أصدر واحداً جديداً */
-    if (typeof accessTokenStillValid === 'function') {
-      if (!accessTokenStillValid(acc)) {
-        if (typeof stampAccessToken === 'function') stampAccessToken(acc, genAccessToken);
-        else acc.accessToken = genAccessToken();
+    let out = null;
+    const upd = await repos.accounts.update(req.params.id, (acc) => {
+      if (acc.suspended || acc.status !== 'approved' || !token) return false;
+      const hit = sessionsLib.findSessionByToken(acc, token);
+      if (hit && (hit.kind === 'dash' || hit.kind === 'prevDash')) {
+        // جلسة جهاز: تدوير رمزَيها مع مهلة 60 ث للرمزين السابقين (طلبات في الطريق)
+        if (hit.kind === 'prevDash') return false; // رمز سابق لا يُبدَّل مرة ثانية
+        out = sessionsLib.rotateSession(hit.session, genAccessToken, genDashToken);
+      } else if (sessionsLib.primaryDashMatches(acc, token) && acc.dashToken && timingSafeEqualStr(token, acc.dashToken)) {
+        // الرمز الأساسي: تدوير dashToken (لمرة واحدة) مع مهلة للسابق
+        sessionsLib.rotatePrimaryDash(acc, genDashToken);
+        if (typeof accessTokenStillValid === 'function' ? !accessTokenStillValid(acc) : !acc.accessToken) {
+          if (typeof stampAccessToken === 'function') stampAccessToken(acc, genAccessToken);
+          else acc.accessToken = genAccessToken();
+        }
+        out = {
+          accessToken: acc.accessToken,
+          dashToken: acc.dashToken,
+          accessTokenExpiresAt: acc.accessTokenExpiresAt || null,
+          dashTokenExpiresAt: acc.dashTokenExpiresAt || null,
+        };
+      } else {
+        return false;
       }
-    } else if (!acc.accessToken) {
-      acc.accessToken = genAccessToken();
-    }
-    acc.dashExchangedAt = new Date().toISOString();
-    list[idx] = acc;
-    await writeAccounts(list);
+      acc.dashExchangedAt = new Date().toISOString();
+      return true;
+    });
+    if (!upd) return res.status(404).json({ error: 'account_not_found' });
+    if (!out) return res.status(401).json({ error: 'unauthorized' });
     res.set('Cache-Control', 'no-store');
     res.json({
       ok: true,
-      accessToken: acc.accessToken,
-      dashToken: acc.dashToken,
-      token: acc.dashToken,
-      accessTokenExpiresAt: acc.accessTokenExpiresAt || null,
-      dashTokenExpiresAt: acc.dashTokenExpiresAt || null,
+      accessToken: out.accessToken,
+      dashToken: out.dashToken,
+      token: out.dashToken,
+      accessTokenExpiresAt: out.accessTokenExpiresAt || null,
+      dashTokenExpiresAt: out.dashTokenExpiresAt || null,
     });
   }
 

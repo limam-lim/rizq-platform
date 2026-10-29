@@ -30,6 +30,8 @@ const SECRET_KEYS = new Set([
   'activityImage2',
   'activity_image2',
   'receiptImage',
+  'sessions',
+  'prevDashHash',
 ]);
 
 function scrubValue(value, depth) {

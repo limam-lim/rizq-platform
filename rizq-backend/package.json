@@ -35,6 +35,7 @@
     "test:async-regressions": "node -r dotenv/config scripts/test-async-regressions.js",
     "test:kyc": "node -r dotenv/config scripts/test-kyc-access.js",
     "test:2fa": "node -r dotenv/config scripts/test-admin-2fa.js",
+    "test:sessions": "node -r dotenv/config scripts/test-sessions-concurrency.js",
     "admin:2fa": "node scripts/admin-2fa.js"
   },
   "dependencies": {

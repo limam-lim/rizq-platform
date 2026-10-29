@@ -25,6 +25,24 @@ function encodeData(data) {
   return typeof data === 'string' ? data : JSON.stringify(data);
 }
 
+/* أثر القراءة لـ saveList (كتابة آمنة متزامنة — انظر platformStore.diffWrite) */
+const _docMeta = new WeakMap(); // object → { enc, seen:Set<id> }
+const _docArraySeen = new WeakMap();
+class TrackedDocArray extends Array {
+  static get [Symbol.species]() { return Array; }
+  filter(...a) { const r = TrackedDocArray.from(super.filter(...a)); _docArraySeen.set(r, _docArraySeen.get(this)); return r; }
+  slice(...a) { const r = TrackedDocArray.from(super.slice(...a)); _docArraySeen.set(r, _docArraySeen.get(this)); return r; }
+  concat(...a) { const r = TrackedDocArray.from(super.concat(...a)); _docArraySeen.set(r, _docArraySeen.get(this)); return r; }
+}
+function _trackDocs(input, idField) {
+  const list = input instanceof TrackedDocArray ? input : TrackedDocArray.from(input);
+  const seen = new Set();
+  list.forEach((o) => { const id = o && o[idField] != null ? String(o[idField]) : ''; if (id) seen.add(id); });
+  list.forEach((o) => { if (o && typeof o === 'object') _docMeta.set(o, { enc: JSON.stringify(o), seen }); });
+  _docArraySeen.set(list, seen);
+  return list;
+}
+
 async function runInTransaction(fn) {
   return sql.withTransaction(fn);
 }
@@ -79,7 +97,46 @@ function createCollection(collection, opts) {
       'SELECT data FROM documents WHERE collection = ?',
       [name]
     );
-    return rows.map((r) => safeParse(r.data, null)).filter((x) => x != null);
+    return _trackDocs(rows.map((r) => safeParse(r.data, null)).filter((x) => x != null), 'id');
+  }
+
+  /**
+   * كتابة آمنة لقائمة مقروءة عبر list(): تكتب المتغيّر/الجديد فقط، وتحذف فقط ما رآه
+   * القارئ ثم أزاله — لا تمس ما أضافه غيره في الأثناء (بديل replaceAll للقوائم الحيّة).
+   */
+  async function saveList(input, opts) {
+    const idField = (opts && opts.idField) || 'id';
+    const rows = Array.isArray(input) ? input : [];
+    const keep = new Set();
+    const seen = new Set();
+    const arrSeen = _docArraySeen.get(input);
+    if (arrSeen) arrSeen.forEach((id) => seen.add(id));
+    rows.forEach((o) => {
+      const id = o && o[idField] != null ? String(o[idField]) : '';
+      if (id) keep.add(id);
+      const m = o && typeof o === 'object' ? _docMeta.get(o) : null;
+      if (m) m.seen.forEach((x) => seen.add(x));
+    });
+    await runInTransaction(async (tx) => {
+      for (const id of [...seen].filter((x) => !keep.has(x))) {
+        await tx.execute('DELETE FROM documents WHERE collection = ? AND id = ?', [name, id]);
+      }
+      for (const o of rows) {
+        const id = o && o[idField] != null ? String(o[idField]) : '';
+        if (!id) continue;
+        const m = _docMeta.get(o);
+        if (m && m.enc === JSON.stringify(o)) continue;
+        await tx.execute(
+          `INSERT INTO documents (collection, id, data, updated_at)
+           VALUES (?, ?, ?::jsonb, ?)
+           ON CONFLICT (collection, id) DO UPDATE SET
+             data = EXCLUDED.data, updated_at = EXCLUDED.updated_at, updated_at_ts = NOW()`,
+          [name, id, encodeData(o), new Date().toISOString()]
+        );
+      }
+    });
+    _trackDocs(rows, idField);
+    await writeBackup();
   }
 
   async function listEntries() {
@@ -269,6 +326,7 @@ function createCollection(collection, opts) {
     remove,
     upsertMany,
     replaceAll,
+    saveList,
     migrateFromArray,
     migrateFromMap,
     migrateSingleton,

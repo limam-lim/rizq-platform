@@ -2039,6 +2039,10 @@ function stripToken(acc) {
     delete safe.id_image;
   }
   delete safe.password;
+  // جلسات الأجهزة (بصمات) — داخلية فقط
+  delete safe.sessions;
+  delete safe.prevDashHash;
+  delete safe.prevDashUntil;
   return safe;
 }
 
@@ -2053,6 +2057,9 @@ function toAdminAccount(acc) {
     ...safe
   } = acc;
   delete safe.password;
+  delete safe.sessions;
+  delete safe.prevDashHash;
+  delete safe.prevDashUntil;
   // لا تُضمَّن صور KYC في ردود الأدمن إطلاقاً — أعلام وجود فقط؛
   // العرض عبر GET /api/admin/kyc/:accountId/:doc (صلاحية kyc.view + سجل تدقيق)
   return require('./services/kycAccess').redactKycForAdmin(safe);
@@ -2597,8 +2604,8 @@ app.get('/api/buyers/me', (req, res) => {
 const SUB_REQUESTS_FILE = path.join(DATA_DIR, 'sub-requests.json');
 async function readSubRequests() { return await repos.subRequests.list(); }
 async function writeSubRequests(list) {
-  const rows = Array.isArray(list) ? list : [];
-  await repos.subRequests.replaceAll(rows.filter((r) => r && r.id).map((r) => ({ id: String(r.id), data: r })));
+  // saveList: لا يمحو طلب دفع وصل من مشترك آخر في نفس اللحظة (كان replaceAll يمسح الكل)
+  await repos.subRequests.saveList(Array.isArray(list) ? list : []);
 }
 
 const subRequestsLimiter = rateLimit({
