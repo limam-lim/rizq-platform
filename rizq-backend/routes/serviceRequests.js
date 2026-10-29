@@ -79,7 +79,7 @@ function sanitizeRequestForOwner(row) {
  * @param {import('express').Application} app
  * @param {object} deps
  */
-async function mountServiceRequestRoutes(app, deps) {
+function mountServiceRequestRoutes(app, deps) {
   const {
     verifyAccountOwner,
     extractAccountToken,

@@ -21,7 +21,7 @@ function genBidId() {
  * @param {import('express').Application} app
  * @param {object} deps
  */
-async function mountTendersRoutes(app, deps) {
+function mountTendersRoutes(app, deps) {
   const {
     requireAdminAuth,
     requireAdminPermission,
@@ -63,7 +63,7 @@ async function mountTendersRoutes(app, deps) {
   }
 
   /** توافق مع الاستدعاءات القديمة — يعني اشتراك مدفوع فعّال (ليس تجريبي) */
-  function hasTenderAccess(accountId) {
+  async function hasTenderAccess(accountId) {
     return hasTenderPaidAccess(accountId);
   }
 
@@ -92,12 +92,13 @@ async function mountTendersRoutes(app, deps) {
     return await getTenderEntitlements(null);
   }
 
-  function toPublicTender(t, access, viewerId) {
+  async function toPublicTender(t, access, viewerId) {
     const now = Date.now();
     const deadlineMs = new Date(t.deadline).getTime();
-    const ent = access || TENDER_PUBLIC_ACCESS_FALLBACK();
+    const ent = access || (await TENDER_PUBLIC_ACCESS_FALLBACK()) || {};
     const contactsUnlocked = !!ent.canUnlockContacts;
-    const contacts = resolveTenderOwnerContacts(t);
+    // contacts only needed (and only read) when unlocked
+    const contacts = contactsUnlocked ? await resolveTenderOwnerContacts(t) : {};
     const rawImages = Array.isArray(t.images) ? t.images : [];
     const imageCount = rawImages.length;
     const hasDocument = !!t.document;
@@ -181,8 +182,8 @@ async function mountTendersRoutes(app, deps) {
     const qSig = String(req.query.sig || '');
     if (qViewer && assetKey && verifyTenderAssetSig(qViewer, t.id, assetKey, qExp, qSig)) {
       if (t.ownerId === qViewer) return true;
-      const qAccess = getTenderAccessForViewer(qViewer);
-      if (qAccess.canUnlockContacts && isTenderPubliclyOpen(t)) return true;
+      const qAccess = await getTenderAccessForViewer(qViewer);
+      if (qAccess && qAccess.canUnlockContacts && isTenderPubliclyOpen(t)) return true;
     }
     return false;
   }
@@ -236,7 +237,7 @@ async function mountTendersRoutes(app, deps) {
     const token = req.header('x-account-token') || '';
     const acc = await verifyAccountOwner(b.accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
-    if (!hasTenderPaidAccess(b.accountId)) {
+    if (!(await hasTenderPaidAccess(b.accountId))) {
       return res.status(403).json({ error: 'tender_package_required', msg: 'تحتاج باقة مدفوعة فعّالة لنشر مناقصة — الباقة التجريبية للتصفّح فقط' });
     }
     if (!b.title || !b.deadline) return res.status(400).json({ error: 'title و deadline مطلوبان' });
@@ -322,7 +323,7 @@ async function mountTendersRoutes(app, deps) {
       provisionalTier: score.provisionalTier,
       provisionalLabel: score.provisionalLabelAr,
       autoApproved: auto,
-      tender: toPublicTender(tender, getTenderAccessForViewer(b.accountId), b.accountId),
+      tender: await toPublicTender(tender, await getTenderAccessForViewer(b.accountId), b.accountId),
       msg: auto
         ? 'موافقة مبدئية من وكيل المناقصات — نُشرت بصفة مبدئية (قابلة للمراجعة).'
         : 'تم استلام مناقصتك — معلّقة بانتظار مراجعة Limam (لبس أو شبهة).',
@@ -373,15 +374,15 @@ async function mountTendersRoutes(app, deps) {
    * المشترك المدفوع يكشف التواصل ويمكنه تقديم العروض. يدعم ?cat=&city=
    */
   app.get('/api/tenders', async (req, res) => {
-    const viewerId = resolveOptionalTenderViewer(req);
-    const access = getTenderAccessForViewer(viewerId);
+    const viewerId = await resolveOptionalTenderViewer(req);
+    const access = (await getTenderAccessForViewer(viewerId)) || {};
     const { cat, city } = req.query || {};
     let list = filterPublicOpenTenders(await readTenders());
     if (cat) list = list.filter((t) => t.category === cat);
     if (city) list = list.filter((t) => t.city === city);
     res.json({
       ok: true,
-      tenders: list.map((t) => toPublicTender(t, access, viewerId)),
+      tenders: await Promise.all(list.map((t) => toPublicTender(t, access, viewerId))),
       access: {
         contactsUnlocked: !!access.canUnlockContacts,
         canSubmitBid: !!access.canSubmitProposals,
@@ -403,10 +404,10 @@ async function mountTendersRoutes(app, deps) {
     const token = req.header('x-account-token') || '';
     const acc = await verifyAccountOwner(b.accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
-    if (!hasTenderPaidAccess(b.accountId)) {
+    if (!(await hasTenderPaidAccess(b.accountId))) {
       return res.status(403).json({ error: 'tender_package_required', msg: 'تحتاج باقة مدفوعة فعّالة لتقديم عرض — الباقة التجريبية للتصفّح فقط' });
     }
-    const bidderAccess = getTenderAccessForViewer(b.accountId);
+    const bidderAccess = (await getTenderAccessForViewer(b.accountId)) || {};
     const list = await readTenders();
     const idx = list.findIndex((t) => t.id === req.params.id && t.status !== 'removed');
     if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
@@ -475,11 +476,11 @@ async function mountTendersRoutes(app, deps) {
    * GET /api/tenders/:id/document — تحميل ملف PDF للمناقصة (مشتركون مدفوعون أو صاحب المناقصة)
    */
   app.get('/api/tenders/:id/document', tenderAssetLimiter, async (req, res) => {
-    const viewerId = resolveOptionalTenderViewer(req);
-    const access = getTenderAccessForViewer(viewerId);
+    const viewerId = await resolveOptionalTenderViewer(req);
+    const access = (await getTenderAccessForViewer(viewerId)) || {};
     const t = (await readTenders()).find((x) => x.id === req.params.id && x.status !== 'removed');
     if (!t || !t.document) return res.status(404).json({ error: 'document_not_found' });
-    if (!canAccessTenderAsset(req, t, viewerId, access, 'doc:0')) {
+    if (!(await canAccessTenderAsset(req, t, viewerId, access, 'doc:0'))) {
       return res.status(403).json({
         error: 'document_locked',
         msg: 'ملف المناقصة متاح للمشتركين فقط — اشترك لتحميله',
@@ -493,12 +494,12 @@ async function mountTendersRoutes(app, deps) {
    * GET /api/tenders/:id/images/:index — صورة مرجعية (مشتركون أو صاحب المناقصة)
    */
   app.get('/api/tenders/:id/images/:index', tenderAssetLimiter, async (req, res) => {
-    const viewerId = resolveOptionalTenderViewer(req);
-    const access = getTenderAccessForViewer(viewerId);
+    const viewerId = await resolveOptionalTenderViewer(req);
+    const access = (await getTenderAccessForViewer(viewerId)) || {};
     const t = (await readTenders()).find((x) => x.id === req.params.id && x.status !== 'removed');
     if (!t) return res.status(404).json({ error: 'tender_not_found' });
     const assetKey = 'img:' + req.params.index;
-    if (!canAccessTenderAsset(req, t, viewerId, access, assetKey)) {
+    if (!(await canAccessTenderAsset(req, t, viewerId, access, assetKey))) {
       return res.status(403).json({
         error: 'images_locked',
         msg: 'الصور المرجعية متاحة للمشتركين فقط',
@@ -540,13 +541,13 @@ async function mountTendersRoutes(app, deps) {
    * مسار به معامل (:id) يجب أن يُسجَّل دائماً بعد كل المسارات الثابتة المشابهة.
    */
   app.get('/api/tenders/:id', async (req, res) => {
-    const viewerId = resolveOptionalTenderViewer(req);
-    const access = getTenderAccessForViewer(viewerId);
+    const viewerId = await resolveOptionalTenderViewer(req);
+    const access = (await getTenderAccessForViewer(viewerId)) || {};
     const t = (await readTenders()).find((x) => x.id === req.params.id && x.status !== 'removed');
     if (!t || !isTenderPubliclyOpen(t)) return res.status(404).json({ error: 'tender_not_found' });
     res.json({
       ok: true,
-      tender: toPublicTender(t, access, viewerId),
+      tender: await toPublicTender(t, access, viewerId),
       access: {
         contactsUnlocked: !!access.canUnlockContacts,
         canSubmitBid: !!access.canSubmitProposals,
@@ -621,7 +622,7 @@ async function mountTendersRoutes(app, deps) {
     if (!b.accountId) return res.status(400).json({ error: 'accountId مطلوب' });
     const { findCatalogPackage, isTrialPackage } = require('../services/catalogConfig');
     const pkgName = b.pkgName || TENDER_PACKAGE_NAME;
-    const pkgDef = findCatalogPackage(b.packageId || pkgName);
+    const pkgDef = await findCatalogPackage(b.packageId || pkgName);
     const days = Number(b.days) || (pkgDef && pkgDef.durationDays) || 30;
     const price = Number(b.price) || (pkgDef && pkgDef.price) || 0;
     const isTrial = b.isTrial === true || isTrialPackage((pkgDef && pkgDef.name) || pkgName, price);
@@ -664,7 +665,7 @@ async function mountTendersRoutes(app, deps) {
     const acc = await verifyAccountOwner(req.params.id, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
     const ent = await getTenderEntitlements(req.params.id);
-    const rec = getAccountRecord(req.params.id + '::tender');
+    const rec = await getAccountRecord(req.params.id + '::tender');
     const safeRec = rec ? (() => { const { accessToken, ...rest } = rec; return rest; })() : null;
     res.json({
       ok: true,

@@ -12,7 +12,7 @@ function genCatalogId() {
  * @param {import('express').Application} app
  * @param {object} deps
  */
-async function mountCatalogRoutes(app, deps) {
+function mountCatalogRoutes(app, deps) {
   const {
     verifyAccountOwner,
     getEntitlements,

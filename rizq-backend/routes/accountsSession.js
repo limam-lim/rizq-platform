@@ -10,7 +10,7 @@ const rateLimit = require('express-rate-limit');
  * @param {import('express').Application} app
  * @param {object} deps
  */
-async function mountAccountsSessionRoutes(app, deps) {
+function mountAccountsSessionRoutes(app, deps) {
   const {
     bcrypt,
     readAccounts,
@@ -275,12 +275,12 @@ async function mountAccountsSessionRoutes(app, deps) {
       return res.status(400).json({ ok: false, code: 'invalid_code', error: 'رمز غير صحيح أو منتهٍ' });
     }
 
-    const verified = verifySellerResetOtp(email, code);
+    const verified = await verifySellerResetOtp(email, code);
     if (!verified.ok) {
       // نفس الشكل دائماً — لا نفرّق no_otp / invalid_code للعميل
       return res.status(400).json({ ok: false, code: 'invalid_code', error: 'رمز غير صحيح أو منتهٍ' });
     }
-    const consumed = consumeSellerResetVerification(email);
+    const consumed = await consumeSellerResetVerification(email);
     if (!consumed.ok) {
       return res.status(400).json({ ok: false, code: 'invalid_code', error: 'رمز غير صحيح أو منتهٍ' });
     }

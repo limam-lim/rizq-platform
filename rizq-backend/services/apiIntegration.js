@@ -61,7 +61,7 @@ async function verifyPlainKey(plainKey) {
 
 async function ensureApiKeyForCompany(companyId, accountType) {
   if (!companyId) return { ok: false, error: 'company_id_required' };
-  if (!isCorpDiamondProEntitled(companyId, accountType)) {
+  if (!(await isCorpDiamondProEntitled(companyId, accountType))) {
     return { ok: false, error: 'not_entitled', code: 'PLAN_REQUIRED' };
   }
 
@@ -95,7 +95,7 @@ async function ensureApiKeyForCompany(companyId, accountType) {
 }
 
 async function regenerateApiKey(companyId, accountType) {
-  if (!isCorpDiamondProEntitled(companyId, accountType)) {
+  if (!(await isCorpDiamondProEntitled(companyId, accountType))) {
     return { ok: false, error: 'not_entitled', code: 'PLAN_REQUIRED' };
   }
   const plainKey = generatePlainApiKey();
@@ -120,7 +120,7 @@ async function regenerateApiKey(companyId, accountType) {
 
 async function getIntegrationStatus(companyId, accountType, opts) {
   opts = opts || {};
-  const entitled = isCorpDiamondProEntitled(companyId, accountType);
+  const entitled = await isCorpDiamondProEntitled(companyId, accountType);
   const row = await CorpApiIntegration.findByCompanyId(companyId);
   if (!row) {
     return {
@@ -145,7 +145,7 @@ async function suspendApiKey(companyId) {
 }
 
 async function activateApiKey(companyId, accountType) {
-  if (!isCorpDiamondProEntitled(companyId, accountType)) {
+  if (!(await isCorpDiamondProEntitled(companyId, accountType))) {
     return await suspendApiKey(companyId);
   }
   const row = await CorpApiIntegration.findByCompanyId(companyId);
@@ -159,7 +159,7 @@ async function activateApiKey(companyId, accountType) {
 }
 
 async function updateAllowedOriginIp(companyId, accountType, ipValue) {
-  if (!isCorpDiamondProEntitled(companyId, accountType)) {
+  if (!(await isCorpDiamondProEntitled(companyId, accountType))) {
     return { ok: false, error: 'not_entitled', code: 'PLAN_REQUIRED' };
   }
   const row = await CorpApiIntegration.findByCompanyId(companyId);

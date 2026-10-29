@@ -640,7 +640,7 @@ async function _deactivateExpiredVideoAds(baseAccountId) {
 // accountsHelpers (اختياري): { readAccounts, writeAccounts } من server.js —
 // مطلوب فقط لتفعيل مكافأة الإحالة (تحتاج قراءة/كتابة accounts.json الذي لا
 // يملكه هذا الملف). إن لم يُمرَّر، تُستثنى منطقة الإحالة بصمت بلا أي كسر.
-async function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
+function setupPackageLifecycleAPI(app, requireSharedSecret, accountsHelpers) {
   // مزامنة تفعيل/تجديد — تُستدعى من rizq_subscription_engine.js (activatePackage)
   // أو من admin.html عند موافقة الأدمن على طلب اشتراك. محمية بسرّ الأدمن
   // (نفس BACKEND_SHARED_SECRET المستخدم لبقية نقاط لوحة الأدمن).

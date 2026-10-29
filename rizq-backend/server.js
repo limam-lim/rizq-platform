@@ -580,7 +580,7 @@ app.post('/api/agent/toggle', async (req, res) => {
     return res.status(403).json({ ok: false, error: 'unauthorized' });
   }
   if (!subscriberPhone) return res.status(400).json({ ok: false, error: 'subscriberPhone required' });
-  const row = setActive(subscriberPhone, active);
+  const row = await setActive(subscriberPhone, active);
   let profile = null;
   try { profile = await getSubscriberProfile(subscriberPhone); } catch (e) { /* optional */ }
   res.json({
@@ -603,14 +603,14 @@ app.get('/api/agent/status/:phone', requireAdminPermission('subscriber-agents'),
   res.json({
     ok: true,
     phone,
-    active: isActive(phone),
+    active: await isActive(phone),
     business: profile && profile.businessName ? profile.businessName : null,
   });
 });
 
 /** GET /api/agent/status — admin/debug */
-app.get('/api/agent/status', requireAdminPermission('subscriber-agents'), (req, res) => {
-  res.json({ ok: true, status: readAgentStatusAll() });
+app.get('/api/agent/status', requireAdminPermission('subscriber-agents'), async (req, res) => {
+  res.json({ ok: true, status: await readAgentStatusAll() });
 });
 
 /**
@@ -917,7 +917,7 @@ app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
       try {
         await assertAiAgentAccess(acc, { channel: 'widget' });
       } catch (e) {
-        const ent = getAccountEntitlements(acc);
+        const ent = await getAccountEntitlements(acc);
         const status = e.status && e.status >= 400 ? e.status : 403;
         return res.status(status).json({
           ok: false,
@@ -927,7 +927,7 @@ app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
       }
       merchantAcc = acc;
       body.accountId = accountId;
-      body.profile = buildProfileFromAccount(acc);
+      body.profile = await buildProfileFromAccount(acc);
       body.agentTier = 'diamond';
     } else {
       // مساعد المنصة العام — امنع انتحال الباقة الماسية من العميل
@@ -1002,7 +1002,7 @@ app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
       try {
         await assertAiAgentAccess(acc, { channel: 'widget' });
       } catch (e) {
-        const ent = getAccountEntitlements(acc);
+        const ent = await getAccountEntitlements(acc);
         const status = e.status && e.status >= 400 ? e.status : 403;
         return res.status(status).json({
           ok: false,
@@ -1012,7 +1012,7 @@ app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
       }
       merchantAcc = acc;
       body.accountId = accountId;
-      body.profile = buildProfileFromAccount(acc);
+      body.profile = await buildProfileFromAccount(acc);
       body.agentTier = 'diamond';
     } else {
       if (body.profile && typeof body.profile === 'object') {
@@ -1164,7 +1164,7 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
     try {
       await assertAiAgentAccess(acc, { channel: 'dashboard' });
     } catch (e) {
-      const ent = getAccountEntitlements(acc);
+      const ent = await getAccountEntitlements(acc);
       const status = e.status && e.status >= 400 ? e.status : 403;
       return res.status(status).json({ ok: false, error: e.message || resolveAccessDenialMessage(ent), code: e.code || ent.subscriptionStatus });
     }
@@ -1175,7 +1175,7 @@ app.post('/api/subscriber/chat', subscriberChatLimiter, async (req, res) => {
       message,
       lang: b.lang || 'ar',
       uiLang: b.uiLang || b.lang || 'ar',
-      profile: buildProfileFromAccount(acc),
+      profile: await buildProfileFromAccount(acc),
       history: Array.isArray(b.history) ? b.history : [],
       pageContext: b.pageContext || { page: 'dashboard' },
     });
@@ -2220,7 +2220,7 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
       autoApproved = true;
     } else {
       try {
-        otpGate = consumeBuyerVerificationByEmail(sellerEmail);
+        otpGate = await consumeBuyerVerificationByEmail(sellerEmail);
       } catch (eOtp) {
         otpGate = { ok: false, error: 'otp_required' };
       }
@@ -2228,7 +2228,7 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
         const phoneForOtp = String(b.phone || '').replace(/\D/g, '').slice(-8);
         if (phoneForOtp) {
           try {
-            const phoneGate = consumeVerification(phoneForOtp);
+            const phoneGate = await consumeVerification(phoneForOtp);
             if (phoneGate && phoneGate.ok) otpGate = phoneGate;
           } catch (ePh) { /* ignore */ }
         }
@@ -2504,14 +2504,14 @@ app.post('/api/otp/send', otpLimiter, async (req, res) => {
 });
 
 /** POST /api/otp/verify — التحقق من الرمز */
-app.post('/api/otp/verify', otpLimiter, (req, res) => {
+app.post('/api/otp/verify', otpLimiter, async (req, res) => {
   const b = req.body || {};
   if (b.channel === 'buyer' || (b.email && !b.phone)) {
-    const result = verifyBuyerOtp(b.email, b.code);
+    const result = await verifyBuyerOtp(b.email, b.code);
     if (!result.ok) return res.status(400).json(result);
     return res.json(result);
   }
-  const result = verifyOtp(b.phone, b.code);
+  const result = await verifyOtp(b.phone, b.code);
   if (!result.ok) return res.status(400).json(result);
   res.json(result);
 });
@@ -2575,12 +2575,12 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
   let catalogPkg = null;
   try {
     const { findCatalogPackage } = require('./services/catalogConfig');
-    catalogPkg = findCatalogPackage({
+    catalogPkg = (await findCatalogPackage({
       pkgName: pkgRef,
       name: pkgRef,
       id: pkgRef,
       category: b.category,
-    }) || findCatalogPackage(pkgRef);
+    })) || (await findCatalogPackage(pkgRef));
   } catch (catErr) {
     console.warn('[sub-requests] catalog lookup:', catErr.message);
   }
@@ -2656,7 +2656,7 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
   if (rec.category === 'package' && rec.accountId) {
     try {
       const accRow = (await readAccounts()).find((a) => a.id === rec.accountId);
-      createPendingPackageFromRequest({
+      await createPendingPackageFromRequest({
         accountId: rec.accountId,
         accountName: rec.account || accRow?.name || rec.accountId,
         accountPhone: accRow?.phone || '',
@@ -3041,12 +3041,12 @@ const agentMissLimiter = rateLimit({
 });
 
 /** POST /api/agent/miss — تسجيل سؤال فائت/رد ضعيف من الواجهة (أوفلاين أو ويدجت) */
-app.post('/api/agent/miss', agentMissLimiter, (req, res) => {
+app.post('/api/agent/miss', agentMissLimiter, async (req, res) => {
   try {
     const aq = require('./services/agentQuality');
     const b = req.body || {};
     const clip = (v, n) => String(v == null ? '' : v).slice(0, n);
-    const row = aq.recordAgentMiss({
+    const row = await aq.recordAgentMiss({
       text: clip(b.text || b.message, 500),
       reply: clip(b.reply, 800),
       lang: clip(b.lang, 16),
@@ -3064,20 +3064,20 @@ app.post('/api/agent/miss', agentMissLimiter, (req, res) => {
   }
 });
 
-app.get('/api/admin/agent-misses', requireAdminPermission('ai-manager'), (req, res) => {
+app.get('/api/admin/agent-misses', requireAdminPermission('ai-manager'), async (req, res) => {
   try {
     const aq = require('./services/agentQuality');
-    res.json({ ok: true, misses: aq.listAgentMisses(req.query.limit) });
+    res.json({ ok: true, misses: await aq.listAgentMisses(req.query.limit) });
   } catch (err) {
     console.error('[admin/agent-misses]', err && err.message);
     res.status(500).json({ ok: false, error: 'list_failed' });
   }
 });
 
-app.delete('/api/admin/agent-misses', requireAdminPermission('ai-manager'), (req, res) => {
+app.delete('/api/admin/agent-misses', requireAdminPermission('ai-manager'), async (req, res) => {
   try {
     const aq = require('./services/agentQuality');
-    const n = aq.clearAgentMisses();
+    const n = await aq.clearAgentMisses();
     res.json({ ok: true, cleared: n });
   } catch (err) {
     console.error('[admin/agent-misses delete]', err && err.message);
@@ -3138,11 +3138,11 @@ app.get('/api/admin/launch-config', requireSuperAdmin, async (req, res) => {
 });
 
 /** GET /api/admin/ops-reports — تقارير العمليات الأسبوعية (ب4) */
-app.get('/api/admin/ops-reports', requireSuperAdmin, (req, res) => {
+app.get('/api/admin/ops-reports', requireSuperAdmin, async (req, res) => {
   try {
     const ops = require('./services/opsHousekeeping');
     const limit = Math.max(1, Math.min(40, Number(req.query.limit) || 12));
-    res.json({ ok: true, reports: ops.listWeeklyReports(limit) });
+    res.json({ ok: true, reports: await ops.listWeeklyReports(limit) });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
@@ -3182,7 +3182,7 @@ app.get('/api/account/:accountId/notifications', async (req, res) => {
   try {
     const ops = require('./services/opsHousekeeping');
     const limit = Math.max(1, Math.min(100, Number(req.query.limit) || 50));
-    res.json({ ok: true, notifications: ops.listAccountNotifications(accountId, limit) });
+    res.json({ ok: true, notifications: await ops.listAccountNotifications(accountId, limit) });
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
@@ -3292,17 +3292,17 @@ app.post('/api/admin/launch-config', requireSuperAdmin, async (req, res) => {
 });
 
 /** GET/PUT خزنة أسرار السوبر أدمن — لا تُرجع قيم المفاتيح كاملة */
-app.get('/api/admin/secrets-vault', requireSuperAdmin, (req, res) => {
+app.get('/api/admin/secrets-vault', requireSuperAdmin, async (req, res) => {
   try {
-    res.json(require('./services/secretsVault').getPublicStatus());
+    res.json(await require('./services/secretsVault').getPublicStatus());
   } catch (err) {
     res.status(500).json({ ok: false, error: err.message });
   }
 });
-app.put('/api/admin/secrets-vault', requireSuperAdmin, (req, res) => {
+app.put('/api/admin/secrets-vault', requireSuperAdmin, async (req, res) => {
   try {
     const admin = (req.adminUser && (req.adminUser.user || req.adminUser.name)) || 'super';
-    const result = require('./services/secretsVault').saveSecrets(req.body || {}, admin);
+    const result = await require('./services/secretsVault').saveSecrets(req.body || {}, admin);
     res.json(result);
   } catch (err) {
     console.error('[secretsVault] save', err);
@@ -3455,8 +3455,8 @@ app.get('/api/subscriber/knowledge/mine/:accountId', async (req, res) => {
   const token = extractAccountToken(req) || '';
   const acc = await verifyAccountOwner(accountId, token);
   if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
-  const ent = getAccountEntitlements(acc);
-  if (!accountHasAiAgent(acc)) {
+  const ent = await getAccountEntitlements(acc);
+  if (!(await accountHasAiAgent(acc))) {
     return res.status(403).json({ ok: false, error: resolveAccessDenialMessage(ent), code: ent.subscriptionStatus });
   }
   const row = await getSubscriberProfileByAccountId(accountId);
@@ -3483,8 +3483,8 @@ app.post('/api/subscriber/knowledge/instructions', async (req, res) => {
   }
   const acc = await verifyAccountOwner(accountId, token);
   if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
-  if (!accountHasAiAgent(acc)) {
-    const ent = getAccountEntitlements(acc);
+  if (!(await accountHasAiAgent(acc))) {
+    const ent = await getAccountEntitlements(acc);
     return res.status(403).json({ ok: false, error: resolveAccessDenialMessage(ent), code: ent.subscriptionStatus });
   }
 
@@ -3511,8 +3511,8 @@ app.post('/api/subscriber/knowledge/upload', async (req, res) => {
   }
   const acc = await verifyAccountOwner(accountId, token);
   if (!acc) return res.status(401).json({ ok: false, error: 'unauthorized' });
-  const entUp = getAccountEntitlements(acc);
-  if (!accountHasAiAgent(acc)) {
+  const entUp = await getAccountEntitlements(acc);
+  if (!(await accountHasAiAgent(acc))) {
     return res.status(403).json({ ok: false, error: resolveAccessDenialMessage(entUp), code: entUp.subscriptionStatus });
   }
 
@@ -3750,8 +3750,8 @@ app.post('/api/reports/admin/:id/resolve', requireAdminPermission('reports'), as
 });
 
 /** GET /api/support-tickets/admin — admin list support tickets */
-app.get('/api/support-tickets/admin', requireAdminPermission('users'), (req, res) => {
-  const list = readTickets().sort((a, b) => {
+app.get('/api/support-tickets/admin', requireAdminPermission('users'), async (req, res) => {
+  const list = (await readTickets()).sort((a, b) => {
     if (a.status !== b.status) {
       const order = { open: 0, in_progress: 1, resolved: 2, closed: 3 };
       return (order[a.status] ?? 9) - (order[b.status] ?? 9);
@@ -3762,10 +3762,10 @@ app.get('/api/support-tickets/admin', requireAdminPermission('users'), (req, res
 });
 
 /** PATCH /api/support-tickets/admin/:id — update ticket status */
-app.patch('/api/support-tickets/admin/:id', requireAdminPermission('users'), (req, res) => {
+app.patch('/api/support-tickets/admin/:id', requireAdminPermission('users'), async (req, res) => {
   const { status, adminNote } = req.body || {};
   if (!status) return res.status(400).json({ error: 'status required' });
-  const updated = updateTicketStatus(req.params.id, status, adminNote);
+  const updated = await updateTicketStatus(req.params.id, status, adminNote);
   if (!updated) return res.status(404).json({ error: 'ticket_not_found' });
   res.json({ ok: true, ticket: updated });
 });
@@ -3879,7 +3879,7 @@ const HOURS_FILE = path.join(DATA_DIR, 'business-hours.json');
 async function readAllHours() { return await repos.businessHours.asMap(); }
 async function writeAllHours(obj) {
   const map = obj && typeof obj === 'object' ? obj : {};
-  (await repos.businessHours.replaceAll(Object.keys(map)).map((k) => ({ id: k, data: map[k] })));
+  await repos.businessHours.replaceAll(Object.keys(map).map((k) => ({ id: k, data: map[k] })));
 }
 
 // نفس منطق حفظ صور الإعلانات كملفات حقيقية بدل base64 داخل catalog.json
@@ -4005,7 +4005,7 @@ const REVIEWS_FILE = path.join(DATA_DIR, 'reviews.json');
 async function readReviews() { return await repos.reviews.asMap(); }
 async function writeReviews(obj) {
   const map = obj && typeof obj === 'object' ? obj : {};
-  (await repos.reviews.replaceAll(Object.keys(map)).map((k) => ({ id: k, data: map[k] })));
+  await repos.reviews.replaceAll(Object.keys(map).map((k) => ({ id: k, data: map[k] })));
 }
 function genReviewId() { return 'RV-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8); }
 
@@ -4039,7 +4039,7 @@ app.post('/api/reviews', reviewsLimiter, async (req, res) => {
     const { extractBuyerCredentials } = require('./middleware/buyerAuth');
     const cred = extractBuyerCredentials(req);
     if (cred.id && cred.token) {
-      const row = BuyerModel.findByIdAndToken(cred.id, cred.token);
+      const row = await BuyerModel.findByIdAndToken(cred.id, cred.token);
       if (row) {
         reviewerAccountId = String(row.id).slice(0, 60);
         reviewerName = String(row.name || '').trim().slice(0, 60);
@@ -4305,7 +4305,7 @@ const AD_BOOSTS_FILE = path.join(DATA_DIR, 'ad_boosts.json');
 async function readAdBoosts() { return await repos.adBoosts.asMap(); }
 async function writeAdBoosts(obj) {
   const map = obj && typeof obj === 'object' ? obj : {};
-  (await repos.adBoosts.replaceAll(Object.keys(map)).map((k) => ({ id: k, data: map[k] })));
+  await repos.adBoosts.replaceAll(Object.keys(map).map((k) => ({ id: k, data: map[k] })));
 }
 
 /** POST /api/ad-boosts — الأدمن فقط، بعد موافقته الفعلية على طلب "مميزة" */
@@ -4499,7 +4499,7 @@ app.get('/api/discovery/platform-stats', async (req, res) => {
 
     let investmentsLive = 0;
     try {
-      const inv = require('./services/investmentRoom').listPublic({ unlockContacts: false });
+      const inv = (await require('./services/investmentRoom').listPublic({ unlockContacts: false })) || {};
       investmentsLive = Array.isArray(inv.opportunities) ? inv.opportunities.length : 0;
     } catch (_) {
       investmentsLive = 0;
@@ -4745,7 +4745,7 @@ async function boot() {
       autoRefreshCurrencyRatesIfStale().catch(function () {});
     }, CURRENCY_AUTO_REFRESH_MS);
     try {
-      const invSched = investmentRoom.startDailyOpsScheduler();
+      const invSched = await investmentRoom.startDailyOpsScheduler();
       if (invSched && invSched.started) {
         console.log('[investments] daily ops report scheduler started');
       }

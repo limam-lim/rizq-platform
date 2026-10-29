@@ -11,7 +11,7 @@ const { resolveAccountPhones } = require('../lib/phoneNormalize');
  * @param {import('express').Application} app
  * @param {object} deps
  */
-async function mountAccountsManageRoutes(app, deps) {
+function mountAccountsManageRoutes(app, deps) {
   const {
     requireAdminAuth,
     requireAdminPermission,

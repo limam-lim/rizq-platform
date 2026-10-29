@@ -38,7 +38,7 @@ const externalLimiter = rateLimit({
   message: { ok: false, error: 'تجاوزت حد طلبات API — حاول لاحقاً', code: 'RATE_LIMIT' },
 });
 
-async function setupIntegrationAPI(app, deps) {
+function setupIntegrationAPI(app, deps) {
   deps = deps || {};
   const {
     verifyAccountOwner,
@@ -60,7 +60,7 @@ async function setupIntegrationAPI(app, deps) {
       return { ok: false, status: 403, error: 'متاح لحسابات الشركات فقط', code: 'CORP_ONLY' };
     }
     try {
-      assertAccountFeature(acc, 'api_erp_integration');
+      await assertAccountFeature(acc, 'api_erp_integration');
     } catch (e) {
       return { ok: false, status: e.status || 403, error: e.message, code: e.code };
     }
@@ -68,45 +68,45 @@ async function setupIntegrationAPI(app, deps) {
   }
 
   /** GET /api/integration/status/:accountId — owner dashboard (لا يُنشئ مفتاحاً) */
-  app.get('/api/integration/status/:accountId', integrationLimiter, (req, res) => {
+  app.get('/api/integration/status/:accountId', integrationLimiter, async (req, res) => {
     const accountId = String(req.params.accountId || '').trim();
     const token = String(req.header('x-account-token') || '').trim();
-    const guard = ownerGuard(accountId, token);
+    const guard = await ownerGuard(accountId, token);
     if (!guard.ok) return sendError(res, guard.status, guard.error, guard.code);
 
-    const status = getIntegrationStatus(accountId, guard.acc.type);
+    const status = await getIntegrationStatus(accountId, guard.acc.type);
     res.json({ ok: true, ...status });
   });
 
   /** POST /api/integration/key/:accountId/create — إنشاء مفتاح لأول مرة (يكشف النص مرة واحدة) */
-  app.post('/api/integration/key/:accountId/create', integrationLimiter, (req, res) => {
+  app.post('/api/integration/key/:accountId/create', integrationLimiter, async (req, res) => {
     const accountId = String(req.params.accountId || '').trim();
     const token = String(req.header('x-account-token') || '').trim();
-    const guard = ownerGuard(accountId, token);
+    const guard = await ownerGuard(accountId, token);
     if (!guard.ok) return sendError(res, guard.status, guard.error, guard.code);
 
-    const result = ensureApiKeyForCompany(accountId, guard.acc.type);
+    const result = await ensureApiKeyForCompany(accountId, guard.acc.type);
     if (!result.ok) return sendError(res, 403, result.error, result.code);
     res.json(result);
   });
 
   /** POST /api/integration/key/:accountId/regenerate — rotate key (owner) */
-  app.post('/api/integration/key/:accountId/regenerate', integrationLimiter, (req, res) => {
+  app.post('/api/integration/key/:accountId/regenerate', integrationLimiter, async (req, res) => {
     const accountId = String(req.params.accountId || '').trim();
     const token = req.header('x-account-token') || '';
-    const guard = ownerGuard(accountId, token);
+    const guard = await ownerGuard(accountId, token);
     if (!guard.ok) return sendError(res, guard.status, guard.error, guard.code);
 
-    const result = regenerateApiKey(accountId, guard.acc.type);
+    const result = await regenerateApiKey(accountId, guard.acc.type);
     if (!result.ok) return sendError(res, 403, result.error, result.code);
     res.json(result);
   });
 
   /** PATCH /api/integration/key/:accountId — update IP allowlist (owner) */
-  app.patch('/api/integration/key/:accountId', integrationLimiter, (req, res) => {
+  app.patch('/api/integration/key/:accountId', integrationLimiter, async (req, res) => {
     const accountId = String(req.params.accountId || '').trim();
     const token = req.header('x-account-token') || '';
-    const guard = ownerGuard(accountId, token);
+    const guard = await ownerGuard(accountId, token);
     if (!guard.ok) return sendError(res, guard.status, guard.error, guard.code);
 
     const body = req.body || {};
@@ -116,7 +116,7 @@ async function setupIntegrationAPI(app, deps) {
       return sendError(res, 400, 'allowedOriginIp مطلوب', 'MISSING_FIELD');
     }
     const ipVal = body.allowedOriginIp != null ? body.allowedOriginIp : body.allowed_origin_ip;
-    const result = updateAllowedOriginIp(accountId, guard.acc.type, ipVal);
+    const result = await updateAllowedOriginIp(accountId, guard.acc.type, ipVal);
     if (!result.ok) return sendError(res, 400, result.error, result.code);
     res.json(result);
   });
@@ -127,9 +127,10 @@ async function setupIntegrationAPI(app, deps) {
       const all = await CorpApiIntegration.listAll();
       const accounts = typeof readAccounts === 'function' ? await readAccounts() : [];
       const byId = new Map((accounts || []).map((a) => [a.id, a]));
-      const rows = all.map((row) => {
+      const rows = [];
+      for (const row of all) {
         const acc = byId.get(row.companyId) || null;
-        return {
+        rows.push({
           companyId: row.companyId,
           companyName: acc ? (acc.name || acc.id) : row.companyId,
           apiStatus: row.apiStatus,
@@ -137,15 +138,15 @@ async function setupIntegrationAPI(app, deps) {
           allowedOriginIp: row.allowedOriginIp,
           lastUsedAt: row.lastUsedAt,
           createdAt: row.createdAt,
-          entitled: isCorpDiamondProEntitled(row.companyId, 'corp'),
-        };
-      });
+          entitled: await isCorpDiamondProEntitled(row.companyId, 'corp'),
+        });
+      }
       res.json({ ok: true, integrations: rows });
     });
 
-    app.get('/api/integration/admin/:accountId', requireSharedSecret, (req, res) => {
+    app.get('/api/integration/admin/:accountId', requireSharedSecret, async (req, res) => {
       const accountId = String(req.params.accountId || '').trim();
-      const status = getIntegrationStatus(accountId, 'corp');
+      const status = await getIntegrationStatus(accountId, 'corp');
       res.json({ ok: true, ...status });
     });
   }

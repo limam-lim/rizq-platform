@@ -563,7 +563,7 @@ function getMailer() {
 
 async function sendOpsDailyReport() {
   const to = opsEmail();
-  const digest = buildDailyDigest();
+  const digest = await buildDailyDigest();
   if (!to) {
     return { ok: false, skipped: true, reason: 'ops_email_unset', digest };
   }

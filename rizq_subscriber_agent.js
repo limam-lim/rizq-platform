@@ -492,7 +492,7 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
         scrubbedClaim: true,
         force: true,
         tier: 'diamond',
-      });
+      }).catch(() => {});
     }
   } catch (eQ) { /* optional */ }
 

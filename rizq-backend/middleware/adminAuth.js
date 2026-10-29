@@ -65,7 +65,7 @@ function createAdminAuth(deps) {
     return async (req, res, next) => {
       try {
         await new Promise((resolve, reject) => {
-          requireAdminAuth(req, res, (err) => (err ? reject(err) : resolve()));
+          requireAdminAuth(req, res, (err) => (err ? reject(err) : resolve())); // await-ok: callback-style, errors go to next(err)
         });
         if (res.headersSent) return;
         const perms = (req.adminUser && req.adminUser.permissions) || [];
@@ -86,7 +86,7 @@ function createAdminAuth(deps) {
   async function requireSuperAdmin(req, res, next) {
     try {
       await new Promise((resolve, reject) => {
-        requireAdminAuth(req, res, (err) => (err ? reject(err) : resolve()));
+        requireAdminAuth(req, res, (err) => (err ? reject(err) : resolve())); // await-ok: callback-style, errors go to next(err)
       });
       if (res.headersSent) return;
       const perms = (req.adminUser && req.adminUser.permissions) || [];
