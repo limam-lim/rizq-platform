@@ -214,6 +214,20 @@ function mountCatalogRoutes(app, deps) {
     res.json({ ok: true, items: list });
   });
 
+  /** GET /api/catalog/admin/pending — عناصر الكتالوج بانتظار مراجعة الأدمن (لوحة الإشراف) */
+  app.get('/api/catalog/admin/pending', async (req, res) => {
+    if (!(await isCatalogAdmin(req))) return res.status(401).json({ error: 'unauthorized' });
+    const items = (await readCatalog())
+      .filter((it) => it.status === 'pending_review')
+      .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
+      .slice(0, 200)
+      .map((it) => ({
+        id: it.id, accountId: it.accountId, kind: it.kind, name: it.name || it.title || '',
+        price: it.price, image: it.image || null, createdAt: it.createdAt,
+      }));
+    res.json({ ok: true, items });
+  });
+
   /** GET /api/catalog/:id — عام فقط للعناصر النشطة؛ المالك/الأدمن يريان الباقي */
   app.get('/api/catalog/:id', async (req, res) => {
     const item = (await readCatalog()).find((it) => it.id === req.params.id);

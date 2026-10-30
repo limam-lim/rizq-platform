@@ -25,6 +25,7 @@ function mountAdminCoreRoutes(app, deps) {
     readSubRequests,
     readAdsRequests,
     readTenders,
+    readCatalog,
     getAllAccountPackageRecords,
     readAuditLog,
     DATA_DIR,
@@ -267,6 +268,9 @@ function mountAdminCoreRoutes(app, deps) {
       const pendingBizContacts = (typeof readAdsRequests === 'function' ? await readAdsRequests() : [])
         .filter((r) => r.status === 'pending_contact');
       const pendingTenders = (await readTenders()).filter((t) => t.status === 'pending_review');
+      // منتجات/خدمات الكتالوج تُنشأ pending_review ولا تظهر للعامة قبل موافقة الأدمن
+      const pendingCatalog = typeof readCatalog === 'function'
+        ? (await readCatalog()).filter((it) => it.status === 'pending_review') : [];
 
       const pkgRecords = await getAllAccountPackageRecords();
       const expiringSoon = [];
@@ -290,6 +294,7 @@ function mountAdminCoreRoutes(app, deps) {
         pendingSubRequests: { count: pendingSubRequests.length },
         pendingBizContacts: { count: pendingBizContacts.length },
         pendingTenders: { count: pendingTenders.length },
+        pendingCatalog: { count: pendingCatalog.length, items: pendingCatalog.slice(0, 20).map((it) => ({ id: it.id, name: it.name, accountId: it.accountId })) },
         expiringSoon: { count: expiringSoon.length, items: expiringSoon.slice(0, 20) },
         suspended: { count: suspended.length, items: suspended.slice(0, 20) },
         lastMaintenance,

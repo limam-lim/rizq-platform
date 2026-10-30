@@ -3093,6 +3093,7 @@ mountAdminCoreRoutes(app, {
   readSubRequests,
   readAdsRequests: async () => await repos.adsRequests.list(),
   readTenders,
+  readCatalog,
   getAllAccountPackageRecords,
   readAuditLog,
   DATA_DIR,

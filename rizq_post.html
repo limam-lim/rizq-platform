@@ -1522,6 +1522,84 @@ function _rizqRecordPostTimestamp(){
   }catch(e){}
 }
 
+/* ══ إرسال الإعلان إلى الخادم وانتظار ردّه — الخادم هو المرجع ══
+   كان النشر "أطلق وانسَ": شاشة النجاح تظهر قبل ردّ الخادم، والطلب يُرسل بلا
+   توكن فيُرفض (401) بصمت — الإعلان يبقى في متصفح الناشر فقط ولا يراه أحد. */
+function _rizqPostBase(){
+  return (typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE) ? window.RIZQ_BACKEND_BASE.replace(/\/$/, '') : '';
+}
+function _rizqPostSession(){
+  try{
+    var act = JSON.parse(localStorage.getItem('rizq_active_session') || 'null');
+    if(act && act.id && act.token) return act;
+    var ind = JSON.parse(localStorage.getItem('rizq_individual_session') || 'null');
+    if(ind && ind.id && ind.token) return ind;
+  }catch(e){}
+  return null;
+}
+function _rizqPostSaveDash(id, dash){
+  try{
+    sessionStorage.setItem('rizq_dash_token_' + id, dash);
+    ['rizq_active_session', 'rizq_individual_session'].forEach(function(k){
+      var s = JSON.parse(localStorage.getItem(k) || 'null');
+      if(s && s.id === id){ s.token = dash; localStorage.setItem(k, JSON.stringify(s)); }
+    });
+    var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+    var rec = accs.find(function(a){ return a && a.id === id; });
+    if(rec){ rec.token = dash; rec.dashToken = dash; localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs)); }
+  }catch(e){}
+}
+function _rizqPostAccessToken(sess){
+  var base = _rizqPostBase();
+  if(!sess || !base) return Promise.resolve('');
+  try{ var mem = sessionStorage.getItem('rizq_access_mem_' + sess.id); if(mem) return Promise.resolve(mem); }catch(e){}
+  var dash = '';
+  try{ dash = sessionStorage.getItem('rizq_dash_token_' + sess.id) || ''; }catch(e){}
+  if(!dash) dash = sess.token;
+  return fetch(base + '/api/accounts/exchange-dash-token/' + encodeURIComponent(sess.id), {
+    method: 'POST', headers: { 'Content-Type': 'application/json', 'x-dash-token': dash }, body: JSON.stringify({ dashToken: dash })
+  }).then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
+    if(!d || !d.ok || !d.accessToken) return '';
+    try{ sessionStorage.setItem('rizq_access_mem_' + sess.id, d.accessToken); }catch(e){}
+    if(d.dashToken) _rizqPostSaveDash(sess.id, d.dashToken);
+    return d.accessToken;
+  }).catch(function(){ return ''; });
+}
+function _rizqSubmitAdToServer(data){
+  var fr = (typeof isAr !== 'undefined' && !isAr);
+  var base = _rizqPostBase();
+  if(!base) return Promise.resolve({ ok:false, message: fr ? 'Serveur indisponible — réessayez plus tard' : 'الخادم غير متاح حالياً — حاول لاحقاً' });
+  var sess = _rizqPostSession();
+  if(!sess) return Promise.resolve({ ok:false, needLogin:true, message: fr ? 'Connectez-vous pour publier votre annonce' : 'سجّل الدخول لنشر إعلانك' });
+  return _rizqPostAccessToken(sess).then(function(tok){
+    if(!tok) return { ok:false, needLogin:true, message: fr ? 'Session expirée — reconnectez-vous' : 'انتهت الجلسة — سجّل الدخول من جديد' };
+    var payload = Object.assign({}, data, { accountId: sess.id });
+    return fetch(base + '/api/ads', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-account-token': tok }, body: JSON.stringify(payload)
+    }).then(function(r){
+      return r.json().catch(function(){ return {}; }).then(function(b){
+        if(r.ok && b && b.ok) return { ok:true, id: b.id || (b.ad && b.ad.id), status: (b.ad && b.ad.status) || 'pending' };
+        if(r.status === 401){ try{ sessionStorage.removeItem('rizq_access_mem_' + sess.id); }catch(e){} }
+        var msg = (b && (fr ? (b.msg_fr || b.message_fr) : (b.msg || b.message))) || (b && typeof b.error === 'string' && /[؀-ۿ]/.test(b.error) && !fr ? b.error : '') || (fr ? 'Échec de la publication — réessayez' : 'تعذّر نشر الإعلان — حاول مرة أخرى');
+        return { ok:false, status:r.status, message:msg, needLogin: r.status === 401 };
+      });
+    });
+  }).catch(function(){ return { ok:false, message: fr ? 'Connexion impossible — réessayez' : 'تعذّر الاتصال — حاول مرة أخرى' }; });
+}
+function _rizqPublishFailed(res){
+  var btn = document.getElementById('btn-publish');
+  if(btn){ btn.disabled = false; }
+  showToast('⚠️ ' + (res && res.message ? res.message : 'تعذّر نشر الإعلان'), 'error');
+  if(res && res.needLogin){
+    try{ sessionStorage.setItem('rizq_after_auth_href', 'rizq_post.html'); }catch(e){}
+    setTimeout(function(){ location.href = 'rizq_landing_v8.html?openLogin=1'; }, 1800);
+  }
+}
+function _rizqPublishBusy(){
+  var btn = document.getElementById('btn-publish');
+  if(btn){ btn.disabled = true; }
+}
+
 function publishAd(){
   // ══ حماية أساسية من النشر الآلي المفرط ══
   if(_rizqRecentPostCount() >= RIZQ_MAX_ADS_PER_DAY){
@@ -1666,7 +1744,11 @@ function publishAd(){
             }).catch(function(){ /* أي خطأ في تحسين الصور لا يجب أن يمنع نشر الإعلان */ })
           : Promise.resolve();
 
-        _visualStep.then(function(){
+        _rizqPublishBusy();
+        _visualStep.then(function(){ return _rizqSubmitAdToServer(data); }).then(function(_srv){
+          if(!_srv || !_srv.ok){ _rizqPublishFailed(_srv); return; }
+          data.id = _srv.id || data.id;
+          data._status = _srv.status || 'pending';
           document.getElementById('success-id').textContent = data.id;
           _showSuccessCondition(data);
           document.querySelectorAll('.post-panel').forEach(function(p){p.classList.remove('active');});
@@ -1687,15 +1769,7 @@ function publishAd(){
           // فعلياً لأي زائر آخر من أي جهاز، لا محبوساً في متصفح الناشر فقط.
           // فشل صامت إن لم يُنشَر الخادم بعد أو انقطعت الشبكة — النشر
           // المحلي (فوق) يبقى يعمل بشكل طبيعي في كل الحالات.
-          try{
-            if(typeof window.RIZQ_BACKEND_BASE === 'string' && window.RIZQ_BACKEND_BASE){
-              fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/, '') + '/api/ads', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-              }).catch(function(){ /* صامت — لا خادم منشور بعد أو انقطاع شبكة */ });
-            }
-          }catch(e){}
+          // (الإرسال للخادم تم أعلاه بانتظار الرد — هنا نسخة محلية مؤقتة فقط)
           try{
             localStorage.setItem('rizq_ads', JSON.stringify(ads));
           }catch(quotaErr){
@@ -1719,7 +1793,11 @@ function publishAd(){
         window.scrollTo({top:0,behavior:'smooth'});
       },
       onReview: function(result, data){
-        // يُعامَل كنشر ناجح لكن بحالة pending
+        // يُعامَل كنشر ناجح لكن بحالة pending — بعد قبول الخادم فقط (كان لا يُرسل للخادم إطلاقاً)
+        _rizqPublishBusy();
+        _rizqSubmitAdToServer(data).then(function(_srv){
+        if(!_srv || !_srv.ok){ _rizqPublishFailed(_srv); return; }
+        data.id = _srv.id || data.id;
         document.getElementById('success-id').textContent = data.id;
         _showSuccessCondition(data);
         document.querySelectorAll('.post-panel').forEach(function(p){p.classList.remove('active');});
@@ -1730,11 +1808,16 @@ function publishAd(){
           s.querySelector('.step-circle').textContent = '✓';
         });
         window.scrollTo({top:0,behavior:'smooth'});
+        });
       },
     });
   } else {
-    // fallback إذا لم يُحمَّل الوكيل
-    adData.status = 'active';
+    // fallback إذا لم يُحمَّل الوكيل — الخادم يراجع كل إعلان (pending) قبل الظهور
+    _rizqPublishBusy();
+    _rizqSubmitAdToServer(adData).then(function(_srv){
+    if(!_srv || !_srv.ok){ _rizqPublishFailed(_srv); return; }
+    adData.id = _srv.id || adData.id;
+    adData.status = _srv.status || 'pending';
     adData.date = new Date().toLocaleDateString('ar-MR-u-nu-latn');
     try{
       var adsFb = JSON.parse(localStorage.getItem('rizq_ads') || '[]');
@@ -1752,6 +1835,7 @@ function publishAd(){
       s.querySelector('.step-circle').textContent = '✓';
     });
     window.scrollTo({top:0,behavior:'smooth'});
+    });
   }
 }
 
