@@ -29,7 +29,7 @@ async function main() {
   assert(cfg.listCampaignTypes().length >= 8, 'campaign types present');
   assert(cfg.CHANNELS.facebook.publishable === true, 'facebook publishable');
 
-  const status = marketing.getPublicStatus();
+  const status = await marketing.getPublicStatus();
   assert(status.enabled === true, 'enabled by default');
   assert(status.facebookConfigured === false, 'facebook not configured in test');
   assert(status.claudeConfigured === false, 'claude not configured in test');
@@ -51,12 +51,12 @@ async function main() {
   const scored = marketing.scoreCreative(camp.body, { channel: 'facebook' });
   assert(scored.pass === true || scored.score >= 50, 'quality reasonable');
 
-  const edited = marketing.updateDraftBody(camp.id, {
+  const edited = await marketing.updateDraftBody(camp.id, {
     body: camp.body + '\n\nسجّل الآن على منصة رزق.',
   }, 'test-admin');
   assert(edited.body.indexOf('سجّل الآن') !== -1, 'edit body');
 
-  const approved = marketing.approveCampaign(camp.id, 'test-admin', {});
+  const approved = await marketing.approveCampaign(camp.id, 'test-admin', {});
   assert(approved.status === 'approved', 'approved');
 
   let publishErr = null;
@@ -67,10 +67,10 @@ async function main() {
   }
   assert(publishErr && publishErr.code === 'fb_not_configured', 'publish blocked without FB token');
 
-  const listed = marketing.listCampaigns({ limit: 10 });
+  const listed = await marketing.listCampaigns({ limit: 10 });
   assert(listed.some((c) => c.id === camp.id), 'listed');
 
-  const stats = marketing.getStats();
+  const stats = await marketing.getStats();
   assert(stats.total >= 1, 'stats total');
 
   if (failed) {

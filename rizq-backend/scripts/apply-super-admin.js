@@ -42,7 +42,7 @@ function upsertEnv(raw, key, value) {
   return next.join('\n').replace(/\n*$/, '\n');
 }
 
-function main() {
+async function main() {
   const email = String(arg('email', process.env.SUPER_ADMIN_EMAIL || 'megalimam@gmail.com'))
     .trim()
     .toLowerCase();
@@ -72,7 +72,7 @@ function main() {
   process.env.SUPER_ADMIN_NAME = name;
 
   const adminTeam = require('../services/adminTeam');
-  adminTeam.ensureOwnerSuperAdmin({
+  await adminTeam.ensureOwnerSuperAdmin({
     email,
     user: email,
     name,
@@ -87,4 +87,6 @@ function main() {
   console.log('  Restart the backend if it is already running.');
 }
 
-main();
+main()
+  .then(() => setTimeout(() => process.exit(0), 100))
+  .catch((e) => { console.error('✗ apply-super-admin failed:', e.message); process.exit(1); });

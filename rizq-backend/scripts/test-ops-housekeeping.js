@@ -201,7 +201,7 @@ async function run() {
   check('B1 email attempted', rem.emailAttempted >= 1);
   check('B1 emailed', rem.emailed >= 1 && emailsSent.some((e) => e.to === 'ind@test.local'));
   check('B1 email subject', emailsSent.some((e) => /تذكير|انتهاء/.test(e.subject)));
-  const adRem = deps.readAds().find((a) => a.id === 'AD_REM');
+  const adRem = (await deps.readAds()).find((a) => a.id === 'AD_REM');
   check(
     'B1 both channels recorded',
     !!(adRem && adRem.renewalReminderChannels && adRem.renewalReminderChannels.notification && adRem.renewalReminderChannels.email)
@@ -216,16 +216,16 @@ async function run() {
   check('B2 unverified warned', clean.unverifiedWarned >= 1);
 
   // second cleanup after warn grace → delete
-  const accAfter = deps.readAccounts();
+  const accAfter = await deps.readAccounts();
   const uv = accAfter.find((a) => a.id === 'acc_uv_1');
   check('B2 warnAt set', !!(uv && uv.unverifiedWarnAt));
   if (uv) {
     uv.unverifiedWarnAt = new Date(now - 8 * MS_DAY).toISOString();
-    deps.writeAccounts(accAfter);
+    await deps.writeAccounts(accAfter);
   }
   const clean2 = await runCleanups(deps);
   check('B2 unverified deleted', clean2.unverifiedDeleted >= 1, JSON.stringify(clean2));
-  check('B2 account gone', !deps.readAccounts().some((a) => a.id === 'acc_uv_1'));
+  check('B2 account gone', !(await deps.readAccounts()).some((a) => a.id === 'acc_uv_1'));
 
   // ── B4 weekly report ─────────────────────────────────────
   const report = await buildWeeklyReport({

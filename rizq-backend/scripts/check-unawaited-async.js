@@ -24,6 +24,7 @@ const walk = require('acorn-walk');
 
 const BACKEND = path.resolve(__dirname, '..');
 const JSON_OUT = process.argv.includes('--json');
+const INCLUDE_SCRIPTS = process.argv.includes('--scripts');
 const ARRAY_BUILTINS = new Set(['forEach', 'map', 'filter', 'find', 'findIndex', 'some', 'every', 'reduce', 'sort', 'push', 'includes', 'bind', 'call', 'apply']);
 const DEPS = /^(deps|accountsHelpers|helpers|repos|store|ctx|services|svc|db|sql)$/;
 
@@ -58,7 +59,13 @@ function listServerFiles() {
       }
     }
   }
-  return [...out].filter((f) => !/[\\/]scripts[\\/]/.test(f));
+  const files = [...out].filter((f) => !/[\\/]scripts[\\/]/.test(f));
+  // --scripts: افحص أيضاً سكربتات التشغيل (scripts/*.js) التي تستدعي المستودع
+  if (INCLUDE_SCRIPTS) {
+    const sd = path.join(BACKEND, 'scripts');
+    for (const f of fs.readdirSync(sd)) if (f.endsWith('.js')) files.push(path.join(sd, f));
+  }
+  return files;
 }
 
 const mods = new Map();

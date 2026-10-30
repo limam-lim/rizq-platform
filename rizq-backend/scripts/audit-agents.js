@@ -39,22 +39,25 @@ function syntax(file) {
 // 2. Widget tools (sync path — async executeWidgetTool is covered in listen())
 const { executeWidgetTool, executeWidgetToolSync, resolvePageContextFacts, WIDGET_TOOLS } = require('../services/widgetAgentTools');
 ok('widget tools count', WIDGET_TOOLS.length >= 6, String(WIDGET_TOOLS.length));
-ok('search_ads', executeWidgetToolSync('search_ads', { limit: 2 }).ok);
-const ticket = executeWidgetToolSync('create_support_ticket', { type: 'report', summary: 'audit test' });
-ok('ticket persisted', ticket.ok && ticket.ticket_id);
 const { readTickets } = require('../services/agentTickets');
-ok('ticket in file', readTickets().some((t) => t.id === ticket.ticket_id));
-
-// 3. Page context
-const facts = resolvePageContextFacts({ urlAdId: 'NOPE-ID' });
-ok('page context no crash', Array.isArray(facts.ads));
-
-// 4. Agent status
 const { setActive, isActive } = require('../services/agentStatus');
-setActive('22112233', false);
-ok('agent status off', isActive('22112233') === false);
-setActive('22112233', true);
-ok('agent status on', isActive('22112233') === true);
+// المستودع async — هذه الفحوص تُنتظر داخل listen() قبل كتابة النتيجة
+const earlyChecks = (async () => {
+  ok('search_ads', (await executeWidgetToolSync('search_ads', { limit: 2 })).ok);
+  const ticket = await executeWidgetToolSync('create_support_ticket', { type: 'report', summary: 'audit test' });
+  ok('ticket persisted', ticket.ok && ticket.ticket_id);
+  ok('ticket in file', (await readTickets()).some((t) => t.id === ticket.ticket_id));
+
+  // 3. Page context
+  const facts = await resolvePageContextFacts({ urlAdId: 'NOPE-ID' });
+  ok('page context no crash', Array.isArray(facts.ads));
+
+  // 4. Agent status
+  await setActive('22112233', false);
+  ok('agent status off', (await isActive('22112233')) === false);
+  await setActive('22112233', true);
+  ok('agent status on', (await isActive('22112233')) === true);
+})().catch((e) => ok('early agent checks', false, e.message));
 
 // 5. Brain tools (no API) — executeTool is async; package check runs in listen() below
 const { executeTool, AGENT_TOOLS } = require(path.join(ROOT, 'rizq_agent_brain.js'));
@@ -167,11 +170,11 @@ app.use(express.json());
 app.use('/api/auth', authRouter);
 app.use('/api/wishlist', wishlistRouter);
 const { setActive: setSt } = require('../services/agentStatus');
-app.post('/api/agent/toggle', (req, res) => {
+app.post('/api/agent/toggle', async (req, res) => {
   const { subscriberPhone, active, secret } = req.body || {};
   const a = process.env.BACKEND_SHARED_SECRET || 'test-secret';
   if (secret !== a) return res.status(403).json({ ok: false });
-  setSt(subscriberPhone, active);
+  await setSt(subscriberPhone, active);
   res.json({ ok: true, active: !!active });
 });
 app.use(notFoundHandler);
@@ -199,6 +202,7 @@ const server = app.listen(0, async () => {
   }
 
   try {
+    await earlyChecks;
     // Brain/widget get_packages_info are async and now source live_catalog
     const bt = await executeTool('get_packages_info', { lang: 'ar', catalog: 'store' });
     ok(
@@ -251,7 +255,7 @@ const server = app.listen(0, async () => {
       });
     } catch (eQuota) {
       // At 100% assertQuotaAvailable may block further writes — treat as capped
-      snap100 = Quota.getSnapshot('+22244110001', 'ACC-Q1');
+      snap100 = await Quota.getSnapshot('+22244110001', 'ACC-Q1');
       snap100._blockedWrite = eQuota && eQuota.code === 'quota_exhausted';
     }
     ok(
@@ -260,16 +264,16 @@ const server = app.listen(0, async () => {
         && Quota.shouldForceFast() === false
         && (snap100.textBlocked || snap100.quotaBlocked || snap100._blockedWrite || snap100.alertLevel === 100)
     );
-    const reqTopup = Quota.requestTopup({ subscriberId: '+22244110001', accountId: 'ACC-Q1', businessName: 'مكتب اختبار', type: 'text' });
+    const reqTopup = await Quota.requestTopup({ subscriberId: '+22244110001', accountId: 'ACC-Q1', businessName: 'مكتب اختبار', type: 'text' });
     ok('quota topup request', reqTopup.ok && reqTopup.request && reqTopup.request.status === 'pending');
-    const approved = Quota.resolveTopup(reqTopup.request.id, 'approved');
+    const approved = await Quota.resolveTopup(reqTopup.request.id, 'approved');
     ok(
       'quota topup approved restores headroom',
       approved.ok
         && (approved.snapshot.topupMessages > 0 || !approved.snapshot.textBlocked)
         && Quota.shouldForceFast() === false
     );
-    const admin = Quota.listAdminUsage([{ subscriberId: '+22244110001', accountId: 'ACC-Q1', businessName: 'مكتب اختبار' }]);
+    const admin = await Quota.listAdminUsage([{ subscriberId: '+22244110001', accountId: 'ACC-Q1', businessName: 'مكتب اختبار' }]);
     ok('quota admin tracker', admin.count >= 1 && typeof admin.totalCostUsd === 'number');
     try { fs.unlinkSync(quotaTmp); } catch (e) {}
 
