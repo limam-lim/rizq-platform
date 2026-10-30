@@ -2394,7 +2394,21 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
   }
 
   list.push(acc);
-  await writeAccounts(list);
+  try {
+    await writeAccounts(list);
+  } catch (eSave) {
+    // فهرس فريد في القاعدة: تسجيل متزامن بنفس البريد/الهوية سبقنا بلحظة
+    if (eSave && eSave.code === '23505') {
+      const isNni = /nni/i.test(String(eSave.constraint || eSave.message || ''));
+      return res.status(409).json(isNni ? nniDuplicatePayload() : {
+        ok: false,
+        code: 'email_in_use',
+        error: 'البريد الإلكتروني مستخدم مسبقاً — سجّل الدخول أو استخدم بريداً آخر',
+      });
+    }
+    console.error('[accounts/register] save failed:', eSave && eSave.message);
+    return res.status(500).json({ ok: false, code: 'save_failed', error: 'تعذّر حفظ الحساب — حاول مرة أخرى' });
+  }
   if (autoApproved && canAutoApproveAccountType(reqType) && acc.idImage) {
     const idx = list.length - 1;
     purgeAccountIdDocument(list[idx]);
@@ -2805,6 +2819,10 @@ app.post('/api/sub-requests/admin/:id/decision', requireAdminPermission('payment
       writeAdBoosts,
     };
     const activation = await activateSubRequest(row, deps);
+    if (activation && activation.error === 'already_processed') {
+      // موافقة أخرى (لوحة/Telegram/الوكيل) تعالج هذا الطلب الآن أو عالجته — لا تفعيل مزدوج
+      return res.status(409).json({ ok: false, error: 'already_processed', message: 'هذا الطلب قيد المعالجة أو عولج بالفعل' });
+    }
     if (!activation || !activation.ok) {
       return res.status(500).json({
         ok: false,
@@ -3084,11 +3102,9 @@ mountAdminCoreRoutes(app, {
 
 const { mountMarketingRoutes } = require('./routes/marketing');
 mountMarketingRoutes(app, { requireAdminPermission });
-try {
-  require('./services/marketingAgent').startScheduler();
-} catch (eMkt) {
+require('./services/marketingAgent').startScheduler().catch((eMkt) => {
   console.warn('[marketingAgent] scheduler not started:', eMkt && eMkt.message);
-}
+});
 
 const agentMissLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -4661,7 +4677,10 @@ setupIntegrationAPI(app, {
   readCatalog,
   readMessages,
   writeMessages,
-  requireAdminAuth: requireAdminPermission('siteconfig.write'),
+  // 'siteconfig.write' لم يكن ضمن الصلاحيات القابلة للمنح (سوبر فقط فعلياً) → 'siteconfig'
+  requireAdminAuth: requireAdminPermission('siteconfig'),
+  // لوحة الأدمن تطلب قائمة مفاتيح API الشركات بجلسة أدمن — كان المسار غير مسجَّل (404)
+  requireSharedSecret: requireAdminPermission('siteconfig', 'accounts'),
 });
 
 // ── تطوير محلي: صفحات HTML + API على نفس المنفذ (localhost:3000) ──
@@ -4679,6 +4698,15 @@ if (process.env.NODE_ENV !== 'production' && process.env.RIZQ_SERVE_STATIC !== '
     if (req.path.startsWith('/rizq-backend')) return notFoundHandler(req, res);
     // أدلة تقنية داخلية — لا تُعرض للزوّار عبر الملفات الثابتة
     const p = String(req.path || '').toLowerCase();
+    // ملفات خادمية/أدوات لا يحتاجها المتصفح (منطق الوكلاء، معالجات الاتصال، سكربتات، إعدادات نشر)
+    if (
+      /^\/(rizq_agent_brain|rizq_call_handler|rizq_email_handler|rizq_quota_guard_agent|rizq_subscriber_agent|rizq_whatsapp_handler)\.js$/.test(p)
+      || p.startsWith('/scripts/') || p.startsWith('/node_modules/') || p.startsWith('/.')
+      || /^\/(package(-lock)?\.json|render\.yaml)$/.test(p)
+      || /\.(md|ya?ml|ps1|sh|bat|env|log|sqlite|db)$/.test(p)
+    ) {
+      return notFoundHandler(req, res);
+    }
     if (
       p === '/rizq_platform_manual.md' ||
       p.endsWith('/rizq_platform_manual.md') ||

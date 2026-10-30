@@ -180,7 +180,9 @@ for (const f of files) {
         } else {
           let root = obj;
           while (root && root.type === 'MemberExpression') root = root.object;
-          const rootName = root && root.type === 'Identifier' ? root.name : '';
+          // repos().x.list() — مستودع يُجلب عبر دالة كسولة
+          const rootName = root && root.type === 'Identifier' ? root.name
+            : (root && root.type === 'CallExpression' && root.callee.type === 'Identifier' && /^_?repos?$/.test(root.callee.name) ? 'repos' : '');
           if (!DEPS.test(rootName)) return;
           if (rootName === 'repos' || rootName === 'db') kind = 'repo';
           else if (globalAsync.has(prop)) kind = 'dep';

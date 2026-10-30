@@ -111,7 +111,8 @@ function ok(name, cond, extra) {
     ok('old dash token still accepted briefly', (await mine(laptop.dashToken)) === 200);
     ok('new access token works', (await mine(ex.d.accessToken)) === 200);
     const exAgain = await call('POST', '/api/accounts/exchange-dash-token/' + acc.id, { dashToken: laptop.dashToken });
-    ok('old dash token cannot be exchanged twice', exAgain.s === 401, exAgain.s);
+    ok('second tab opening at the same moment (old dash token, within grace) still gets in', exAgain.s === 200, exAgain.s);
+    ok('forged dash token is refused', (await call('POST', '/api/accounts/exchange-dash-token/' + acc.id, { dashToken: 'forged' })).s === 401);
     const vd = await call('POST', '/api/accounts/verify-dash/' + acc.id, { dashToken: ex.d.dashToken });
     ok('verify-dash accepts a device dash token', vd.s === 200, vd.s);
 

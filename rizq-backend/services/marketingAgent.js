@@ -23,29 +23,29 @@ function repos() {
 
 /* ── إعدادات تشغيل مخزّنة ─────────────────────────────────── */
 
-function getSettings() {
-  const raw = repos().marketingSettings.get('_root') || {};
+async function getSettings() {
+  const raw = (await repos().marketingSettings.get('_root')) || {};
   return Object.assign({}, cfg.RUNTIME_DEFAULTS, raw, {
     // لا نخزّن أسراراً في SQLite — تُقرأ دائماً من البيئة
   });
 }
 
-function saveSettings(partial) {
-  const cur = getSettings();
+async function saveSettings(partial) {
+  const cur = await getSettings();
   const next = Object.assign({}, cur, partial && typeof partial === 'object' ? partial : {});
   // منع حقن أسرار في المتجر
   delete next.facebookPageAccessToken;
   delete next.facebookAppSecret;
   delete next.apiKey;
-  repos().marketingSettings.upsert('_root', next);
+  await repos().marketingSettings.upsert('_root', next);
   return getPublicStatus();
 }
 
-function facebookCredentials() {
+function facebookCredentials(settings) {
   return {
     pageId: String(process.env.FACEBOOK_PAGE_ID || '').trim(),
     token: String(process.env.FACEBOOK_PAGE_ACCESS_TOKEN || '').trim(),
-    apiVersion: String(process.env.FACEBOOK_API_VERSION || getSettings().facebookApiVersion || 'v21.0').trim(),
+    apiVersion: String(process.env.FACEBOOK_API_VERSION || (settings && settings.facebookApiVersion) || 'v21.0').trim(),
   };
 }
 
@@ -54,8 +54,8 @@ function isFacebookConfigured() {
   return !!(c.pageId && c.token);
 }
 
-function getPublicStatus() {
-  const s = getSettings();
+async function getPublicStatus() {
+  const s = await getSettings();
   return {
     ok: true,
     enabled: !!s.enabled,
@@ -155,8 +155,8 @@ function newId(prefix) {
   return (prefix || 'mkt') + '_' + Date.now().toString(36) + '_' + crypto.randomBytes(3).toString('hex');
 }
 
-function listCampaigns(filter) {
-  let rows = repos().marketingCampaigns.list().slice();
+async function listCampaigns(filter) {
+  let rows = (await repos().marketingCampaigns.list()).slice();
   rows.sort((a, b) => String(b.updatedAt || b.createdAt || '').localeCompare(String(a.updatedAt || a.createdAt || '')));
   if (filter && filter.status) {
     rows = rows.filter((r) => r.status === filter.status);
@@ -168,20 +168,20 @@ function listCampaigns(filter) {
   return rows.slice(0, limit);
 }
 
-function getCampaign(id) {
-  return repos().marketingCampaigns.get(String(id || '')) || null;
+async function getCampaign(id) {
+  return (await repos().marketingCampaigns.get(String(id || ''))) || null;
 }
 
-function upsertCampaign(camp) {
+async function upsertCampaign(camp) {
   if (!camp || !camp.id) return null;
   camp.updatedAt = new Date().toISOString();
-  repos().marketingCampaigns.upsert(String(camp.id), camp);
+  await repos().marketingCampaigns.upsert(String(camp.id), camp);
   return camp;
 }
 
-function countDraftsToday() {
+async function countDraftsToday() {
   const day = new Date().toISOString().slice(0, 10);
-  return repos().marketingCampaigns.list().filter((c) => String(c.createdAt || '').slice(0, 10) === day).length;
+  return (await repos().marketingCampaigns.list()).filter((c) => String(c.createdAt || '').slice(0, 10) === day).length;
 }
 
 /* ── توليد المحتوى ───────────────────────────────────────── */
@@ -210,12 +210,13 @@ function buildSystemPrompt() {
 function buildUserPrompt(input) {
   const typeKey = String(input.campaignType || 'platform_awareness');
   const typeMeta = cfg.CAMPAIGN_TYPES[typeKey] || cfg.CAMPAIGN_TYPES.platform_awareness;
-  const lang = String(input.lang || getSettings().defaultLang || 'ar');
+  // lang/link تُحسم من الإعدادات في createDraftCampaign قبل الوصول هنا
+  const lang = String(input.lang || 'ar');
   const channel = String(input.channel || 'facebook');
   const chMeta = cfg.CHANNELS[channel] || cfg.CHANNELS.facebook;
   const brief = String(input.brief || '').trim().slice(0, 2000);
   const feature = String(input.feature || '').trim().slice(0, 200);
-  const link = String(input.link || getSettings().linkFallback || cfg.BRAND.siteUrl).trim();
+  const link = String(input.link || cfg.BRAND.siteUrl).trim();
   const tags = (cfg.BRAND.hashtags[lang] || cfg.BRAND.hashtags.ar || []).join(' ');
 
   return [
@@ -380,13 +381,13 @@ async function createDraftCampaign(input, adminUser) {
   } catch (eOps) {
     if (eOps && eOps.code === 'disabled') throw eOps;
   }
-  const settings = getSettings();
+  const settings = await getSettings();
   if (!settings.enabled) {
     const err = new Error('مدير التسويق معطّل من الإعدادات');
     err.code = 'disabled';
     throw err;
   }
-  if (countDraftsToday() >= (settings.maxDraftsPerDay || 30)) {
+  if ((await countDraftsToday()) >= (settings.maxDraftsPerDay || 30)) {
     const err = new Error('تم بلوغ حد المسودات اليومية');
     err.code = 'rate_limit';
     throw err;
@@ -465,8 +466,8 @@ function pushHistory(camp, action, by, note) {
   if (camp.history.length > 40) camp.history = camp.history.slice(-40);
 }
 
-function updateDraftBody(id, patch, adminUser) {
-  const camp = getCampaign(id);
+async function updateDraftBody(id, patch, adminUser) {
+  const camp = await getCampaign(id);
   if (!camp) return null;
   if (['published', 'publishing', 'cancelled'].includes(camp.status)) {
     const err = new Error('لا يمكن تعديل حملة في هذه الحالة');
@@ -489,8 +490,8 @@ function updateDraftBody(id, patch, adminUser) {
   return upsertCampaign(camp);
 }
 
-function approveCampaign(id, adminUser, opts) {
-  const camp = getCampaign(id);
+async function approveCampaign(id, adminUser, opts) {
+  const camp = await getCampaign(id);
   if (!camp) return null;
   if (!['pending_review', 'draft', 'rejected', 'failed', 'approved', 'scheduled'].includes(camp.status)) {
     const err = new Error('الحالة لا تسمح بالموافقة');
@@ -520,8 +521,8 @@ function approveCampaign(id, adminUser, opts) {
   return upsertCampaign(camp);
 }
 
-function rejectCampaign(id, adminUser, reason) {
-  const camp = getCampaign(id);
+async function rejectCampaign(id, adminUser, reason) {
+  const camp = await getCampaign(id);
   if (!camp) return null;
   if (['published', 'publishing'].includes(camp.status)) {
     const err = new Error('لا يمكن رفض حملة منشورة');
@@ -534,8 +535,8 @@ function rejectCampaign(id, adminUser, reason) {
   return upsertCampaign(camp);
 }
 
-function cancelCampaign(id, adminUser) {
-  const camp = getCampaign(id);
+async function cancelCampaign(id, adminUser) {
+  const camp = await getCampaign(id);
   if (!camp) return null;
   if (camp.status === 'published') {
     const err = new Error('الحملة منشورة مسبقاً');
@@ -549,8 +550,8 @@ function cancelCampaign(id, adminUser) {
 
 /* ── نشر فيسبوك ───────────────────────────────────────────── */
 
-async function publishToFacebook(camp) {
-  const creds = facebookCredentials();
+async function publishToFacebook(camp, settings) {
+  const creds = facebookCredentials(settings);
   if (!creds.pageId || !creds.token) {
     const err = new Error('فيسبوك غير مُعدّ — أضف FACEBOOK_PAGE_ID و FACEBOOK_PAGE_ACCESS_TOKEN في .env');
     err.code = 'fb_not_configured';
@@ -590,17 +591,34 @@ async function publishToFacebook(camp) {
   };
 }
 
+const _publishing = new Set(); // قفل داخل العملية: الجدولة + زر الأدمن لا ينشران نفس الحملة مرتين
+
 async function publishCampaign(id, adminUser, opts) {
-  const settings = getSettings();
-  const camp = getCampaign(id);
+  const key = String(id || '');
+  if (_publishing.has(key) && !(opts && opts._reentrant)) {
+    const err = new Error('الحملة قيد النشر الآن');
+    err.code = 'already_publishing';
+    throw err;
+  }
+  _publishing.add(key);
+  try {
+    return await _publishCampaignLocked(id, adminUser, opts);
+  } finally {
+    if (!(opts && opts._reentrant)) _publishing.delete(key);
+  }
+}
+
+async function _publishCampaignLocked(id, adminUser, opts) {
+  const settings = await getSettings();
+  const camp = await getCampaign(id);
   if (!camp) return null;
 
   if (settings.requireHumanApproval !== false) {
     if (!['approved', 'scheduled'].includes(camp.status) && !(opts && opts.forceAfterApprove)) {
       // مسار مختصر: موافقة + نشر في خطوة واحدة من الأدمن
       if (opts && opts.approveAndPublish) {
-        approveCampaign(id, adminUser, { scheduledAt: null });
-        return publishCampaign(id, adminUser, { forceAfterApprove: true });
+        await approveCampaign(id, adminUser, { scheduledAt: null });
+        return _publishCampaignLocked(id, adminUser, { forceAfterApprove: true });
       }
       const err = new Error('يلزم موافقة أدمن قبل النشر');
       err.code = 'needs_approval';
@@ -620,10 +638,10 @@ async function publishCampaign(id, adminUser, opts) {
 
   camp.status = 'publishing';
   pushHistory(camp, 'publishing', adminUser);
-  upsertCampaign(camp);
+  await upsertCampaign(camp);
 
   try {
-    const result = await publishToFacebook(camp);
+    const result = await publishToFacebook(camp, settings);
     camp.status = 'published';
     camp.publishedAt = new Date().toISOString();
     camp.publishResult = result;
@@ -633,7 +651,7 @@ async function publishCampaign(id, adminUser, opts) {
     camp.status = 'failed';
     camp.publishResult = { error: err.message, code: err.code, details: err.details || null };
     pushHistory(camp, 'failed', adminUser, err.message);
-    upsertCampaign(camp);
+    await upsertCampaign(camp);
     throw err;
   }
 }
@@ -644,7 +662,7 @@ let _schedulerTimer = null;
 
 async function processDueSchedules() {
   const now = Date.now();
-  const due = repos().marketingCampaigns.list().filter((c) => {
+  const due = (await repos().marketingCampaigns.list()).filter((c) => {
     if (c.status !== 'scheduled' || !c.scheduledAt) return false;
     const t = Date.parse(c.scheduledAt);
     return Number.isFinite(t) && t <= now;
@@ -659,9 +677,10 @@ async function processDueSchedules() {
   return due.length;
 }
 
-function startScheduler() {
+async function startScheduler() {
   if (_schedulerTimer) return;
-  const sec = Math.max(30, Number(getSettings().schedulePollSeconds) || 60);
+  let sec = 60;
+  try { sec = Math.max(30, Number((await getSettings()).schedulePollSeconds) || 60); } catch (e) { /* defaults */ }
   _schedulerTimer = setInterval(() => {
     processDueSchedules().catch((e) => console.error('[marketingAgent] scheduler', e.message));
   }, sec * 1000);
@@ -669,8 +688,8 @@ function startScheduler() {
   console.log('[marketingAgent] scheduler started every ' + sec + 's');
 }
 
-function getStats() {
-  const all = repos().marketingCampaigns.list();
+async function getStats() {
+  const all = await repos().marketingCampaigns.list();
   const byStatus = {};
   all.forEach((c) => {
     byStatus[c.status] = (byStatus[c.status] || 0) + 1;
@@ -678,7 +697,7 @@ function getStats() {
   return {
     total: all.length,
     byStatus,
-    draftsToday: countDraftsToday(),
+    draftsToday: await countDraftsToday(),
     facebookConfigured: isFacebookConfigured(),
     claudeConfigured: isAnthropicConfigured(),
   };

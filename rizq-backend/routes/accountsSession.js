@@ -415,8 +415,9 @@ function mountAccountsSessionRoutes(app, deps) {
       if (acc.suspended || acc.status !== 'approved' || !token) return false;
       const hit = sessionsLib.findSessionByToken(acc, token);
       if (hit && (hit.kind === 'dash' || hit.kind === 'prevDash')) {
-        // جلسة جهاز: تدوير رمزَيها مع مهلة 60 ث للرمزين السابقين (طلبات في الطريق)
-        if (hit.kind === 'prevDash') return false; // رمز سابق لا يُبدَّل مرة ثانية
+        // جلسة جهاز: تدوير رمزَيها مع مهلة 60 ث للرمزين السابقين (طلبات في الطريق).
+        // رمز سابق ضمن المهلة يُقبل أيضاً: تبويبان يفتحان اللوحة في نفس اللحظة لا يُخرج أحدهما الآخر
+        // (بعد المهلة يُرفض — الرمز المسروق لا يعيش أكثر من 60 ثانية بعد استبداله).
         out = sessionsLib.rotateSession(hit.session, genAccessToken, genDashToken);
       } else if (sessionsLib.primaryDashMatches(acc, token) && acc.dashToken && timingSafeEqualStr(token, acc.dashToken)) {
         // الرمز الأساسي: تدوير dashToken (لمرة واحدة) مع مهلة للسابق

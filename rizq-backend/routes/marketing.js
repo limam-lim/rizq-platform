@@ -25,12 +25,12 @@ function mountMarketingRoutes(app, deps) {
   const adminUser = (req) => (req.adminUser && (req.adminUser.user || req.adminUser.name)) || 'admin';
 
   /** GET /api/admin/marketing/status */
-  app.get('/api/admin/marketing/status', requireAdminPermission('marketing'), (req, res) => {
-    res.json(Object.assign({ ok: true }, marketing.getPublicStatus(), { stats: marketing.getStats() }));
+  app.get('/api/admin/marketing/status', requireAdminPermission('marketing'), async (req, res) => {
+    res.json(Object.assign({ ok: true }, await marketing.getPublicStatus(), { stats: await marketing.getStats() }));
   });
 
   /** PATCH /api/admin/marketing/settings — تفعيل/حد المسودات/الموافقة البشرية */
-  app.patch('/api/admin/marketing/settings', requireAdminPermission('marketing'), (req, res) => {
+  app.patch('/api/admin/marketing/settings', requireAdminPermission('marketing'), async (req, res) => {
     const b = req.body || {};
     const patch = {};
     if (typeof b.enabled === 'boolean') patch.enabled = b.enabled;
@@ -39,23 +39,23 @@ function mountMarketingRoutes(app, deps) {
     if (b.defaultLang) patch.defaultLang = String(b.defaultLang).slice(0, 8);
     if (b.maxDraftsPerDay != null) patch.maxDraftsPerDay = Math.min(200, Math.max(1, Number(b.maxDraftsPerDay) || 30));
     if (b.linkFallback) patch.linkFallback = String(b.linkFallback).slice(0, 500);
-    const status = marketing.saveSettings(patch);
+    const status = await marketing.saveSettings(patch);
     res.json({ ok: true, status });
   });
 
   /** GET /api/admin/marketing/campaigns */
-  app.get('/api/admin/marketing/campaigns', requireAdminPermission('marketing'), (req, res) => {
-    const rows = marketing.listCampaigns({
+  app.get('/api/admin/marketing/campaigns', requireAdminPermission('marketing'), async (req, res) => {
+    const rows = await marketing.listCampaigns({
       status: req.query.status || '',
       channel: req.query.channel || '',
       limit: req.query.limit,
     });
-    res.json({ ok: true, campaigns: rows, stats: marketing.getStats() });
+    res.json({ ok: true, campaigns: rows, stats: await marketing.getStats() });
   });
 
   /** GET /api/admin/marketing/campaigns/:id */
-  app.get('/api/admin/marketing/campaigns/:id', requireAdminPermission('marketing'), (req, res) => {
-    const camp = marketing.getCampaign(req.params.id);
+  app.get('/api/admin/marketing/campaigns/:id', requireAdminPermission('marketing'), async (req, res) => {
+    const camp = await marketing.getCampaign(req.params.id);
     if (!camp) return res.status(404).json({ ok: false, error: 'غير موجود' });
     res.json({ ok: true, campaign: camp });
   });
@@ -81,9 +81,9 @@ function mountMarketingRoutes(app, deps) {
   );
 
   /** PATCH /api/admin/marketing/campaigns/:id */
-  app.patch('/api/admin/marketing/campaigns/:id', requireAdminPermission('marketing'), (req, res) => {
+  app.patch('/api/admin/marketing/campaigns/:id', requireAdminPermission('marketing'), async (req, res) => {
     try {
-      const camp = marketing.updateDraftBody(req.params.id, req.body || {}, adminUser(req));
+      const camp = await marketing.updateDraftBody(req.params.id, req.body || {}, adminUser(req));
       if (!camp) return res.status(404).json({ ok: false, error: 'غير موجود' });
       res.json({ ok: true, campaign: camp });
     } catch (err) {
@@ -92,9 +92,9 @@ function mountMarketingRoutes(app, deps) {
   });
 
   /** POST /api/admin/marketing/campaigns/:id/approve */
-  app.post('/api/admin/marketing/campaigns/:id/approve', requireAdminPermission('marketing'), (req, res) => {
+  app.post('/api/admin/marketing/campaigns/:id/approve', requireAdminPermission('marketing'), async (req, res) => {
     try {
-      const camp = marketing.approveCampaign(req.params.id, adminUser(req), {
+      const camp = await marketing.approveCampaign(req.params.id, adminUser(req), {
         scheduledAt: (req.body && req.body.scheduledAt) || null,
       });
       if (!camp) return res.status(404).json({ ok: false, error: 'غير موجود' });
@@ -105,9 +105,9 @@ function mountMarketingRoutes(app, deps) {
   });
 
   /** POST /api/admin/marketing/campaigns/:id/reject */
-  app.post('/api/admin/marketing/campaigns/:id/reject', requireAdminPermission('marketing'), (req, res) => {
+  app.post('/api/admin/marketing/campaigns/:id/reject', requireAdminPermission('marketing'), async (req, res) => {
     try {
-      const camp = marketing.rejectCampaign(
+      const camp = await marketing.rejectCampaign(
         req.params.id,
         adminUser(req),
         (req.body && req.body.reason) || ''
@@ -120,9 +120,9 @@ function mountMarketingRoutes(app, deps) {
   });
 
   /** POST /api/admin/marketing/campaigns/:id/cancel */
-  app.post('/api/admin/marketing/campaigns/:id/cancel', requireAdminPermission('marketing'), (req, res) => {
+  app.post('/api/admin/marketing/campaigns/:id/cancel', requireAdminPermission('marketing'), async (req, res) => {
     try {
-      const camp = marketing.cancelCampaign(req.params.id, adminUser(req));
+      const camp = await marketing.cancelCampaign(req.params.id, adminUser(req));
       if (!camp) return res.status(404).json({ ok: false, error: 'غير موجود' });
       res.json({ ok: true, campaign: camp });
     } catch (err) {

@@ -141,10 +141,57 @@ async function maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts)
 /**
  * تفعيل طلب اشتراك من الخادم (Telegram / API) — يطابق منطق handleSubReq في rizq_admin.html
  */
+/**
+ * مطالبة ذرّية بطلب اشتراك قبل تفعيله: pending → activating في عبارة SQL واحدة.
+ * موافقتان متزامنتان (لوحة + Telegram + الوكيل الآلي) لا تفعّلان الباقة مرتين
+ * (أيام مضاعفة، فاتورتان، مكافأة إحالة مزدوجة). الثانية تتلقى already_processed.
+ */
+async function claimSubRequest(id) {
+  const sql = require('../db/sql');
+  const rows = await sql.query(
+    `UPDATE documents SET data = jsonb_set(data, '{status}', '"activating"'), updated_at_ts = NOW()
+     WHERE collection = 'sub_requests' AND id = ? AND data->>'status' = 'pending'
+     RETURNING id`,
+    [String(id)]
+  );
+  return Array.isArray(rows) && rows.length === 1;
+}
+
+async function releaseSubRequestClaim(id) {
+  const sql = require('../db/sql');
+  await sql.execute(
+    `UPDATE documents SET data = jsonb_set(data, '{status}', '"pending"'), updated_at_ts = NOW()
+     WHERE collection = 'sub_requests' AND id = ? AND data->>'status' = 'activating'`,
+    [String(id)]
+  );
+}
+
 async function activateSubRequest(req, deps) {
   deps = deps || {};
   if (!req || !req.id) return { ok: false, error: 'invalid_request' };
   if (req.status !== 'pending') return { ok: false, error: 'not_pending', status: req.status };
+  let claimed = false;
+  try {
+    claimed = await claimSubRequest(req.id);
+  } catch (eClaim) {
+    console.error('[sub-activation] claim failed:', eClaim && eClaim.message);
+    return { ok: false, error: 'claim_failed' };
+  }
+  if (!claimed) return { ok: false, error: 'already_processed', status: 'processing_or_done' };
+  let result;
+  try {
+    result = await _activateClaimed(req, deps);
+  } catch (eAct) {
+    result = { ok: false, error: 'activation_exception', message: eAct && eAct.message };
+  }
+  if (!result || !result.ok) {
+    // فشل التفعيل: أعِد الطلب إلى pending ليُعاد المحاولة لاحقاً
+    try { await releaseSubRequestClaim(req.id); } catch (eRel) { /* */ }
+  }
+  return result;
+}
+
+async function _activateClaimed(req, deps) {
 
   const {
     syncAccountPackage,
