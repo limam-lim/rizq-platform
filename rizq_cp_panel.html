@@ -4039,6 +4039,7 @@ function persistPlatformFlag(btn, key){
   var willBeOn = !btn.classList.contains('on');
   var warn = _CRITICAL_PLATFORM_FLAGS[key];
   if(!willBeOn && warn && !confirm(RizqI18n.t2(warn[0], warn[1]))) return;
+  if(willBeOn && key === 'vpnBlock' && !confirm(RizqI18n.t2('حظر الزوار القادمين عبر VPN؟ قد يمنع بعض المستخدمين الحقيقيين من الدخول.','Bloquer les visiteurs via VPN ? Certains vrais utilisateurs pourraient être bloqués.'))) return;
   var prev = _readPlatformFlags();
   btn.classList.toggle('on', willBeOn);
   var body = { platformFlags: {} };
