@@ -22,6 +22,8 @@ const wishlistRouter = require('./routes/wishlist');
 const BuyerModel = require('./models/buyer');
 const { globalErrorHandler, notFoundHandler } = require('./middleware/errors');
 const express = require('express');
+// أخطاء المعالجات async تصل لمعالج الأخطاء العام (بدل طلب معلّق حتى انتهاء المهلة)
+require('express-async-errors');
 const cors = require('cors');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
@@ -61,6 +63,18 @@ app.disable('x-powered-by');
   }
   app.set('trust proxy', raw.split(',').map((s) => s.trim()).filter(Boolean));
 })();
+
+/* خلف Cloudflare: IP الزائر الحقيقي في CF-Connecting-IP (وإلا يتشارك كل الزوار حدّ الطلبات نفسه).
+   فعّله فقط حين يقبل الخادم الاتصال من Cloudflare وحدها (جدار ناري) — TRUST_CLOUDFLARE=1. */
+if (String(process.env.TRUST_CLOUDFLARE || '') === '1') {
+  app.use((req, res, next) => {
+    const cf = String(req.headers['cf-connecting-ip'] || '').trim();
+    if (cf && /^[0-9a-fA-F:.]{3,45}$/.test(cf)) {
+      Object.defineProperty(req, 'ip', { value: cf, configurable: true });
+    }
+    next();
+  });
+}
 
 // ── ضغط الاستجابات (gzip/Brotli حسب ما يدعمه المتصفح) ──────────────
 // خطوة خفّة حقيقية وقابلة للتنفيذ الآن (بخلاف CDN/Redis التي تحتاج نشراً
@@ -219,6 +233,17 @@ function gateUploadByStatus(resolveEntity, allowedStatuses, error) {
     }
   };
 }
+// مسارات الرفع: نرفض أي ترميز (%xx) أو شرطات مزدوجة/عكسية قبل فحوص الحماية،
+// وإلا يمكن تجاوز /uploads/kyc مثلاً عبر /uploads/%6byc لأن الخادم الثابت يفك الترميز لاحقاً.
+// أسماء الملفات المشروعة كلها [a-zA-Z0-9_.-] فلا يتأثر أي رابط حقيقي.
+app.use('/uploads', (req, res, next) => {
+  const raw = String(req.originalUrl || '').split('?')[0];
+  const rest = raw.slice(raw.toLowerCase().indexOf('/uploads') + '/uploads'.length);
+  if (/%|\/\/|\\|\.\./.test(rest) || /[^a-zA-Z0-9_.\/-]/.test(rest)) {
+    return res.status(400).json({ error: 'bad_upload_path' });
+  }
+  return next();
+});
 app.use('/uploads/tenders', forbidUploadPath(
   'tender_assets_forbidden',
   'مرفقات المناقصة محمية — يلزم اشتراك للوصول',
@@ -250,7 +275,11 @@ app.use('/uploads/ads', gateUploadByStatus(
   'ad_media_forbidden'
 ));
 app.use('/uploads/catalog', gateUploadByStatus(
-  async (itemId) => (await repos.catalog.list()).find((c) => c && c.id === itemId) || null,
+  async (itemId) => {
+    // صف واحد لكل صورة بدل قراءة الكتالوج كاملاً
+    try { const r = await require('./db/sql').queryOne('SELECT data FROM catalog_items WHERE id = ?', [String(itemId)]); return r ? (typeof r.data === 'string' ? JSON.parse(r.data) : r.data) : null; }
+    catch (e) { return (await repos.catalog.list()).find((c) => c && c.id === itemId) || null; }
+  },
   ['active'],
   'catalog_media_forbidden'
 ));
@@ -409,7 +438,14 @@ async function adminHasPermission(req, ...keys) {
 
 const anthropic = new Anthropic({ apiKey: getAnthropicApiKey() });
 
-app.get('/health', (req, res) => res.json({ ok: true }));
+app.get('/health', async (req, res) => {
+  // جاهزية حقيقية: قاعدة البيانات تستجيب (Postgres) — 503 إن تعطلت
+  if (String(process.env.DB_DRIVER || '').toLowerCase() === 'postgres') {
+    try { await require('./db/sql').query('SELECT 1 AS ok', []); }
+    catch (e) { return res.status(503).json({ ok: false, db: false }); }
+  }
+  res.json({ ok: true });
+});
 
 // دليل المساعدة العام للزوّار = HTML فقط.
 // الأدلة التقنية (MD) محجوبة عن الزوّار وتتطلّب مصادقة أدمن.
@@ -2268,7 +2304,7 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
       error: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
     });
   }
-  const passHash = sellerPassword ? bcrypt.hashSync(sellerPassword, 10) : null;
+  const passHash = sellerPassword ? await bcrypt.hash(sellerPassword, 10) : null;
   // فرد/محل: تفعيل فوري بعد إثبات ملكية البريد (أو الهاتف) بـ OTP عند otpRequired
   const platformFlags = await getPlatformFlags();
   let autoApproved = false;
@@ -2282,15 +2318,8 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
       } catch (eOtp) {
         otpGate = { ok: false, error: 'otp_required' };
       }
-      if (!(otpGate && otpGate.ok)) {
-        const phoneForOtp = String(b.phone || '').replace(/\D/g, '').slice(-8);
-        if (phoneForOtp) {
-          try {
-            const phoneGate = await consumeVerification(phoneForOtp);
-            if (phoneGate && phoneGate.ok) otpGate = phoneGate;
-          } catch (ePh) { /* ignore */ }
-        }
-      }
+      // التفعيل الفوري يتطلب إثبات ملكية البريد نفسه — إثبات الهاتف وحده لا يكفي
+      // (وإلا سجّل أي شخص ببريد غيره وحجزه). بدون رمز البريد يبقى الحساب بانتظار المراجعة.
       autoApproved = !!(otpGate && otpGate.ok);
     }
   }
@@ -3512,7 +3541,8 @@ if (!fs.existsSync(TENDER_UPLOADS_DIR)) fs.mkdirSync(TENDER_UPLOADS_DIR, { recur
 // يثبت أن accountId + token يطابقان حساباً حقيقياً في accounts.json، ويُعيده
 async function verifyAccountOwner(accountId, token) {
   if (!accountId || !token) return null;
-  const acc = (await readAccounts()).find((a) => a.id === accountId);
+  // قراءة صف واحد (وليس كل الحسابات) — يُستدعى في كل طلب مُصادَق
+  const acc = await repos.accounts.getById(String(accountId));
   // suspended=true (تعليق من الأدمن) يمنع صاحب الحساب من أي فعل يتطلب هذا
   // التحقق — نشر إعلان، تعديل الكتالوج، تعديل الملف الشخصي، إلخ — بغض
   // النظر عن صحة توكنه. هذا هو التطبيق الفعلي الوحيد لمعنى "تعليق مستخدم".
@@ -3932,6 +3962,7 @@ app.post('/api/deactivation-requests/admin/:id/resolve', requireAdminPermission(
       accs[aidx].suspendedAt = new Date().toISOString();
       accs[aidx].dashToken = genDashToken();
       accs[aidx].accessToken = genAccessToken();
+      require('./middleware/accountAuth').revokeAllSessions(accs[aidx]);
       await writeAccounts(accs);
     }
   }
@@ -4520,12 +4551,15 @@ if (!isProdEnv()) {
  * POST /api/telegram/setup-webhook — أدمين فقط — يسجّل webhook لدى Telegram
  * body: { publicBaseUrl?: "https://your-domain.com" }
  */
-app.post('/api/telegram/setup-webhook', requireAdminPermission('channels'), async (req, res) => {
+app.post('/api/telegram/setup-webhook', requireSuperAdmin, async (req, res) => {
   if (!isTelegramBotConfigured()) {
     return res.status(503).json({ error: 'telegram_bot_not_configured', hint: 'TELEGRAM_BOT_TOKEN in .env' });
   }
   try {
-    const publicBaseUrl = (req.body && req.body.publicBaseUrl) || process.env.PUBLIC_BASE_URL || '';
+    // في الإنتاج: عنوان المنصة من البيئة فقط — لا يُقبل من الطلب (وإلا وُجِّه البوت وسرّه لخادم آخر)
+    const publicBaseUrl = isProdEnv()
+      ? (process.env.PUBLIC_BASE_URL || '')
+      : ((req.body && req.body.publicBaseUrl) || process.env.PUBLIC_BASE_URL || '');
     const out = await registerTelegramWebhook(publicBaseUrl);
     if (!out.ok) return res.status(400).json(out);
     res.json(out);
@@ -4703,7 +4737,7 @@ if (process.env.NODE_ENV !== 'production' && process.env.RIZQ_SERVE_STATIC !== '
     // ملفات خادمية/أدوات لا يحتاجها المتصفح (منطق الوكلاء، معالجات الاتصال، سكربتات، إعدادات نشر)
     if (
       /^\/(rizq_agent_brain|rizq_call_handler|rizq_email_handler|rizq_quota_guard_agent|rizq_subscriber_agent|rizq_whatsapp_handler)\.js$/.test(p)
-      || p.startsWith('/scripts/') || p.startsWith('/node_modules/') || p.startsWith('/.')
+      || p.startsWith('/scripts/') || p.startsWith('/deploy/') || p.startsWith('/backups/') || p.startsWith('/docs/') || p.startsWith('/qa/') || p.startsWith('/node_modules/') || p.startsWith('/.')
       || /^\/(package(-lock)?\.json|render\.yaml)$/.test(p)
       || /\.(md|ya?ml|ps1|sh|bat|env|log|sqlite|db)$/.test(p)
     ) {
@@ -4807,7 +4841,7 @@ async function boot() {
     console.warn('[rizq-backend] subscribers warm:', eSub && eSub.message);
   }
 
-  app.listen(PORT, HOST, async () => {
+  global.__rizqHttpServer = app.listen(PORT, HOST, async () => {
     console.log('[rizq-backend] running on http://' + HOST + ':' + PORT + '/');
     console.log('[rizq-backend] agent model (Sonnet only): ' + getAgentModel());
     if (isAnthropicConfigured()) {
@@ -4849,4 +4883,17 @@ boot().catch((err) => {
 });
 
 process.on('SIGINT', () => { stopTelegramPolling(); process.exit(0); });
-process.on('SIGTERM', () => { stopTelegramPolling(); process.exit(0); });
+// إيقاف نظيف: إنهاء الطلبات الجارية وإغلاق اتصالات القاعدة، ثم خروج إجباري بعد 10 ثوانٍ
+process.on('SIGTERM', () => {
+  try { stopTelegramPolling(); } catch (e) { /* ignore */ }
+  const force = setTimeout(() => process.exit(0), 10000);
+  force.unref();
+  const done = () => {
+    Promise.resolve()
+      .then(() => { try { const pool = require('./db/pool'); return pool && typeof pool.close === 'function' ? pool.close() : null; } catch (e) { return null; } })
+      .catch(() => {})
+      .then(() => process.exit(0));
+  };
+  if (global.__rizqHttpServer && typeof global.__rizqHttpServer.close === 'function') global.__rizqHttpServer.close(done);
+  else done();
+});

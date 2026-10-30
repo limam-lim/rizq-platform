@@ -358,6 +358,7 @@ async function _activateClaimed(req, deps) {
       accountEmail,
       accountType,
       pkgName: req.pkg,
+      packageId: req.packageId || null,
       price: Number(req.price) || 0,
       days,
       periodStart,

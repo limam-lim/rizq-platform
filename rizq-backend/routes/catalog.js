@@ -27,6 +27,21 @@ function mountCatalogRoutes(app, deps) {
     adminHasPermission,
   } = deps;
 
+  const { scanContactLeakFields } = require('../services/contactLeakGuard');
+  function catalogLeak(b) {
+    const scan = scanContactLeakFields(['name', 'title', 'nameFr', 'desc', 'descFr']
+      .filter((k) => typeof b[k] === 'string').map((k) => ({ key: k, val: b[k] })));
+    if (!scan || !scan.hasLeak) return null;
+    return {
+      ok: false,
+      error: 'contact_in_text_forbidden',
+      field: scan.fields && scan.fields[0] && scan.fields[0].field,
+      hits: scan.hits || [],
+      msg: scan.messageAr,
+      msg_fr: scan.messageFr,
+    };
+  }
+
   const isCatalogAdmin = async (req) => (typeof adminHasPermission === 'function'
     ? adminHasPermission(req, 'moderation', 'ads')
     : isAdminRequest(req));
@@ -44,8 +59,11 @@ function mountCatalogRoutes(app, deps) {
     if (!['product', 'service'].includes(b.kind)) return res.status(400).json({ error: "kind يجب أن يكون 'product' أو 'service'" });
     // Normalize title → name for estate / legacy clients
     if (!b.name && b.title) b.name = b.title;
+    const leak = catalogLeak(b);
+    if (leak) return res.status(422).json(leak);
     const ent = await getEntitlements(b.accountId, acc.type);
-    const activeCount = (await readCatalog()).filter((it) => it.accountId === b.accountId && it.status === 'active').length;
+    // الحد يشمل العناصر بانتظار المراجعة أيضاً (وإلا تُضاف عناصر بلا حد ثم تُعتمد كلها)
+    const activeCount = (await readCatalog()).filter((it) => it.accountId === b.accountId && (it.status === 'active' || it.status === 'pending_review')).length;
     const imageCount = Array.isArray(b.images) ? b.images.length : (b.image ? 1 : 0);
     try {
       assertCanAddCatalogItem(ent, activeCount);
@@ -105,8 +123,14 @@ function mountCatalogRoutes(app, deps) {
         return out;
       }, {})
       : {};
-    const metaIn = (b.meta && typeof b.meta === 'object' && !Array.isArray(b.meta)) ? b.meta : {};
-    const sellerBadges = (b.sellerContext && b.sellerContext.badges) || {};
+    // meta: قيم بسيطة فقط (لا كائنات متداخلة ولا مفاتيح خاصة)، بحجم محدود
+    const metaRaw = (b.meta && typeof b.meta === 'object' && !Array.isArray(b.meta)) ? b.meta : {};
+    const metaIn = Object.keys(metaRaw).slice(0, 30).reduce(function (out, k) {
+      if (k === '__proto__' || k === 'constructor' || k === 'prototype') return out;
+      const v = metaRaw[k];
+      if (v == null || ['string', 'number', 'boolean'].includes(typeof v)) out[String(k).slice(0, 48)] = typeof v === 'string' ? v.slice(0, 200) : v;
+      return out;
+    }, {});
     const rec = {
       id,
       accountId: b.accountId,
@@ -143,12 +167,13 @@ function mountCatalogRoutes(app, deps) {
       }),
       sellerContext: {
         storeId: String(b.storeId || b.accountId).slice(0, 60),
-        storeName: String((b.sellerContext && b.sellerContext.storeName) || acc.name || '').slice(0, 120),
+        // الاسم والشارات من سجل الحساب فقط — لا يقرّرها العميل (شارات مدفوعة)
+        storeName: String(acc.name || '').slice(0, 120),
         accountType,
         badges: {
-          verified: !!(sellerBadges.verified || acc.verified || acc.nniVerified),
-          verifiedPlus: !!(sellerBadges.verifiedPlus || acc.verifiedPlus),
-          trusted: !!(sellerBadges.trusted || acc.trusted),
+          verified: !!(acc.verified || acc.nniVerified),
+          verifiedPlus: !!acc.verifiedPlus,
+          trusted: !!acc.trusted,
         },
       },
       listingSource: 'dashboard_catalog',
@@ -253,6 +278,21 @@ function mountCatalogRoutes(app, deps) {
     const isOwner = !!(item.accountId && await verifyAccountOwner(item.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
     const b = req.body || {};
+    if (!isAdmin) {
+      const leak = catalogLeak(b);
+      if (leak) return res.status(422).json(leak);
+      if (Array.isArray(b.images) && b.images.length) {
+        try {
+          const ownerAcc = await require('../db/repos').accounts.getById(item.accountId);
+          const entP = await getEntitlements(item.accountId, ownerAcc ? ownerAcc.type : 'store');
+          assertPhotoCount(entP, b.images.length);
+        } catch (gateErr) {
+          return res.status(gateErr.status || 403).json({ ok: false, error: gateErr.message, code: gateErr.code, details: gateErr.details });
+        }
+      }
+    }
+    const contentChanged = ['name', 'nameFr', 'desc', 'descFr', 'title'].some((k) => typeof b[k] === 'string' && b[k] !== (item[k] || ''))
+      || Array.isArray(b.images) || typeof b.image === 'string' || typeof b.cover === 'string';
     const editable = ['name', 'nameFr', 'price', 'cat', 'topicId', 'desc', 'descFr', 'stock', 'variants', 'sku', 'unit', 'emoji', 'brandId', 'brandName', 'brandNameFr', 'modelId', 'modelName', 'modelNameFr', 'duration', 'cover', 'thumb', 'categoryId', 'category', 'categoryKey', 'subCategoryId', 'subcat', 'activityId'];
     editable.forEach((k) => {
       if (typeof b[k] !== 'string') return;
@@ -285,7 +325,13 @@ function mountCatalogRoutes(app, deps) {
       }, {});
     }
     if (b.meta && typeof b.meta === 'object' && !Array.isArray(b.meta)) {
-      item.meta = Object.assign({}, item.meta || {}, b.meta, { listingSource: 'dashboard_catalog' });
+      const metaPatch = Object.keys(b.meta).slice(0, 30).reduce(function (out, k) {
+        if (k === '__proto__' || k === 'constructor' || k === 'prototype') return out;
+        const v = b.meta[k];
+        if (v == null || ['string', 'number', 'boolean'].includes(typeof v)) out[String(k).slice(0, 48)] = typeof v === 'string' ? v.slice(0, 200) : v;
+        return out;
+      }, {});
+      item.meta = Object.assign({}, item.meta || {}, metaPatch, { listingSource: 'dashboard_catalog' });
     }
     item.listingSource = 'dashboard_catalog';
     item.storeId = item.storeId || item.accountId;
@@ -321,6 +367,8 @@ function mountCatalogRoutes(app, deps) {
       const allowed = isAdmin ? adminAllowed : ownerAllowed;
       if (allowed.includes(b.status)) item.status = b.status;
     }
+    // تعديل محتوى عنصر منشور من صاحبه = مراجعة جديدة
+    if (!isAdmin && contentChanged && item.status === 'active') item.status = 'pending_review';
     item.updatedAt = new Date().toISOString();
     list[idx] = item;
     await writeCatalog(list);

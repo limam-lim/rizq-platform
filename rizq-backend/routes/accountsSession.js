@@ -302,7 +302,7 @@ function mountAccountsSessionRoutes(app, deps) {
     }
 
     try {
-      acc.passHash = bcrypt.hashSync(newPassword, 10);
+      acc.passHash = await bcrypt.hash(newPassword, 10);
     } catch (eHash) {
       return res.status(500).json({ ok: false, code: 'hash_failed', error: 'تعذّر حفظ كلمة المرور' });
     }
@@ -369,7 +369,7 @@ function mountAccountsSessionRoutes(app, deps) {
       return res.status(401).json({ ok: false, code: 'invalid_current', error: 'كلمة المرور الحالية غير صحيحة' });
     }
     try {
-      acc.passHash = bcrypt.hashSync(newPassword, 10);
+      acc.passHash = await bcrypt.hash(newPassword, 10);
     } catch (eHash) {
       return res.status(500).json({ ok: false, code: 'hash_failed', error: 'تعذّر حفظ كلمة المرور' });
     }

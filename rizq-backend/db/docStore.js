@@ -239,13 +239,41 @@ function createCollection(collection, opts) {
   }
 
   async function replaceAll(entries) {
+    // إن كانت السجلات مقروءة عبر list() (متتبَّعة): كتابة فرقية آمنة للتزامن —
+    // لا تمس ما أضافه طلب آخر في الأثناء (رسائل/تقييمات/OTP...). وإلا: السلوك القديم.
+    const list0 = (entries || []).filter((e) => e && e.id != null);
+    const tracked = list0.some((e) => e.data && typeof e.data === 'object' && _docMeta.get(e.data));
+    if (tracked) {
+      const keep = new Set(list0.map((e) => String(e.id)));
+      const seen = new Set();
+      list0.forEach((e) => { const m = e.data && typeof e.data === 'object' ? _docMeta.get(e.data) : null; if (m) m.seen.forEach((x) => seen.add(x)); });
+      await runInTransaction(async (tx) => {
+        for (const id of [...seen].filter((x) => !keep.has(x))) {
+          await tx.execute('DELETE FROM documents WHERE collection = ? AND id = ?', [name, id]);
+        }
+        for (const e of list0) {
+          const m = e.data && typeof e.data === 'object' ? _docMeta.get(e.data) : null;
+          if (m && m.enc === JSON.stringify(e.data)) continue;
+          await tx.execute(
+            `INSERT INTO documents (collection, id, data, updated_at)
+             VALUES (?, ?, ?::jsonb, ?)
+             ON CONFLICT (collection, id) DO UPDATE SET
+               data = EXCLUDED.data, updated_at = EXCLUDED.updated_at, updated_at_ts = NOW()`,
+            [name, String(e.id), encodeData(e.data), new Date().toISOString()]
+          );
+        }
+      });
+      await writeBackup();
+      return;
+    }
     await runInTransaction(async (tx) => {
       await tx.execute('DELETE FROM documents WHERE collection = ?', [name]);
       for (const e of entries || []) {
         if (!e || e.id == null) continue;
         await tx.execute(
           `INSERT INTO documents (collection, id, data, updated_at)
-           VALUES (?, ?, ?::jsonb, ?)`,
+           VALUES (?, ?, ?::jsonb, ?)
+           ON CONFLICT (collection, id) DO UPDATE SET data = EXCLUDED.data, updated_at = EXCLUDED.updated_at`,
           [name, String(e.id), encodeData(e.data), new Date().toISOString()]
         );
       }

@@ -440,6 +440,8 @@ function mountAccountsManageRoutes(app, deps) {
         // إبطال الجلسات المسروقة فور التعليق
         list[idx].dashToken = typeof genDashToken === 'function' ? genDashToken() : list[idx].dashToken;
         list[idx].accessToken = typeof genAccessToken === 'function' ? genAccessToken() : list[idx].accessToken;
+        // وكل جلسات الأجهزة أيضاً (هاتف/كمبيوتر) — لا تعود صالحة بعد إعادة التفعيل
+        require('../middleware/accountAuth').revokeAllSessions(list[idx]);
       }
       await writeAccounts(list);
       return res.json({ ok: true, account: adminView(list[idx]) });

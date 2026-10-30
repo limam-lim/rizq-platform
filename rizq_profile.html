@@ -522,6 +522,9 @@ main, .page-content.active, .main-content, .results-area,
 <div class="toast" id="toast"></div>
 
 <script>
+// data-fr يُطبَّق عبر innerHTML في جسر الترجمة — بيانات المستخدم تُهرَّب أولاً
+function _pfEscAttrHtml(v){ return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
 // أيقونات SVG بهوية رزق (أزرق داكن على خلفية بيضاء) تحل محل الإيموجي العام في صور مصغّرة لإعلانات الملف الشخصي
 const ICON_SVG = {
   '🏠':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11 12 4l8 7"/><path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9"/></svg>',
@@ -693,10 +696,10 @@ function applyRealProfile(){
 
   // ── الاسم والمدينة (لا توجد ترجمة فرنسية فعلية لاسم/مدينة الحساب — نعرض نفس القيمة بصدق في اللغتين) ──
   [document.getElementById('pf-name'), document.getElementById('pf-sidebar-name')].forEach(function(el){
-    if(el && acc.name){ el.textContent = acc.name; el.setAttribute('data-fr', acc.name); }
+    if(el && acc.name){ el.textContent = acc.name; el.setAttribute('data-fr', _pfEscAttrHtml(acc.name)); }
   });
   var cityEl = document.getElementById('pf-city');
-  if(cityEl && acc.city){ var cityTxt = '📍 ' + acc.city; cityEl.textContent = cityTxt; cityEl.setAttribute('data-fr', cityTxt); }
+  if(cityEl && acc.city){ var cityTxt = '📍 ' + acc.city; cityEl.textContent = cityTxt; cityEl.setAttribute('data-fr', _pfEscAttrHtml(cityTxt)); }
 
   // ── تاريخ انضمام حقيقي (اعتماد الحساب فعلياً من الإدارة) ──
   var memberEl = document.getElementById('pf-member-since');

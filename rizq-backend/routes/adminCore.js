@@ -188,6 +188,7 @@ function mountAdminCoreRoutes(app, deps) {
         return res.status(403).json({ error: e.code, msg: 'لا يمكنك منح صلاحيات أوسع مما تملك', denied: e.denied || [] });
       }
       if (e.code === 'last_super_admin') return res.status(400).json({ error: e.code, msg: 'لا يمكن إزالة آخر Super Admin' });
+      if (e.code === 'cannot_modify_higher') return res.status(403).json({ error: e.code, msg: 'لا يمكنك تعديل عضو يملك صلاحيات أعلى منك' });
       res.status(500).json({ error: 'update_failed' });
     }
   });
@@ -198,6 +199,10 @@ function mountAdminCoreRoutes(app, deps) {
     const target = await adminTeamService.getMemberById(req.params.id);
     if (!target) return res.status(404).json({ error: 'member_not_found' });
     if (target.user === selfId) return res.status(400).json({ error: 'cannot_deactivate_self' });
+    const actorPerms = (req.adminUser && req.adminUser.permissions) || [];
+    if (!adminTeamService.canManageMember(actorPerms, target.permissions)) {
+      return res.status(403).json({ error: 'cannot_modify_higher', msg: 'لا يمكنك تعطيل عضو يملك صلاحيات أعلى منك' });
+    }
     if ((target.permissions || []).includes('*') && (await adminTeamService.readTeam()).filter((m) => m.active !== false && (m.permissions || []).includes('*')).length <= 1) {
       return res.status(400).json({ error: 'last_super_admin', msg: 'لا يمكن تعطيل آخر Super Admin' });
     }

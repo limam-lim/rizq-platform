@@ -278,11 +278,28 @@ async function createMember(payload, actorUser, actorPerms) {
   return publicMember(member);
 }
 
+/**
+ * هل يملك المنفّذ كل صلاحيات العضو المستهدف؟ (لا يمكن لمدير فريق تعديل/تعطيل
+ * من هو أعلى منه — مثل Super Admin — وإلا استطاع تغيير كلمة مروره والاستيلاء عليه)
+ */
+function canManageMember(actorPerms, targetPerms) {
+  const actor = normalizePermissions(actorPerms || []);
+  if (actor.includes('*')) return true;
+  const target = normalizePermissions(targetPerms || []);
+  if (target.includes('*')) return false;
+  return target.every((p) => actor.includes(p));
+}
+
 async function updateMember(id, payload, actorPerms) {
   const list = await readTeam();
   const idx = list.findIndex((m) => m.id === id);
   if (idx === -1) return null;
   const row = list[idx];
+  if (!canManageMember(actorPerms, row.permissions)) {
+    const err = new Error('cannot_modify_higher');
+    err.code = 'cannot_modify_higher';
+    throw err;
+  }
   if (payload.name != null) row.name = String(payload.name).trim().slice(0, 120);
   if (payload.email != null) row.email = String(payload.email).slice(0, 120);
   if (payload.phone != null) row.phone = String(payload.phone).slice(0, 40);
@@ -332,6 +349,7 @@ async function deactivateMember(id) {
 }
 
 module.exports = {
+  canManageMember,
   MAX_TEAM_MEMBERS,
   PERMISSION_DEFS,
   PERMISSION_PRESETS,

@@ -28,8 +28,12 @@ const PENDING_STATUSES = ['pending', 'pending_payment', 'awaiting_payment'];
 
 function isPaymentConfirmed(rec) {
   if (!rec) return false;
+  // الإلغاء/عدم الدفع الصريح يغلب paidAt القديم (وإلا تعود باقة ملغاة للعمل)
+  if (rec.paymentConfirmed === false) {
+    // تجربة/باقة مجانية فعّلها الأدمن: لا دفع مطلوب — تعمل حتى نهاية مدتها
+    return !!(rec.isTrial && rec.activatedBy === 'admin' && ACTIVE_STATUSES.includes(rec.status));
+  }
   if (rec.paymentConfirmed === true || rec.paidAt) return true;
-  if (rec.paymentConfirmed === false) return false;
   // سجلات قديمة قبل حقل paymentConfirmed — تُعتبر موثّقة إذا فُعّلت من الأدمن
   return rec.activatedBy === 'admin' && ACTIVE_STATUSES.includes(rec.status);
 }
@@ -248,8 +252,9 @@ function mapMediaPackageToPlanType(rec) {
  */
 async function getMediaEntitlements(accountId, accountRecordOverride) {
   const id = String(accountId || '');
+  const videoKey = id.endsWith('::video') ? id : (id + '::video');
   const rec = accountRecordOverride
-    || (await getAccountRecord(id.includes('::video')) ? id : (id + '::video'))
+    || (await getAccountRecord(videoKey))
     || (await getAccountRecord(id));
   const planType = mapMediaPackageToPlanType(rec);
   if (!rec || !planType) {
@@ -633,10 +638,7 @@ function mapPackageIdToPlanType(packageId, accountType) {
   if (/^tnd-/.test(id)) return mapTenderPackageToPlanType({ packageId: id });
   if (/^inv-/.test(id)) return mapInvestmentPackageToPlanType({ packageId: id });
   if (/^vid-/.test(id)) return mapMediaPackageToPlanType({ packageId: id });
-  const type = String(accountType || 'individual').toLowerCase();
-  if (type === 'store' || type === 'shop') return 'store_monthly';
-  if (type === 'office' || type === 'estate') return 'office_monthly';
-  if (type === 'corp') return 'corp_monthly';
+  // معرّف غير معروف: لا نفترض "الشهرية" — نترك الاستنتاج من اسم الباقة (وإلا تُفعَّل الماسية/السنوية كشهرية)
   return null;
 }
 

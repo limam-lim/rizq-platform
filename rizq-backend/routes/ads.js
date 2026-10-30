@@ -381,6 +381,24 @@ function mountAdsRoutes(app, deps) {
     const isOwner = !!(ad.accountId && await verifyAccountOwner(ad.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
     const b = req.body || {};
+    // نفس فحص الإنشاء: لا أرقام/روابط تواصل في النص عند التعديل (وإلا تُتجاوز بوابة التواصل)
+    if (!isAdmin) {
+      const editScan = scanContactLeakFields(['title', 'desc', 'titleFr', 'descFr']
+        .filter((k) => typeof b[k] === 'string').map((k) => ({ key: k, val: b[k] })));
+      if (editScan && editScan.hasLeak) {
+        return res.status(422).json({
+          ok: false,
+          error: 'contact_in_text_forbidden',
+          field: editScan.fields && editScan.fields[0] && editScan.fields[0].field,
+          hits: editScan.hits || [],
+          msg: editScan.messageAr,
+          msg_fr: editScan.messageFr,
+        });
+      }
+    }
+    const contentKeys = ['title', 'desc', 'titleFr', 'descFr'];
+    const contentChanged = contentKeys.some((k) => typeof b[k] === 'string' && b[k].slice(0, k.startsWith('desc') ? 5000 : 200) !== (ad[k] || ''))
+      || Array.isArray(b.images);
     const editable = ['title', 'desc', 'titleFr', 'descFr', 'price', 'originalPrice', 'subcat', 'wilaya', 'condition', 'brandId', 'brandName', 'brandNameFr', 'modelId', 'modelName', 'modelNameFr'];
     editable.forEach((k) => { if (typeof b[k] === 'string') ad[k] = b[k].slice(0, (k === 'desc' || k === 'descFr') ? 5000 : 200); });
     if (Object.prototype.hasOwnProperty.call(b, 'stockQty')) {
@@ -434,6 +452,11 @@ function mountAdsRoutes(app, deps) {
       const adminAllowedStatus = ['active', 'pending', 'rejected', 'sold', 'inactive', 'removed'];
       const allowedStatus = isAdmin ? adminAllowedStatus : ownerAllowedStatus;
       if (allowedStatus.includes(b.status)) ad.status = b.status;
+    }
+    // تعديل نص/صور إعلان منشور من صاحبه = مراجعة جديدة (لا نشر لمحتوى لم يراجعه أحد)
+    if (!isAdmin && contentChanged && ad.status === 'active') {
+      ad.status = 'pending';
+      ad.reReviewAt = new Date().toISOString();
     }
     ad.updatedAt = new Date().toISOString();
     list[idx] = ad;
