@@ -51,7 +51,12 @@
   } else if (isLocal) {
     window.RIZQ_BACKEND_BASE = 'http://' + (host || 'localhost') + ':3000';
   } else {
-    window.RIZQ_BACKEND_BASE = 'https://rizq-platform-api.onrender.com';
+    // الإنتاج (rizq.mr على Hetzner): الواجهة والـAPI على نفس النطاق خلف Caddy
+    try {
+      window.RIZQ_BACKEND_BASE = String(window.location.origin || '').replace(/\/$/, '');
+    } catch (e3) {
+      window.RIZQ_BACKEND_BASE = '';
+    }
   }
   /* إشارات أمان للعميل: demo dashboards فقط محلياً/معاينة */
   window.RIZQ_PUBLIC_CONFIG = Object.assign({}, window.RIZQ_PUBLIC_CONFIG || {}, {

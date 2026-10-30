@@ -25,6 +25,7 @@ function mountAdminCoreRoutes(app, deps) {
     readSubRequests,
     readAdsRequests,
     readTenders,
+    readCatalog,
     getAllAccountPackageRecords,
     readAuditLog,
     DATA_DIR,
@@ -187,6 +188,7 @@ function mountAdminCoreRoutes(app, deps) {
         return res.status(403).json({ error: e.code, msg: 'لا يمكنك منح صلاحيات أوسع مما تملك', denied: e.denied || [] });
       }
       if (e.code === 'last_super_admin') return res.status(400).json({ error: e.code, msg: 'لا يمكن إزالة آخر Super Admin' });
+      if (e.code === 'cannot_modify_higher') return res.status(403).json({ error: e.code, msg: 'لا يمكنك تعديل عضو يملك صلاحيات أعلى منك' });
       res.status(500).json({ error: 'update_failed' });
     }
   });
@@ -197,6 +199,10 @@ function mountAdminCoreRoutes(app, deps) {
     const target = await adminTeamService.getMemberById(req.params.id);
     if (!target) return res.status(404).json({ error: 'member_not_found' });
     if (target.user === selfId) return res.status(400).json({ error: 'cannot_deactivate_self' });
+    const actorPerms = (req.adminUser && req.adminUser.permissions) || [];
+    if (!adminTeamService.canManageMember(actorPerms, target.permissions)) {
+      return res.status(403).json({ error: 'cannot_modify_higher', msg: 'لا يمكنك تعطيل عضو يملك صلاحيات أعلى منك' });
+    }
     if ((target.permissions || []).includes('*') && (await adminTeamService.readTeam()).filter((m) => m.active !== false && (m.permissions || []).includes('*')).length <= 1) {
       return res.status(400).json({ error: 'last_super_admin', msg: 'لا يمكن تعطيل آخر Super Admin' });
     }
@@ -267,6 +273,9 @@ function mountAdminCoreRoutes(app, deps) {
       const pendingBizContacts = (typeof readAdsRequests === 'function' ? await readAdsRequests() : [])
         .filter((r) => r.status === 'pending_contact');
       const pendingTenders = (await readTenders()).filter((t) => t.status === 'pending_review');
+      // منتجات/خدمات الكتالوج تُنشأ pending_review ولا تظهر للعامة قبل موافقة الأدمن
+      const pendingCatalog = typeof readCatalog === 'function'
+        ? (await readCatalog()).filter((it) => it.status === 'pending_review') : [];
 
       const pkgRecords = await getAllAccountPackageRecords();
       const expiringSoon = [];
@@ -290,6 +299,7 @@ function mountAdminCoreRoutes(app, deps) {
         pendingSubRequests: { count: pendingSubRequests.length },
         pendingBizContacts: { count: pendingBizContacts.length },
         pendingTenders: { count: pendingTenders.length },
+        pendingCatalog: { count: pendingCatalog.length, items: pendingCatalog.slice(0, 20).map((it) => ({ id: it.id, name: it.name, accountId: it.accountId })) },
         expiringSoon: { count: expiringSoon.length, items: expiringSoon.slice(0, 20) },
         suspended: { count: suspended.length, items: suspended.slice(0, 20) },
         lastMaintenance,

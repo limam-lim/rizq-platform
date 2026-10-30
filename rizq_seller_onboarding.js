@@ -142,7 +142,9 @@
       markDone(opts.accountId);
       closeOverlay();
     };
-    box.querySelector('[data-act="back"]').onclick = function () {
+    // الخطوة الأولى بلا زر "السابق" — كان الوصول إليه يرمي خطأ فلا يُربط زر "التالي"
+    var backBtn = box.querySelector('[data-act="back"]');
+    if (backBtn) backBtn.onclick = function () {
       renderStep(stepIdx - 1, cfg, state, opts);
     };
     box.querySelector('[data-act="next"]').onclick = function () {

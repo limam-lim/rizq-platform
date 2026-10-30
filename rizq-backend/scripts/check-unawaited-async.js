@@ -24,6 +24,7 @@ const walk = require('acorn-walk');
 
 const BACKEND = path.resolve(__dirname, '..');
 const JSON_OUT = process.argv.includes('--json');
+const INCLUDE_SCRIPTS = process.argv.includes('--scripts');
 const ARRAY_BUILTINS = new Set(['forEach', 'map', 'filter', 'find', 'findIndex', 'some', 'every', 'reduce', 'sort', 'push', 'includes', 'bind', 'call', 'apply']);
 const DEPS = /^(deps|accountsHelpers|helpers|repos|store|ctx|services|svc|db|sql)$/;
 
@@ -58,7 +59,13 @@ function listServerFiles() {
       }
     }
   }
-  return [...out].filter((f) => !/[\\/]scripts[\\/]/.test(f));
+  const files = [...out].filter((f) => !/[\\/]scripts[\\/]/.test(f));
+  // --scripts: افحص أيضاً سكربتات التشغيل (scripts/*.js) التي تستدعي المستودع
+  if (INCLUDE_SCRIPTS) {
+    const sd = path.join(BACKEND, 'scripts');
+    for (const f of fs.readdirSync(sd)) if (f.endsWith('.js')) files.push(path.join(sd, f));
+  }
+  return files;
 }
 
 const mods = new Map();
@@ -180,7 +187,9 @@ for (const f of files) {
         } else {
           let root = obj;
           while (root && root.type === 'MemberExpression') root = root.object;
-          const rootName = root && root.type === 'Identifier' ? root.name : '';
+          // repos().x.list() — مستودع يُجلب عبر دالة كسولة
+          const rootName = root && root.type === 'Identifier' ? root.name
+            : (root && root.type === 'CallExpression' && root.callee.type === 'Identifier' && /^_?repos?$/.test(root.callee.name) ? 'repos' : '');
           if (!DEPS.test(rootName)) return;
           if (rootName === 'repos' || rootName === 'db') kind = 'repo';
           else if (globalAsync.has(prop)) kind = 'dep';

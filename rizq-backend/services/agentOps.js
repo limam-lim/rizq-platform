@@ -92,7 +92,7 @@ async function buildDashboard() {
 
   let marketingStats = null;
   try {
-    marketingStats = require('./marketingAgent').getStats();
+    marketingStats = await require('./marketingAgent').getStats();
   } catch (e) { /* */ }
 
   const claude = isAnthropicConfigured();

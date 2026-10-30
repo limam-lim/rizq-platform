@@ -386,7 +386,10 @@
       if (el.hasAttribute('data-t-fr')) return;
       cacheArAttr(el, 'data-ar', function () { return el.innerHTML; });
       var val = isFr ? el.getAttribute('data-fr') : el.getAttribute('data-ar');
-      if (val != null) el.innerHTML = val;
+      if (val == null) return;
+      // عنصر نصّي بحت: نص الترجمة يُعامل كنص (لا HTML) — يحمي من بيانات مستخدم وُضعت في data-fr
+      if (el.children.length === 0 && /<[a-z!\/]/i.test(val)) el.textContent = val;
+      else el.innerHTML = val;
     });
     root.querySelectorAll('option[data-fr]').forEach(function (el) {
       if (el.hasAttribute('data-t-fr')) return;

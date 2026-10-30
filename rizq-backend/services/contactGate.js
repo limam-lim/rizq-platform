@@ -323,7 +323,12 @@ function toPublicAdGated(ad, gate, sellerAccount) {
   const reviewAverage = sellerAccount && Number.isFinite(Number(sellerAccount.reviewAverage))
     ? Number(sellerAccount.reviewAverage)
     : null;
-  return Object.assign({}, ad, {
+  // حقول تواصل خام على الإعلان نفسه — كانت تُنسخ كما هي فتتجاوز البوابة (contactsLocked:true والرقم ظاهر)
+  const hideAdContact = !unlocked || ad.hidePhone === true;
+  const rawContact = hideAdContact
+    ? { phone: null, phoneIntl: null, whatsapp: null, email: null, contactPhone: null, sellerPhone: null }
+    : {};
+  return Object.assign({}, ad, rawContact, {
     desc: unlocked ? ad.desc : redactContactPatterns(ad.desc),
     descFr: unlocked ? (ad.descFr || '') : redactContactPatterns(ad.descFr || ''),
     /* بث درجة الثقة الحية من الحساب — لا تُثبَّت 60 على الإعلان */

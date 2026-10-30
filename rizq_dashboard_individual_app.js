@@ -230,10 +230,10 @@ function renderQuickAds(){
     <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #eef2fb">
       <div style="width:40px;height:36px;border-radius:8px;background:linear-gradient(145deg,#eef2fb,#f8faff);border:1px solid #e2e8f5;display:flex;align-items:center;justify-content:center;color:var(--royal);flex-shrink:0"><span style="display:flex;width:18px;height:18px">${iconHTML(a.emoji).replace('<svg ', '<svg style="width:18px;height:18px;stroke-width:1.6" ')}</span></div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13px;font-weight:700;color:#1a2535;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${adTitleLocalized(a)}</div>
+        <div style="font-size:13px;font-weight:700;color:#1a2535;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${_escapeHtmlDash(adTitleLocalized(a))}</div>
         <div style="font-size:11.5px;color:var(--text-muted)">👁 ${a.views} ${_t2('مشاهدة','vues')} · 📞 ${a.contacts} ${_t2('تواصل','contacts')}</div>
       </div>
-      <div style="font-size:13px;font-weight:800;color:var(--gold-dk);white-space:nowrap">${a.price.split(' ')[0]}</div>
+      <div style="font-size:13px;font-weight:800;color:var(--gold-dk);white-space:nowrap">${_escapeHtmlDash(String(a.price).split(' ')[0])}</div>
     </div>`).join('');
 }
 
@@ -452,8 +452,8 @@ function _favCardHTML(a, href){
   return `<a href="${href}" style="background:#fff;border:1px solid #e2e8f5;border-radius:14px;overflow:hidden;text-decoration:none;display:block;transition:all .3s;box-shadow:0 2px 10px rgba(15,35,65,.04)" onmouseover="this.style.borderColor='rgba(201,168,76,.3)'" onmouseout="this.style.borderColor='#e2e8f5'">
       <div style="height:100px;background:linear-gradient(145deg,#eef2fb,#f8faff);display:flex;align-items:center;justify-content:center;color:var(--royal)"><span style="display:flex;width:38px;height:38px">${iconHTML(a.emoji).replace('<svg ', '<svg style="width:38px;height:38px;stroke-width:1.4" ')}</span></div>
       <div style="padding:12px">
-        <div style="font-size:13px;font-weight:700;color:#1a2535;margin-bottom:5px">${adTitleLocalized(a)}</div>
-        <div style="font-size:14px;font-weight:900;color:var(--gold-dk)">${a.price}</div>
+        <div style="font-size:13px;font-weight:700;color:#1a2535;margin-bottom:5px">${_escapeHtmlDash(adTitleLocalized(a))}</div>
+        <div style="font-size:14px;font-weight:900;color:var(--gold-dk)">${_escapeHtmlDash(a.price)}</div>
       </div>
     </a>`;
 }
@@ -587,8 +587,8 @@ function renderAdsTableData(data){
   const tbody=document.getElementById('ads-tbody');
   tbody.innerHTML=data.map(a=>`
     <tr>
-      <td><div class="td-ad" onclick="window.location='rizq_browse.html?id='+encodeURIComponent('${a.id}')" style="cursor:pointer" title="عرض الإعلان"><div class="td-thumb">${iconHTML(a.emoji)}</div><div><div class="td-title" style="color:var(--gold)">${adTitleLocalized(a)}</div><div class="td-cat">${a.cat}</div></div></div></td>
-      <td><div class="td-price">${a.price}</div></td>
+      <td><div class="td-ad" onclick="window.location='rizq_browse.html?id='+encodeURIComponent('${a.id}')" style="cursor:pointer" title="عرض الإعلان"><div class="td-thumb">${iconHTML(a.emoji)}</div><div><div class="td-title" style="color:var(--gold)">${_escapeHtmlDash(adTitleLocalized(a))}</div><div class="td-cat">${_escapeHtmlDash(a.cat)}</div></div></div></td>
+      <td><div class="td-price">${_escapeHtmlDash(a.price)}</div></td>
       <td>${statMap[a.status]||''}</td>
       <td><div class="td-views">👁 ${(a.views||0).toLocaleString()}</div></td>
       <td><div class="td-stat">📞 ${a.contacts||0}</div></td>

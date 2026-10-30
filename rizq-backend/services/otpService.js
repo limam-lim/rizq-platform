@@ -380,12 +380,9 @@ async function sendBuyerOtp(payload) {
   });
   await writeStore(list);
 
-  let sentViaSms = false;
-  if (isValidMauritanianPhone(mr) && process.env.TWILIO_SID && (process.env.TWILIO_TOKEN || process.env.TWILIO_AUTH_TOKEN) && process.env.RIZQ_TWILIO_NUMBER) {
-    const sms = await sendSMS('+222' + mr, `رمز التحقق رزق: ${code}. صالح 5 دقائق.`);
-    sentViaSms = !!(sms && sms.ok);
-  }
-
+  // رمز المشتري يُثبت ملكية البريد (ويُستعمل للدخول وتغيير كلمة المرور) —
+  // لذلك يُرسل إلى البريد فقط، وليس إلى هاتف يختاره الطالب (وإلا استولى على حساب غيره).
+  const sentViaSms = false;
   const mail = await sendOtpEmail(email, code, name);
   const sentViaEmail = !!(mail && mail.ok);
 

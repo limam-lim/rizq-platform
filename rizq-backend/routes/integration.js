@@ -71,10 +71,12 @@ function setupIntegrationAPI(app, deps) {
   app.get('/api/integration/status/:accountId', integrationLimiter, async (req, res) => {
     const accountId = String(req.params.accountId || '').trim();
     const token = String(req.header('x-account-token') || '').trim();
-    const guard = await ownerGuard(accountId, token);
-    if (!guard.ok) return sendError(res, guard.status, guard.error, guard.code);
+    // الحالة تُحسب entitled بنفسها: الشركة بلا الباقة ترى بطاقة الترقية بدل خطأ 403
+    const acc = await verifyAccountOwner(accountId, token);
+    if (!acc) return sendError(res, 401, 'unauthorized');
+    if (acc.type !== 'corp') return sendError(res, 403, 'متاح لحسابات الشركات فقط', 'CORP_ONLY');
 
-    const status = await getIntegrationStatus(accountId, guard.acc.type);
+    const status = await getIntegrationStatus(accountId, acc.type);
     res.json({ ok: true, ...status });
   });
 

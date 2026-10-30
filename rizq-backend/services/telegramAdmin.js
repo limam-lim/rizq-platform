@@ -905,9 +905,16 @@ function verifyWebhookSecret(req) {
   const headerSecret = req.header('x-telegram-bot-api-secret-token') || '';
   const pathSecret = req.params && req.params.secret;
   if (pathSecret != null) {
-    return pathSecret === expected && (!headerSecret || headerSecret === expected);
+    return safeEqual(pathSecret, expected) && (!headerSecret || safeEqual(headerSecret, expected));
   }
-  return headerSecret === expected;
+  return safeEqual(headerSecret, expected);
+}
+
+function safeEqual(a, b) {
+  const crypto = require('crypto');
+  const ha = crypto.createHash('sha256').update(String(a || '')).digest();
+  const hb = crypto.createHash('sha256').update(String(b || '')).digest();
+  return crypto.timingSafeEqual(ha, hb) && String(a || '').length === String(b || '').length;
 }
 
 async function registerWebhook(publicBaseUrl) {

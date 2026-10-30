@@ -2381,7 +2381,7 @@ main, .page-content.active, .main-content, .results-area,
   <!-- ══════════════════════════════════════════════════════════════
        PANEL: ANNOUNCEMENTS — نظام الإشعارات والإعلانات
   ══════════════════════════════════════════════════════════════ -->
-  <div class="panel" id="panel-announcements" style="display:none">
+  <div class="panel" id="panel-announcements">
 
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px">
@@ -4028,15 +4028,30 @@ function saveSiteConfig(){
   });
 }
 
+// مفاتيح تؤثر على كل الزوار فوراً — تأكيد قبل الإيقاف (نقرة خاطئة = منصة مغلقة)
+var _CRITICAL_PLATFORM_FLAGS = {
+  platformOpen: ['إغلاق المنصة بالكامل أمام جميع الزوار (وضع الصيانة)؟','Fermer toute la plateforme aux visiteurs (maintenance) ?'],
+  registrationOpen: ['إيقاف تسجيل المستخدمين الجدد؟','Bloquer l’inscription des nouveaux utilisateurs ?'],
+  adsOpen: ['إيقاف نشر الإعلانات الجديدة لكل المستخدمين؟','Bloquer la publication de nouvelles annonces ?'],
+  otpRequired: ['إلغاء التحقق الإلزامي بـ OTP عند الدخول؟ (يُضعف الأمان)','Désactiver l’OTP obligatoire à la connexion ? (sécurité réduite)']
+};
 function persistPlatformFlag(btn, key){
-  btn.classList.toggle('on');
+  var willBeOn = !btn.classList.contains('on');
+  var warn = _CRITICAL_PLATFORM_FLAGS[key];
+  if(!willBeOn && warn && !confirm(RizqI18n.t2(warn[0], warn[1]))) return;
+  if(willBeOn && key === 'vpnBlock' && !confirm(RizqI18n.t2('حظر الزوار القادمين عبر VPN؟ قد يمنع بعض المستخدمين الحقيقيين من الدخول.','Bloquer les visiteurs via VPN ? Certains vrais utilisateurs pourraient être bloqués.'))) return;
+  var prev = _readPlatformFlags();
+  btn.classList.toggle('on', willBeOn);
   var body = { platformFlags: {} };
-  body.platformFlags[key] = btn.classList.contains('on');
-  localStorage.setItem('rizq_platform_flags', JSON.stringify(Object.assign(_readPlatformFlags(), body.platformFlags)));
+  body.platformFlags[key] = willBeOn;
+  localStorage.setItem('rizq_platform_flags', JSON.stringify(Object.assign({}, prev, body.platformFlags)));
   _adminPostSiteConfig(body, function(){
     showToast(RizqI18n.t2('✅ تم تحديث الإعداد','✅ Paramètre mis à jour'));
   }, function(){
-    showToast(RizqI18n.t2('✅ حُفظ محلياً','✅ Enregistré localement'));
+    // لم يُطبَّق على الخادم — تراجع حتى لا يظن الأدمن أن الإعداد سارٍ
+    btn.classList.toggle('on', !willBeOn);
+    localStorage.setItem('rizq_platform_flags', JSON.stringify(prev));
+    showToast(RizqI18n.t2('❌ فشل الحفظ على الخادم — لم يتغيّر الإعداد','❌ Échec de l’enregistrement — paramètre inchangé'),'error');
   });
 }
 
@@ -4342,6 +4357,7 @@ function loadModulesPanel(){
 
 function toggleModuleFlag(key, btn){
   var willBeOn = !btn.classList.contains('on');
+  if(!willBeOn && !confirm(RizqI18n.t2('إغلاق هذا القسم وإخفاؤه عن جميع الزوار؟','Fermer cette section et la masquer à tous les visiteurs ?'))) return;
   btn.classList.toggle('on', willBeOn);
   var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
   if(!c.backendUrl){
@@ -5514,7 +5530,7 @@ function refreshUnifiedReviewPanel(){
 
       var cards=[
         {key:'accounts', icon:'⏳', color:'#f59e0b', count:digest.pendingAccounts&&digest.pendingAccounts.count||0, title:RizqI18n.t2('حسابات معلّقة','Comptes en attente'), panel:'accounts', hint:RizqI18n.t2('موافقة / رفض التسجيل','Approuver / refuser')},
-        {key:'ads', icon:'📋', color:'#3b82f6', count:digest.pendingAds&&digest.pendingAds.count||0, title:RizqI18n.t2('إعلانات معلّقة','Annonces en attente'), panel:'ads', hint:RizqI18n.t2('مراجعة الإعلانات','Modérer les annonces')},
+        {key:'ads', icon:'📋', color:'#3b82f6', count:(digest.pendingAds&&digest.pendingAds.count||0)+(digest.pendingCatalog&&digest.pendingCatalog.count||0), title:RizqI18n.t2('إعلانات معلّقة','Annonces en attente'), panel:'ads', hint:RizqI18n.t2('مراجعة الإعلانات','Modérer les annonces')},
         {key:'subs', icon:'💳', color:'#8b5cf6', count:digest.pendingSubRequests&&digest.pendingSubRequests.count||0, title:RizqI18n.t2('طلبات اشتراك','Demandes d’abonnement'), panel:'payments', hint:RizqI18n.t2('مدفوعات وباقات','Paiements et forfaits')},
         {key:'biz', icon:'📞', color:'#06b6d4', count:digest.pendingBizContacts&&digest.pendingBizContacts.count||0, title:RizqI18n.t2('طلبات تواصل أعمال','Contacts pro'), panel:'promo-video', hint:RizqI18n.t2('طلبات فيديو/إعلان','Demandes vidéo/pub')},
         {key:'tenders', icon:'📄', color:'#10b981', count:digest.pendingTenders&&digest.pendingTenders.count||0, title:RizqI18n.t2('مناقصات معلّقة','Appels d’offres'), panel:'tenders-mod', hint:RizqI18n.t2('مراقبة المناقصات','Modération AO')},
@@ -6303,23 +6319,9 @@ function loadModerationPanel(){
   var adsList = document.getElementById('mod-ads-list');
   var adsEmpty = document.getElementById('mod-ads-empty');
   if(reviewAds.length === 0){
+    // لا بطاقة "تجريبية" وهمية في لوحة الإشراف الحقيقية — حالة الفراغ المصممة أصلاً
     adsList.innerHTML = '';
-    adsEmpty.style.display = 'none';
-    var dh = '<div style="background:#fff;border:1px solid rgba(27,58,107,.1);border-radius:14px;padding:18px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap">';
-    dh += '<div style="flex:1">';
-    dh += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
-    dh += '<span style="background:#fef2f2;color:#dc2626;border:1px solid #fee2e2;border-radius:6px;padding:1px 8px;font-size:11px;font-weight:700">R06</span>';
-    dh += '<span style="font-size:13px;font-weight:700;color:#1a2535">'+RizqI18n.t2('هاتف iPhone 15 Pro Max — سعر مريب جداً','iPhone 15 Pro Max — prix très suspect')+'</span>';
-    dh += '</div>';
-    dh += '<div style="font-size:12px;color:#2C3A4F">'+RizqI18n.t2('سعر مريب + طلب دفع مسبق عبر واتساب','Prix suspect + demande de paiement anticipé via WhatsApp')+'</div>';
-    dh += '<div style="font-size:11px;color:#9ca3af;margin-top:4px">👤 '+RizqI18n.t2('أحمد ولد سيدي · تجريبي','Ahmed Ould Sidi · démo')+'</div>';
-    dh += '</div>';
-    dh += '<div style="display:flex;gap:8px;flex-shrink:0">';
-    dh += '<button data-msg="'+RizqI18n.t2('تم نشر الإعلان','L\'annonce a été publiée')+'" data-type="success" onclick="showToast(this.dataset.msg,this.dataset.type)" style="padding:8px 14px;background:#16a34a;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">✅ '+RizqI18n.t2('نشر','Publier')+'</button>';
-    dh += '<button data-msg="'+RizqI18n.t2('تم رفض الإعلان','L\'annonce a été refusée')+'" data-type="error" onclick="showToast(this.dataset.msg,this.dataset.type)" style="padding:8px 14px;background:#dc2626;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">❌ '+RizqI18n.t2('رفض','Refuser')+'</button>';
-    dh += '</div></div>';
-    adsList.innerHTML = dh;
-    document.getElementById('mod-ads-count').textContent = '1 ('+RizqI18n.t2('تجريبي','démo')+')';
+    adsEmpty.style.display = 'block';
   } else {
     adsEmpty.style.display = 'none';
     adsList.innerHTML = reviewAds.map(function(ad){
@@ -6363,6 +6365,18 @@ function _rizqMergeBackendPendingAds(){
         });
         if(window._rizqBackendPendingAds.length) loadModerationPanel();
       }).catch(function(){ window._rizqBackendPendingAdsFetched = true; /* صامت — لا خادم منشور بعد */ });
+    // منتجات/خدمات الكتالوج تُنشأ pending_review — بدون هذا لا تُعتمد أبداً ولا تظهر للزوار
+    fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/catalog/admin/pending', {
+      headers: _adminAuthHeaders()
+    }).then(function(res){ return res.ok ? res.json() : null; })
+      .then(function(data){
+        if(!data || !Array.isArray(data.items) || !data.items.length) return;
+        var items = data.items.map(function(it){
+          return { id: it.id, kind: 'catalog', code: (it.kind === 'service' ? RizqI18n.t2('خدمة','Service') : RizqI18n.t2('منتج','Produit')), title: it.name || RizqI18n.t2('(بدون اسم)','(Sans nom)'), reason: RizqI18n.t2('عنصر كتالوج جديد بانتظار المراجعة','Nouvel article du catalogue en attente de révision'), seller: it.accountId || '', date: it.createdAt ? new Date(it.createdAt).toLocaleDateString('fr-FR') : '', isReal: true };
+        });
+        window._rizqBackendPendingAds = (window._rizqBackendPendingAds || []).filter(function(a){ return a.kind !== 'catalog'; }).concat(items);
+        loadModerationPanel();
+      }).catch(function(){ /* صامت */ });
   }catch(e){}
 }
 
@@ -6423,7 +6437,34 @@ function syncRealAdReviewStatus(adId, newStatus){
   }catch(e){}
 }
 
+function _rizqBackendPendingFind(adId){
+  return (window._rizqBackendPendingAds || []).filter(function(a){ return a.id === adId; })[0] || null;
+}
+function _rizqBackendPendingDrop(adId){
+  window._rizqBackendPendingAds = (window._rizqBackendPendingAds || []).filter(function(a){ return a.id !== adId; });
+}
+// قرار الأدمن على عنصر كتالوج: active عند الموافقة، inactive عند الرفض (يبقى ظاهراً لصاحبه فقط)
+function _rizqCatalogDecision(itemId, approve){
+  var cfg = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
+  if(!cfg.backendUrl) return Promise.resolve(false);
+  return fetch(cfg.backendUrl.replace(/\/$/,'') + '/api/catalog/' + encodeURIComponent(itemId), {
+    method: 'PATCH',
+    headers: _adminAuthHeaders({ 'Content-Type':'application/json' }),
+    body: JSON.stringify({ status: approve ? 'active' : 'inactive' })
+  }).then(function(r){ return r.ok; }).catch(function(){ return false; });
+}
+
 function approveAd(adId){
+  var pend = _rizqBackendPendingFind(adId);
+  if(pend && pend.kind === 'catalog'){
+    _rizqCatalogDecision(adId, true).then(function(ok){
+      if(ok){ _rizqBackendPendingDrop(adId); showToast(RizqI18n.t2('✅ تم نشر العنصر في الكتالوج','✅ Article publié dans le catalogue')); }
+      else showToast(RizqI18n.t2('تعذّر حفظ القرار على الخادم — أعد المحاولة','Impossible d’enregistrer la décision — réessayez'),'error');
+      loadModerationPanel();
+    });
+    return;
+  }
+  _rizqBackendPendingDrop(adId);
   syncRealAdReviewStatus(adId, 'approved');
   var ads = JSON.parse(localStorage.getItem('rizq_flagged_ads') || '[]');
   ads = ads.filter(function(a){ return a.id !== adId; });
@@ -6434,6 +6475,16 @@ function approveAd(adId){
 
 function rejectAd(adId){
   if(!confirm(RizqI18n.t2('رفض هذا الإعلان؟ سيُخطَر البائع بالرفض.','Refuser cette annonce ? Le vendeur sera informé du refus.'))) return;
+  var pend = _rizqBackendPendingFind(adId);
+  if(pend && pend.kind === 'catalog'){
+    _rizqCatalogDecision(adId, false).then(function(ok){
+      if(ok){ _rizqBackendPendingDrop(adId); showToast(RizqI18n.t2('❌ تم رفض العنصر','❌ Article refusé')); }
+      else showToast(RizqI18n.t2('تعذّر حفظ القرار على الخادم — أعد المحاولة','Impossible d’enregistrer la décision — réessayez'),'error');
+      loadModerationPanel();
+    });
+    return;
+  }
+  _rizqBackendPendingDrop(adId);
   syncRealAdReviewStatus(adId, 'rejected');
   var ads = JSON.parse(localStorage.getItem('rizq_flagged_ads') || '[]');
   ads = ads.filter(function(a){ return a.id !== adId; });

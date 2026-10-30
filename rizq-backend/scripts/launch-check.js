@@ -137,12 +137,12 @@ async function launchDateEmpty() {
   }
 }
 
-function countDemo() {
+async function countDemo() {
   const store = require('../db/platformStore');
-  const adsAll = store.readAds() || [];
-  const accountsAll = store.readAccounts() || [];
+  const adsAll = (await store.readAds()) || [];
+  const accountsAll = (await store.readAccounts()) || [];
   let catalogAll = [];
-  try { catalogAll = store.readCatalog() || []; } catch (e) { /* ignore */ }
+  try { catalogAll = (await store.readCatalog()) || []; } catch (e) { /* ignore */ }
   const ads = adsAll.filter(isDemoRec);
   const accounts = accountsAll.filter(isDemoRec);
   const catalog = catalogAll.filter(isDemoRec);
@@ -192,7 +192,7 @@ async function main() {
   }
   check('backup restore tested', restoreOk, restoreDetail);
 
-  const demo = countDemo();
+  const demo = await countDemo();
   /* أثناء عرض التخرج: المحتوى الموسوم graduationDemo مطلوب.
      قبل الإطلاق الحقيقي: بعد purge يجب أن يكون المجموع 0. */
   if (demo.graduationTagged > 0) {
