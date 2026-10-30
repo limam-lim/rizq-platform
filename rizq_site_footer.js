@@ -185,7 +185,29 @@
     var root = document.getElementById('rizq-site-footer');
     if (root && window.RizqI18n && typeof window.RizqI18n.applyStaticDom === 'function') {
       try { window.RizqI18n.applyStaticDom(root); } catch (e) {}
+    } else if (root) {
+      applyFooterDict(root, fr);
     }
+  }
+
+  // صفحات بلا rizq_i18n.js (مثل التسجيل): نفس القاموس المشترك، تحميل كسول عند الحاجة
+  var _dictLoading = false;
+  function applyFooterDict(root, fr) {
+    var D = fr ? window.RIZQ_I18N_FR : window.RIZQ_I18N_AR;
+    if (!D) {
+      if (!fr || _dictLoading) return;
+      _dictLoading = true;
+      var s = document.createElement('script');
+      s.src = 'rizq_i18n_data.js';
+      s.onload = function () { applyFooterDict(root, isFrFooter()); };
+      document.head.appendChild(s);
+      return;
+    }
+    var common = D.common || {};
+    root.querySelectorAll('[data-t]').forEach(function (el) {
+      var v = common[el.getAttribute('data-t')];
+      if (v != null && el.children.length === 0) el.textContent = v;
+    });
   }
 
   function ensureToggle() {

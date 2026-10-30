@@ -765,6 +765,12 @@
   }
 
   function applyLangTexts() {
+    [['goto-register', 'ليس لديك حساب؟ ', 'Pas encore de compte ? ', 'أنشئ حساباً مجاناً', 'Créer un compte gratuit'],
+     ['goto-login', 'لديك حساب؟ ', 'Déjà un compte ? ', 'سجّل دخولك هنا', 'Connectez-vous ici']].forEach(function (r) {
+      var b = document.getElementById(r[0]); if (!b) return;
+      b.textContent = t(r[3], r[4]);
+      if (b.previousSibling && b.previousSibling.nodeType === 3) b.previousSibling.nodeValue = t(r[1], r[2]);
+    });
     document.getElementById('btn-cancel').textContent = t('✕ إلغاء', '✕ Annuler');
     document.getElementById('nav-terms').textContent = t('شروط القبول', 'Conditions');
     document.getElementById('nav-contact').textContent = t('تواصل', 'Contact');

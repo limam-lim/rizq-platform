@@ -422,6 +422,15 @@
 
   function demoStripAds() {
     /* 6 بطاقات ظاهرة أكبر — ملف mp4 لكل بطاقة بلا تكرار */
+    var fr = (document.documentElement.lang || '').toLowerCase().indexOf('fr') === 0;
+    var FR = {
+      'واجهة محلك': ['Votre vitrine', 'Boutiques Rizq', 'Nouakchott'],
+      'مكتب أعمالك': ['Votre bureau d’affaires', 'Bureaux Rizq', 'Mauritanie'],
+      'معرضك الافتراضي': ['Votre showroom virtuel', 'Showrooms Rizq', 'Toutes les wilayas'],
+      'واجهات المنصة': ['Les interfaces de la plateforme', 'Rizq', 'Rizq ADS'],
+      'منصة رزق': ['La plateforme Rizq', 'Rizq', 'Mauritanie'],
+      'وحدات المنصة': ['Les modules de la plateforme', 'Rizq', 'Démo pratique']
+    };
     return [
       { advertiser: 'محلات رزق', title: 'واجهة محلك', loc: 'نوّاكشوط', url: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4', active: true, demo: true },
       { advertiser: 'مكاتب رزق', title: 'مكتب أعمالك', loc: 'موريتانيا', url: 'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4', active: true, demo: true },
@@ -430,7 +439,8 @@
       { advertiser: 'رزق', title: 'منصة رزق', loc: 'موريتانيا', url: 'rizq-assets/promo/rizq-platform-promo-light.mp4', active: true, demo: true },
       { advertiser: 'رزق', title: 'وحدات المنصة', loc: 'شرح عملي', url: 'rizq-assets/promo/rizq-modules-promo-demo-light.mp4', active: true, demo: true }
     ].map(function (a) {
-      return Object.assign({}, a, { url: resolvePromoUrl(a.url) });
+      var t = fr && FR[a.title];
+      return Object.assign({}, a, t ? { title: t[0], advertiser: t[1], loc: t[2] } : {}, { url: resolvePromoUrl(a.url) });
     });
   }
 

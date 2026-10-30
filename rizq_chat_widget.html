@@ -765,6 +765,40 @@ var RizqWidget = (function() {
         if (el) el.innerHTML = dict[id];
       });
     }
+    _applyQuickChipsLang(isFr);
+  }
+
+  // أزرار الاختصار: نص الزر + السؤال المرسل بلغة الواجهة
+  var _QUICK_FR = {
+    'كيف أسجل': ['Inscription', 'Comment m’inscrire ?'],
+    'أنواع الحسابات': ['Types de comptes', 'Quels sont les types de comptes ?'],
+    'كيف أنشر إعلاناً؟': ['Publier une annonce', 'Comment publier une annonce ?'],
+    'كيف أشتري': ['Comment acheter', 'Comment acheter ?'],
+    'الباقات': ['Forfaits', 'Quels sont les forfaits ?'],
+    'طرق الدفع': ['Moyens de paiement', 'Quels sont les moyens de paiement ?'],
+    'توثيق الهوية': ['Vérification', 'Vérification d’identité'],
+    'لوحة التحكم': ['Tableau de bord', 'Tableau de bord'],
+    'متجر افتراضي': ['Boutique', 'Boutique virtuelle'],
+    'مكتب افتراضي': ['Bureau', 'Bureau virtuel'],
+    'الفئات': ['Catégories', 'Quelles sont les catégories ?'],
+    'ما هي رزق': ['À propos de Rizq', 'Qu’est-ce que Rizq ?'],
+    'تواصل': ['Contact', 'Comment vous contacter ?'],
+    'عندي شكوى': ['Réclamation', 'J’ai une réclamation']
+  };
+  function _applyQuickChipsLang(isFr) {
+    var btns = document.querySelectorAll('#rw-quick-actions .rw-quick-btn');
+    Array.prototype.forEach.call(btns, function (btn) {
+      if (!btn.hasAttribute('data-q-ar')) {
+        var m = /quickSend\('([^']*)'\)/.exec(btn.getAttribute('onclick') || '');
+        btn.setAttribute('data-q-ar', m ? m[1] : '');
+        btn.setAttribute('data-label-ar', btn.textContent);
+      }
+      var q = btn.getAttribute('data-q-ar');
+      var fr = isFr && _QUICK_FR[q];
+      btn.textContent = fr ? fr[0] : btn.getAttribute('data-label-ar');
+      var send = fr ? fr[1] : q;
+      btn.onclick = function () { RizqWidget.quickSend(send); };
+    });
   }
 
   function _ts() {
