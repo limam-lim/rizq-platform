@@ -4028,15 +4028,29 @@ function saveSiteConfig(){
   });
 }
 
+// مفاتيح تؤثر على كل الزوار فوراً — تأكيد قبل الإيقاف (نقرة خاطئة = منصة مغلقة)
+var _CRITICAL_PLATFORM_FLAGS = {
+  platformOpen: ['إغلاق المنصة بالكامل أمام جميع الزوار (وضع الصيانة)؟','Fermer toute la plateforme aux visiteurs (maintenance) ?'],
+  registrationOpen: ['إيقاف تسجيل المستخدمين الجدد؟','Bloquer l’inscription des nouveaux utilisateurs ?'],
+  adsOpen: ['إيقاف نشر الإعلانات الجديدة لكل المستخدمين؟','Bloquer la publication de nouvelles annonces ?'],
+  otpRequired: ['إلغاء التحقق الإلزامي بـ OTP عند الدخول؟ (يُضعف الأمان)','Désactiver l’OTP obligatoire à la connexion ? (sécurité réduite)']
+};
 function persistPlatformFlag(btn, key){
-  btn.classList.toggle('on');
+  var willBeOn = !btn.classList.contains('on');
+  var warn = _CRITICAL_PLATFORM_FLAGS[key];
+  if(!willBeOn && warn && !confirm(RizqI18n.t2(warn[0], warn[1]))) return;
+  var prev = _readPlatformFlags();
+  btn.classList.toggle('on', willBeOn);
   var body = { platformFlags: {} };
-  body.platformFlags[key] = btn.classList.contains('on');
-  localStorage.setItem('rizq_platform_flags', JSON.stringify(Object.assign(_readPlatformFlags(), body.platformFlags)));
+  body.platformFlags[key] = willBeOn;
+  localStorage.setItem('rizq_platform_flags', JSON.stringify(Object.assign({}, prev, body.platformFlags)));
   _adminPostSiteConfig(body, function(){
     showToast(RizqI18n.t2('✅ تم تحديث الإعداد','✅ Paramètre mis à jour'));
   }, function(){
-    showToast(RizqI18n.t2('✅ حُفظ محلياً','✅ Enregistré localement'));
+    // لم يُطبَّق على الخادم — تراجع حتى لا يظن الأدمن أن الإعداد سارٍ
+    btn.classList.toggle('on', !willBeOn);
+    localStorage.setItem('rizq_platform_flags', JSON.stringify(prev));
+    showToast(RizqI18n.t2('❌ فشل الحفظ على الخادم — لم يتغيّر الإعداد','❌ Échec de l’enregistrement — paramètre inchangé'),'error');
   });
 }
 
@@ -4342,6 +4356,7 @@ function loadModulesPanel(){
 
 function toggleModuleFlag(key, btn){
   var willBeOn = !btn.classList.contains('on');
+  if(!willBeOn && !confirm(RizqI18n.t2('إغلاق هذا القسم وإخفاؤه عن جميع الزوار؟','Fermer cette section et la masquer à tous les visiteurs ?'))) return;
   btn.classList.toggle('on', willBeOn);
   var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
   if(!c.backendUrl){

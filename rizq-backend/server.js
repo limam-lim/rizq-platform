@@ -2973,7 +2973,8 @@ app.get('/api/video-ads/stats/:accountId', async (req, res) => {
   if (!acc) return res.status(401).json({ error: 'unauthorized' });
   const media = await getMediaEntitlements(accountId);
   if (!media.subscribed || !media.basicStats) {
-    return res.status(403).json({ ok: false, error: 'stats_not_available', media });
+    // ليس خطأً: الحساب بلا باقة فيديو — 200 بلا إحصائيات (لا ضجيج 403 في كل فتح للوحة)
+    return res.json({ ok: true, available: false, error: 'stats_not_available', stats: null, media });
   }
   const cfg = (await repos.getSiteConfig()) || {};
   const statsAll = (cfg.videoAds && cfg.videoAds.stats) || {};
