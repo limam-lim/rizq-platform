@@ -1846,6 +1846,13 @@ window.RIZQ_I18N_AR = {
     "denied-msg-pre": "تواصل مع منصة",
     "denied-msg-post": "للحصول على رابط داشبورد صحيح.",
     "denied-home": "الصفحة الرئيسية"
+  },
+  "dashboard_estate": {
+    "denied-title": "يجب تسجيل الدخول",
+    "denied-msg-pre": "سجّل حساباً عقارياً أو سجّل الدخول للوصول إلى لوحة التحكم على",
+    "denied-msg-post": ".",
+    "denied-register": "تسجيل / دخول عقاري",
+    "denied-home": "الصفحة الرئيسية"
   }
 };
 
@@ -3694,6 +3701,13 @@ window.RIZQ_I18N_FR = {
     "denied-title": "Lien invalide",
     "denied-msg-pre": "Contactez la plateforme",
     "denied-msg-post": "pour obtenir un lien de tableau de bord valide.",
+    "denied-home": "Page d'accueil"
+  },
+  "dashboard_estate": {
+    "denied-title": "Connexion requise",
+    "denied-msg-pre": "Créez un compte immobilier ou connectez-vous pour accéder à votre tableau de bord sur",
+    "denied-msg-post": ".",
+    "denied-register": "Inscription / connexion immobilier",
     "denied-home": "Page d'accueil"
   }
 };

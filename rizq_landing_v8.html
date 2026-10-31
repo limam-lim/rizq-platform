@@ -13664,6 +13664,28 @@ function checkNniAvailable(nni){
 // بنفس معرّف الحساب المحلي — فيراه الأدمن من أي جهاز عبر GET /api/accounts/admin
 // (مُفعَّل بالفعل في rizq_admin.html). فشل الشبكة أو عدم نشر الخادم بعد لا
 // يكسر التسجيل المحلي إطلاقاً — يستمر العمل تماماً كما كان قبل هذا التعديل.
+function _syncAccountFailMessage(httpStatus, data){
+  var code = String((data && data.code) || '');
+  var err = String((data && (data.error || data.message)) || '');
+  if(httpStatus === 429){
+    return isAr ? 'ضغط مؤقت، أعد المحاولة بعد دقيقة' : 'Charge temporaire, réessayez dans une minute';
+  }
+  if(httpStatus === 409 && (
+    code === 'email_in_use' || code === 'email_duplicate' || /email/i.test(code)
+    || /email|بريد|déjà|already/i.test(err)
+  )){
+    return isAr ? 'البريد مسجّل مسبقاً، سجّل الدخول' : 'Cet e-mail est déjà enregistré, connectez-vous';
+  }
+  return isAr ? 'تعذّر إتمام التسجيل، أعد المحاولة' : 'Impossible de finaliser l\'inscription, réessayez';
+}
+
+function _reenablePkgSubmitBtn(){
+  try{
+    var btn = document.querySelector('#p-pkg-payment button.m-btn-main, #p-pkg-payment .m-btn-main, button[onclick*="ppFinalSubmit"]');
+    if(btn){ btn.disabled = false; }
+  }catch(e){}
+}
+
 function _syncAccountToBackend(acc){
   if(!window.RIZQ_BACKEND_BASE) return Promise.resolve({ ok: true, localOnly: true });
   return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts', {
@@ -13702,12 +13724,34 @@ function _syncAccountToBackend(acc){
   }).then(function(res){
     return res.json().then(function(data){ return { res: res, data: data }; }).catch(function(){ return { res: res, data: null }; });
   }).then(function(out){
+    var res = out.res;
     var data = out.data;
-    if(data && (data.code === 'nni_duplicate' || data.code === 'nni_invalid')){
+    if(data && (data.code === 'nni_duplicate' || data.code === 'nni_invalid' || data.code === 'nni_unavailable')){
       _rollbackLocalAccount(acc.id);
       return { ok: false, blocked: true, code: data.code, message: nniRejectMessage(data) };
     }
-    if(!data || !data.ok || !data.accessToken) return { ok: true };
+    // كان الخطأ يُعامل كنجاح (ok:true) رغم 429/409/5xx — الحساب يبقى محلياً فقط
+    // ولا يصل للأدمن. عند ضبط الخادم: أي فشل HTTP أو رد ناقص → تراجع محلي.
+    if(!res.ok){
+      _rollbackLocalAccount(acc.id);
+      return {
+        ok: false,
+        blocked: true,
+        code: (data && data.code) || ('http_' + res.status),
+        status: res.status,
+        message: _syncAccountFailMessage(res.status, data)
+      };
+    }
+    if(!data || !data.ok || !data.accessToken){
+      _rollbackLocalAccount(acc.id);
+      return {
+        ok: false,
+        blocked: true,
+        code: (data && data.code) || 'sync_incomplete',
+        status: res.status,
+        message: _syncAccountFailMessage(res.status || 500, data)
+      };
+    }
     // نخزّن توكن الوصول الخاص بالحساب محلياً — سيُستخدم لاحقاً من داشبورد
     // المشترك نفسه للاستعلام عن حالة الموافقة الحقيقية عبر GET /api/accounts/mine/:id
     // ونزامن status/dashToken من الخادم حتى يطابق التوجيه لوحة النوع الصحيح.
@@ -13749,7 +13793,16 @@ function _syncAccountToBackend(acc){
       accessToken: data.accessToken,
       id: data.id || acc.id,
     };
-  }).catch(function(){ return { ok: true, localOnly: true }; });
+  }).catch(function(){
+    // شبكة معطّلة والخادم مضبوط — لا تُعرض شاشة النجاح ولا يُترك حساب محلي يتيم
+    _rollbackLocalAccount(acc.id);
+    return {
+      ok: false,
+      blocked: true,
+      code: 'network',
+      message: isAr ? 'تعذّر إتمام التسجيل، أعد المحاولة' : 'Impossible de finaliser l\'inscription, réessayez'
+    };
+  });
 }
 
 /** بعد التسجيل: إن بقي الحساب معلّقاً بانتظار OTP — أرسل الرمز وفعّل فوراً حتى يدخل الزبون */
@@ -14092,8 +14145,9 @@ function ppFinalSubmit(){
   data.receipt_name = _ppReceiptName||null;
   data.pkg_status   = isTrial?'trial':((_ppReceiptB64)?'pending_payment_review':'pending_payment');
   Promise.resolve(saveAccountPending(data)).then(function(result){
-    if(result && result.blocked){
-      alert(result.message);
+    if(!result || result.ok === false || result.blocked){
+      alert((result && result.message) || (isAr ? 'تعذّر إتمام التسجيل، أعد المحاولة' : 'Impossible de finaliser l\'inscription, réessayez'));
+      _reenablePkgSubmitBtn();
       return;
     }
     var afterOtp = Promise.resolve(result);
@@ -14110,6 +14164,11 @@ function ppFinalSubmit(){
       });
     }
     return afterOtp.then(function(result2){
+    if(!result2 || result2.ok === false || result2.blocked){
+      alert((result2 && result2.message) || (isAr ? 'تعذّر إتمام التسجيل، أعد المحاولة' : 'Impossible de finaliser l\'inscription, réessayez'));
+      _reenablePkgSubmitBtn();
+      return;
+    }
     var okEl=document.getElementById('p-ok');
     if(okEl){
       var h3=okEl.querySelector('h3');
@@ -14129,6 +14188,9 @@ function ppFinalSubmit(){
       setTimeout(function () { window.RizqAccount.goAfterRegistration(data); }, 1400);
     }
     });
+  }).catch(function(){
+    alert(isAr ? 'تعذّر إتمام التسجيل، أعد المحاولة' : 'Impossible de finaliser l\'inscription, réessayez');
+    _reenablePkgSubmitBtn();
   });
 }
 

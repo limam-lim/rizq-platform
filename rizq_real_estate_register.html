@@ -310,12 +310,32 @@ input:focus,select:focus,textarea:focus{border-color:rgba(201,168,76,.75)}
       focusAreas: document.getElementById('f-focus').value.trim()
     };
 
+    function estateRegFailMessage(httpStatus, d) {
+      var code = String((d && d.code) || '');
+      var err = String((d && (d.error || d.message)) || '');
+      var fr = (document.documentElement.lang || '').toLowerCase().indexOf('fr') === 0
+        || (localStorage.getItem('rizq_lang') || '') === 'fr';
+      if (httpStatus === 429) {
+        return fr ? 'Charge temporaire, réessayez dans une minute' : 'ضغط مؤقت، أعد المحاولة بعد دقيقة';
+      }
+      if (httpStatus === 409 && (
+        code === 'email_in_use' || code === 'email_duplicate' || /email/i.test(code)
+        || /email|بريد|déjà|already/i.test(err)
+      )) {
+        return fr ? 'Cet e-mail est déjà enregistré, connectez-vous' : 'البريد مسجّل مسبقاً، سجّل الدخول';
+      }
+      return fr ? 'Impossible de finaliser l\'inscription, réessayez' : 'تعذّر إتمام التسجيل، أعد المحاولة';
+    }
+
     function doRegister() {
       return fetch(base + '/api/accounts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      }).then(function (r) { return r.json().then(function (d) { return { status: r.status, data: d }; }); });
+      }).then(function (r) {
+        return r.json().then(function (d) { return { status: r.status, ok: r.ok, data: d }; })
+          .catch(function () { return { status: r.status, ok: r.ok, data: null }; });
+      });
     }
 
     var otpCode = document.getElementById('f-otp').value.trim();
@@ -332,13 +352,13 @@ input:focus,select:focus,textarea:focus{border-color:rgba(201,168,76,.75)}
       .then(function (res) {
         btn.disabled = false;
         var d = res.data;
-        if (!d || !d.ok) {
+        if (!res.ok || !d || !d.ok) {
           if (d && d.otpRequired) {
             document.getElementById('otp-row').classList.add('show');
             show(d.message || 'فعّل البريد برمز OTP أو انتظر موافقة الإدارة', false);
             return;
           }
-          show((d && d.error) || 'فشل التسجيل', false);
+          show(estateRegFailMessage(res.status, d), false);
           return;
         }
         if (d.status === 'pending' || !d.dashToken) {
@@ -360,7 +380,7 @@ input:focus,select:focus,textarea:focus{border-color:rgba(201,168,76,.75)}
       })
       .catch(function () {
         btn.disabled = false;
-        show('خطأ شبكة أثناء التسجيل', false);
+        show(estateRegFailMessage(0, null), false);
       });
   });
 })();

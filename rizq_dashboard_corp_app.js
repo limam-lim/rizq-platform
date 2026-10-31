@@ -1,4 +1,15 @@
-/* Token hardening: accessToken never persisted to localStorage — use RizqDash */
+(function rizqCaptureBootParams(){
+  try {
+    var p = new URLSearchParams(window.location.search);
+    window.__RIZQ_BOOT_ID = p.get('id') || '';
+    window.__RIZQ_BOOT_TOKEN = p.get('token') || '';
+    window.__RIZQ_BOOT_DEMO = p.get('demo') === '1';
+  } catch (eBoot) {
+    window.__RIZQ_BOOT_ID = '';
+    window.__RIZQ_BOOT_TOKEN = '';
+    window.__RIZQ_BOOT_DEMO = false;
+  }
+})();
 if (window.RizqDash && RizqDash.purgeSensitiveTokensFromStorage) { try { RizqDash.purgeSensitiveTokensFromStorage(); RizqDash.stripUrlToken(); } catch (ePurge) {} }
 /* extracted from rizq_dashboard_corp.html — do not edit HTML for logic */
 (function(){try{if(/[?&]embed=1(?:&|$)/.test(location.search))document.documentElement.classList.add('rizq-dash-embed');}catch(e){}})();
@@ -385,21 +396,21 @@ var DEFAULT_ADS_PKGS = [
 
 function initCorpAccess(){
   var p = new URLSearchParams(location.search);
-  var isDemoParam = p.get('demo') === '1';
+  var isDemoParam = !!(window.__RIZQ_BOOT_DEMO || p.get('demo') === '1');
   if(isDemoParam){IS_DEMO=true;CORP_ACC=DEMO_ACC;initDashboard();return;}
   var id = '', tok = '';
   if(window.RizqAccount && typeof window.RizqAccount.recoverSessionParams === 'function'){
     var rec = window.RizqAccount.recoverSessionParams('corp');
-    if(rec){ id = rec.id; tok = rec.token; }
+    if(rec && rec.id && rec.token){ id = rec.id; tok = rec.token; }
   }
-  if(!id) id = p.get('id') || '';
+  if(!id) id = window.__RIZQ_BOOT_ID || p.get('id') || '';
   if(!tok && id && window.RizqAccount && typeof window.RizqAccount.readDashToken === 'function'){
     tok = window.RizqAccount.readDashToken(id);
   }
-  if(!tok) tok = p.get('token') || '';
-  if(!id||!tok){showAccessDenied();return;}
+  if(!tok) tok = window.__RIZQ_BOOT_TOKEN || p.get('token') || '';
+  if(!id){showAccessDenied();return;}
   // دائماً تحقق من الخادم — لا تثق بـ localStorage وحده (تعليق/رفض/تدوير توكن)
-  verifyCorpAccessRemote(id, tok);
+  verifyCorpAccessRemote(id, tok || 'pending-check');
 }
 
 // ── يُستدعى فقط عندما لا يوجد سجل محلي — يتحقق من الخادم (rizq_backend_config.js
@@ -407,17 +418,32 @@ function initCorpAccess(){
 // حتى تعمل الجلسات التالية على هذا الجهاز بلا حاجة متكررة للشبكة.
 function verifyCorpAccessRemote(id, tok){
   if(!window.RIZQ_BACKEND_BASE){ showAccessDenied(); return; }
+  var done = function(remote){
+    if(remote && remote.__pending){ showAccessDenied(true); return; }
+    if(!remote){ showAccessDenied(); return; }
+    var acc = Object.assign({ token: tok, status:'approved' }, remote);
+    CORP_ACC = loadActivatedPackage(acc);
+    initDashboard();
+  };
+  if (window.RizqDash && typeof RizqDash.verifyAccessRemote === 'function') {
+    RizqDash.verifyAccessRemote(id, tok, 'corp').then(done);
+    return;
+  }
   fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(id), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':tok}, body:JSON.stringify({dashToken:tok}) })
-    .then(function(res){ return res.ok ? res.json() : null; })
-    .then(function(data){
-      if(!data || !data.ok || !data.account || data.account.type!=='corp'){ showAccessDenied(); return; }
-      var acc = Object.assign({ token: tok, status:'approved' }, data.account);
-      try{
-        var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-        if(!accs.some(function(a){return a.id===acc.id;})) { accs.push(acc); localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs)); }
-      }catch(e){}
-      CORP_ACC = loadActivatedPackage(acc);
-      initDashboard();
+    .then(function(res){
+      return res.json().then(function(data){ return { res:res, data:data }; }).catch(function(){ return { res:res, data:null }; });
+    })
+    .then(function(out){
+      var data = out.data;
+      if(out.res.ok && data && data.ok && data.account && data.account.type==='corp'){
+        done(Object.assign({ token: tok, status:'approved' }, data.account));
+        return;
+      }
+      if(data && (data.code==='not_approved' || (data.status && data.status!=='approved'))){
+        done({ __pending:true, status: data.status||'pending' });
+        return;
+      }
+      showAccessDenied();
     }).catch(function(){ showAccessDenied(); });
 }
 
@@ -465,7 +491,10 @@ function verifyCorpAccessRemote(id, tok){
 })();
 initCorpAccess();
 
-function showAccessDenied(){
+function showAccessDenied(pending){
+  if(pending && window.RizqDash && RizqDash.applyPendingDeniedMessage){
+    RizqDash.applyPendingDeniedMessage();
+  }
   var el=document.getElementById('access-denied');
   if(el){el.style.display='flex';}
 }
