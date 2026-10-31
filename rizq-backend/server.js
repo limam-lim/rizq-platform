@@ -2703,6 +2703,23 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
       message: 'سعر الباقة غير مضبوط — حدّده السوبر أدمن من لوحة إدارة الباقات أولاً',
     });
   }
+  // الفئة تتبع الباقة نفسها (لا يختارها العميل): باقة 300 أوقية لا تفتح غرفة المناقصات
+  {
+    const pkgId = String(catalogPkg.id || '').toLowerCase();
+    const reqCat = ['video', 'tender', 'investment', 'ad_boost', 'verified_plus'].indexOf(b.category) !== -1 ? b.category : 'package';
+    const prefixFor = { tender: /^tnd-/, investment: /^inv-/, video: /^vid-/ };
+    const specialPrefix = /^(tnd|inv|vid)-/.test(pkgId);
+    const mismatch = prefixFor[reqCat]
+      ? !prefixFor[reqCat].test(pkgId)
+      : (reqCat === 'package' && specialPrefix);
+    if (pkgId && mismatch) {
+      return res.status(400).json({ ok: false, error: 'category_mismatch', message: 'الباقة لا تخص هذه الفئة' });
+    }
+    // سعر 0 مسموح فقط للتجربة/المجانية المعلنة
+    if (serverPrice === 0 && !/(trial|free|تجريب|مجان)/i.test(String(catalogPkg.id || '') + ' ' + String(catalogPkg.name || ''))) {
+      return res.status(400).json({ ok: false, error: 'price_unset', message: 'سعر الباقة غير مضبوط' });
+    }
+  }
   const list = await readSubRequests();
   const clientId = typeof b.id === 'string' && /^sub_\d{10,20}$/.test(b.id) ? b.id : null;
   const id = clientId && !list.some((r) => r.id === clientId)
@@ -2825,6 +2842,10 @@ app.post('/api/sub-requests/admin/:id/decision', requireAdminPermission('payment
   const row = list[idx];
 
   if (action === 'reject') {
+    // رفض طلب سبق قبوله لا يلغي الباقة المفعّلة — يُمنع لتبقى السجلات صادقة
+    if (row.status !== 'pending') {
+      return res.status(409).json({ ok: false, error: 'already_processed', status: row.status });
+    }
     list[idx].status = 'rejected';
     list[idx].reviewedAt = new Date().toISOString();
     list[idx].reviewedVia = 'admin_api';
