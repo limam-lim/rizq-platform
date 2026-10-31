@@ -22,6 +22,12 @@ Ran all `test:*` scripts. `test:register-sync-fail` added and green. Spawners `t
 - MULTI: product sync proven via API + focused UI; full robot sensitive to login rate-limit / onboard overlay  
 - R3 × desktop-fr: completed with warnings (estate path); FR gate i18n verified separately  
 
+## Follow-up (same branch) — verify-dash enumeration
+
+`handleVerifyDash` now returns `403 not_approved` **only** when the caller presents a token that `tokenMatchesAccount` accepts. No token / wrong token → `401` (no status leak on guessable `ACC_<timestamp>` ids). Frontend still probes with ephemeral accessToken and falls back to local pending hint for J-DASH-PENDING-MSG.
+
+Test: `npm run test:verify-dash-pending`.
+
 ## Out of scope
 
 No product design/copy rewrites beyond the specified fail/pending/i18n strings. No Hetzner/prod. No PR opened.

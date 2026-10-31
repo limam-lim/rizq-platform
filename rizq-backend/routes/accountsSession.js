@@ -397,9 +397,15 @@ function mountAccountsSessionRoutes(app, deps) {
     const acc = await repos.accounts.getById(req.params.id);
     if (!acc) return res.status(404).json({ error: 'account_not_found' });
     const token = extractDashToken(req);
-    // حساب معلّق بانتظار الموافقة: لا تُرجع 401 العام («رابط غير صالح») —
-    // فرّق الحالة حتى تعرض الواجهة «حسابك قيد المراجعة».
-    if (!acc.suspended && acc.status && acc.status !== 'approved') {
+    // «قيد المراجعة» فقط لصاحب الحساب الذي يملك رمزاً صحيحاً (access أو dash).
+    // بلا رمز / برمز خاطئ → 401 كما كان — لا يكشف حالة ACC_<timestamp> للمتخمّنين.
+    if (
+      !acc.suspended
+      && acc.status
+      && acc.status !== 'approved'
+      && token
+      && sessionsLib.tokenMatchesAccount(acc, token)
+    ) {
       res.set('Cache-Control', 'no-store');
       return res.status(403).json({
         ok: false,

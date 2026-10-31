@@ -217,39 +217,53 @@
         else resolve(null);
         return;
       }
-      // حتى بلا dashToken: الخادم يميّز الحساب المعلّق (403 not_approved) عن الرابط غير الصالح
+      // جرّب dashToken ثم accessToken المؤقت — الخادم لا يكشف not_approved بلا رمز مطابق
       var dash = sessionToken || '';
-      fetch(base + '/api/accounts/verify-dash/' + encodeURIComponent(sessionId), {
-        method: 'POST',
-        headers: Object.assign({ 'Content-Type': 'application/json' }, dash ? { 'x-dash-token': dash } : {}),
-        body: JSON.stringify({ dashToken: dash })
-      })
-        .then(function (res) {
+      var access = '';
+      try { access = readEphemeralAccessToken(sessionId) || ''; } catch (eAcc) { access = ''; }
+      function probe(tok) {
+        var t = String(tok || '');
+        return fetch(base + '/api/accounts/verify-dash/' + encodeURIComponent(sessionId), {
+          method: 'POST',
+          headers: Object.assign({ 'Content-Type': 'application/json' }, t ? { 'x-dash-token': t } : {}),
+          body: JSON.stringify({ dashToken: t })
+        }).then(function (res) {
           return res.json().then(function (data) { return { res: res, data: data }; })
             .catch(function () { return { res: res, data: null }; });
-        })
-        .then(function (out) {
-          var data = out.data;
-          if (out.res.ok && data && data.ok && data.account && data.account.type === expectedType) {
-            var acc = Object.assign({ token: sessionToken, status: 'approved' }, data.account);
-            mergeAccountIntoLocalStorage(acc);
-            resolve(acc);
-            return;
-          }
-          if (data && (data.code === 'not_approved' || (data.status && data.status !== 'approved'))) {
-            resolve({ __pending: true, status: data.status || 'pending' });
-            return;
-          }
-          if (localPendingHint(sessionId)) {
-            resolve({ __pending: true, status: 'pending' });
-            return;
-          }
-          resolve(null);
-        })
-        .catch(function () {
-          if (localPendingHint(sessionId)) resolve({ __pending: true, status: 'pending' });
-          else resolve(null);
         });
+      }
+      function interpret(out) {
+        var data = out && out.data;
+        if (out && out.res && out.res.ok && data && data.ok && data.account && data.account.type === expectedType) {
+          var acc = Object.assign({ token: sessionToken || dash, status: 'approved' }, data.account);
+          mergeAccountIntoLocalStorage(acc);
+          return { kind: 'ok', acc: acc };
+        }
+        if (data && data.code === 'not_approved') {
+          return { kind: 'pending', status: data.status || 'pending' };
+        }
+        return { kind: 'deny' };
+      }
+      var firstTok = dash || access;
+      var chain = firstTok ? probe(firstTok) : Promise.resolve({ res: { ok: false, status: 401 }, data: null });
+      chain.then(function (out) {
+        var r = interpret(out);
+        if (r.kind === 'ok') { resolve(r.acc); return null; }
+        if (r.kind === 'pending') { resolve({ __pending: true, status: r.status }); return null; }
+        // إن فشل dash جرّب accessToken (حساب معلّق يملك access بلا dash)
+        if (access && access !== firstTok) return probe(access);
+        return null;
+      }).then(function (out2) {
+        if (out2 == null) return;
+        var r2 = interpret(out2);
+        if (r2.kind === 'ok') { resolve(r2.acc); return; }
+        if (r2.kind === 'pending') { resolve({ __pending: true, status: r2.status }); return; }
+        if (localPendingHint(sessionId)) resolve({ __pending: true, status: 'pending' });
+        else resolve(null);
+      }).catch(function () {
+        if (localPendingHint(sessionId)) resolve({ __pending: true, status: 'pending' });
+        else resolve(null);
+      });
     });
   }
 
