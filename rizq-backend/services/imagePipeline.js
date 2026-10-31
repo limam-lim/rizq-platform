@@ -12,7 +12,17 @@ const sharp = require('sharp');
 const objectStorage = require('../lib/objectStorage');
 
 const MAX_INPUT_BYTES = 3 * 1024 * 1024;
+/** Catalog fallback when entitlements do not set maxImageBytes */
+const DEFAULT_CATALOG_MAX_IMAGE_BYTES = Math.floor(1.5 * 1024 * 1024);
 const DATA_URI_RE = /^data:image\/(png|jpeg|jpg|webp);base64,(.+)$/i;
+
+function makeImageTooLargeError(maxBytes) {
+  const err = new Error('image_too_large');
+  err.code = 'image_too_large';
+  err.status = 413;
+  err.maxBytes = Number(maxBytes) > 0 ? Number(maxBytes) : DEFAULT_CATALOG_MAX_IMAGE_BYTES;
+  return err;
+}
 
 const VARIANT_SPECS = {
   thumb: { width: 400, quality: 80, suffix: '.thumb' },
@@ -167,7 +177,10 @@ async function saveProcessedImages({ namespace, uploadUrlPrefix, entityId, image
   const prefix = '/uploads/' + ns + '/';
   const urls = [];
   const slice = images.slice(0, maxCount);
-  const parseOpts = Number(maxImageBytes) > 0 ? { maxBytes: Number(maxImageBytes) } : undefined;
+  const effectiveMax = Number(maxImageBytes) > 0
+    ? Number(maxImageBytes)
+    : (ns === 'catalog' ? DEFAULT_CATALOG_MAX_IMAGE_BYTES : MAX_INPUT_BYTES);
+  const parseOpts = { maxBytes: effectiveMax };
   // إعادة استخدام URL موجود فقط إن كان تحت مجلد هذا الكيان (منع اختطاف وسائط الغير)
   const ownedPrefix = prefix + safeId + '/';
   for (let i = 0; i < slice.length; i++) {
@@ -185,7 +198,12 @@ async function saveProcessedImages({ namespace, uploadUrlPrefix, entityId, image
     // رفض أي /uploads/... لا يخص هذا الكيان
     if (img.indexOf('/uploads/') === 0) continue;
     const parsed = parseDataUriImage(img, parseOpts);
-    if (!parsed || parsed.error) continue;
+    if (!parsed || parsed.error) {
+      if (parsed && parsed.error === 'too_large') {
+        throw makeImageTooLargeError(parsed.maxBytes || effectiveMax);
+      }
+      continue;
+    }
     const savedUrl = await putImageVariants(ns, safeId, i, parsed.buf, { paid: !!paid });
     urls.push(savedUrl);
   }
@@ -293,6 +311,8 @@ module.exports = {
   saveTenderImages,
   saveInvestmentImages,
   saveKycImages,
+  makeImageTooLargeError,
   VARIANT_SPECS,
   MAX_INPUT_BYTES,
+  DEFAULT_CATALOG_MAX_IMAGE_BYTES,
 };

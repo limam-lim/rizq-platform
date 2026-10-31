@@ -28,6 +28,7 @@ function mountCatalogRoutes(app, deps) {
   } = deps;
 
   const { scanContactLeakFields } = require('../services/contactLeakGuard');
+  const { DEFAULT_CATALOG_MAX_IMAGE_BYTES } = require('../services/imagePipeline');
   function catalogLeak(b) {
     const scan = scanContactLeakFields(['name', 'title', 'nameFr', 'desc', 'descFr']
       .filter((k) => typeof b[k] === 'string').map((k) => ({ key: k, val: b[k] })));
@@ -40,6 +41,13 @@ function mountCatalogRoutes(app, deps) {
       msg: scan.messageAr,
       msg_fr: scan.messageFr,
     };
+  }
+  function resolveCatalogMaxImageBytes(ent) {
+    const fromEnt = ent && ent.limits && Number(ent.limits.maxImageBytes);
+    return fromEnt > 0 ? fromEnt : DEFAULT_CATALOG_MAX_IMAGE_BYTES;
+  }
+  function isImageTooLargeErr(err) {
+    return !!(err && (err.code === 'image_too_large' || err.message === 'image_too_large' || err.status === 413));
   }
 
   const isCatalogAdmin = async (req) => (typeof adminHasPermission === 'function'
@@ -103,17 +111,28 @@ function mountCatalogRoutes(app, deps) {
     // images: مصفوفة (حتى 6) — الحقل الجديد للمعرض. image: الصورة الأولى
     // منها، يبقى محدَّثاً لتوافق أي كود قديم يقرأ item.image فقط. يدعم
     // كلا المسارين: عميل جديد يرسل images[]، أو عميل قديم يرسل image واحدة.
+    const maxPhotos = (ent.limits && ent.limits.maxPhotosPerItem) || 8;
+    const maxImageBytes = resolveCatalogMaxImageBytes(ent);
     let catImages;
-    if (Array.isArray(b.images) && b.images.length) {
-      catImages = await saveCatalogImages(id, b.images, {
-        maxCount: (ent.limits && ent.limits.maxPhotosPerItem) || 8,
-        maxImageBytes: ent.limits && ent.limits.maxImageBytes,
-      });
-    } else {
-      const single = await saveCatalogImage(id, b.image, {
-        maxImageBytes: ent.limits && ent.limits.maxImageBytes,
-      });
-      catImages = single ? [single] : [];
+    try {
+      if (Array.isArray(b.images) && b.images.length) {
+        catImages = await saveCatalogImages(id, b.images, {
+          maxCount: maxPhotos,
+          maxImageBytes,
+        });
+      } else {
+        const single = await saveCatalogImage(id, b.image, { maxImageBytes });
+        catImages = single ? [single] : [];
+      }
+    } catch (imgErr) {
+      if (isImageTooLargeErr(imgErr)) {
+        return res.status(413).json({
+          ok: false,
+          error: 'image_too_large',
+          maxBytes: imgErr.maxBytes || maxImageBytes,
+        });
+      }
+      throw imgErr;
     }
     const attrs = (b.attrs && typeof b.attrs === 'object' && !Array.isArray(b.attrs))
       ? Object.keys(b.attrs).slice(0, 40).reduce(function (out, k) {
@@ -206,6 +225,13 @@ function mountCatalogRoutes(app, deps) {
     await writeCatalog(list);
     res.json({ ok: true, item: rec });
     } catch (err) {
+      if (isImageTooLargeErr(err)) {
+        return res.status(413).json({
+          ok: false,
+          error: 'image_too_large',
+          maxBytes: err.maxBytes || DEFAULT_CATALOG_MAX_IMAGE_BYTES,
+        });
+      }
       console.error('[catalog/post] image pipeline:', err.message);
       res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة الصور — تأكد من أن الملفات صور صالحة' });
     }
@@ -353,12 +379,30 @@ function mountCatalogRoutes(app, deps) {
     }
     // لا نسمح للمالك بتضخيم sold — للأدمن فقط
     if (isAdmin && typeof b.sold !== 'undefined' && Number.isFinite(Number(b.sold))) item.sold = Number(b.sold);
-    if (Array.isArray(b.images)) {
-      item.images = await saveCatalogImages(item.id, b.images);
-      item.image = item.images[0] || null;
-    } else if (typeof b.image === 'string') {
-      item.image = await saveCatalogImage(item.id, b.image);
-      item.images = item.image ? [item.image] : [];
+    if (Array.isArray(b.images) || typeof b.image === 'string') {
+      const ownerAcc = await require('../db/repos').accounts.getById(item.accountId);
+      const entImg = await getEntitlements(item.accountId, ownerAcc ? ownerAcc.type : 'store');
+      const maxPhotos = (entImg.limits && entImg.limits.maxPhotosPerItem) || 8;
+      const maxImageBytes = resolveCatalogMaxImageBytes(entImg);
+      try {
+        if (Array.isArray(b.images)) {
+          if (!isAdmin) assertPhotoCount(entImg, b.images.length);
+          item.images = await saveCatalogImages(item.id, b.images, { maxCount: maxPhotos, maxImageBytes });
+          item.image = item.images[0] || null;
+        } else if (typeof b.image === 'string') {
+          item.image = await saveCatalogImage(item.id, b.image, { maxImageBytes });
+          item.images = item.image ? [item.image] : [];
+        }
+      } catch (imgErr) {
+        if (isImageTooLargeErr(imgErr)) {
+          return res.status(413).json({
+            ok: false,
+            error: 'image_too_large',
+            maxBytes: imgErr.maxBytes || maxImageBytes,
+          });
+        }
+        throw imgErr;
+      }
     }
     // مثل الإعلانات: المالك يدير inactive/removed فقط؛ active/pending_review للأدمن
     if (typeof b.status === 'string') {
@@ -374,6 +418,13 @@ function mountCatalogRoutes(app, deps) {
     await writeCatalog(list);
     res.json({ ok: true, item });
     } catch (err) {
+      if (isImageTooLargeErr(err)) {
+        return res.status(413).json({
+          ok: false,
+          error: 'image_too_large',
+          maxBytes: err.maxBytes || DEFAULT_CATALOG_MAX_IMAGE_BYTES,
+        });
+      }
       console.error('[catalog/patch] image pipeline:', err.message);
       res.status(400).json({ error: 'image_processing_failed', message: 'تعذّر معالجة الصور — تأكد من أن الملفات صور صالحة' });
     }

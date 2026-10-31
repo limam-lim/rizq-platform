@@ -1,0 +1,88 @@
+{
+  "script": "09-contact-and-authz-deep",
+  "at": "2026-10-31T16:59:47.871Z",
+  "checks": [
+    {
+      "name": "structured phone nulled",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "desc scrubbed",
+      "pass": true,
+      "detail": "للطلب واتساب ••• ••• ••• أو اتصال"
+    },
+    {
+      "name": "tagline scrubbed",
+      "pass": true,
+      "detail": "أفضل متجر [محجوب — اشترك لعرض التواصل] [محجوب — اشترك لعرض التواصل]"
+    },
+    {
+      "name": "address scrubbed",
+      "pass": true,
+      "detail": "عرفات قرب المسجد [محجوب — اشترك لعرض التواصل] [محجوب — اشترك لعرض التواصل]"
+    },
+    {
+      "name": "facebook wa.me scrubbed or locked",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "ad structured phones nulled anonymously",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "name": "minted token works on mine",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "name": "mine with minted token",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "name": "catalog blocked without package",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "err": "لا توجد باقة نشطة — اشترك للوصول لهذه الميزة"
+      }
+    },
+    {
+      "name": "catalog blocked when periodEnd past",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "err": "انتهت مدة باقتك — جدّد الاشتراك لاستعادة الميزات"
+      }
+    },
+    {
+      "name": "landing HTML size recorded",
+      "pass": true,
+      "detail": "1046KB"
+    },
+    {
+      "name": "finance blocked from telegram setup",
+      "pass": true,
+      "detail": 403
+    },
+    {
+      "name": "finance blocked from launch-config",
+      "pass": true,
+      "detail": 403
+    }
+  ],
+  "findings": [
+    {
+      "id": "09-contact-and-authz-deep-001",
+      "severity": "medium",
+      "page": "rizq_landing_v8.html",
+      "userImpact": "Landing HTML alone is 1046KB before CSS/JS/images — costly on weak 4G (Playwright weak profile ~17s DCL).",
+      "repro": "GET /rizq_landing_v8.html → 1071455 bytes",
+      "evidence": "evidence/landing-weight.json",
+      "script": "09-contact-and-authz-deep"
+    }
+  ]
+}

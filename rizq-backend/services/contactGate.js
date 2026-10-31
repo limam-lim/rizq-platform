@@ -31,7 +31,11 @@ function normalizeModule(moduleOrType) {
   return 'individual';
 }
 
-const { redactContactPatterns } = require('./contactLeakGuard');
+const {
+  redactContactPatterns,
+  stripContactLeak,
+  sanitizePublicFacebookUrl,
+} = require('./contactLeakGuard');
 
 async function getSellerContactEligibility(targetAccountId, accountTypeHint) {
   if (!targetAccountId) {
@@ -256,7 +260,15 @@ async function toPublicAccountGated(acc, gate) {
   if (!acc) return null;
   const out = {};
   ACCOUNT_PUBLIC_SAFE.forEach((k) => { if (acc[k] !== undefined) out[k] = acc[k]; });
-  out.desc = gate && gate.contactsUnlocked ? (acc.desc || '') : redactContactPatterns(acc.desc || '');
+  const unlocked = !!(gate && gate.contactsUnlocked);
+  out.desc = unlocked ? (acc.desc || '') : redactContactPatterns(acc.desc || '');
+  // When contacts are locked: redact digits/links inside free-text fields (keep keys).
+  if (!unlocked) {
+    out.tagline = stripContactLeak(acc.tagline || '');
+    out.address = stripContactLeak(acc.address || '');
+  }
+  // facebook: only facebook.com / fb.com / m.facebook.com — always, locked or not
+  out.facebook = sanitizePublicFacebookUrl(acc.facebook);
   const contact = toGatedContactPayload(acc, gate);
   out.contactsLocked = contact.contactsLocked;
   out.phone = contact.phone;

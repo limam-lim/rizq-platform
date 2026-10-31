@@ -1,0 +1,28 @@
+{
+  "id": "ACC_AUD_STO_mvwnccp12104",
+  "type": "store",
+  "name": "تدقيق store mvwnccp12104",
+  "city": "نواكشوط",
+  "address": "عرفات قرب المسجد [محجوب — اشترك لعرض التواصل] [محجوب — اشترك لعرض التواصل]",
+  "facebook": null,
+  "tagline": "أفضل متجر [محجوب — اشترك لعرض التواصل] [محجوب — اشترك لعرض التواصل]",
+  "status": "approved",
+  "approvedAt": "2026-10-31T16:59:47.723Z",
+  "createdAt": "2026-10-31T16:59:47.723Z",
+  "desc": "للطلب واتساب ••• ••• ••• أو اتصال",
+  "contactsLocked": true,
+  "phone": null,
+  "email": null,
+  "whatsapp": null,
+  "hidePhone": false,
+  "contactAccess": {
+    "lockReason": "unauthenticated",
+    "fomoEligible": false
+  },
+  "badges": {
+    "verified": true,
+    "premium": false,
+    "priorityListing": false,
+    "verifiedPlus": false
+  }
+}

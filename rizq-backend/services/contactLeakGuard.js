@@ -163,11 +163,32 @@ function redactContactPatterns(text) {
   return s;
 }
 
+/**
+ * Public facebook field: only facebook.com / fb.com / m.facebook.com hosts.
+ * Returns a normalized https URL string, or null when empty/invalid/non-Facebook.
+ */
+function sanitizePublicFacebookUrl(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return null;
+  let url;
+  try {
+    url = new URL(/^https?:\/\//i.test(s) ? s : 'https://' + s);
+  } catch (e) {
+    return null;
+  }
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+  const host = String(url.hostname || '').replace(/^www\./i, '').toLowerCase();
+  if (host !== 'facebook.com' && host !== 'fb.com' && host !== 'm.facebook.com') return null;
+  url.protocol = 'https:';
+  return url.toString();
+}
+
 module.exports = {
   scanContactLeak,
   scanContactLeakFields,
   stripContactLeak,
   redactContactPatterns,
+  sanitizePublicFacebookUrl,
   CONTACT_PATTERNS,
   CONTACT_KEYWORD_RES,
 };

@@ -1,0 +1,99 @@
+{
+  "script": "02-security-upload-xss-injection",
+  "at": "2026-10-31T17:00:18.959Z",
+  "checks": [
+    {
+      "name": "xss-account login",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "name": "public account fetch",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "name": "XSS payload presence in public JSON (raw)",
+      "pass": true,
+      "detail": "raw_html_in_json=true"
+    },
+    {
+      "name": "ad with contact digits rejected or sanitized",
+      "pass": true,
+      "detail": {
+        "status": 422,
+        "error": "contact_in_text_forbidden"
+      }
+    },
+    {
+      "name": "search injection survives status<500: '; DROP TABLE accoun",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "name": "search injection survives status<500: ' OR '1'='1",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "name": "search injection survives status<500: {\"$gt\":\"\"}",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "name": "search injection survives status<500: <script>alert(1)</sc",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "name": "uploads path traversal blocked",
+      "pass": true,
+      "detail": {
+        "s1": 404,
+        "s2": 400
+      }
+    },
+    {
+      "name": "SVG upload handled (reject or sanitize)",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "name": "HTML polyglot upload handled",
+      "pass": true,
+      "detail": 200
+    },
+    {
+      "name": "oversize upload rejected or limited",
+      "pass": true,
+      "detail": 413
+    },
+    {
+      "name": "OTP rate limit triggers (429)",
+      "pass": true,
+      "detail": true
+    },
+    {
+      "name": "seller-login rate limit or lockout",
+      "pass": true,
+      "detail": [
+        429,
+        429,
+        429,
+        429,
+        429
+      ]
+    },
+    {
+      "name": "forged admin token rejected",
+      "pass": true,
+      "detail": 401
+    },
+    {
+      "name": "weird ad id does not 500",
+      "pass": true,
+      "detail": 404
+    }
+  ],
+  "findings": []
+}
