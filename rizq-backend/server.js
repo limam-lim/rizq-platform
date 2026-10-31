@@ -5,7 +5,15 @@
  * خادم خلفي صغير وآمن لمنصة رزق
  * ══════════════════════════════════════════════════════════════════
  */
-require('dotenv').config({ path: require('path').join(__dirname, '.env'), override: true });
+(() => {
+  // احتفظ بـ PORT/HOST إن عيّنهما مُشغّل الاختبار قبل dotenv (override:true كان يفرض .env:3000)
+  const preserve = {};
+  if (Object.prototype.hasOwnProperty.call(process.env, 'PORT')) preserve.PORT = process.env.PORT;
+  if (Object.prototype.hasOwnProperty.call(process.env, 'HOST')) preserve.HOST = process.env.HOST;
+  require('dotenv').config({ path: require('path').join(__dirname, '.env'), override: true });
+  if (Object.prototype.hasOwnProperty.call(preserve, 'PORT')) process.env.PORT = preserve.PORT;
+  if (Object.prototype.hasOwnProperty.call(preserve, 'HOST')) process.env.HOST = preserve.HOST;
+})();
 process.env.TZ = process.env.RIZQ_TIMEZONE || process.env.MAINTENANCE_CRON_TZ || 'Africa/Nouakchott';
 process.on('unhandledRejection', (err) => {
   console.error('[rizq-backend] unhandledRejection:', err && err.stack ? err.stack : err);
@@ -3255,6 +3263,7 @@ app.get('/api/admin/launch-config', requireSuperAdmin, async (req, res) => {
       stored: {
         launchDate: cfg.launchDate || '',
         freeDays: cfg.freeDays != null ? cfg.freeDays : launchMode.DEFAULT_FREE_DAYS,
+        minActiveAdsToShow: launchMode.normalizeMinActiveAdsToShow(cfg.minActiveAdsToShow),
       },
       audit: Array.isArray(cfg.launchAudit) ? cfg.launchAudit.slice(0, 40) : [],
     });
@@ -3370,6 +3379,20 @@ app.post('/api/admin/launch-config', requireSuperAdmin, async (req, res) => {
       nextDays = Math.round(n);
     }
 
+    const prevMinAds = launchMode.normalizeMinActiveAdsToShow(current.minActiveAdsToShow);
+    let nextMinAds = prevMinAds;
+    if (Object.prototype.hasOwnProperty.call(body, 'minActiveAdsToShow')) {
+      const n = Number(body.minActiveAdsToShow);
+      if (!Number.isFinite(n) || n < 0 || n > 1000000) {
+        return res.status(400).json({
+          ok: false,
+          error: 'invalid_min_active_ads',
+          message: 'الحد الأدنى لإعلان نشط يجب أن يكون بين 0 و 1000000',
+        });
+      }
+      nextMinAds = Math.floor(n);
+    }
+
     const nextUntil = nextDate ? launchMode.addDaysYmd(nextDate, nextDays) : null;
     const endMs = nextUntil ? launchMode.freeUntilEndMs(nextUntil) : null;
     const inPast = !!(endMs != null && endMs < Date.now());
@@ -3385,6 +3408,7 @@ app.post('/api/admin/launch-config', requireSuperAdmin, async (req, res) => {
     const next = Object.assign({}, current, {
       launchDate: nextDate,
       freeDays: nextDays,
+      minActiveAdsToShow: nextMinAds,
     });
     // أزل الحقل اليدوي القديم إن وُجد
     if (Object.prototype.hasOwnProperty.call(next, 'launchFreeUntil')) {
@@ -3398,8 +3422,18 @@ app.post('/api/admin/launch-config', requireSuperAdmin, async (req, res) => {
       at: new Date().toISOString(),
       by,
       byId,
-      old: { launchDate: prevDate || null, freeDays: prevDays, freeUntil: prevUntil || null },
-      new: { launchDate: nextDate || null, freeDays: nextDays, freeUntil: nextUntil || null },
+      old: {
+        launchDate: prevDate || null,
+        freeDays: prevDays,
+        freeUntil: prevUntil || null,
+        minActiveAdsToShow: prevMinAds,
+      },
+      new: {
+        launchDate: nextDate || null,
+        freeDays: nextDays,
+        freeUntil: nextUntil || null,
+        minActiveAdsToShow: nextMinAds,
+      },
       confirmPast: inPast === true,
     });
 
@@ -3408,7 +3442,11 @@ app.post('/api/admin/launch-config', requireSuperAdmin, async (req, res) => {
     res.json({
       ok: true,
       launch,
-      stored: { launchDate: nextDate || '', freeDays: nextDays },
+      stored: {
+        launchDate: nextDate || '',
+        freeDays: nextDays,
+        minActiveAdsToShow: nextMinAds,
+      },
       audit: Array.isArray(next.launchAudit) ? next.launchAudit.slice(0, 40) : [],
     });
   } catch (err) {

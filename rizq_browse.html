@@ -2114,24 +2114,34 @@ function _rizqFetchAndOpenAd(id){
 }
 const ALL_ADS = loadRealSearchAds().concat((window.RizqDemo && RizqDemo.inventoryAllowed && RizqDemo.inventoryAllowed()) ? DEMO_ADS : []);
 
-/* عند ضبط launchDate لاحقاً من site-config: أزل DEMO من القائمة (إلا ?demo=1) */
+/* عند ضبط launchDate: أزل DEMO. عند السماح لاحقاً (بعد site-config بلا إطلاق): أضف DEMO إن غاب */
 (function(){
-  function stripDemoIfLaunched(){
+  function syncDemoWithLaunch(){
     try {
-      if (window.RizqDemo && RizqDemo.inventoryAllowed && RizqDemo.inventoryAllowed()) return;
       if (!Array.isArray(ALL_ADS)) return;
       var demoIds = {};
       (DEMO_ADS||[]).forEach(function(a){ if(a&&a.id!=null) demoIds[String(a.id)] = true; });
-      for (var i = ALL_ADS.length - 1; i >= 0; i--) {
-        var id = ALL_ADS[i] && ALL_ADS[i].id;
-        if (id != null && demoIds[String(id)]) ALL_ADS.splice(i, 1);
+      var allowed = !!(window.RizqDemo && RizqDemo.inventoryAllowed && RizqDemo.inventoryAllowed());
+      if (!allowed) {
+        for (var i = ALL_ADS.length - 1; i >= 0; i--) {
+          var id = ALL_ADS[i] && ALL_ADS[i].id;
+          if (id != null && demoIds[String(id)]) ALL_ADS.splice(i, 1);
+        }
+      } else {
+        var have = {};
+        ALL_ADS.forEach(function(a){ if(a&&a.id!=null) have[String(a.id)] = true; });
+        (DEMO_ADS||[]).forEach(function(a){
+          if(!a || a.id==null || have[String(a.id)]) return;
+          ALL_ADS.push(a);
+          have[String(a.id)] = true;
+        });
       }
       if (typeof applyFilters === 'function') applyFilters();
     } catch (eStrip) {}
   }
-  document.addEventListener('rizq:launch', stripDemoIfLaunched);
+  document.addEventListener('rizq:launch', syncDemoWithLaunch);
   if (window.RizqApi && typeof RizqApi.siteConfig === 'function') {
-    RizqApi.siteConfig().then(stripDemoIfLaunched);
+    RizqApi.siteConfig().then(syncDemoWithLaunch);
   }
 })();
 

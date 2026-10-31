@@ -28,20 +28,29 @@ async function saveLaunch(body) {
   if (Object.prototype.hasOwnProperty.call(body, 'freeDays')) {
     nextDays = launchMode.normalizeFreeDays(body.freeDays);
   }
+  const prevMin = launchMode.normalizeMinActiveAdsToShow(current.minActiveAdsToShow);
+  let nextMin = prevMin;
+  if (Object.prototype.hasOwnProperty.call(body, 'minActiveAdsToShow')) {
+    nextMin = launchMode.normalizeMinActiveAdsToShow(body.minActiveAdsToShow);
+  }
   const nextUntil = nextDate ? launchMode.addDaysYmd(nextDate, nextDays) : null;
   const endMs = nextUntil ? launchMode.freeUntilEndMs(nextUntil) : null;
   const inPast = !!(endMs != null && endMs < Date.now());
   if (inPast && body.confirmPast !== true) {
     return { status: 409, error: 'needs_confirm_past', freeUntil: nextUntil };
   }
-  const next = Object.assign({}, current, { launchDate: nextDate, freeDays: nextDays });
+  const next = Object.assign({}, current, {
+    launchDate: nextDate,
+    freeDays: nextDays,
+    minActiveAdsToShow: nextMin,
+  });
   delete next.launchFreeUntil;
   const list = Array.isArray(next.launchAudit) ? next.launchAudit.slice() : [];
   list.unshift({
     at: new Date().toISOString(),
     by: 'test-super',
-    old: { launchDate: prevDate || null, freeDays: prevDays },
-    new: { launchDate: nextDate || null, freeDays: nextDays, freeUntil: nextUntil },
+    old: { launchDate: prevDate || null, freeDays: prevDays, minActiveAdsToShow: prevMin },
+    new: { launchDate: nextDate || null, freeDays: nextDays, freeUntil: nextUntil, minActiveAdsToShow: nextMin },
   });
   next.launchAudit = list.slice(0, 80);
   await repos.saveSiteConfig(next);
@@ -49,7 +58,7 @@ async function saveLaunch(body) {
     status: 200,
     ok: true,
     launch: await launchMode.publicLaunchConfig({}),
-    stored: { launchDate: nextDate, freeDays: nextDays },
+    stored: { launchDate: nextDate, freeDays: nextDays, minActiveAdsToShow: nextMin },
     audit: next.launchAudit,
   };
 }
@@ -80,11 +89,17 @@ async function main() {
     check('future launch computes freeUntil', r.status === 200 && r.launch.freeUntil === '2026-12-30');
     check('not dry-run', r.launch.maintenanceDryRun === false);
     check('daysRemaining present', r.launch.daysRemaining != null);
+    check('minActiveAdsToShow default 0', r.launch.minActiveAdsToShow === 0);
+
+    r = await saveLaunch({ launchDate: '2026-10-01', freeDays: 90, minActiveAdsToShow: 5 });
+    check('minActiveAdsToShow saved', r.status === 200 && r.stored.minActiveAdsToShow === 5
+      && r.launch.minActiveAdsToShow === 5);
   } finally {
     const cur = (await repos.getSiteConfig()) || {};
     const restored = Object.assign({}, cur, {
       launchDate: snap.launchDate || '',
       freeDays: snap.freeDays != null ? snap.freeDays : 90,
+      minActiveAdsToShow: snap.minActiveAdsToShow != null ? snap.minActiveAdsToShow : 0,
       launchAudit: snap.launchAudit || [],
     });
     if (!snap.launchFreeUntil) delete restored.launchFreeUntil;

@@ -7681,7 +7681,16 @@ function buildCards(){
     requestAnimationFrame(function(){ syncMarqueeShift(track); });
   });
 }
-buildCards();
+/* لا ترسم DEMO قبل معرفة launchDate (كاش أو site-config) — أبقِ الهيكل العظمي */
+function _rizqMaybePaintDemoInventory(){
+  try {
+    if(!(window.RizqDemo && typeof RizqDemo.inventoryAllowed === 'function' && RizqDemo.inventoryAllowed())) return;
+    if(typeof buildCards === 'function') buildCards();
+    if(typeof buildLandingAds === 'function') buildLandingAds(true);
+  } catch(ePaint) {}
+}
+_rizqMaybePaintDemoInventory();
+document.addEventListener('rizq:launch', function(){ _rizqMaybePaintDemoInventory(); });
 window.addEventListener('load', function(){ setTimeout(syncAllMarquees, 160); });
 window.addEventListener('resize', function(){
   if(syncAllMarquees._t) clearTimeout(syncAllMarquees._t);
@@ -7727,7 +7736,10 @@ function _landingAdsPool(){
       out.push(a);
     });
   }
-  if(typeof FEATURED_ADS !== 'undefined') add(FEATURED_ADS);
+  var demoOk = (window.RizqDemo && typeof RizqDemo.inventoryAllowed === 'function')
+    ? RizqDemo.inventoryAllowed()
+    : !(window.RIZQ_LAUNCH && RIZQ_LAUNCH.launchDate);
+  if(demoOk && typeof FEATURED_ADS !== 'undefined') add(FEATURED_ADS);
   if(typeof ADS !== 'undefined') add(ADS);
   if(typeof ALL_ADS_DATA !== 'undefined') add(ALL_ADS_DATA);
   if(out.length > LANDING_ADS_MAX) out = out.slice(0, LANDING_ADS_MAX);
@@ -7832,7 +7844,7 @@ function buildLandingAds(resetVisible){
   var more = document.getElementById('landing-ads-more');
   if(more){ more.innerHTML = ''; more.hidden = true; }
 }
-try { buildLandingAds(true); } catch(eLad) {}
+/* buildLandingAds: يُستدعى عبر _rizqMaybePaintDemoInventory / hydrateLiveAds فقط */
 
 
 /* ── Style Ideas: أزياء وملابس وإكسسوارات فقط (لا سيارات/شاحنات/إلكترونيات…) ── */
@@ -8150,8 +8162,11 @@ function _styCollectStoreStyleItems(){
     /* يبقى فارغاً حتى يرفع التاجر منتجات */
   });
 
-  /* 3) إن لم تكفِ المنتجات — كتالوجات محلات أزياء تجريبية */
-  if(out.length < 9){
+  /* 3) إن لم تكفِ المنتجات — كتالوجات محلات أزياء تجريبية (فقط قبل الإطلاق) */
+  var styDemoOk = (window.RizqDemo && typeof RizqDemo.inventoryAllowed === 'function')
+    ? RizqDemo.inventoryAllowed()
+    : !(window.RIZQ_LAUNCH && RIZQ_LAUNCH.launchDate);
+  if(styDemoOk && out.length < 9){
     _styDemoFashionStores().forEach(function(demo){
       if(storeIdsTouched[demo.id]) return;
       (demo.products || []).forEach(function(p){ pushProduct(p, demo); });
@@ -8180,7 +8195,10 @@ function _styAdsPool(){
     });
   }
   if(typeof ADS !== 'undefined') add(ADS);
-  if(typeof FEATURED_ADS !== 'undefined') add(FEATURED_ADS);
+  var styAdsDemoOk = (window.RizqDemo && typeof RizqDemo.inventoryAllowed === 'function')
+    ? RizqDemo.inventoryAllowed()
+    : !(window.RIZQ_LAUNCH && RIZQ_LAUNCH.launchDate);
+  if(styAdsDemoOk && typeof FEATURED_ADS !== 'undefined') add(FEATURED_ADS);
   if(typeof ALL_ADS_DATA !== 'undefined') add(ALL_ADS_DATA);
   return out;
 }
@@ -8370,8 +8388,11 @@ function _srmCollectShowroomCatalogItems(){
     }
   } catch(eApi){}
 
-  /* 3) احتياطي: كتالوجات معارض تجريبية */
-  if(out.length < 9){
+  /* 3) احتياطي: كتالوجات معارض تجريبية (فقط قبل الإطلاق) */
+  var srmDemoOk = (window.RizqDemo && typeof RizqDemo.inventoryAllowed === 'function')
+    ? RizqDemo.inventoryAllowed()
+    : !(window.RIZQ_LAUNCH && RIZQ_LAUNCH.launchDate);
+  if(srmDemoOk && out.length < 9){
     _srmDemoShowroomCatalogs().forEach(function(demo){
       if(touched[demo.id]) return;
       (demo.products || []).forEach(function(p){ pushProduct(p, demo); });
@@ -15345,13 +15366,32 @@ window.addEventListener('storage',function(e){ if(e.key==='rizq_extra_categories
 /** إعلان نشط حي من الخادم — تحت شريط الفيديو مباشرة */
 (function(){
   function applyAdsLive(n){
-    var num = document.querySelector('#platform-stats [data-stat="ads"] .h-stat-num');
+    var cell = document.querySelector('#platform-stats [data-stat="ads"]');
+    var num = cell ? cell.querySelector('.h-stat-num') : document.querySelector('#platform-stats [data-stat="ads"] .h-stat-num');
     if(!num) return;
     var v = Math.max(0, Number(n)||0);
+    var minShow = (window.RizqDemo && typeof RizqDemo.minActiveAdsToShow === 'function')
+      ? RizqDemo.minActiveAdsToShow()
+      : (Number(window.RIZQ_LAUNCH && RIZQ_LAUNCH.minActiveAdsToShow) || 0);
+    if(cell){
+      if(minShow > 0 && v < minShow){
+        cell.style.display = 'none';
+        cell.setAttribute('hidden', '');
+      } else {
+        cell.style.display = '';
+        cell.removeAttribute('hidden');
+      }
+    }
     num.setAttribute('data-target', String(v));
     num.dataset.counted = '1';
     num.textContent = v.toLocaleString('en-US');
   }
+  document.addEventListener('rizq:launch', function(){
+    try {
+      var cur = document.querySelector('#platform-stats [data-stat="ads"] .h-stat-num');
+      if(cur) applyAdsLive(Number(cur.getAttribute('data-target') || cur.textContent) || 0);
+    } catch(eMinAds) {}
+  });
   function refreshPlatformLiveStats(){
     var base = (window.RIZQ_BACKEND_BASE||'').replace(/\/$/,'');
     if(!base){ applyAdsLive(0); return; }
@@ -17018,15 +17058,18 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
           return new Date(b.approvedAt||0) - new Date(a.approvedAt||0);
         });
 
-        /* إن وُجدت محلات حقيقية → شريط مباشر فقط (تختفي الخلفية والنص الفارغ) */
-        if(list.length < DISCOVERY_MIN_READY_ACCOUNTS){
-          list = showcaseAccounts(type);
-        } else if(!list.some(function(a){ return !!accountCardMedia(a, type); })){
-          /* حسابات بلا غلاف/صورة → عيّنات مصوّرة حتى لا تبقى بطاقات زرقاء فارغة */
-          list = showcaseAccounts(type).concat(list);
+        /* عيّنات العرض فقط قبل الإطلاق (أو ?demo=1) — بعد الإطلاق تبقى الحاوية فارغة/حية */
+        var discDemoOk = (window.RizqDemo && typeof RizqDemo.inventoryAllowed === 'function')
+          ? RizqDemo.inventoryAllowed()
+          : !(window.RIZQ_LAUNCH && RIZQ_LAUNCH.launchDate);
+        if(discDemoOk){
+          if(list.length < DISCOVERY_MIN_READY_ACCOUNTS){
+            list = showcaseAccounts(type);
+          } else if(!list.some(function(a){ return !!accountCardMedia(a, type); })){
+            list = showcaseAccounts(type).concat(list);
+          }
+          list = padDiscoveryList(list, type);
         }
-        /* محلّان فقط على الهاتف لا يتحركان — نكمّل من العيّنات مثل المعارض/المكاتب */
-        list = padDiscoveryList(list, type);
         if(!list.length){
           mountStrip(mount, '', cfg, fr);
           return;

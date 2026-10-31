@@ -107,13 +107,22 @@ async function readSiteConfigSafe() {
   }
 }
 
-function _settingsFromParts(launchDate, freeDays, freeUntil, source) {
+function normalizeMinActiveAdsToShow(raw) {
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return Math.min(1000000, Math.floor(n));
+}
+
+function _settingsFromParts(launchDate, freeDays, freeUntil, source, minActiveAdsToShow) {
   return {
     launchDate,
     freeDays,
     freeUntil,
     source,
     maintenanceDryRun: !launchDate,
+    minActiveAdsToShow: normalizeMinActiveAdsToShow(
+      minActiveAdsToShow != null ? minActiveAdsToShow : 0
+    ),
   };
 }
 
@@ -127,6 +136,7 @@ async function getLaunchSettings() {
     const freeDays = normalizeFreeDays(
       _testOverride.freeDays != null ? _testOverride.freeDays : DEFAULT_FREE_DAYS
     );
+    const minActiveAdsToShow = normalizeMinActiveAdsToShow(_testOverride.minActiveAdsToShow);
     let freeUntil = null;
     let source = 'none';
     if (launchDate) {
@@ -139,7 +149,7 @@ async function getLaunchSettings() {
       freeUntil = parseYmd(process.env.RIZQ_LAUNCH_FREE_UNTIL);
       source = freeUntil ? 'env' : 'none';
     }
-    return _settingsFromParts(launchDate, freeDays, freeUntil, source);
+    return _settingsFromParts(launchDate, freeDays, freeUntil, source, minActiveAdsToShow);
   }
 
   const cfg = await readSiteConfigSafe();
@@ -147,6 +157,7 @@ async function getLaunchSettings() {
   const freeDays = normalizeFreeDays(
     cfg.freeDays != null && cfg.freeDays !== '' ? cfg.freeDays : DEFAULT_FREE_DAYS
   );
+  const minActiveAdsToShow = normalizeMinActiveAdsToShow(cfg.minActiveAdsToShow);
   let freeUntil = null;
   let source = 'none';
   if (launchDate) {
@@ -156,7 +167,7 @@ async function getLaunchSettings() {
     freeUntil = parseYmd(process.env.RIZQ_LAUNCH_FREE_UNTIL);
     source = freeUntil ? 'env' : 'none';
   }
-  return _settingsFromParts(launchDate, freeDays, freeUntil, source);
+  return _settingsFromParts(launchDate, freeDays, freeUntil, source, minActiveAdsToShow);
 }
 
 async function getLaunchFreeUntil() {
@@ -245,6 +256,9 @@ async function publicLaunchConfig(moduleFlags, nowMs) {
     trialOfferVisible: await isTrialOfferVisible(nowMs),
     trialDurationDays: TRIAL_DURATION_DAYS,
     trialClaimWindowDays: TRIAL_CLAIM_WINDOW_DAYS,
+    minActiveAdsToShow: settings.minActiveAdsToShow != null
+      ? settings.minActiveAdsToShow
+      : 0,
   };
 }
 
@@ -317,6 +331,7 @@ module.exports = {
   addDaysYmd,
   freeUntilEndMs,
   normalizeFreeDays,
+  normalizeMinActiveAdsToShow,
   getLaunchSettings,
   getLaunchFreeUntil,
   isMaintenanceDryRun,
