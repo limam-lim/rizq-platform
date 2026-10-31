@@ -133,13 +133,6 @@ function ok(name, cond, extra) {
         await new Promise((s) => setTimeout(s, 100));
       }
       await repos.subRequests.upsert(rj.d.id, Object.assign({}, await repos.subRequests.get(rj.d.id), { status: 'rejected' }), { skipBackup: true });
-      try {
-        if (repos.trialClaims) await repos.trialClaims.remove(accRej.id, { skipBackup: true });
-        const pend = await life.getAccountRecord(accRej.id);
-        if (pend && pend.status === 'pending') {
-          await repos.packages.remove(accRej.id, { skipBackup: true });
-        }
-      } catch (eClear) { /* */ }
     }
     const rj2 = track(await call({ accountId: accRej.id, account: accRej.name, pkg: 'st-trial', category: 'package' }, accRej.accessToken));
     ok('new trial request after rejection accepted', rj2.s === 200, rj2);

@@ -2914,18 +2914,6 @@ app.post('/api/sub-requests/admin/:id/decision', requireAdminPermission('payment
     list[idx].reviewedAt = new Date().toISOString();
     list[idx].reviewedVia = 'admin_api';
     await writeSubRequests(list);
-    // طلب تجربة مرفوض لا يحجز التجربة — امسح المطالبة إن وُجدت
-    try {
-      const zero = Number(row.price) === 0
-        || /trial|تجريب|مجان|free/i.test(String(row.pkg || '') + ' ' + String(row.packageId || ''));
-      if (zero && row.accountId && repos.trialClaims) {
-        await repos.trialClaims.remove(String(row.accountId));
-        const cat = row.category && row.category !== 'package'
-          ? (String(row.accountId) + '::' + row.category)
-          : null;
-        if (cat) await repos.trialClaims.remove(cat);
-      }
-    } catch (eTrialClear) { /* best-effort */ }
     return res.json({ ok: true, request: list[idx] });
   }
 
