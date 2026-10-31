@@ -470,11 +470,8 @@
     media.addEventListener('click', function (e) {
       var t = e.target;
       if (!t || !t.classList || !t.classList.contains('rzq-adx-zoomable')) return;
-      /* هاتف: لا تكبير بلا معلومات — اترك النقر يفتح الإعلان (openAdById / selectAd) */
-      if (isPhoneLike()) return;
-      e.preventDefault();
-      e.stopPropagation();
-      openImageZoom(t.getAttribute('data-full') || t.getAttribute('src') || '', t.getAttribute('alt') || '');
+      /* النقر على الصورة يفتح صفحة الإعلان (هاتف وكمبيوتر) — التكبير متاح داخل صفحة التفاصيل */
+      return;
     });
 
     var x0 = null;
