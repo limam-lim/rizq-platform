@@ -63,8 +63,9 @@
     production: !isLocal,
     demoDashboardAllowed: !!isLocal,
   });
-  /* يُحدَّث من /api/site-config.launch بعد التحميل */
-  window.RIZQ_LAUNCH = window.RIZQ_LAUNCH || {
+  /* يُحدَّث من /api/site-config.launch بعد التحميل؛ يُستعاد فوراً من localStorage لتجنّب رمشة DEMO */
+  var _LAUNCH_CACHE_KEY = 'rizq_launch_cache_v1';
+  var _launchDefaults = {
     launchDate: null,
     freeDays: 90,
     freeUntil: null,
@@ -73,8 +74,40 @@
     maintenanceDryRun: true,
     openSections: null,
     foundingDiscountPercent: 40,
+    minActiveAdsToShow: 0,
   };
+  window.RIZQ_LAUNCH = window.RIZQ_LAUNCH || Object.assign({}, _launchDefaults);
+  window.__RIZQ_LAUNCH_FROM_CACHE = false;
+  window.__RIZQ_SITE_CONFIG_READY = false;
+  try {
+    var _cachedLaunch = null;
+    try { _cachedLaunch = JSON.parse(localStorage.getItem(_LAUNCH_CACHE_KEY) || 'null'); } catch (eC0) { _cachedLaunch = null; }
+    if (_cachedLaunch && typeof _cachedLaunch === 'object') {
+      window.__RIZQ_LAUNCH_FROM_CACHE = true;
+      window.RIZQ_LAUNCH = Object.assign({}, window.RIZQ_LAUNCH, {
+        launchDate: _cachedLaunch.launchDate != null && _cachedLaunch.launchDate !== '' ? _cachedLaunch.launchDate : null,
+        freeDays: _cachedLaunch.freeDays != null ? _cachedLaunch.freeDays : window.RIZQ_LAUNCH.freeDays,
+        freeUntil: _cachedLaunch.freeUntil != null ? _cachedLaunch.freeUntil : window.RIZQ_LAUNCH.freeUntil,
+        minActiveAdsToShow: Number(_cachedLaunch.minActiveAdsToShow) >= 0
+          ? Number(_cachedLaunch.minActiveAdsToShow)
+          : 0,
+      });
+    }
+  } catch (eBootCache) {}
   if (!isLocal) window.__RIZQ_ALLOW_DEMO_DASH = false;
+
+  function _persistLaunchCache(launch) {
+    try {
+      if (!launch || typeof launch !== 'object') return;
+      localStorage.setItem(_LAUNCH_CACHE_KEY, JSON.stringify({
+        launchDate: launch.launchDate || null,
+        freeDays: launch.freeDays != null ? launch.freeDays : 90,
+        freeUntil: launch.freeUntil || null,
+        minActiveAdsToShow: Number(launch.minActiveAdsToShow) >= 0 ? Number(launch.minActiveAdsToShow) : 0,
+        savedAt: Date.now(),
+      }));
+    } catch (ePersist) {}
+  }
 
   /* كاش طلبات عامة مشتركة — يمنع تكرار /api/site-config و /api/accounts/public عند فتح المحل/المكتب */
   var _siteConfigPromise = null;
@@ -91,6 +124,7 @@
     if (_siteConfigPromise && !opts.force) return _siteConfigPromise;
     var base = _apiBase();
     if (!base || typeof fetch === 'undefined') {
+      window.__RIZQ_SITE_CONFIG_READY = true;
       return Promise.resolve(null);
     }
     var init = opts.cache === 'no-store' ? { cache: 'no-store' } : undefined;
@@ -99,16 +133,26 @@
       .then(function (data) {
         try {
           var launch = data && data.config && data.config.launch;
+          window.__RIZQ_SITE_CONFIG_READY = true;
           if (launch) {
             window.RIZQ_LAUNCH = Object.assign({}, window.RIZQ_LAUNCH || {}, launch);
+            if (launch.minActiveAdsToShow == null) {
+              window.RIZQ_LAUNCH.minActiveAdsToShow = Number(window.RIZQ_LAUNCH.minActiveAdsToShow) || 0;
+            }
+            _persistLaunchCache(window.RIZQ_LAUNCH);
             try {
               document.dispatchEvent(new CustomEvent('rizq:launch', { detail: window.RIZQ_LAUNCH }));
             } catch (eEv) {}
           }
-        } catch (eLaunch) {}
+        } catch (eLaunch) {
+          window.__RIZQ_SITE_CONFIG_READY = true;
+        }
         return data;
       })
-      .catch(function () { return null; });
+      .catch(function () {
+        window.__RIZQ_SITE_CONFIG_READY = true;
+        return null;
+      });
     return _siteConfigPromise;
   };
   window.RizqApi.publicAccounts = function (headers) {
@@ -135,6 +179,7 @@
    * مخزون DEMO_ADS / نوافذ العرض التجريبية:
    * - يظهر ما دام launchDate فارغاً في site-config
    * - يختفي تلقائياً عند ضبط تاريخ الإطلاق
+   * - بلا كاش وبدون رد site-config بعد: يُمنع العرض لتجنّب الرمشة بعد الإطلاق
    * - ?demo=1 يُبقي الظهور للاختبار فقط حتى بعد الإطلاق
    */
   window.RizqDemo = window.RizqDemo || {};
@@ -145,10 +190,21 @@
       }
     } catch (eDemoQ) {}
     try {
+      if (!window.__RIZQ_LAUNCH_FROM_CACHE && !window.__RIZQ_SITE_CONFIG_READY) {
+        return false;
+      }
       var ld = window.RIZQ_LAUNCH && window.RIZQ_LAUNCH.launchDate;
       return !ld;
     } catch (eDemoL) {
-      return true;
+      return false;
+    }
+  };
+  window.RizqDemo.minActiveAdsToShow = function () {
+    try {
+      var n = Number(window.RIZQ_LAUNCH && window.RIZQ_LAUNCH.minActiveAdsToShow);
+      return Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+    } catch (eMin) {
+      return 0;
     }
   };
   /* جلب مبكّر لـ launchDate حتى تتكيّف الصفحات قبل الرسم النهائي */

@@ -1118,6 +1118,10 @@ main, .page-content.active, .main-content, .results-area,
                 <label for="launch-free-days" style="font-size:11px;font-weight:700;color:#1B3A6B;display:block;margin-bottom:4px">الأيام المجانية</label>
                 <input type="number" id="launch-free-days" class="form-input" dir="ltr" min="0" max="3650" value="90" style="width:100%;font-family:monospace;font-size:13px" oninput="previewLaunchFreeUntil()"/>
               </div>
+              <div style="width:120px">
+                <label for="launch-min-active-ads" style="font-size:11px;font-weight:700;color:#1B3A6B;display:block;margin-bottom:4px">حد إعلان نشط</label>
+                <input type="number" id="launch-min-active-ads" class="form-input" dir="ltr" min="0" max="1000000" value="0" style="width:100%;font-family:monospace;font-size:13px" title="0 = إظهار الخانة دائماً"/>
+              </div>
               <button type="button" id="btn-save-launch" onclick="saveLaunchConfig()" style="background:linear-gradient(135deg,#1B3A6B,#234d8f);color:#fff;border:none;padding:10px 16px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer">حفظ</button>
               <button type="button" id="btn-clear-launch" onclick="clearLaunchConfig()" style="background:#f1f5f9;color:#1B3A6B;border:1px solid #dbe3f0;padding:10px 14px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer">مسح تاريخ الإطلاق</button>
             </div>
@@ -4146,7 +4150,7 @@ var MODULE_DEFS = [
   {key:'videoAds',   icon:'🎬', name:'فيديوهات Rizq ADS', name_fr:'Vidéos Rizq ADS', desc:'شراء مساحات الفيديو الإعلاني', desc_fr:'Achat d\'espaces vidéo publicitaires'},
 ];
 var _moduleFlagsCache = null;
-var _launchConfigCache = { launchDate: '', freeDays: 90, freeUntil: null, freePeriodActive: false, maintenanceDryRun: true };
+var _launchConfigCache = { launchDate: '', freeDays: 90, freeUntil: null, freePeriodActive: false, maintenanceDryRun: true, minActiveAdsToShow: 0 };
 
 function _addDaysYmd(ymd, days){
   if(!ymd || !/^\d{4}-\d{2}-\d{2}$/.test(ymd)) return null;
@@ -4217,15 +4221,21 @@ function applyLaunchConfigResponse(data){
   var stored = data.stored || {};
   var dateEl = document.getElementById('launch-date');
   var daysEl = document.getElementById('launch-free-days');
+  var minAdsEl = document.getElementById('launch-min-active-ads');
   if (dateEl) dateEl.value = stored.launchDate || launch.launchDate || '';
   if (daysEl) daysEl.value = (stored.freeDays != null ? stored.freeDays : (launch.freeDays != null ? launch.freeDays : 90));
+  var minAdsVal = stored.minActiveAdsToShow != null
+    ? stored.minActiveAdsToShow
+    : (launch.minActiveAdsToShow != null ? launch.minActiveAdsToShow : 0);
+  if (minAdsEl) minAdsEl.value = Number(minAdsVal) >= 0 ? Number(minAdsVal) : 0;
   _launchConfigCache = {
     launchDate: stored.launchDate || launch.launchDate || '',
     freeDays: stored.freeDays != null ? stored.freeDays : 90,
     freeUntil: launch.freeUntil || null,
     freePeriodActive: !!launch.freePeriodActive,
     maintenanceDryRun: !!launch.maintenanceDryRun,
-    daysRemaining: launch.daysRemaining
+    daysRemaining: launch.daysRemaining,
+    minActiveAdsToShow: Number(minAdsVal) >= 0 ? Number(minAdsVal) : 0
   };
   renderLaunchConfigStatus(Object.assign({}, launch, { launchDate: _launchConfigCache.launchDate, freeDays: _launchConfigCache.freeDays }));
   renderLaunchAudit(data.audit || []);
@@ -4234,15 +4244,19 @@ function applyLaunchConfigResponse(data){
 function saveLaunchConfig(confirmPast){
   var dateEl = document.getElementById('launch-date');
   var daysEl = document.getElementById('launch-free-days');
+  var minAdsEl = document.getElementById('launch-min-active-ads');
   var launchDate = (dateEl && dateEl.value) || '';
   var freeDays = daysEl ? Number(daysEl.value) : 90;
   if (!Number.isFinite(freeDays) || freeDays < 0) freeDays = 90;
+  var minActiveAdsToShow = minAdsEl ? Number(minAdsEl.value) : 0;
+  if (!Number.isFinite(minActiveAdsToShow) || minActiveAdsToShow < 0) minActiveAdsToShow = 0;
+  minActiveAdsToShow = Math.floor(minActiveAdsToShow);
   var c = (typeof RizqSub!=='undefined') ? RizqSub.getAgentConfig() : {};
   if(!c.backendUrl){
     showToast(RizqI18n.t2('❌ لا يوجد اتصال بالخادم — تعذّر الحفظ','❌ Pas de connexion au serveur — échec de l\'enregistrement'));
     return;
   }
-  var body = { launchDate: launchDate, freeDays: freeDays };
+  var body = { launchDate: launchDate, freeDays: freeDays, minActiveAdsToShow: minActiveAdsToShow };
   if (confirmPast) body.confirmPast = true;
   fetch(c.backendUrl.replace(/\/$/,'') + '/api/admin/launch-config', {
     method: 'POST',
