@@ -412,7 +412,7 @@ function mountTendersRoutes(app, deps) {
     const idx = list.findIndex((t) => t.id === req.params.id && t.status !== 'removed');
     if (idx === -1) return res.status(404).json({ error: 'tender_not_found' });
     const t = list[idx];
-    if (t.status !== 'open') {
+    if (!isTenderPubliclyOpen(t)) {
       return res.status(400).json({ error: 'tender_not_open', msg: 'هذه المناقصة غير متاحة لتقديم العروض حالياً' });
     }
     if (t.ownerId === acc.id) return res.status(400).json({ error: 'cannot_bid_own_tender' });

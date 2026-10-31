@@ -145,6 +145,11 @@ function mountInvestmentsRoutes(app, deps) {
       if (!accountId || !verifyAccountOwner || !await verifyAccountOwner(accountId, token)) {
         return res.status(401).json({ ok: false, error: 'unauthorized', code: 'auth_required' });
       }
+      // نشر فرصة استثمارية يتطلب باقة استثمار فعّالة (canPostOpportunities)
+      const invAccess = (typeof getInvestAccessForViewer === 'function' ? await getInvestAccessForViewer(accountId) : null) || {};
+      if (!invAccess.canPostOpportunities) {
+        return res.status(403).json({ ok: false, error: 'investment_package_required', code: 'investment_package_required' });
+      }
       const body = Object.assign({}, req.body || {}, { accountId, requireHumanReview: true });
       const out = await investmentRoom.submitOpportunity(body);
       // لا نعرض للعموم قبل موافقة أدمن — أخضر يبقى معلّقاً إن فرضنا المراجعة

@@ -433,12 +433,14 @@ async function applyReferralBonusDays(referrerAccountId, bonusDays) {
   // لا نمنح مكافأة إن لم يكن للمُحيل أي باقة مفعَّلة من قبل على الإطلاق —
   // لا يوجد "تاريخ انتهاء" منطقي نمدّده فوقه، ولا نريد إنشاء سجل باقة وهمي.
   if (!rec) return { ok: false, error: 'referrer has no package record yet' };
+  // باقة علّقها الأدمن (احتيال مثلاً) أو منتهية: لا تعيدها مكافأة الإحالة للعمل
+  if (rec.status === 'suspended' || rec.status === 'expired' || rec.paymentConfirmed === false) {
+    return { ok: false, error: 'referrer package not active' };
+  }
   const days = Number(bonusDays) || REFERRAL_BONUS_DAYS;
   const baseMs = Math.max(Date.now(), new Date(rec.periodEnd || 0).getTime() || 0);
   rec.periodEnd = new Date(baseMs + days * 86400000).toISOString();
-  if (rec.status === 'expired' || rec.status === 'suspended' || rec.status === 'expiring_soon') {
-    rec.status = 'active'; // مكافأة الإحالة تُعيد تفعيل الباقة إن كانت أوشكت على الانتهاء/توقفت
-  }
+  if (rec.status === 'expiring_soon') rec.status = 'active'; // تمديد باقة فعّالة أوشكت على الانتهاء
   rec.referralBonusDaysTotal = (rec.referralBonusDaysTotal || 0) + days;
   store[referrerAccountId] = rec;
   await _save(store);
