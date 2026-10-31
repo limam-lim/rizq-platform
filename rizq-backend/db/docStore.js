@@ -209,6 +209,22 @@ function createCollection(collection, opts) {
     return { inserted: false, data: await get(key) };
   }
 
+  /**
+   * كتابة مشروطة (compare-and-set): لا تكتب إلا إن كان السجل في القاعدة ما زال يساوي
+   * expected (مقارنة jsonb دلالية). تُرجع false إن غيّره كاتب آخر منذ القراءة.
+   */
+  async function updateIfUnchanged(id, expected, data, opts) {
+    const key = String(id || '');
+    if (!key) return false;
+    const r = await sql.execute(
+      `UPDATE documents SET data = ?::jsonb, updated_at = ?, updated_at_ts = NOW()
+       WHERE collection = ? AND id = ? AND data = ?::jsonb`,
+      [encodeData(data), new Date().toISOString(), name, key, encodeData(expected)]
+    );
+    if (r.changes && !(opts && opts.skipBackup)) await writeBackup();
+    return r.changes > 0;
+  }
+
   async function remove(id, opts) {
     const key = String(id || '');
     if (!key) return false;
@@ -351,6 +367,7 @@ function createCollection(collection, opts) {
     count,
     upsert,
     insertIfAbsent,
+    updateIfUnchanged,
     remove,
     upsertMany,
     replaceAll,

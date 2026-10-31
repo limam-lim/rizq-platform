@@ -12,6 +12,11 @@ const {
   assertCanAddMediaVideo,
 } = require('./entitlements');
 const repos = require('../db/repos');
+const {
+  priorPackageOf,
+  isSamePackage,
+  isPackageStillActive,
+} = require('../rizq_package_lifecycle_agent');
 
 const TENDER_PACKAGE_NAME = 'باقة المناقصة';
 
@@ -31,32 +36,26 @@ async function resolvePackageDurationDays(pkgName) {
 
 /**
  * B6 — شراء باقة ثانية:
- * - نفس packageId: مدّ الانتهاء من periodEnd الحالي إن كان في المستقبل، وإلا من اليوم.
+ * - نفس الباقة وما زالت نشطة: مدّ الانتهاء من periodEnd الحالي، وإلا من اليوم.
  * - باقة مختلفة: ابدأ من الآن بأيام الباقة الجديدة فقط (بدون ترحيل أيام القديمة).
+ * incoming: packageId (نص) أو { packageId, pkgName }.
  */
-function computeActivationPeriod(days, existingRecord, newPackageId) {
+function computeActivationPeriod(days, existingRecord, incoming) {
   const now = new Date();
   const nDays = Math.max(1, Number(days) || 30);
-  const sameId = !!(
-    existingRecord
-    && newPackageId
-    && existingRecord.packageId
-    && String(existingRecord.packageId) === String(newPackageId)
-  );
+  const next = incoming && typeof incoming === 'object' ? incoming : { packageId: incoming || null };
+  const prior = priorPackageOf(existingRecord);
+  const samePackage = isSamePackage(prior, next);
   let ends = new Date(now.getTime() + nDays * 86400000);
-  if (sameId && existingRecord && existingRecord.periodEnd) {
-    const existingEnd = new Date(existingRecord.periodEnd);
-    if (!Number.isNaN(existingEnd.getTime()) && existingEnd > now) {
-      ends = new Date(existingEnd.getTime() + nDays * 86400000);
-    }
+  if (samePackage && isPackageStillActive(prior, now.getTime())) {
+    ends = new Date(new Date(prior.periodEnd).getTime() + nDays * 86400000);
   }
   return {
     periodStart: now.toISOString(),
     periodEnd: ends.toISOString(),
     now,
-    samePackage: sameId,
-    switchedPackage: !!(existingRecord && existingRecord.packageId && newPackageId
-      && String(existingRecord.packageId) !== String(newPackageId)),
+    samePackage,
+    switchedPackage: !!prior && !samePackage,
   };
 }
 
@@ -231,17 +230,20 @@ async function _activateClaimed(req, deps) {
   const accountPhone = accRow?.phone || '';
   const accountEmail = accRow?.email || '';
   const accountType = accRow?.type || 'individual';
-  const days = await resolvePackageDurationDays(req.pkg);
+  // بالمعرّف أولاً: أسماء مثل "سنوية" مشتركة بين الكتالوجات ولا تُطابق كمرجع نصي
+  const days = await resolvePackageDurationDays(req.packageId ? { id: req.packageId, pkgName: req.pkg } : req.pkg);
   const category = req.category || 'package';
 
   try {
     if (category === 'tender') {
       const pkgDef = await findCatalogPackage(req.pkg);
       const isTrial = isTrialPackage(req.pkg, req.price);
+      const tndPkgId = req.packageId || (pkgDef && pkgDef.id) || null;
+      const tndPkgName = (pkgDef && pkgDef.name) || req.pkg || 'شهرية';
       const { periodStart, periodEnd, now } = computeActivationPeriod(
         days,
         await getAccountRecord(req.accountId + '::tender'),
-        req.packageId || (pkgDef && pkgDef.id) || null
+        { packageId: tndPkgId, pkgName: tndPkgName }
       );
       const result = await syncAccountPackage({
         accountId: req.accountId + '::tender',
@@ -249,8 +251,8 @@ async function _activateClaimed(req, deps) {
         accountPhone,
         accountEmail,
         accountType,
-        pkgName: (pkgDef && pkgDef.name) || req.pkg || 'شهرية',
-        packageId: (pkgDef && pkgDef.id) || null,
+        pkgName: tndPkgName,
+        packageId: tndPkgId,
         price: Number(req.price) || 0,
         days,
         periodStart,
@@ -268,11 +270,11 @@ async function _activateClaimed(req, deps) {
     if (category === 'investment') {
       const pkgDef = await findCatalogPackage(req.pkg);
       const isTrial = isTrialPackage(req.pkg, req.price);
-      const invPkgId = (pkgDef && pkgDef.id) || req.packageId || null;
+      const invPkgId = req.packageId || (pkgDef && pkgDef.id) || null;
       const { periodStart, periodEnd, now } = computeActivationPeriod(
         days,
         await getAccountRecord(req.accountId + '::investment'),
-        invPkgId
+        { packageId: invPkgId, pkgName: (pkgDef && pkgDef.name) || req.pkg || 'شهرية' }
       );
       const result = await syncAccountPackage({
         accountId: req.accountId + '::investment',
@@ -343,7 +345,7 @@ async function _activateClaimed(req, deps) {
       const { periodStart, periodEnd, now } = computeActivationPeriod(
         days,
         await getAccountRecord(req.accountId + '::video'),
-        packageId
+        { packageId, pkgName: (pkgDef && pkgDef.name) || req.pkg || 'أساسي فيديو' }
       );
       const isTrial = isTrialPackage(req.pkg, req.price);
       const result = await syncAccountPackage({
@@ -378,7 +380,7 @@ async function _activateClaimed(req, deps) {
     // package (default) — باقات الحساب العامة فقط
     const existingPkg = await getAccountRecord(req.accountId);
     const newPkgId = req.packageId || (await findCatalogPackage(req.pkg) || {}).id || null;
-    const { periodStart, periodEnd, now } = computeActivationPeriod(days, existingPkg, newPkgId);
+    const { periodStart, periodEnd, now } = computeActivationPeriod(days, existingPkg, { packageId: newPkgId, pkgName: req.pkg });
     const isTrial = isTrialPackage(req.pkg, req.price);
 
     const result = await syncAccountPackage({

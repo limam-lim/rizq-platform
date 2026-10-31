@@ -30,6 +30,9 @@ const packages = createCollection('account_packages', {
   onBackup: mapBackup,
 });
 
+/* مطالبة ذرّية بالتجربة المجانية — مفتاح: accountId أو accountId::category */
+const trialClaims = createCollection('trial_claims');
+
 const otp = createCollection('otp', {
   backupFile: 'otp-store.json',
   onBackup: arrayBackup,
@@ -541,6 +544,7 @@ module.exports = {
   },
 
   packages,
+  trialClaims,
   otp,
   adminTeam,
   subRequests,

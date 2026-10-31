@@ -2737,9 +2737,8 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
         ? String(b.accountId)
         : (String(b.accountId) + '::' + reqCat);
       try {
-        const { getAccountRecord } = require('./rizq_package_lifecycle_agent');
-        const existingPkg = await getAccountRecord(pkgKey);
-        if (existingPkg && (existingPkg.isTrial || existingPkg.trialUsed)) {
+        const { isTrialAlreadyUsed } = require('./rizq_package_lifecycle_agent');
+        if (await isTrialAlreadyUsed({ accountId: pkgKey, accountPhone: owner.phone, accountEmail: owner.email })) {
           return res.status(409).json({
             ok: false,
             error: 'trial_already_used',

@@ -44,6 +44,9 @@
     "test:quota-concurrency": "node -r dotenv/config scripts/test-quota-concurrency.js",
     "test:packages-b14": "node -r dotenv/config scripts/test-packages-b14-receipt-b16.js",
     "test:packages-core": "node -r dotenv/config scripts/test-packages-b6-b3-b8-trial.js",
+    "test:package-period": "node -r dotenv/config scripts/test-package-period-history.js",
+    "test:lifecycle-save": "node -r dotenv/config scripts/test-lifecycle-concurrent-save.js",
+    "test:trial-once": "node -r dotenv/config scripts/test-trial-once.js",
     "admin:2fa": "node scripts/admin-2fa.js"
   },
   "dependencies": {
