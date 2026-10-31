@@ -1,4 +1,16 @@
-/* Token hardening: accessToken never persisted to localStorage — use RizqDash */
+/* Token hardening: capture ?id/?token before stripUrlToken removes them from the address bar */
+(function rizqCaptureBootParams(){
+  try {
+    var p = new URLSearchParams(window.location.search);
+    window.__RIZQ_BOOT_ID = p.get('id') || '';
+    window.__RIZQ_BOOT_TOKEN = p.get('token') || '';
+    window.__RIZQ_BOOT_DEMO = p.get('demo') === '1';
+  } catch (eBoot) {
+    window.__RIZQ_BOOT_ID = '';
+    window.__RIZQ_BOOT_TOKEN = '';
+    window.__RIZQ_BOOT_DEMO = false;
+  }
+})();
 if (window.RizqDash && RizqDash.purgeSensitiveTokensFromStorage) { try { RizqDash.purgeSensitiveTokensFromStorage(); RizqDash.stripUrlToken(); } catch (ePurge) {} }
 /* extracted from rizq_dashboard_store.html — do not edit HTML for logic */
 (function(){try{if(/[?&]embed=1(?:&|$)/.test(location.search))document.documentElement.classList.add('rizq-dash-embed');}catch(e){}})();
@@ -14,15 +26,15 @@ if(window.RizqAccount)RizqAccount.bootstrapDashboard();
 const params = new URLSearchParams(window.location.search);
 var SESSION_ID = '';
 var SESSION_TOKEN = '';
-const IS_DEMO = params.get('demo') === '1';
+const IS_DEMO = !!(window.__RIZQ_BOOT_DEMO || params.get('demo') === '1');
 (function rizqHydrateDashSession(){
   if(IS_DEMO) return;
   if(window.RizqAccount && typeof window.RizqAccount.recoverSessionParams === 'function'){
     var rec = window.RizqAccount.recoverSessionParams('store');
-    if(rec){ SESSION_ID = rec.id || ''; SESSION_TOKEN = rec.token || ''; return; }
+    if(rec && rec.id && rec.token){ SESSION_ID = rec.id || ''; SESSION_TOKEN = rec.token || ''; return; }
   }
-  SESSION_ID = params.get('id') || '';
-  SESSION_TOKEN = params.get('token') || '';
+  SESSION_ID = window.__RIZQ_BOOT_ID || params.get('id') || '';
+  SESSION_TOKEN = window.__RIZQ_BOOT_TOKEN || params.get('token') || '';
   if(SESSION_ID && !SESSION_TOKEN && window.RizqAccount && typeof window.RizqAccount.readDashToken === 'function'){
     SESSION_TOKEN = window.RizqAccount.readDashToken(SESSION_ID);
   }
@@ -77,23 +89,55 @@ function verifyAccess(){
 // + /api/accounts/verify-dash) قبل الرفض النهائي، ونخزّن النتيجة محلياً حتى
 // تعمل الجلسات التالية على هذا الجهاز بلا حاجة متكررة للشبكة.
 function verifyAccessRemote(){
+  if (window.RizqDash && typeof RizqDash.verifyAccessRemote === 'function') {
+    return RizqDash.verifyAccessRemote(SESSION_ID, SESSION_TOKEN, 'store');
+  }
   return new Promise(function(resolve){
     if(!window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN){ resolve(null); return; }
     fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(SESSION_ID), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
-      .then(function(res){ return res.ok ? res.json() : null; })
-      .then(function(data){
-        if(!data || !data.ok || !data.account || data.account.type!=='store'){ resolve(null); return; }
-        var acc = Object.assign({ token: SESSION_TOKEN, status:'approved' }, data.account);
-        try{
-          var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-          if(!accs.some(function(a){return a.id===acc.id;})) { accs.push(acc); localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs)); }
-        }catch(e){}
-        resolve(acc);
+      .then(function(res){
+        return res.json().then(function(data){ return { res:res, data:data }; }).catch(function(){ return { res:res, data:null }; });
+      })
+      .then(function(out){
+        var data = out.data;
+        if(out.res.ok && data && data.ok && data.account && data.account.type==='store'){
+          var acc = Object.assign({ token: SESSION_TOKEN, status:'approved' }, data.account);
+          if (window.RizqDash && RizqDash.mergeAccountIntoLocalStorage) RizqDash.mergeAccountIntoLocalStorage(acc);
+          else {
+            try{
+              var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+              var idx = accs.findIndex(function(a){return a && a.id===acc.id;});
+              if(idx===-1) accs.push(acc); else accs[idx]=Object.assign({},accs[idx],acc);
+              localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
+            }catch(e){}
+          }
+          resolve(acc);
+          return;
+        }
+        if(data && (data.code==='not_approved' || (data.status && data.status!=='approved'))){
+          resolve({ __pending:true, status: data.status||'pending' });
+          return;
+        }
+        resolve(null);
       }).catch(function(){ resolve(null); });
   });
 }
 
-function showAccessDenied(){
+function showAccessDenied(pending){
+  if(pending && window.RizqDash && typeof RizqDash.applyPendingDeniedMessage === 'function'){
+    RizqDash.applyPendingDeniedMessage({ sessionId: SESSION_ID });
+  } else if(pending){
+    try{
+      var el = document.getElementById('access-denied');
+      var lang = (localStorage.getItem('rizq_lang')||'ar');
+      var h2 = el && el.querySelector('h2');
+      var pre = el && el.querySelector('[data-t="denied-msg-pre"]');
+      var post = el && el.querySelector('[data-t="denied-msg-post"]');
+      if(h2) h2.textContent = lang==='fr' ? 'Compte en cours de vérification' : 'حسابك قيد المراجعة';
+      if(pre) pre.textContent = lang==='fr' ? 'Votre demande est examinée par' : 'طلبك قيد المراجعة لدى';
+      if(post) post.textContent = lang==='fr' ? '. Vous serez notifié à l\'activation.' : '. سيتم إشعارك عند التفعيل.';
+    }catch(e){}
+  }
   document.getElementById('access-denied').style.display='flex';
   document.getElementById('sidebar').style.display='none';
   document.querySelector('.main').style.display='none';
@@ -342,9 +386,11 @@ var storePhotos = [];
 
 function init(){
   if(IS_DEMO){ _initWithAccount(DEMO_ACCOUNT); return; }
-  if(!SESSION_ID || !SESSION_TOKEN){ showAccessDenied(); return; }
+  if(!SESSION_ID){ showAccessDenied(); return; }
   // دائماً تحقق من الخادم — لا تثق بـ localStorage وحده
+  // (حتى بلا token: الخادم يُرجع not_approved للحساب المعلّق)
   verifyAccessRemote().then(function(remoteAcc){
+    if(remoteAcc && remoteAcc.__pending){ showAccessDenied(true); return; }
     if(remoteAcc) _initWithAccount(remoteAcc); else showAccessDenied();
   });
 }
@@ -363,6 +409,7 @@ function _initWithAccount(acc){
   if(!IS_DEMO) _resolveRealAccessToken(acc).then(function(){
     _rizqMergeCatalogFromBackend();
     _rizqMergeServiceRequests();
+    _rizqRefreshProfileFromBackend();
     if(typeof applyStoreInventoryPresets==='function') applyStoreInventoryPresets();
     if(typeof RizqAccountPayments !== 'undefined' && acc.id){
       RizqAccountPayments.syncFromBackend(acc.id, window.REAL_ACCESS_TOKEN || SESSION_TOKEN).then(function(methods){
@@ -1835,8 +1882,10 @@ function saveProfile(){
   localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
   STORE = accs[idx];
   document.getElementById('sb-store-name').textContent = STORE.name||_t2('محلي','Ma boutique');
-  _syncProfileToBackend(STORE);
-  showToast(_t2('تم حفظ معلومات المحل ✅','Informations de la boutique enregistrées ✅'),'success');
+  // انتظر مزامنة الخادم حتى يظهر التعديل على الأجهزة الأخرى بعد إعادة التحميل
+  Promise.resolve(_syncProfileToBackend(STORE)).then(function(){
+    showToast(_t2('تم حفظ معلومات المحل ✅','Informations de la boutique enregistrées ✅'),'success');
+  });
 }
 
 /* إصلاح جوهري: saveProfile() كانت تكتب فقط إلى localStorage — أي تعديل يجريه
@@ -1845,19 +1894,55 @@ function saveProfile(){
    وصفحة معرضه rizq_showroom.html العامة (المصدر: GET /api/accounts/public).
    الآن نُرسل نفس الحقول عبر PATCH /api/accounts/mine/:id بعد كل حفظ محلي. */
 function _syncProfileToBackend(acc){
-  if(!window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN) return;
-  fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/mine/' + encodeURIComponent(SESSION_ID), {
-    method: 'PATCH',
-    headers: { 'Content-Type':'application/json', 'x-account-token': (window.REAL_ACCESS_TOKEN || SESSION_TOKEN) },
-    body: JSON.stringify({
-      name: acc.name||'', phone: acc.phone||'', phoneIntl: acc.phoneIntl||'', email: acc.email||'', city: acc.city||'',
-      category: acc.category||'', activityId: acc.activityId||'', activity: acc.activity||'',
-      address: acc.address||'', desc: acc.desc||'',
-      promo_video: acc.promo_video||'', promo_video_extra: acc.promo_video_extra||'', whatsapp: acc.whatsapp||'', facebook: acc.facebook||'',
-      tagline: acc.tagline||'', thumb: acc.thumb||'', cover: acc.cover||'',
-      storeTopics: Array.isArray(acc.storeTopics) ? acc.storeTopics : []
-    })
-  }).catch(function(){ /* فشل صامت — البيانات محفوظة محلياً على الأقل */ });
+  if(!window.RIZQ_BACKEND_BASE || !SESSION_ID) return Promise.resolve(null);
+  var payload = {
+    name: acc.name||'', phone: acc.phone||'', phoneIntl: acc.phoneIntl||'', email: acc.email||'', city: acc.city||'',
+    category: acc.category||'', activityId: acc.activityId||'', activity: acc.activity||'',
+    address: acc.address||'', desc: acc.desc||'',
+    promo_video: acc.promo_video||'', promo_video_extra: acc.promo_video_extra||'', whatsapp: acc.whatsapp||'', facebook: acc.facebook||'',
+    tagline: acc.tagline||'', thumb: acc.thumb||'', cover: acc.cover||'',
+    storeTopics: Array.isArray(acc.storeTopics) ? acc.storeTopics : []
+  };
+  function send(tok){
+    if(!tok) return Promise.resolve(null);
+    return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/mine/' + encodeURIComponent(SESSION_ID), {
+      method: 'PATCH',
+      headers: { 'Content-Type':'application/json', 'x-account-token': tok },
+      body: JSON.stringify(payload)
+    }).then(function(res){
+      if(res.ok) return _rizqRefreshProfileFromBackend();
+      return null;
+    }).catch(function(){ return null; });
+  }
+  if(window.REAL_ACCESS_TOKEN) return send(window.REAL_ACCESS_TOKEN);
+  return _resolveRealAccessToken(acc || STORE).then(function(tok){ return send(tok); });
+}
+
+/** مصدر الحقيقة للملف الشخصي: GET /api/accounts/mine/:id — لا تعتمد على localStorage وحده عبر الأجهزة. */
+function _rizqRefreshProfileFromBackend(){
+  if(!window.RIZQ_BACKEND_BASE || !SESSION_ID || !window.REAL_ACCESS_TOKEN) return Promise.resolve(null);
+  return fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/mine/' + encodeURIComponent(SESSION_ID), {
+    headers: { 'x-account-token': window.REAL_ACCESS_TOKEN }
+  }).then(function(res){ return res.ok ? res.json() : null; })
+    .then(function(data){
+      if(!data || !data.ok || !data.account) return null;
+      var remote = data.account;
+      STORE = Object.assign({}, STORE || {}, remote, { token: SESSION_TOKEN, status: remote.status || 'approved' });
+      if (window.RizqDash && RizqDash.mergeAccountIntoLocalStorage) {
+        RizqDash.mergeAccountIntoLocalStorage(STORE);
+      } else {
+        try{
+          var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
+          var idx = accs.findIndex(function(a){ return a && a.id===SESSION_ID; });
+          if(idx===-1) accs.push(STORE); else accs[idx]=Object.assign({},accs[idx],STORE);
+          localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
+        }catch(e){}
+      }
+      if(typeof fillProfileForm === 'function') fillProfileForm();
+      var nameEl = document.getElementById('sb-store-name');
+      if(nameEl) nameEl.textContent = STORE.name || _t2('محلي','Ma boutique');
+      return STORE;
+    }).catch(function(){ return null; });
 }
 
 // ══ HOURS ══

@@ -5629,11 +5629,20 @@ function syncPendingAccountsFromBackend(){
           status: bacc.status || 'pending', _fromBackend: true
         });
         changed = true;
-      } else if(local[idx]._fromBackend && local[idx].status !== bacc.status){
-        // حالته تغيّرت من جهاز آخر (موافقة/رفض) — حدّثها محلياً
-        local[idx].status = bacc.status;
-        if(bacc.approvedAt) local[idx].approvedAt = bacc.approvedAt;
-        changed = true;
+      } else {
+        // حدّث دائماً من الخادم (حتى السجلات المحلية بدون _fromBackend) —
+        // وإلا يبقى حساب سُجّل على جهاز الأدمن نفسه بحالة قديمة ويُستبعد من «معلّقة».
+        var prev = local[idx];
+        var nextStatus = bacc.status || prev.status || 'pending';
+        var touched = false;
+        if(prev.status !== nextStatus){ prev.status = nextStatus; touched = true; }
+        if(bacc.approvedAt && prev.approvedAt !== bacc.approvedAt){ prev.approvedAt = bacc.approvedAt; touched = true; }
+        if(bacc.name && prev.name !== bacc.name){ prev.name = bacc.name; touched = true; }
+        if(bacc.email && prev.email !== bacc.email){ prev.email = bacc.email; touched = true; }
+        if(bacc.phone && prev.phone !== bacc.phone){ prev.phone = bacc.phone; touched = true; }
+        if(bacc.type && prev.type !== bacc.type){ prev.type = bacc.type; touched = true; }
+        if(!prev._fromBackend){ prev._fromBackend = true; touched = true; }
+        if(touched) changed = true;
       }
     });
     if(changed) savePendingAccounts(local);

@@ -157,32 +157,113 @@
     }
   }
 
+  function mergeAccountIntoLocalStorage(acc) {
+    if (!acc || !acc.id) return;
+    try {
+      var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+      var idx = accs.findIndex(function (a) { return a && a.id === acc.id; });
+      if (idx === -1) accs.push(acc);
+      else accs[idx] = Object.assign({}, accs[idx], acc);
+      localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
+    } catch (e) {}
+  }
+
+  /** يعيد كتابة نص #access-denied الموجود إلى حالة «قيد المراجعة» بلا تصميم جديد. */
+  function applyPendingDeniedMessage(opts) {
+    opts = opts || {};
+    var el = document.getElementById(opts.deniedId || 'access-denied');
+    if (!el) return;
+    var lang = 'ar';
+    try {
+      lang = (localStorage.getItem('rizq_lang') || document.documentElement.lang || 'ar').toLowerCase();
+      if (lang.indexOf('fr') === 0) lang = 'fr';
+      else lang = 'ar';
+    } catch (eL) { lang = 'ar'; }
+    var h2 = el.querySelector('h2');
+    var pre = el.querySelector('[data-t="denied-msg-pre"]');
+    var post = el.querySelector('[data-t="denied-msg-post"]');
+    var p = el.querySelector('p');
+    if (h2) {
+      h2.textContent = lang === 'fr' ? 'Compte en cours de vérification' : 'حسابك قيد المراجعة';
+      // امنع applyStaticDom من إعادة كتابة data-t="denied-title" فوق رسالة المراجعة
+      try { h2.removeAttribute('data-t'); } catch (e1) {}
+    }
+    if (pre && post) {
+      pre.textContent = lang === 'fr' ? 'Votre demande est examinée par' : 'طلبك قيد المراجعة لدى';
+      post.textContent = lang === 'fr' ? '. Vous serez notifié à l\'activation.' : '. سيتم إشعارك عند التفعيل.';
+      try { pre.removeAttribute('data-t'); post.removeAttribute('data-t'); } catch (e2) {}
+    } else if (p) {
+      p.textContent = lang === 'fr'
+        ? 'Votre compte est en cours de vérification. Vous serez notifié à l\'activation.'
+        : 'حسابك قيد المراجعة. سيتم إشعارك عند التفعيل.';
+    }
+  }
+
+  function localPendingHint(sessionId) {
+    if (!sessionId) return false;
+    try {
+      var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
+      var hit = accs.find(function (a) { return a && a.id === sessionId; });
+      if (hit && hit.status && hit.status !== 'approved') return true;
+    } catch (e) {}
+    return false;
+  }
+
   function verifyAccessRemote(sessionId, sessionToken, expectedType) {
     return new Promise(function (resolve) {
       var base = backendBase();
-      if (!base || !sessionId || !sessionToken) { resolve(null); return; }
-      fetch(base + '/api/accounts/verify-dash/' + encodeURIComponent(sessionId), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-dash-token': sessionToken },
-        body: JSON.stringify({ dashToken: sessionToken })
-      })
-        .then(function (res) { return res.ok ? res.json() : null; })
-        .then(function (data) {
-          if (!data || !data.ok || !data.account || data.account.type !== expectedType) {
-            resolve(null);
-            return;
-          }
-          var acc = Object.assign({ token: sessionToken, status: 'approved' }, data.account);
-          try {
-            var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts') || '[]');
-            if (!accs.some(function (a) { return a.id === acc.id; })) {
-              accs.push(acc);
-              localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs));
-            }
-          } catch (e) {}
-          resolve(acc);
-        })
-        .catch(function () { resolve(null); });
+      if (!base || !sessionId) {
+        if (localPendingHint(sessionId)) resolve({ __pending: true, status: 'pending' });
+        else resolve(null);
+        return;
+      }
+      // جرّب dashToken ثم accessToken المؤقت — الخادم لا يكشف not_approved بلا رمز مطابق
+      var dash = sessionToken || '';
+      var access = '';
+      try { access = readEphemeralAccessToken(sessionId) || ''; } catch (eAcc) { access = ''; }
+      function probe(tok) {
+        var t = String(tok || '');
+        return fetch(base + '/api/accounts/verify-dash/' + encodeURIComponent(sessionId), {
+          method: 'POST',
+          headers: Object.assign({ 'Content-Type': 'application/json' }, t ? { 'x-dash-token': t } : {}),
+          body: JSON.stringify({ dashToken: t })
+        }).then(function (res) {
+          return res.json().then(function (data) { return { res: res, data: data }; })
+            .catch(function () { return { res: res, data: null }; });
+        });
+      }
+      function interpret(out) {
+        var data = out && out.data;
+        if (out && out.res && out.res.ok && data && data.ok && data.account && data.account.type === expectedType) {
+          var acc = Object.assign({ token: sessionToken || dash, status: 'approved' }, data.account);
+          mergeAccountIntoLocalStorage(acc);
+          return { kind: 'ok', acc: acc };
+        }
+        if (data && data.code === 'not_approved') {
+          return { kind: 'pending', status: data.status || 'pending' };
+        }
+        return { kind: 'deny' };
+      }
+      var firstTok = dash || access;
+      var chain = firstTok ? probe(firstTok) : Promise.resolve({ res: { ok: false, status: 401 }, data: null });
+      chain.then(function (out) {
+        var r = interpret(out);
+        if (r.kind === 'ok') { resolve(r.acc); return null; }
+        if (r.kind === 'pending') { resolve({ __pending: true, status: r.status }); return null; }
+        // إن فشل dash جرّب accessToken (حساب معلّق يملك access بلا dash)
+        if (access && access !== firstTok) return probe(access);
+        return null;
+      }).then(function (out2) {
+        if (out2 == null) return;
+        var r2 = interpret(out2);
+        if (r2.kind === 'ok') { resolve(r2.acc); return; }
+        if (r2.kind === 'pending') { resolve({ __pending: true, status: r2.status }); return; }
+        if (localPendingHint(sessionId)) resolve({ __pending: true, status: 'pending' });
+        else resolve(null);
+      }).catch(function () {
+        if (localPendingHint(sessionId)) resolve({ __pending: true, status: 'pending' });
+        else resolve(null);
+      });
     });
   }
 
@@ -316,9 +397,13 @@
 
   function showAccessDenied(opts) {
     opts = opts || {};
+    if (opts.pending || (opts.ctx && opts.ctx.pendingReview) || localPendingHint(opts.sessionId)) {
+      applyPendingDeniedMessage(opts);
+    }
     var el = document.getElementById(opts.deniedId || 'access-denied');
     var sidebar = document.getElementById(opts.sidebarId || 'sidebar');
-    var main = document.querySelector(opts.mainSelector || '.main-content');
+    var main = document.querySelector(opts.mainSelector || '.main-content')
+      || document.querySelector('.main');
     if (el) el.style.display = 'flex';
     if (sidebar) sidebar.style.display = 'none';
     if (main) main.style.display = 'none';
@@ -344,11 +429,16 @@
 
     function finishDenied() {
       if (typeof opts.onDenied === 'function') opts.onDenied(ctx);
-      else showAccessDenied(opts);
+      else showAccessDenied(Object.assign({}, opts, { pending: !!ctx.pendingReview, sessionId: ctx.sessionId, ctx: ctx }));
     }
 
     function afterAccount(acc) {
       if (!acc && !ctx.isDemo) {
+        finishDenied();
+        return;
+      }
+      if (acc && acc.__pending) {
+        ctx.pendingReview = true;
         finishDenied();
         return;
       }
@@ -369,6 +459,11 @@
 
     /* دائماً تحقق من الخادم — لا تثق بـ localStorage وحده (يمنع تزوير جلسة عقار/لوحة) */
     return verifyAccessRemote(ctx.sessionId, ctx.sessionToken, expectedType).then(function (remote) {
+      if (remote && remote.__pending) {
+        ctx.pendingReview = true;
+        finishDenied();
+        return;
+      }
       if (remote) return afterAccount(remote);
       finishDenied();
     });
@@ -408,6 +503,8 @@
     rememberAccessToken: rememberAccessToken,
     readEphemeralAccessToken: readEphemeralAccessToken,
     showAccessDenied: showAccessDenied,
+    applyPendingDeniedMessage: applyPendingDeniedMessage,
+    mergeAccountIntoLocalStorage: mergeAccountIntoLocalStorage,
     bootstrapDashboard: bootstrapDashboard,
     applySubscriptionLock: applySubscriptionLock,
     init: init

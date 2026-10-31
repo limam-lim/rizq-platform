@@ -1242,11 +1242,16 @@ function boot() {
   RizqDash.bootstrapDashboard({
     expectedType: 'estate',
     writeRoot: document.getElementById('dash-root'),
-    onDenied: function () {
+    onDenied: function (ctx) {
       document.getElementById('app-shell').style.display = 'none';
       var sb = document.getElementById('sidebar');
       if (sb) sb.style.display = 'none';
-      RizqDash.showAccessDenied();
+      RizqDash.showAccessDenied({
+        pending: !!(ctx && ctx.pendingReview),
+        sessionId: ctx && ctx.sessionId,
+        ctx: ctx,
+        mainSelector: '#app-shell'
+      });
     },
     onReady: function (acc, ctx) {
       ACCOUNT = acc;

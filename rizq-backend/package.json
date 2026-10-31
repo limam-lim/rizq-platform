@@ -37,6 +37,8 @@
     "test:2fa": "node -r dotenv/config scripts/test-admin-2fa.js",
     "test:sessions": "node -r dotenv/config scripts/test-sessions-concurrency.js",
     "test:contact-scrub": "node -r dotenv/config scripts/test-contact-scrub.js",
+    "test:register-sync-fail": "node scripts/test-register-sync-fail.js",
+    "test:verify-dash-pending": "node scripts/test-verify-dash-pending.js",
     "admin:2fa": "node scripts/admin-2fa.js"
   },
   "dependencies": {

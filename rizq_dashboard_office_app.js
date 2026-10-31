@@ -1,4 +1,15 @@
-/* Token hardening: accessToken never persisted to localStorage — use RizqDash */
+(function rizqCaptureBootParams(){
+  try {
+    var p = new URLSearchParams(window.location.search);
+    window.__RIZQ_BOOT_ID = p.get('id') || '';
+    window.__RIZQ_BOOT_TOKEN = p.get('token') || '';
+    window.__RIZQ_BOOT_DEMO = p.get('demo') === '1';
+  } catch (eBoot) {
+    window.__RIZQ_BOOT_ID = '';
+    window.__RIZQ_BOOT_TOKEN = '';
+    window.__RIZQ_BOOT_DEMO = false;
+  }
+})();
 if (window.RizqDash && RizqDash.purgeSensitiveTokensFromStorage) { try { RizqDash.purgeSensitiveTokensFromStorage(); RizqDash.stripUrlToken(); } catch (ePurge) {} }
 /* extracted from rizq_dashboard_office.html — do not edit HTML for logic */
 (function(){try{if(/[?&]embed=1(?:&|$)/.test(location.search))document.documentElement.classList.add('rizq-dash-embed');}catch(e){}})();
@@ -23,15 +34,15 @@ if(window.RizqAccount)RizqAccount.bootstrapDashboard();
 const params=new URLSearchParams(window.location.search);
 var SESSION_ID='';
 var SESSION_TOKEN='';
-const IS_DEMO=params.get('demo')==='1';
+const IS_DEMO=!!(window.__RIZQ_BOOT_DEMO || params.get('demo')==='1');
 (function rizqHydrateDashSession(){
   if(IS_DEMO) return;
   if(window.RizqAccount && typeof window.RizqAccount.recoverSessionParams === 'function'){
     var rec = window.RizqAccount.recoverSessionParams('office');
-    if(rec){ SESSION_ID = rec.id || ''; SESSION_TOKEN = rec.token || ''; return; }
+    if(rec && rec.id && rec.token){ SESSION_ID = rec.id || ''; SESSION_TOKEN = rec.token || ''; return; }
   }
-  SESSION_ID = params.get('id') || '';
-  SESSION_TOKEN = params.get('token') || '';
+  SESSION_ID = window.__RIZQ_BOOT_ID || params.get('id') || '';
+  SESSION_TOKEN = window.__RIZQ_BOOT_TOKEN || params.get('token') || '';
   if(SESSION_ID && !SESSION_TOKEN && window.RizqAccount && typeof window.RizqAccount.readDashToken === 'function'){
     SESSION_TOKEN = window.RizqAccount.readDashToken(SESSION_ID);
   }
@@ -82,22 +93,15 @@ function verifyAccess(){
 // متصفح الأدمن)، لا يوجد محلياً سجل لهذا الحساب — كانت الصفحة ترفض الوصول
 // رغم أن الحساب مُفعَّل فعلياً على الخادم. نحاول التحقق من الخادم قبل الرفض.
 function verifyAccessRemote(){
-  return new Promise(function(resolve){
-    if(!window.RIZQ_BACKEND_BASE || !SESSION_ID || !SESSION_TOKEN){ resolve(null); return; }
-    fetch(window.RIZQ_BACKEND_BASE.replace(/\/$/,'') + '/api/accounts/verify-dash/' + encodeURIComponent(SESSION_ID), { method:'POST', headers:{'Content-Type':'application/json','x-dash-token':SESSION_TOKEN}, body:JSON.stringify({dashToken:SESSION_TOKEN}) })
-      .then(function(res){ return res.ok ? res.json() : null; })
-      .then(function(data){
-        if(!data || !data.ok || !data.account || data.account.type!=='office'){ resolve(null); return; }
-        var acc = Object.assign({ token: SESSION_TOKEN, status:'approved' }, data.account);
-        try{
-          var accs = JSON.parse(localStorage.getItem('rizq_pending_accounts')||'[]');
-          if(!accs.some(function(a){return a.id===acc.id;})) { accs.push(acc); localStorage.setItem('rizq_pending_accounts', JSON.stringify(accs)); }
-        }catch(e){}
-        resolve(acc);
-      }).catch(function(){ resolve(null); });
-  });
+  if (window.RizqDash && typeof RizqDash.verifyAccessRemote === 'function') {
+    return RizqDash.verifyAccessRemote(SESSION_ID, SESSION_TOKEN, 'office');
+  }
+  return Promise.resolve(null);
 }
-function showAccessDenied(){
+function showAccessDenied(pending){
+  if(pending && window.RizqDash && RizqDash.applyPendingDeniedMessage){
+    RizqDash.applyPendingDeniedMessage({ sessionId: SESSION_ID });
+  }
   document.getElementById('access-denied').style.display='flex';
   document.getElementById('sidebar').style.display='none';
   document.querySelector('.main').style.display='none';
@@ -508,9 +512,10 @@ function loadActivatedPackage(acc) {
 
 function init(){
   if(IS_DEMO){ _initWithAccount(DEMO_ACC); return; }
-  if(!SESSION_ID || !SESSION_TOKEN){ showAccessDenied(); return; }
+  if(!SESSION_ID){ showAccessDenied(); return; }
   // دائماً تحقق من الخادم — لا تثق بـ localStorage وحده
   verifyAccessRemote().then(function(remoteAcc){
+    if(remoteAcc && remoteAcc.__pending){ showAccessDenied(true); return; }
     if(remoteAcc) _initWithAccount(remoteAcc); else showAccessDenied();
   });
 }
