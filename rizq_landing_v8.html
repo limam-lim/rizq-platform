@@ -6717,7 +6717,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
           <div class="cat-icon-box" style="flex-shrink:0">🏠</div>
           <div style="flex:1">
             <div style="font-size:15px;font-weight:700;color:#1b3a6b;margin-bottom:3px"><span class="ar-only">سوق العقارات</span><span class="fr-only">Marché immobilier</span></div>
-            <div style="font-size:11.5px;color:var(--text-muted)"><span class="ar-only">وكالة · مطور · مالك — لوحة عقارات مستقلة مثل المحل والمكتب</span><span class="fr-only">Agence · promoteur · propriétaire — tableau immobilier dédié</span></div>
+            <div style="font-size:11.5px;color:var(--text-muted)"><span class="ar-only">وكالة · مطور · مالك — أنشر عقاراتك وأدر طلبات المعاينة</span><span class="fr-only">Agence · promoteur · propriétaire — publiez vos biens et gérez les visites</span></div>
           </div>
           <div id="chk-estate" style="width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.2);flex-shrink:0;transition:all .3s"></div>
         </div>
@@ -12187,7 +12187,7 @@ const TR = {
     'type-priv-title': 'حساب خاص (بائع)',
     'type-priv-sub':   'للأفراد — انشر إعلاناتك بسهولة',
     'type-estate-title': 'سوق العقارات',
-    'type-estate-sub':   'وكالة · مطور · مالك — لوحة عقارات مستقلة مثل المحل والمكتب',
+    'type-estate-sub':   'وكالة · مطور · مالك — أنشر عقاراتك وأدر طلبات المعاينة',
     'type-co-title':   'شركة أو مؤسسة',
     'type-co-sub':     'محل · مكتب · معرض/مصنع — حساب موثّق',
     'type-next':       'التالي ←',
@@ -12306,7 +12306,7 @@ const TR = {
     'type-priv-title': 'Compte privé (vendeur)',
     'type-priv-sub':   'Pour les particuliers — publiez vos annonces',
     'type-estate-title': 'Marché immobilier',
-    'type-estate-sub':   'Agence · promoteur · propriétaire — tableau immobilier dédié',
+    'type-estate-sub':   'Agence · promoteur · propriétaire — publiez vos biens et gérez les visites',
     'type-co-title':   'Entreprise ou organisation',
     'type-co-sub':     'Boutique · bureau · showroom — compte vérifié',
     'type-next':       'Suivant →',
@@ -14329,7 +14329,7 @@ function goFromType(){
     return;
   }
   if(acctType==='estate'){
-    /* مسار مستقل مثل المحل/المكتب → تسجيل عقاري ثم داشبورد العقارات */
+    /* مسار سوق العقارات → تسجيل ثم داشبورد العقارات */
     location.href='rizq_real_estate_register.html';
     return;
   }
