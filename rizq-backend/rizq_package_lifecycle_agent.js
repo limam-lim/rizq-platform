@@ -33,16 +33,26 @@ const REMINDER_WINDOWS_DAYS = [3, 1]; // نُذكّر عند تبقّي 3 أيا
 async function _load() {
   return await repos.listPackagesMap();
 }
+/**
+ * B3 — حفظ سجل-بسجل (upsert) بدل replaceAll حتى لا تُمحى موافقة دفع
+ * تمت أثناء تشغيل وكيل دورة الحياة.
+ */
 async function _save(store) {
   const map = store && typeof store === 'object' ? store : {};
   const invoiceSeq = map.__invoiceSeq || 0;
-  const entries = [];
-  Object.keys(map).forEach((key) => {
-    if (key === '__invoiceSeq' || key === '__meta') return;
-    entries.push({ id: key, data: map[key] });
-  });
-  entries.push({ id: '__meta', data: { invoiceSeq } });
-  await repos.packages.replaceAll(entries);
+  const keys = Object.keys(map).filter((key) => key !== '__invoiceSeq' && key !== '__meta');
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    await repos.setPackage(key, map[key]);
+  }
+  await repos.setPackageMeta({ invoiceSeq });
+}
+
+/** حفظ صف واحد فقط — للاختبارات والمسارات الحساسة للتزامن */
+async function _saveOne(accountId, record, invoiceSeq) {
+  if (!accountId || !record) return;
+  await repos.setPackage(String(accountId), record);
+  if (invoiceSeq != null) await repos.setPackageMeta({ invoiceSeq: Number(invoiceSeq) || 0 });
 }
 
 function _genToken() { return crypto.randomBytes(20).toString('hex'); }
@@ -185,22 +195,33 @@ async function syncAccountPackage(opts) {
   const diamondTier = await resolveDiamondTier({ id: opts.packageId, pkgName: opts.pkgName, planType });
   const isTrial = opts.isTrial === true || isTrialPackage(opts.pkgName, opts.price);
 
-  /* تجربة واحدة لكل هوية + ظهور فقط بعد الفترة المجانية وخلال مهلة 7 أيام */
-  if (isTrial && opts.activatedBy !== 'admin') {
-    if (!(await launchMode.isTrialOfferVisible())) {
+  /* تجربة واحدة لكل حساب ولكل فئة (مفتاح accountId بما فيه ::tender/::video) */
+  if (isTrial) {
+    if (!(await launchMode.isTrialOfferVisible()) && opts.activatedBy !== 'admin') {
       return { ok: false, error: 'trial_not_available', msg: 'الباقة التجريبية غير متاحة حالياً' };
     }
     const phoneKey = String(opts.accountPhone || existing.accountPhone || '').replace(/\D/g, '');
     const emailKey = String(opts.accountEmail || existing.accountEmail || '').trim().toLowerCase();
+    const baseId = String(opts.accountId).split('::')[0];
+    const categorySuffix = String(opts.accountId).includes('::')
+      ? String(opts.accountId).slice(String(opts.accountId).indexOf('::'))
+      : '';
     const already = Object.keys(store).some(function (id) {
-      if (id === '__meta' || id === opts.accountId) return false;
+      if (id === '__meta' || id === '__invoiceSeq' || id === opts.accountId) return false;
       const r = store[id];
       if (!r || !r.isTrial) return false;
+      // نفس الحساب ونفس الفئة
+      if (String(id) === String(opts.accountId)) return true;
+      const idBase = String(id).split('::')[0];
+      const idSuffix = String(id).includes('::') ? String(id).slice(String(id).indexOf('::')) : '';
+      if (idBase === baseId && idSuffix === categorySuffix) return true;
+      // نفس الهوية (هاتف/بريد) على نفس الفئة
+      if (idSuffix !== categorySuffix) return false;
       const p = String(r.accountPhone || '').replace(/\D/g, '');
       const e = String(r.accountEmail || '').trim().toLowerCase();
       return (phoneKey && p && p === phoneKey) || (emailKey && e && e === emailKey);
     });
-    if (already || existing.isTrial) {
+    if (already || existing.isTrial || existing.trialUsed === true) {
       return { ok: false, error: 'trial_already_used', msg: 'تم استخدام التجربة المجانية لهذه الهوية مسبقاً' };
     }
   }
@@ -245,6 +266,29 @@ async function syncAccountPackage(opts) {
     issuedAt: new Date().toISOString(),
   } : null;
 
+  // B6: عند تبديل الباقة سجّل القديمة في سجل الحساب قبل الاستبدال
+  const history = Array.isArray(existing.packageHistory) ? existing.packageHistory.slice() : [];
+  const prevPkgId = existing.packageId || null;
+  const nextPkgId = opts.packageId || prevPkgId || null;
+  if (
+    prevPkgId
+    && nextPkgId
+    && String(prevPkgId) !== String(nextPkgId)
+    && (paymentConfirmed || isTrial)
+    && existing.pkgName
+  ) {
+    history.unshift({
+      packageId: prevPkgId,
+      pkgName: existing.pkgName,
+      planType: existing.planType || null,
+      periodStart: existing.periodStart || null,
+      periodEnd: existing.periodEnd || null,
+      price: existing.price || 0,
+      endedAt: new Date().toISOString(),
+      reason: 'replaced_by_' + String(nextPkgId),
+    });
+  }
+
   const record = {
     accountId: opts.accountId,
     accountName: opts.accountName || opts.accountId,
@@ -253,8 +297,9 @@ async function syncAccountPackage(opts) {
     accountType,
     planType,
     diamondTier: diamondTier || existing.diamondTier || null,
-    packageId: opts.packageId || existing.packageId || null,
+    packageId: nextPkgId,
     isTrial,
+    trialUsed: !!(existing.trialUsed || existing.isTrial || isTrial),
     subscriptionStatus: isTrial ? 'active' : (paymentConfirmed ? 'active' : 'pending'),
     pkgName: opts.pkgName,
     price: Number(opts.price) || 0,
@@ -269,12 +314,14 @@ async function syncAccountPackage(opts) {
     suspendedAt: null,
     downgradedAt: null,
     accessToken,
+    packageHistory: history.slice(0, 40),
     invoices: invoice
       ? [invoice].concat(existing.invoices || []).slice(0, 50)
       : (existing.invoices || []),
   };
   store[opts.accountId] = record;
-  await _save(store);
+  // صف واحد — لا replaceAll
+  await _saveOne(opts.accountId, record, store.__invoiceSeq);
 
   try {
     const { onSubscriptionActivated, onSubscriptionExpired } = require('./services/apiIntegration');

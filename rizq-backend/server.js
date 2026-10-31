@@ -50,7 +50,7 @@ const { normalizeAccountActivityFields, loadCatalog } = require('./services/merc
 const { refreshCurrencyRates, sanitizeCurrencyList, mergeCurrencyConfig, ensureCurrencyCodes } = require('./services/currencyRates');
 const { parseKnowledgeFile, formatDynamicKnowledgeForPrompt } = require('./services/dynamicKnowledge');
 const { recordUsage, setupQuotaGuardAPI } = require('../rizq_quota_guard_agent');
-const { storeReceipt } = require('./services/receiptStorage');
+const { storeReceipt, findReceiptShaInRequests } = require('./services/receiptStorage');
 
 const app = express();
 app.disable('x-powered-by');
@@ -2728,19 +2728,72 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
       return res.status(400).json({ ok: false, error: 'price_unset', message: 'سعر الباقة غير مضبوط' });
     }
   }
+  // TRIAL: تجربة مجانية واحدة لكل حساب ولكل فئة
+  {
+    const { isTrialPackage } = require('./services/catalogConfig');
+    if (isTrialPackage(catalogPkg.name || catalogPkg.id, serverPrice) || serverPrice === 0) {
+      const reqCat = ['video', 'tender', 'investment'].indexOf(b.category) !== -1 ? b.category : 'package';
+      const pkgKey = reqCat === 'package'
+        ? String(b.accountId)
+        : (String(b.accountId) + '::' + reqCat);
+      try {
+        const { getAccountRecord } = require('./rizq_package_lifecycle_agent');
+        const existingPkg = await getAccountRecord(pkgKey);
+        if (existingPkg && (existingPkg.isTrial || existingPkg.trialUsed)) {
+          return res.status(409).json({
+            ok: false,
+            error: 'trial_already_used',
+            message: 'تم استخدام التجربة المجانية لهذه الفئة مسبقاً',
+          });
+        }
+        // طلبات سابقة مجانية/تجريبية لنفس الحساب+الفئة
+        const prior = (await readSubRequests()).some((r) => {
+          if (!r || String(r.accountId) !== String(b.accountId)) return false;
+          const rCat = r.category || 'package';
+          if (rCat !== reqCat) return false;
+          const zero = Number(r.price) === 0 || /trial|تجريب|مجان|free/i.test(String(r.pkg || '') + ' ' + String(r.packageId || ''));
+          return zero && r.status !== 'rejected';
+        });
+        if (prior) {
+          return res.status(409).json({
+            ok: false,
+            error: 'trial_already_used',
+            message: 'تم استخدام التجربة المجانية لهذه الفئة مسبقاً',
+          });
+        }
+      } catch (trialErr) {
+        console.warn('[sub-requests] trial check:', trialErr.message);
+      }
+    }
+  }
   const list = await readSubRequests();
   const clientId = typeof b.id === 'string' && /^sub_\d{10,20}$/.test(b.id) ? b.id : null;
   const id = clientId && !list.some((r) => r.id === clientId)
     ? clientId : ('sub_' + Date.now() + '_' + crypto.randomBytes(3).toString('hex'));
   let receiptPath = null;
   let receiptMeta = null;
+  let receiptSha256 = null;
   if (b.receiptImage) {
     const stored = storeReceipt(b.receiptImage, { accountId: String(b.accountId || '').slice(0, 60), requestId: id });
     if (!stored.ok) {
       return res.status(stored.status || 400).json({ ok: false, error: stored.error, maxBytes: stored.maxBytes });
     }
+    const dup = findReceiptShaInRequests(list, stored.sha256);
+    if (dup) {
+      try {
+        const abs = require('./services/receiptStorage').resolveReceiptAbsolute(stored.relativePath);
+        if (abs) require('fs').unlinkSync(abs);
+      } catch (_) { /* best-effort cleanup */ }
+      return res.status(409).json({
+        ok: false,
+        error: 'receipt_already_used',
+        message: 'هذا الإيصال مُستخدم مسبقاً',
+        priorRequestId: dup.id || null,
+      });
+    }
     receiptPath = stored.relativePath;
-    receiptMeta = { mime: stored.mime, bytes: stored.bytes };
+    receiptSha256 = stored.sha256 || null;
+    receiptMeta = { mime: stored.mime, bytes: stored.bytes, sha256: receiptSha256 };
   }
   const authoritativePrice = serverPrice;
   const rec = {
@@ -2767,6 +2820,7 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
     // لا نخزّن base64 الوصل في JSON — الملف على القرص فقط تحت uploads/receipts
     receiptImage: null,
     receiptPath: receiptPath || null,
+    receiptSha256: receiptSha256 || null,
     receiptMeta: receiptMeta || null,
     // لا نخزّن riskLevel/flags من العميل — السيرفر فقط يحدّدهما بعد التحليل
     riskLevel: 'unreviewed',

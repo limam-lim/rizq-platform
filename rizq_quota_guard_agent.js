@@ -145,12 +145,31 @@ function _ensurePeriod(row, meta) {
     topupMessages: row.topupMessages || 0,
     topupMinutes: row.topupMinutes || 0,
   });
+  // B8: لا تُصفَّر أرصدة الشحن المدفوعة عند إعادة الضبط الشهرية
+  const carryTopupMessages = Number(row.topupMessages) || 0;
+  const carryTopupMinutes = Number(row.topupMinutes) || 0;
+  const carryTopupRequests = Array.isArray(row.topupRequests) ? row.topupRequests : [];
   return Object.assign(emptyRow(row.subscriberId, {
     accountId: row.accountId || (meta && meta.accountId),
     businessName: row.businessName || (meta && meta.businessName),
     phone: row.phone || (meta && meta.phone),
     diamondTier: row.diamondTier || (meta && meta.diamondTier),
-  }), { history: hist.slice(0, 12) });
+  }), {
+    history: hist.slice(0, 12),
+    topupMessages: carryTopupMessages,
+    topupMinutes: carryTopupMinutes,
+    topupRequests: carryTopupRequests,
+  });
+}
+
+/** سلسلة وعود لكل مشترك — تمنع فقد الزيادات داخل نفس العملية */
+const _usageChains = new Map();
+function _serializeUsage(key, fn) {
+  const k = String(key || '_');
+  const prev = _usageChains.get(k) || Promise.resolve();
+  const next = prev.then(() => fn(), () => fn());
+  _usageChains.set(k, next.then(() => undefined, () => undefined));
+  return next;
 }
 
 function findRow(store, subscriberId, accountId) {
@@ -402,28 +421,50 @@ async function recordUsage(opts) {
   const subscriberId = String(opts.subscriberId || opts.accountId || '').trim();
   if (!subscriberId) return null;
 
-  await assertQuotaAvailable(opts);
+  // B8: زيادة ذرّية متسلسلة لكل مشترك (+ قفل استشاري على Postgres إن وُجد)
+  return _serializeUsage(subscriberId, async () => {
+    await assertQuotaAvailable(opts);
 
-  const store = await _load();
-  const { row } = getOrCreate(store, subscriberId, opts);
-  const usage = opts.usage || {};
-  const msgAdd = opts.messages != null ? Number(opts.messages) : 1;
-  if (Number.isFinite(msgAdd) && msgAdd > 0 && String(opts.channel || '').toLowerCase() !== 'call') {
-    row.messages += msgAdd;
-  }
-  let minutes = Number(opts.minutes) || 0;
-  if (!minutes && opts.channel === 'call') minutes = estimateCallMinutes(opts.replyText || '');
-  if (minutes > 0) row.minutes = Math.round(((row.minutes || 0) + minutes) * 100) / 100;
-  row.tokensIn += usage.input_tokens || 0;
-  row.tokensOut += usage.output_tokens || 0;
-  row.tokensCacheRead += usage.cache_read_input_tokens || 0;
-  row.tokensCacheWrite += usage.cache_creation_input_tokens || 0;
-  row.costUsd = Math.round(((row.costUsd || 0) + estimateUsd(opts.model, usage)) * 100000) / 100000;
-  await maybeAlert(row, opts);
-  await _save(store);
-  const snap = await snapshotOf(row, opts);
-  snap.quotaBlocked = (await quotaBlockedState(row, opts.channel, opts)).blocked;
-  return snap;
+    let sql = null;
+    try { sql = require('./rizq-backend/db/sql'); } catch (eSql) { sql = null; }
+
+    const apply = async () => {
+      const store = await _load();
+      const { row } = getOrCreate(store, subscriberId, opts);
+      const usage = opts.usage || {};
+      const msgAdd = opts.messages != null ? Number(opts.messages) : 1;
+      if (Number.isFinite(msgAdd) && msgAdd > 0 && String(opts.channel || '').toLowerCase() !== 'call') {
+        row.messages += msgAdd;
+      }
+      let minutes = Number(opts.minutes) || 0;
+      if (!minutes && opts.channel === 'call') minutes = estimateCallMinutes(opts.replyText || '');
+      if (minutes > 0) row.minutes = Math.round(((row.minutes || 0) + minutes) * 100) / 100;
+      row.tokensIn += usage.input_tokens || 0;
+      row.tokensOut += usage.output_tokens || 0;
+      row.tokensCacheRead += usage.cache_read_input_tokens || 0;
+      row.tokensCacheWrite += usage.cache_creation_input_tokens || 0;
+      row.costUsd = Math.round(((row.costUsd || 0) + estimateUsd(opts.model, usage)) * 100000) / 100000;
+      store.subscribers[row.subscriberId || subscriberId] = row;
+      await maybeAlert(row, opts);
+      await _save(store);
+      const snap = await snapshotOf(row, opts);
+      snap.quotaBlocked = (await quotaBlockedState(row, opts.channel, opts)).blocked;
+      return snap;
+    };
+
+    if (sql && typeof sql.withTransaction === 'function'
+      && process.env.RIZQ_QUOTA_STORE !== 'memory'
+      && process.env.RIZQ_QUOTA_MEMORY_ONLY !== '1') {
+      return sql.withTransaction(async (tx) => {
+        // قفل استشاري على مفتاح المشترك — يمنع فقد التحديثات بين العمليات
+        try {
+          await tx.query('SELECT pg_advisory_xact_lock(hashtext(?))', ['quota:' + subscriberId]);
+        } catch (eLock) { /* continue without lock */ }
+        return apply();
+      });
+    }
+    return apply();
+  });
 }
 
 async function getSnapshot(subscriberId, accountId, opts) {

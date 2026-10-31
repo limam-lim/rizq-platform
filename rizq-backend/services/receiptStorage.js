@@ -69,7 +69,7 @@ function parseDataUrl(input) {
 
 /**
  * Validate + persist a receipt data-URL / base64 blob.
- * @returns {{ ok:true, relativePath, mime, bytes } | { ok:false, error, status }}
+ * @returns {{ ok:true, relativePath, mime, bytes, sha256 } | { ok:false, error, status }}
  */
 function storeReceipt(input, meta) {
   ensureReceiptsDir();
@@ -99,6 +99,7 @@ function storeReceipt(input, meta) {
     }
   }
 
+  const sha256 = crypto.createHash('sha256').update(buf).digest('hex');
   const ext = ALLOWED[sniffed].ext;
   const accountPart = String((meta && meta.accountId) || 'anon').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 40) || 'anon';
   const reqPart = String((meta && meta.requestId) || Date.now()).replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 40);
@@ -111,7 +112,26 @@ function storeReceipt(input, meta) {
     relativePath: path.join('receipts', name).replace(/\\/g, '/'),
     mime: sniffed,
     bytes: buf.length,
+    sha256,
   };
+}
+
+/** هل وُجدت بصمة إيصال مطابقة في طلبات سابقة؟ */
+function findReceiptShaInRequests(list, sha256) {
+  const hash = String(sha256 || '').toLowerCase();
+  if (!hash || hash.length < 32) return null;
+  const rows = Array.isArray(list) ? list : [];
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    if (!r) continue;
+    const h = String(
+      (r.receiptSha256)
+      || (r.receiptMeta && r.receiptMeta.sha256)
+      || ''
+    ).toLowerCase();
+    if (h && h === hash) return r;
+  }
+  return null;
 }
 
 function resolveReceiptAbsolute(relativePath) {
@@ -128,5 +148,6 @@ module.exports = {
   RECEIPTS_DIR,
   ensureReceiptsDir,
   storeReceipt,
+  findReceiptShaInRequests,
   resolveReceiptAbsolute,
 };

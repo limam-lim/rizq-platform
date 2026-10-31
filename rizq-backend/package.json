@@ -41,6 +41,8 @@
     "test:verify-dash-pending": "node scripts/test-verify-dash-pending.js",
     "test:launch-demo": "node scripts/test-launch-demo-gate.js",
     "test:a1-launch": "node -r dotenv/config scripts/test-a1-launch-config-api.js",
+    "test:packages-b14": "node -r dotenv/config scripts/test-packages-b14-receipt-b16.js",
+    "test:packages-core": "node -r dotenv/config scripts/test-packages-b6-b3-b8-trial.js",
     "admin:2fa": "node scripts/admin-2fa.js"
   },
   "dependencies": {
