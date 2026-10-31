@@ -30,6 +30,9 @@ const packages = createCollection('account_packages', {
   onBackup: mapBackup,
 });
 
+/* مطالبة ذرّية بالتجربة المجانية — مفتاح: accountId أو accountId::category */
+const trialClaims = createCollection('trial_claims');
+
 const otp = createCollection('otp', {
   backupFile: 'otp-store.json',
   onBackup: arrayBackup,
@@ -190,9 +193,22 @@ const agentOpsSettings = createCollection('agent_ops_settings', {
   onBackup: singletonBackup,
 });
 
+/** صف لكل مشترك (sub:<key>) وطلب شحن لكل مستند (topup:<id>) — انظر db/quotaStore.js */
+function quotaBackup(entries) {
+  const root = singletonBackup(entries);
+  const subscribers = Object.assign({}, (root && root.subscribers) || {});
+  const topupRequests = [];
+  entries.forEach((e) => {
+    if (e.id.startsWith('sub:')) subscribers[e.id.slice(4)] = e.data;
+    else if (e.id.startsWith('topup:')) topupRequests.push(e.data);
+  });
+  topupRequests.sort((a, b) => String(b.createdAt || '').localeCompare(String(a.createdAt || '')));
+  return { subscribers, topupRequests };
+}
+
 const quotaUsage = createCollection('quota_usage', {
   backupFile: 'quota-usage.json',
-  onBackup: singletonBackup,
+  onBackup: quotaBackup,
 });
 
 const secretsVault = createCollection('secrets_vault', {
@@ -528,6 +544,7 @@ module.exports = {
   },
 
   packages,
+  trialClaims,
   otp,
   adminTeam,
   subRequests,

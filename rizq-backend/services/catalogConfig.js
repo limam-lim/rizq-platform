@@ -12,6 +12,66 @@ const DEFAULT_INDIVIDUAL_PACKAGES = [
   { id: 'ind-monthly', name: 'باقة شهرية', price: 2000, durationDays: 30, active: true },
 ];
 
+/**
+ * افتراضيات باقات المحلات/المكاتب/المعارض/المناقصات/الاستثمار/الفيديو —
+ * مصدر الأسعار والحدود: rizq_packages_config.js CATALOGS (+ PKG_DEFAULTS في لوحة الأدمن).
+ * لا تغيّر أسعاراً ظاهرة في الواجهة؛ تُستخدم فقط عندما لا تكون محفوظة في site-config.
+ */
+const DEFAULT_STORE_PACKAGES = [
+  { id: 'st-trial', name: 'تجريبية', price: 0, durationDays: 10, maxCatalogItems: 10, active: true },
+  { id: 'st-month', name: 'شهرية', price: 2000, durationDays: 30, maxCatalogItems: 100, active: true },
+  { id: 'st-quart', name: 'ربعية', price: 5500, durationDays: 90, maxCatalogItems: 500, active: true },
+  { id: 'st-year', name: 'سنوية', price: 15000, durationDays: 365, maxCatalogItems: null, active: true },
+  { id: 'st-diam-std', name: 'الماسية الأساسية', price: 3500, durationDays: 30, maxCatalogItems: null, diamondTier: 'diamond_standard', active: true },
+  { id: 'st-diam-pro', name: 'الماسية Pro', price: 6000, durationDays: 30, maxCatalogItems: null, diamondTier: 'diamond_pro', active: true },
+];
+const DEFAULT_OFFICE_PACKAGES = [
+  { id: 'of-trial', name: 'تجريبية', price: 0, durationDays: 10, maxCatalogItems: 3, active: true },
+  { id: 'of-month', name: 'شهرية', price: 3500, durationDays: 30, maxCatalogItems: null, active: true },
+  { id: 'of-quart', name: 'ربعية', price: 9000, durationDays: 90, maxCatalogItems: null, active: true },
+  { id: 'of-year', name: 'سنوية', price: 28000, durationDays: 365, maxCatalogItems: null, active: true },
+  { id: 'of-diam-std', name: 'الماسية الأساسية', price: 4000, durationDays: 30, maxCatalogItems: null, diamondTier: 'diamond_standard', active: true },
+  { id: 'of-diam-pro', name: 'الماسية Pro', price: 7500, durationDays: 30, maxCatalogItems: null, diamondTier: 'diamond_pro', active: true },
+];
+const DEFAULT_CORP_PACKAGES = [
+  { id: 'cp-trial', name: 'تجريبية', price: 0, durationDays: 10, active: true },
+  { id: 'cp-month', name: 'شهرية', price: 3500, durationDays: 30, maxCatalogItems: 30, active: true },
+  { id: 'cp-quart', name: 'ربعية', price: 9000, durationDays: 90, maxCatalogItems: null, active: true },
+  { id: 'cp-year', name: 'سنوية', price: 25000, durationDays: 365, maxCatalogItems: null, active: true },
+  { id: 'cp-diam-std', name: 'الماسية الأساسية', price: 6000, durationDays: 30, maxCatalogItems: null, diamondTier: 'diamond_standard', active: true },
+  { id: 'cp-diam-pro', name: 'الماسية Pro', price: 15000, durationDays: 30, maxCatalogItems: null, diamondTier: 'diamond_pro', active: true },
+];
+const DEFAULT_TENDER_PACKAGES = [
+  { id: 'tnd-trial', name: 'تجريبية', price: 0, durationDays: 10, active: true },
+  { id: 'tnd-month', name: 'شهرية', price: 5000, durationDays: 30, active: true },
+  { id: 'tnd-quart', name: 'ربعية', price: 13500, durationDays: 90, active: true },
+  { id: 'tnd-year', name: 'سنوية', price: 45000, durationDays: 365, active: true },
+];
+const DEFAULT_INVESTMENT_PACKAGES = [
+  { id: 'inv-trial', name: 'تجريبية', price: 0, durationDays: 10, active: true },
+  { id: 'inv-month', name: 'شهرية', price: 5000, durationDays: 30, active: true },
+  { id: 'inv-quart', name: 'ربعية', price: 13500, durationDays: 90, active: true },
+  { id: 'inv-year', name: 'سنوية', price: 45000, durationDays: 365, active: true },
+];
+const DEFAULT_VIDEO_PACKAGES = [
+  { id: 'vid-single', name: 'إعلان فيديو واحد', price: 1500, durationDays: 10, maxVideosPerMonth: 1, payPerAd: true, active: true },
+  { id: 'vid-basic', name: 'أساسية', price: 5000, durationDays: 30, maxVideosPerMonth: 3, active: true },
+  { id: 'vid-pro', name: 'احترافية', price: 12000, durationDays: 30, maxVideosPerMonth: 10, active: true },
+  { id: 'vid-business', name: 'أعمال', price: 25000, durationDays: 30, maxVideosPerMonth: null, active: true },
+];
+
+const DEFAULT_CATALOG_BY_KEY = {
+  individual: DEFAULT_INDIVIDUAL_PACKAGES,
+  store: DEFAULT_STORE_PACKAGES,
+  office: DEFAULT_OFFICE_PACKAGES,
+  corp: DEFAULT_CORP_PACKAGES,
+  tender: DEFAULT_TENDER_PACKAGES,
+  investment: DEFAULT_INVESTMENT_PACKAGES,
+  video: DEFAULT_VIDEO_PACKAGES,
+  ads: DEFAULT_VIDEO_PACKAGES,
+  media: DEFAULT_VIDEO_PACKAGES,
+};
+
 const DEFAULT_QUOTA_CONFIG = {
   diamond_standard: {
     messages: 2000,
@@ -74,18 +134,37 @@ async function getTopupConfig() {
 async function getAllCatalogPackages() {
   const cfg = await readSiteConfigRaw();
   const pkgs = (cfg.packages && typeof cfg.packages === 'object') ? cfg.packages : {};
-  const out = [];
+  const byCat = Object.create(null);
+
+  // 1) ابدأ بالافتراضيات لكل كتالوج معروف
+  Object.keys(DEFAULT_CATALOG_BY_KEY).forEach((cat) => {
+    byCat[cat] = (DEFAULT_CATALOG_BY_KEY[cat] || []).map((p) => Object.assign({ _catalog: cat }, p));
+  });
+
+  // 2) ادمج site-config فوق الافتراضيات حسب id (أو أضف إن غاب)
   Object.keys(pkgs).forEach((cat) => {
     if (!Array.isArray(pkgs[cat])) return;
+    if (!byCat[cat]) byCat[cat] = [];
     pkgs[cat].forEach((p) => {
-      if (p && p.active !== false) out.push(Object.assign({ _catalog: cat }, p));
+      if (!p || p.active === false) return;
+      const row = Object.assign({ _catalog: cat }, p);
+      const id = String(p.id || '');
+      if (!id) {
+        byCat[cat].push(row);
+        return;
+      }
+      const idx = byCat[cat].findIndex((x) => String(x.id) === id);
+      if (idx >= 0) byCat[cat][idx] = Object.assign({}, byCat[cat][idx], row);
+      else byCat[cat].push(row);
     });
   });
-  if (!out.length) {
-    DEFAULT_INDIVIDUAL_PACKAGES.forEach((p) => {
-      out.push(Object.assign({ _catalog: 'individual' }, p));
+
+  const out = [];
+  Object.keys(byCat).forEach((cat) => {
+    byCat[cat].forEach((p) => {
+      if (p && p.active !== false) out.push(p);
     });
-  }
+  });
   return out;
 }
 
@@ -191,6 +270,14 @@ function isTrialPackage(pkgName, price) {
 module.exports = {
   DEFAULT_QUOTA_CONFIG,
   DEFAULT_TOPUP_CONFIG,
+  DEFAULT_INDIVIDUAL_PACKAGES,
+  DEFAULT_STORE_PACKAGES,
+  DEFAULT_OFFICE_PACKAGES,
+  DEFAULT_CORP_PACKAGES,
+  DEFAULT_TENDER_PACKAGES,
+  DEFAULT_INVESTMENT_PACKAGES,
+  DEFAULT_VIDEO_PACKAGES,
+  DEFAULT_CATALOG_BY_KEY,
   readSiteConfigRaw,
   getQuotaConfig,
   getTopupConfig,

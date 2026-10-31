@@ -212,6 +212,20 @@ function mountMessagesRoutes(app, deps) {
       return res.status(400).json({ error: 'threadKey غير صالح' });
     }
     if (!b.body || !String(b.body).trim()) return res.status(400).json({ error: 'نص الرسالة مطلوب' });
+    const bodyText = String(b.body).slice(0, 3000);
+    try {
+      const { scanContactLeak } = require('../services/contactLeakGuard');
+      const leak = scanContactLeak(bodyText);
+      if (leak && leak.hasLeak) {
+        return res.status(422).json({
+          ok: false,
+          error: 'contact_in_text_forbidden',
+          hits: leak.hits || [],
+          msg: leak.messageAr,
+          msg_fr: leak.messageFr,
+        });
+      }
+    } catch (eLeak) { /* fail-open only if guard missing */ }
     const list = await readMessages();
     const rec = {
       id: 'MSG-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
@@ -222,7 +236,7 @@ function mountMessagesRoutes(app, deps) {
       buyerPhone: '',
       adId: null,
       adTitle: null,
-      body: String(b.body).slice(0, 3000),
+      body: bodyText,
       fromRole: 'seller',
       read: true,
       createdAt: new Date().toISOString(),

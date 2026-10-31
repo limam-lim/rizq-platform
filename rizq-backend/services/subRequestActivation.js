@@ -12,6 +12,11 @@ const {
   assertCanAddMediaVideo,
 } = require('./entitlements');
 const repos = require('../db/repos');
+const {
+  priorPackageOf,
+  isSamePackage,
+  isPackageStillActive,
+} = require('../rizq_package_lifecycle_agent');
 
 const TENDER_PACKAGE_NAME = 'باقة المناقصة';
 
@@ -29,16 +34,29 @@ async function resolvePackageDurationDays(pkgName) {
   return 30;
 }
 
-function computeActivationPeriod(days, existingRecord) {
+/**
+ * B6 — شراء باقة ثانية:
+ * - نفس الباقة وما زالت نشطة: مدّ الانتهاء من periodEnd الحالي، وإلا من اليوم.
+ * - باقة مختلفة: ابدأ من الآن بأيام الباقة الجديدة فقط (بدون ترحيل أيام القديمة).
+ * incoming: packageId (نص) أو { packageId, pkgName }.
+ */
+function computeActivationPeriod(days, existingRecord, incoming) {
   const now = new Date();
-  let ends = new Date(now.getTime() + days * 86400000);
-  if (existingRecord && existingRecord.periodEnd) {
-    const existingEnd = new Date(existingRecord.periodEnd);
-    if (!Number.isNaN(existingEnd.getTime()) && existingEnd > now) {
-      ends = new Date(existingEnd.getTime() + days * 86400000);
-    }
+  const nDays = Math.max(1, Number(days) || 30);
+  const next = incoming && typeof incoming === 'object' ? incoming : { packageId: incoming || null };
+  const prior = priorPackageOf(existingRecord);
+  const samePackage = isSamePackage(prior, next);
+  let ends = new Date(now.getTime() + nDays * 86400000);
+  if (samePackage && isPackageStillActive(prior, now.getTime())) {
+    ends = new Date(new Date(prior.periodEnd).getTime() + nDays * 86400000);
   }
-  return { periodStart: now.toISOString(), periodEnd: ends.toISOString(), now };
+  return {
+    periodStart: now.toISOString(),
+    periodEnd: ends.toISOString(),
+    now,
+    samePackage,
+    switchedPackage: !!prior && !samePackage,
+  };
 }
 
 async function getAccountInfo(accountId, readAccounts) {
@@ -212,22 +230,29 @@ async function _activateClaimed(req, deps) {
   const accountPhone = accRow?.phone || '';
   const accountEmail = accRow?.email || '';
   const accountType = accRow?.type || 'individual';
-  const days = await resolvePackageDurationDays(req.pkg);
+  // بالمعرّف أولاً: أسماء مثل "سنوية" مشتركة بين الكتالوجات ولا تُطابق كمرجع نصي
+  const days = await resolvePackageDurationDays(req.packageId ? { id: req.packageId, pkgName: req.pkg } : req.pkg);
   const category = req.category || 'package';
 
   try {
     if (category === 'tender') {
       const pkgDef = await findCatalogPackage(req.pkg);
       const isTrial = isTrialPackage(req.pkg, req.price);
-      const { periodStart, periodEnd, now } = computeActivationPeriod(days, await getAccountRecord(req.accountId + '::tender'));
+      const tndPkgId = req.packageId || (pkgDef && pkgDef.id) || null;
+      const tndPkgName = (pkgDef && pkgDef.name) || req.pkg || 'شهرية';
+      const { periodStart, periodEnd, now } = computeActivationPeriod(
+        days,
+        await getAccountRecord(req.accountId + '::tender'),
+        { packageId: tndPkgId, pkgName: tndPkgName }
+      );
       const result = await syncAccountPackage({
         accountId: req.accountId + '::tender',
         accountName,
         accountPhone,
         accountEmail,
         accountType,
-        pkgName: (pkgDef && pkgDef.name) || req.pkg || 'شهرية',
-        packageId: (pkgDef && pkgDef.id) || null,
+        pkgName: tndPkgName,
+        packageId: tndPkgId,
         price: Number(req.price) || 0,
         days,
         periodStart,
@@ -245,7 +270,12 @@ async function _activateClaimed(req, deps) {
     if (category === 'investment') {
       const pkgDef = await findCatalogPackage(req.pkg);
       const isTrial = isTrialPackage(req.pkg, req.price);
-      const { periodStart, periodEnd, now } = computeActivationPeriod(days, await getAccountRecord(req.accountId + '::investment'));
+      const invPkgId = req.packageId || (pkgDef && pkgDef.id) || null;
+      const { periodStart, periodEnd, now } = computeActivationPeriod(
+        days,
+        await getAccountRecord(req.accountId + '::investment'),
+        { packageId: invPkgId, pkgName: (pkgDef && pkgDef.name) || req.pkg || 'شهرية' }
+      );
       const result = await syncAccountPackage({
         accountId: req.accountId + '::investment',
         accountName,
@@ -253,7 +283,7 @@ async function _activateClaimed(req, deps) {
         accountEmail,
         accountType,
         pkgName: (pkgDef && pkgDef.name) || req.pkg || 'شهرية',
-        packageId: (pkgDef && pkgDef.id) || null,
+        packageId: invPkgId,
         price: Number(req.price) || 0,
         days,
         periodStart,
@@ -314,7 +344,8 @@ async function _activateClaimed(req, deps) {
       }
       const { periodStart, periodEnd, now } = computeActivationPeriod(
         days,
-        await getAccountRecord(req.accountId + '::video')
+        await getAccountRecord(req.accountId + '::video'),
+        { packageId, pkgName: (pkgDef && pkgDef.name) || req.pkg || 'أساسي فيديو' }
       );
       const isTrial = isTrialPackage(req.pkg, req.price);
       const result = await syncAccountPackage({
@@ -348,7 +379,8 @@ async function _activateClaimed(req, deps) {
 
     // package (default) — باقات الحساب العامة فقط
     const existingPkg = await getAccountRecord(req.accountId);
-    const { periodStart, periodEnd, now } = computeActivationPeriod(days, existingPkg);
+    const newPkgId = req.packageId || (await findCatalogPackage(req.pkg) || {}).id || null;
+    const { periodStart, periodEnd, now } = computeActivationPeriod(days, existingPkg, { packageId: newPkgId, pkgName: req.pkg });
     const isTrial = isTrialPackage(req.pkg, req.price);
 
     const result = await syncAccountPackage({
@@ -358,7 +390,7 @@ async function _activateClaimed(req, deps) {
       accountEmail,
       accountType,
       pkgName: req.pkg,
-      packageId: req.packageId || null,
+      packageId: newPkgId,
       price: Number(req.price) || 0,
       days,
       periodStart,
@@ -409,6 +441,7 @@ function formatPlausibility(level) {
 module.exports = {
   TENDER_PACKAGE_NAME,
   resolvePackageDurationDays,
+  computeActivationPeriod,
   activateSubRequest,
   rejectSubRequest,
   formatPlausibility,

@@ -120,6 +120,14 @@ async function maybeAutoReplyToInquiry({ sellerAccount, buyerMessage, threadKey,
     return null;
   }
 
+  let replyBody = String(result.reply).slice(0, 3000);
+  try {
+    const { scanContactLeak, redactContactPatterns } = require('./contactLeakGuard');
+    const leak = scanContactLeak(replyBody);
+    if (leak && leak.hasLeak && typeof redactContactPatterns === 'function') {
+      replyBody = redactContactPatterns(replyBody);
+    }
+  } catch (eLeak) { /* keep reply if guard unavailable */ }
   const rec = {
     id: 'MSG-' + Date.now() + '-' + Math.floor(Math.random() * 10000),
     threadKey,
@@ -129,7 +137,7 @@ async function maybeAutoReplyToInquiry({ sellerAccount, buyerMessage, threadKey,
     buyerPhone: '',
     adId: buyerMessage.adId || null,
     adTitle: buyerMessage.adTitle || null,
-    body: String(result.reply).slice(0, 3000),
+    body: replyBody,
     fromRole: 'agent',
     aiGenerated: true,
     read: true,

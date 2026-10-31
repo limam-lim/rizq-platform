@@ -17,7 +17,8 @@
     "dev:api": "npm --prefix rizq-backend run dev",
     "test:links": "node scripts/audit-platform-links.js",
     "test:smoke": "node scripts/e2e-platform-smoke.js",
-    "test:isolation": "node scripts/test-subscriber-isolation.js"
+    "test:isolation": "node scripts/test-subscriber-isolation.js",
+    "test:quota-concurrency": "npm --prefix rizq-backend run test:quota-concurrency"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",

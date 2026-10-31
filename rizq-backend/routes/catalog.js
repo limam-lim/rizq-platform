@@ -237,6 +237,57 @@ function mountCatalogRoutes(app, deps) {
     }
   });
 
+  /**
+   * حد العرض العام عند انتهاء الباقة = حد الباقة التجريبية/المجانية لنوع الحساب.
+   * لا يحذف المنتجات — يخفي الزائد عن الحد فقط في GET العام.
+   */
+  function freeTierPublicCatalogCap(accountType) {
+    const t = String(accountType || '').toLowerCase();
+    if (t === 'store') return 10;
+    if (t === 'office' || t === 'estate') return 3;
+    if (t === 'corp' || t === 'company') return 5;
+    return 1;
+  }
+
+  async function applyPublicCatalogCaps(items) {
+    const byAcc = new Map();
+    (items || []).forEach((it) => {
+      const aid = String((it && it.accountId) || '');
+      if (!byAcc.has(aid)) byAcc.set(aid, []);
+      byAcc.get(aid).push(it);
+    });
+    const out = [];
+    for (const [accountId, rows] of byAcc.entries()) {
+      rows.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      if (!accountId) {
+        out.push.apply(out, rows);
+        continue;
+      }
+      let max = Infinity;
+      try {
+        const ent = await getEntitlements(accountId, 'store');
+        const status = ent && ent.subscriptionStatus;
+        const paidActive = status === 'active' || status === 'expiring_soon';
+        if (paidActive) {
+          max = ent.limits && ent.limits.maxCatalogItems != null
+            ? ent.limits.maxCatalogItems
+            : Infinity;
+        } else {
+          const type = (ent && ent.accountType) || 'store';
+          max = freeTierPublicCatalogCap(type);
+        }
+      } catch (eCap) {
+        max = freeTierPublicCatalogCap('store');
+      }
+      if (!Number.isFinite(max) || max < 0) {
+        out.push.apply(out, rows);
+      } else {
+        out.push.apply(out, rows.slice(0, Math.floor(max)));
+      }
+    }
+    return out;
+  }
+
   /** GET /api/catalog?accountId=...&kind=...&categoryId=...&subcat=... — عرض عام (active فقط) */
   app.get('/api/catalog', async (req, res) => {
     const q = req.query || {};
@@ -251,6 +302,7 @@ function mountCatalogRoutes(app, deps) {
       const sc = String(q.subcat || q.subCategoryId);
       list = list.filter((it) => (it.subcat || it.subCategoryId || '') === sc);
     }
+    list = await applyPublicCatalogCaps(list);
     list = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     res.json({ ok: true, items: list });
   });
