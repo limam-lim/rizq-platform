@@ -6,6 +6,10 @@
 'use strict';
 
 const { resolveAccountPhones } = require('../lib/phoneNormalize');
+const {
+  scanContactLeakFields,
+  sanitizePublicFacebookUrl,
+} = require('../services/contactLeakGuard');
 
 /**
  * @param {import('express').Application} app
@@ -186,6 +190,38 @@ function mountAccountsManageRoutes(app, deps) {
 
     const EDITABLE = ['name', 'phone', 'phoneIntl', 'city', 'category', 'activity', 'activityId', 'address', 'desc', 'promo_video', 'promo_video_extra', 'whatsapp', 'facebook', 'thumb', 'cover', 'tagline', 'nni', 'idImage', 'licenseImage'];
     const b = req.body || {};
+    // منع أرقام/روابط تواصل في الاسم والشعار والعنوان (نفس سياسة الإعلانات)
+    const profileLeak = scanContactLeakFields(
+      ['tagline', 'address', 'name']
+        .filter((k) => typeof b[k] === 'string')
+        .map((k) => ({ key: k, val: b[k] }))
+    );
+    if (profileLeak && profileLeak.hasLeak) {
+      return res.status(422).json({
+        ok: false,
+        error: 'contact_in_text_forbidden',
+        field: profileLeak.fields && profileLeak.fields[0] && profileLeak.fields[0].field,
+        hits: profileLeak.hits || [],
+        msg: profileLeak.messageAr,
+        msg_fr: profileLeak.messageFr,
+      });
+    }
+    if (b.facebook !== undefined) {
+      const fbRaw = String(b.facebook || '').trim();
+      if (fbRaw) {
+        const fbOk = sanitizePublicFacebookUrl(fbRaw);
+        if (!fbOk) {
+          return res.status(400).json({
+            ok: false,
+            error: 'invalid_facebook_url',
+            message: 'رابط فيسبوك غير صالح — يُقبل facebook.com أو fb.com أو m.facebook.com فقط',
+          });
+        }
+        b.facebook = fbOk;
+      } else {
+        b.facebook = '';
+      }
+    }
     // ضبط الهاتف (محل/مكتب/معرض/فرد): تطبيع + رفض أرقام غير صالحة
     if (b.phone !== undefined || b.phoneIntl !== undefined || b.whatsapp !== undefined) {
       const waRaw = b.whatsapp !== undefined ? b.whatsapp : acc.whatsapp;
