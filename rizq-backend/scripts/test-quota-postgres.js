@@ -20,9 +20,8 @@ async function main() {
   await db.ready();
 
   const sid = 'quota_step0_' + Date.now();
-  const beforeDoc = await repos.quotaUsage.get('_root');
-  const beforeMsgs = (beforeDoc && beforeDoc.subscribers && beforeDoc.subscribers[sid]
-    && beforeDoc.subscribers[sid].messages) || 0;
+  const beforeRow = await repos.quotaUsage.get('sub:' + sid);
+  const beforeMsgs = (beforeRow && beforeRow.messages) || 0;
 
   const snap = await quota.recordUsage({
     subscriberId: sid,
@@ -34,19 +33,19 @@ async function main() {
   assert(snap, 'recordUsage must return a snapshot');
   assert(snap.messages >= 1, 'snapshot messages should increment');
 
-  const afterDoc = await repos.quotaUsage.get('_root');
-  assert(afterDoc && typeof afterDoc === 'object', 'quota_usage/_root must exist in Postgres');
-  assert(afterDoc.subscribers && afterDoc.subscribers[sid], 'subscriber row must be in PG doc');
+  const afterRow = await repos.quotaUsage.get('sub:' + sid);
+  assert(afterRow && typeof afterRow === 'object', 'quota_usage/sub:<id> row must exist in Postgres');
   assert.strictEqual(
-    afterDoc.subscribers[sid].messages,
+    afterRow.messages,
     beforeMsgs + 1,
     'messages must persist in Postgres after recordUsage'
   );
 
   console.log('[test-quota-postgres] ALL PASSED', {
     subscriberId: sid,
-    messages: afterDoc.subscribers[sid].messages,
+    messages: afterRow.messages,
   });
+  process.exit(0);
 }
 
 main().catch((e) => {
