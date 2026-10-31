@@ -34,18 +34,21 @@ async function main() {
   const now = Date.now();
   const futureEnd = new Date(now + 10 * 86400000).toISOString();
   const pastEnd = new Date(now - 5 * 86400000).toISOString();
-  const same = computeActivationPeriod(30, { packageId: 'st-month', periodEnd: futureEnd }, 'st-month');
+  const priorActive = { packageId: 'st-month', pkgName: 'شهرية', status: 'active', periodEnd: futureEnd };
+  const same = computeActivationPeriod(30, priorActive, { packageId: 'st-month', pkgName: 'شهرية' });
   const sameEndMs = new Date(same.periodEnd).getTime();
   const expectedSame = new Date(futureEnd).getTime() + 30 * 86400000;
   ok('B6 same package extends from current end',
     Math.abs(sameEndMs - expectedSame) < 2000 && same.samePackage === true,
     'end=' + same.periodEnd);
 
-  const sameExpired = computeActivationPeriod(30, { packageId: 'st-month', periodEnd: pastEnd }, 'st-month');
+  const sameExpired = computeActivationPeriod(30,
+    { packageId: 'st-month', pkgName: 'شهرية', status: 'expired', periodEnd: pastEnd },
+    { packageId: 'st-month', pkgName: 'شهرية' });
   ok('B6 same package expired → from today',
     Math.abs(new Date(sameExpired.periodEnd).getTime() - (now + 30 * 86400000)) < 5000);
 
-  const diff = computeActivationPeriod(90, { packageId: 'st-month', periodEnd: futureEnd }, 'st-year');
+  const diff = computeActivationPeriod(90, priorActive, { packageId: 'st-year', pkgName: 'سنوية' });
   ok('B6 different package ignores old days',
     Math.abs(new Date(diff.periodEnd).getTime() - (now + 90 * 86400000)) < 5000
     && diff.switchedPackage === true);
@@ -113,53 +116,39 @@ async function main() {
       && switched.packageHistory[0] && switched.packageHistory[0].packageId === 'st-month'),
     JSON.stringify(switched && switched.packageHistory && switched.packageHistory[0]));
 
-  // ── B8 ──
+  // ── B8 (تغطية سريعة؛ الاختبار الشامل: npm run test:quota-concurrency) ──
   process.env.RIZQ_QUOTA_STORE = 'memory';
   delete require.cache[require.resolve('../../rizq_quota_guard_agent')];
   const quota = require('../../rizq_quota_guard_agent');
   const qid = 'Q_CONC_' + now;
-  // seed high limits via direct record with large topup so assert won't block
-  await quota.resolveTopup; // ensure module loads
-  // bypass block by recording with custom quotaLimits through getOrCreate — use recordUsage with high limit opts
-  // First create row by a single recordUsage with huge quotaLimits
-  await quota.recordUsage({
-    subscriberId: qid,
-    accountId: qid,
-    messages: 0,
-    channel: 'widget',
-    quotaLimits: { messages: 100000, minutes: 0, tier: 'diamond_standard' },
-  });
-  const before = await quota.getSnapshot(qid, qid, {
-    quotaLimits: { messages: 100000, minutes: 0 },
-  });
-  const baseMsg = (before && before.messages) || 0;
+  const LIMITS = { messages: 100000, minutes: 0, tier: 'diamond_standard' };
   await Promise.all(Array.from({ length: 20 }, () => quota.recordUsage({
     subscriberId: qid,
     accountId: qid,
     messages: 1,
     channel: 'widget',
-    quotaLimits: { messages: 100000, minutes: 0, tier: 'diamond_standard' },
+    quotaLimits: LIMITS,
   })));
-  const after = await quota.getSnapshot(qid, qid, {
-    quotaLimits: { messages: 100000, minutes: 0 },
-  });
+  const after = await quota.getSnapshot(qid, qid, { quotaLimits: LIMITS });
   ok('B8 20 concurrent recordUsage → +20 exactly',
-    ((after && after.messages) || 0) - baseMsg === 20,
-    'before=' + baseMsg + ' after=' + (after && after.messages));
+    after && after.messages === 20,
+    'after=' + (after && after.messages));
 
-  // topup survives period rollover
-  const store = global.__rizqQuotaMemory;
-  if (store && store.subscribers && store.subscribers[qid]) {
-    store.subscribers[qid].topupMessages = 500;
-    store.subscribers[qid].period = '2020-01';
-  }
-  const snap2 = await quota.getSnapshot(qid, qid, {
-    quotaLimits: { messages: 100, minutes: 0 },
+  // رصيد مدفوع منفصل يبقى بعد إعادة ضبط الشهر
+  const top = await quota.requestTopup({
+    subscriberId: qid, accountId: qid, type: 'text', businessName: 't',
   });
-  ok('B8 topupMessages survive monthly reset',
-    snap2 && Number(snap2.topupMessages || snap2.limits && 0) >= 0
-      && store.subscribers[qid].topupMessages === 500,
-    'topup=' + (store.subscribers[qid] && store.subscribers[qid].topupMessages));
+  if (top && top.request && top.request.id) {
+    await quota.resolveTopup(top.request.id, 'approved');
+  }
+  if (global.__rizqQuotaMemory && global.__rizqQuotaMemory.subscribers
+      && global.__rizqQuotaMemory.subscribers[qid]) {
+    global.__rizqQuotaMemory.subscribers[qid].period = '2020-01';
+  }
+  const snap2 = await quota.getSnapshot(qid, qid, { quotaLimits: { messages: 100, minutes: 0 } });
+  ok('B8 paid balance survives monthly reset',
+    !!(snap2 && (Number(snap2.paidMessages) > 0 || Number(snap2.topupMessages) > 0)),
+    'paid=' + (snap2 && snap2.paidMessages) + ' topup=' + (snap2 && snap2.topupMessages));
 
   // ── TRIAL via HTTP ──
   const launchMode = require('../config/launchMode');

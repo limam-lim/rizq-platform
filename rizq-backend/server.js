@@ -2745,13 +2745,16 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
             message: 'تم استخدام التجربة المجانية لهذه الفئة مسبقاً',
           });
         }
-        // طلبات سابقة مجانية/تجريبية لنفس الحساب+الفئة
+        // طلب معلّق/مقبول لنفس التجربة يحجب التكرار؛ المرفوض لا يُحسب
         const prior = (await readSubRequests()).some((r) => {
           if (!r || String(r.accountId) !== String(b.accountId)) return false;
           const rCat = r.category || 'package';
           if (rCat !== reqCat) return false;
-          const zero = Number(r.price) === 0 || /trial|تجريب|مجان|free/i.test(String(r.pkg || '') + ' ' + String(r.packageId || ''));
-          return zero && r.status !== 'rejected';
+          const st = String(r.status || 'pending');
+          if (st === 'rejected' || st === 'cancelled') return false;
+          const zero = Number(r.price) === 0
+            || /trial|تجريب|مجان|free/i.test(String(r.pkg || '') + ' ' + String(r.packageId || ''));
+          return zero && (st === 'pending' || st === 'approved' || st === 'activating');
         });
         if (prior) {
           return res.status(409).json({
@@ -2911,6 +2914,18 @@ app.post('/api/sub-requests/admin/:id/decision', requireAdminPermission('payment
     list[idx].reviewedAt = new Date().toISOString();
     list[idx].reviewedVia = 'admin_api';
     await writeSubRequests(list);
+    // طلب تجربة مرفوض لا يحجز التجربة — امسح المطالبة إن وُجدت
+    try {
+      const zero = Number(row.price) === 0
+        || /trial|تجريب|مجان|free/i.test(String(row.pkg || '') + ' ' + String(row.packageId || ''));
+      if (zero && row.accountId && repos.trialClaims) {
+        await repos.trialClaims.remove(String(row.accountId));
+        const cat = row.category && row.category !== 'package'
+          ? (String(row.accountId) + '::' + row.category)
+          : null;
+        if (cat) await repos.trialClaims.remove(cat);
+      }
+    } catch (eTrialClear) { /* best-effort */ }
     return res.json({ ok: true, request: list[idx] });
   }
 

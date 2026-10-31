@@ -5,7 +5,7 @@ Branch: `fix-packages-2`
 | البند | الملفات | الاختبار | النتيجة |
 |------|---------|----------|---------|
 | B6 نفس/باقة مختلفة | `services/subRequestActivation.js` (`computeActivationPeriod`), `rizq_package_lifecycle_agent.js` (`packageHistory`) | `npm run test:packages-core` | pass |
-| B8 حصة ذرّية + شحن لا يُصفَّر | `rizq_quota_guard_agent.js` | `test:packages-core` (20 متزامن = +20) | pass |
+| B8 حصة ذرّية + شحن لا يُصفَّر | `rizq_quota_guard_agent.js`, `db/quotaStore.js` (صف لكل مشترك + رصيد `paidMessages` منفصل) | `test:quota-concurrency` + `test:packages-core` | pass |
 | B3 حفظ سجل بسجل | `rizq_package_lifecycle_agent.js` (`_save` / `_saveOne`) | `test:packages-core` | pass |
 | TRIAL مرة واحدة/حساب+فئة | `server.js` POST `/api/sub-requests`, lifecycle `syncAccountPackage` | `test:packages-core` | pass |
 | B14 افتراضيات st/of/cp/tnd/inv/vid | `services/catalogConfig.js` | `npm run test:packages-b14` | pass |
