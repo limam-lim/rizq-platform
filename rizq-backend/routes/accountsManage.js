@@ -245,15 +245,34 @@ function mountAccountsManageRoutes(app, deps) {
         phoneMatchKey(phoneResolved.phoneIntl),
         phoneMatchKey(phoneResolved.whatsapp),
       ].filter(Boolean);
-      const conflict = list.find((other) => {
-        if (!other || other.id === acc.id) return false;
-        const otherKeys = [
-          phoneMatchKey(other.phone),
-          phoneMatchKey(other.phoneIntl),
-          phoneMatchKey(other.whatsapp),
-        ].filter(Boolean);
-        return nextKeys.some((k) => otherKeys.indexOf(k) !== -1);
-      });
+      /* نفس المالك: بريد مطبّع أو NNI متطابق — يُسمح بمشاركة الرقم بين حساباته */
+      const sameOwner = (other) => {
+        if (!other) return false;
+        const emA = String(acc.email || '').trim().toLowerCase();
+        const emB = String(other.email || '').trim().toLowerCase();
+        if (emA && emB && emA === emB) return true;
+        const nniA = String(acc.nni || '').replace(/\D/g, '');
+        const nniB = String(other.nni || '').replace(/\D/g, '');
+        if (nniA && nniB && nniA === nniB) return true;
+        return false;
+      };
+      let phoneHits = [];
+      try {
+        const { findAccountsByPhoneKeys } = require('../db/platformStore');
+        phoneHits = await findAccountsByPhoneKeys(nextKeys, acc.id);
+      } catch (ePhoneSql) {
+        /* احتياط: مسح القائمة المحمّلة إن فشل الاستعلام */
+        phoneHits = list.filter((other) => {
+          if (!other || other.id === acc.id) return false;
+          const otherKeys = [
+            phoneMatchKey(other.phone),
+            phoneMatchKey(other.phoneIntl),
+            phoneMatchKey(other.whatsapp),
+          ].filter(Boolean);
+          return nextKeys.some((k) => otherKeys.indexOf(k) !== -1);
+        });
+      }
+      const conflict = phoneHits.find((other) => other && other.id !== acc.id && !sameOwner(other));
       if (conflict) {
         return res.status(409).json({
           ok: false,

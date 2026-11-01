@@ -4,8 +4,9 @@
 **الأساس:** `main` @ `0b94daa` (بعد دمج PR #262 / `fix-agents-1`)  
 **المرجع:** `qa/agents/AUDIT-WIDGET-SUBSCRIBER.md`  
 **التاريخ:** 2026-11-01 (Europe/Madrid)  
-**النطاق:** منطق + أمان فقط — بلا تصميم. UTF-8 / LF. **لا PR ولا دمج.**  
-**قاعدة الاختبار:** `rizq_test`
+**النطاق:** منطق + أمان فقط — بلا تصميم. UTF-8 / LF.  
+**قاعدة الاختبار:** `rizq_test`  
+**الدمج:** عبر PR إلى `main` بعد نجاح الاختبارات.
 
 ---
 
@@ -23,10 +24,10 @@
 ### B-H1 — اختطاف رقم المشترك
 
 **الهجوم:** يغيّر المهاجم هاتف حسابه إلى رقم الضحية عبر `PATCH /api/accounts/mine`؛ `upsertSubscriberProfileFromAccount` يطابق باللاحقة ويعيد كتابة `accountId`/`businessName` في ملف الوكيل → مكالمات/واتساب الضحية تخدم المهاجم.  
-**الإصلاح:** فرادة رقم بين الحسابات (409 `phone_in_use`)؛ upsert يرفض إن وُجد `accountId` لغير المالك؛ ربط جديد بمعرّف الحساب لا بلاحقة هاتف غريبة؛ لا مزامنة وكيل بلا `isDiamondActive`؛ `askSubscriberAgent` fail-closed بلا `accountId` أو عند فشل التحقق.  
-**اختبار يثبت الفشل:** `test-fix-agents-2.js` — stub ماسية للمهاجم + نفس رقم الضحية → `phone_in_use`؛ ملف الضحية دون تغيير `accountId`/`businessName`.
+**الإصلاح:** فرادة رقم بين الحسابات (409 `phone_in_use`)؛ يُسمح بنفس الرقم إذا كان الحساب الآخر لنفس المالك (بريد مطبّع أو NNI متطابق) ويُرفض لشخص آخر؛ البحث عبر `findAccountsByPhoneKeys` (SQL على `data` jsonb) بدل تحميل كل الحسابات؛ upsert يرفض إن وُجد `accountId` لغير المالك؛ ربط جديد بمعرّف الحساب لا بلاحقة هاتف غريبة؛ لا مزامنة وكيل بلا `isDiamondActive`؛ `askSubscriberAgent` fail-closed بلا `accountId` أو عند فشل التحقق.  
+**اختبار:** `test-fix-agents-2.js` — stub ماسية للمهاجم → `phone_in_use`؛ PATCH نفس المالك → 200؛ مالك مختلف → 409.
 
-**الملفات:** `rizq_subscriber_agent.js`، `rizq-backend/routes/accountsManage.js`
+**الملفات:** `rizq_subscriber_agent.js`، `rizq-backend/routes/accountsManage.js`، `rizq-backend/db/platformStore.js`
 
 ---
 

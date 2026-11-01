@@ -165,6 +165,91 @@ async function main() {
   const amSrc = fs.readFileSync(path.join(BACKEND, 'routes/accountsManage.js'), 'utf8');
   ok(/phone_in_use/.test(amSrc), 'B-H1 accountsManage uniqueness check');
   ok(/allowPhoneRebind:\s*false/.test(amSrc), 'B-H1 no phone rebind on PATCH mine');
+  ok(/findAccountsByPhoneKeys|sameOwner/.test(amSrc), 'B-H1 SQL phone lookup + same-owner allow');
+
+  // ── PATCH /api/accounts/mine: نفس المالك مسموح، مالك مختلف → 409 ──
+  const crypto = require('crypto');
+  const bcrypt = require('bcryptjs');
+  const repos = require('../db/repos');
+  const sql = require('../db/sql');
+  const { spawnHttpTestServer } = require('./_spawnHttpTestServer');
+  const stamp = Date.now();
+  const sharedPhone = '45' + String(stamp).slice(-6);
+  const otherPhone = '36' + String(stamp).slice(-6);
+  const ownerEmail = 'owner.phone.' + stamp + '@test.mr';
+  const ownerNni = '1' + String(stamp).slice(-9);
+  /* فهرس الفرادة يمنع بذر حسابين بنفس البريد/NNI — أسقطه مؤقتاً لهذا السيناريو فقط */
+  await sql.execute('DROP INDEX IF EXISTS uq_accounts_email_lower');
+  await sql.execute('DROP INDEX IF EXISTS uq_accounts_nni');
+  const tokA = crypto.randomBytes(24).toString('hex');
+  const tokB = crypto.randomBytes(24).toString('hex');
+  const tokForeign = crypto.randomBytes(24).toString('hex');
+  const accA = 'ACC_PHONE_OWN_A_' + stamp;
+  const accB = 'ACC_PHONE_OWN_B_' + stamp;
+  const accForeign = 'ACC_PHONE_FOR_' + stamp;
+  const passHash = await bcrypt.hash('PhoneTest!' + stamp, 8);
+  const baseAcc = {
+    type: 'store',
+    status: 'approved',
+    suspended: false,
+    passHash,
+    city: 'نواكشوط',
+    createdAt: new Date().toISOString(),
+    approvedAt: new Date().toISOString(),
+    accessTokenExpiresAt: new Date(Date.now() + 864e5).toISOString(),
+  };
+  await repos.accounts.upsert(Object.assign({}, baseAcc, {
+    id: accA, name: 'محل أ', email: ownerEmail, nni: ownerNni,
+    phone: otherPhone, phoneIntl: '+222' + otherPhone, whatsapp: '+222' + otherPhone,
+    accessToken: tokA,
+  }));
+  await repos.accounts.upsert(Object.assign({}, baseAcc, {
+    id: accB, name: 'محل ب', email: ownerEmail, nni: ownerNni,
+    phone: sharedPhone, phoneIntl: '+222' + sharedPhone, whatsapp: '+222' + sharedPhone,
+    accessToken: tokB,
+  }));
+  const foreignPhone = '44' + String(stamp).slice(-6);
+  await repos.accounts.upsert(Object.assign({}, baseAcc, {
+    id: accForeign, name: 'محل أجنبي',
+    email: 'foreign.phone.' + stamp + '@test.mr',
+    nni: '8' + String(stamp).slice(-9),
+    phone: foreignPhone, phoneIntl: '+222' + foreignPhone, whatsapp: '+222' + foreignPhone,
+    accessToken: tokForeign,
+  }));
+
+  const srv = await spawnHttpTestServer({});
+  try {
+    const patch = async (id, token, body) => {
+      const r = await fetch(srv.base + '/api/accounts/mine/' + id, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json', 'x-account-token': token },
+        body: JSON.stringify(body),
+      });
+      const json = await r.json().catch(() => null);
+      return { status: r.status, json };
+    };
+    // نفس المالك (بريد/NNI): حساب A يأخذ رقم حساب B → مسموح
+    const same = await patch(accA, tokA, {
+      phone: sharedPhone,
+      phoneIntl: '+222' + sharedPhone,
+      whatsapp: '+222' + sharedPhone,
+    });
+    ok(same.status === 200 && same.json && (same.json.ok === true || same.json.account),
+      'B-H1 same owner phone reuse allowed — status=' + same.status
+      + ' code=' + (same.json && same.json.code));
+
+    // مالك مختلف: حساب A يحاول رقم حساب أجنبي → 409
+    const other = await patch(accA, tokA, {
+      phone: foreignPhone,
+      phoneIntl: '+222' + foreignPhone,
+      whatsapp: '+222' + foreignPhone,
+    });
+    ok(other.status === 409 && other.json && other.json.code === 'phone_in_use',
+      'B-H1 different owner → 409 phone_in_use — status=' + other.status
+      + ' code=' + (other.json && other.json.code));
+  } finally {
+    await srv.stop();
+  }
 
   // ── تأكيد A-H1/A-H3 ما زالت مغلقة من 517bdd0 ──
   ok(/body\.profile = null/.test(serverSrc), 'A-H1 public path nulls profile');
