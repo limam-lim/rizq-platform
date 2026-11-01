@@ -1,0 +1,64 @@
+# رزق — Caddy أمام Node على Hetzner (خلف Cloudflare)
+# القائمة البيضاء للملفات العامة + تمرير /api و /uploads
+
+{
+	email {$CADDY_ACME_EMAIL:ops@rizq.mr}
+}
+
+(security_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "geolocation=(), microphone=(), camera=()"
+		-Server
+	}
+}
+
+(block_sensitive) {
+	@blocked {
+		path /.env /.env.* /.git* /node_modules* /rizq-backend/data* /rizq-backend/.env*
+		path /backups* /deploy* /scripts/* /qa/* /docs/* /migrations*
+		path *.pem *.key *.sql *.sql.gz *.enc
+	}
+	respond @blocked 404
+}
+
+rizq.mr, www.rizq.mr {
+	import security_headers
+	import block_sensitive
+
+	encode gzip zstd
+	root * /opt/rizq
+
+	# API + uploads → Node
+	handle /api/* {
+		reverse_proxy 127.0.0.1:3000
+	}
+	handle /uploads/* {
+		reverse_proxy 127.0.0.1:3000
+	}
+	handle /health {
+		reverse_proxy 127.0.0.1:3000
+	}
+
+	# ملفات عامة فقط (HTML/JS/CSS/صور الواجهة)
+	@publicFiles {
+		path *.html *.js *.css *.webp *.png *.jpg *.jpeg *.svg *.ico *.woff2 *.woff *.map *.txt *.xml
+		path /rizq_* /favicon.ico /robots.txt /sitemap.xml
+	}
+	handle @publicFiles {
+		file_server
+	}
+
+	# الصفحة الافتراضية
+	handle {
+		rewrite * /rizq_landing_v8.html
+		file_server
+	}
+
+	log {
+		output file /var/log/caddy/rizq.log
+	}
+}

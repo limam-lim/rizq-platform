@@ -1,0 +1,32 @@
+[Unit]
+Description=Rizq Node API
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=rizq
+Group=rizq
+WorkingDirectory=/opt/rizq/rizq-backend
+EnvironmentFile=-/opt/rizq/rizq-backend/.env
+Environment=NODE_ENV=production
+Environment=DEV_JSON_DUMPS=0
+ExecStart=/usr/bin/node server.js
+Restart=always
+RestartSec=3
+# حدود موارد (خادم ~8GB / 4 أنوية)
+MemoryMax=2G
+MemoryHigh=1536M
+CPUQuota=200%
+LimitNOFILE=65535
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/rizq/rizq-backend/data /opt/rizq/rizq-backend/uploads /opt/rizq/backups /tmp
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target
