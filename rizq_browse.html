@@ -2633,10 +2633,39 @@ function applyFilters(opts){
     page=1;
     visibleCount=PER_PAGE;
   }
-  renderResultList();
+  var skipFullRender = false;
+  if(soft && bodyEl){
+    /* لا تعِد innerHTML إن كانت البطاقات الظاهرة نفسها — إعادة الرسم كانت تقفز للأعلى */
+    var want = filtered.slice(0, visibleCount);
+    var nodes = bodyEl.querySelectorAll('.rc[data-ad-id]');
+    if(nodes.length === want.length && want.length > 0){
+      skipFullRender = true;
+      for(var si = 0; si < want.length; si++){
+        if(String(nodes[si].getAttribute('data-ad-id') || '') !== String(want[si].id)){
+          skipFullRender = false;
+          break;
+        }
+      }
+    }
+  }
+  if(skipFullRender){
+    try{ _updateInfiniteStatus(_rizqLang()==='fr'); }catch(eSt){}
+    _bindInfiniteScroll();
+  } else {
+    renderResultList();
+  }
   if(soft){
-    if(bodyEl) bodyEl.scrollTop = prevScroll;
-    try{ window.scrollTo(0, prevWin); }catch(eScr){}
+    var restoreScroll = function(){
+      if(bodyEl) bodyEl.scrollTop = prevScroll;
+      try{ window.scrollTo(0, prevWin); }catch(eScr){}
+    };
+    restoreScroll();
+    try{
+      requestAnimationFrame(function(){
+        restoreScroll();
+        requestAnimationFrame(restoreScroll);
+      });
+    }catch(eRaf){}
   }
   if(!(opts && opts.skipUrl)){
     try{ _syncBrowseFiltersToUrl({selWilaya,pMin,pMax,selCond,sinceDays,onlyVerified,onlyPinned,sortBy,navCat,selCat}); }catch(eUrl){}

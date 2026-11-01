@@ -65,36 +65,75 @@ async function resetAndMigrate(testUrl) {
   ], { cwd: BACKEND, env: Object.assign({}, process.env, { DATABASE_URL: testUrl }), encoding: 'utf8' });
   if (mig.status !== 0) throw new Error('migrate failed');
 }
-async function seedAds(testUrl, n) {
-  process.env.DATABASE_URL = testUrl;
-  process.env.DB_DRIVER = 'postgres';
-  Object.keys(require.cache).forEach((k) => {
-    if (k.includes('/rizq-backend/db') || k.includes('/rizq-backend/config')) delete require.cache[k];
+function assertTestDb(url) {
+  const name = new URL(url).pathname.replace(/^\//, '').split('/')[0];
+  if (name !== 'rizq_test') {
+    throw new Error('REFUSE: seed/test must use rizq_test, got ' + name);
+  }
+}
+
+function snapshotSharedJson() {
+  const files = ['ads.json', 'accounts.json'];
+  const out = {};
+  files.forEach((name) => {
+    const p = path.join(BACKEND, 'data', name);
+    out[name] = fs.existsSync(p) ? fs.readFileSync(p) : null;
   });
-  const platformStore = require(path.join(BACKEND, 'db/platformStore'));
-  const repos = require(path.join(BACKEND, 'db/repos'));
-  await repos.accounts.upsert({
+  return out;
+}
+
+function restoreSharedJson(snap) {
+  Object.keys(snap || {}).forEach((name) => {
+    const p = path.join(BACKEND, 'data', name);
+    if (snap[name] == null) {
+      try { fs.unlinkSync(p); } catch (e) { /* ignore */ }
+      return;
+    }
+    fs.mkdirSync(path.dirname(p), { recursive: true });
+    fs.writeFileSync(p, snap[name]);
+  });
+}
+
+/** زرع مباشر في rizq_test عبر SQL — بدون platformStore.writeAds حتى لا يلوّث data/ads.json → rizq_audit */
+async function seedAds(testUrl, n) {
+  assertTestDb(testUrl);
+  const c = new Client({ connectionString: testUrl });
+  await c.connect();
+  const now = Date.now();
+  const account = {
     id: 'ACC_BRW_SEED', type: 'individual', name: 'Browse Seed',
     email: 'brw_seed@test.mr', phone: '44119988', status: 'approved', suspended: false,
     createdAt: new Date().toISOString(),
-  });
-  const now = Date.now();
-  const ads = [];
+  };
+  await c.query(
+    `INSERT INTO accounts (id, type, email, status, nni, suspended, data, updated_at)
+     VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8)
+     ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, status = EXCLUDED.status, updated_at = EXCLUDED.updated_at`,
+    [account.id, account.type, account.email, account.status, '', 0, JSON.stringify(account), account.createdAt]
+  );
   for (let i = 1; i <= n; i++) {
-    ads.push({
+    const ad = {
       id: 'BRW_' + String(i).padStart(4, '0'),
       accountId: 'ACC_BRW_SEED',
       title: 'إعلان تصفح ' + i + ' — نواكشوط',
       desc: 'وصف ' + i,
       category: 'إلكترونيات',
+      cat: 'إلكترونيات',
       wilaya: 'نواكشوط',
       price: String(1500 * i),
+      priceNum: 1500 * i,
       status: 'active',
       images: [],
       createdAt: new Date(now - i * 60000).toISOString(),
-    });
+    };
+    await c.query(
+      `INSERT INTO ads (id, account_id, status, category, data, updated_at)
+       VALUES ($1,$2,$3,$4,$5::jsonb,$6)
+       ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, status = EXCLUDED.status, updated_at = EXCLUDED.updated_at`,
+      [ad.id, ad.accountId, ad.status, ad.category, JSON.stringify(ad), ad.createdAt]
+    );
   }
-  await platformStore.writeAds(ads);
+  await c.end();
 }
 
 async function measureCls(page) {
@@ -176,8 +215,24 @@ async function scrollStress(page, label) {
       });
       if (atEnd && step > 2) break;
     }
-    // pause between passes at bottom
-    await page.waitForTimeout(300);
+    // pause between passes at bottom — وحاكِ دمج الخادم/rizq:launch (soft) أثناء البقاء في الأسفل
+    await page.evaluate(() => {
+      if (typeof applyFilters === 'function') {
+        try { applyFilters({ soft: true, skipUrl: true }); } catch (e) {}
+      }
+    });
+    await page.waitForTimeout(350);
+    const yAfterSoft = await page.evaluate(() => {
+      const body = document.getElementById('result-list-body');
+      const win = window.scrollY || window.pageYOffset || 0;
+      const useWin = !body || body.scrollHeight <= body.clientHeight + 4;
+      return useWin ? win : body.scrollTop;
+    });
+    samples.push({ pass, step: 'afterSoft', y: yAfterSoft });
+    if (lastY > 200 && yAfterSoft < lastY - 180 && yAfterSoft < 80) {
+      suddenDrop = true;
+    }
+    lastY = yAfterSoft;
   }
 
   const meta = await page.evaluate(() => {
@@ -197,6 +252,8 @@ async function scrollStress(page, label) {
 async function main() {
   loadEnv();
   const testUrl = withDb(process.env.DATABASE_URL, 'rizq_test');
+  assertTestDb(testUrl);
+  const sharedSnap = snapshotSharedJson();
   {
     const admin = new Client({ connectionString: withDb(process.env.DATABASE_URL, 'postgres') });
     await admin.connect();
@@ -216,6 +273,7 @@ async function main() {
   async function withServer(adCount, fn) {
     await resetAndMigrate(testUrl);
     await seedAds(testUrl, adCount);
+    restoreSharedJson(sharedSnap); // لا تترك data/*.json ملوّثة بعد الزرع
     const child = spawn(process.execPath, ['server.js'], {
       cwd: BACKEND,
       env: Object.assign({}, process.env, {
@@ -236,68 +294,84 @@ async function main() {
     } finally {
       try { child.kill('SIGTERM'); } catch (e) {}
       await new Promise((r) => setTimeout(r, 400));
+      restoreSharedJson(sharedSnap);
     }
   }
 
-  const browser = await chromium.launch({ headless: true });
+  try {
+    const browser = await chromium.launch({ headless: true });
 
-  for (const n of [6, 100]) {
-    await withServer(n, async () => {
-      for (const width of [1440, 375]) {
-        const context = await browser.newContext({
-          viewport: { width, height: width <= 400 ? 812 : 900 },
-          locale: 'ar',
-        });
+    for (const n of [6, 100]) {
+      await withServer(n, async () => {
+        for (const width of [1440, 375]) {
+          const context = await browser.newContext({
+            viewport: { width, height: width <= 400 ? 812 : 900 },
+            locale: 'ar',
+          });
+          const page = await context.newPage();
+          const errs = [];
+          page.on('pageerror', (e) => errs.push(String(e.message || e)));
+          await page.goto('http://127.0.0.1:' + PORT + '/rizq_browse.html', { waitUntil: 'domcontentloaded', timeout: 60000 });
+          const result = await scrollStress(page, 'ads' + n + '-w' + width);
+          result.consoleErrs = errs.length;
+          report.scroll.push(result);
+          console.log(JSON.stringify(result));
+          await context.close();
+        }
+      });
+    }
+
+    // CLS: landing + browse (reload)
+    await withServer(30, async () => {
+      for (const [name, url] of [
+        ['landing', '/rizq_landing_v8.html'],
+        ['browse', '/rizq_browse.html'],
+      ]) {
+        const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: 'ar' });
         const page = await context.newPage();
-        const errs = [];
-        page.on('pageerror', (e) => errs.push(String(e.message || e)));
-        await page.goto('http://127.0.0.1:' + PORT + '/rizq_browse.html', { waitUntil: 'domcontentloaded', timeout: 60000 });
-        const result = await scrollStress(page, 'ads' + n + '-w' + width);
-        result.consoleErrs = errs.length;
-        report.scroll.push(result);
-        console.log(JSON.stringify(result));
+        await page.addInitScript(() => {
+          try { localStorage.removeItem('rizq_launch_cache_v1'); } catch (e) {}
+        });
+        await page.goto('http://127.0.0.1:' + PORT + url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+        const cls1 = await measureCls(page);
+        await page.reload({ waitUntil: 'domcontentloaded' });
+        const cls2 = await measureCls(page);
+        const yAfter = await page.evaluate(() => window.scrollY || 0);
+        report.cls[name] = { firstLoad: cls1, afterReload: cls2, scrollYAfterReload: yAfter };
+        console.log('CLS', name, report.cls[name]);
         await context.close();
       }
     });
-  }
 
-  // CLS: landing + browse (reload)
-  await withServer(30, async () => {
-    for (const [name, url] of [
-      ['landing', '/rizq_landing_v8.html'],
-      ['browse', '/rizq_browse.html'],
-    ]) {
-      const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, locale: 'ar' });
-      const page = await context.newPage();
-      await page.addInitScript(() => {
-        try { localStorage.removeItem('rizq_launch_cache_v1'); } catch (e) {}
-      });
-      await page.goto('http://127.0.0.1:' + PORT + url, { waitUntil: 'domcontentloaded', timeout: 60000 });
-      const cls1 = await measureCls(page);
-      await page.reload({ waitUntil: 'domcontentloaded' });
-      const cls2 = await measureCls(page);
-      const yAfter = await page.evaluate(() => window.scrollY || 0);
-      report.cls[name] = { firstLoad: cls1, afterReload: cls2, scrollYAfterReload: yAfter };
-      console.log('CLS', name, report.cls[name]);
-      await context.close();
+    await browser.close();
+  } finally {
+    restoreSharedJson(sharedSnap);
+    try {
+      const c = new Client({ connectionString: testUrl });
+      await c.connect();
+      await c.query('DROP SCHEMA IF EXISTS public CASCADE');
+      await c.query('CREATE SCHEMA public');
+      await c.end();
+    } catch (e) {}
+    // تأكيد عدم تلويث rizq_audit
+    try {
+      const auditUrl = withDb(process.env.DATABASE_URL, 'rizq_audit');
+      const ac = new Client({ connectionString: auditUrl });
+      await ac.connect();
+      const brw = await ac.query("SELECT count(*)::int AS n FROM ads WHERE id LIKE 'BRW_%'");
+      await ac.end();
+      report.auditBrwAfter = brw.rows[0].n;
+      if (brw.rows[0].n > 0) throw new Error('POLLUTED rizq_audit with BRW_ ads: ' + brw.rows[0].n);
+    } catch (e) {
+      if (String(e.message || e).includes('POLLUTED')) throw e;
     }
-  });
-
-  await browser.close();
-  // cleanup
-  try {
-    const c = new Client({ connectionString: testUrl });
-    await c.connect();
-    await c.query('DROP SCHEMA IF EXISTS public CASCADE');
-    await c.query('CREATE SCHEMA public');
-    await c.end();
-  } catch (e) {}
+  }
 
   const scrollFail = report.scroll.filter((r) => r.suddenDrop);
   const clsFail = Object.values(report.cls).some((c) => c.afterReload >= 0.1);
   report.ok = scrollFail.length === 0 && !clsFail;
   fs.writeFileSync(path.join(OUT, 'scroll-cls-report.json'), JSON.stringify(report, null, 2));
-  console.log('\nREPORT ok=', report.ok, 'scrollFails=', scrollFail.length);
+  console.log('\nREPORT ok=', report.ok, 'scrollFails=', scrollFail.length, 'auditBrw=', report.auditBrwAfter);
   process.exit(report.ok ? 0 : 1);
 }
 
