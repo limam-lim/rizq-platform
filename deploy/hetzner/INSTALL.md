@@ -103,38 +103,42 @@ TARGET_DATABASE_URL=postgres://rizq:…@127.0.0.1:5432/rizq_test_restore \
 الفعل الوحيد المسموح: إيقاظ مهمة مجدولة عبر قائمة بيضاء.
 
 ```bash
-# 1) كلمة سر دور Postgres (أضفها قبل الترحيل)
-# في rizq-backend/.env:
+# 1) أسرار الحارس في rizq-backend/.env (SENTINEL_WAKE_SECRET إلزامي — بلا fallback)
 # SENTINEL_DB_PASSWORD=…قوية…
-# SENTINEL_WAKE_SECRET=…(أو نفس BACKEND_SHARED_SECRET)…
+# SENTINEL_WAKE_SECRET=…عشوائي طويل مستقل…
 # SENTINEL_TELEGRAM_CHAT_ID=…معرف محادثة المالك…
 # SENTINEL_DAILY_TOKEN_BUDGET=50000
 # SENTINEL_DOMAIN_EXPIRY=2027-01-01   # اختياري
 # SENTINEL_LISTEN_PORT=3017
 
-# أنشئ الدور كـ postgres (مطلوب CREATEROLE)، ثم حدّث كلمة السر:
-sudo -u postgres psql -d rizq -c "CREATE ROLE rizq_sentinel LOGIN PASSWORD '…' NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT;"
-# أو حرّر CHANGE_ME في deploy/hetzner/sentinel-role.sql ثم:
-# sudo -u postgres psql -d rizq -f /opt/rizq/deploy/hetzner/sentinel-role.sql
-
+# 2) ترحيل الجداول والـ views (قبل أو بعد إنشاء الدور)
 cd /opt/rizq/rizq-backend
-sudo -u rizq npm run migrate   # جداول sentinel_* + GRANT للدور إن وُجد
+sudo -u rizq npm run migrate
 
-# 2) تبعيات خدمة الحارس
+# 3) إنشاء دور Postgres — كلمة السر عبر -v فقط (لا قيمة افتراضية في الملف)
+sudo -u postgres psql -d rizq \
+  -v sentinel_password='YOUR_STRONG_PASSWORD' \
+  -f /opt/rizq/deploy/hetzner/sentinel-role.sql
+# يرفض السكربت كلمة سر فارغة أو CHANGE_ME*
+
+# 4) تبعيات خدمة الحارس
 cd /opt/rizq/services/sentinel
 sudo -u rizq npm ci --omit=dev
 # اختياري للرحلات: sudo -u rizq npx playwright install chromium
 
-# 3) حساب منصة موسوم للحارس (رحلات الدخول) — يُستثنى من الإحصاءات والقوائم
-# أنشئ حساباً ببريد sentinel@… وضع isSentinel:true في data عبر SQL أو لوحة داخلية
+# 5) حساب منصة موسوم للحارس (رحلات الدخول) — يُستثنى من الإحصاءات والقوائم
+# أنشئ حساباً ببريد sentinel@… وضع isSentinel:true في data
 
-# 4) systemd مستقل عن rizq.service
+# 6) systemd مستقل عن rizq.service
 sudo cp /opt/rizq/deploy/hetzner/rizq-sentinel.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable --now rizq-sentinel
 curl -fsS http://127.0.0.1:3017/health
 
-# 5) لوحة الأدمن → تبويب «الحارس» (سوبر فقط): الحالة، آخر 50 حدثاً، التقارير، الاقتراحات
+# 7) أعد تحميل Caddy بعد تحديث Caddyfile (يحظر /api/internal/sentinel/wake من الخارج بـ 404)
+sudo systemctl reload caddy
+
+# 8) لوحة الأدمن → تبويب «الحارس» (سوبر فقط)
 ```
 
 التقارير اليومية/الأسبوعية: 08:30 بتوقيت `Europe/Madrid` عبر تيليغرام إلى `SENTINEL_TELEGRAM_CHAT_ID` فقط.
@@ -144,4 +148,5 @@ curl -fsS http://127.0.0.1:3017/health
 - `DEV_JSON_DUMPS=0` في الإنتاج
 - لا تفتح Postgres على الإنترنت
 - قيّد منفذ 22 بـ IP إداري عند الإمكان بعد استقرار الوصول
-- دور `rizq_sentinel`: SELECT فقط على جداول المنصة؛ INSERT/UPDATE على `sentinel_*` فقط
+- دور `rizq_sentinel`: SELECT على `sentinel_v_*` فقط (بلا `data`/hash/هاتف)؛ INSERT/UPDATE على `sentinel_*`
+- `/api/internal/sentinel/wake`: localhost فقط + `SENTINEL_WAKE_SECRET`؛ محظور في Caddy للطلبات الخارجية

@@ -1,14 +1,9 @@
 /**
- * الحارس (Sentinel) — جداول خاصة + منح صلاحيات لدور rizq_sentinel إن وُجد.
- * إنشاء الدور نفسه يتطلب CREATEROLE (غالباً عبر postgres في INSTALL).
- * كلمة السر من SENTINEL_DB_PASSWORD عند توفّر صلاحية الإنشاء.
- * آمن للإعادة: IF NOT EXISTS / EXCEPTION handlers.
+ * الحارس (Sentinel) — جداول خاصة + views بأقل صلاحية.
+ * لا يُمنح SELECT على accounts / documents / buyers (ولا جداول المنصة الخام).
+ * إنشاء الدور عبر deploy/hetzner/sentinel-role.sql (postgres + -v sentinel_password).
  */
 'use strict';
-
-function escapeLiteral(value) {
-  return String(value).replace(/'/g, "''");
-}
 
 /** @type {import('node-pg-migrate').MigrationBuilder} */
 exports.up = (pgm) => {
@@ -52,28 +47,63 @@ exports.up = (pgm) => {
     CREATE INDEX IF NOT EXISTS idx_sentinel_suggestions_status ON sentinel_suggestions (status, created_at DESC);
   `);
 
-  const pass = String(process.env.SENTINEL_DB_PASSWORD || process.env.RIZQ_SENTINEL_PASSWORD || '').trim();
-  const lit = escapeLiteral(pass || 'sentinel_change_me');
-
-  // محاولة إنشاء/تحديث الدور — تُتخطّى بهدوء إن لم تتوفر CREATEROLE
+  // Views — بلا data / hash / tokens / هاتف / بريد / هوية
   pgm.sql(`
-    DO $sentinel$
-    BEGIN
-      IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'rizq_sentinel') THEN
-        BEGIN
-          CREATE ROLE rizq_sentinel LOGIN PASSWORD '${lit}' NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT;
-        EXCEPTION WHEN insufficient_privilege THEN
-          RAISE NOTICE 'rizq_sentinel: CREATE ROLE skipped (need CREATEROLE) — run deploy/hetzner/sentinel-role.sql as postgres';
-        END;
-      ELSIF '${lit}' <> 'sentinel_change_me' THEN
-        BEGIN
-          ALTER ROLE rizq_sentinel WITH LOGIN PASSWORD '${lit}' NOSUPERUSER NOCREATEDB NOCREATEROLE;
-        EXCEPTION WHEN insufficient_privilege THEN
-          RAISE NOTICE 'rizq_sentinel: ALTER PASSWORD skipped (insufficient privilege)';
-        END;
-      END IF;
-    END
-    $sentinel$;
+    CREATE OR REPLACE VIEW sentinel_v_accounts AS
+    SELECT
+      id,
+      type,
+      status,
+      suspended,
+      COALESCE(NULLIF(data->>'createdAt',''), updated_at) AS created_at,
+      updated_at
+    FROM accounts
+    WHERE COALESCE(data->>'isSentinel','') IS DISTINCT FROM 'true';
+
+    CREATE OR REPLACE VIEW sentinel_v_ads AS
+    SELECT
+      id,
+      category AS type,
+      status,
+      0::integer AS suspended,
+      COALESCE(NULLIF(data->>'createdAt',''), updated_at) AS created_at,
+      updated_at
+    FROM ads;
+
+    CREATE OR REPLACE VIEW sentinel_v_catalog AS
+    SELECT
+      id,
+      ''::text AS type,
+      status,
+      0::integer AS suspended,
+      COALESCE(NULLIF(data->>'createdAt',''), updated_at) AS created_at,
+      updated_at
+    FROM catalog_items;
+
+    CREATE OR REPLACE VIEW sentinel_v_tenders AS
+    SELECT
+      id,
+      ''::text AS type,
+      status,
+      0::integer AS suspended,
+      COALESCE(NULLIF(data->>'createdAt',''), updated_at) AS created_at,
+      updated_at
+    FROM tenders;
+
+    CREATE OR REPLACE VIEW sentinel_v_requests AS
+    SELECT
+      id,
+      collection,
+      COALESCE(data->>'status', '') AS status,
+      COALESCE(NULLIF(data->>'createdAt',''), updated_at) AS created_at,
+      updated_at,
+      COALESCE(
+        NULLIF(data->>'finishedAt',''),
+        NULLIF(data->>'at',''),
+        NULLIF(data->>'statusAt',''),
+        updated_at
+      ) AS status_at
+    FROM documents;
   `);
 
   pgm.sql(`
@@ -88,10 +118,23 @@ exports.up = (pgm) => {
           RAISE NOTICE 'CONNECT grant skipped: %', SQLERRM;
         END;
         GRANT USAGE ON SCHEMA public TO rizq_sentinel;
-        GRANT SELECT ON TABLE accounts, ads, catalog_items, tenders, documents, buyers, wishlist_items TO rizq_sentinel;
-        GRANT SELECT, INSERT, UPDATE ON TABLE sentinel_events, sentinel_reports, sentinel_suggestions TO rizq_sentinel;
+
+        -- إلغاء أي منح سابق على الجداول الخام
+        REVOKE ALL ON TABLE accounts, ads, catalog_items, tenders, documents, buyers, wishlist_items FROM rizq_sentinel;
+
+        GRANT SELECT ON
+          sentinel_v_accounts,
+          sentinel_v_ads,
+          sentinel_v_catalog,
+          sentinel_v_tenders,
+          sentinel_v_requests
+        TO rizq_sentinel;
+
+        GRANT SELECT, INSERT, UPDATE ON TABLE
+          sentinel_events, sentinel_reports, sentinel_suggestions
+        TO rizq_sentinel;
       ELSE
-        RAISE NOTICE 'rizq_sentinel role missing — tables created; grant after creating the role';
+        RAISE NOTICE 'rizq_sentinel role missing — tables/views created; run deploy/hetzner/sentinel-role.sql';
       END IF;
     END
     $g$;
@@ -105,10 +148,18 @@ exports.down = (pgm) => {
     BEGIN
       IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'rizq_sentinel') THEN
         REVOKE ALL ON TABLE sentinel_events, sentinel_reports, sentinel_suggestions FROM rizq_sentinel;
-        REVOKE ALL ON TABLE accounts, ads, catalog_items, tenders, documents, buyers, wishlist_items FROM rizq_sentinel;
+        REVOKE ALL ON
+          sentinel_v_accounts, sentinel_v_ads, sentinel_v_catalog,
+          sentinel_v_tenders, sentinel_v_requests
+        FROM rizq_sentinel;
       END IF;
     END
     $d$;
+    DROP VIEW IF EXISTS sentinel_v_requests;
+    DROP VIEW IF EXISTS sentinel_v_tenders;
+    DROP VIEW IF EXISTS sentinel_v_catalog;
+    DROP VIEW IF EXISTS sentinel_v_ads;
+    DROP VIEW IF EXISTS sentinel_v_accounts;
     DROP TABLE IF EXISTS sentinel_suggestions;
     DROP TABLE IF EXISTS sentinel_reports;
     DROP TABLE IF EXISTS sentinel_events;

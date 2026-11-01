@@ -1,5 +1,5 @@
 /**
- * تجميع النشاط — كل 15 دقيقة (قراءة فقط).
+ * تجميع النشاط — كل 15 دقيقة (قراءة فقط عبر views الحارس).
  */
 'use strict';
 
@@ -8,31 +8,28 @@ const db = require('./db');
 const store = require('./store');
 const { cfg } = require('./config');
 
-const SENTINEL_SQL = `(COALESCE(data->>'isSentinel','') <> 'true')`;
-
-async function countWhere(table, where, params) {
+async function countWhere(view, where, params) {
   const r = await db.queryOne(
-    'SELECT COUNT(*)::int AS n FROM ' + table + ' WHERE ' + where,
+    'SELECT COUNT(*)::int AS n FROM ' + view + ' WHERE ' + where,
     params || []
   );
   return Number(r && r.n) || 0;
 }
 
-async function oldestWhere(table, where, params, orderExpr) {
+async function oldestWhere(view, where, params) {
   const r = await db.queryOne(
-    'SELECT id, updated_at AS "updatedAt", data FROM ' + table
+    'SELECT id, type, status, created_at AS "createdAt", updated_at AS "updatedAt" FROM ' + view
       + ' WHERE ' + where
-      + ' ORDER BY ' + (orderExpr || "COALESCE(NULLIF(data->>'createdAt',''), updated_at) ASC")
-      + ' LIMIT 1',
+      + ' ORDER BY created_at ASC NULLS LAST LIMIT 1',
     params || []
   );
   if (!r) return null;
   return {
     id: r.id,
     updatedAt: r.updatedAt,
-    createdAt: r.data && r.data.createdAt,
-    type: r.data && r.data.type,
-    name: r.data && r.data.name,
+    createdAt: r.createdAt,
+    type: r.type,
+    status: r.status,
   };
 }
 
@@ -102,9 +99,8 @@ async function collectActivity() {
   const registrationsByType = {};
   try {
     const rows = await db.query(
-      `SELECT type, COUNT(*)::int AS n FROM accounts
-       WHERE ${SENTINEL_SQL}
-         AND COALESCE(NULLIF(data->>'createdAt',''), updated_at) >= $1
+      `SELECT type, COUNT(*)::int AS n FROM sentinel_v_accounts
+       WHERE created_at >= $1
        GROUP BY type`,
       [todayIso]
     );
@@ -113,40 +109,36 @@ async function collectActivity() {
     registrationsByType._error = e.message;
   }
 
-  const pendingAccounts = await countWhere(
-    'accounts',
-    `status = 'pending' AND ${SENTINEL_SQL}`
-  );
-  const oldestPendingAccount = await oldestWhere(
-    'accounts',
-    `status = 'pending' AND ${SENTINEL_SQL}`
-  );
+  const pendingAccounts = await countWhere('sentinel_v_accounts', `status = 'pending'`);
+  const oldestPendingAccount = await oldestWhere('sentinel_v_accounts', `status = 'pending'`);
 
   const pendingPayments = await countWhere(
-    'documents',
-    `collection = 'sub_requests' AND (data->>'status' = 'pending')`
+    'sentinel_v_requests',
+    `collection = 'sub_requests' AND status = 'pending'`
   ).catch(() => 0);
+
   let oldestPayment = null;
   try {
     oldestPayment = await db.queryOne(
-      `SELECT id, data, updated_at AS "updatedAt" FROM documents
-       WHERE collection = 'sub_requests' AND data->>'status' = 'pending'
-       ORDER BY COALESCE(NULLIF(data->>'createdAt',''), updated_at) ASC LIMIT 1`
+      `SELECT id, created_at AS "createdAt", updated_at AS "updatedAt"
+       FROM sentinel_v_requests
+       WHERE collection = 'sub_requests' AND status = 'pending'
+       ORDER BY created_at ASC NULLS LAST LIMIT 1`
     );
   } catch (_) { /* */ }
 
-  const pendingAds = await countWhere('ads', `status = 'pending'`);
-  const pendingCatalog = await countWhere('catalog_items', `status = 'pending_review'`);
+  const pendingAds = await countWhere('sentinel_v_ads', `status = 'pending'`);
+  const pendingCatalog = await countWhere('sentinel_v_catalog', `status = 'pending_review'`);
   const reports = await countWhere(
-    'documents',
-    `collection IN ('reports','ad_reports') AND COALESCE(data->>'status','open') IN ('open','pending','new')`
+    'sentinel_v_requests',
+    `collection IN ('reports','ad_reports') AND COALESCE(NULLIF(status,''),'open') IN ('open','pending','new')`
   ).catch(() => 0);
 
   let widgetMessages = 0;
   try {
     widgetMessages = await countWhere(
-      'documents',
-      `collection = 'widget_messages' AND COALESCE(NULLIF(data->>'createdAt',''), updated_at) >= $1`,
+      'sentinel_v_requests',
+      `collection = 'widget_messages' AND created_at >= $1`,
       [todayIso]
     );
   } catch (_) { /* */ }
@@ -154,8 +146,8 @@ async function collectActivity() {
   let leads = 0;
   try {
     leads = await countWhere(
-      'documents',
-      `collection IN ('leads','widget_leads') AND COALESCE(NULLIF(data->>'createdAt',''), updated_at) >= $1`,
+      'sentinel_v_requests',
+      `collection IN ('leads','widget_leads') AND created_at >= $1`,
       [todayIso]
     );
   } catch (_) { /* */ }
@@ -171,7 +163,7 @@ async function collectActivity() {
     oldestPendingAccount,
     pendingPayments,
     oldestPayment: oldestPayment
-      ? { id: oldestPayment.id, createdAt: oldestPayment.data && oldestPayment.data.createdAt }
+      ? { id: oldestPayment.id, createdAt: oldestPayment.createdAt }
       : null,
     pendingAds,
     pendingCatalog,
@@ -193,4 +185,4 @@ async function collectActivity() {
   return metrics;
 }
 
-module.exports = { collectActivity, SENTINEL_SQL };
+module.exports = { collectActivity };

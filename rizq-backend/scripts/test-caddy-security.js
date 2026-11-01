@@ -248,6 +248,9 @@ async function main() {
   const prodSrc = fs.readFileSync(CADDYFILE_PROD, 'utf8');
   ok(/route\s*\{/.test(prodSrc), 'Caddyfile uses route for ordered handlers');
   ok(/handle @blocked\s*\{[\s\S]*?respond 404/.test(prodSrc), 'blocked paths use handle+respond inside route');
+  ok(/@sentinelWake[\s\S]*?path \/api\/internal\/sentinel\/wake/.test(prodSrc)
+    && /handle @sentinelWake\s*\{[\s\S]*?respond 404/.test(prodSrc),
+    'Caddy blocks /api/internal/sentinel/wake externally with 404');
   ok(/path \/rizq-backend/.test(prodSrc), 'blocks /rizq-backend');
   ok(/Content-Security-Policy/.test(prodSrc), 'CSP header present');
   ok(/Permissions-Policy "camera=\(\), microphone=\(\), geolocation=\(self\), payment=\(\), usb=\(\)"/.test(prodSrc),

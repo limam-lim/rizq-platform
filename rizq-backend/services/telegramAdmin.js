@@ -228,7 +228,7 @@ async function maybeBridgeViaSentinel(text, meta) {
   meta = meta || {};
   const port = String(process.env.SENTINEL_LISTEN_PORT || '3017').trim();
   const base = String(process.env.SENTINEL_BRIDGE_URL || ('http://127.0.0.1:' + port)).replace(/\/$/, '');
-  const secret = String(process.env.SENTINEL_WAKE_SECRET || process.env.BACKEND_SHARED_SECRET || '').trim();
+  const secret = String(process.env.SENTINEL_WAKE_SECRET || '').trim();
   const enabled = String(process.env.SENTINEL_TELEGRAM_BRIDGE || '1').trim() !== '0';
   if (!enabled || !secret) return null;
   const critical = !!(meta.critical || meta.severity === 'critical'

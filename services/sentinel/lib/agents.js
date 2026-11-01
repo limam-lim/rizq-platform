@@ -1,5 +1,5 @@
 /**
- * إشراف الوكلاء المجدولين + اقتراحات جودة الويدجت.
+ * إشراف الوكلاء المجدولين + اقتراحات جودة الويدجت (عبر views بلا محتوى شخصي).
  */
 'use strict';
 
@@ -23,8 +23,8 @@ const wokeOnce = new Map();
 async function readDocLatest(collection) {
   try {
     return await db.queryOne(
-      `SELECT id, data, updated_at AS "updatedAt"
-       FROM documents WHERE collection = $1
+      `SELECT id, status, status_at AS "statusAt", updated_at AS "updatedAt", created_at AS "createdAt"
+       FROM sentinel_v_requests WHERE collection = $1
        ORDER BY updated_at DESC LIMIT 1`,
       [collection]
     );
@@ -36,9 +36,10 @@ async function readDocLatest(collection) {
 async function listPendingSocialDrafts() {
   try {
     const r = await db.query(
-      `SELECT id, data FROM documents
+      `SELECT id, status, created_at AS "createdAt"
+       FROM sentinel_v_requests
        WHERE collection IN ('marketing_drafts','social_drafts')
-         AND COALESCE(data->>'status','pending') IN ('pending','pending_approval','draft')
+         AND COALESCE(NULLIF(status,''),'pending') IN ('pending','pending_approval','draft')
        ORDER BY updated_at DESC LIMIT 30`
     );
     return r.rows || [];
@@ -50,11 +51,16 @@ async function listPendingSocialDrafts() {
 async function listWeakMisses(limit) {
   try {
     const r = await db.query(
-      `SELECT id, data FROM documents WHERE collection = 'agent_misses'
+      `SELECT id, status, status_at AS "statusAt", created_at AS "createdAt"
+       FROM sentinel_v_requests WHERE collection = 'agent_misses'
        ORDER BY updated_at DESC LIMIT $1`,
       [Math.max(1, Math.min(50, Number(limit) || 20))]
     );
-    return (r.rows || []).map((row) => Object.assign({ id: row.id }, row.data || {}));
+    return (r.rows || []).map((row) => ({
+      id: row.id,
+      type: row.status || '',
+      at: row.statusAt || row.createdAt,
+    }));
   } catch (_) {
     return [];
   }
@@ -68,11 +74,10 @@ async function superviseAgents(telegram) {
     if (ag.docCollection) {
       const doc = await readDocLatest(ag.docCollection);
       if (doc) {
-        lastAt = Date.parse(doc.updatedAt || (doc.data && (doc.data.at || doc.data.finishedAt))) || null;
-        lastOk = doc.data ? (doc.data.ok !== false) : null;
+        lastAt = Date.parse(doc.statusAt || doc.updatedAt || doc.createdAt) || null;
+        lastOk = doc.status ? (doc.status !== 'error' && doc.status !== 'failed') : null;
       }
     }
-    // fallback: آخر حدث حارس مرتبط
     if (!lastAt) {
       const ev = await store.latestEventByKind('agent_run_' + ag.id);
       if (ev) lastAt = Date.parse(ev.createdAt) || null;
@@ -109,7 +114,9 @@ async function superviseAgents(telegram) {
 
   const pendingSocial = await listPendingSocialDrafts();
   const misses = await listWeakMisses(15);
-  const unanswered = misses.filter((m) => m.type === 'unanswered' || m.type === 'no_answer' || !m.reply);
+  const unanswered = misses.filter((m) =>
+    m.type === 'unanswered' || m.type === 'no_answer' || m.type === '' || m.type === 'miss'
+  );
 
   await store.insertEvent({
     kind: 'agents_supervision',
@@ -128,31 +135,24 @@ async function superviseAgents(telegram) {
     agents: results,
     pendingSocial: pendingSocial.slice(0, 10).map((d) => ({
       id: d.id,
-      title: d.data && (d.data.title || d.data.campaignType),
-      status: d.data && d.data.status,
+      status: d.status,
     })),
     quality: {
       weakCount: misses.length,
       unansweredCount: unanswered.length,
       worst: misses.slice(0, 5).map((m) => ({
         id: m.id,
-        text: String(m.text || '').slice(0, 120),
-        reason: m.reason || m.type,
-        agent: m.agent,
+        reason: m.type,
       })),
     },
   };
 }
 
-/**
- * اقتراحات تحسين من جودة الويدجت — تُحفظ بانتظار موافقة المالك (لا تطبيق تلقائي).
- */
 async function proposeQualitySuggestions(claude) {
   const misses = await listWeakMisses(30);
   if (!misses.length) return [];
   const c = cfg();
   if (!c.anthropicKey || !claude) {
-    // اقتراح رقمي بسيط بلا Claude
     const id = await store.insertSuggestion({
       category: 'knowledge',
       title: 'مراجعة أسئلة بلا جواب',

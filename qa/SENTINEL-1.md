@@ -9,12 +9,13 @@
 
 | مسموح | ممنوع |
 |--------|--------|
-| SELECT على جداول المنصة اللازمة | UPDATE/DELETE على بيانات المستخدمين |
+| SELECT على `sentinel_v_*` فقط (id/type/status/تواريخ — بلا `data`) | SELECT على `accounts` / `documents` / `buyers` الخام |
 | INSERT/UPDATE على `sentinel_events` / `sentinel_reports` / `sentinel_suggestions` | تعديل ملفات/كود، موافقة دفع أو إعلان، نشر |
-| إيقاظ مهمة مجدولة عبر قائمة بيضاء | أي فعل كتابة آخر على المنصة |
+| إيقاظ من `127.0.0.1`/`::1` + `SENTINEL_WAKE_SECRET` (timing-safe) | إيقاظ خارجي أو سر مشترك عام كـ fallback |
 
-دور Postgres: `rizq_sentinel` — كلمة السر من `SENTINEL_DB_PASSWORD`.  
-عملية مستقلة: `services/sentinel/` + `deploy/hetzner/rizq-sentinel.service`.
+دور Postgres: `rizq_sentinel` — عبر `sentinel-role.sql -v sentinel_password=…` (لا CHANGE_ME).  
+عملية مستقلة: `services/sentinel/` + `deploy/hetzner/rizq-sentinel.service`.  
+Caddy يرد 404 على `/api/internal/sentinel/wake` من الخارج.
 
 ## البنية
 
@@ -73,12 +74,13 @@ SENTINEL_DB_PASSWORD=… npm run test:sentinel
 
 يغطي:
 
-1. دور القراءة فقط: رفض UPDATE/DELETE على `accounts`/`ads`؛ السماح بـ INSERT/UPDATE على جداول الحارس  
+1. SELECT على الـ views فقط؛ رفض SELECT `data`/`passHash` من الجداول الأصلية؛ رفض UPDATE/DELETE  
 2. تنبيه حرج → كتم → رسالة عودة (خادم / قرص / نسخة)  
 3. رفض إيقاظ خارج القائمة البيضاء  
-4. تجاهل `/ask` من `chat_id` غريب  
-5. حساب `isSentinel` مستثنى من القوائم العامة  
-6. إخفاء الهاتف والبريد (`2224****67` ونمط البريد)
+4. إيقاظ: IP خارجي → 403؛ سر خاطئ → 401؛ بلا `SENTINEL_WAKE_SECRET` → 503  
+5. تجاهل `/ask` من `chat_id` غريب  
+6. حساب `isSentinel` مستثنى من القوائم العامة  
+7. إخفاء الهاتف والبريد (`2224****67` ونمط البريد)
 
 ## تفعيل الإنتاج
 

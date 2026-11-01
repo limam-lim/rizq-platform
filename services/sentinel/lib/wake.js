@@ -37,7 +37,6 @@ async function wakeAgent(name, opts) {
       headers: {
         'Content-Type': 'application/json',
         'X-Sentinel-Secret': c.wakeSecret,
-        'X-Shared-Secret': c.wakeSecret,
       },
       body: JSON.stringify({ agent, reason: opts.reason || 'sentinel_auto_wake', once: true }),
     });

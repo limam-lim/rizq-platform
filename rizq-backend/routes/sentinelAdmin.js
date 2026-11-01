@@ -1,9 +1,57 @@
 /**
  * مسارات لوحة الحارس (سوبر فقط) + إيقاظ داخلي بقائمة بيضاء.
+ * الإيقاظ: localhost فقط + SENTINEL_WAKE_SECRET إلزامي (timing-safe) بلا fallback.
  */
 'use strict';
 
+const crypto = require('crypto');
 const { WAKE_WHITELIST } = require('../../services/sentinel/lib/config');
+
+function wakeSecretConfigured() {
+  return String(process.env.SENTINEL_WAKE_SECRET || '').trim();
+}
+
+function timingSafeEqualStr(a, b) {
+  const sa = String(a || '');
+  const sb = String(b || '');
+  const ha = crypto.createHash('sha256').update(sa).digest();
+  const hb = crypto.createHash('sha256').update(sb).digest();
+  return crypto.timingSafeEqual(ha, hb) && sa.length === sb.length;
+}
+
+/** عنوان الاتصال الخام فقط — لا X-Forwarded-For (قابل للتزوير). */
+function socketRemoteIp(req) {
+  const raw = String(
+    (req.socket && req.socket.remoteAddress)
+    || (req.connection && req.connection.remoteAddress)
+    || ''
+  );
+  return raw.replace(/^::ffff:/i, '');
+}
+
+function isLocalWakeRequest(req) {
+  const ip = socketRemoteIp(req);
+  return ip === '127.0.0.1' || ip === '::1';
+}
+
+function requireLocalWake(req, res, next) {
+  if (!isLocalWakeRequest(req)) {
+    return res.status(403).json({ ok: false, error: 'localhost_only' });
+  }
+  return next();
+}
+
+function requireWakeSecret(req, res, next) {
+  const expected = wakeSecretConfigured();
+  if (!expected) {
+    return res.status(503).json({ ok: false, error: 'wake_secret_not_configured' });
+  }
+  const got = String(req.header('x-sentinel-secret') || '').trim();
+  if (!got || !timingSafeEqualStr(got, expected)) {
+    return res.status(401).json({ ok: false, error: 'unauthorized' });
+  }
+  return next();
+}
 
 function mountSentinelRoutes(app, deps) {
   const {
@@ -11,17 +59,6 @@ function mountSentinelRoutes(app, deps) {
     requireSharedSecret,
     sql,
   } = deps;
-
-  const wakeSecret = () =>
-    String(process.env.SENTINEL_WAKE_SECRET || process.env.BACKEND_SHARED_SECRET || '').trim();
-
-  function requireWakeSecret(req, res, next) {
-    const expected = wakeSecret();
-    if (!expected) return res.status(503).json({ ok: false, error: 'wake_secret_not_configured' });
-    const got = String(req.header('x-sentinel-secret') || req.header('x-shared-secret') || '').trim();
-    if (!got || got !== expected) return res.status(401).json({ ok: false, error: 'unauthorized' });
-    return next();
-  }
 
   async function tableExists(name) {
     try {
@@ -125,7 +162,6 @@ function mountSentinelRoutes(app, deps) {
         return res.status(400).json({ ok: false, error: 'decision must be approve|reject' });
       }
       const status = decision === 'approve' ? 'approved' : 'rejected';
-      // لا تطبيق تلقائي — الموافقة تعني فقط قبول الاقتراح للتوثيق
       const who = (req.admin && (req.admin.email || req.admin.user || req.admin.id)) || 'super';
       const row = await sql.queryOne(
         `UPDATE sentinel_suggestions
@@ -141,36 +177,39 @@ function mountSentinelRoutes(app, deps) {
     }
   });
 
-  /** إيقاظ داخلي — قائمة بيضاء فقط */
-  app.post('/api/internal/sentinel/wake', requireWakeSecret, async (req, res) => {
-    try {
-      const agent = String((req.body && req.body.agent) || '').trim().toLowerCase();
-      if (!WAKE_WHITELIST.includes(agent)) {
-        return res.status(403).json({ ok: false, error: 'not_whitelisted', agent });
+  /** إيقاظ داخلي — localhost + سر إلزامي + قائمة بيضاء */
+  app.post(
+    '/api/internal/sentinel/wake',
+    requireLocalWake,
+    requireWakeSecret,
+    async (req, res) => {
+      try {
+        const agent = String((req.body && req.body.agent) || '').trim().toLowerCase();
+        if (!WAKE_WHITELIST.includes(agent)) {
+          return res.status(403).json({ ok: false, error: 'not_whitelisted', agent });
+        }
+        const reason = String((req.body && req.body.reason) || 'manual').slice(0, 200);
+        const result = await runWhitelistedWake(agent, deps);
+        if (await tableExists('sentinel_events')) {
+          const id = 'wake_' + Date.now().toString(36);
+          await sql.query(
+            `INSERT INTO sentinel_events (id, kind, severity, source, summary, payload)
+             VALUES ($1,'wake_invoke',$2,'backend',$3,$4::jsonb)`,
+            [
+              id,
+              result.ok ? 'info' : 'warn',
+              'إيقاظ ' + agent + (result.ok ? ' OK' : ' فشل'),
+              JSON.stringify({ agent, reason, result }),
+            ]
+          );
+        }
+        res.status(result.ok ? 200 : 500).json(Object.assign({ agent, reason }, result));
+      } catch (e) {
+        res.status(500).json({ ok: false, error: e.message });
       }
-      const reason = String((req.body && req.body.reason) || 'manual').slice(0, 200);
-      const result = await runWhitelistedWake(agent, deps);
-      // سجّل إن وُجدت الجداول
-      if (await tableExists('sentinel_events')) {
-        const id = 'wake_' + Date.now().toString(36);
-        await sql.query(
-          `INSERT INTO sentinel_events (id, kind, severity, source, summary, payload)
-           VALUES ($1,'wake_invoke',$2,'backend',$3,$4::jsonb)`,
-          [
-            id,
-            result.ok ? 'info' : 'warn',
-            'إيقاظ ' + agent + (result.ok ? ' OK' : ' فشل'),
-            JSON.stringify({ agent, reason, result }),
-          ]
-        );
-      }
-      res.status(result.ok ? 200 : 500).json(Object.assign({ agent, reason }, result));
-    } catch (e) {
-      res.status(500).json({ ok: false, error: e.message });
     }
-  });
+  );
 
-  // مشاركة requireSharedSecret إن لزم لاحقاً
   void requireSharedSecret;
 }
 
@@ -241,4 +280,14 @@ async function runWhitelistedWake(agent, deps) {
   }
 }
 
-module.exports = { mountSentinelRoutes, runWhitelistedWake, WAKE_WHITELIST };
+module.exports = {
+  mountSentinelRoutes,
+  runWhitelistedWake,
+  WAKE_WHITELIST,
+  isLocalWakeRequest,
+  requireLocalWake,
+  requireWakeSecret,
+  wakeSecretConfigured,
+  timingSafeEqualStr,
+  socketRemoteIp,
+};

@@ -56,7 +56,7 @@ function cfg() {
     backendBase,
     databaseUrl,
     dbPass,
-    wakeSecret: String(process.env.SENTINEL_WAKE_SECRET || process.env.BACKEND_SHARED_SECRET || '').trim(),
+    wakeSecret: String(process.env.SENTINEL_WAKE_SECRET || '').trim(),
     telegramBotToken: String(process.env.SENTINEL_TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '').trim(),
     telegramChatId: String(process.env.SENTINEL_TELEGRAM_CHAT_ID || process.env.TELEGRAM_ADMIN_CHAT_ID || '').trim(),
     anthropicKey: String(process.env.ANTHROPIC_API_KEY || '').trim(),

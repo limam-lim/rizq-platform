@@ -46,6 +46,14 @@ rizq.mr, www.rizq.mr {
 			respond 404
 		}
 
+		# مسار إيقاظ الحارس داخلي فقط (Node يقبل 127.0.0.1/::1) — احظره من الخارج
+		@sentinelWake {
+			path /api/internal/sentinel/wake /api/internal/sentinel/wake/*
+		}
+		handle @sentinelWake {
+			respond 404
+		}
+
 		handle /api/* {
 			reverse_proxy 127.0.0.1:3000
 		}
