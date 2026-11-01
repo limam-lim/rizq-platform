@@ -1,0 +1,23 @@
+{
+  "name": "rizq-sentinel",
+  "version": "1.0.0",
+  "description": "الحارس — وكيل مراقبة وتنسيق للقراءة فقط",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node scripts/test-sentinel.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "dotenv": "^16.4.5",
+    "node-cron": "^4.6.0",
+    "pg": "^8.23.1"
+  },
+  "optionalDependencies": {
+    "playwright": "^1.48.0"
+  }
+}

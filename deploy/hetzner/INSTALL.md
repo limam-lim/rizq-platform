@@ -97,8 +97,56 @@ TARGET_DATABASE_URL=postgres://rizq:…@127.0.0.1:5432/rizq_test_restore \
 3. لوحة الأدمن + 2FA
 4. نسخة احتياطية ناجحة في `/opt/rizq/backups/db/daily/`
 
-## 10) ملاحظات أمان
+## 10) الحارس (Sentinel) — عملية مراقبة مستقلة
+
+الحارس وكيل قراءة فقط: لا يعدّل بيانات المستخدمين ولا يوافق على دفع/إعلان ولا ينشر.
+الفعل الوحيد المسموح: إيقاظ مهمة مجدولة عبر قائمة بيضاء.
+
+```bash
+# 1) أسرار الحارس في rizq-backend/.env (SENTINEL_WAKE_SECRET إلزامي — بلا fallback)
+# SENTINEL_DB_PASSWORD=…قوية…
+# SENTINEL_WAKE_SECRET=…عشوائي طويل مستقل…
+# SENTINEL_TELEGRAM_CHAT_ID=…معرف محادثة المالك…
+# SENTINEL_DAILY_TOKEN_BUDGET=50000
+# SENTINEL_DOMAIN_EXPIRY=2027-01-01   # اختياري
+# SENTINEL_LISTEN_PORT=3017
+
+# 2) ترحيل الجداول والـ views (قبل أو بعد إنشاء الدور)
+cd /opt/rizq/rizq-backend
+sudo -u rizq npm run migrate
+
+# 3) إنشاء دور Postgres — كلمة السر عبر -v فقط (لا قيمة افتراضية في الملف)
+sudo -u postgres psql -d rizq \
+  -v sentinel_password='YOUR_STRONG_PASSWORD' \
+  -f /opt/rizq/deploy/hetzner/sentinel-role.sql
+# يرفض السكربت كلمة سر فارغة أو CHANGE_ME*
+
+# 4) تبعيات خدمة الحارس
+cd /opt/rizq/services/sentinel
+sudo -u rizq npm ci --omit=dev
+# اختياري للرحلات: sudo -u rizq npx playwright install chromium
+
+# 5) حساب منصة موسوم للحارس (رحلات الدخول) — يُستثنى من الإحصاءات والقوائم
+# أنشئ حساباً ببريد sentinel@… وضع isSentinel:true في data
+
+# 6) systemd مستقل عن rizq.service
+sudo cp /opt/rizq/deploy/hetzner/rizq-sentinel.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now rizq-sentinel
+curl -fsS http://127.0.0.1:3017/health
+
+# 7) أعد تحميل Caddy بعد تحديث Caddyfile (يحظر /api/internal/sentinel/wake من الخارج بـ 404)
+sudo systemctl reload caddy
+
+# 8) لوحة الأدمن → تبويب «الحارس» (سوبر فقط)
+```
+
+التقارير اليومية/الأسبوعية: 08:30 بتوقيت `Europe/Madrid` عبر تيليغرام إلى `SENTINEL_TELEGRAM_CHAT_ID` فقط.
+
+## 11) ملاحظات أمان
 
 - `DEV_JSON_DUMPS=0` في الإنتاج
 - لا تفتح Postgres على الإنترنت
 - قيّد منفذ 22 بـ IP إداري عند الإمكان بعد استقرار الوصول
+- دور `rizq_sentinel`: SELECT على `sentinel_v_*` فقط (بلا `data`/hash/هاتف)؛ INSERT/UPDATE على `sentinel_*`
+- `/api/internal/sentinel/wake`: localhost فقط + `SENTINEL_WAKE_SECRET`؛ محظور في Caddy للطلبات الخارجية

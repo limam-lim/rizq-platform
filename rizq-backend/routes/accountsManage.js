@@ -148,7 +148,8 @@ function mountAccountsManageRoutes(app, deps) {
     res.set('Cache-Control', 'public, max-age=30');
     const viewerId = await resolveOptionalAccountViewer(req);
     const acc = (await readAccounts()).find((a) => a && a.id === req.params.id);
-    if (!acc || acc.status !== 'approved' || acc.suspended || String(acc.id || '').startsWith('acc_demo')) {
+    const { isSentinelAccount } = require('../lib/sentinelAccount');
+    if (!acc || acc.status !== 'approved' || acc.suspended || String(acc.id || '').startsWith('acc_demo') || isSentinelAccount(acc)) {
       return res.status(404).json({ ok: false, error: 'account_not_found' });
     }
     res.json({ ok: true, account: await toPublicAccountForViewer(acc, viewerId) });

@@ -48,6 +48,7 @@
     "test:lifecycle-save": "node scripts/run-with-test-db.js scripts/test-lifecycle-concurrent-save.js",
     "test:trial-once": "node scripts/run-with-test-db.js scripts/test-trial-once.js",
     "test:browse": "node scripts/run-with-test-db.js scripts/test-browse-infinite-and-cards.js",
+    "test:sentinel": "node scripts/run-with-test-db.js scripts/test-sentinel-1.js",
     "admin:2fa": "node scripts/admin-2fa.js"
   },
   "dependencies": {

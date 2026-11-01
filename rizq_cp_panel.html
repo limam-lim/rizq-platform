@@ -410,6 +410,7 @@ main, .page-content.active, .main-content, .results-area,
     <div class="sb-item" data-admin-perm="announcements" onclick="showPanel('announcements',this)" id="sb-ann-item"><span class="sb-icon">📢</span><span class="sb-label" data-t="sb-announcements">الإشعارات والإعلانات</span><span class="sb-badge" id="ann-badge" style="display:none;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#3d2a00">0</span></div>
     <div class="sb-section" data-t="sb-section-agents">الوكلاء الذكيون</div>
     <div class="sb-item" data-admin-perm="*" onclick="showPanel('secrets-vault',this)" id="sb-secrets-vault"><span class="sb-icon">🔐</span><span class="sb-label" data-t="sb-secrets-vault">خزنة المفاتيح</span></div>
+    <div class="sb-item" data-admin-perm="*" onclick="showPanel('sentinel',this)" id="sb-sentinel"><span class="sb-icon">🛡</span><span class="sb-label" data-t="sb-sentinel">الحارس</span><span class="sb-badge" id="sentinel-badge" style="background:#0e7490;color:#fff;border-radius:9px;font-size:11px;padding:1px 7px;margin-right:6px;display:none">0</span></div>
     <div class="sb-item" data-admin-perm="ai-manager" onclick="showPanel('agents-hub',this)" id="sb-agents-hub"><span class="sb-icon">🎛️</span><span class="sb-label" data-t="sb-agents-hub">مركز تسيير الوكلاء</span><span class="sb-badge" id="agents-hub-badge" style="background:#ef4444;color:#fff;border-radius:9px;font-size:11px;padding:1px 7px;margin-right:6px;display:none">0</span></div>
     <div class="sb-item" data-admin-perm="marketing" onclick="showPanel('marketing',this)"><span class="sb-icon">📣</span><span class="sb-label" data-t="sb-marketing">مدير التسويق</span></div>
     <div class="sb-item" data-admin-perm="subscriber-agents" onclick="showPanel('subscriber-agents',this)"><span class="sb-icon">🎭</span><span class="sb-label" data-t="sb-subscriber-agents">وكلاء الباقة الماسية 💎</span></div>
@@ -1473,6 +1474,30 @@ main, .page-content.active, .main-content, .results-area,
       <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
         <button type="button" onclick="secretsVaultSave()" style="padding:11px 22px;background:linear-gradient(135deg,#1B3A6B,#0e7490);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">💾 حفظ المفاتيح</button>
         <span id="secrets-vault-msg" style="font-size:12px;color:#6b7280"></span>
+      </div>
+    </div>
+
+    <!-- ══ SENTINEL / الحارس (سوبر فقط) ══ -->
+    <div class="panel" id="panel-sentinel">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+        <div>
+          <h2 style="font-size:22px;font-weight:700;color:var(--navy)" data-t="sentinel-h">🛡 الحارس</h2>
+          <p style="font-size:13px;color:#2C3A4F;margin-top:4px" data-t="sentinel-sub">مراقبة للقراءة فقط — حالة الصحة، الأحداث، التقارير، واقتراحات بانتظار موافقتك (بلا تطبيق تلقائي)</p>
+        </div>
+        <button type="button" onclick="sentinelRefresh()" style="padding:9px 16px;background:#fff;border:1.5px solid rgba(27,58,107,.2);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;color:var(--navy)">🔄 تحديث</button>
+      </div>
+      <div id="sentinel-status-bar" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px"></div>
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:18px">
+        <div style="padding:14px 18px;border-bottom:1px solid #e5e7eb;font-weight:700;color:var(--navy);font-size:14px">📋 آخر 50 حدثاً</div>
+        <div id="sentinel-events" style="padding:12px 16px;max-height:320px;overflow:auto;font-size:13px;color:#374151">—</div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;margin-bottom:18px">
+        <div style="padding:14px 18px;border-bottom:1px solid #e5e7eb;font-weight:700;color:var(--navy);font-size:14px">📰 التقارير</div>
+        <div id="sentinel-reports" style="padding:12px 16px;max-height:260px;overflow:auto;font-size:13px;color:#374151">—</div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:14px 18px;border-bottom:1px solid #e5e7eb;font-weight:700;color:var(--navy);font-size:14px">💡 اقتراحات بانتظار موافقة المالك</div>
+        <div id="sentinel-suggestions" style="padding:12px 16px;min-height:60px;font-size:13px;color:#374151">—</div>
       </div>
     </div>
 
@@ -2754,7 +2779,7 @@ const PANEL_PERM_KEYS = {
   siteconfig: 'siteconfig', modules: 'modules', settings: 'settings', legal: 'legal', 'legal-editor': 'legal-editor',
   channels: 'channels', announcements: 'announcements', 'subscriber-agents': 'subscriber-agents',
   'quota-guard': 'quota-guard', accounts: 'accounts', 'unified-review': 'accounts', 'special-grant': 'accounts', 'ai-manager': 'ai-manager', 'moderator-config': 'moderator-config',
-  marketing: 'marketing', 'agents-hub': 'ai-manager', 'secrets-vault': '*',
+  marketing: 'marketing', 'agents-hub': 'ai-manager', 'secrets-vault': '*', sentinel: '*',
 };
 
 function _adminHasPerm(required) {
@@ -3126,7 +3151,7 @@ async function saveOwnAdminPassword(){
 
 // ══ PANELS ══
 // خريطة id اللوحة → مفتاح القاموس (مفاتيح topbar-* في namespace admin)
-const PANEL_TITLE_KEYS={overview:'topbar-overview',users:'topbar-users',ads:'topbar-ads',reports:'topbar-reports',payments:'topbar-payments',analytics:'topbar-analytics',team:'topbar-team',packages:'topbar-packages',prices:'topbar-prices','extra-categories':'topbar-extra-categories',siteconfig:'topbar-siteconfig',settings:'topbar-settings',legal:'topbar-legal','legal-editor':'topbar-legal-editor',accounts:'topbar-accounts','unified-review':'topbar-unified-review','special-grant':'topbar-special-grant',moderation:'topbar-moderation','tenders-mod':'topbar-tenders-mod','promo-video':'topbar-promo-video',modules:'topbar-modules',announcements:'topbar-announcements','subscriber-agents':'topbar-subscriber-agents','quota-guard':'topbar-quota-guard','ai-manager':'topbar-ai-manager','moderator-config':'topbar-moderator-config',channels:'topbar-channels',marketing:'topbar-marketing','agents-hub':'topbar-agents-hub','secrets-vault':'topbar-secrets-vault'};
+const PANEL_TITLE_KEYS={overview:'topbar-overview',users:'topbar-users',ads:'topbar-ads',reports:'topbar-reports',payments:'topbar-payments',analytics:'topbar-analytics',team:'topbar-team',packages:'topbar-packages',prices:'topbar-prices','extra-categories':'topbar-extra-categories',siteconfig:'topbar-siteconfig',settings:'topbar-settings',legal:'topbar-legal','legal-editor':'topbar-legal-editor',accounts:'topbar-accounts','unified-review':'topbar-unified-review','special-grant':'topbar-special-grant',moderation:'topbar-moderation','tenders-mod':'topbar-tenders-mod','promo-video':'topbar-promo-video',modules:'topbar-modules',announcements:'topbar-announcements','subscriber-agents':'topbar-subscriber-agents','quota-guard':'topbar-quota-guard','ai-manager':'topbar-ai-manager','moderator-config':'topbar-moderator-config',channels:'topbar-channels',marketing:'topbar-marketing','agents-hub':'topbar-agents-hub','secrets-vault':'topbar-secrets-vault',sentinel:'topbar-sentinel'};
 let _currentPanelId='overview';
 function refreshTopbarTitle(){
   const key=PANEL_TITLE_KEYS[_currentPanelId];
@@ -3183,6 +3208,7 @@ function showPanel(id, navEl){
   if(id==='marketing'){ mktRefresh(); }
   if(id==='agents-hub'){ agentsHubRefresh(); }
   if(id==='secrets-vault'){ secretsVaultRefresh(); }
+  if(id==='sentinel'){ sentinelRefresh(); }
   if(window.innerWidth<900)closeSidebar();
 }
 
@@ -9027,6 +9053,109 @@ function _quotaBar(pct, label){
     '<div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:3px"><span>'+label+'</span><span style="font-weight:700;color:'+col+'">'+p+'%</span></div>'+
     '<div style="height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden"><div style="height:100%;width:'+p+'%;background:'+col+';border-radius:99px"></div></div>'+
     '</div>';
+}
+
+/* ══ الحارس (Sentinel) — سوبر أدمن ══ */
+function sentinelEsc(s) {
+  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function sentinelRefresh() {
+  if (!_adminHasPerm('*')) {
+    var box = document.getElementById('sentinel-status-bar');
+    if (box) box.innerHTML = '<div style="color:#b91c1c">هذا القسم للسوبر أدمن فقط</div>';
+    return Promise.resolve();
+  }
+  var base = _adminBackendBase();
+  var hdr = _adminAuthHeaders();
+  return Promise.all([
+    fetch(base + '/api/admin/sentinel/status', { headers: hdr }).then(function (r) { return r.json(); }),
+    fetch(base + '/api/admin/sentinel/events?limit=50', { headers: hdr }).then(function (r) { return r.json(); }),
+    fetch(base + '/api/admin/sentinel/reports?limit=20', { headers: hdr }).then(function (r) { return r.json(); }),
+    fetch(base + '/api/admin/sentinel/suggestions?status=pending_owner', { headers: hdr }).then(function (r) { return r.json(); }),
+  ]).then(function (parts) {
+    var st = parts[0] || {};
+    var ev = parts[1] || {};
+    var rp = parts[2] || {};
+    var sg = parts[3] || {};
+    var bar = document.getElementById('sentinel-status-bar');
+    if (bar) {
+      var cards = [
+        { t: 'الجاهزية', v: st.ready ? 'جاهز' : 'غير مُرحَّل' },
+        { t: 'اقتراحات معلّقة', v: String(st.pendingSuggestions != null ? st.pendingSuggestions : '—') },
+        { t: 'آخر صحة', v: st.lastHealth && st.lastHealth.createdAt ? String(st.lastHealth.createdAt).slice(0, 19) : '—' },
+        { t: 'آخر نشاط', v: st.lastActivity && st.lastActivity.createdAt ? String(st.lastActivity.createdAt).slice(0, 19) : '—' },
+      ];
+      bar.innerHTML = cards.map(function (c) {
+        return '<div class="card" style="padding:12px 14px"><div style="font-size:11px;color:#6b7280">' + sentinelEsc(c.t)
+          + '</div><div style="font-size:16px;font-weight:700;color:var(--navy);margin-top:4px">' + sentinelEsc(c.v) + '</div></div>';
+      }).join('');
+    }
+    var evEl = document.getElementById('sentinel-events');
+    if (evEl) {
+      var events = ev.events || [];
+      if (!events.length) evEl.textContent = 'لا أحداث بعد';
+      else {
+        evEl.innerHTML = events.map(function (e) {
+          return '<div style="padding:8px 0;border-bottom:1px solid #f1f5f9"><span style="font-weight:700;color:#0e7490">'
+            + sentinelEsc(e.kind) + '</span> · <span style="color:#6b7280;font-size:12px">'
+            + sentinelEsc(e.severity) + ' · ' + sentinelEsc(e.createdAt) + '</span><div style="margin-top:4px">'
+            + sentinelEsc(e.summary) + '</div></div>';
+        }).join('');
+      }
+    }
+    var rpEl = document.getElementById('sentinel-reports');
+    if (rpEl) {
+      var reports = rp.reports || [];
+      if (!reports.length) rpEl.textContent = 'لا تقارير بعد';
+      else {
+        rpEl.innerHTML = reports.map(function (r) {
+          return '<div style="padding:10px 0;border-bottom:1px solid #f1f5f9"><div style="font-weight:700;color:var(--navy)">'
+            + sentinelEsc(r.title) + '</div><div style="font-size:12px;color:#6b7280;margin:4px 0">'
+            + sentinelEsc(r.reportType) + ' · ' + sentinelEsc(r.createdAt) + '</div><pre style="white-space:pre-wrap;font-family:inherit;font-size:12px;margin:0;color:#374151">'
+            + sentinelEsc(String(r.body || '').slice(0, 800)) + '</pre></div>';
+        }).join('');
+      }
+    }
+    var sgEl = document.getElementById('sentinel-suggestions');
+    var badge = document.getElementById('sentinel-badge');
+    var suggestions = sg.suggestions || [];
+    if (badge) {
+      if (suggestions.length) { badge.style.display = ''; badge.textContent = String(suggestions.length); }
+      else badge.style.display = 'none';
+    }
+    if (sgEl) {
+      if (!suggestions.length) sgEl.textContent = 'لا اقتراحات بانتظار الموافقة';
+      else {
+        sgEl.innerHTML = suggestions.map(function (s) {
+          return '<div style="padding:12px;border:1px solid #e5e7eb;border-radius:10px;margin-bottom:10px">'
+            + '<div style="font-weight:700;color:var(--navy)">#' + sentinelEsc(s.impactRank) + ' — ' + sentinelEsc(s.title) + '</div>'
+            + '<div style="font-size:12px;color:#6b7280;margin:4px 0">' + sentinelEsc(s.category) + ' · ' + sentinelEsc(s.source) + '</div>'
+            + '<div style="margin:8px 0;line-height:1.6">' + sentinelEsc(s.body) + '</div>'
+            + '<div style="display:flex;gap:8px">'
+            + '<button type="button" onclick="sentinelDecide(\'' + sentinelEsc(s.id) + '\',\'approve\')" style="padding:6px 12px;background:#059669;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit">موافقة</button>'
+            + '<button type="button" onclick="sentinelDecide(\'' + sentinelEsc(s.id) + '\',\'reject\')" style="padding:6px 12px;background:#fff;color:#b91c1c;border:1px solid #fecaca;border-radius:8px;font-weight:700;cursor:pointer;font-family:inherit">رفض</button>'
+            + '</div></div>';
+        }).join('');
+      }
+    }
+  }).catch(function (err) {
+    var bar = document.getElementById('sentinel-status-bar');
+    if (bar) bar.innerHTML = '<div style="color:#b91c1c">' + sentinelEsc(err.message) + '</div>';
+  });
+}
+
+function sentinelDecide(id, decision) {
+  return fetch(_adminBackendBase() + '/api/admin/sentinel/suggestions/' + encodeURIComponent(id) + '/decide', {
+    method: 'POST',
+    headers: Object.assign({ 'Content-Type': 'application/json' }, _adminAuthHeaders()),
+    body: JSON.stringify({ decision: decision }),
+  }).then(function (r) { return r.json(); }).then(function (data) {
+    if (!data || !data.ok) throw new Error((data && data.error) || 'فشل');
+    return sentinelRefresh();
+  }).catch(function (err) {
+    alert(err.message || 'فشل القرار');
+  });
 }
 
 /* ══ خزنة المفاتيح — سوبر أدمن ══ */

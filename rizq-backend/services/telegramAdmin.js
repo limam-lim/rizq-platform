@@ -220,8 +220,52 @@ async function validateAdminChatAtStartup() {
   return { ok: false, error: lastErr && lastErr.message, discovered };
 }
 
+/**
+ * توجيه إشعارات المالك عبر الحارس أولاً (تجميع/تحليل) مع إبقاء الحرج فورياً.
+ * يُفعَّل عند SENTINEL_BRIDGE_URL أو SENTINEL_LISTEN_PORT.
+ */
+async function maybeBridgeViaSentinel(text, meta) {
+  meta = meta || {};
+  const port = String(process.env.SENTINEL_LISTEN_PORT || '3017').trim();
+  const base = String(process.env.SENTINEL_BRIDGE_URL || ('http://127.0.0.1:' + port)).replace(/\/$/, '');
+  const secret = String(process.env.SENTINEL_WAKE_SECRET || '').trim();
+  const enabled = String(process.env.SENTINEL_TELEGRAM_BRIDGE || '1').trim() !== '0';
+  if (!enabled || !secret) return null;
+  const critical = !!(meta.critical || meta.severity === 'critical'
+    || /🚨|حرج|متوقف|5xx|SSL|نسخة احتياطية|القرص/i.test(String(text || '')));
+  try {
+    const res = await fetch(base + '/ingest/telegram', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Sentinel-Secret': secret,
+      },
+      body: JSON.stringify({ text, meta: Object.assign({}, meta, { critical }) }),
+      signal: AbortSignal.timeout(4000),
+    });
+    if (!res.ok) return null;
+    const body = await res.json().catch(() => ({}));
+    // إن جمّع الحارس الرسالة غير الحرجة — لا نُرسل مجدداً من هنا
+    if (body && body.buffered) return { bridged: true, buffered: true };
+    if (body && body.ok) return { bridged: true, result: body };
+  } catch (e) {
+    // الحارس متوقف — نكمل الإرسال المباشر
+    return null;
+  }
+  return null;
+}
+
 async function sendMessageToAlertChats(text, meta) {
   meta = meta || {};
+  const bridged = await maybeBridgeViaSentinel(text, meta);
+  if (bridged && bridged.buffered) {
+    return { result: { ok: true, buffered: true }, chatId: 'sentinel_bridge', via: 'sentinel_buffer' };
+  }
+  // إن أرسل الحارس فوراً (حرج) نعتبرها مُسلَّمة
+  if (bridged && bridged.bridged && !bridged.buffered) {
+    return { result: bridged.result || { ok: true }, chatId: 'sentinel_bridge', via: 'sentinel_direct' };
+  }
+
   const candidates = await buildAlertChatCandidates();
   let lastErr = null;
 

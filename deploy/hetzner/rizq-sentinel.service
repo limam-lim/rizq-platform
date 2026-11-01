@@ -1,0 +1,34 @@
+[Unit]
+Description=Rizq Sentinel (الحارس) — read-only monitor
+After=network.target postgresql.service rizq.service
+Wants=postgresql.service
+# لا يعتمد فشل الحارس على سقوط الخادم الرئيسي والعكس
+
+[Service]
+Type=simple
+User=rizq
+Group=rizq
+WorkingDirectory=/opt/rizq/services/sentinel
+EnvironmentFile=-/opt/rizq/rizq-backend/.env
+EnvironmentFile=-/opt/rizq/services/sentinel/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node index.js
+Restart=always
+RestartSec=5
+MemoryMax=768M
+MemoryHigh=512M
+CPUQuota=50%
+LimitNOFILE=65535
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/rizq/services/sentinel /opt/rizq/backups /tmp
+# قراءة سجلات Caddy للنسب فقط
+ReadOnlyPaths=/var/log/caddy
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=multi-user.target

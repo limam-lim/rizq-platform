@@ -3253,6 +3253,13 @@ mountAdminCoreRoutes(app, {
   backendRootDir: __dirname,
 });
 
+const { mountSentinelRoutes } = require('./routes/sentinelAdmin');
+mountSentinelRoutes(app, {
+  requireSuperAdmin,
+  requireSharedSecret,
+  sql: require('./db/sql'),
+});
+
 const { mountMarketingRoutes } = require('./routes/marketing');
 mountMarketingRoutes(app, { requireAdminPermission });
 require('./services/marketingAgent').startScheduler().catch((eMkt) => {
@@ -4743,9 +4750,11 @@ app.get('/api/discovery/platform-stats', async (req, res) => {
       && !/^RZQ-2026-1000\d$/i.test(String(a.id || ''))
     ).length;
 
+    const { isSentinelAccount } = require('./lib/sentinelAccount');
     const businesses = (await readAccounts()).filter((a) =>
       a && a.status === 'approved' && !a.suspended
       && !String(a.id || '').startsWith('acc_demo')
+      && !isSentinelAccount(a)
       && (a.type === 'store' || a.type === 'office' || a.type === 'corp')
     );
     const businessesApproved = businesses.length;
