@@ -1,61 +1,83 @@
 # رزق — Caddy أمام Node على Hetzner (خلف Cloudflare)
-# القائمة البيضاء للملفات العامة + تمرير /api و /uploads
+# قائمة بيضاء صريحة للملفات العامة + تمرير /api و /uploads إلى Node
+# حظر /rizq-backend/* والمسارات الحساسة قبل أي file_server
 
 {
 	email {$CADDY_ACME_EMAIL:ops@rizq.mr}
 }
 
+# رؤوس الإنتاج كما في rizq-backend/server.js (isProdEnv) — CSP و Permissions-Policy حرفياً
 (security_headers) {
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
 		X-Content-Type-Options "nosniff"
-		X-Frame-Options "SAMEORIGIN"
+		X-Frame-Options "DENY"
 		Referrer-Policy "strict-origin-when-cross-origin"
-		Permissions-Policy "geolocation=(), microphone=(), camera=()"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=(), usb=()"
+		Content-Security-Policy "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; frame-src 'self' https://www.openstreetmap.org https://openstreetmap.org; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; connect-src 'self' https: wss:;"
+		Cross-Origin-Opener-Policy "same-origin"
+		Cross-Origin-Resource-Policy "same-site"
+		X-DNS-Prefetch-Control "off"
 		-Server
 	}
 }
 
-(block_sensitive) {
-	@blocked {
-		path /.env /.env.* /.git* /node_modules* /rizq-backend/data* /rizq-backend/.env*
-		path /backups* /deploy* /scripts/* /qa/* /docs/* /migrations*
-		path *.pem *.key *.sql *.sql.gz *.enc
-	}
-	respond @blocked 404
-}
-
 rizq.mr, www.rizq.mr {
 	import security_headers
-	import block_sensitive
 
 	encode gzip zstd
 	root * /opt/rizq
 
-	# API + uploads → Node
-	handle /api/* {
-		reverse_proxy 127.0.0.1:3000
-	}
-	handle /uploads/* {
-		reverse_proxy 127.0.0.1:3000
-	}
-	handle /health {
-		reverse_proxy 127.0.0.1:3000
-	}
+	# route يحافظ على الترتيب: الحظر أولاً ثم الوكيل ثم القائمة البيضاء
+	route {
+		@blocked {
+			path /.env /.env.* /.git* /.cursor* /.github*
+			path /node_modules /node_modules/*
+			path /rizq-backend /rizq-backend/*
+			path /backups /backups/* /deploy /deploy/* /scripts /scripts/*
+			path /qa /qa/* /docs /docs/* /migrations /migrations/*
+			path /data /data/* /rizq-backend/data /rizq-backend/data/*
+			path /package.json /package-lock.json
+			path /docker-compose.yml /docker-compose.dev.yml /render.yaml
+			path *.pem *.key *.sql *.sql.gz *.enc *.sh *.bat *.ps1
+			path *.md *.yml *.yaml *.log *.sqlite *.db
+		}
+		handle @blocked {
+			respond 404
+		}
 
-	# ملفات عامة فقط (HTML/JS/CSS/صور الواجهة)
-	@publicFiles {
-		path *.html *.js *.css *.webp *.png *.jpg *.jpeg *.svg *.ico *.woff2 *.woff *.map *.txt *.xml
-		path /rizq_* /favicon.ico /robots.txt /sitemap.xml
-	}
-	handle @publicFiles {
-		file_server
-	}
+		handle /api/* {
+			reverse_proxy 127.0.0.1:3000
+		}
+		handle /uploads/* {
+			reverse_proxy 127.0.0.1:3000
+		}
+		handle /health {
+			reverse_proxy 127.0.0.1:3000
+		}
 
-	# الصفحة الافتراضية
-	handle {
-		rewrite * /rizq_landing_v8.html
-		file_server
+		# قائمة بيضاء: جذر الواجهة + أصول ثابتة معروفة فقط
+		@publicFiles {
+			path /
+			path /*.html
+			path /rizq_*.js
+			path /rizq_*.css
+			path /rizq-theme.css
+			path /sw.js
+			path /favicon.ico /favicon.svg /favicon-*.png /apple-touch-icon.png
+			path /manifest.json /robots.txt /sitemap.xml
+			path /rizq-assets /rizq-assets/*
+			path /help-images /help-images/*
+			path /vendor /vendor/*
+		}
+		handle @publicFiles {
+			file_server
+		}
+
+		handle {
+			rewrite * /rizq_landing_v8.html
+			file_server
+		}
 	}
 
 	log {

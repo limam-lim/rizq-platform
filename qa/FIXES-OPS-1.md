@@ -34,17 +34,25 @@ Branch: `fix-ops-1` (من `main`)
 
 | ملف | الغرض |
 |-----|--------|
-| `Caddyfile` | قائمة بيضاء للملفات العامة، تمرير `/api` و `/uploads` إلى Node، منع `.env` والمجلدات الداخلية، رؤوس أمان، `rizq.mr` + `www` |
+| `Caddyfile` | قائمة بيضاء صريحة (جذر الواجهة + `rizq-assets`/`help-images`/`vendor`)؛ حظر `/rizq-backend/*` و`scripts`/`deploy`/`qa`/`docs`/`backups`/`migrations`/`node_modules`/`data`؛ `handle @blocked` داخل `route` قبل الباقي؛ CSP و Permissions-Policy كما في `server.js` (إنتاج)؛ تمرير `/api` و `/uploads` و `/health` إلى Node |
 | `rizq.service` | systemd بمستخدم غير root، `Restart=always`، حدود موارد |
 | `postgres-tuning.conf` | ضبط لخادم ~8GB / 4 أنوية |
 | `ufw-cloudflare.sh` | 80/443 من نطاقات Cloudflare الرسمية فقط، 22 مفتوح |
 | `.env.production.example` | كل المتغيرات (`TRUST_CLOUDFLARE=1`, `ADMIN_2FA_KEY`, …) بلا قيم سرية |
 | `INSTALL.md` | خطوات تثبيت مرقّمة من الصفر حتى الإطلاق |
 
+### إصلاح Caddy (قبل الدمج)
+
+1. لا `*.js` عام — كان يسمح بتنزيل `rizq-backend/server.js` و`routes/*.js`.
+2. `respond` بعد `handle` في ترتيب Caddy الافتراضي → الحظر داخل `route` عبر `handle @blocked { respond 404 }` أولاً.
+3. إعادة رؤوس CSP / Permissions-Policy من `server.js` على الاستجابات الثابتة من Caddy.
+
 ## اختبارات
 
 ```bash
 cd rizq-backend && node scripts/run-with-test-db.js scripts/test-ops-1.js
+# أو مباشرة:
+node rizq-backend/scripts/test-caddy-security.js
 ```
 
 | فحص | نتيجة |
@@ -54,3 +62,4 @@ cd rizq-backend && node scripts/run-with-test-db.js scripts/test-ops-1.js
 | SQL filters + 5000-ad bench | pass (mem≈24ms → sql≈6ms) |
 | backup → restore `rizq_test_restore` + مقارنة counts | pass |
 | ملفات `deploy/hetzner/` موجودة | pass |
+| `caddy validate` + curl حظر حساس / CSP / proxy | عبر `test-caddy-security.js` |

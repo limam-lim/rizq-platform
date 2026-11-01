@@ -259,6 +259,17 @@ async function main() {
   ['Caddyfile', 'rizq.service', 'postgres-tuning.conf', 'ufw-cloudflare.sh', '.env.production.example', 'INSTALL.md']
     .forEach((f) => ok(fs.existsSync(path.join(deploy, f)), 'deploy file ' + f));
 
+  // Caddy: validate + حظر المسارات الحساسة + CSP + تمرير /api و /uploads
+  const caddyTest = path.join(__dirname, 'test-caddy-security.js');
+  const caddyRun = spawnSync(process.execPath, [caddyTest], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    env: process.env,
+  });
+  if (caddyRun.stdout) process.stdout.write(caddyRun.stdout);
+  if (caddyRun.stderr) process.stderr.write(caddyRun.stderr);
+  ok(caddyRun.status === 0, 'test-caddy-security.js exit 0', 'status=' + caddyRun.status);
+
   if (failed) {
     console.error('\n' + failed + ' assertion(s) failed');
     process.exit(1);
