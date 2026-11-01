@@ -1835,7 +1835,7 @@
   function ensureMockHeaderAssets() {
     try {
       if (isDashShell()) return;
-      var v = '5.83';
+      var v = '5.89';
       var cssWant = 'rizq_header_mockup_trial.css?v=' + v;
       var jsWant = 'rizq_header_mockup_trial.js?v=' + v;
       var l = document.querySelector('link[href*="rizq_header_mockup_trial.css"]');
@@ -1846,12 +1846,13 @@
       }
       if ((l.getAttribute('href') || '').indexOf('v=' + v) < 0) l.href = cssWant;
       var s = document.querySelector('script[src*="rizq_header_mockup_trial.js"]');
+      /* إن وُجد سكربت متزامن مسبقاً في الصفحة — لا تُعد التحميل بـ defer (كان يسبب CLS) */
       if (!s) {
         s = document.createElement('script');
         s.src = jsWant;
         s.defer = true;
         (document.head || document.documentElement).appendChild(s);
-      } else if ((s.getAttribute('src') || '').indexOf('v=' + v) < 0) {
+      } else if ((s.getAttribute('src') || '').indexOf('v=' + v) < 0 && !s.getAttribute('data-rmh-booted')) {
         var fresh = document.createElement('script');
         fresh.src = jsWant;
         fresh.defer = true;

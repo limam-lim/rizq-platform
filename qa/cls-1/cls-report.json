@@ -1,0 +1,83 @@
+{
+  "threshold": 0.05,
+  "widths": [
+    390,
+    768,
+    1440
+  ],
+  "pages": [
+    "/rizq_landing_v8.html",
+    "/rizq_browse.html",
+    "/rizq_products.html",
+    "/rizq_store.html"
+  ],
+  "results": {
+    "390": {
+      "/rizq_landing_v8.html": {
+        "cold": 0.0001,
+        "warm": 0.0001,
+        "scrollRestoration": "manual"
+      },
+      "/rizq_browse.html": {
+        "cold": 0.0016,
+        "warm": 0.0017,
+        "scrollRestoration": "manual"
+      },
+      "/rizq_products.html": {
+        "cold": 0.0077,
+        "warm": 0.0077,
+        "scrollRestoration": "manual"
+      },
+      "/rizq_store.html": {
+        "cold": 0.0135,
+        "warm": 0.0135,
+        "scrollRestoration": "manual"
+      }
+    },
+    "768": {
+      "/rizq_landing_v8.html": {
+        "cold": 0,
+        "warm": 0,
+        "scrollRestoration": "manual"
+      },
+      "/rizq_browse.html": {
+        "cold": 0.0012,
+        "warm": 0.0013,
+        "scrollRestoration": "manual"
+      },
+      "/rizq_products.html": {
+        "cold": 0.0056,
+        "warm": 0.0056,
+        "scrollRestoration": "manual"
+      },
+      "/rizq_store.html": {
+        "cold": 0.019,
+        "warm": 0.019,
+        "scrollRestoration": "manual"
+      }
+    },
+    "1440": {
+      "/rizq_landing_v8.html": {
+        "cold": 0.016,
+        "warm": 0.0038,
+        "scrollRestoration": "manual"
+      },
+      "/rizq_browse.html": {
+        "cold": 0.0266,
+        "warm": 0.0266,
+        "scrollRestoration": "manual"
+      },
+      "/rizq_products.html": {
+        "cold": 0.0281,
+        "warm": 0.0281,
+        "scrollRestoration": "manual"
+      },
+      "/rizq_store.html": {
+        "cold": 0.0496,
+        "warm": 0.0496,
+        "scrollRestoration": "manual"
+      }
+    }
+  },
+  "ok": true
+}

@@ -18,14 +18,67 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://www.youtube.com https://www.facebook.com"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=optional">
+<script>
+(function(){
+  function loadFonts(){
+    var l=document.createElement('link');
+    l.rel='stylesheet';
+    l.href='https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=optional';
+    document.head.appendChild(l);
+  }
+  if('requestIdleCallback' in window) requestIdleCallback(loadFonts,{timeout:4000});
+  else window.addEventListener('load', function(){ setTimeout(loadFonts, 2000); });
+})();
+</script>
 <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
 <link rel="stylesheet" href="rizq_product_detail.css?v=29.0"/>
 <link rel="preload" href="rizq_header.js?v=27.0" as="script"/>
-<script>document.documentElement.classList.add('rizq-app-nav')</script>
+<script>
+try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(eSR){}
+document.documentElement.classList.add('rizq-app-nav');
+</script>
 <title>المنتجات — متجر النور | Rizq</title>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.89"/>
 <style>
+html.rizq-app-nav{--rizq-header-h:210px;--rizq-mock-hdr-h:210px;--rizq-mock-nav-h:80px;--rizq-ticker-h:42px;--rizq-mock-hdr-gap:12px}
+html.rizq-app-nav body{padding-top:210px!important;box-sizing:border-box}
+#rizq-mock-hdr{
+  position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:10050!important;
+  max-height:210px!important;overflow:hidden!important;box-sizing:border-box!important
+}
+html.rizq-app-nav .topnav,
+html.rizq-app-nav body > nav.topnav{
+  display:none!important;visibility:hidden!important;pointer-events:none!important;
+  height:0!important;max-height:0!important;min-height:0!important;margin:0!important;padding:0!important;
+  overflow:hidden!important;border:0!important
+}
+#store-lux-strip.store-lux-strip,.store-lux-strip{
+  min-height:137px!important;box-sizing:border-box!important;animation:none!important
+}
+@media(max-width:768px){
+  html.rizq-app-nav body{padding-bottom:var(--rizq-mock-nav-h,80px)!important}
+}
+@media(min-width:769px){
+  html.rizq-app-nav{--rizq-header-h:215px;--rizq-mock-hdr-h:203px}
+  html.rizq-app-nav body{padding-top:215px!important}
+  #rizq-mock-hdr{max-height:203px!important;min-height:203px!important}
+  #rizq-mock-hdr .rmh-main,.rmh-main{
+    display:grid!important;
+    grid-template-columns:minmax(120px,1fr) minmax(280px,460px) minmax(120px,1fr)!important;
+    grid-template-rows:auto!important;align-items:center!important;gap:12px!important;
+    padding:8px 20px!important;min-height:90px!important;box-sizing:border-box!important
+  }
+  #rmh-nav-top,nav.rmh-nav-top{display:none!important;height:0!important;overflow:hidden!important}
+  #rmh-search-form,#rizq-mock-hdr .rmh-search{
+    min-height:74px!important;height:74px!important;max-height:74px!important;overflow:hidden!important;
+    grid-column:2!important;align-self:center!important
+  }
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top),nav.rmh-nav:not(.rmh-nav-top){
+    height:85px!important;min-height:85px!important;max-height:85px!important;overflow:hidden!important
+  }
+}
 :root{
   --navy:#1B3A6B;--navy2:#0F2347;
   --gold:#C9A84C;--gold2:#E8C96A;
@@ -74,12 +127,15 @@ html[dir="ltr"] body:has(.filters-sidebar) #rizq-chat-toggle{
 /* شريط هوية المحل الفاخر */
 .store-lux-strip{
   position:relative;overflow:hidden;
+  min-height:129px;box-sizing:border-box;
   background:
     radial-gradient(ellipse 900px 420px at 70% -20%,rgba(201,168,76,.22),transparent 55%),
     linear-gradient(135deg,#06111C 0%,#0F2347 45%,#1B3A6B 100%);
   border-bottom:1px solid rgba(201,168,76,.35);
   color:#fff;
 }
+.breadcrumb,.bc-inner{min-height:41px;box-sizing:border-box}
+.store-lux-chip{min-height:34px;box-sizing:border-box}
 .store-lux-inner{
   max-width:1360px;margin:0 auto;padding:14px 18px 12px;
   display:flex;align-items:center;gap:14px;flex-wrap:wrap;
@@ -131,6 +187,12 @@ html[dir="ltr"] body:has(.filters-sidebar) #rizq-chat-toggle{
 .page-wrap{
   max-width:1360px;margin:14px auto 20px;padding:0 14px;
   display:grid;grid-template-columns:220px minmax(0,1fr);gap:16px;align-items:start;
+  min-height:520px;
+}
+.products-grid{min-height:360px}
+@media(min-width:1440px){
+  .page-wrap{min-height:540px}
+  .products-grid{min-height:420px}
 }
 
 /* FILTERS SIDEBAR */
@@ -569,6 +631,7 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_ux_polish.js?v=23.4" defer></script>
 </head>
 <body data-t-ns="products">
+<script src="rizq_header_mockup_trial.js?v=5.89"></script>
 <script src="rizq_header.js?v=27.0"></script>
 <button class="btn-lang-primary btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
 
