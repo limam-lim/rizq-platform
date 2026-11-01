@@ -781,6 +781,15 @@ const widgetChatLimiter = rateLimit({
   message: { error: 'عدد كبير جداً من الرسائل — حاول مرة أخرى بعد قليل' },
 });
 
+/** حد أشد لمسارات الـ leads العامة — منع spam تيليغرام */
+const widgetLeadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { ok: false, error: 'too_many_leads', code: 'rate_limited' },
+});
+
 const { handleWidgetChat } = require('./services/widgetChat');
 const { moderatorAdMiddleware } = require('./services/moderatorServer');
 const { readTickets, updateTicketStatus } = require('./services/agentTickets');
@@ -841,10 +850,14 @@ const { readLatestBackupMeta } = require('./services/backupService');
  * POST /api/widget/chat � function calling + س�`ا� ا�صفحة + �&راجعة ا�رد
  * body: { message, lang, profile?, history?, pageContext? }
  */
-app.post('/api/widget/lead', widgetChatLimiter, async (req, res) => {
+async function handlePublicLeadPost(req, res, logTag) {
   try {
     const { createLeadAndNotify } = require('./services/leadEscalation');
     const body = req.body || {};
+    // تحقق أساسي من العميل العام: اسم + هاتف + رفض honeypot
+    if (body.website || body.company_url || body.hp_field) {
+      return res.status(400).json({ ok: false, error: 'rejected', code: 'bot_trap' });
+    }
     const result = await createLeadAndNotify(body, {
       source: 'widget-api',
       channel: body.channel || 'widget',
@@ -854,38 +867,23 @@ app.post('/api/widget/lead', widgetChatLimiter, async (req, res) => {
       catalogHint: body.catalog_hint || body.catalogHint || null,
       userText: body.user_message || body.message || null,
       notes: body.notes || null,
-      history: body.history || null,
+      history: null, // لا نثق بتاريخ عميل عام على مسار lead العام
+      requireVerifiedFields: true,
+      clientIp: String((req.headers['x-forwarded-for'] || '').toString().split(',')[0].trim() || req.ip || '').slice(0, 64),
     });
-    if (!result.ok) return res.status(400).json(result);
+    if (!result.ok) {
+      const status = result.code === 'rate_limited' ? 429 : 400;
+      return res.status(status).json(result);
+    }
     res.json(result);
   } catch (err) {
-    console.error('[widget/lead] error:', err.message);
+    console.error('[' + logTag + '] error:', err.message);
     res.status(500).json({ ok: false, error: 'lead_save_failed' });
   }
-});
+}
 
-app.post('/api/leads', widgetChatLimiter, async (req, res) => {
-  try {
-    const { createLeadAndNotify } = require('./services/leadEscalation');
-    const body = req.body || {};
-    const result = await createLeadAndNotify(body, {
-      source: 'widget-api',
-      channel: body.channel || 'widget',
-      kind: body.kind || 'register_interest',
-      lang: body.lang || 'ar',
-      pageContext: body.pageContext || null,
-      catalogHint: body.catalog_hint || body.catalogHint || null,
-      userText: body.user_message || body.message || null,
-      notes: body.notes || null,
-      history: body.history || null,
-    });
-    if (!result.ok) return res.status(400).json(result);
-    res.json(result);
-  } catch (err) {
-    console.error('[api/leads] error:', err.message);
-    res.status(500).json({ ok: false, error: 'lead_save_failed' });
-  }
-});
+app.post('/api/widget/lead', widgetLeadLimiter, (req, res) => handlePublicLeadPost(req, res, 'widget/lead'));
+app.post('/api/leads', widgetLeadLimiter, (req, res) => handlePublicLeadPost(req, res, 'api/leads'));
 
 /** GET /api/telegram/status — diagnostic (requires X-Copyright admin secret) */
 app.get('/api/telegram/status', requireAdminPermission('channels'), async (req, res) => {

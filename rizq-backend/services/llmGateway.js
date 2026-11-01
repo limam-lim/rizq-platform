@@ -143,8 +143,17 @@ function _maskDeep(value, vault) {
   return value;
 }
 
+/** أزل/عطّل علامات اللفّ داخل النص حتى لا يغلق المهاجم الغلاف بنفسه */
+function neutralizeWrapperMarkers(text) {
+  return String(text == null ? '' : text)
+    .replace(/<<<\s*UNTRUSTED_INPUT[^>\n]*>>>/gi, '[UNTRUSTED_MARKER]')
+    .replace(/<<<\s*END_UNTRUSTED_INPUT\s*>>>/gi, '[END_UNTRUSTED_MARKER]')
+    .replace(/<<</g, '‹‹‹')
+    .replace(/>>>/g, '›››');
+}
+
 function wrapUntrusted(text, label) {
-  const body = String(text == null ? '' : text);
+  const body = neutralizeWrapperMarkers(text);
   const open = label
     ? '<<<UNTRUSTED_INPUT label="' + String(label).replace(/"/g, '') + '">>>'
     : UNTRUSTED_OPEN;
@@ -159,7 +168,8 @@ function sanitizeText(text, opts) {
   opts = opts || {};
   let s = String(text == null ? '' : text);
   if (!opts.skipRedaction) s = redactPii(s, opts.vault);
-  if (opts.wrap && !isAlreadyWrapped(s)) s = wrapUntrusted(s, opts.label || 'user');
+  // دائماً لفّ مدخلات المستخدم — لا تتخطَّ اللفّ حتى لو وُجدت علامات داخل النص
+  if (opts.wrap) s = wrapUntrusted(s, opts.label || 'user');
   return s;
 }
 
@@ -354,6 +364,8 @@ module.exports = {
   restorePii,
   createPiiVault,
   wrapUntrusted,
+  neutralizeWrapperMarkers,
+  isAlreadyWrapped,
   sanitizeText,
   sanitizeMessages,
   sanitizeParams,

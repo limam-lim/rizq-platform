@@ -222,7 +222,8 @@ function mountAccountsManageRoutes(app, deps) {
         b.facebook = '';
       }
     }
-    // ضبط الهاتف (محل/مكتب/معرض/فرد): تطبيع + رفض أرقام غير صالحة
+    // ضبط الهاتف (محل/مكتب/معرض/فرد): تطبيع + رفض أرقام غير صالحة + فرادة
+    let phoneChanged = false;
     if (b.phone !== undefined || b.phoneIntl !== undefined || b.whatsapp !== undefined) {
       const waRaw = b.whatsapp !== undefined ? b.whatsapp : acc.whatsapp;
       const isWaUrl = /^https?:\/\//i.test(String(waRaw || ''));
@@ -238,6 +239,31 @@ function mountAccountsManageRoutes(app, deps) {
           error: phoneResolved.error || 'رقم هاتف غير صالح',
         });
       }
+      const { phoneMatchKey } = require('../lib/phoneNormalize');
+      const nextKeys = [
+        phoneMatchKey(phoneResolved.phone),
+        phoneMatchKey(phoneResolved.phoneIntl),
+        phoneMatchKey(phoneResolved.whatsapp),
+      ].filter(Boolean);
+      const conflict = list.find((other) => {
+        if (!other || other.id === acc.id) return false;
+        const otherKeys = [
+          phoneMatchKey(other.phone),
+          phoneMatchKey(other.phoneIntl),
+          phoneMatchKey(other.whatsapp),
+        ].filter(Boolean);
+        return nextKeys.some((k) => otherKeys.indexOf(k) !== -1);
+      });
+      if (conflict) {
+        return res.status(409).json({
+          ok: false,
+          code: 'phone_in_use',
+          error: 'هذا الرقم مرتبط بحساب آخر — لا يمكن نقله دون تحقق',
+        });
+      }
+      const prevKey = phoneMatchKey(acc.phone || acc.whatsapp || acc.phoneIntl);
+      const newKey = phoneMatchKey(phoneResolved.phone || phoneResolved.whatsapp || phoneResolved.phoneIntl);
+      phoneChanged = !!(newKey && newKey !== prevKey);
       b.phone = phoneResolved.phone;
       b.phoneIntl = phoneResolved.phoneIntl;
       b.whatsapp = isWaUrl ? String(waRaw).trim().slice(0, 60) : phoneResolved.whatsapp;
@@ -352,10 +378,22 @@ function mountAccountsManageRoutes(app, deps) {
     acc.updatedAt = new Date().toISOString();
     list[idx] = acc;
     await writeAccounts(list);
-    // مزامنة ملف الوكيل الهاتفي عند تغيير رقم المحل/المكتب/المعرض
+    // مزامنة ملف الوكيل — فقط لنفس accountId وبعد تحقق الماسية؛ لا اختطاف عبر تغيير الرقم
     if (typeof upsertSubscriberProfileFromAccount === 'function'
       && (b.phone !== undefined || b.phoneIntl !== undefined || b.whatsapp !== undefined || b.name !== undefined)) {
-      await upsertSubscriberProfileFromAccount(acc, {}).catch(() => {});
+      try {
+        let diamondOk = false;
+        try {
+          const { isDiamondActive } = require('../rizq_package_lifecycle_agent');
+          diamondOk = !!(await isDiamondActive(acc.id));
+        } catch (eDia) { diamondOk = false; }
+        if (diamondOk) {
+          await upsertSubscriberProfileFromAccount(acc, {
+            allowPhoneRebind: false,
+            phoneChanged: !!phoneChanged,
+          });
+        }
+      } catch (eUp) { /* لا تفشل PATCH الحساب إن تعذّرت مزامنة الوكيل */ }
     }
     res.json({ ok: true, account: stripToken(acc) });
   });

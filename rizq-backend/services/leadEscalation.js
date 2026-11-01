@@ -29,6 +29,39 @@ const SUPPORT_CONTACT = {
   phone: '+222 44 88 22 12',
 };
 
+/** حد إشعارات تيليغرام لكل هاتف / IP (منع spam بعد تجاوز حد HTTP) */
+const _telegramThrottle = new Map();
+function _throttleKeyOk(key, windowMs, max) {
+  const k = String(key || '').slice(0, 80);
+  if (!k) return true;
+  const now = Date.now();
+  let arr = _telegramThrottle.get(k) || [];
+  arr = arr.filter((t) => now - t < windowMs);
+  if (arr.length >= max) {
+    _telegramThrottle.set(k, arr);
+    return false;
+  }
+  arr.push(now);
+  _telegramThrottle.set(k, arr);
+  return true;
+}
+
+function validatePublicLeadFields(lead) {
+  const name = String((lead && lead.businessName) || '').trim();
+  const wa = String((lead && lead.whatsapp) || '').replace(/\s+/g, '');
+  if (name.length < 2 || name.length > 120) {
+    return { ok: false, error: 'business_name_required', code: 'invalid_business_name' };
+  }
+  if (/https?:\/\//i.test(name) || /<<<|>>>/.test(name)) {
+    return { ok: false, error: 'business_name_invalid', code: 'invalid_business_name' };
+  }
+  const digits = wa.replace(/\D/g, '');
+  if (digits.length < 8 || digits.length > 15) {
+    return { ok: false, error: 'whatsapp_invalid', code: 'invalid_whatsapp' };
+  }
+  return { ok: true };
+}
+
 const LEAD_INTENT_RE = /(?:اشتراك|تفعيل|أريد.*باق|الباقة|باقة|ماس|سنو|تجرب|خصم|subscribe|forfait|diamond|activation|register|pro\b|trial|مشارك)/i;
 const LEAD_CORRECTION_RE = /(?:لا|ليس|غير|مو|ليسة|بل\s|قصدي|أريد|اريد|ودي|بغيت).*?(?:pro|برو|ماس|أساس|standard|basic|مكتب|مكاتب|محل|محلات|معارض|معرض|showroom|شركات|شركة)/i;
 const LEAD_CATALOG_CORRECTION_RE = /(?:لا|ليس|غير|مو|ليسة|بل|قصدي).*?(?:محلات|محل|متجر|مكاتب|مكتب|معارض|معرض|showroom|شركات)/i;
@@ -309,6 +342,9 @@ async function dispatchTelegramLeadAlert(leadPayload, meta, leadId) {
  */
 async function createLeadAndNotify(input, meta) {
   meta = meta || {};
+  if (meta.merchantMode === true) {
+    return { ok: false, error: 'merchant_mode_no_platform_lead', code: 'merchant_mode' };
+  }
   let lead = normalizeLeadInput(input);
   if (!lead.whatsapp) {
     lead.whatsapp = extractWhatsappFromMeta(meta, lead);
@@ -323,7 +359,14 @@ async function createLeadAndNotify(input, meta) {
     notes: meta.notes || lead.reason || null,
   });
   lead.businessName = extractBusinessNameFromMeta(enrichMeta, lead);
+  if (meta.requireVerifiedFields) {
+    const v = validatePublicLeadFields(lead);
+    if (!v.ok) return v;
+  }
   lead = enrichLeadWithLivePricing(lead, meta.lang || 'ar', enrichMeta);
+
+  const phoneKey = String(lead.whatsapp || '').replace(/\D/g, '').slice(-12);
+  const ipKey = meta.clientIp ? ('ip:' + meta.clientIp) : '';
 
   const dup = await findRecentDuplicate(lead.whatsapp, 3600000);
   if (dup) {
@@ -356,6 +399,15 @@ async function createLeadAndNotify(input, meta) {
     }
     const shouldNotifyTelegram = !dup.telegramSent || updated;
     if (shouldNotifyTelegram) {
+      if (!_throttleKeyOk('wa:' + phoneKey, 3600000, 3)
+        || (ipKey && !_throttleKeyOk(ipKey, 900000, 5))) {
+        return buildLeadToolResult(dupLead, dup.id, meta.lang || 'ar', meta, {
+          duplicate: true,
+          updated: false,
+          telegram_sent: false,
+          throttled: true,
+        });
+      }
       console.log('[lead-escalation] Telegram for duplicate lead', dup.id, updated ? 'update' : 'retry');
       const dupPayload = {
         businessName: dupLead.businessName,
@@ -390,6 +442,11 @@ async function createLeadAndNotify(input, meta) {
       updated: updated,
       telegram_sent: !!dup.telegramSent,
     });
+  }
+
+  if (!_throttleKeyOk('wa:' + phoneKey, 3600000, 3)
+    || (ipKey && !_throttleKeyOk(ipKey, 900000, 5))) {
+    return { ok: false, error: 'too_many_leads', code: 'rate_limited', duplicate: true };
   }
 
   const saved = await saveLead({
@@ -469,7 +526,8 @@ function leadToolWasUsed(toolResultsRaw) {
   ));
 }
 
-async function maybeAutoNotifyLead({ userText, history, toolResultsRaw, channel }) {
+async function maybeAutoNotifyLead({ userText, history, toolResultsRaw, channel, merchantMode }) {
+  if (merchantMode) return null;
   const isCorrection = LEAD_CORRECTION_RE.test(String(userText || ''))
     || LEAD_CATALOG_CORRECTION_RE.test(String(userText || ''));
   if (leadToolWasUsed(toolResultsRaw)) {
@@ -526,6 +584,7 @@ module.exports = {
   buildLeadConfirmationMessage,
   buildLeadToolResult,
   sendTelegramLeadAlert,
+  validatePublicLeadFields,
   getPendingLeads,
   formatPendingLeadsForAdmin,
   SUPPORT_CONTACT,

@@ -277,16 +277,61 @@ function upsertSubscriberInstructionsFromAccount(acc, customInstructions) {
 }
 
 async function upsertSubscriberProfileFromAccount(acc, patch) {
-  const subscriberId = await resolveSubscriberIdForAccount(acc);
-  if (!subscriberId) return { ok: false, error: 'no_subscriber_id' };
+  patch = patch || {};
+  if (!acc || !acc.id) return { ok: false, error: 'no_account' };
+
+  // لا تُثبّت الماسية بلا تحقق اشتراك نشط
+  let diamondActive = false;
+  try {
+    const { isDiamondActive } = require('./rizq-backend/rizq_package_lifecycle_agent');
+    diamondActive = !!(await isDiamondActive(acc.id));
+  } catch (eDia) {
+    diamondActive = false;
+  }
+  if (!diamondActive) {
+    return { ok: false, error: 'diamond_required', code: 'diamond_required' };
+  }
+
   await _loadFromDisk();
+  // فضّل الربط عبر accountId القائم — امنع اختطاف ملف مشترك عبر تغيير الهاتف
+  const byAcc = await getSubscriberProfileByAccountId(acc.id);
+  let subscriberId = byAcc ? byAcc.subscriberId : null;
+  if (!subscriberId) {
+    const phone = String(acc.phone || acc.whatsapp || '').replace(/\D/g, '');
+    const phoneId = phone ? phone.slice(-12) : '';
+    if (phoneId && subscriberProfiles.has(phoneId)) {
+      const existing = subscriberProfiles.get(phoneId) || {};
+      const owner = String(existing.accountId || '');
+      if (owner && owner !== String(acc.id)) {
+        // رقم يخص حساباً آخر — ارفض إعادة الربط (إلا إن صُرّح صراحةً وهو غير مسموح افتراضياً)
+        if (patch.allowPhoneRebind !== true) {
+          return { ok: false, error: 'phone_bound_to_other_account', code: 'phone_in_use' };
+        }
+      }
+      if (!owner || owner === String(acc.id)) {
+        subscriberId = phoneId;
+      }
+    }
+    if (!subscriberId) {
+      // ملف جديد بمعرّف الحساب — لا تستخدم لاحقة هاتف غريبة قد تطابق ضحية
+      subscriberId = String(acc.id).slice(0, 40);
+    }
+  }
+
   const existing = subscriberProfiles.get(subscriberId) || {};
-  const merged = Object.assign({}, existing, acc, patch || {});
+  if (existing.accountId && String(existing.accountId) !== String(acc.id)) {
+    return { ok: false, error: 'subscriber_owned_by_other', code: 'account_mismatch' };
+  }
+
+  const merged = Object.assign({}, existing, acc, patch);
   const personaKey = RizqPrompts.resolveBusinessType(Object.assign({}, merged, {
     businessName: acc.name || existing.businessName,
     activity: acc.activity || acc.desc || existing.activity,
-    businessType: (patch && patch.businessType) || existing.businessType || acc.type,
+    businessType: patch.businessType || existing.businessType || acc.type,
   }));
+  const safePatch = Object.assign({}, patch);
+  delete safePatch.allowPhoneRebind;
+  delete safePatch.phoneChanged;
   await registerSubscriber(subscriberId, Object.assign({}, existing, {
     accountId: acc.id,
     businessName: acc.name || existing.businessName || 'المنشأة',
@@ -294,7 +339,9 @@ async function upsertSubscriberProfileFromAccount(acc, patch) {
     plan: 'diamond',
     tier: 'diamond',
     activity: acc.activity || acc.desc || existing.activity || '',
-  }, patch || {}));
+    phone: acc.phone || existing.phone || '',
+    whatsapp: acc.whatsapp || existing.whatsapp || '',
+  }, safePatch));
   return { ok: true, subscriberId };
 }
 
@@ -380,18 +427,32 @@ async function askSubscriberAgent({ subscriberId, channel, message, context = {}
     };
   }
 
-  if (profile.accountId) {
-    try {
-      const { isDiamondActive } = require('./rizq-backend/rizq_package_lifecycle_agent');
-      if (!(await isDiamondActive(profile.accountId))) {
-        return {
-          text: 'انتهت باقتك الماسية أو لم يُؤكَّد الدفع بعد — جدّد الاشتراك لاستعادة الوكيل الذكي.',
-          channel,
-          model: null,
-          isolation: { subscriberId: canonicalId, mode: 'diamond_inactive' },
-        };
-      }
-    } catch (e) { /* optional if lifecycle module unavailable */ }
+  // بوابة الماسية: fail-closed — بلا accountId أو عند الخطأ = رفض
+  if (!profile.accountId) {
+    return {
+      text: 'خدمة الوكيل الذكي غير متاحة — الحساب غير مربوط بشكل صحيح.',
+      channel,
+      model: null,
+      isolation: { subscriberId: canonicalId, mode: 'account_required' },
+    };
+  }
+  try {
+    const { isDiamondActive } = require('./rizq-backend/rizq_package_lifecycle_agent');
+    if (!(await isDiamondActive(profile.accountId))) {
+      return {
+        text: 'انتهت باقتك الماسية أو لم يُؤكَّد الدفع بعد — جدّد الاشتراك لاستعادة الوكيل الذكي.',
+        channel,
+        model: null,
+        isolation: { subscriberId: canonicalId, mode: 'diamond_inactive' },
+      };
+    }
+  } catch (e) {
+    return {
+      text: 'تعذّر التحقق من الاشتراك حالياً — حاول لاحقاً.',
+      channel,
+      model: null,
+      isolation: { subscriberId: canonicalId, mode: 'diamond_check_failed' },
+    };
   }
 
   // ── بناء System Prompt خاص بالمشترك فقط (لا تُحمَّل منشآت أخرى) ──
