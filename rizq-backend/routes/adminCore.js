@@ -267,7 +267,8 @@ function mountAdminCoreRoutes(app, deps) {
   // فقط، ومحمي بنفس BACKEND_SHARED_SECRET العام لبقية نقاط لوحة الأدمن.
   app.get('/api/admin/daily-digest', requireAdminPermission('overview'), async (req, res) => {
     try {
-      const pendingAccounts = (await readAccounts()).filter((a) => a.status === 'pending');
+      const { isSentinelAccount } = require('../lib/sentinelAccount');
+      const pendingAccounts = (await readAccounts()).filter((a) => a.status === 'pending' && !isSentinelAccount(a));
       const pendingAds = (await readAds()).filter((a) => a.status === 'pending');
       const pendingSubRequests = (await readSubRequests()).filter((r) => r.status === 'pending');
       const pendingBizContacts = (typeof readAdsRequests === 'function' ? await readAdsRequests() : [])

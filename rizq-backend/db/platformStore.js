@@ -497,6 +497,7 @@ async function queryPublicAds(filters) {
     "status = 'active'",
     "account_id NOT LIKE 'acc_demo%'",
     "id !~* '^RZQ-2026-1000[0-9]$'",
+    "account_id NOT IN (SELECT id FROM accounts WHERE COALESCE(data->>'isSentinel','') = 'true')",
   ];
   const params = [];
   function push(val) {
@@ -561,6 +562,7 @@ async function queryPublicAccounts(filters) {
     "status = 'approved'",
     'suspended = 0',
     "id NOT LIKE 'acc_demo%'",
+    "(COALESCE(data->>'isSentinel','') IS DISTINCT FROM 'true')",
   ];
   const params = [];
   function push(val) {
