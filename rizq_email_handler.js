@@ -17,7 +17,7 @@
  * rizq_subscription_engine.js) تفترض رداً تلقائياً شخصياً باسم كل منشأة
  * مشتركة على بريدها الإلكتروني الخاص. هذا الملف لا يفعل ذلك إطلاقاً — هو
  * فقط يرد تلقائياً على البريد الوارد لصندوق دعم رزق العام نفسه
- * (direction@rizq.mr)، بلا أي مفهوم "مشترك" أو "باقة" على الإطلاق.
+ * (contact@rizq.mr)، بلا أي مفهوم "مشترك" أو "باقة" على الإطلاق.
  * لا يمكن "إصلاح" هذا بمجرد إضافة تحقق من الباقة (كما فعلنا في rizq_call_
  * handler.js وrizq_widget_embed.js) لأن الميزة نفسها غير مبنية بعد: تتطلب
  * جمع بيانات اعتماد بريد إلكتروني حقيقية لكل مشترك (IMAP/SMTP أو OAuth)
@@ -51,17 +51,17 @@ const CONFIG = {
     port  : parseInt(process.env.SMTP_PORT || '587'),
     secure: false,
     auth: {
-      user: process.env.EMAIL_USER || 'direction@rizq.mr',
+      user: process.env.EMAIL_USER || 'contact@rizq.mr',
       pass: process.env.EMAIL_PASS || ''
     }
   },
-  FROM     : '"رزق — ADMINIA SARL" <direction@rizq.mr>',
+  FROM     : '"رزق — ADMINIA SARL" <contact@rizq.mr>',
   SIGNATURE: `
 
 ---
 مع خالص التحية،
 فريق رزق — ADMINIA SARL
-direction@rizq.mr | rizq.mr
+contact@rizq.mr | rizq.mr
 +222 44 88 22 12`
 };
 

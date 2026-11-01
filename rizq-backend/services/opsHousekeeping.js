@@ -56,7 +56,7 @@ async function sendEmailSafe(to, subject, html) {
       ...smtpTransportTimeouts('smtp'),
     });
     await mailer.sendMail({
-      from: process.env.EMAIL_FROM || '"رزق Rizq" <direction@rizq.mr>',
+      from: process.env.EMAIL_FROM || '"رزق Rizq" <contact@rizq.mr>',
       to, subject, html,
     });
     return { ok: true };

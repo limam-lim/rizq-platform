@@ -54,7 +54,7 @@ const DEMO_ACCOUNT = {
   planName: "سنوية",
   /* نفس الروابط التي تظهر في واجهة المحل التجريبية — واضحة وقابلة للمعاينة هنا */
   promo_video: "rizq-assets/promo/rizq-dashboard-store-demo-light.mp4",
-  promo_video_extra: "https://www.youtube.com/watch?v=eRsGyueVLvQ",
+  promo_video_extra: "",
   serviceDesk: {
     enabled: true,
     formTitle: 'طلب خدمة — محل النجمة',

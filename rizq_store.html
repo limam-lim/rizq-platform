@@ -2194,7 +2194,7 @@ function rizqShare(title, url) {
         <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" id="rzq-cn-1">موريتل: </strong><a href="tel:+22244882212" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 44 88 22 12</a></li>
         <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" id="rzq-cn-2">ماتيل: </strong><a href="tel:+22236485784" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 36 48 57 84</a></li>
         <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" id="rzq-cn-3">شينقيتل: </strong><a href="tel:+22222708338" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 22 70 83 38</a></li>
-        <li style="font-size:13px"><a href="mailto:direction@rizq.mr" style="color:#e0e0e0;text-decoration:none">📧 direction@rizq.mr</a></li>
+        <li style="font-size:13px"><a href="mailto:contact@rizq.mr" style="color:#e0e0e0;text-decoration:none">📧 contact@rizq.mr</a></li>
       </ul>
     </div>
   </div>
@@ -2701,7 +2701,7 @@ function rizqShare(title, url) {
         planName: 'سنوية',
         /* تعريفي: بضع ثوانٍ من داشبورد المحل · إضافي: كما كان (يوتيوب) */
         promo_video: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4',
-        promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ',
+        promo_video_extra: '',
         /* غلاف هيرو ترويجي للمحل (واجهة بوتيك) — محلي فوري بلا وميض كحلي */
         cover: 'rizq-assets/demo-heroes/store-boutique-promo.jpg',
         thumb: 'rizq-assets/demo-heroes/store-boutique-promo.jpg'
@@ -2865,15 +2865,16 @@ function rizqShare(title, url) {
     function mountStorePromoVideo(acc){
       /* بطاقات هادئة على الهيرو: تعريفي + إضافي — بلا شريط مكرر أسفل */
       if(!acc || !window.RizqIntroVideo) return;
-      var videos;
-      if(window.RizqStoreCommerce && typeof RizqStoreCommerce.promoVideosOf === 'function'){
-        videos = RizqStoreCommerce.promoVideosOf(acc);
-      } else {
-        videos = [];
+      function resolveVideos(){
+        if(window.RizqStoreCommerce && typeof RizqStoreCommerce.promoVideosOf === 'function'){
+          return RizqStoreCommerce.promoVideosOf(acc) || [];
+        }
+        var videos = [];
         if(acc.promo_video) videos.push({ url: String(acc.promo_video).trim(), kind: 'intro' });
         if(acc.promo_video_extra) videos.push({ url: String(acc.promo_video_extra).trim(), kind: 'extra' });
-        videos = videos.filter(function(v){ return !!v.url; });
+        return videos.filter(function(v){ return !!v.url && !(window.RizqStoreCommerce && RizqStoreCommerce.isRejectedDemoVideoUrl && RizqStoreCommerce.isRejectedDemoVideoUrl(v.url)); });
       }
+      function paintWith(videos){
       var hero = document.getElementById('store-hero');
       var introCard = document.getElementById('hero-intro-card');
       var extraCard = document.getElementById('hero-extra-card');
@@ -2922,6 +2923,12 @@ function rizqShare(title, url) {
       }
       if(hero) hero.classList.toggle('has-hero-videos', !!(okIntro || okExtra));
       try{ if(window.RizqLiveShowcase) RizqLiveShowcase.maybeApplyPublic(acc); }catch(eLive2){}
+      } /* end paintWith */
+      if(window.RizqApi && typeof RizqApi.siteConfig === 'function' && !window.__RIZQ_LAST_SITE_CONFIG){
+        RizqApi.siteConfig().then(function(){ paintWith(resolveVideos()); }).catch(function(){ paintWith(resolveVideos()); });
+      } else {
+        paintWith(resolveVideos());
+      }
     }
 
     function paintStoreProductsGrid(products, storeId){
@@ -2958,7 +2965,9 @@ function rizqShare(title, url) {
         var topic = null;
         if(window.RizqStoreTopics) topic = RizqStoreTopics.resolveProductTopic(storeTopics, p);
         var topicKey = topic ? topic.id : (p.topicId || p.cat || '');
-        var priceTxt = (Number(p.price)||0).toLocaleString('en-US') + ' MRU';
+        var priceTxt = (Number(p.price) > 0)
+          ? ((Number(p.price)||0).toLocaleString('en-US') + ' MRU')
+          : (isFr() ? 'Prix à la demande' : 'السعر عند التواصل');
         var media = (window.RizqStoreCommerce && RizqStoreCommerce.productMediaHtml)
           ? RizqStoreCommerce.productMediaHtml(Object.assign({}, p, { id: pid, images: imgs }), { fr: isFr(), showPrice: false })
           : (imgs[0]
@@ -3073,6 +3082,8 @@ function rizqShare(title, url) {
               accountId: id,
               isDemo: isPreview,
               packageIds: ['store-packages'],
+              packagesAsCta: true,
+              packagesKind: 'store',
               paymentIds: ['store-payment-methods'],
               hideListingPrefacture: true
             });
@@ -3259,6 +3270,8 @@ function rizqShare(title, url) {
                     accountId: id,
                     isDemo: apiIsDemo,
                     packageIds: ['store-packages'],
+                    packagesAsCta: true,
+                    packagesKind: 'store',
                     paymentIds: ['store-payment-methods'],
                     hideListingPrefacture: true
                   });

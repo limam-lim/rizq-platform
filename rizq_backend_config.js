@@ -146,6 +146,9 @@
       .then(function (r) { return r && r.ok ? r.json() : null; })
       .then(function (data) {
         try {
+          if (data && data.config) {
+            window.__RIZQ_LAST_SITE_CONFIG = data.config;
+          }
           var launch = data && data.config && data.config.launch;
           window.__RIZQ_SITE_CONFIG_READY = true;
           if (launch) {

@@ -25,7 +25,7 @@ const { cleanField } = require('./telegramNotifyFormat');
 const { formatPlainChatText } = require('./widgetMarkdown');
 
 const SUPPORT_CONTACT = {
-  email: 'direction@rizq.mr',
+  email: 'contact@rizq.mr',
   phone: '+222 44 88 22 12',
 };
 

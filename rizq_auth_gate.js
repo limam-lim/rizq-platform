@@ -550,7 +550,7 @@
       '        <div><strong>Mauritel:</strong> <a href="tel:+22244882212" dir="ltr">+222 44 88 22 12</a></div>',
       '        <div><strong>Mattel:</strong> <a href="tel:+22236485784" dir="ltr">+222 36 48 57 84</a></div>',
       '        <div><strong>Chinguitel:</strong> <a href="tel:+22222708338" dir="ltr">+222 22 70 83 38</a></div>',
-      '        <div><a href="mailto:direction@rizq.mr">direction@rizq.mr</a></div>',
+      '        <div><a href="mailto:contact@rizq.mr">contact@rizq.mr</a></div>',
       '      </div>',
       '    </nav>',
       '  </div>',

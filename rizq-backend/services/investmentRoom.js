@@ -1,7 +1,7 @@
 /**
  * غرفة الاستثمارات — وكيل المراجعة الأوّلية + تخزين الفرص + تقرير تشغيلي يومي.
  * البريد التشغيلي خاص (INVESTMENT_OPS_EMAIL / OWNER_OPS_EMAIL / SUPER_ADMIN_EMAIL)
- * ولا يُعرَض أبداً في الواجهة العامة — direction@rizq.mr هو البريد العام فقط.
+ * ولا يُعرَض أبداً في الواجهة العامة — contact@rizq.mr هو البريد العام فقط.
  */
 'use strict';
 
@@ -20,7 +20,7 @@ const { saveInvestmentImages } = require('./imagePipeline');
 const { saveInvestmentDocument, extractPdfTextFromDataUri } = require('./tenderDocument');
 const repos = require('../db/repos');
 
-const PUBLIC_CONTACT = 'direction@rizq.mr';
+const PUBLIC_CONTACT = 'contact@rizq.mr';
 const SECTORS = [
   'تجارة', 'خدمات', 'تكنولوجيا', 'عقارات', 'زراعة', 'صناعة', 'طاقة', 'سياحة', 'تعليم', 'صحة', 'أخرى',
   'commerce', 'services', 'technologie', 'immobilier', 'agriculture', 'industrie', 'energie', 'tourisme', 'education', 'sante', 'autre'
@@ -606,7 +606,7 @@ async function sendOpsDailyReport() {
 
   try {
     await mailer.sendMail({
-      from: process.env.EMAIL_FROM || '"رزق Rizq Ops" <direction@rizq.mr>',
+      from: process.env.EMAIL_FROM || '"رزق Rizq Ops" <contact@rizq.mr>',
       to,
       subject: '[Rizq] Investment room daily report — ' + new Date().toISOString().slice(0, 10),
       text: lines.join('\n'),

@@ -1171,10 +1171,10 @@
         });
       }
       return pick({
-        ar: 'أنا في الوضع المحلي (الخادم غير متصل). اسأل عن: نشر إعلان، الباقات، الدفع، أو الأمان — أو راسل direction@rizq.mr',
-        fr: 'Je suis en mode local (serveur hors ligne). Demandez: publication, forfaits, paiement, sécurité — ou écrivez à direction@rizq.mr',
-        es: 'Estoy en modo local (servidor sin conexión). Pregunte: publicar, planes, pago, seguridad — o escriba a direction@rizq.mr',
-        en: 'I\'m in local mode (server offline). Ask about: posting, plans, payment, safety — or email direction@rizq.mr'
+        ar: 'أنا في الوضع المحلي (الخادم غير متصل). اسأل عن: نشر إعلان، الباقات، الدفع، أو الأمان — أو راسل contact@rizq.mr',
+        fr: 'Je suis en mode local (serveur hors ligne). Demandez: publication, forfaits, paiement, sécurité — ou écrivez à contact@rizq.mr',
+        es: 'Estoy en modo local (servidor sin conexión). Pregunte: publicar, planes, pago, seguridad — o escriba a contact@rizq.mr',
+        en: 'I\'m in local mode (server offline). Ask about: posting, plans, payment, safety — or email contact@rizq.mr'
       });
     }
 

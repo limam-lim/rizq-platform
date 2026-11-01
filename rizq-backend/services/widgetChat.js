@@ -460,10 +460,10 @@ function validateReply(reply, mergedFacts, lang, userMessage) {
   if (uncertain && !hasGrounding && adQuery && !platformQuery) {
     return {
       reply: pickLang({
-        ar: 'لا تتوفر لدي بيانات مؤكدة في قاعدة البيانات. راجع بطاقة الإعلان أو تواصل مع direction@rizq.mr.',
-        fr: 'Je n\'ai pas de données confirmées en base. Consultez la fiche ou écrivez à direction@rizq.mr.',
-        en: 'I have no confirmed data in the database. Check the listing card or email direction@rizq.mr.',
-        es: 'No tengo datos confirmados. Revise la ficha del anuncio o escriba a direction@rizq.mr.',
+        ar: 'لا تتوفر لدي بيانات مؤكدة في قاعدة البيانات. راجع بطاقة الإعلان أو تواصل مع contact@rizq.mr.',
+        fr: 'Je n\'ai pas de données confirmées en base. Consultez la fiche ou écrivez à contact@rizq.mr.',
+        en: 'I have no confirmed data in the database. Check the listing card or email contact@rizq.mr.',
+        es: 'No tengo datos confirmados. Revise la ficha del anuncio o escriba a contact@rizq.mr.',
       }, lang),
       grounded: false,
       reviewed: true,

@@ -12,7 +12,7 @@ var RIZQ_IDENTITY = {
   name_ar: 'مدير رزق', name_fr: 'Directeur Rizq', name_en: 'Rizq Manager',
   platform: 'رزق — منصة التجارة الإلكترونية الموريتانية',
   website:  'rizq.mr',
-  email:    'direction@rizq.mr',
+  email:    'contact@rizq.mr',
   greeting: {
     ar: 'وعليكم السلام! أهلاً وسهلاً 😊\nكيف أقدر أساعدك اليوم؟',
     fr: 'Wa alaykum assalam! Bienvenue 😊\nComment puis-je vous aider?',
@@ -409,8 +409,8 @@ var FAQ = [
       // (LRI...PDI) تفرض LTR على الرقم فقط دون التأثير على بقية الجملة — تعمل
       // حتى كنص خام (الويدجت يعرض هذا النص مُهرَّباً عبر _esc()، فلا يمكن
       // استخدام <span dir="ltr">).
-      ar: '📞 التواصل مع فريق رزق:\n\n📱 موريتل: ⁦+222 44 88 22 12⁩\n📱 ماتيل: ⁦+222 36 48 57 84⁩\n📱 شينقيتل: ⁦+222 22 70 83 38⁩\n\n📧 البريد: direction@rizq.mr\n🌐 الموقع: rizq.mr\n\n⏰ أوقات العمل: السبت–الخميس، 8ص–8م بتوقيت نواكشوط\n\nأو تابع معي — أستطيع حل معظم المشاكل مباشرة! 😊',
-      fr: '📞 Contacter l\'équipe Rizq:\n\n📱 Mauritel: ⁦+222 44 88 22 12⁩\n📱 Mattel: ⁦+222 36 48 57 84⁩\n📱 Chinguitel: ⁦+222 22 70 83 38⁩\n\n📧 Email: direction@rizq.mr\n🌐 Site: rizq.mr\n\n⏰ Horaires: samedi–jeudi, 8h–20h (heure de Nouakchott)\n\nOu continuez avec moi — je peux résoudre la plupart des problèmes directement! 😊'
+      ar: '📞 التواصل مع فريق رزق:\n\n📱 موريتل: ⁦+222 44 88 22 12⁩\n📱 ماتيل: ⁦+222 36 48 57 84⁩\n📱 شينقيتل: ⁦+222 22 70 83 38⁩\n\n📧 البريد: contact@rizq.mr\n🌐 الموقع: rizq.mr\n\n⏰ أوقات العمل: السبت–الخميس، 8ص–8م بتوقيت نواكشوط\n\nأو تابع معي — أستطيع حل معظم المشاكل مباشرة! 😊',
+      fr: '📞 Contacter l\'équipe Rizq:\n\n📱 Mauritel: ⁦+222 44 88 22 12⁩\n📱 Mattel: ⁦+222 36 48 57 84⁩\n📱 Chinguitel: ⁦+222 22 70 83 38⁩\n\n📧 Email: contact@rizq.mr\n🌐 Site: rizq.mr\n\n⏰ Horaires: samedi–jeudi, 8h–20h (heure de Nouakchott)\n\nOu continuez avec moi — je peux résoudre la plupart des problèmes directement! 😊'
     }
   },
   {
@@ -765,8 +765,8 @@ function processMessage(userMessage, context) {
 
   // Location / address
   if (/\u0645\u0648\u0642\u0639|\u0639\u0646\u0648\u0627\u0646|\u0641\u064A\u0646|\u0648\u064A\u0646|\u0623\u064A\u0646|location|adresse|donde/.test(lower)) {
-    var locR = _matchFAQ("\u0639\u0646\u0648\u0627\u0646 \u0631\u0632\u0642", lang) || '{\u0644\u0644\u062A\u0648\u0627\u0635\u0644: direction@rizq.mr \u0623\u0648 rizq.mr}';
-    return { reply: lang==='fr' ? '\uD83D\uDCCD Rizq est une plateforme en ligne. Contactez-nous: direction@rizq.mr' : '\uD83D\uDCCD \u0631\u0632\u0642 \u0645\u0646\u0635\u0629 \u0625\u0644\u0643\u062A\u0631\u0648\u0646\u064A\u0629. \u062A\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627: direction@rizq.mr', lang: lang };
+    var locR = _matchFAQ("\u0639\u0646\u0648\u0627\u0646 \u0631\u0632\u0642", lang) || '{\u0644\u0644\u062A\u0648\u0627\u0635\u0644: contact@rizq.mr \u0623\u0648 rizq.mr}';
+    return { reply: lang==='fr' ? '\uD83D\uDCCD Rizq est une plateforme en ligne. Contactez-nous: contact@rizq.mr' : '\uD83D\uDCCD \u0631\u0632\u0642 \u0645\u0646\u0635\u0629 \u0625\u0644\u0643\u062A\u0631\u0648\u0646\u064A\u0629. \u062A\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627: contact@rizq.mr', lang: lang };
   }
 
   // Trust / verification

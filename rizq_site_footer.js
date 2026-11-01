@@ -143,7 +143,7 @@
       + '        <li class="footer-contact-row">📱 <strong class="carrier-name" style="color:#C9A84C">Mauritel:</strong> <a href="tel:+22244882212" dir="ltr" style="color:rgba(255,255,255,.75);text-decoration:none;direction:ltr;unicode-bidi:isolate">+222 44 88 22 12</a></li>'
       + '        <li class="footer-contact-row">📱 <strong class="carrier-name" style="color:#C9A84C">Mattel:</strong> <a href="tel:+22236485784" dir="ltr" style="color:rgba(255,255,255,.75);text-decoration:none;direction:ltr;unicode-bidi:isolate">+222 36 48 57 84</a></li>'
       + '        <li class="footer-contact-row">📱 <strong class="carrier-name" style="color:#C9A84C">Chinguitel:</strong> <a href="tel:+22222708338" dir="ltr" style="color:rgba(255,255,255,.75);text-decoration:none;direction:ltr;unicode-bidi:isolate">+222 22 70 83 38</a></li>'
-      + '        <li class="footer-contact-row">📧 <a href="mailto:direction@rizq.mr" style="color:rgba(255,255,255,.75);text-decoration:none">direction@rizq.mr</a></li>'
+      + '        <li class="footer-contact-row">📧 <a id="rzq-site-ft-email" href="mailto:contact@rizq.mr" style="color:rgba(255,255,255,.75);text-decoration:none">contact@rizq.mr</a></li>'
       + '      </ul>'
       + '    </div>'
       + '  </div>'
@@ -161,6 +161,37 @@
       + '    <p class="footer-copy" id="rzq-site-ft-sig" data-t="ft-sig" style="display:flex;align-items:center;gap:4px"><span id="rzq-site-ft-sig-pre" data-t-fr="Signé par">بتوقيع</span><span style="color:#C9A84C">✍️</span><strong style="font-weight:600">ADMINIA SARL — Powered by M. LIMAM</strong></p>'
       + '  </div>'
       + '</footer>';
+  }
+
+  var DEFAULT_PUBLIC_EMAIL = 'contact@rizq.mr';
+
+  function applyPublicContactEmail(email) {
+    var em = String(email || '').trim() || DEFAULT_PUBLIC_EMAIL;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) em = DEFAULT_PUBLIC_EMAIL;
+    document.querySelectorAll('#rzq-site-ft-email, a[href^="mailto:contact@rizq.mr"], a[href^="mailto:direction@rizq.mr"]').forEach(function (a) {
+      if (!a) return;
+      /* لا تلمس روابط صفحات أخرى مخصّصة إن وُسمت data-rizq-email-fixed */
+      if (a.getAttribute('data-rizq-email-fixed') === '1') return;
+      a.setAttribute('href', 'mailto:' + em);
+      if (!a.querySelector('*') || a.id === 'rzq-site-ft-email') {
+        if (/^(contact|direction)@rizq\.mr$/i.test(String(a.textContent || '').trim()) || a.id === 'rzq-site-ft-email') {
+          a.textContent = em;
+        }
+      }
+    });
+  }
+
+  function refreshPublicContactFromSiteConfig() {
+    try {
+      if (window.RizqApi && typeof window.RizqApi.siteConfig === 'function') {
+        window.RizqApi.siteConfig().then(function (data) {
+          var em = data && data.config && data.config.site && data.config.site.email;
+          applyPublicContactEmail(em);
+        }).catch(function () { applyPublicContactEmail(DEFAULT_PUBLIC_EMAIL); });
+        return;
+      }
+    } catch (e) {}
+    applyPublicContactEmail(DEFAULT_PUBLIC_EMAIL);
   }
 
   function isFrFooter() {
@@ -258,6 +289,7 @@
     ensureToggle();
     ensureSocialLinks();
     applyFooterLang();
+    refreshPublicContactFromSiteConfig();
     try {
       if (typeof window._rzqApplyFooterStats === 'function') window._rzqApplyFooterStats();
     } catch (e2) {}
@@ -265,6 +297,7 @@
 
   window.RizqEnsureSiteFooter = boot;
   window.RizqApplySiteFooterLang = applyFooterLang;
+  window.RizqApplyPublicContactEmail = applyPublicContactEmail;
   document.addEventListener('rizq:langchange', applyFooterLang);
 
   if (document.readyState === 'loading') {
