@@ -66,9 +66,11 @@ function getMailer() {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) return null;
   try {
     const nodemailer = require('nodemailer');
+    const { smtpTransportTimeouts } = require('../lib/externalHttp');
     _mailer = nodemailer.createTransport({
       service: process.env.EMAIL_SERVICE || 'gmail',
       auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+      ...smtpTransportTimeouts('smtp'),
     });
     return _mailer;
   } catch (e) {

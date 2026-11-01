@@ -286,13 +286,15 @@ async function telegramApi(method, payload, multipart) {
 
   let res;
   try {
+    const { fetchWithTimeout } = require('../lib/externalHttp');
     if (multipart) {
-      res = await fetch(url, { method: 'POST', body: payload });
+      res = await fetchWithTimeout(url, { method: 'POST', body: payload, service: 'telegram' });
     } else {
-      res = await fetch(url, {
+      res = await fetchWithTimeout(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
+        service: 'telegram',
       });
     }
   } catch (networkErr) {

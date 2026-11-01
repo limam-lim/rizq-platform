@@ -602,10 +602,12 @@ async function publishToFacebook(camp, settings) {
   const url = 'https://graph.facebook.com/' + encodeURIComponent(creds.apiVersion) +
     '/' + encodeURIComponent(creds.pageId) + '/feed';
 
-  const res = await fetch(url, {
+  const { fetchWithTimeout } = require('../lib/externalHttp');
+  const res = await fetchWithTimeout(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
+    service: 'facebook',
   });
   const data = await res.json().catch(() => ({}));
   if (!res.ok || data.error) {

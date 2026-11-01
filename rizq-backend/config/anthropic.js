@@ -87,16 +87,23 @@ function applyPromptCache(params) {
   return next;
 }
 
-/** مهلة مؤقتة لكل طلب Anthropic حتى بوابة LLM الموحّدة */
+/** مهلة مؤقتة لكل طلب Anthropic — افتراضي 15ث (EXTERNAL_HTTP_TIMEOUT_MS / ANTHROPIC_TIMEOUT_MS) */
 function getAnthropicTimeoutMs() {
-  const n = Number(process.env.ANTHROPIC_TIMEOUT_MS);
-  return Number.isFinite(n) && n > 0 ? n : 30_000;
+  try {
+    return require('../lib/externalHttp').getExternalTimeoutMs('anthropic');
+  } catch (e) {
+    const n = Number(process.env.ANTHROPIC_TIMEOUT_MS || process.env.EXTERNAL_HTTP_TIMEOUT_MS);
+    return Number.isFinite(n) && n > 0 ? n : 15_000;
+  }
 }
 
 function getAnthropicMaxRetries() {
-  const n = Number(process.env.ANTHROPIC_MAX_RETRIES);
-  // إعادة محاولة واحدة إضافية بعد الفشل الأول (إجمالي محاولتين)
-  return Number.isFinite(n) && n >= 0 ? n : 1;
+  try {
+    return require('../lib/externalHttp').getExternalMaxRetries('anthropic');
+  } catch (e) {
+    const n = Number(process.env.ANTHROPIC_MAX_RETRIES);
+    return Number.isFinite(n) && n >= 0 ? n : 1;
+  }
 }
 
 function requestOptions(extra) {
