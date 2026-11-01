@@ -617,12 +617,14 @@ async function handleWidgetChat(body) {
   const adFlow = isAdFlowQuery(text, pageContext);
   const preferredModel = getAgentModel();
 
+  // لا نقبل أدوار assistant/agent من العميل (تزوير تاريخ) — أدوار user فقط
   const messages = [];
   if (Array.isArray(history)) {
     history.slice(-6).forEach((h) => {
-      if (h && h.text && (h.role === 'user' || h.role === 'agent')) {
-        messages.push({ role: h.role === 'agent' ? 'assistant' : 'user', content: String(h.text).slice(0, 500) });
-      }
+      if (!h || !h.text) return;
+      const role = String(h.role || h.sender || '').toLowerCase();
+      if (role === 'agent' || role === 'assistant' || role === 'bot' || role === 'system') return;
+      messages.push({ role: 'user', content: String(h.text).slice(0, 500) });
     });
   }
 
@@ -760,12 +762,17 @@ async function handleWidgetChat(body) {
     catalogHint
   );
 
-  const autoLead = await maybeAutoNotifyLead({
-    userText: text,
-    history: body.history,
-    toolResultsRaw,
-    channel: 'widget',
-  });
+  // وضع التاجر (ماسية): لا تصعيد تلقائي لـ leads المنصة — تجنّب تحويل زبون المحل لـ spam إداري
+  const merchantMode = serverTier === 'diamond' && !!(body.accountId || (profile && profile.accountId));
+  const autoLead = merchantMode
+    ? null
+    : await maybeAutoNotifyLead({
+      userText: text,
+      history: body.history,
+      toolResultsRaw,
+      channel: 'widget',
+      merchantMode: false,
+    });
   if (autoLead && autoLead.lead_id) {
     console.log('[widget-chat] lead persisted', autoLead.lead_id, 'telegram:', autoLead.telegram_sent);
   }

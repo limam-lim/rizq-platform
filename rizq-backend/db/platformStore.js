@@ -277,6 +277,40 @@ async function getAccountByEmail(email) {
   return r ? safeParse(r.data, null) : null;
 }
 
+/**
+ * بحث حسابات بنفس مفتاح الهاتف (آخر 8 أرقام) عبر SQL على data jsonb —
+ * بدل تحميل كل الحسابات في الذاكرة.
+ * @param {string[]} keys
+ * @param {string} [excludeId]
+ * @returns {Promise<object[]>}
+ */
+async function findAccountsByPhoneKeys(keys, excludeId) {
+  const ks = [...new Set(
+    (Array.isArray(keys) ? keys : [])
+      .map((k) => String(k || '').replace(/\D/g, '').slice(-8))
+      .filter((k) => k.length >= 6 && k.length <= 15)
+  )];
+  if (!ks.length) return [];
+  const excl = String(excludeId || '');
+  /* \D في نمط PostgreSQL — داخل سلسلة JS نكتب \\D */
+  const digitsOf = (field) =>
+    "right(regexp_replace(COALESCE(" + field + ", ''), '\\D', '', 'g'), 8)";
+  const phoneExpr = digitsOf("data->>'phone'");
+  const intlExpr = digitsOf("data->>'phoneIntl'");
+  const waExpr = digitsOf("data->>'whatsapp'");
+  const params = [excl];
+  const parts = [];
+  ks.forEach((k) => {
+    params.push(k, k, k);
+    parts.push('(' + phoneExpr + ' = ? OR ' + intlExpr + ' = ? OR ' + waExpr + ' = ?)');
+  });
+  const rows = await sql.query(
+    'SELECT data FROM accounts WHERE id <> ? AND (' + parts.join(' OR ') + ') LIMIT 50',
+    params
+  );
+  return (rows || []).map((r) => safeParse(r.data, null)).filter(Boolean);
+}
+
 async function upsertAccount(acc) {
   const row = accountRow(acc);
   if (!row) return null;
@@ -442,6 +476,7 @@ module.exports = {
   writeAccounts,
   getAccountById,
   getAccountByEmail,
+  findAccountsByPhoneKeys,
   upsertAccount,
   updateAccount,
   deleteAccount,
