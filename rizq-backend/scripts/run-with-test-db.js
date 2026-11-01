@@ -67,9 +67,14 @@ async function ensureDatabase(baseUrl) {
   try {
     const r = await admin.query('SELECT 1 FROM pg_database WHERE datname = $1', [TEST_DB]);
     if (!r.rowCount) {
-      // identifier — validated constant
-      await admin.query('CREATE DATABASE ' + TEST_DB + ' OWNER CURRENT_USER');
-      console.log('[run-with-test-db] created database ' + TEST_DB);
+      // CREATE DATABASE … OWNER CURRENT_USER is invalid SQL; resolve role then quote.
+      const who = await admin.query('SELECT current_user AS u');
+      const owner = String((who.rows[0] && who.rows[0].u) || '').trim();
+      if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(owner)) {
+        throw new Error('refusing CREATE DATABASE: unsafe current_user="' + owner + '"');
+      }
+      await admin.query('CREATE DATABASE ' + TEST_DB + ' OWNER ' + owner);
+      console.log('[run-with-test-db] created database ' + TEST_DB + ' owner=' + owner);
     }
   } finally {
     await admin.end().catch(() => {});
