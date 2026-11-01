@@ -51,7 +51,8 @@ function buildUnit(code, divisor) {
 async function fetchFrankfurter(code) {
   const c = String(code || '').toUpperCase();
   const url = FRANKFURTER + '?from=' + encodeURIComponent(c) + '&to=MRU';
-  const res = await fetch(url, { headers: { Accept: 'application/json' } });
+  const { fetchWithTimeout } = require('../lib/externalHttp');
+  const res = await fetchWithTimeout(url, { headers: { Accept: 'application/json' }, service: 'http' });
   if (!res.ok) throw new Error('frankfurter_' + res.status);
   const data = await res.json();
   const rate = data && data.rates && data.rates.MRU;
@@ -62,7 +63,8 @@ async function fetchFrankfurter(code) {
 async function fetchFawaz(code) {
   const c = String(code || '').toLowerCase();
   const url = FAWAZ_CDN + '/' + encodeURIComponent(c) + '.json';
-  const res = await fetch(url, { headers: { Accept: 'application/json' } });
+  const { fetchWithTimeout } = require('../lib/externalHttp');
+  const res = await fetchWithTimeout(url, { headers: { Accept: 'application/json' }, service: 'http' });
   if (!res.ok) throw new Error('fawaz_' + res.status);
   const data = await res.json();
   const rate = data && data[c] && data[c].mru;

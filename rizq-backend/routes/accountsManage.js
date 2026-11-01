@@ -114,13 +114,27 @@ function mountAccountsManageRoutes(app, deps) {
   app.get('/api/accounts/public', async (req, res) => {
     res.set('Cache-Control', 'public, max-age=30');
     const viewerId = await resolveOptionalAccountViewer(req);
-    const list = (await readAccounts()).filter((a) => a.status === 'approved' && !a.suspended && !String(a.id || '').startsWith('acc_demo'));
+    const q = req.query || {};
+    const platformStore = require('../db/platformStore');
+    const filters = {
+      type: q.type || q.category || '',
+      city: q.city || '',
+      wilaya: q.wilaya || '',
+      search: q.search || '',
+    };
+    // بلا limit → كل المطابقين (توافق rizq_landing / rizq_backend_config)
+    if (q.limit != null && q.limit !== '') {
+      filters.limit = q.limit;
+      filters.offset = q.offset || 0;
+    }
+    const { total, accounts: list } = await platformStore.queryPublicAccounts(filters);
     const accounts = [];
     for (const acc of list) {
       accounts.push(await toPublicAccountForViewer(acc, viewerId));
     }
     res.json({
       ok: true,
+      total,
       accounts,
       viewerId: viewerId || null,
     });

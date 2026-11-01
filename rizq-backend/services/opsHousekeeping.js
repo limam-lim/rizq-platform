@@ -49,9 +49,11 @@ async function sendEmailSafe(to, subject, html) {
   }
   try {
     const nodemailer = require('nodemailer');
+    const { smtpTransportTimeouts } = require('../lib/externalHttp');
     const mailer = nodemailer.createTransport({
       service: process.env.EMAIL_SERVICE || 'gmail',
       auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+      ...smtpTransportTimeouts('smtp'),
     });
     await mailer.sendMail({
       from: process.env.EMAIL_FROM || '"رزق Rizq" <direction@rizq.mr>',

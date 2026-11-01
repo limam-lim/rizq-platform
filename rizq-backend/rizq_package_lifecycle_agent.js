@@ -207,10 +207,12 @@ async function _sendWhatsApp(to, text) {
     return { ok: false, error: 'WhatsApp غير مُعدّ (WHATSAPP_TOKEN/WHATSAPP_PHONE_ID) أو لا رقم هاتف' };
   }
   try {
-    const res = await fetch(`https://graph.facebook.com/v20.0/${PHONE_ID}/messages`, {
+    const { fetchWithTimeout } = require('./lib/externalHttp');
+    const res = await fetchWithTimeout(`https://graph.facebook.com/v20.0/${PHONE_ID}/messages`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${TOKEN}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ messaging_product: 'whatsapp', to, type: 'text', text: { body: text } }),
+      service: 'facebook',
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) return { ok: false, error: (data.error && data.error.message) || ('http_' + res.status) };

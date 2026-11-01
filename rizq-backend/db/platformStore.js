@@ -99,7 +99,13 @@ function readLegacyJson(file, fallback) {
   }
 }
 
+function jsonDumpsEnabled() {
+  return String(process.env.DEV_JSON_DUMPS || '') === '1';
+}
+
 function backupJson(file, data) {
+  // في الإنتاج: لا نسخ JSON كاملة عند كل كتابة — فقط مع DEV_JSON_DUMPS=1
+  if (!jsonDumpsEnabled()) return;
   try {
     const dir = path.dirname(file);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -471,6 +477,128 @@ async function migrateAllPlatformStores() {
   };
 }
 
+function safeParseRow(row) {
+  if (!row) return null;
+  if (row.data != null && typeof row.data === 'object') return row.data;
+  try {
+    return JSON.parse(row.data);
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
+ * تصفح إعلانات عامة بفلترة وترقيم داخل SQL (لا تحميل القائمة كاملة).
+ * @returns {{ total: number, ads: object[] }}
+ */
+async function queryPublicAds(filters) {
+  filters = filters || {};
+  const where = [
+    "status = 'active'",
+    "account_id NOT LIKE 'acc_demo%'",
+    "id !~* '^RZQ-2026-1000[0-9]$'",
+  ];
+  const params = [];
+  function push(val) {
+    params.push(val);
+    return '?';
+  }
+
+  if (filters.category) {
+    where.push('category = ' + push(String(filters.category).slice(0, 60)));
+  }
+  if (filters.subcat) {
+    where.push("data->>'subcat' = " + push(String(filters.subcat).slice(0, 80)));
+  }
+  if (filters.wilaya) {
+    where.push("data->>'wilaya' = " + push(String(filters.wilaya).slice(0, 80)));
+  }
+  if (filters.accountId) {
+    where.push('account_id = ' + push(String(filters.accountId).slice(0, 60)));
+  }
+  if (filters.brandId) {
+    where.push("data->>'brandId' = " + push(String(filters.brandId).slice(0, 80)));
+  }
+  if (filters.modelId) {
+    where.push("data->>'modelId' = " + push(String(filters.modelId).slice(0, 80)));
+  }
+  if (filters.search) {
+    const s = '%' + String(filters.search).toLowerCase().slice(0, 120) + '%';
+    where.push(
+      "(lower(COALESCE(data->>'title','')) LIKE " + push(s)
+      + " OR lower(COALESCE(data->>'desc','')) LIKE " + push(s)
+      + " OR lower(COALESCE(data->>'titleFr','')) LIKE " + push(s)
+      + " OR lower(COALESCE(data->>'descFr','')) LIKE " + push(s)
+      + " OR lower(COALESCE(data->>'brandName','')) LIKE " + push(s)
+      + " OR lower(COALESCE(data->>'modelName','')) LIKE " + push(s)
+      + ')'
+    );
+  }
+
+  const whereSql = where.join(' AND ');
+  const countRow = await sql.queryOne('SELECT COUNT(*)::int AS n FROM ads WHERE ' + whereSql, params);
+  const total = Number(countRow && countRow.n) || 0;
+
+  const limit = Math.max(1, Math.min(2000, Number(filters.limit) || 60));
+  const offset = Math.max(0, Number(filters.offset) || 0);
+  const rows = await sql.query(
+    'SELECT data FROM ads WHERE ' + whereSql
+    + " ORDER BY COALESCE(NULLIF(data->>'createdAt',''), updated_at) DESC"
+    + ' LIMIT ' + push(limit) + ' OFFSET ' + push(offset),
+    params
+  );
+  const ads = (rows || []).map(safeParseRow).filter(Boolean);
+  return { total, ads };
+}
+
+/**
+ * حسابات عامة بفلترة وترقيم اختياري داخل SQL.
+ * بلا limit → كل المطابقين (توافق الواجهة الحالية).
+ */
+async function queryPublicAccounts(filters) {
+  filters = filters || {};
+  const where = [
+    "status = 'approved'",
+    'suspended = 0',
+    "id NOT LIKE 'acc_demo%'",
+  ];
+  const params = [];
+  function push(val) {
+    params.push(val);
+    return '?';
+  }
+  if (filters.type) {
+    where.push('type = ' + push(String(filters.type).slice(0, 30)));
+  }
+  if (filters.city || filters.wilaya) {
+    const city = String(filters.city || filters.wilaya).slice(0, 80);
+    where.push("(data->>'city' = " + push(city) + " OR data->>'wilaya' = " + push(city) + ')');
+  }
+  if (filters.search) {
+    const s = '%' + String(filters.search).toLowerCase().slice(0, 120) + '%';
+    where.push(
+      "(lower(COALESCE(data->>'name','')) LIKE " + push(s)
+      + " OR lower(COALESCE(data->>'desc','')) LIKE " + push(s)
+      + " OR lower(COALESCE(data->>'activity','')) LIKE " + push(s)
+      + ')'
+    );
+  }
+  const whereSql = where.join(' AND ');
+  const countRow = await sql.queryOne('SELECT COUNT(*)::int AS n FROM accounts WHERE ' + whereSql, params);
+  const total = Number(countRow && countRow.n) || 0;
+
+  let sqlText = 'SELECT data FROM accounts WHERE ' + whereSql
+    + " ORDER BY COALESCE(NULLIF(data->>'createdAt',''), updated_at) DESC";
+  if (filters.limit != null && filters.limit !== '') {
+    const limit = Math.max(1, Math.min(2000, Number(filters.limit) || 60));
+    const offset = Math.max(0, Number(filters.offset) || 0);
+    sqlText += ' LIMIT ' + push(limit) + ' OFFSET ' + push(offset);
+  }
+  const rows = await sql.query(sqlText, params);
+  const accounts = (rows || []).map(safeParseRow).filter(Boolean);
+  return { total, accounts };
+}
+
 module.exports = {
   readAccounts,
   writeAccounts,
@@ -494,5 +622,7 @@ module.exports = {
   upsertTender,
   deleteTender,
   migrateAllPlatformStores,
+  queryPublicAds,
+  queryPublicAccounts,
   DATA_DIR,
 };

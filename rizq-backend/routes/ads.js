@@ -279,36 +279,30 @@ function mountAdsRoutes(app, deps) {
   app.get('/api/ads', async (req, res) => {
     const q = req.query || {};
     const viewerId = await resolveOptionalAccountViewer(req);
-    let list = (await readAds()).filter((a) => a.status === 'active' && !String(a.accountId || '').startsWith('acc_demo') && !/^RZQ-2026-1000\d$/i.test(String(a.id || '')));
-    if (q.category) list = list.filter((a) => a.category === q.category);
-    if (q.subcat) list = list.filter((a) => a.subcat === q.subcat);
-    if (q.brandId) list = list.filter((a) => String(a.brandId || '') === String(q.brandId));
-    if (q.modelId) list = list.filter((a) => String(a.modelId || '') === String(q.modelId));
-    if (q.wilaya) list = list.filter((a) => a.wilaya === q.wilaya);
-    if (q.accountId) list = list.filter((a) => a.accountId === q.accountId);
-    if (q.search) {
-      const s = String(q.search).toLowerCase();
-      list = list.filter((a) => {
-        const blob = [
-          a.title, a.desc, a.titleFr, a.descFr,
-          a.brandId, a.brandName, a.brandNameFr,
-          a.modelId, a.modelName, a.modelNameFr
-        ].join(' ').toLowerCase();
-        return blob.indexOf(s) !== -1;
-      });
-    }
-    list = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    const limit = Math.max(1, Math.min(200, Number(q.limit) || 60));
+    const platformStore = require('../db/platformStore');
+    // الواجهة قد تطلب حتى 2000 — نفس الحد السابق عبر SQL
+    const limit = Math.max(1, Math.min(2000, Number(q.limit) || 60));
     const offset = Math.max(0, Number(q.offset) || 0);
-    const accounts = await readAccounts();
-    const slice = list.slice(offset, offset + limit);
+    const { total, ads: slice } = await platformStore.queryPublicAds({
+      category: q.category || '',
+      subcat: q.subcat || '',
+      brandId: q.brandId || '',
+      modelId: q.modelId || '',
+      wilaya: q.wilaya || '',
+      accountId: q.accountId || '',
+      search: q.search || '',
+      limit,
+      offset,
+    });
     const page = [];
     for (const ad of slice) {
-      const seller = accounts.find((a) => a.id === ad.accountId);
+      const seller = ad.accountId
+        ? (await platformStore.getAccountById(ad.accountId))
+        : null;
       const gate = await resolveContactGate(viewerId, ad.accountId, seller && seller.type);
       page.push(toPublicAdGated(await withBoostFlag(ad), gate, seller));
     }
-    res.json({ ok: true, total: list.length, ads: page });
+    res.json({ ok: true, total, ads: page });
   });
 
   /**
