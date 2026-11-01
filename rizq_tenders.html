@@ -296,8 +296,8 @@ a[href="#tender-packages"]{display:none!important}
 </div>
 
 <div class="wrap">
-  <div class="td-notice" data-t-fr="Rizq est un intermédiaire de publication. Remplissez le dossier ci-dessous — photos/PDF optionnels pour clarifier le besoin. Contact public: direction@rizq.mr">
-    رزق وسيط نشر إلكتروني. املأ ملف المناقصة أدناه — صور/PDF اختيارية لتوضيح الاحتياج. التواصل العام: direction@rizq.mr
+  <div class="td-notice" data-t-fr="Rizq est un intermédiaire de publication. Remplissez le dossier ci-dessous — photos/PDF optionnels pour clarifier le besoin. Contact public: contact@rizq.mr">
+    رزق وسيط نشر إلكتروني. املأ ملف المناقصة أدناه — صور/PDF اختيارية لتوضيح الاحتياج. التواصل العام: contact@rizq.mr
   </div>
 
   <div class="td-section-head">
@@ -481,7 +481,7 @@ a[href="#tender-packages"]{display:none!important}
         <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" data-t-fr="Mauritel : ">موريتل: </strong><a href="tel:+22244882212" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 44 88 22 12</a></li>
         <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" data-t-fr="Mattel : ">ماتيل: </strong><a href="tel:+22236485784" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 36 48 57 84</a></li>
         <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" data-t-fr="Chinguitel : ">شينقيتل: </strong><a href="tel:+22222708338" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 22 70 83 38</a></li>
-        <li style="font-size:13px"><a href="mailto:direction@rizq.mr" style="color:#e0e0e0;text-decoration:none">📧 direction@rizq.mr</a></li>
+        <li style="font-size:13px"><a href="mailto:contact@rizq.mr" style="color:#e0e0e0;text-decoration:none">📧 contact@rizq.mr</a></li>
       </ul>
     </div>
   </div>
@@ -867,18 +867,23 @@ function refreshTdSubmitGate(){
   var loginEl = document.getElementById('td-submit-login');
   var formEl = document.getElementById('td-submit-form');
   if(!formEl) return;
-  /* النموذج يبقى ظاهراً دائماً (مثل غرفة الاستثمارات) — التنبيه فقط عند غياب الجلسة */
+  /* النموذج يبقى ظاهراً — تنبيه أعلى النموذج + تعطيل الإرسال حتى الدخول */
   formEl.style.display = '';
+  var submitBtn = formEl.querySelector('[type="submit"]');
   if(loginEl){
     if(!session){
       loginEl.hidden = false;
-      loginEl.innerHTML = (fr
-        ? 'Astuce : connectez-vous depuis votre tableau de bord (compte particulier, magasin, bureau ou société) avant d\'envoyer. Vous pouvez déjà préparer le dossier ci-dessous.'
-        : 'تنبيه: سجّل دخولك من لوحة تحكمك (حساب فردي، محل، مكتب أو شركة) قبل الإرسال. يمكنك تحضير الملف أدناه الآن.')
-        + '<br><a href="rizq_landing_v8.html">'+(fr?'Aller à la page d\'accueil':'الذهاب للصفحة الرئيسية')+'</a>';
+      loginEl.innerHTML = '<strong>'+(fr ? 'Connectez-vous' : 'سجّل دخولك')+'</strong><br>'
+        + (fr
+          ? 'Vous devez être connecté pour envoyer une demande d\'appel d\'offres.'
+          : 'يجب تسجيل الدخول لإرسال ملف المناقصة.')
+        + '<br><a class="td-login-cta" href="rizq_register.html" style="display:inline-block;margin-top:10px;padding:8px 16px;border-radius:10px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0D1B2A;font-weight:800;text-decoration:none">'
+        + (fr ? 'Se connecter / Créer un compte' : 'تسجيل الدخول') + '</a>';
+      if(submitBtn){ submitBtn.disabled = true; submitBtn.setAttribute('aria-disabled','true'); }
     } else {
       loginEl.hidden = true;
       loginEl.innerHTML = '';
+      if(submitBtn){ submitBtn.disabled = false; submitBtn.removeAttribute('aria-disabled'); }
     }
   }
   _fillCatSelect();

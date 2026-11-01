@@ -62,7 +62,7 @@ ${buildDiamondTiersPromptBlock()}
   }
   return prompt + `
 
-📋 تواصل رزق: direction@rizq.mr · rizq.mr · +222 44 88 22 12
+📋 تواصل رزق: contact@rizq.mr · rizq.mr · +222 44 88 22 12
 
 🎭 أسلوب القناة:
 - مكالمة: جمل قصيرة (≤15 ثانية)، بدون قوائم.
@@ -223,7 +223,7 @@ async function askAgent({ channel, message, context = {} }) {
     const ops = require('./rizq-backend/services/agentOps');
     if (!(await ops.isAgentFamilyEnabled('brain'))) {
       return {
-        text: 'وكيل القنوات موقّف مؤقتاً من لوحة الإدارة. راسلوا direction@rizq.mr.',
+        text: 'وكيل القنوات موقّف مؤقتاً من لوحة الإدارة. راسلوا contact@rizq.mr.',
         model: null,
         channel,
         disabled: true,

@@ -39,14 +39,30 @@
     var id = p.id != null ? String(p.id) : '';
 
     if (global.RizqAdCards && typeof global.RizqAdCards.mediaHtml === 'function') {
+      /* showPrice:false → السعر في جسم البطاقة فقط (تجنّب انحدار browse-1) */
+      var hidePrice = opts.showPrice === false;
+      var rawNum = Number(p.price);
+      var emptyPrice = !(rawNum > 0);
+      var mediaPrice = hidePrice ? '' : (emptyPrice ? '' : price);
       return global.RizqAdCards.mediaHtml({
         id: id,
         title: title,
         images: imgs,
         emoji: emoji,
-        price: opts.showPrice === false ? '' : price,
-        pin: !!(p.isNew || p.featured)
-      }, { fr: fr, emoji: emoji, title: title, price: opts.showPrice === false ? '' : price, pin: !!(p.isNew || p.featured) });
+        price: mediaPrice,
+        pin: !!(p.isNew || p.featured),
+        contactsLocked: !!opts.contactsLocked
+      }, {
+        fr: fr,
+        emoji: emoji,
+        title: title,
+        price: mediaPrice,
+        pin: !!(p.isNew || p.featured),
+        hidePrice: hidePrice,
+        showPrice: !hidePrice,
+        priceOnContact: !hidePrice && (emptyPrice || !!opts.contactsLocked),
+        contactsLocked: !!opts.contactsLocked
+      });
     }
 
     if (imgs.length) {
@@ -665,12 +681,47 @@
     };
   }
 
+  /** روابط فيديو تجريبية خارجية لا علاقة لها بالمنصة (مثل TINTEL) — تُستبعد */
+  function isRejectedDemoVideoUrl(url) {
+    var u = String(url || '').toLowerCase();
+    if (!u) return true;
+    if (/tintel/i.test(u)) return true;
+    if (/youtube\.com\/watch\?v=ersgyuevlvq|youtu\.be\/ersgyuevlvq|embed\/ersgyuevlvq/i.test(u)) return true;
+    return false;
+  }
+
+  function platformPromoVideoUrl() {
+    try {
+      var cfg = global.__RIZQ_LAST_SITE_CONFIG || (global.RIZQ_SITE_CONFIG) || null;
+      var pv = cfg && cfg.promoVideo;
+      if (pv && (pv.url || pv.heroUrl)) {
+        var u = String(pv.url || pv.heroUrl || '').trim();
+        if (u && !isRejectedDemoVideoUrl(u)) return u;
+      }
+      var va = cfg && cfg.videoAds;
+      if (va && va.platformPromoEnabled && va.platformPromoUrl) {
+        var u2 = String(va.platformPromoUrl).trim();
+        if (u2 && !isRejectedDemoVideoUrl(u2)) return u2;
+      }
+    } catch (e) {}
+    return '';
+  }
+
+  /**
+   * فيديو الواجهة: فيديو التاجر إن وُجد، وإلا فيديو المنصة الترويجي من إعدادات الموقع، وإلا لا شيء.
+   */
   function promoVideosOf(acc) {
     if (!acc) return [];
     var list = [];
-    if (acc.promo_video) list.push({ url: String(acc.promo_video).trim(), kind: 'intro' });
-    if (acc.promo_video_extra) list.push({ url: String(acc.promo_video_extra).trim(), kind: 'extra' });
-    return list.filter(function (v) { return !!v.url; });
+    var intro = String(acc.promo_video || '').trim();
+    var extra = String(acc.promo_video_extra || '').trim();
+    if (intro && !isRejectedDemoVideoUrl(intro)) list.push({ url: intro, kind: 'intro' });
+    if (extra && !isRejectedDemoVideoUrl(extra)) list.push({ url: extra, kind: 'extra' });
+    if (!list.length) {
+      var plat = platformPromoVideoUrl();
+      if (plat) list.push({ url: plat, kind: 'intro', fromPlatform: true });
+    }
+    return list;
   }
 
   /* ── لوحة تفاصيل منتج بهوية عرض الإعلان ── */
@@ -1366,6 +1417,8 @@
     setHeroPhoto: setHeroPhoto,
     introVideoSlots: introVideoSlots,
     promoVideosOf: promoVideosOf,
+    platformPromoVideoUrl: platformPromoVideoUrl,
+    isRejectedDemoVideoUrl: isRejectedDemoVideoUrl,
     openProductDetail: openProductDetail,
     closeProductDetail: closeProductDetail,
     setPhoto: setPhoto,

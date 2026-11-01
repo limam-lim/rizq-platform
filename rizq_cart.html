@@ -543,6 +543,19 @@ body.cart-is-general #main-wrap,
 body.cart-is-general > .btn-lang-primary{display:none !important}
 body.cart-is-general #cart-general-hub{display:block}
 #cart-general-hub{display:none}
+/* زر لغة يتيم: أخفِه إن وُجد زر اللغة في الشريط العلوي؛ رتّب الشريط ثم المسار بلا فراغ */
+html.rizq-app-nav:has(#rizq-desk-nav) body > button#lang-btn.btn-lang-primary,
+html.rizq-app-nav:has(#rizq-desk-nav) body > button#lang-btn.btn-lang,
+html.rizq-app-nav:has(#rizq-lang-btn) body > button#lang-btn,
+html.rizq-app-nav:has(#rizq-desk-lang-btn) body > button#lang-btn,
+html.rizq-app-nav.has-rizq-desk-nav body > button#lang-btn{
+  display:none !important;visibility:hidden !important;pointer-events:none !important;
+  height:0 !important;width:0 !important;min-width:0 !important;min-height:0 !important;
+  margin:0 !important;padding:0 !important;border:0 !important;overflow:hidden !important;
+  position:absolute !important;left:-9999px !important;
+}
+html.rizq-app-nav:has(#rizq-desk-nav) .topnav{order:1}
+html.rizq-app-nav:has(#rizq-desk-nav) .breadcrumb{order:2;position:relative;z-index:1}
 </style>
   
   <script src="rizq_backend_config.js"></script>
@@ -694,8 +707,8 @@ body.cart-is-general #cart-general-hub{display:block}
 
       <!-- DELIVERY TYPE -->
       <div class="delivery-section">
-        <div style="font-size:15px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px">
-          🚚 Mode de livraison
+        <div style="font-size:15px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:6px" data-t="delivery-title">
+          🚚 طريقة الاستلام
         </div>
         <div class="delivery-opts">
           <div class="delivery-opt selected" id="dopt-delivery" onclick="selectDelivery('delivery')">
@@ -2132,7 +2145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" id="rzq-cn-1" data-t-fr="Mauritel : ">موريتل: </strong><a href="tel:+22244882212" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 44 88 22 12</a></li>
         <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" id="rzq-cn-2" data-t-fr="Mattel : ">ماتيل: </strong><a href="tel:+22236485784" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 36 48 57 84</a></li>
         <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" id="rzq-cn-3" data-t-fr="Chinguitel : ">شينقيتل: </strong><a href="tel:+22222708338" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 22 70 83 38</a></li>
-        <li style="font-size:13px"><a href="mailto:direction@rizq.mr" style="color:#e0e0e0;text-decoration:none">📧 direction@rizq.mr</a></li>
+        <li style="font-size:13px"><a href="mailto:contact@rizq.mr" style="color:#e0e0e0;text-decoration:none">📧 contact@rizq.mr</a></li>
       </ul>
     </div>
   </div>
@@ -2336,5 +2349,26 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeRizqPro
   new MutationObserver(applyRizqPromoLang).observe(document.documentElement, {attributes:true, attributeFilter:['lang']});
 })();
 </script>
+
+<script>
+(function(){
+  function hideOrphanLang(){
+    try{
+      var desk = document.getElementById('rmh-lang-btn') || document.getElementById('rizq-desk-nav') || document.getElementById('rizq-lang-btn') || document.getElementById('rizq-desk-lang-btn') || document.getElementById('nav-lang-btn');
+      var orphan = document.getElementById('lang-btn');
+      if(desk && orphan && orphan !== document.getElementById('rizq-lang-btn') && orphan !== document.getElementById('rizq-desk-lang-btn')){
+        orphan.hidden = true;
+        orphan.setAttribute('aria-hidden','true');
+        orphan.style.cssText = 'display:none!important;visibility:hidden!important;position:absolute!important;left:-9999px!important;height:0!important;width:0!important;';
+      }
+    }catch(e){}
+  }
+  hideOrphanLang();
+  document.addEventListener('DOMContentLoaded', hideOrphanLang);
+  setTimeout(hideOrphanLang, 0);
+  setTimeout(hideOrphanLang, 400);
+})();
+</script>
+
 </body>
 </html>

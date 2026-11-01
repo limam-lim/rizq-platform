@@ -219,8 +219,8 @@ a[href="#investment-packages"]{display:none!important}
 </div>
 
 <div class="wrap">
-  <div class="inv-notice" data-t-fr="Rizq est un intermédiaire de publication. Le conseiller peut donner une approbation provisoire (vert) ou suspendre en cas d'ambiguïté/suspicion (jaune/rouge) pour Limam. Pas un conseil financier agréé. Contact public: direction@rizq.mr">
-    رزق وسيط نشر إلكتروني. وكيل الاستثمار يمنح موافقة مبدئية (أخضر) أو يعلّق عند اللبس/الشبهة (أصفر/أحمر) لعرضها عليك. ليس استشارة مالية مرخّصة. التواصل العام: direction@rizq.mr
+  <div class="inv-notice" data-t-fr="Rizq est un intermédiaire de publication. Le conseiller peut donner une approbation provisoire (vert) ou suspendre en cas d'ambiguïté/suspicion (jaune/rouge) pour Limam. Pas un conseil financier agréé. Contact public: contact@rizq.mr">
+    رزق وسيط نشر إلكتروني. وكيل الاستثمار يمنح موافقة مبدئية (أخضر) أو يعلّق عند اللبس/الشبهة (أصفر/أحمر) لعرضها عليك. ليس استشارة مالية مرخّصة. التواصل العام: contact@rizq.mr
   </div>
 
   <div class="inv-section-head">
@@ -328,6 +328,7 @@ a[href="#investment-packages"]{display:none!important}
       <h2 data-t-fr="Déposer une opportunité">أودع فرصة استثمارية</h2>
       <p data-t-fr="Revue interne avant publication. Aucune promesse de financement.">مراجعة داخلية قبل النشر. بلا وعد بالتمويل.</p>
     </div>
+    <div id="inv-submit-login" class="login-notice" hidden style="margin-bottom:14px;background:#fff8e9;border:1.5px solid #f0d99a;border-radius:13px;padding:18px;font-size:13px;color:#7a5c00;text-align:center;line-height:1.85"></div>
     <form id="inv-submit-form" autocomplete="off">
       <div class="f-group">
         <label class="f-label" for="sub-title" data-t-fr="Titre">العنوان</label>
@@ -368,7 +369,7 @@ a[href="#investment-packages"]{display:none!important}
         <div class="att-thumbs" id="inv-att-thumbs"></div>
       </div>
       <button type="submit" class="f-submit" data-t-fr="Envoyer pour revue">إرسال للمراجعة</button>
-      <p class="f-hint" data-t-fr="Vos contacts ne sont pas affichés publiquement. Canal public: direction@rizq.mr">بياناتك لا تُعرض للعامة. القناة العامة: direction@rizq.mr</p>
+      <p class="f-hint" data-t-fr="Vos contacts ne sont pas affichés publiquement. Canal public: contact@rizq.mr">بياناتك لا تُعرض للعامة. القناة العامة: <span class="rzq-public-email">contact@rizq.mr</span></p>
       <p id="inv-submit-msg" class="f-hint" style="color:var(--ok);font-weight:700" hidden></p>
     </form>
   </div>
@@ -384,7 +385,7 @@ a[href="#investment-packages"]{display:none!important}
     </div>
     <div class="trust-item">
       <strong data-t-fr="Contact public unique">تواصل عام موحّد</strong>
-      <span>direction@rizq.mr</span>
+      <span class="rzq-public-email">contact@rizq.mr</span>
     </div>
   </div>
 </div>
@@ -447,7 +448,7 @@ a[href="#investment-packages"]{display:none!important}
         <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" data-t-fr="Mauritel : ">موريتل: </strong><a href="tel:+22244882212" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 44 88 22 12</a></li>
         <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" data-t-fr="Mattel : ">ماتيل: </strong><a href="tel:+22236485784" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 36 48 57 84</a></li>
         <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" data-t-fr="Chinguitel : ">شينقيتل: </strong><a href="tel:+22222708338" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 22 70 83 38</a></li>
-        <li style="font-size:13px"><a href="mailto:direction@rizq.mr" style="color:#e0e0e0;text-decoration:none">📧 direction@rizq.mr</a></li>
+        <li style="font-size:13px"><a href="mailto:contact@rizq.mr" style="color:#e0e0e0;text-decoration:none">📧 contact@rizq.mr</a></li>
       </ul>
     </div>
   </div>
@@ -662,10 +663,58 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
     renderOpps();
   }
 
+  function _invHasSession() {
+    try {
+      if (window.RizqAuthGate && typeof RizqAuthGate.isLoggedIn === 'function') {
+        return !!RizqAuthGate.isLoggedIn();
+      }
+    } catch (e0) {}
+    try {
+      var s = JSON.parse(localStorage.getItem('rizq_session') || 'null');
+      if (s && (s.accountId || s.id) && (s.accessToken || s.token)) return true;
+    } catch (e1) {}
+    try {
+      var d = JSON.parse(localStorage.getItem('rizq_dashboard_session') || 'null');
+      if (d && d.id && d.accessToken) return true;
+    } catch (e2) {}
+    try {
+      var ind = JSON.parse(localStorage.getItem('rizq_individual_session') || 'null');
+      if (ind && (ind.accountId || ind.id || ind.phone)) return true;
+    } catch (e3) {}
+    return false;
+  }
+  function refreshInvSubmitGate() {
+    var fr = isFr();
+    var loginEl = document.getElementById('inv-submit-login');
+    var form = document.getElementById('inv-submit-form');
+    if (!form) return;
+    var btn = form.querySelector('[type="submit"]');
+    var ok = _invHasSession();
+    if (loginEl) {
+      if (!ok) {
+        loginEl.hidden = false;
+        loginEl.innerHTML = '<strong>' + (fr ? 'Connectez-vous' : 'سجّل دخولك') + '</strong><br>'
+          + (fr
+            ? 'Vous devez être connecté pour déposer une opportunité.'
+            : 'يجب تسجيل الدخول لإيداع فرصة استثمارية.')
+          + '<br><a href="rizq_register.html" style="display:inline-block;margin-top:10px;padding:8px 16px;border-radius:10px;background:linear-gradient(135deg,#C9A84C,#e8c96a);color:#0D1B2A;font-weight:800;text-decoration:none">'
+          + (fr ? 'Se connecter / Créer un compte' : 'تسجيل الدخول') + '</a>';
+      } else {
+        loginEl.hidden = true;
+        loginEl.innerHTML = '';
+      }
+    }
+    if (btn) {
+      btn.disabled = !ok;
+      if (!ok) btn.setAttribute('aria-disabled', 'true');
+      else btn.removeAttribute('aria-disabled');
+    }
+  }
   function bindSubmit() {
     var form = document.getElementById('inv-submit-form');
     var msg = document.getElementById('inv-submit-msg');
     if (!form) return;
+    refreshInvSubmitGate();
     window._invImages = window._invImages || [];
     window._invPdf = window._invPdf || null;
 
@@ -740,6 +789,11 @@ footer.rizq-footer .afl-powered strong{color:var(--gold)}
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       var fr = isFr();
+      if (!_invHasSession()) {
+        refreshInvSubmitGate();
+        showToast(fr ? 'Connectez-vous pour envoyer' : 'سجّل دخولك للإرسال');
+        return;
+      }
       var btn = form.querySelector('[type="submit"]');
       var body = {
         title: (form.querySelector('[name="title"]') || {}).value || '',

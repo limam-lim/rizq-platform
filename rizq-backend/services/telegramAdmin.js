@@ -794,7 +794,7 @@ async function handleIncomingMessage(message, deps) {
     }
   } catch (err) {
     console.error('[telegram-bot] agent error:', err.message, err.status ? ('status=' + err.status) : '');
-    replyText = '⚠️ عذراً، حدثت مشكلة مؤقتة. حاول مجدداً أو تواصل عبر direction@rizq.mr';
+    replyText = '⚠️ عذراً، حدثت مشكلة مؤقتة. حاول مجدداً أو تواصل عبر contact@rizq.mr';
   }
 
   try {

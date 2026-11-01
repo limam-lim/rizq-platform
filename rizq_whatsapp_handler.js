@@ -290,7 +290,7 @@ app.post('/api/whatsapp', async (req, res) => {
 
     } catch(err) {
       console.error('❌ Claude error:', err.message);
-      replyText = '⚠️ عذراً، حدثت مشكلة مؤقتة. يرجى إعادة المحاولة أو التواصل عبر direction@rizq.mr';
+      replyText = '⚠️ عذراً، حدثت مشكلة مؤقتة. يرجى إعادة المحاولة أو التواصل عبر contact@rizq.mr';
     }
 
     // ── أرسل الرد ─────────────────────────────────────

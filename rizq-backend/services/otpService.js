@@ -92,7 +92,7 @@ async function sendOtpEmail(to, code, name, opts) {
     : 'رمز التحقق الخاص بك:';
   try {
     await mailer.sendMail({
-      from: process.env.EMAIL_FROM || '"رزق Rizq" <direction@rizq.mr>',
+      from: process.env.EMAIL_FROM || '"رزق Rizq" <contact@rizq.mr>',
       to,
       subject,
       html: '<div dir="rtl" style="font-family:Segoe UI,Tahoma,Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#1B3A6B">'

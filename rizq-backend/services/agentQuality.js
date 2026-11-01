@@ -81,9 +81,9 @@ function stripForbiddenClaims(text, lang) {
   const hit = findForbiddenClaim(text);
   if (!hit) return { text: String(text || ''), scrubbed: false };
   const safe = {
-    ar: 'لا نقدّم وعود أرباح مضمونة أو خصومات غير رسمية. راجع البيانات الرسمية على المنصة أو راسل direction@rizq.mr.',
-    fr: 'Nous ne promettons pas de rendement garanti ni de remises non officielles. Consultez les données officielles ou écrivez à direction@rizq.mr.',
-    en: 'We do not promise guaranteed returns or unofficial discounts. Check official platform data or email direction@rizq.mr.',
+    ar: 'لا نقدّم وعود أرباح مضمونة أو خصومات غير رسمية. راجع البيانات الرسمية على المنصة أو راسل contact@rizq.mr.',
+    fr: 'Nous ne promettons pas de rendement garanti ni de remises non officielles. Consultez les données officielles ou écrivez à contact@rizq.mr.',
+    en: 'We do not promise guaranteed returns or unofficial discounts. Check official platform data or email contact@rizq.mr.',
   };
   const l = String(lang || 'ar').toLowerCase();
   return { text: safe[l] || safe.ar, scrubbed: true, hit };

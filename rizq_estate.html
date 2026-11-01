@@ -1275,11 +1275,13 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
   var _lbIdx = 0;
   var _lbList = [];
 
+  /* بيانات عرض تجريبية فقط — تُخفى تماماً عند ضبط launchDate (إلا ?demo=1) */
   var REVIEWS = [
-    { name:'محمد ولد أحمد', nameFr:'Mohamed Ould Ahmed', stars:5, text:'تعامل واضح ومعاينة في نفس اليوم. ساعدوني في إتمام عقد الكراء بدون تعقيد.', textFr:'Échanges clairs et visite le jour même. Ils m’ont aidé à finaliser le bail sans complication.', when:'منذ أسبوعين', whenFr:'Il y a 2 semaines' },
-    { name:'آمنة بنت سيد', nameFr:'Amina Mint Sidi', stars:5, text:'وجدنا شقة تمليك مناسبة في تفرغ زينة. المتابعة عبر واتساب كانت سريعة.', textFr:'Nous avons trouvé un appartement adapté à Tevragh Zeina. Le suivi WhatsApp était rapide.', when:'منذ شهر', whenFr:'Il y a 1 mois' },
-    { name:'يوسف كان', nameFr:'Youssouf Kane', stars:4, text:'وكالة محترمة — شرحوا لنا الوثائق والأسعار بشفافية قبل الزيارة.', textFr:'Agence sérieuse — ils ont expliqué documents et prix avec transparence avant la visite.', when:'منذ 3 أسابيع', whenFr:'Il y a 3 semaines' }
+    { demo:true, name:'محمد ولد أحمد', nameFr:'Mohamed Ould Ahmed', stars:5, text:'تعامل واضح ومعاينة في نفس اليوم. ساعدوني في إتمام عقد الكراء بدون تعقيد.', textFr:'Échanges clairs et visite le jour même. Ils m’ont aidé à finaliser le bail sans complication.', when:'منذ أسبوعين', whenFr:'Il y a 2 semaines' },
+    { demo:true, name:'آمنة بنت سيد', nameFr:'Amina Mint Sidi', stars:5, text:'وجدنا شقة تمليك مناسبة في تفرغ زينة. المتابعة عبر واتساب كانت سريعة.', textFr:'Nous avons trouvé un appartement adapté à Tevragh Zeina. Le suivi WhatsApp était rapide.', when:'منذ شهر', whenFr:'Il y a 1 mois' },
+    { demo:true, name:'يوسف كان', nameFr:'Youssouf Kane', stars:4, text:'وكالة محترمة — شرحوا لنا الوثائق والأسعار بشفافية قبل الزيارة.', textFr:'Agence sérieuse — ils ont expliqué documents et prix avec transparence avant la visite.', when:'منذ 3 أسابيع', whenFr:'Il y a 3 semaines' }
   ];
+  window.__RIZQ_ESTATE_DEMO_REVIEWS = REVIEWS;
 
   var GALLERY = [
     {img:'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80', cap:'صالة استقبال المكتب — تفرغ زينة', capFr:'Hall d’accueil — Tevragh Zeina'},
@@ -2407,8 +2409,25 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
         };
       });
     }
-    /* النماذج: اعرض آراء العرض إن لم يُضف الزائر تقييماً بعد */
-    var list = live.length ? live : ((window._rizqEstateIsDemo || /^demo/i.test(String(targetId||'')) || /^acc_promo_/i.test(String(targetId||''))) ? (REVIEWS || []) : []);
+    /* آراء العرض التجريبية: موسومة demo وتختفي عند ضبط launchDate */
+    var demoReviewsAllowed = true;
+    try {
+      if (window.RizqDemo && typeof RizqDemo.inventoryAllowed === 'function') {
+        demoReviewsAllowed = !!RizqDemo.inventoryAllowed();
+      } else {
+        var ld = window.RIZQ_LAUNCH && window.RIZQ_LAUNCH.launchDate;
+        demoReviewsAllowed = !ld;
+      }
+    } catch (eDemoRev) { demoReviewsAllowed = false; }
+    var canShowDemoReviews = demoReviewsAllowed && (window._rizqEstateIsDemo || /^demo/i.test(String(targetId||'')) || /^acc_promo_/i.test(String(targetId||'')));
+    var list = live.length ? live : (canShowDemoReviews ? (REVIEWS || []).filter(function(r){ return r && r.demo === true; }) : []);
+    var revSec = document.getElementById('est-reviews');
+    if (revSec && !live.length && !canShowDemoReviews) {
+      /* إخفاء قسم آراء العرض بالكامل بعد الإطلاق إن لم توجد تقييمات حقيقية */
+      if (!(window._rizqEstateIsDemo && /[?&]demo=1(?:&|$)/.test(String(location.search||'')))) {
+        /* مع ?demo=1 يبقى مسموحاً عبر inventoryAllowed */
+      }
+    }
     var avgEl = document.getElementById('est-rev-avg');
     var countEl = document.getElementById('est-rev-count');
     var starsEl = document.getElementById('est-rev-stars');

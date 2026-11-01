@@ -40,6 +40,28 @@ html.rizq-app-nav .rizq-splash{
   opacity:0 !important;
 }
 
+/* زر FR|AR اليتيم في body: أخفِه على كل العروض عند وجود زر اللغة في الهيدر الموحّد */
+html.rizq-app-nav:has(#rmh-lang-btn) body > button#lang-btn,
+html.rizq-app-nav:has(#rmh-lang-btn) body > button#lang-btn.btn-lang,
+html.rizq-app-nav:has(#rmh-lang-btn) body > button#lang-btn.btn-lang-primary,
+html.rizq-app-nav:has(#rizq-lang-btn) body > button#lang-btn,
+html.rizq-app-nav:has(#rizq-desk-lang-btn) body > button#lang-btn,
+html.rizq-app-nav:has(#nav-lang-btn) body > button#lang-btn{
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+  height:0 !important;
+  width:0 !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  overflow:hidden !important;
+  position:absolute !important;
+  left:-9999px !important;
+}
+
 /* أرقام الهاتف والحسابات: لاتينية وLTR — علامة + دائماً من اليسار */
 a[href^="tel:"],
 a[href^="TEL:"],
@@ -576,19 +598,26 @@ html[dir="ltr"] .rizq-hdr-more-menu{right:auto;left:0}
   }
   html.rizq-app-nav.has-rizq-desk-nav .topnav,
   html.rizq-app-nav.has-rizq-desk-nav body > .btn-lang,
+  html.rizq-app-nav:has(#rizq-desk-nav) body > .btn-lang,
+  html.rizq-app-nav:has(#rizq-desk-nav) body > button#lang-btn,
+  html.rizq-app-nav:has(#rizq-desk-nav) body > button#lang-btn.btn-lang-primary,
   html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(.section-jump-bar):not(.hero-biz-nav):not(.cta-hubs) .logo,
   html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(.cta-hubs) .nav-actions,
   html.rizq-app-nav.has-rizq-desk-nav body > nav:not(#rizq-desk-nav):not(.cta-hubs) .nav-disclaimer,
   html.rizq-app-nav.has-rizq-desk-nav #lang-btn:not(#rizq-desk-lang-btn):not(#nav-lang-btn):not(#rizq-lang-btn),
+  html.rizq-app-nav:has(#rizq-desk-nav) #lang-btn:not(#rizq-desk-lang-btn):not(#nav-lang-btn):not(#rizq-lang-btn),
   #rizq-desk-nav ~ nav .logo,
   #rizq-desk-nav ~ nav .nav-actions,
   #rizq-desk-nav ~ nav .nav-disclaimer,
   #rizq-desk-nav ~ nav #lang-btn:not(#rizq-desk-lang-btn),
+  #rizq-desk-nav ~ button#lang-btn,
   nav.rizq-search-strip-nav .logo,
   nav.rizq-search-strip-nav .nav-actions,
   nav.rizq-search-strip-nav .nav-disclaimer,
   nav.rizq-search-strip-nav #lang-btn{
     display:none !important;
+    visibility:hidden !important;
+    pointer-events:none !important;
   }
 
   html.rizq-app-nav #nav,

@@ -2232,7 +2232,7 @@ function openMaps(){
         ],
         /* فيديو تعريفي + إضافي على الهيرو مثل المحلات */
         promo_video: 'rizq-assets/promo/rizq-dashboard-office-demo-light.mp4',
-        promo_video_extra: 'https://www.youtube.com/watch?v=eRsGyueVLvQ',
+        promo_video_extra: '',
         /* غلاف هيرو محلي — نفس أسلوب المحل (صورة خلفية + طبقة تغميق) */
         cover: 'rizq-assets/demo-heroes/office-lawyer-justice.jpg',
         thumb: 'rizq-assets/demo-heroes/office-lawyer-justice.jpg',
@@ -2416,10 +2416,17 @@ function openMaps(){
             RizqSubscriptionPermissions.applyPublicMerchantSurface({
               accountId: id,
               isDemo: isPreview,
-              packageIds: ['office-packages', 'sec-packages-btn'],
+              packageIds: ['office-packages'],
+              packagesAsCta: true,
+              packagesKind: 'office',
               paymentIds: ['office-payment-methods'],
               hideListingPrefacture: true
             });
+            var secPkgBtn = document.getElementById('sec-packages-btn');
+            if (secPkgBtn) {
+              var showPkgOffice = RizqSubscriptionPermissions.shouldShowPlatformPackages(id, { isDemo: isPreview });
+              secPkgBtn.style.display = showPkgOffice ? '' : 'none';
+            }
           } else {
             ['office-packages','sec-packages-btn'].forEach(function(oid){
               var el = document.getElementById(oid);
@@ -2985,7 +2992,7 @@ window._rizqProfile = (function() {
         <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" id="rzq-cn-1">موريتل: </strong><a href="tel:+22244882212" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 44 88 22 12</a></li>
         <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" id="rzq-cn-2">ماتيل: </strong><a href="tel:+22236485784" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 36 48 57 84</a></li>
         <li style="font-size:13px;color:#fff"><strong style="color:#C9A84C" id="rzq-cn-3">شينقيتل: </strong><a href="tel:+22222708338" style="color:#e0e0e0;text-decoration:none;font-weight:500" dir="ltr">+222 22 70 83 38</a></li>
-        <li style="font-size:13px"><a href="mailto:direction@rizq.mr" style="color:#e0e0e0;text-decoration:none">📧 direction@rizq.mr</a></li>
+        <li style="font-size:13px"><a href="mailto:contact@rizq.mr" style="color:#e0e0e0;text-decoration:none">📧 contact@rizq.mr</a></li>
       </ul>
     </div>
   </div>

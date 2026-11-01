@@ -153,12 +153,101 @@
     });
   }
 
+  /** هل الزائر هو صاحب الحساب المعروض؟ */
+  function isViewerAccountOwner(accountId) {
+    accountId = String(accountId || '');
+    if (!accountId) return false;
+    function sid(obj) {
+      try { return String((obj && (obj.accountId || obj.id)) || ''); } catch (e) { return ''; }
+    }
+    try {
+      var s = JSON.parse(localStorage.getItem('rizq_session') || 'null');
+      if (sid(s) && sid(s) === accountId) return true;
+    } catch (e0) {}
+    try {
+      var d = JSON.parse(localStorage.getItem('rizq_dashboard_session') || 'null');
+      if (sid(d) && sid(d) === accountId) return true;
+    } catch (e1) {}
+    try {
+      var ind = JSON.parse(localStorage.getItem('rizq_individual_session') || 'null');
+      if (sid(ind) && sid(ind) === accountId) return true;
+    } catch (e2) {}
+    try {
+      if (global._rizqOwnerPreview === true) return true;
+    } catch (e3) {}
+    return false;
+  }
+
   /**
-   * باقات اشتراك المنصة: للنماذج/المعاينة فقط (قبل اشتراك التاجر).
-   * صفحة محل/مكتب/معرض/وكالة حقيقية = بدون باقات.
+   * باقات المنصة أسفل واجهة المحل/المعرض/المكتب:
+   * - صاحب الحساب: ظاهرة كما هي
+   * - النماذج/المعاينة: ظاهرة
+   * - الزائر العادي: لا — يُستبدل بزر يفتح القسم عند الضغط
    */
   function shouldShowPlatformPackages(accountId, opts) {
-    return isDemoPage({ accountId: accountId, isDemo: !!(opts && (opts.isDemo || opts.forceDemo)) });
+    opts = opts || {};
+    if (opts.forceShow) return true;
+    if (isViewerAccountOwner(accountId)) return true;
+    return isDemoPage({ accountId: accountId, isDemo: !!(opts.isDemo || opts.forceDemo) });
+  }
+
+  function platformPackagesCtaLabel(kind, fr) {
+    kind = String(kind || 'store');
+    if (fr) {
+      if (kind === 'showroom' || kind === 'gallery') return 'Ouvrez votre showroom sur Rizq';
+      if (kind === 'office') return 'Ouvrez votre bureau sur Rizq';
+      return 'Ouvrez votre boutique sur Rizq';
+    }
+    if (kind === 'showroom' || kind === 'gallery') return 'افتح معرضك على رزق';
+    if (kind === 'office') return 'افتح مكتبك على رزق';
+    return 'افتح محلك على رزق';
+  }
+
+  /**
+   * يُظهر القسم مباشرة للمالك/الديمو، أو زر CTA للزائر يفتح القسم عند الضغط.
+   * opts: { accountId, isDemo, sectionId, ctaId?, kind? }
+   */
+  function bindPlatformPackagesDisclosure(opts) {
+    opts = opts || {};
+    var section = typeof opts.sectionId === 'string' ? document.getElementById(opts.sectionId) : opts.sectionId;
+    if (!section) return { showPackages: false };
+    var show = shouldShowPlatformPackages(opts.accountId, opts);
+    var fr = false;
+    try { fr = (localStorage.getItem('rizq_lang') || 'ar') === 'fr'; } catch (e) {}
+    var ctaId = opts.ctaId || (section.id + '-open-cta');
+    var existing = document.getElementById(ctaId);
+    if (show) {
+      section.style.display = '';
+      section.removeAttribute('hidden');
+      if (existing) existing.style.display = 'none';
+      return { showPackages: true, ownerOrDemo: true };
+    }
+    section.style.display = 'none';
+    section.setAttribute('hidden', 'hidden');
+    if (!existing) {
+      existing = document.createElement('div');
+      existing.id = ctaId;
+      existing.className = 'rizq-pkg-open-cta-wrap';
+      existing.style.cssText = 'padding:28px 16px 40px;text-align:center;background:#f7f9fc;border-top:1px solid #e7ecf3';
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'rizq-pkg-open-cta';
+      btn.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 22px;border-radius:12px;border:1px solid rgba(201,168,76,.55);background:linear-gradient(135deg,#0F2347,#1B3A6B);color:#E8C96A;font:800 14px Cairo,sans-serif;cursor:pointer';
+      btn.textContent = platformPackagesCtaLabel(opts.kind || 'store', fr);
+      btn.addEventListener('click', function () {
+        section.style.display = '';
+        section.removeAttribute('hidden');
+        existing.style.display = 'none';
+        try { section.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (eScr) {}
+      });
+      existing.appendChild(btn);
+      if (section.parentNode) section.parentNode.insertBefore(existing, section);
+    } else {
+      existing.style.display = '';
+      var b2 = existing.querySelector('button');
+      if (b2) b2.textContent = platformPackagesCtaLabel(opts.kind || 'store', fr);
+    }
+    return { showPackages: false, cta: true };
   }
 
   /**
@@ -198,7 +287,19 @@
     var showPay = shouldShowStorefrontPayments();
     (opts.packageIds || []).forEach(function (id) {
       var el = typeof id === 'string' ? document.getElementById(id) : id;
-      if (el) el.style.display = showPkg ? '' : 'none';
+      if (!el) return;
+      if (opts.packagesAsCta && !showPkg) {
+        bindPlatformPackagesDisclosure({
+          accountId: accountId,
+          isDemo: opts.isDemo,
+          sectionId: el,
+          kind: opts.packagesKind || 'store',
+          ctaId: opts.packagesCtaId
+        });
+        return;
+      }
+      el.style.display = showPkg ? '' : 'none';
+      if (showPkg) el.removeAttribute('hidden');
     });
     (opts.paymentIds || []).forEach(function (id) {
       var el = typeof id === 'string' ? document.getElementById(id) : id;
@@ -230,8 +331,11 @@
     isDemoPage: isDemoPage,
     isDemoAccountId: isDemoAccountId,
     isViewerLoggedIn: isViewerLoggedIn,
+    isViewerAccountOwner: isViewerAccountOwner,
     disableFormsAndShowUpgradeBanner: disableFormsAndShowUpgradeBanner,
     shouldShowPlatformPackages: shouldShowPlatformPackages,
+    bindPlatformPackagesDisclosure: bindPlatformPackagesDisclosure,
+    platformPackagesCtaLabel: platformPackagesCtaLabel,
     shouldShowStorefrontPayments: shouldShowStorefrontPayments,
     shouldShowListingPrefacture: shouldShowListingPrefacture,
     shouldShowCheckoutPrefacture: shouldShowCheckoutPrefacture,

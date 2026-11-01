@@ -282,7 +282,7 @@ async function _sendEmail(to, subject, html) {
   }
   try {
     await mailer.sendMail({
-      from: process.env.EMAIL_FROM || '"رزق Rizq" <direction@rizq.mr>',
+      from: process.env.EMAIL_FROM || '"رزق Rizq" <contact@rizq.mr>',
       to, subject, html,
     });
     return { ok: true };
@@ -305,7 +305,7 @@ function _invoiceEmailHTML(inv) {
       <tr><td style="padding:6px 0;color:#6b7280">المبلغ</td><td style="padding:6px 0;font-weight:700;color:#C9A84C">${inv.price > 0 ? _fmtMoney(inv.price) : 'مجاناً'}</td></tr>
       <tr><td style="padding:6px 0;color:#6b7280">صالحة حتى</td><td style="padding:6px 0">${_fmtDate(inv.periodEnd)}</td></tr>
     </table>
-    <p style="font-size:11px;color:#6b7280">إيصال داخلي يؤكد تفعيل الباقة بعد مراجعة الدفع، وليس فاتورة ضريبية رسمية. لأي استفسار: direction@rizq.mr</p>
+    <p style="font-size:11px;color:#6b7280">إيصال داخلي يؤكد تفعيل الباقة بعد مراجعة الدفع، وليس فاتورة ضريبية رسمية. لأي استفسار: contact@rizq.mr</p>
   </div>`;
 }
 

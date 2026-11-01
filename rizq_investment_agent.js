@@ -108,6 +108,42 @@
       out.innerHTML = '<p class="inv-plan-loading">' + (lang === 'fr' ? 'Le conseiller investissement prépare le dossier…' : 'وكيل الاستثمار يجهّز الملف…') + '</p>';
       generatePlan(input).then(function (plan) {
         renderPlan(plan, out, lang);
+        /* املأ نموذج «أودع فرصة استثمارية» تلقائياً + زر متابعة الإيداع */
+        try {
+          var st = document.getElementById('sub-title');
+          var ss = document.getElementById('sub-sector');
+          var sc = document.getElementById('sub-capital');
+          var sd = document.getElementById('sub-desc');
+          if (st) st.value = input.title || st.value;
+          if (ss) ss.value = input.sector || ss.value;
+          if (sc) sc.value = input.capital || sc.value;
+          if (sd) {
+            var pitch = (plan && (plan.investorPitch || plan.executiveSummary)) || input.description || '';
+            sd.value = pitch;
+          }
+          var contId = 'inv-continue-deposit';
+          var cont = document.getElementById(contId);
+          if (!cont && out && out.parentNode) {
+            cont = document.createElement('button');
+            cont.type = 'button';
+            cont.id = contId;
+            cont.className = 'f-submit';
+            cont.style.marginTop = '12px';
+            cont.textContent = lang === 'fr' ? 'Continuer le dépôt ↓' : 'متابعة الإيداع ↓';
+            cont.addEventListener('click', function () {
+              var panel = document.getElementById('inv-submit');
+              if (panel) {
+                try { panel.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (eScr) {}
+                var focusEl = document.getElementById('sub-title');
+                if (focusEl) setTimeout(function () { try { focusEl.focus(); } catch (eF) {} }, 350);
+              }
+            });
+            out.parentNode.appendChild(cont);
+          } else if (cont) {
+            cont.textContent = lang === 'fr' ? 'Continuer le dépôt ↓' : 'متابعة الإيداع ↓';
+            cont.hidden = false;
+          }
+        } catch (eFill) {}
       }).finally(function () {
         if (btn) {
           btn.disabled = false;
