@@ -39,7 +39,7 @@ function mountMarketingRoutes(app, deps) {
     if (b.defaultLang) patch.defaultLang = String(b.defaultLang).slice(0, 8);
     if (b.maxDraftsPerDay != null) patch.maxDraftsPerDay = Math.min(200, Math.max(1, Number(b.maxDraftsPerDay) || 30));
     if (b.linkFallback) patch.linkFallback = String(b.linkFallback).slice(0, 500);
-    const status = await marketing.saveSettings(patch);
+    const status = await marketing.saveSettings(patch, adminUser(req));
     res.json({ ok: true, status });
   });
 

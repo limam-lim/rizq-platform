@@ -30,6 +30,20 @@ async function buildProfileFromAccount(acc) {
     ? row.profile.customInstructions
     : '';
 
+  let phone = '';
+  let whatsapp = '';
+  try {
+    const { getSellerContactEligibility } = require('./contactGate');
+    const seller = await getSellerContactEligibility(acc.id, acc.type);
+    if (seller && seller.canExpose) {
+      phone = String(acc.phone || '').trim();
+      whatsapp = String(acc.whatsapp || acc.phone || '').trim();
+    }
+  } catch (eGate) {
+    phone = '';
+    whatsapp = '';
+  }
+
   return {
     businessName: acc.name || 'المنشأة',
     businessType: personaKey,
@@ -37,9 +51,9 @@ async function buildProfileFromAccount(acc) {
     customInstructions,
     dynamicKnowledge,
     channels: {
-      phone: acc.phone || '',
-      whatsapp: acc.whatsapp || acc.phone || '',
-      email: acc.email || '',
+      phone,
+      whatsapp,
+      email: '',
       location: [acc.city, acc.address].filter(Boolean).join(' — '),
     },
     persona: {

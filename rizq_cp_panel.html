@@ -1529,6 +1529,7 @@ main, .page-content.active, .main-content, .results-area,
       </div>
 
       <div id="mkt-status-bar" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:18px"></div>
+      <div id="mkt-approval-warning" style="display:none;background:#fef2f2;border:1.5px solid #ef4444;border-radius:12px;padding:12px 16px;margin-bottom:16px;color:#b91c1c;font-size:13px;font-weight:700;line-height:1.6"></div>
 
       <div style="background:linear-gradient(135deg,rgba(27,58,107,.06),rgba(14,116,144,.05));border:1.5px solid rgba(27,58,107,.14);border-radius:14px;padding:18px 20px;margin-bottom:20px">
         <div style="font-weight:700;color:var(--navy);margin-bottom:12px;font-size:14px">✨ توليد حملة جديدة</div>
@@ -1568,6 +1569,9 @@ main, .page-content.active, .main-content, .results-area,
           <button type="button" id="mkt-gen-btn" onclick="mktGenerate()" style="padding:10px 22px;background:linear-gradient(135deg,#0e7490,#1B3A6B);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">✨ توليد مسودة</button>
           <label style="display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#374151;cursor:pointer">
             <input type="checkbox" id="mkt-enabled-toggle" onchange="mktToggleEnabled(this)"/> تفعيل المدير
+          </label>
+          <label style="display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#374151;cursor:pointer">
+            <input type="checkbox" id="mkt-approval-toggle" onchange="mktToggleHumanApproval(this)" checked/> موافقة بشرية قبل النشر
           </label>
           <span id="mkt-gen-msg" style="font-size:12px;color:#6b7280"></span>
         </div>
@@ -9398,6 +9402,19 @@ function mktRenderStatusBar(status) {
     card(by.scheduled || 0, 'مجدولة') +
     card(by.published || 0, 'منشورة') +
     card(stats.draftsToday || 0, 'مسودات اليوم');
+  var warn = document.getElementById('mkt-approval-warning');
+  if (warn) {
+    if (status.requireHumanApproval === false || status.humanApprovalWarning) {
+      warn.style.display = 'block';
+      warn.textContent = status.humanApprovalWarningText ||
+        'تحذير أمني: الموافقة البشرية معطّلة — قد تُنشر الحملات دون مراجعة أدمن.';
+    } else {
+      warn.style.display = 'none';
+      warn.textContent = '';
+    }
+  }
+  var appr = document.getElementById('mkt-approval-toggle');
+  if (appr) appr.checked = status.requireHumanApproval !== false;
 }
 
 function mktOpenEditor(camp) {
@@ -9495,6 +9512,26 @@ function mktToggleEnabled(el) {
   }).then(function () {
     if (typeof showToast === 'function') showToast(el.checked ? '✅ المدير مفعّل' : '⏸️ المدير موقّف', 'success');
   }).catch(function (err) {
+    if (typeof showToast === 'function') showToast(err.message, 'error');
+  });
+}
+
+function mktToggleHumanApproval(el) {
+  var on = !!(el && el.checked);
+  if (!on && !window.confirm('تحذير: تعطيل الموافقة البشرية يسمح بالنشر دون مراجعة. هل أنت متأكد؟')) {
+    el.checked = true;
+    return;
+  }
+  mktApi('/api/admin/marketing/settings', {
+    method: 'PATCH',
+    body: { requireHumanApproval: on },
+  }).then(function (data) {
+    if (data && data.status) mktRenderStatusBar(Object.assign({}, _mktStatus || {}, data.status));
+    if (typeof showToast === 'function') {
+      showToast(on ? '✅ الموافقة البشرية مفعّلة' : '⚠️ الموافقة البشرية معطّلة — تم التسجيل', on ? 'success' : 'error');
+    }
+  }).catch(function (err) {
+    el.checked = !on;
     if (typeof showToast === 'function') showToast(err.message, 'error');
   });
 }

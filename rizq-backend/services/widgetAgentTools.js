@@ -125,8 +125,8 @@ const WIDGET_TOOLS = [
         lang: { type: 'string', enum: ['ar', 'hs', 'fr', 'en', 'es'], description: 'Reply language for package names' },
         catalog: {
           type: 'string',
-          enum: ['store', 'office', 'corp', 'general', 'individual'],
-          description: 'Business category catalog — REQUIRED when user mentions محل/متجر (store), مكتب (office), or شركة (corp). Returns ONLY that category live prices.',
+          enum: ['store', 'office', 'corp', 'estate', 'individual'],
+          description: 'Business category catalog — REQUIRED when user mentions محل/متجر (store), مكتب (office), شركة (corp), or عقارات/وكالة (estate). Returns ONLY that category live prices. Never use legacy general prices.',
         },
       },
     },

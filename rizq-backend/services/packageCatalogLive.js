@@ -12,9 +12,9 @@ const {
   catalogPackageLabel,
 } = require('../../rizq_packages_config');
 
-const CATALOG_KEYS = ['general', 'store', 'office', 'corp', 'individual'];
+const CATALOG_KEYS = ['general', 'store', 'office', 'corp', 'individual', 'estate'];
 /** كتالوجات الوكيل الذكي — بلا general (أسعار عامة قديمة 5000/10000 لا تُعرض للزائر) */
-const AI_CATALOG_KEYS = ['store', 'office', 'corp'];
+const AI_CATALOG_KEYS = ['store', 'office', 'corp', 'estate'];
 
 function normRef(value) {
   return String(value || '')
@@ -214,7 +214,7 @@ function findInCatalogByRef(ref, catalogKey, lang) {
   return hit ? Object.assign({}, hit, { catalog: catalogKey }) : null;
 }
 
-const DIAMOND_LOOKUP_ORDER = ['store', 'office', 'corp', 'general', 'individual'];
+const DIAMOND_LOOKUP_ORDER = ['store', 'office', 'corp', 'estate', 'individual'];
 
 function findDiamondByTier(tier, lang, preferredCatalog, strictOnly) {
   const ids = tier === 'diamond_pro' ? DIAMOND_PRO_IDS : DIAMOND_STD_IDS;

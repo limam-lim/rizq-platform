@@ -375,11 +375,11 @@
         inputPh: 'اكتب رسالتك هنا...',
         footerHtml: 'مدعوم بـ <strong style="color:#1B3A6B">رزق AI</strong> · منصة رزق للتجارة الإلكترونية',
         greeting: 'أهلاً! 👋\nأنا رزق ذكي — مساعدك على المنصة. كيف أساعدك؟',
-        errNoBackend: '⚠️ خدمة الذكاء الاصطناعي غير متصلة بالخادم حالياً. حاول لاحقاً أو راسل direction@rizq.mr',
-        errNetwork: '⚠️ تعذّر الاتصال بالخادم. تحقق من الإنترنت وحاول مرة أخرى.',
-        errTimeout: '⚠️ استغرق الرد وقتاً طويلاً. أعد إرسال رسالتك من فضلك.',
-        errServer: '⚠️ حدث خطأ في الخادم. حاول بعد قليل أو تواصل مع direction@rizq.mr',
-        errEmpty: '⚠️ لم أتلقَّ رداً من المساعد. أعد صياغة سؤالك من فضلك.'
+        errNoBackend: 'الخدمة مشغولة، جرّب بعد قليل أو تواصل مع الدعم',
+        errNetwork: 'الخدمة مشغولة، جرّب بعد قليل أو تواصل مع الدعم',
+        errTimeout: 'الخدمة مشغولة، جرّب بعد قليل أو تواصل مع الدعم',
+        errServer: 'الخدمة مشغولة، جرّب بعد قليل أو تواصل مع الدعم',
+        errEmpty: 'الخدمة مشغولة، جرّب بعد قليل أو تواصل مع الدعم'
       },
       fr: {
         toggleAria: 'Rizq IA — votre assistant',
@@ -396,17 +396,15 @@
         inputPh: 'Écrivez votre message ici...',
         footerHtml: 'Propulsé par <strong style="color:#1B3A6B">Rizq AI</strong> · plateforme Rizq e-commerce',
         greeting: 'Bonjour ! 👋\nJe suis Rizq IA — votre assistant sur la plateforme. Comment puis-je vous aider ?',
-        errNoBackend: '⚠️ Le service IA n\'est pas connecté au serveur. Réessayez plus tard ou écrivez à direction@rizq.mr',
-        errNetwork: '⚠️ Connexion impossible. Vérifiez Internet et réessayez.',
-        errTimeout: '⚠️ La réponse a pris trop de temps. Renvoyez votre message.',
-        errServer: '⚠️ Erreur serveur. Réessayez bientôt ou contactez direction@rizq.mr',
-        errEmpty: '⚠️ Aucune réponse reçue. Reformulez votre question.'
+        errNoBackend: 'Le service est occupé, réessayez bientôt ou contactez le support',
+        errNetwork: 'Le service est occupé, réessayez bientôt ou contactez le support',
+        errTimeout: 'Le service est occupé, réessayez bientôt ou contactez le support',
+        errServer: 'Le service est occupé, réessayez bientôt ou contactez le support',
+        errEmpty: 'Le service est occupé, réessayez bientôt ou contactez le support'
       }
     };
+    // agentTier يضبطه الخادم وحده بعد assertAiAgentAccess — لا استنتاج من businessName
     function _resolveAgentTier() {
-      var profile = _ctx.profile || null;
-      var biz = profile && profile.businessName ? String(profile.businessName) : '';
-      if (biz && biz !== 'رزق' && biz.toLowerCase() !== 'rizq') return 'diamond';
       return 'general';
     }
 
@@ -1079,26 +1077,23 @@
       return urls;
     }
 
+    function _busyServiceMsg(lang) {
+      var L = (lang === 'fr' || lang === 'es' || lang === 'en' || lang === 'hs') ? lang : 'ar';
+      var map = {
+        ar: 'الخدمة مشغولة، جرّب بعد قليل أو تواصل مع الدعم',
+        hs: 'الخدمة مشغولة، جرّب بعد شوية أو تواصل مع الدعم',
+        fr: 'Le service est occupé, réessayez bientôt ou contactez le support',
+        en: 'Service is busy — try again shortly or contact support',
+        es: 'El servicio está ocupado; inténtelo más tarde o contacte con soporte'
+      };
+      return map[L] || map.ar;
+    }
+
     function _offlineAgentReply(userText) {
       var msgLang = _detectMessageLang(userText);
-      var pageCtx = _collectPageContext();
-      var mgr = window.RizqManager;
-      if (mgr && typeof mgr.processMessage === 'function') {
-        try {
-          var result = mgr.processMessage(userText, Object.assign({}, _ctx, {
-            uiLang: _ctx.lang,
-            lang: msgLang,
-            pageContext: pageCtx
-          }));
-          var reply = result && (result.reply != null ? result.reply : result);
-          if (result && result.lang) _ctx.chatLang = result.lang;
-          else _ctx.chatLang = msgLang;
-          if (reply) return String(reply);
-        } catch (eMgr) {
-          console.error('Widget Chat Error: offline RizqManager fallback failed', eMgr);
-        }
-      }
-      return _inlineOfflineReply(userText, msgLang);
+      _ctx.chatLang = msgLang;
+      // تعطل الخادم: لا أسعار ولا هاتف/واتساب من أي fallback محلي
+      return _busyServiceMsg(msgLang);
     }
 
     function _inlineOfflineReply(text, lang) {
