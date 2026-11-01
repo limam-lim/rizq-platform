@@ -110,11 +110,12 @@ function buildLiveCatalogSnapshotBlock(liveCatalog, catalogHint) {
 function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts, extraInstruction, agentTier, liveCatalog, catalogHint }) {
   const uiLang = normalizeUiLang(lang);
   const replyLang = detectedLang || uiLang;
-  const tier = agentTier || (profile && profile.businessName ? 'diamond' : 'general');
+  // agentTier من الخادم فقط — لا يُستنتج من profile.businessName
+  const tier = String(agentTier || 'general').toLowerCase() === 'diamond' ? 'diamond' : 'general';
   let prompt = buildLanguageInstructions(replyLang, uiLang);
   prompt += '\n' + RizqAgent.buildMasterSystemPrompt({
     agentTier: tier,
-    profile: profile || null
+    profile: tier === 'diamond' ? (profile || null) : null
   });
   if (extraInstruction) {
     prompt += `\n## Extra language instruction\n${String(extraInstruction).slice(0, 1200)}\n`;
@@ -152,16 +153,16 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
       `Never guess prices or trust scores — if no data, say so clearly.\n` +
       `For Rizq subscription/package/pricing questions:\n` +
       `1) If business type unknown (محل/مكتب/شركة) — ASK that first in one short question. Do NOT dump package lists.\n` +
-      `2) When type is known — call get_packages_info(catalog=store|office|corp) and quote ONLY that live result.\n` +
-      `3) Never invent MRU amounts; never mix catalogs; never use memorized training prices.\n` +
+      `2) When type is known — call get_packages_info(catalog=store|office|corp|estate) and quote ONLY that live result.\n` +
+      `3) Never invent MRU amounts; never mix catalogs; never use memorized training prices or legacy general 5000/10000.\n` +
       `Do NOT redirect to "open listing card" unless the user asks about a specific ad.\n` +
       `Rizq payments: Bankily, Sedad, or cash with seller. Registration is free.\n` +
       `When explaining how to register or log in, use ONLY on-screen button labels the user can tap:\n` +
       `- Personal account: «حسابي» → «أتصفّح وأتواصل» then email verification code\n` +
       `- New business account: homepage «حساب جديد» or «سجّل الآن — مجاناً»\n` +
       `- Account login: homepage «دخول» or «حسابي» → «لدي حساب على رزق — دخول»\n` +
-      `NEVER expose file names, .html paths, query parameters (?openRegister, ?openLogin), or internal technical URLs in replies.\n` +
-      `Keep general answers concise (2-4 sentences). Sound human, not scripted.\n` +
+      `For tenders say «قسم المناقصات» — NEVER file names, .html, API, endpoints, or query strings.\n` +
+      `Answer the asked question first (especially prices). Keep replies short for phones (2-4 sentences). One clarifying question when unclear.\n` +
       `Never use Unicode bidi control characters — quote prices only from get_packages_info, Western digits 0-9 only.\n`;
   }
 
@@ -592,19 +593,24 @@ async function handleWidgetChat(body) {
       ? getLivePackagesForAI(detectedLang, { catalog: catalogHint })
       : getLivePackagesForAI(detectedLang);
   }
-  const extraInstruction = body.autoLang === true
-    ? 'Detect the user language automatically (Arabic fusaha, Mauritanian Hassaniya, French, English, or Spanish) and reply only in that language. For Hassaniya: Mauritanian Hassaniya only — never Moroccan Darija.'
-    : (body.systemInstruction
-      ? String(body.systemInstruction).slice(0, 400)
-      : '');
+  const serverTier = String(body.agentTier || 'general').toLowerCase() === 'diamond' ? 'diamond' : 'general';
+  // تجاهل أي systemInstruction قادم من العميل — قائمة بيضاء داخلية فقط (autoLang هنا من الخادم/المسار)
+  const INTERNAL_EXTRA_WHITELIST = {
+    autoLang:
+      'Detect the user language automatically (Arabic fusaha, Mauritanian Hassaniya, French, English, or Spanish) and reply only in that language. For Hassaniya: Mauritanian Hassaniya only — never Moroccan Darija.',
+  };
+  const extraInstruction = body.autoLang === true ? INTERNAL_EXTRA_WHITELIST.autoLang : '';
+  // إسقاط حقول العميل غير الموثوقة إن وُجدت
+  if (body.systemInstruction) delete body.systemInstruction;
+  if (body.systemInstructionAllowlisted) delete body.systemInstructionAllowlisted;
   const systemPrompt = buildSystemPrompt({
     lang: uiLang,
     detectedLang,
-    profile,
+    profile: serverTier === 'diamond' ? profile : null,
     pageContext,
     pageFacts,
     extraInstruction,
-    agentTier: body.agentTier || (profile && profile.businessName ? 'diamond' : 'general'),
+    agentTier: serverTier,
     liveCatalog: liveCatalogPrefetch,
     catalogHint,
   });

@@ -166,6 +166,23 @@
         } else if (ent.subscriptionStatus === 'active' || ent.subscriptionStatus === 'expiring_soon') {
           accs[accId].pkg_status = 'active';
         }
+        // شارات/مزايا الذكاء الاصطناعي من الخادم فقط — غيابها = رفض لاحقاً في hasFeature
+        var serverFeats = Array.isArray(ent.features) ? ent.features.slice() : [];
+        var aiFromServer = [];
+        AI_FEATURES.forEach(function (f) {
+          var flagged = ent.flags && (
+            (f === 'ai_agent_full' && ent.flags.aiAgent) ||
+            (f === 'widget_channel' && ent.flags.widgetChannel) ||
+            (f === 'whatsapp_channel' && ent.flags.whatsappChannel) ||
+            (f === 'calls_channel' && ent.flags.callsChannel) ||
+            (f === 'quota_dashboard' && ent.flags.quotaDashboard) ||
+            (f === 'auto_reply_calls' && serverFeats.indexOf('auto_reply_calls') !== -1) ||
+            (f === 'vip_manager' && serverFeats.indexOf('vip_manager') !== -1)
+          );
+          if (flagged || serverFeats.indexOf(f) !== -1) aiFromServer.push(f);
+        });
+        accs[accId].serverAiFeatures = aiFromServer;
+        accs[accId].serverEntitlementsAt = new Date().toISOString();
         // صلاحيات الفيديو المعزولة
         if (data.media) {
           accs[accId].mediaEntitlements = data.media;
@@ -723,6 +740,12 @@
           }
         }
         tierFeats.forEach(function(feat){
+          // لا تُضاف مزايا AI من اسم الباقة المحلي — فقط عبر شارات الخادم
+          if (AI_FEATURES.indexOf(feat) !== -1) return;
+          if(features.indexOf(feat)===-1) features.push(feat);
+        });
+        var serverAi = (acc && Array.isArray(acc.serverAiFeatures)) ? acc.serverAiFeatures : [];
+        serverAi.forEach(function(feat){
           if(features.indexOf(feat)===-1) features.push(feat);
         });
       }
@@ -856,9 +879,18 @@
   }
 
   // ── hasFeature ────────────────────────────────────────────────────
+  // مزايا الذكاء الاصطناعي تعتمد شارات الخادم إلزامياً — غيابها = رفض
   function hasFeature(accId, featureName) {
+    var feat = String(featureName || '');
+    if (AI_FEATURES.indexOf(feat) !== -1) {
+      var accounts = getAccounts();
+      var acc = accounts[accId];
+      var serverList = acc && Array.isArray(acc.serverAiFeatures) ? acc.serverAiFeatures : null;
+      if (!serverList || !serverList.length) return false;
+      return serverList.indexOf(feat) !== -1;
+    }
     var sub = checkSubscription(accId);
-    return sub.features.indexOf(featureName) !== -1;
+    return sub.features.indexOf(feat) !== -1;
   }
 
   // ── الشارتان الحقيقيتان — تصحيح 25/07/2026 (توضيح صريح من Limam) ──

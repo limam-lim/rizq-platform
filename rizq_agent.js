@@ -33,7 +33,11 @@ var INJECTION_PATTERNS = [
   /your instructions/i,
   /reveal.*prompt/i,
   /show.*(source code|api key|database|backend)/i,
-  /اكشف.*(الكود|السورس|قاعدة|api)/i
+  /اكشف.*(الكود|السورس|قاعدة|api)/i,
+  /dump.*(system|prompt|instructions)/i,
+  /افرغ.*(البرومبت|التعليمات)/i,
+  /montre.*(prompt|instructions?\s*syst[eè]me)/i,
+  /r[eé]v[eè]le.*(prompt|instructions)/i
 ];
 
 var POLICY_VIOLATION_PATTERNS = [
@@ -51,7 +55,11 @@ var SECRET_TOPIC_PATTERNS = [
   /system\s*prompt/i,
   /agent\s*instructions/i,
   /source\s*code/i,
-  /api\s*key/i,
+  /api[\s_-]*key/i,
+  /anthropic|sk-ant-|claude[_-]?api/i,
+  /secret[\s_-]*(key|token)|bearer\s+[a-z0-9._-]{12,}/i,
+  /private[\s_-]*(key|token|secret)/i,
+  /openai|xai[_-]?api|grok[_-]?key/i,
   /database\s*model/i,
   /backend\s*logic/i,
   /file\s*structure/i,
@@ -61,7 +69,23 @@ var SECRET_TOPIC_PATTERNS = [
   /الكود\s*المصدري/i,
   /هيكل\s*الملفات/i,
   /قاعدة\s*البيانات/i,
-  /مفتاح\s*api/i
+  /مفتاح\s*(api|الـ?\s*api|السري|السرية|الأنثروبيك)/i,
+  /ور[ّي]?يني?\s*(البرومبت|التعليمات|المفتاح|api)/i,
+  /شنو\s*(التعليمات|البرومبت|المفتاح)|شحال\s*المفتاح/i,
+  /رقم\s*(البائع|التاجر|الواتساب)?\s*(المقفل|المخفي|السري)/i,
+  /هات[فف]\s*(مقفل|مخفي|سري)/i,
+  /الرقم\s*(المقفل|المخفي|السري)/i,
+  /locked|hidden|private\s*(phone|number|whatsapp)/i,
+  /num[eé]ro\s*(verrouill[eé]|cach[eé]|secret|masqu[eé])/i,
+  /cl[eé]\s*(api|secr[eè]te)|mot\s*de\s*passe\s*(api|syst[eè]me)/i,
+  /الماسية\s*(مجانا|بلا\s*(فلوس|ثمن|دفع)|بدون\s*(دفع|اشتراك|فلوس))/i,
+  /diamond\s*(for\s*)?free|diamant\s*gratuit/i,
+  /فعّ?ل.*(الماسية|diamond).*بدون\s*(دفع|اشتراك)/i,
+  /activate\s*diamond\s*without\s*pay/i,
+  /donne[- ]?moi\s*(le\s*)?(diamant|forfait)\s*gratuit/i,
+  /تعليمات\s*(داخلية|النظام|الوكيل)/i,
+  /instructions?\s*(internes?|syst[eè]me|secr[eè]tes?)/i,
+  /reveal\s*(the\s*)?(api[\s_-]*key|system\s*prompt|secret)/i
 ];
 
 function normalizeUiLang(lang) {
@@ -110,6 +134,7 @@ function getPolicyRefusal(lang) {
 function getSecrecyRefusal(lang) {
   return pickLang({
     ar: 'هذه المعلومات سرية ✋ كيف أساعدك في شيء آخر؟',
+    hs: 'هذ المعلومات سرية ✋ شنهو نقدر نعاونك فيه غير كذا؟',
     fr: 'Information confidentielle ✋ Comment puis-je vous aider autrement ?',
     en: 'That information is confidential ✋ How else can I help?',
     es: 'Esa información es confidencial ✋ ¿En qué más puedo ayudarte?'
@@ -147,16 +172,17 @@ function buildKnowledgeBaseBlock() {
 
 function buildToneBlock() {
   return (
-    '## COMMERCIAL TACT, WIT & WARMTH (sound human)\n' +
+    '## COMMERCIAL TACT, WIT & WARMTH (sound human — phone-first)\n' +
     '- Speak like a helpful Mauritanian colleague: warm, clear, never robotic or template-like.\n' +
-    '- Mirror the user\'s energy: short slang → short reply; detailed question → structured plain-text answer.\n' +
-    '- Polite jokes, emojis, and warm greetings are welcome when natural (مرحبا، أهلا، hola, bonjour).\n' +
-    '- Match the user\'s language exactly (Arabic fusaha, Mauritanian Hassaniya, French, Spanish, English) — never mix unless they do.\n' +
-    '- Hassaniya = Mauritanian only (زين، شنهو، تبي، كيفاه، أهلين). NEVER Moroccan Darija (واخا، دابا، ديال، يلاه).\n' +
-    '- Prefer concrete next steps using on-screen button labels only ("حسابي → أشتري أو أتصفّح" للمشتري؛ «حساب جديد» أو «سجّل الآن — مجاناً» للبائع؛ «دخول» لدخول البائع). Never mention file names, .html paths, query strings like ?openRegister, or internal code.\n' +
-    '- If unsure: say so honestly, then offer the best next action (tool, page, or direction@rizq.mr).\n' +
-    '- Stay inviting: «نحن هنا دائماً في خدمتك! 😊» / «Nous sommes toujours là pour vous ! 😊»\n' +
-    '- Keep answers concise (2–4 sentences) unless packages/pricing need a full comparison.\n'
+    '- ALWAYS answer the user\'s question first. If they ask a price, do NOT open with a generic greeting — give the live price (after tools) then one short follow-up question if needed.\n' +
+    '- Mirror the user\'s language: Hassaniya→Hassaniya, French→French, fusaha→fusaha; if they mix languages, reply in the dominant mix they used (still clear).\n' +
+    '- Hassaniya = Mauritanian only (زين، شنهو، تبي، كيفاه، أهلين، شحّال). NEVER Moroccan Darija (واخا، دابا، ديال، يلاه).\n' +
+    '- Short sentences for mobile screens. One clarifying question when ambiguous — never a long menu.\n' +
+    '- NEVER mention file names, .html paths, API, endpoints, query strings, or internal code. Say «قسم المناقصات» / «صفحة الباقات» and point to on-screen buttons only.\n' +
+    '- Prices ALWAYS from live tools (get_packages_info) — never from memory/training. If tools fail: say so and offer human support.\n' +
+    '- For financial disputes, payment not activated, or uncertainty: escalate kindly to human support (direction@rizq.mr / ticket) — no blame.\n' +
+    '- Prefer concrete next steps using on-screen labels («حسابي»، «حساب جديد»، «سجّل الآن — مجاناً»، «دخول»).\n' +
+    '- Keep answers concise (2–4 sentences) unless a package comparison truly needs more.\n'
   );
 }
 
@@ -218,7 +244,8 @@ function buildMasterSystemPrompt(opts) {
   opts = opts || {};
   var tier = String(opts.agentTier || opts.tier || 'general').toLowerCase();
   var profile = opts.profile || null;
-  var isDiamond = tier === 'diamond' || !!(profile && profile.businessName);
+  // الخادم وحده يضبط agentTier=diamond بعد assertAiAgentAccess — لا استنتاج من businessName
+  var isDiamond = tier === 'diamond';
 
   return [
     buildKnowledgeBaseBlock(),

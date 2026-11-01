@@ -950,6 +950,49 @@ app.post('/api/telegram/test-lead-alert', requireAdminPermission('channels'), as
   }
 });
 
+/** GET /api/agent/public-eligibility/:accountId — بوابة السكرتير (خادم فقط، بلا localStorage) */
+const agentEligibilityLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { ok: false, eligible: false, error: 'too_many_requests' },
+});
+app.get('/api/agent/public-eligibility/:accountId', agentEligibilityLimiter, async (req, res) => {
+  try {
+    const accountId = String(req.params.accountId || '').trim().slice(0, 80);
+    if (!accountId) {
+      return res.status(400).json({ ok: false, eligible: false, error: 'accountId_required' });
+    }
+    const acc = (await readAccounts()).find((a) => a && a.id === accountId) || null;
+    if (!acc || acc.status !== 'approved' || acc.suspended) {
+      return res.json({ ok: true, eligible: false, code: 'merchant_inactive' });
+    }
+    const { accountHasAiAgentStrict } = require('./services/packageAccessGuard');
+    const eligible = await accountHasAiAgentStrict(acc);
+    if (!eligible) {
+      return res.json({ ok: true, eligible: false, code: 'ai_not_entitled' });
+    }
+    const profile = await buildProfileFromAccount(acc);
+    return res.json({
+      ok: true,
+      eligible: true,
+      profile: {
+        accountId,
+        businessName: profile.businessName,
+        businessType: profile.businessType,
+        agentTitle: profile.persona && profile.persona.agentTitle,
+        persona: profile.persona || null,
+        channels: profile.channels || {},
+        workingHours: '',
+        isOffHours: false,
+      },
+    });
+  } catch (err) {
+    return res.status(500).json({ ok: false, eligible: false, error: 'eligibility_failed' });
+  }
+});
+
 app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
   try {
     const body = req.body || {};
@@ -986,18 +1029,12 @@ app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
       body.accountId = accountId;
       body.profile = await buildProfileFromAccount(acc);
       body.agentTier = 'diamond';
+      delete body.systemInstruction;
     } else {
       // مساعد المنصة العام — امنع انتحال الباقة الماسية من العميل
-      if (body.profile && typeof body.profile === 'object') {
-        delete body.profile.tier;
-        delete body.profile.plan;
-        delete body.profile.dynamicKnowledge;
-        delete body.profile.customInstructions;
-        delete body.profile.accountId;
-      }
-      if (String(body.agentTier || '').toLowerCase() === 'diamond') {
-        body.agentTier = 'standard';
-      }
+      body.profile = null;
+      body.agentTier = 'general';
+      delete body.systemInstruction;
     }
 
     const result = await handleWidgetChat(body);
@@ -1071,17 +1108,11 @@ app.post('/api/ai/chat', widgetChatLimiter, async (req, res) => {
       body.accountId = accountId;
       body.profile = await buildProfileFromAccount(acc);
       body.agentTier = 'diamond';
+      delete body.systemInstruction;
     } else {
-      if (body.profile && typeof body.profile === 'object') {
-        delete body.profile.tier;
-        delete body.profile.plan;
-        delete body.profile.dynamicKnowledge;
-        delete body.profile.customInstructions;
-        delete body.profile.accountId;
-      }
-      if (String(body.agentTier || '').toLowerCase() === 'diamond') {
-        body.agentTier = 'standard';
-      }
+      body.profile = null;
+      body.agentTier = 'general';
+      delete body.systemInstruction;
     }
 
     const result = await handleWidgetChat(body);

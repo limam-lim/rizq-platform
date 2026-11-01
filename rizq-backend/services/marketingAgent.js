@@ -30,13 +30,37 @@ async function getSettings() {
   });
 }
 
-async function saveSettings(partial) {
+async function saveSettings(partial, adminUser) {
   const cur = await getSettings();
   const next = Object.assign({}, cur, partial && typeof partial === 'object' ? partial : {});
   // منع حقن أسرار في المتجر
   delete next.facebookPageAccessToken;
   delete next.facebookAppSecret;
   delete next.apiKey;
+
+  const prevApproval = cur.requireHumanApproval !== false;
+  const nextApproval = next.requireHumanApproval !== false;
+  if (prevApproval !== nextApproval || (partial && Object.prototype.hasOwnProperty.call(partial, 'requireHumanApproval'))) {
+    const log = Array.isArray(next.approvalAuditLog) ? next.approvalAuditLog.slice() : [];
+    log.push({
+      at: new Date().toISOString(),
+      by: String(adminUser || 'admin').slice(0, 80),
+      requireHumanApproval: nextApproval,
+      warning: !nextApproval,
+      note: nextApproval
+        ? 'human_approval_enabled'
+        : 'human_approval_DISABLED — auto-publish risk',
+    });
+    next.approvalAuditLog = log.slice(-50);
+    if (!nextApproval) {
+      console.warn(
+        '[marketingAgent] SECURITY: requireHumanApproval=false by',
+        adminUser || 'admin',
+        '— admin panel must show warning'
+      );
+    }
+  }
+
   await repos().marketingSettings.upsert('_root', next);
   return getPublicStatus();
 }
@@ -56,10 +80,17 @@ function isFacebookConfigured() {
 
 async function getPublicStatus() {
   const s = await getSettings();
+  const requireHumanApproval = s.requireHumanApproval !== false;
+  const audit = Array.isArray(s.approvalAuditLog) ? s.approvalAuditLog : [];
   return {
     ok: true,
     enabled: !!s.enabled,
-    requireHumanApproval: s.requireHumanApproval !== false,
+    requireHumanApproval,
+    humanApprovalWarning: !requireHumanApproval,
+    humanApprovalWarningText: requireHumanApproval
+      ? ''
+      : 'تحذير أمني: الموافقة البشرية معطّلة — قد تُنشر الحملات دون مراجعة أدمن.',
+    approvalAuditLog: audit.slice(-10),
     defaultChannel: s.defaultChannel || 'facebook',
     defaultLang: s.defaultLang || 'ar',
     maxDraftsPerDay: s.maxDraftsPerDay || 30,
