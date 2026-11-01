@@ -15,9 +15,9 @@
     "dev:split": "powershell -NoProfile -ExecutionPolicy Bypass -File ./scripts/dev.ps1",
     "dev:front": "npx --yes serve -l 5500 .",
     "dev:api": "npm --prefix rizq-backend run dev",
-    "test:links": "node scripts/audit-platform-links.js",
-    "test:smoke": "node scripts/e2e-platform-smoke.js",
-    "test:isolation": "node scripts/test-subscriber-isolation.js",
+    "test:links": "node rizq-backend/scripts/run-with-test-db.js scripts/audit-platform-links.js",
+    "test:smoke": "node rizq-backend/scripts/run-with-test-db.js scripts/e2e-platform-smoke.js",
+    "test:isolation": "node rizq-backend/scripts/run-with-test-db.js scripts/test-subscriber-isolation.js",
     "test:quota-concurrency": "npm --prefix rizq-backend run test:quota-concurrency"
   },
   "dependencies": {

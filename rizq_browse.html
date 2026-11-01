@@ -1987,17 +1987,29 @@ function dateFr(d){if(!d)return '';return d.replace('منذ ساعتين','il y 
 // استُخرجت من loadRealSearchAds() كدالة مشتركة (بدل تكرار المنطق) حتى
 // تُستخدَم أيضاً مع إعلانات rizq-backend الحقيقية القادمة عبر fetch —
 // راجع _rizqMergeBackendAds() أسفل لتفاصيل الدمج.
+function adHasPublicTitle(a){
+  if(!a) return false;
+  var t=String(a.title||'').trim();
+  var tFr=String(a.titleFr||a.titleFR||'').trim();
+  if(!t && !tFr) return false;
+  if(t==='(بدون عنوان)' || t==='(Sans titre)') return false;
+  if(tFr==='(بدون عنوان)' || tFr==='(Sans titre)') return false;
+  return true;
+}
+
 function _mapRawAdsToDisplay(rawList){
   /* إصلاح: هذه القيم الافتراضية (بدون عنوان/تفاوض/غير محدد/صاحب الإعلان) كانت
      ثابتة بالعربية دائماً لكل الإعلانات الحقيقية (غير التجريبية)، تظهر بالعربية
-     حتى في الواجهة الفرنسية. الآن تتبع اللغة الحالية. */
+     حتى في الواجهة الفرنسية. الآن تتبع اللغة الحالية.
+     إعلان بلا عنوان حقيقي لا يُعرض في القوائم العامة.
+     السعر الفارغ → «السعر عند التواصل» (نفس شارة السعر). */
   var _fr = _rizqLang()==='fr';
-  var noTitle = _fr ? '(Sans titre)' : '(بدون عنوان)';
-  var negotiable = _fr ? 'À négocier' : 'تفاوض';
+  var priceOnContact = _fr ? 'Prix à la demande' : 'السعر عند التواصل';
   var noLoc = _fr ? '📍 Non spécifié' : '📍 غير محدد';
   var sellerLbl = _fr ? "Propriétaire de l'annonce" : 'صاحب الإعلان';
   return (rawList||[])
     .filter(a=>a.status!=='rejected')
+    .filter(adHasPublicTitle)
     .map(a=>{
       var p=parseInt(String(a.price||'0').replace(/[^\d]/g,''))||0;
       // ── شارتا "موثّق" و"مميّز" الحقيقيتان — تصحيح 25/07/2026 ──
@@ -2021,7 +2033,7 @@ function _mapRawAdsToDisplay(rawList){
       var _origP = parseInt(String(a.originalPrice||'0').replace(/[^\d]/g,''))||0;
       var _discountPct = (_origP>0 && p>0 && _origP>p) ? Math.round((1-(p/_origP))*100) : 0;
       var item = {id:a.id,subcat:a.subcat||a.category||'',cat:a.category||'',wilaya:a.wilaya||'',
-        title:a.title||noTitle,desc:a.desc||'',price:p?(p.toLocaleString()+' MRU'):negotiable,
+        title:a.title||a.titleFr||a.titleFR||'',desc:a.desc||'',price:p?(p.toLocaleString()+' MRU'):priceOnContact,
         priceNum:p,rooms:0,verified:_badges.verified,pin:(_badges.premium||_badges.priorityListing||_boosted),boosted:_boosted,
         priorityListing:!!_badges.priorityListing,
         originalPriceNum:_origP,discountPct:_discountPct,emoji:a.emoji||'📦',
@@ -2541,6 +2553,7 @@ function applyFilters(){
     : {};
 
   filtered=ALL_ADS.filter(a=>{
+    if(typeof adHasPublicTitle==='function' && !adHasPublicTitle(a)) return false;
     if(searchText){
       const q=searchText.toLowerCase();
       const brandBlob=[a.brandId,a.brandName,a.brandNameFr,a.modelId,a.modelName,a.modelNameFr].join(' ');
@@ -2629,7 +2642,8 @@ function _syncBrowseFiltersToUrl(opts){
 function _adCardHtml(a, fr){
   const isActive=window._currentAd&&String(window._currentAd.id)===String(a.id)?'active':'';
   const _title=adTitleLocalized(a);
-  const _price=fr?priceFr(a.price||''):(a.price||'');
+  let _price=fr?priceFr(a.price||''):(a.price||'');
+  if(!_price || !String(_price).trim()) _price = fr ? 'Prix à la demande' : 'السعر عند التواصل';
   const _loc=fr?locFr(a.loc,a.wilaya):(a.loc||'');
   const idJs=String(a.id).replace(/'/g,"\\'");
   const media=(window.RizqAdCards&&typeof RizqAdCards.mediaHtml==='function')
@@ -2683,6 +2697,25 @@ function _infiniteStatusHtml(fr){
   </div>`;
 }
 
+function _updateInfiniteStatus(fr){
+  const body=document.getElementById('result-list-body');
+  if(!body) return;
+  let status=document.getElementById('rl-infinite');
+  const html=_infiniteStatusHtml(fr);
+  if(!html){
+    if(status) status.remove();
+    return;
+  }
+  if(status){
+    const wrap=document.createElement('div');
+    wrap.innerHTML=html;
+    const next=wrap.firstElementChild;
+    status.replaceWith(next);
+  } else {
+    body.insertAdjacentHTML('beforeend', html);
+  }
+}
+
 function renderResultList(){
   const body=document.getElementById('result-list-body');
   const pagEl=document.getElementById('result-pagination');
@@ -2719,10 +2752,28 @@ function loadMoreAds(){
   if(visibleCount>=filtered.length) return false;
   _infiniteLoading=true;
   const body=document.getElementById('result-list-body');
-  const prevTop=body?body.scrollTop:0;
+  const fr=_rizqLang()==='fr';
+  const prevCount=visibleCount;
   visibleCount=Math.min(visibleCount+PER_PAGE, filtered.length);
-  renderResultList();
-  if(body) body.scrollTop=prevTop;
+  const chunk=filtered.slice(prevCount, visibleCount);
+  if(body && chunk.length){
+    const status=document.getElementById('rl-infinite');
+    const html=chunk.map(a=>_adCardHtml(a,fr)).join('');
+    if(status) status.insertAdjacentHTML('beforebegin', html);
+    else body.insertAdjacentHTML('beforeend', html);
+    if(window.RizqAdCards && typeof RizqAdCards.bindAll==='function'){
+      // اربط البطاقات الجديدة فقط — لا تُعِد رسم القائمة
+      const nodes=body.querySelectorAll('.rc[data-ad-id]');
+      const start=Math.max(0, nodes.length - chunk.length);
+      for(let i=start;i<nodes.length;i++){
+        try{ RizqAdCards.bindAll(nodes[i]); }catch(eBind){}
+      }
+    }
+    _updateInfiniteStatus(fr);
+    _bindInfiniteScroll();
+  } else {
+    renderResultList();
+  }
   // امنع سلسلة تحميل فورية إذا بقي الـ sentinel ظاهراً في الشاشة
   setTimeout(function(){ _infiniteLoading=false; }, 120);
   return true;

@@ -7,6 +7,7 @@
 const path = require('path');
 const fs = require('fs');
 try { require('dotenv').config({ path: path.join(__dirname, '..', '.env') }); } catch (e) { /* optional */ }
+const { spawnHttpTestServer } = require('./_spawnHttpTestServer');
 
 const results = [];
 function ok(name, pass, detail) {
@@ -14,7 +15,7 @@ function ok(name, pass, detail) {
   console.log((pass ? 'OK  ' : 'FAIL') + ' ' + name + (detail ? ' — ' + detail : ''));
 }
 
-const BASE = 'http://127.0.0.1:' + (process.env.PORT || 3000);
+let BASE = 'http://127.0.0.1:' + (process.env.PORT || 3000);
 
 async function req(method, urlPath, body, headers) {
   const r = await fetch(BASE + urlPath, {
@@ -29,6 +30,18 @@ async function req(method, urlPath, body, headers) {
 
 async function main() {
   console.log('\n=== B14 / RECEIPT / B16 ===\n');
+  let httpServer = null;
+  try {
+    httpServer = await spawnHttpTestServer();
+    BASE = httpServer.base;
+    process.env.PORT = String(httpServer.port);
+    ok('spawned HTTP test server on rizq_test', true, 'port=' + httpServer.port);
+  } catch (eSpawn) {
+    ok('spawned HTTP test server on rizq_test', false, String(eSpawn && eSpawn.message || eSpawn));
+    const failedSpawn = results.filter((r) => !r.pass);
+    console.log('\nFAILED ' + failedSpawn.length + ' / ' + results.length);
+    process.exit(1);
+  }
 
   const {
     findCatalogPackage,
@@ -128,6 +141,10 @@ async function main() {
   ok('messages/reply uses contactLeakGuard', msgSrc.includes('scanContactLeak') && msgSrc.includes('contact_in_text_forbidden'));
   const catSrc = fs.readFileSync(path.join(__dirname, '..', 'routes', 'catalog.js'), 'utf8');
   ok('catalog public applies free-tier cap', catSrc.includes('applyPublicCatalogCaps') && catSrc.includes('freeTierPublicCatalogCap'));
+
+  if (httpServer) {
+    try { await httpServer.stop(); } catch (eStop) { /* */ }
+  }
 
   const failed = results.filter((r) => !r.pass);
   console.log('\n' + (failed.length ? 'FAILED ' + failed.length : 'ALL OK') + ' / ' + results.length);

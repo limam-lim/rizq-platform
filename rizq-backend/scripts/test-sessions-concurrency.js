@@ -73,7 +73,11 @@ function ok(name, cond, extra) {
   };
   await repos.accounts.upsert(acc);
   const port = 4200 + Math.floor(Math.random() * 90);
-  const env = Object.assign({}, process.env, { PORT: String(port), HOST: '127.0.0.1', NODE_ENV: 'test' });
+  // TRUST_PROXY=1 حتى يعمل تدوير X-Forwarded-For دون ERR_ERL_UNEXPECTED_X_FORWARDED_FOR
+  // (ملف .env قد يضبط TRUST_PROXY=0 لمعاينة محلية).
+  const env = Object.assign({}, process.env, {
+    PORT: String(port), HOST: '127.0.0.1', NODE_ENV: 'test', TRUST_PROXY: '1',
+  });
   delete env.TELEGRAM_BOT_TOKEN;
   const child = spawn(process.execPath, ['server.js'], { cwd: BACKEND, env, stdio: ['ignore', 'pipe', 'pipe'] });
   let logs = '';
@@ -83,7 +87,10 @@ function ok(name, cond, extra) {
   let ipN = 1;
   const call = (m, p, body, h) => fetch(U + p, {
     method: m,
-    headers: Object.assign({ 'content-type': 'application/json', 'x-forwarded-for': '10.20.' + Math.floor(ipN / 250) + '.' + (ipN++ % 250) }, h || {}),
+    headers: Object.assign({
+      'content-type': 'application/json',
+      'x-forwarded-for': '10.20.' + Math.floor(ipN / 250) + '.' + (ipN++ % 250),
+    }, h || {}),
     body: body ? JSON.stringify(body) : undefined,
   }).then(async (r) => ({ s: r.status, d: await r.json().catch(() => null) }));
   const mine = (tok) => call('GET', '/api/accounts/mine/' + acc.id, null, { 'x-account-token': tok }).then((r) => r.s);
@@ -130,17 +137,25 @@ function ok(name, cond, extra) {
     ok('password changed', chg.s === 200, chg.d);
     ok('other devices logged out after password change', (await mine(ex.d.accessToken)) === 401 && (await mine(conc[0].d.account.accessToken)) === 401);
     ok('device that changed it gets fresh working tokens', chg.d && (await mine(chg.d.accessToken)) === 200);
-    const l2 = (await call('POST', '/api/accounts/seller-login', { email: acc.email, password: pw + 'X1' })).d.account;
-    const l3 = (await call('POST', '/api/accounts/seller-login', { email: acc.email, password: pw + 'X1' })).d.account;
-    const all2 = await call('POST', '/api/accounts/logout', { accountId: acc.id, all: true }, { 'x-account-token': l2.accessToken });
-    ok('"logout everywhere" → all devices out', all2.s === 200 && (await mine(l3.accessToken)) === 401 && (await mine(l2.accessToken)) === 401);
+    const l2r = await call('POST', '/api/accounts/seller-login', { email: acc.email, password: pw + 'X1' });
+    const l3r = await call('POST', '/api/accounts/seller-login', { email: acc.email, password: pw + 'X1' });
+    const l2 = l2r.d && l2r.d.account;
+    const l3 = l3r.d && l3r.d.account;
+    ok('re-login after password change', !!(l2 && l2.accessToken && l3 && l3.accessToken), { l2: l2r.s, l3: l3r.s });
+    if (l2 && l3) {
+      const all2 = await call('POST', '/api/accounts/logout', { accountId: acc.id, all: true }, { 'x-account-token': l2.accessToken });
+      ok('"logout everywhere" → all devices out', all2.s === 200 && (await mine(l3.accessToken)) === 401 && (await mine(l2.accessToken)) === 401);
+    } else {
+      ok('"logout everywhere" → all devices out', false, { l2: l2r.d, l3: l3r.d });
+    }
 
     console.log('\n— suspended account —');
-    const l4 = (await call('POST', '/api/accounts/seller-login', { email: acc.email, password: pw + 'X1' })).d.account;
+    const l4r = await call('POST', '/api/accounts/seller-login', { email: acc.email, password: pw + 'X1' });
+    const l4 = l4r.d && l4r.d.account;
     const cur = await repos.accounts.getById(acc.id);
     cur.suspended = true;
     await repos.accounts.upsert(cur);
-    ok('suspension blocks existing device sessions', (await mine(l4.accessToken)) !== 200);
+    ok('suspension blocks existing device sessions', !!(l4 && l4.accessToken) && (await mine(l4.accessToken)) !== 200, l4r.d);
   } finally {
     child.kill('SIGTERM');
     await new Promise((s) => setTimeout(s, 400));

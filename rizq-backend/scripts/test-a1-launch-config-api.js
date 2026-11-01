@@ -2,7 +2,14 @@
 /** A1: launch-config save rules (past confirm + audit) via repos + launchMode */
 'use strict';
 
-require('dotenv').config({ path: require('path').join(__dirname, '..', '.env'), override: true });
+(() => {
+  const preserve = {};
+  if (Object.prototype.hasOwnProperty.call(process.env, 'DATABASE_URL')) preserve.DATABASE_URL = process.env.DATABASE_URL;
+  if (Object.prototype.hasOwnProperty.call(process.env, 'DB_DRIVER')) preserve.DB_DRIVER = process.env.DB_DRIVER;
+  require('dotenv').config({ path: require('path').join(__dirname, '..', '.env'), override: true });
+  if (Object.prototype.hasOwnProperty.call(preserve, 'DATABASE_URL')) process.env.DATABASE_URL = preserve.DATABASE_URL;
+  if (Object.prototype.hasOwnProperty.call(preserve, 'DB_DRIVER')) process.env.DB_DRIVER = preserve.DB_DRIVER;
+})();
 
 const db = require('../db');
 const repos = require('../db/repos');

@@ -348,6 +348,8 @@
     var imgs = imagesOf(ad);
     var multi = imgs.length > 1;
     var price = opts.price != null ? opts.price : (ad && (ad.priceFR && fr ? ad.priceFR : ad.price)) || '';
+    price = String(price == null ? '' : price).trim();
+    if (!price) price = fr ? 'Prix à la demande' : 'السعر عند التواصل';
     var pin = !!(opts.pin || (ad && (ad.pin || ad.boosted || ad.featured)));
     var emoji = opts.emoji || (ad && ad.emoji) || '📦';
     var bg = opts.bg || (ad && ad.bg) || 'linear-gradient(145deg,#111d2e,#1B3A6B)';
@@ -394,7 +396,7 @@
       +   '<button type="button" class="rzq-adx-fav' + (favOn ? ' is-on' : '') + '" data-ad-id="' + esc(id) + '" aria-label="' + (fr ? 'Favoris' : 'المفضلة') + '" aria-pressed="' + (favOn ? 'true' : 'false') + '">' + (favOn ? '♥' : '♡') + '</button>'
       +   nav
       +   dots
-      +   (price ? '<div class="rzq-adx-price"><span class="rzq-adx-price-pill">' + esc(price) + '</span></div>' : '')
+      +   '<div class="rzq-adx-price"><span class="rzq-adx-price-pill">' + esc(price) + '</span></div>'
       +   (pin ? '<div class="rzq-adx-badge">' + (fr ? 'Vedette' : 'مميّز') + '</div>' : '')
       +   (viewed ? seenHtml(fr) : '')
       + '</div>';

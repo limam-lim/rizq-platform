@@ -6,13 +6,20 @@
  * ══════════════════════════════════════════════════════════════════
  */
 (() => {
-  // احتفظ بـ PORT/HOST إن عيّنهما مُشغّل الاختبار قبل dotenv (override:true كان يفرض .env:3000)
+  // احتفظ بـ PORT/HOST/DATABASE_URL إن عيّنها مُشغّل الاختبار قبل dotenv
+  // (override:true كان يفرض .env:3000 ويعيد DATABASE_URL إلى rizq_audit)
   const preserve = {};
   if (Object.prototype.hasOwnProperty.call(process.env, 'PORT')) preserve.PORT = process.env.PORT;
   if (Object.prototype.hasOwnProperty.call(process.env, 'HOST')) preserve.HOST = process.env.HOST;
+  if (Object.prototype.hasOwnProperty.call(process.env, 'DATABASE_URL')) preserve.DATABASE_URL = process.env.DATABASE_URL;
+  if (Object.prototype.hasOwnProperty.call(process.env, 'DB_DRIVER')) preserve.DB_DRIVER = process.env.DB_DRIVER;
+  if (Object.prototype.hasOwnProperty.call(process.env, 'TRUST_PROXY')) preserve.TRUST_PROXY = process.env.TRUST_PROXY;
   require('dotenv').config({ path: require('path').join(__dirname, '.env'), override: true });
   if (Object.prototype.hasOwnProperty.call(preserve, 'PORT')) process.env.PORT = preserve.PORT;
   if (Object.prototype.hasOwnProperty.call(preserve, 'HOST')) process.env.HOST = preserve.HOST;
+  if (Object.prototype.hasOwnProperty.call(preserve, 'DATABASE_URL')) process.env.DATABASE_URL = preserve.DATABASE_URL;
+  if (Object.prototype.hasOwnProperty.call(preserve, 'DB_DRIVER')) process.env.DB_DRIVER = preserve.DB_DRIVER;
+  if (Object.prototype.hasOwnProperty.call(preserve, 'TRUST_PROXY')) process.env.TRUST_PROXY = preserve.TRUST_PROXY;
 })();
 process.env.TZ = process.env.RIZQ_TIMEZONE || process.env.MAINTENANCE_CRON_TZ || 'Africa/Nouakchott';
 process.on('unhandledRejection', (err) => {
