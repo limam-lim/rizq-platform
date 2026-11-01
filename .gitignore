@@ -36,6 +36,7 @@ backups/*.sha256
 
 # لقطات/تقارير fix-ui-logic-1 محلية فقط
 qa/ui-logic-1/*.png
-qa/ui-logic-1/*.json
+qa/ui-logic-1/console-*.json
+qa/ui-logic-1/*-report.json
 qa/ui-logic-1/node_modules/
 qa/ui-logic-1/package-lock.json
