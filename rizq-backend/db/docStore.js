@@ -57,7 +57,13 @@ function readLegacyJson(file, fallback) {
   }
 }
 
+function jsonDumpsEnabled() {
+  return String(process.env.DEV_JSON_DUMPS || '') === '1';
+}
+
 function backupJson(file, data) {
+  // في الإنتاج: لا نسخ JSON كاملة عند كل كتابة — فقط مع DEV_JSON_DUMPS=1
+  if (!jsonDumpsEnabled()) return;
   try {
     const dir = path.dirname(file);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
