@@ -2,6 +2,19 @@
 <html lang="ar" dir="rtl" data-rizq-strip="22.6">
 <head>
   <meta charset="UTF-8"/>
+  <script>
+  /* منع استعادة موضع التمرير قبل اكتمال المحتوى (قفزة F5) */
+  try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(eSR){}
+  (function(){
+    if(location.hash) return;
+    function pinTop(){ try{ window.scrollTo(0,0); }catch(e){} }
+    pinTop();
+    window.addEventListener('pageshow', function(ev){
+      if(location.hash) return;
+      pinTop();
+    });
+  })();
+  </script>
 <style id="rizq-nav-fouc-guard">
 /* Critical: before external CSS — prevent navy bar + blue link flash on refresh */
 html,body{background:#eef2f8}
@@ -1012,7 +1025,7 @@ body.rizq-lang-ar .hero-lead-row{
 /* هوامش موحّدة لكل الأشرطة — 1سم من كل حافة */
 :root{--rizq-strip-inset:1cm}
 /* شريط الإبهار: قصّ حقيقي بـ margin (padding لا يقصّ translate) */
-.hero > #hero-listings.hero-promo-strip{
+  .hero > #hero-listings.hero-promo-strip{
   align-self:stretch;
   width:100%;
   max-width:none;
@@ -1021,6 +1034,7 @@ body.rizq-lang-ar .hero-lead-row{
   box-sizing:border-box;
   animation:fadeUp .8s .28s ease both;
   overflow:visible;
+  min-height:280px;
 }
 .hero > #hero-listings .cards-track-wrap,
 #hero-listings.hero-promo-strip .cards-track-wrap{
@@ -1041,6 +1055,8 @@ body.rizq-lang-ar .hero-lead-row{
   box-sizing:border-box;
   position:relative;
   z-index:50;
+  /* احتفظ بارتفاع تقريبي أثناء ملء الشبكة لتقليل CLS عند التحديث */
+  min-height:320px;
 }
 .categories-after-promo .section-header{margin-bottom:16px}
 .hero-after-promo{
@@ -2375,6 +2391,8 @@ html[dir="ltr"] #all-ads-title{
 .hero-listings-section{
   position:relative;z-index:2;width:100%;overflow:hidden;
   padding:8px 0 52px;
+  /* ثبّت الارتفاع أثناء الهيكل العظمي → المحتوى النهائي لتقليل CLS عند F5 */
+  min-height:280px;
   /* ابعد عنوان «مباشر» عن قرص البحث الثابت عند التمرير */
   scroll-margin-top:calc(var(--rizq-search-top, 110px) + 56px);
 }

@@ -16,6 +16,9 @@
   <link rel="stylesheet" href="rizq_ad_cards.css?v=27.5"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.6"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
+  <script>
+  try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(eSR){}
+  </script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
@@ -30,8 +33,9 @@
   --left-w:340px;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:auto}
 body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f8faff;color:#1a2535;overflow-x:hidden}
+#result-list-body{min-height:min(60vh,520px)}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
 a{text-decoration:none;color:inherit}
 select option{background:#fff!important;color:#1a2535!important}
@@ -2082,22 +2086,22 @@ function _rizqMergeBackendAds(){
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(data){
         if(!data || !Array.isArray(data.ads) || !data.ads.length){
-          if(showedSkel && typeof applyFilters === 'function') applyFilters();
+          if(showedSkel && typeof applyFilters === 'function') applyFilters({ soft: true, skipUrl: true });
           return false;
         }
         var existingIds = {};
         ALL_ADS.forEach(function(a){ existingIds[String(a.id)] = true; });
         var mapped = _mapRawAdsToDisplay(data.ads).filter(function(a){ return !existingIds[String(a.id)]; });
         if(!mapped.length){
-          if(showedSkel && typeof applyFilters === 'function') applyFilters();
+          if(showedSkel && typeof applyFilters === 'function') applyFilters({ soft: true, skipUrl: true });
           return false;
         }
         mapped.forEach(function(a){ ALL_ADS.push(a); });
-        if(typeof applyFilters === 'function') applyFilters();
+        if(typeof applyFilters === 'function') applyFilters({ soft: true, skipUrl: true });
         return true;
       })
       .catch(function(){
-        if(showedSkel && typeof applyFilters === 'function') applyFilters();
+        if(showedSkel && typeof applyFilters === 'function') applyFilters({ soft: true, skipUrl: true });
         return false;
       });
   }catch(e){
@@ -2148,7 +2152,7 @@ const ALL_ADS = loadRealSearchAds().concat((window.RizqDemo && RizqDemo.inventor
           have[String(a.id)] = true;
         });
       }
-      if (typeof applyFilters === 'function') applyFilters();
+      if (typeof applyFilters === 'function') applyFilters({ soft: true, skipUrl: true });
     } catch (eStrip) {}
   }
   document.addEventListener('rizq:launch', syncDemoWithLaunch);
@@ -2509,7 +2513,8 @@ function onSubcatFilterChange(){
   applyFilters();
 }
 
-function applyFilters(){
+function applyFilters(opts){
+  opts = opts || {};
   const catR=document.querySelector('input[name="rcat"]:checked');
   if(catR) _tagSubcatFilter=''; // مسح الـoverride عندما يضغط المستخدم على راديو حقيقي
   const selCat=catR?catR.value:_tagSubcatFilter;
@@ -2616,10 +2621,26 @@ function applyFilters(){
     filtered.sort((a,b)=>(b.pin?1:0)-(a.pin?1:0));
   }
 
-  page=1;
-  visibleCount=PER_PAGE;
+  var soft = !!(opts && opts.soft);
+  var bodyEl = document.getElementById('result-list-body');
+  var prevScroll = bodyEl ? bodyEl.scrollTop : 0;
+  var prevWin = window.scrollY || window.pageYOffset || 0;
+  var prevVisible = visibleCount;
+  if(soft){
+    /* دمج خلفي / rizq:launch — أبقِ الدفعة الظاهرة وموضع التمرير */
+    visibleCount = Math.max(PER_PAGE, Math.min(Math.max(prevVisible, PER_PAGE), filtered.length || PER_PAGE));
+  } else {
+    page=1;
+    visibleCount=PER_PAGE;
+  }
   renderResultList();
-  try{ _syncBrowseFiltersToUrl({selWilaya,pMin,pMax,selCond,sinceDays,onlyVerified,onlyPinned,sortBy,navCat,selCat}); }catch(eUrl){}
+  if(soft){
+    if(bodyEl) bodyEl.scrollTop = prevScroll;
+    try{ window.scrollTo(0, prevWin); }catch(eScr){}
+  }
+  if(!(opts && opts.skipUrl)){
+    try{ _syncBrowseFiltersToUrl({selWilaya,pMin,pMax,selCond,sinceDays,onlyVerified,onlyPinned,sortBy,navCat,selCat}); }catch(eUrl){}
+  }
 }
 
 function _syncBrowseFiltersToUrl(opts){
@@ -2747,6 +2768,13 @@ function renderResultList(){
   _bindInfiniteScroll();
 }
 
+function _browseListScrollsWindow(){
+  const body=document.getElementById('result-list-body');
+  if(!body) return true;
+  /* على الهاتف القائمة تتمدّد والتمرير على النافذة — لا على #result-list-body */
+  return body.scrollHeight <= body.clientHeight + 4;
+}
+
 function loadMoreAds(){
   if(_infiniteLoading) return false;
   if(visibleCount>=filtered.length) return false;
@@ -2754,6 +2782,8 @@ function loadMoreAds(){
   const body=document.getElementById('result-list-body');
   const fr=_rizqLang()==='fr';
   const prevCount=visibleCount;
+  const prevBodyScroll=body?body.scrollTop:0;
+  const prevWinScroll=window.scrollY||window.pageYOffset||0;
   visibleCount=Math.min(visibleCount+PER_PAGE, filtered.length);
   const chunk=filtered.slice(prevCount, visibleCount);
   if(body && chunk.length){
@@ -2770,12 +2800,19 @@ function loadMoreAds(){
       }
     }
     _updateInfiniteStatus(fr);
+    /* ثبّت موضع التمرير بعد إلحاق الدفعة — لا قفز للأعلى */
+    if(_browseListScrollsWindow()){
+      try{ window.scrollTo(0, prevWinScroll); }catch(eW){}
+    } else if(body){
+      body.scrollTop = prevBodyScroll;
+    }
     _bindInfiniteScroll();
-  } else {
-    renderResultList();
+  } else if(chunk.length){
+    /* لا يوجد جسم قائمة — لا تعِد الرسم الكامل أثناء التمرير */
+    _updateInfiniteStatus(fr);
   }
   // امنع سلسلة تحميل فورية إذا بقي الـ sentinel ظاهراً في الشاشة
-  setTimeout(function(){ _infiniteLoading=false; }, 120);
+  setTimeout(function(){ _infiniteLoading=false; }, 180);
   return true;
 }
 
@@ -2800,9 +2837,23 @@ function _bindInfiniteScroll(){
       if(body.scrollTop+body.clientHeight >= body.scrollHeight-320) loadMoreAds();
     }, {passive:true});
   }
+  if(!window._rizqWinInfiniteBound){
+    window._rizqWinInfiniteBound=true;
+    window.addEventListener('scroll', function(){
+      if(!_browseListScrollsWindow()) return;
+      const body2=document.getElementById('result-list-body');
+      if(body2) body2._rizqUserScrolled=true;
+      if(_infiniteLoading) return;
+      if(visibleCount>=filtered.length) return;
+      const y=window.scrollY||window.pageYOffset||0;
+      const docH=Math.max(document.documentElement.scrollHeight, document.body.scrollHeight||0);
+      if(y+window.innerHeight >= docH-320) loadMoreAds();
+    }, {passive:true});
+  }
   _teardownInfiniteObserver();
   if(!sentinel || visibleCount>=filtered.length) return;
   if(typeof IntersectionObserver==='undefined') return;
+  const useWin=_browseListScrollsWindow();
   window._rizqIO=new IntersectionObserver(function(entries){
     entries.forEach(function(en){
       if(!en.isIntersecting) return;
@@ -2811,7 +2862,7 @@ function _bindInfiniteScroll(){
       if(!body._rizqUserScrolled) return;
       loadMoreAds();
     });
-  }, {root: body, rootMargin:'120px 0px', threshold:0});
+  }, {root: useWin ? null : body, rootMargin:'120px 0px', threshold:0});
   window._rizqIO.observe(sentinel);
 }
 

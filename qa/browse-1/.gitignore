@@ -2,5 +2,7 @@
 *.jpg
 *.webp
 capture-meta.json
+scroll-cls-report.json
+cls-before-after.json
 node_modules/
 package-lock.json
