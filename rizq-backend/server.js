@@ -964,7 +964,8 @@ app.get('/api/agent/public-eligibility/:accountId', agentEligibilityLimiter, asy
     if (!accountId) {
       return res.status(400).json({ ok: false, eligible: false, error: 'accountId_required' });
     }
-    const acc = (await readAccounts()).find((a) => a && a.id === accountId) || null;
+    // قراءة صف واحد — لا مسح كامل للقائمة
+    const acc = (await repos.accounts.getById(accountId)) || null;
     if (!acc || acc.status !== 'approved' || acc.suspended) {
       return res.json({ ok: true, eligible: false, code: 'merchant_inactive' });
     }

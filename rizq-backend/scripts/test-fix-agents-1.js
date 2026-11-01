@@ -141,10 +141,20 @@ async function main() {
   ok(!/RizqSub\.hasFeature/.test(secSrc), 'A1 no RizqSub.hasFeature');
   ok(/eligible/.test(secSrc), 'A1 requires eligible');
 
-  // مسار الأهلية موجود
+  // مسار الأهلية موجود — قراءة صف واحد getById لا list().find
   const serverSrc = fs.readFileSync(path.join(BACKEND, 'server.js'), 'utf8');
   ok(/\/api\/agent\/public-eligibility\//.test(serverSrc), 'A1 route registered');
   ok(/accountHasAiAgentStrict/.test(serverSrc), 'A1 uses strict AI entitlement');
+  const eligIdx = serverSrc.indexOf('/api/agent/public-eligibility/:accountId');
+  ok(eligIdx > 0, 'A1 eligibility handler block found');
+  const eligSlice = eligIdx > 0 ? serverSrc.slice(eligIdx, eligIdx + 1200) : '';
+  ok(/repos\.accounts\.getById\(accountId\)/.test(eligSlice), 'A1 uses repos.accounts.getById');
+  ok(!/readAccounts\(\)\s*\.find/.test(eligSlice), 'A1 no readAccounts().find in eligibility');
+
+  // تحقق تشغيلي: getById يعيد صفاً واحداً / null
+  const repos = require('../db/repos');
+  const missing = await repos.accounts.getById('ACC_DOES_NOT_EXIST_FIX_AGENTS');
+  ok(missing == null || missing === undefined, 'A1 getById miss → nullish');
 
   // ── A2: fallback الويدجت بلا هاتف/واتساب/سعر ──
   const widgetHtml = fs.readFileSync(path.join(ROOT, 'rizq_chat_widget.html'), 'utf8');

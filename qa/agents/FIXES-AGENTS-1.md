@@ -13,7 +13,7 @@
 
 | البند | الملفات | الاختبار | النتيجة |
 |-------|---------|----------|---------|
-| **A1** سكرتير بعد تحقق خادمي `ai_agent_full`؛ هاتف/واتساب من بوابة التواصل فقط؛ لا localStorage للباقة | `rizq_secretary_agent.js`؛ `server.js` (`GET /api/agent/public-eligibility/:id`)؛ `inquiryAutoReply.js` (`buildProfileFromAccount` + `contactGate`) | `test-fix-agents-1.js` — A1* | ✅ بوابة خادم؛ فشل/غياب = لا ويدجت |
+| **A1** سكرتير بعد تحقق خادمي `ai_agent_full`؛ هاتف/واتساب من بوابة التواصل فقط؛ لا localStorage للباقة | `rizq_secretary_agent.js`؛ `server.js` (`GET /api/agent/public-eligibility/:id` عبر `repos.accounts.getById`)؛ `inquiryAutoReply.js` (`buildProfileFromAccount` + `contactGate`) | `test-fix-agents-1.js` — A1* | ✅ بوابة خادم؛ صف واحد `getById`؛ فشل/غياب = لا ويدجت |
 | **A2** fallback الويدجت بلا هاتف/واتساب/سعر؛ رسالة مشغولة عند التعطل | `rizq_chat_widget.html`؛ `rizq_widget_embed.js` (رسائل الخطأ + offline) | A2* + محاكاة `processMessage` | ✅ «الخدمة مشغولة…» بلا بيانات |
 | **A3** `hasFeature` لمزايا AI يعتمد شارات الخادم إلزامياً | `rizq_subscription_engine.js` (`serverAiFeatures` من `/api/entitlements`) | A3* | ✅ غياب الشارات = رفض |
 | **A4** حارس الحظر: api key / أسرار / system prompt / رقم مقفل / ماسية مجاناً (حس/ع/فر/إن) | `rizq_agent.js`؛ يُستدعى من `widgetChat.js` | A4* (15 مسباراً) | ✅ كل المسبارات تُحجب |
