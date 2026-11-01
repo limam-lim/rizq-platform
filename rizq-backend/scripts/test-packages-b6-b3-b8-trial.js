@@ -6,6 +6,7 @@
 
 const path = require('path');
 try { require('dotenv').config({ path: path.join(__dirname, '..', '.env') }); } catch (e) { /* */ }
+const { spawnHttpTestServer } = require('./_spawnHttpTestServer');
 
 const results = [];
 function ok(name, pass, detail) {
@@ -13,7 +14,7 @@ function ok(name, pass, detail) {
   console.log((pass ? 'OK  ' : 'FAIL') + ' ' + name + (detail ? ' — ' + detail : ''));
 }
 
-const BASE = 'http://127.0.0.1:' + (process.env.PORT || 3000);
+let BASE = 'http://127.0.0.1:' + (process.env.PORT || 3000);
 
 async function req(method, urlPath, body, headers) {
   const r = await fetch(BASE + urlPath, {
@@ -28,6 +29,18 @@ async function req(method, urlPath, body, headers) {
 
 async function main() {
   console.log('\n=== B6 / B3 / B8 / TRIAL ===\n');
+  let httpServer = null;
+  try {
+    httpServer = await spawnHttpTestServer();
+    BASE = httpServer.base;
+    process.env.PORT = String(httpServer.port);
+    ok('spawned HTTP test server on rizq_test', true, 'port=' + httpServer.port);
+  } catch (eSpawn) {
+    ok('spawned HTTP test server on rizq_test', false, String(eSpawn && eSpawn.message || eSpawn));
+    const failedSpawn = results.filter((r) => !r.pass);
+    console.log('\nFAILED ' + failedSpawn.length + ' / ' + results.length);
+    process.exit(1);
+  }
 
   // ── B6 ──
   const { computeActivationPeriod } = require('../services/subRequestActivation');
@@ -241,6 +254,10 @@ async function main() {
     }
   } catch (eHttp) {
     ok('HTTP trial check', false, String(eHttp.message || eHttp));
+  }
+
+  if (httpServer) {
+    try { await httpServer.stop(); } catch (eStop) { /* */ }
   }
 
   const failed = results.filter((r) => !r.pass);

@@ -9,8 +9,9 @@
 
 const path = require('path');
 try { require('dotenv').config({ path: path.join(__dirname, '..', '.env') }); } catch (e) { /* optional */ }
+const { spawnHttpTestServer } = require('./_spawnHttpTestServer');
 
-const BASE = 'http://127.0.0.1:' + (process.env.PORT || 3000);
+let BASE = 'http://127.0.0.1:' + (process.env.PORT || 3000);
 const results = [];
 
 function ok(name, pass, detail) {
@@ -31,6 +32,16 @@ async function req(method, urlPath, body, headers) {
 
 async function main() {
   console.log('\n=== verify-dash pending token gate ===\n');
+  let httpServer = null;
+  try {
+    httpServer = await spawnHttpTestServer();
+    BASE = httpServer.base;
+    process.env.PORT = String(httpServer.port);
+  } catch (eSpawn) {
+    console.error('spawn failed:', eSpawn && eSpawn.message || eSpawn);
+    process.exit(1);
+  }
+  try {
   const id = 'ACC_' + Date.now() + String(Math.floor(Math.random() * 1e6)).padStart(6, '0');
   const email = 'vd_pend_' + Date.now() + '@test.mr';
   const nni = String(3400000000 + Math.floor(Math.random() * 89999999));
@@ -73,10 +84,17 @@ async function main() {
 
   const failed = results.filter((r) => !r.pass);
   console.log('\n' + (failed.length ? 'FAILED ' + failed.length : 'ALL OK') + ' / ' + results.length);
-  process.exit(failed.length ? 1 : 0);
+  return failed.length ? 1 : 0;
+  } finally {
+    if (httpServer) {
+      try { await httpServer.stop(); } catch (eStop) { /* */ }
+    }
+  }
 }
 
-main().catch((e) => {
+main().then((code) => {
+  process.exit(code == null ? 0 : code);
+}).catch((e) => {
   console.error(e);
   process.exit(1);
 });

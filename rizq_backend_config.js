@@ -49,7 +49,21 @@
       window.RIZQ_BACKEND_BASE = '';
     }
   } else if (isLocal) {
-    window.RIZQ_BACKEND_BASE = 'http://' + (host || 'localhost') + ':3000';
+    /* Live Server / Vite على منفذ ثابت منفصل → API على :3000.
+       خادم رزق ومعاينة Cursor (نفس المنفذ للواجهة والـAPI) → نفس الأصل. */
+    var locPort = '';
+    try { locPort = String((window.location && window.location.port) || ''); } catch (ePort) { locPort = ''; }
+    var staticDevPorts = { '5500': 1, '5501': 1, '8080': 1, '5173': 1, '4173': 1 };
+    if (locPort && staticDevPorts[locPort]) {
+      window.RIZQ_BACKEND_BASE = 'http://' + (host || 'localhost') + ':3000';
+    } else {
+      try {
+        window.RIZQ_BACKEND_BASE = String(window.location.origin || '').replace(/\/$/, '')
+          || ('http://' + (host || 'localhost') + ':3000');
+      } catch (eLoc) {
+        window.RIZQ_BACKEND_BASE = 'http://' + (host || 'localhost') + ':3000';
+      }
+    }
   } else {
     // الإنتاج (rizq.mr على Hetzner): الواجهة والـAPI على نفس النطاق خلف Caddy
     try {
