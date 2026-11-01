@@ -2305,9 +2305,14 @@ function openMaps(){
         var params = new URLSearchParams(location.search);
         var id = params.get('id') || params.get('office') || '';
         // بلا مكتب حقيقي أو بوابة ترويج → نموذج مكتب بكل الخدمات ظاهرة
-        var forceDemo = params.get('demo') === '1' || params.get('sample') === 'law'
+        // حساب له id حقيقي (غير نموذج القانون/الترويج) — ممنوع استبداله بمكتب العرض
+        var isRealOfficeId = !!(id && id !== DEMO_LAW_ID && id !== 'DEMO_OFF'
+          && id !== 'acc_promo_office_rizq' && !/^acc_promo_office/.test(id));
+        var forceDemo = !isRealOfficeId && (
+          params.get('demo') === '1' || params.get('sample') === 'law'
           || id === DEMO_LAW_ID || id === 'DEMO_OFF' || !id
-          || id === 'acc_promo_office_rizq' || /^acc_promo_office/.test(id);
+          || id === 'acc_promo_office_rizq' || /^acc_promo_office/.test(id)
+        );
         if(forceDemo){
           applyDemoLawOffice();
           id = DEMO_LAW_ID;
