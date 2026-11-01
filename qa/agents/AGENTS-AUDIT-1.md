@@ -51,8 +51,8 @@
 |-----|--------|
 | الملف | `rizq_secretary_agent.js` |
 | بوابة الماسية | **مؤكدة من المتصفح:** يقرأ الحساب من `localStorage` (`rizq_accounts` / pending) ثم `_isDiamondActive` (28–68). يستخدم `RizqSub.hasFeature(...,'ai_agent_full')` إن وُجد، وإلا يفحص اسم الباقة محلياً (56–65). |
-| الثغرة | أي مستخدم يحقن `localStorage` بحساب «ماسية / active» يمكنه إظهار ويدجت السكرتير محلياً. التعليق في الملف نفسه يعترف بالاعتماد السابق على منطق محلي. |
-| ملاحظة خادم | مسار الويدجت الفعلي ما زال محمياً بـ `assertAiAgentAccess` — لكن **إظهار الواجهة + بناء profile فيه هاتف/واتساب** يتم قبل الخادم (116–127، 194) |
+| الثغرة | أي مستخدم يحقن `localStorage` بحساب «ماسية / active» يمكنه إظهار ويدجت السكرتير محلياً. مسار `RizqSub` غالباً **ميت** بسبب `defer` على محرك الاشتراك قبل تنفيذ السكرتير بلا `defer` (مثال: `rizq_store.html` 1385 ثم 3453). |
+| ملاحظة خادم | مسار الويدجت مع `accountId` محمي بـ `assertAiAgentAccess`. بلا `accountId`، بقاء `businessName` في الـ body يفعّل دور الماسية عبر `rizq_agent.js:221` (انظر الثغرة #3). بناء profile محلي فيه هاتف/واتساب (116–127، 194). |
 
 ### د) التسويق والسوشيال
 | بند | الواقع |
@@ -120,18 +120,24 @@
 
 ## 4) الثغرات مرتبة بالخطورة
 
+> محدّث بعد نتائج [Audit secretary+marketing+quality](bc-7ce87578-cfad-5cf5-a0e6-2d873ea25d02) (تحقق read-only إضافي في نفس الجلسة).
+
 | # | الخطورة | الملف:السطر | الوصف | اقتراح محدد (دون تنفيذ) |
 |---|---------|-------------|--------|-------------------------|
-| 1 | **CRITICAL** | `rizq_secretary_agent.js:28–68` | قرار إظهار وكيل السكرتير الماسي من **localStorage** / `RizqSub.hasFeature` المحلي | جلب حالة `ai_agent_full` من API خادم موقَّع (مثل entitlements) قبل الحقن؛ إخفاء الويدجت إن فشل التحقق |
-| 2 | **HIGH** | `rizq_chat_widget.html:635–659` | fallback محلي يعرض أسعار منتجات وأرقام هاتف/واتساب من `profile`/`channels` التي يتحكم بها العميل عند فشل/غياب الخادم | إزالة كشف الهاتف من الـ offline fallback؛ الأسعار فقط بعد أدوات الخادم؛ رسالة «الخدمة غير متاحة» بدل بيانات حسّاسة |
-| 3 | **HIGH** | `rizq_subscription_engine.js:859+` + السكرتير | `hasFeature` ما زال يعتمد تخزين المتصفح مع شارات خادم اختيارية | جعل الشارات الخادمية إلزامية لمزايا AI؛ اعتبار غيابها = رفض |
-| 4 | **HIGH** | `rizq_agent.js:102+` / حارس الحظر | لا يحجب `reveal ANTHROPIC_API_KEY` ولا طلبات «رقم مقفل» صراحةً (تُترك للنموذج) | توسيع أنماط الحظر: api[_-]?key، system prompt dumps، «رقم مقفل/مخفي»، طلبات تفعيل مجاني للماسية |
-| 5 | **MEDIUM** | `widgetAgentTools.js:128` | enum أداة الباقات بلا **`estate`** | إضافة `estate` إلى enum + اختبار أسعار 4000/4500/8500 |
-| 6 | **MEDIUM** | `widgetChat.js:597–598` | قبول `systemInstruction` من العميل (مقطوع 400 حرف) يُحقن في البرومبت | تجاهل/تقييد صارم للزائر العام؛ السماح فقط لقائمة بيضاء داخلية |
-| 7 | **MEDIUM** | `widgetChat.js:113` / بناء البرومبت | `profile.businessName` وحده قد يرفع `agentTier` إلى diamond داخل `handleWidgetChat` إن مُرّر profile | الاعتماد حصراً على `body.agentTier` الذي يضبطه الخادم بعد `assertAiAgentAccess` |
-| 8 | **MEDIUM** | `rizq_packages_config.js` + نصوص قديمة | بقايا تسويق «5000/10000 MRU» العامة قد تُستدعى إن اختُلط general | الإبقاء على سياسة «اسأل الفئة»؛ إخفاء general عن أدوات AI تماماً في الإنتاج |
-| 9 | **LOW** | `widgetAgentTools.js:49–50` | `publicAd` يكشف `hasPhone`/`hasWhatsapp` (布尔) لا الرقم — مقبول لكن قد يساعد هندسة اجتماعية | الإبقاء مع عدم كشف الرقم؛ توثيق السياسة في البرومبت |
-| 10 | **LOW** | `marketingAgent.js` | يعتمد موافقة بشرية — جيد؛ خطر إن عُطّلت الموافقة ونُشر مباشرة لفيسبوك | إنذار لوحة إن `requireHumanApproval=false` + سجل تدقيق |
+| 1 | **CRITICAL** | `server.js:3241` + `agentQuality.js:165/169` + `rizq_cp_panel.html:8513` | **XSS مخزَّن بلا مصادقة:** `POST /api/agent/miss` عام يقبل `agent`/`tier`؛ لوحة الأدمن تضع `q.agent` و`q.tier` في `innerHTML` بلا تهريب (بينما `q.text` مُهرَّب) | تهريب كل الحقول؛ whitelist لـ `agent`/`tier`/`lang`/`type`؛ CSP؛ توكن ويدجت أو captcha على المسار العام |
+| 2 | **CRITICAL** | `rizq_secretary_agent.js:28–68` + تحميل `defer` | قرار إظهار السكرتير الماسي من **localStorage**. مسار `RizqSub.hasFeature` غالباً **ميت**: المحرك `defer` (`rizq_store.html:1385`) بينما السكرتير بلا `defer` (`:3453`) فيُنفَّذ قبله | استبدال البوابة بـ API entitlements خادم؛ أو تحميل المحرك أولاً بلا `defer` (مؤقت) |
+| 3 | **HIGH** | `server.js:990–1000` + `rizq_agent.js:221` + `widgetChat.js:113` | **انتحال Diamond للزائر:** بلا `accountId` يُحذف `tier` فقط ويبقى `businessName` → `isDiamond = !!businessName` يفعّل دور الماسية بلا حصة | على مسار الزائر: امسح `profile` أو اسمح بـ `lang` فقط؛ افرض `agentTier='general'`؛ لا تشتق diamond إلا من حساب موثَّق |
+| 4 | **HIGH** | `rizq_chat_widget.html:635–659` | fallback محلي يعرض أسعار/`phone`/`whatsapp` من سياق العميل | رسالة «غير متاح» بدل بيانات حسّاسة؛ لا هاتف في offline |
+| 5 | **HIGH** | `llmGateway.js:154–163` | تجاوز لفّ المدخلات: إن وُجدت علامات `<<<UNTRUSTED_INPUT` يُتخطى اللفّ — يمكن حقن نص بعد العلامة | لفّ دائماً؛ تعطيل/تهريب العلامات داخل النص؛ فاصل عشوائي لكل طلب |
+| 6 | **HIGH** | `widgetChat.js:134,183–188,595–599` | حقن في system prompt من `businessName` / `persona` / `systemInstruction` / سياق الصفحة | احذف `systemInstruction` للزائر؛ قيّد المعرّفات؛ انقل سياق الصفحة لكتلة user ملفوفة |
+| 7 | **HIGH** | `server.js:634` + `agentStatus.js` + `rizq_call_handler.js:116` | زر إيقاف الوكيل للمالك لا يُفرض على مسار المكالمات/واتساب (مخازن منفصلة؛ مفتاح آخر 8 أرقام) | مخزن SQLite واحد؛ `isActive` قبل الرد؛ مفتاح E.164 كامل |
+| 8 | **HIGH** | `marketingAgent.js:119–126,142` | بوابة الجودة التسويقية: ادعاء «عائد مضمون» يخصم 20 فقط و`pass` يبقى true إن لم يُطابق `BRAND.forbidden` (Verified عند التشغيل في التدقيق الفرعي) | `pass=false` عند أي `findForbiddenClaim`؛ فرض قواعد القناة و`maxChars` |
+| 9 | **MEDIUM** | `widgetAgentTools.js:128` | enum الباقات بلا **`estate`** | أضف `estate` + اختبار 4000/4500/8500 |
+| 10 | **MEDIUM** | `rizq_subscriber_agent.js:374–394,294–295` | فشل التحقق يمرّر (fail-open)؛ `tier:'diamond'` مُثبَّت عند upsert | ارفض عند الخطأ؛ لا تُثبّت diamond بلا تحقق |
+| 11 | **MEDIUM** | `marketingAgent.js:361` + نشر فيسبوك | رابط المسودة من النموذج قد يتجاوز رابط الأدمن؛ لا allowlist نطاق | ثبت رابط الأدمن/الإعدادات على `https://*.rizq.mr` |
+| 12 | **MEDIUM** | `rizq_packages_config` نصوص general 5000/10000 | خطر خلط أسعار عامة قديمة | اخفِ general عن أدوات AI في الإنتاج |
+| 13 | **LOW** | `agentQuality.js:26` | `\b` لا يعمل مع العربية → كشف «ربما/أظن» لا يطلق | حدود Unicode مع العلم `u` |
+| 14 | **LOW** | `rizq_secretary_agent.js:14` | وعد بإعادة فحص كل 5 دقائق غير منفَّذ | أزل الوعد أو نفّذ المؤقّت بعد بوابة خادم |
 
 ---
 
