@@ -102,10 +102,10 @@
         (document.head || document.documentElement).appendChild(kill);
       }
     }
-    if (!document.querySelector('link[href*="fonts.googleapis.com"][href*="Cairo"]')) {
+    if (!document.querySelector('link[href*="fonts/cairo.css"], link[href*="cairo.css"]')) {
       var fontLink = document.createElement('link');
       fontLink.rel = 'stylesheet';
-      fontLink.href = 'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap';
+      fontLink.href = 'fonts/cairo.css?v=1.0';
       document.head.appendChild(fontLink);
     }
     if (!document.querySelector('link[rel="stylesheet"][href*="rizq-theme.css"]')) {

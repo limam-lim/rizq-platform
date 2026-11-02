@@ -1,0 +1,669 @@
+{
+  "at": "2026-11-02T15:49:34.556Z",
+  "targetMedian": 0.05,
+  "table": {
+    "landing": {
+      "390": {
+        "ar": {
+          "cold": [
+            0.2011,
+            0.2011,
+            0.2011
+          ],
+          "warm": [
+            0.5835,
+            0.584,
+            0.0123
+          ],
+          "coldMedian": 0.2011,
+          "warmMedian": 0.5835,
+          "ok": false,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": {
+            "sections": {
+              "hero": 754,
+              "hero-listings": 426,
+              "rizq-styles": 839,
+              "rizq-showroom-models": 885,
+              "rizq-vid-strip": 477,
+              "rvid-section": 0,
+              "categories": 1417,
+              "models": 0,
+              "listings": 3611,
+              "virtual-stores": 842,
+              "virtual-showrooms": 831,
+              "virtual-estate": 243,
+              "rizq-estate-models": 656,
+              "virtual-offices": 1223,
+              "rizq-live-activity": 0,
+              "prices": 934
+            },
+            "pageHeight": 14543,
+            "pad": "160px"
+          }
+        },
+        "fr": {
+          "cold": [
+            0.1115,
+            0.1126,
+            1.138
+          ],
+          "warm": [
+            1.1405,
+            0.1115,
+            1.1396
+          ],
+          "coldMedian": 0.1126,
+          "warmMedian": 1.1396,
+          "ok": false,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 9
+          },
+          "heights": {
+            "sections": {
+              "hero": 781,
+              "hero-listings": 452,
+              "rizq-styles": 851,
+              "rizq-showroom-models": 939,
+              "rizq-vid-strip": 477,
+              "rvid-section": 0,
+              "categories": 1566,
+              "models": 0,
+              "listings": 3611,
+              "virtual-stores": 842,
+              "virtual-showrooms": 831,
+              "virtual-estate": 243,
+              "rizq-estate-models": 656,
+              "virtual-offices": 1223,
+              "rizq-live-activity": 0,
+              "prices": 934
+            },
+            "pageHeight": 14900,
+            "pad": "160px"
+          }
+        }
+      },
+      "768": {
+        "ar": {
+          "cold": [
+            0.0112,
+            0.0113,
+            0.0112
+          ],
+          "warm": [
+            1.2231,
+            1.2231,
+            0.4053
+          ],
+          "coldMedian": 0.0112,
+          "warmMedian": 1.2231,
+          "ok": false,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": {
+            "sections": {
+              "hero": 747,
+              "hero-listings": 426,
+              "rizq-styles": 949,
+              "rizq-showroom-models": 1013,
+              "rizq-vid-strip": 351,
+              "rvid-section": 0,
+              "categories": 1440,
+              "models": 0,
+              "listings": 5485,
+              "virtual-stores": 842,
+              "virtual-showrooms": 831,
+              "virtual-estate": 255,
+              "rizq-estate-models": 680,
+              "virtual-offices": 1223,
+              "rizq-live-activity": 0,
+              "prices": 985
+            },
+            "pageHeight": 16723,
+            "pad": "171px"
+          }
+        },
+        "fr": {
+          "cold": [
+            0.4008,
+            1.3589,
+            0.0226
+          ],
+          "warm": [
+            1.3615,
+            1.3615,
+            1.3622
+          ],
+          "coldMedian": 0.4008,
+          "warmMedian": 1.3615,
+          "ok": false,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 9
+          },
+          "heights": {
+            "sections": {
+              "hero": 751,
+              "hero-listings": 426,
+              "rizq-styles": 949,
+              "rizq-showroom-models": 1013,
+              "rizq-vid-strip": 351,
+              "rvid-section": 0,
+              "categories": 1440,
+              "models": 0,
+              "listings": 5485,
+              "virtual-stores": 842,
+              "virtual-showrooms": 831,
+              "virtual-estate": 255,
+              "rizq-estate-models": 680,
+              "virtual-offices": 1223,
+              "rizq-live-activity": 0,
+              "prices": 985
+            },
+            "pageHeight": 16792,
+            "pad": "171px"
+          }
+        }
+      },
+      "1440": {
+        "ar": {
+          "cold": [
+            0.0122,
+            0.018,
+            0.3415
+          ],
+          "warm": [
+            0.0224,
+            0.014,
+            0.0082
+          ],
+          "coldMedian": 0.018,
+          "warmMedian": 0.014,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": {
+            "sections": {
+              "hero": 890,
+              "hero-listings": 505,
+              "rizq-styles": 1011,
+              "rizq-showroom-models": 1025,
+              "rizq-vid-strip": 510,
+              "rvid-section": 0,
+              "categories": 578,
+              "models": 0,
+              "listings": 1534,
+              "virtual-stores": 830,
+              "virtual-showrooms": 830,
+              "virtual-estate": 301,
+              "rizq-estate-models": 639,
+              "virtual-offices": 987,
+              "rizq-live-activity": 0,
+              "prices": 720
+            },
+            "pageHeight": 11779,
+            "pad": "192px"
+          }
+        },
+        "fr": {
+          "cold": [
+            0.0192,
+            0.0133,
+            0.0844
+          ],
+          "warm": [
+            0.0844,
+            0.0786,
+            0.0902
+          ],
+          "coldMedian": 0.0192,
+          "warmMedian": 0.0844,
+          "ok": false,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 9
+          },
+          "heights": {
+            "sections": {
+              "hero": 890,
+              "hero-listings": 505,
+              "rizq-styles": 1011,
+              "rizq-showroom-models": 1025,
+              "rizq-vid-strip": 510,
+              "rvid-section": 0,
+              "categories": 654,
+              "models": 0,
+              "listings": 1538,
+              "virtual-stores": 830,
+              "virtual-showrooms": 830,
+              "virtual-estate": 301,
+              "rizq-estate-models": 639,
+              "virtual-offices": 987,
+              "rizq-live-activity": 0,
+              "prices": 737
+            },
+            "pageHeight": 11967,
+            "pad": "192px"
+          }
+        }
+      }
+    },
+    "browse": {
+      "390": {
+        "ar": {
+          "cold": [
+            0.0376,
+            0.0375,
+            0.0375
+          ],
+          "warm": [
+            1.0317,
+            0.0375,
+            0.0376
+          ],
+          "coldMedian": 0.0375,
+          "warmMedian": 0.0376,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        },
+        "fr": {
+          "cold": [
+            0.0604,
+            0.0058,
+            0.0604
+          ],
+          "warm": [
+            0.0603,
+            0.0604,
+            0.0604
+          ],
+          "coldMedian": 0.0604,
+          "warmMedian": 0.0604,
+          "ok": false,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        }
+      },
+      "768": {
+        "ar": {
+          "cold": [
+            0.0332,
+            0.0332,
+            0.0251
+          ],
+          "warm": [
+            0.0331,
+            0.0013,
+            0.0331
+          ],
+          "coldMedian": 0.0332,
+          "warmMedian": 0.0331,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        },
+        "fr": {
+          "cold": [
+            0.0447,
+            0.0447,
+            0.0447
+          ],
+          "warm": [
+            0.0447,
+            0.0447,
+            0.0447
+          ],
+          "coldMedian": 0.0447,
+          "warmMedian": 0.0447,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        }
+      },
+      "1440": {
+        "ar": {
+          "cold": [
+            0.0265,
+            0.0265,
+            0.0265
+          ],
+          "warm": [
+            0.0265,
+            0.0265,
+            0.0265
+          ],
+          "coldMedian": 0.0265,
+          "warmMedian": 0.0265,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        },
+        "fr": {
+          "cold": [
+            0.0222,
+            0.0222,
+            0.0222
+          ],
+          "warm": [
+            0.0222,
+            0.0222,
+            0.0222
+          ],
+          "coldMedian": 0.0222,
+          "warmMedian": 0.0222,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        }
+      }
+    },
+    "products": {
+      "390": {
+        "ar": {
+          "cold": [
+            0.5104,
+            0.0056,
+            0.0056
+          ],
+          "warm": [
+            0.0056,
+            0.0056,
+            0.034
+          ],
+          "coldMedian": 0.0056,
+          "warmMedian": 0.0056,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        },
+        "fr": {
+          "cold": [
+            0.0072,
+            0.0072,
+            0.0072
+          ],
+          "warm": [
+            0.0072,
+            0.0072,
+            0.0072
+          ],
+          "coldMedian": 0.0072,
+          "warmMedian": 0.0072,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        }
+      },
+      "768": {
+        "ar": {
+          "cold": [
+            0.0059,
+            0.0059,
+            0.007
+          ],
+          "warm": [
+            1.3945,
+            0.0059,
+            0.0059
+          ],
+          "coldMedian": 0.0059,
+          "warmMedian": 0.0059,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        },
+        "fr": {
+          "cold": [
+            0.0087,
+            0.0075,
+            1.5106
+          ],
+          "warm": [
+            0.0747,
+            0.0747,
+            0.0087
+          ],
+          "coldMedian": 0.0087,
+          "warmMedian": 0.0747,
+          "ok": false,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        }
+      },
+      "1440": {
+        "ar": {
+          "cold": [
+            0.0281,
+            0.0281,
+            0.0281
+          ],
+          "warm": [
+            0.0459,
+            0.0281,
+            0.0281
+          ],
+          "coldMedian": 0.0281,
+          "warmMedian": 0.0281,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        },
+        "fr": {
+          "cold": [
+            0.0242,
+            0.0242,
+            0.0242
+          ],
+          "warm": [
+            0.0242,
+            0.0242,
+            0.0242
+          ],
+          "coldMedian": 0.0242,
+          "warmMedian": 0.0242,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        }
+      }
+    },
+    "store": {
+      "390": {
+        "ar": {
+          "cold": [
+            0.0046,
+            0.0046,
+            0.0046
+          ],
+          "warm": [
+            0.0056,
+            0.0046,
+            0.0046
+          ],
+          "coldMedian": 0.0046,
+          "warmMedian": 0.0046,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        },
+        "fr": {
+          "cold": [
+            0.008,
+            0.008,
+            0.007
+          ],
+          "warm": [
+            0.008,
+            0.008,
+            0.008
+          ],
+          "coldMedian": 0.008,
+          "warmMedian": 0.008,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        }
+      },
+      "768": {
+        "ar": {
+          "cold": [
+            0.0064,
+            0.0064,
+            0.0064
+          ],
+          "warm": [
+            0.0052,
+            0.0052,
+            0.0052
+          ],
+          "coldMedian": 0.0064,
+          "warmMedian": 0.0052,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        },
+        "fr": {
+          "cold": [
+            0.0089,
+            0.0078,
+            0.0078
+          ],
+          "warm": [
+            0.0089,
+            0.0078,
+            0.0089
+          ],
+          "coldMedian": 0.0078,
+          "warmMedian": 0.0089,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        }
+      },
+      "1440": {
+        "ar": {
+          "cold": [
+            0.0506,
+            0.0506,
+            0.0504
+          ],
+          "warm": [
+            0.0506,
+            0.0506,
+            0.0506
+          ],
+          "coldMedian": 0.0506,
+          "warmMedian": 0.0506,
+          "ok": false,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        },
+        "fr": {
+          "cold": [
+            0.051,
+            0.0494,
+            0.0494
+          ],
+          "warm": [
+            0.0494,
+            0.051,
+            0.0494
+          ],
+          "coldMedian": 0.0494,
+          "warmMedian": 0.0494,
+          "ok": true,
+          "fontsOk": {
+            "ready": true,
+            "cairoFaces": 12,
+            "loaded": 6
+          },
+          "heights": null
+        }
+      }
+    }
+  },
+  "ok": false
+}
