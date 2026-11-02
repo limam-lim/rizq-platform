@@ -391,10 +391,22 @@ async function syncAccountPackage(opts) {
   const nextPkgId = switched ? (opts.packageId || null) : (opts.packageId || existing.packageId || null);
   const activating = paymentConfirmed || isTrial;
   if (switched && activating) {
-    history.unshift(Object.assign({}, prior, {
+    const histEntry = Object.assign({}, prior, {
       endedAt: new Date().toISOString(),
       reason: 'replaced_by_' + String(nextPkgId || opts.pkgName),
-    }));
+    });
+    if (opts.packageCredit && typeof opts.packageCredit === 'object') {
+      histEntry.packageCredit = {
+        credit: Number(opts.packageCredit.credit) || 0,
+        amountDue: Number(opts.packageCredit.amountDue) || 0,
+        extensionDays: Number(opts.packageCredit.extensionDays) || 0,
+        totalDays: Number(opts.packageCredit.totalDays) || 0,
+        cashRefund: 0,
+        formulaAr: opts.packageCredit.formulaAr || null,
+        appliedTo: String(nextPkgId || opts.pkgName || ''),
+      };
+    }
+    history.unshift(histEntry);
   }
   // طلب معلّق فوق باقة سابقة: احفظ لقطتها حتى التفعيل (لا تُفقد هوية الباقة القديمة)
   const prePending = activating ? undefined : priorPackageOf(existing);
@@ -413,6 +425,7 @@ async function syncAccountPackage(opts) {
     subscriptionStatus: isTrial ? 'active' : (paymentConfirmed ? 'active' : 'pending'),
     pkgName: opts.pkgName,
     price: Number(opts.price) || 0,
+    listPrice: opts.listPrice != null ? Number(opts.listPrice) : (Number(opts.price) || 0),
     periodStart: (paymentConfirmed || isTrial) ? (periodStart || new Date().toISOString()) : (existing.periodStart || null),
     periodEnd: (paymentConfirmed || isTrial) ? (periodEnd || null) : (existing.periodEnd || null),
     activatedBy: opts.activatedBy || 'admin',
@@ -429,6 +442,17 @@ async function syncAccountPackage(opts) {
       ? [invoice].concat(existing.invoices || []).slice(0, 50)
       : (existing.invoices || []),
   };
+  if (opts.packageCredit && typeof opts.packageCredit === 'object' && activating) {
+    record.lastPackageCredit = {
+      credit: Number(opts.packageCredit.credit) || 0,
+      amountDue: Number(opts.packageCredit.amountDue) || 0,
+      extensionDays: Number(opts.packageCredit.extensionDays) || 0,
+      totalDays: Number(opts.packageCredit.totalDays) || 0,
+      cashRefund: 0,
+      formulaAr: opts.packageCredit.formulaAr || null,
+      appliedAt: new Date().toISOString(),
+    };
+  }
   if (prePending !== undefined) record.prePending = prePending;
   store[opts.accountId] = record;
   try {

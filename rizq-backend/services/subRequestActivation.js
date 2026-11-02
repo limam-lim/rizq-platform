@@ -35,28 +35,152 @@ async function resolvePackageDurationDays(pkgName) {
 }
 
 /**
+ * رصيد تغيير الباقة (باقة مختلفة وما زالت القديمة فعّالة):
+ * credit = (oldPrice / oldDays) × remainingDays
+ * يُخصم من سعر الجديدة — لا يُرد نقداً.
+ * إن credit > newPrice يُمدَّد بمدة تعادل الفائض بسعر اليومية للجديدة.
+ */
+function computePackageCredit(opts) {
+  opts = opts || {};
+  const nowMs = opts.nowMs != null ? Number(opts.nowMs) : Date.now();
+  const oldPrice = Math.max(0, Number(opts.oldPrice) || 0);
+  const oldDays = Math.max(1, Number(opts.oldDays) || 30);
+  const newPrice = Math.max(0, Number(opts.newPrice) || 0);
+  const newDays = Math.max(1, Number(opts.newDays) || 30);
+  const periodEndMs = opts.periodEnd ? new Date(opts.periodEnd).getTime() : 0;
+  const remainingMs = Number.isFinite(periodEndMs) ? Math.max(0, periodEndMs - nowMs) : 0;
+  const remainingDays = remainingMs / 86400000;
+  const switched = opts.switched !== false;
+  const active = opts.active !== false && remainingDays > 0 && oldPrice > 0;
+
+  if (!switched || !active) {
+    return {
+      applicable: false,
+      credit: 0,
+      remainingDays: Math.round(remainingDays * 1000) / 1000,
+      oldPrice,
+      oldDays,
+      newPrice,
+      newDays,
+      amountDue: newPrice,
+      extensionDays: 0,
+      totalDays: newDays,
+      cashRefund: 0,
+      formulaAr: null,
+      formulaFr: null,
+    };
+  }
+
+  const creditRaw = (oldPrice / oldDays) * remainingDays;
+  const credit = Math.round(creditRaw * 100) / 100;
+  const amountDue = Math.max(0, Math.round((newPrice - credit) * 100) / 100);
+  let extensionDays = 0;
+  let totalDays = newDays;
+  if (credit > newPrice && newPrice > 0) {
+    extensionDays = ((credit - newPrice) / newPrice) * newDays;
+    totalDays = newDays + extensionDays;
+  }
+  extensionDays = Math.round(extensionDays * 1000) / 1000;
+  totalDays = Math.round(totalDays * 1000) / 1000;
+  const remTxt = (Math.round(remainingDays * 100) / 100).toFixed(2);
+  const creditTxt = credit.toFixed(2);
+  return {
+    applicable: true,
+    credit,
+    remainingDays: Math.round(remainingDays * 1000) / 1000,
+    oldPrice,
+    oldDays,
+    newPrice,
+    newDays,
+    amountDue,
+    extensionDays,
+    totalDays,
+    cashRefund: 0,
+    formulaAr: `(${oldPrice} ÷ ${oldDays}) × ${remTxt} = ${creditTxt} أوقية — لا يُرد نقداً`
+      + (amountDue > 0
+        ? ` · المطلوب بعد الخصم: ${amountDue} أوقية`
+        : ` · الرصيد يغطي السعر · تمديد ${extensionDays} يوماً`),
+    formulaFr: `(${oldPrice} ÷ ${oldDays}) × ${remTxt} = ${creditTxt} MRU — pas de remboursement cash`
+      + (amountDue > 0
+        ? ` · dû après crédit: ${amountDue} MRU`
+        : ` · crédit ≥ prix · prolongation ${extensionDays} j`),
+  };
+}
+
+/**
  * B6 — شراء باقة ثانية:
  * - نفس الباقة وما زالت نشطة: مدّ الانتهاء من periodEnd الحالي، وإلا من اليوم.
- * - باقة مختلفة: ابدأ من الآن بأيام الباقة الجديدة فقط (بدون ترحيل أيام القديمة).
+ * - باقة مختلفة وما زالت القديمة فعّالة: رصيد يُخصم من السعر؛ الفائض يمدّد المدة.
  * incoming: packageId (نص) أو { packageId, pkgName }.
+ * creditInfo اختياري من computePackageCredit (عند التبديل).
  */
-function computeActivationPeriod(days, existingRecord, incoming) {
+function computeActivationPeriod(days, existingRecord, incoming, creditInfo) {
   const now = new Date();
   const nDays = Math.max(1, Number(days) || 30);
   const next = incoming && typeof incoming === 'object' ? incoming : { packageId: incoming || null };
   const prior = priorPackageOf(existingRecord);
   const samePackage = isSamePackage(prior, next);
+  const switchedPackage = !!prior && !samePackage;
   let ends = new Date(now.getTime() + nDays * 86400000);
   if (samePackage && isPackageStillActive(prior, now.getTime())) {
     ends = new Date(new Date(prior.periodEnd).getTime() + nDays * 86400000);
+  } else if (switchedPackage && isPackageStillActive(prior, now.getTime())
+    && creditInfo && creditInfo.applicable && Number(creditInfo.totalDays) > 0) {
+    ends = new Date(now.getTime() + Number(creditInfo.totalDays) * 86400000);
   }
   return {
     periodStart: now.toISOString(),
     periodEnd: ends.toISOString(),
     now,
     samePackage,
-    switchedPackage: !!prior && !samePackage,
+    switchedPackage,
+    packageCredit: creditInfo || null,
   };
+}
+
+/**
+ * احسب رصيد التبديل للحساب الحالي مقابل باقة جديدة (فئة package العامة).
+ */
+async function resolveSwitchCreditForAccount(accountId, newPkg, newPrice, newDays, getAccountRecordFn) {
+  if (!accountId || typeof getAccountRecordFn !== 'function') {
+    return computePackageCredit({ switched: false, newPrice, newDays });
+  }
+  const existing = await getAccountRecordFn(accountId);
+  const prior = priorPackageOf(existing);
+  const next = {
+    packageId: (newPkg && newPkg.id) || (newPkg && newPkg.packageId) || null,
+    pkgName: (newPkg && (newPkg.name || newPkg.pkgName)) || null,
+  };
+  if (!prior || isSamePackage(prior, next) || !isPackageStillActive(prior, Date.now())) {
+    return computePackageCredit({
+      switched: false,
+      active: false,
+      newPrice,
+      newDays,
+      oldPrice: prior && prior.price,
+      periodEnd: prior && prior.periodEnd,
+    });
+  }
+  let oldDays = 30;
+  try {
+    oldDays = await resolvePackageDurationDays({
+      id: prior.packageId,
+      pkgName: prior.pkgName,
+    });
+  } catch (e) { oldDays = 30; }
+  if (prior.periodStart && prior.periodEnd) {
+    const span = (new Date(prior.periodEnd) - new Date(prior.periodStart)) / 86400000;
+    if (Number.isFinite(span) && span >= 1) oldDays = Math.max(1, Math.round(span));
+  }
+  return computePackageCredit({
+    switched: true,
+    active: true,
+    oldPrice: Number(prior.price) || 0,
+    oldDays,
+    periodEnd: prior.periodEnd,
+    newPrice: Number(newPrice) || 0,
+    newDays: Math.max(1, Number(newDays) || 30),
+  });
 }
 
 async function getAccountInfo(accountId, readAccounts) {
@@ -380,7 +504,23 @@ async function _activateClaimed(req, deps) {
     // package (default) — باقات الحساب العامة فقط
     const existingPkg = await getAccountRecord(req.accountId);
     const newPkgId = req.packageId || (await findCatalogPackage(req.pkg) || {}).id || null;
-    const { periodStart, periodEnd, now } = computeActivationPeriod(days, existingPkg, { packageId: newPkgId, pkgName: req.pkg });
+    const catalogPrice = Number(req.expectedPrice != null ? req.expectedPrice : req.listPrice);
+    const paidPrice = Number(req.price) || 0;
+    const creditInfo = req.packageCredit && typeof req.packageCredit === 'object'
+      ? req.packageCredit
+      : await resolveSwitchCreditForAccount(
+        req.accountId,
+        { id: newPkgId, name: req.pkg },
+        Number.isFinite(catalogPrice) && catalogPrice > 0 ? catalogPrice : paidPrice,
+        days,
+        getAccountRecord
+      );
+    const { periodStart, periodEnd, now, switchedPackage } = computeActivationPeriod(
+      days,
+      existingPkg,
+      { packageId: newPkgId, pkgName: req.pkg },
+      creditInfo
+    );
     const isTrial = isTrialPackage(req.pkg, req.price);
 
     const result = await syncAccountPackage({
@@ -391,14 +531,19 @@ async function _activateClaimed(req, deps) {
       accountType,
       pkgName: req.pkg,
       packageId: newPkgId,
-      price: Number(req.price) || 0,
-      days,
+      price: paidPrice,
+      listPrice: Number.isFinite(catalogPrice) ? catalogPrice : paidPrice,
+      days: (creditInfo && creditInfo.applicable && creditInfo.totalDays > 0)
+        ? creditInfo.totalDays
+        : days,
       periodStart,
       periodEnd,
       activatedBy: 'admin',
       paymentConfirmed: !isTrial,
       paidAt: isTrial ? null : now.toISOString(),
       isTrial,
+      packageCredit: creditInfo && creditInfo.applicable ? creditInfo : null,
+      switchedPackage: !!switchedPackage,
     });
     if (!result.ok) return result;
 
@@ -442,6 +587,8 @@ module.exports = {
   TENDER_PACKAGE_NAME,
   resolvePackageDurationDays,
   computeActivationPeriod,
+  computePackageCredit,
+  resolveSwitchCreditForAccount,
   activateSubRequest,
   rejectSubRequest,
   formatPlausibility,
