@@ -1,84 +1,24 @@
 /* === extracted from <style id="rizq-mobile-header-critical"> (rizq-mobile-header-critical) === */
 /* منع وميض التحديث: شريط .rmh-nav كحلي بنص أزرق المتصفح قبل اكتمال mockup CSS */
-#rizq-mock-hdr{
-  background:#0a1628;color:#fff;
-}
-#rizq-mock-hdr nav.rmh-nav,
-nav.rmh-nav{
-  display:flex!important;flex-wrap:nowrap;align-items:center;gap:2px;
-  background:#0a1628!important;background-image:none!important;
-  color:#fff!important;overflow-x:auto;-webkit-overflow-scrolling:touch;
-}
-#rizq-mock-hdr nav.rmh-nav a,
-nav.rmh-nav a{
-  color:#fff!important;-webkit-text-fill-color:#fff!important;
-  text-decoration:none!important;flex:0 0 auto;
-  display:inline-flex!important;flex-direction:column;align-items:center;justify-content:center;
-  gap:2px;padding:6px 8px;font-size:11px;font-weight:700;line-height:1.15;
-  white-space:nowrap;min-width:64px;box-sizing:border-box;
-}
-#rizq-mock-hdr nav.rmh-nav a .rmh-nav-ico,
-nav.rmh-nav a .rmh-nav-ico,
-#rizq-mock-hdr nav.rmh-nav a.is-active .rmh-nav-ico,
-nav.rmh-nav a.is-active .rmh-nav-ico{color:#fff!important}
-#rizq-mock-hdr nav.rmh-nav a:hover .rmh-nav-ico,
-nav.rmh-nav a:hover .rmh-nav-ico{color:#E8C96A!important}
+#rizq-mock-hdr{background:#0a1628;color:#fff;}
+#rizq-mock-hdr nav.rmh-nav, nav.rmh-nav{display:flex!important;flex-wrap:nowrap;align-items:center;gap:2px;background:#0a1628!important;background-image:none!important;color:#fff!important;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+#rizq-mock-hdr nav.rmh-nav a, nav.rmh-nav a{color:#fff!important;-webkit-text-fill-color:#fff!important;text-decoration:none!important;flex:0 0 auto;display:inline-flex!important;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 8px;font-size:11px;font-weight:700;line-height:1.15;white-space:nowrap;min-width:64px;box-sizing:border-box;}
+#rizq-mock-hdr nav.rmh-nav a .rmh-nav-ico, nav.rmh-nav a .rmh-nav-ico, #rizq-mock-hdr nav.rmh-nav a.is-active .rmh-nav-ico, nav.rmh-nav a.is-active .rmh-nav-ico{color:#fff!important;}
+#rizq-mock-hdr nav.rmh-nav a:hover .rmh-nav-ico, nav.rmh-nav a:hover .rmh-nav-ico{color:#E8C96A!important;}
 /* الشريط القديم لا يُعرض أبداً — حتى قبل اكتمال تحميل mockup CSS */
-html.rizq-app-nav #nav,
-html.rizq-app-nav #rizq-desk-nav,
-html.rizq-app-nav #rizq-thumb-dock,
-html.rizq-app-nav .rizq-thumb-dock,
-html.rizq-app-nav #section-jump-bar,
-html.rizq-app-nav #mobile-bottom-nav,
-html.rizq-app-nav .mobile-bottom-nav,
-html.rizq-app-nav #rizq-search-theater,
-html.rizq-app-nav #rizq-search-pill,
-html.rizq-app-nav .nav-sticky-tools{
-  display:none!important;visibility:hidden!important;pointer-events:none!important;
-  height:0!important;max-height:0!important;overflow:hidden!important;opacity:0!important;
-}
-@media(max-width:768px),(orientation:landscape) and (max-height:500px){
-  /* هاتف: مساحة الهيدر الموحّد فقط (لا شريط قديم) */
-  /* thumb-dock-h = ارتفاع الشريط السفلي rmh (لا 0) حتى لا يختبئ ويدجت الدردشة خلفه */
-  html.rizq-app-nav{--rizq-header-h:128px;--rizq-mock-nav-h:72px;--rizq-thumb-dock-h:var(--rizq-mock-nav-h,72px)}
-  html.rizq-app-nav body{
-    padding-top:var(--rizq-mock-hdr-h,var(--rizq-header-h,128px))!important;
-    /* شريط الأقسام السفلي يحسب الـsafe-area داخله — لا نضاعف الفراغ */
-    padding-bottom:var(--rizq-mock-nav-h,72px)!important;
-  }
-  html.rizq-app-nav #nav,html.rizq-app-nav #rizq-desk-nav{
-    display:none!important;visibility:hidden!important;height:0!important;
-    pointer-events:none!important;
-  }
-  /* هاتف: لا نفرض ارتفاع شاشة كاملة — يقلّص الفراغ تحت رزق قبل الشريط السفلي */
-  html.rizq-app-nav .hero{
-    justify-content:flex-start!important;padding-top:0!important;padding-bottom:10px!important;
-    min-height:0!important;height:auto!important;
-  }
-  html.rizq-app-nav .ticker-wrap,html.rizq-app-nav .ticker-wrap:not(.is-empty){
-    position:relative!important;top:auto!important;left:auto!important;right:auto!important;
-    z-index:2!important;margin:0!important;width:100%!important;flex:0 0 auto!important;align-self:stretch!important;
-  }
-  html.rizq-app-nav .hero-content{padding-top:8px!important;padding-bottom:4px!important}
-  /* شعار الهاتف/التابلت = نفس الكمبيوتر: علامة + رزق (Cairo) + PLATFORM */
-  html.rizq-app-nav #nav > .logo{
-    text-decoration:none!important;color:inherit!important;border:none!important;outline:none!important;
-    display:inline-flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important;
-  }
-  html.rizq-app-nav #nav .logo-text{
-    gap:4px!important;
-  }
-  html.rizq-app-nav #nav .logo-ar,html.rizq-app-nav #nav .logo-text .logo-ar{
-    font-family:'Cairo','Segoe UI',Tahoma,sans-serif!important;font-size:20px!important;font-weight:900!important;
-    color:#C9A84C!important;-webkit-text-fill-color:#C9A84C!important;white-space:nowrap!important;
-    overflow:visible!important;min-width:max-content!important;text-decoration:none!important;
-    direction:rtl!important;unicode-bidi:isolate!important;line-height:1!important;
-    text-shadow:0 0 12px rgba(201,168,76,.28)!important;
-  }
-  html.rizq-app-nav #nav .logo-sub{
-    display:block!important;font-family:Georgia,'Times New Roman',serif!important;font-style:italic!important;
-    font-size:7px!important;letter-spacing:1.6px!important;color:rgba(201,168,76,.82)!important;
-    text-transform:uppercase!important;white-space:nowrap!important;margin-top:0!important;
-  }
-}
-
+html.rizq-app-nav #nav, html.rizq-app-nav #rizq-desk-nav, html.rizq-app-nav #rizq-thumb-dock, html.rizq-app-nav .rizq-thumb-dock, html.rizq-app-nav #section-jump-bar, html.rizq-app-nav #mobile-bottom-nav, html.rizq-app-nav .mobile-bottom-nav, html.rizq-app-nav #rizq-search-theater, html.rizq-app-nav #rizq-search-pill, html.rizq-app-nav .nav-sticky-tools{display:none!important;visibility:hidden!important;pointer-events:none!important;height:0!important;max-height:0!important;overflow:hidden!important;opacity:0!important;}
+@media(max-width:768px),(orientation:landscape) and (max-height:500px){/* هاتف: مساحة الهيدر الموحّد فقط (لا شريط قديم) */
+/* thumb-dock-h = ارتفاع الشريط السفلي rmh (لا 0) حتى لا يختبئ ويدجت الدردشة خلفه */
+html.rizq-app-nav{--rizq-header-h:128px;--rizq-mock-nav-h:72px;--rizq-thumb-dock-h:var(--rizq-mock-nav-h,72px);}
+html.rizq-app-nav body{padding-top:var(--rizq-mock-hdr-h,var(--rizq-header-h,128px))!important;/* شريط الأقسام السفلي يحسب الـsafe-area داخله — لا نضاعف الفراغ */
+    padding-bottom:var(--rizq-mock-nav-h,72px)!important;}
+html.rizq-app-nav #nav,html.rizq-app-nav #rizq-desk-nav{display:none!important;visibility:hidden!important;height:0!important;pointer-events:none!important;}
+/* هاتف: لا نفرض ارتفاع شاشة كاملة — يقلّص الفراغ تحت رزق قبل الشريط السفلي */
+html.rizq-app-nav .hero{justify-content:flex-start!important;padding-top:0!important;padding-bottom:10px!important;min-height:0!important;height:auto!important;}
+html.rizq-app-nav .ticker-wrap,html.rizq-app-nav .ticker-wrap:not(.is-empty){position:relative!important;top:auto!important;left:auto!important;right:auto!important;z-index:2!important;margin:0!important;width:100%!important;flex:0 0 auto!important;align-self:stretch!important;}
+html.rizq-app-nav .hero-content{padding-top:8px!important;padding-bottom:4px!important;}
+/* شعار الهاتف/التابلت = نفس الكمبيوتر: علامة + رزق (Cairo) + PLATFORM */
+html.rizq-app-nav #nav > .logo{text-decoration:none!important;color:inherit!important;border:none!important;outline:none!important;display:inline-flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important;}
+html.rizq-app-nav #nav .logo-text{gap:4px!important;}
+html.rizq-app-nav #nav .logo-ar,html.rizq-app-nav #nav .logo-text .logo-ar{font-family:'Cairo','Segoe UI',Tahoma,sans-serif!important;font-size:20px!important;font-weight:900!important;color:#C9A84C!important;-webkit-text-fill-color:#C9A84C!important;white-space:nowrap!important;overflow:visible!important;min-width:max-content!important;text-decoration:none!important;direction:rtl!important;unicode-bidi:isolate!important;line-height:1!important;text-shadow:0 0 12px rgba(201,168,76,.28)!important;}
+html.rizq-app-nav #nav .logo-sub{display:block!important;font-family:Georgia,'Times New Roman',serif!important;font-style:italic!important;font-size:7px!important;letter-spacing:1.6px!important;color:rgba(201,168,76,.82)!important;text-transform:uppercase!important;white-space:nowrap!important;margin-top:0!important;}}
