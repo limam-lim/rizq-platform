@@ -270,60 +270,99 @@ function _styReadStoreAccounts(){
   } catch(eA){}
   return map;
 }
+function _styMapHomeApiItem(it){
+  if(!it) return null;
+  var seller = it.seller || {};
+  var store = {
+    id: it.accountId || seller.id || '',
+    name: seller.name || (it.sellerContext && it.sellerContext.storeName) || it.accountId || '',
+    nameF: seller.name || '',
+    type: seller.type || 'store',
+    activityId: seller.activityId || '',
+    activity: seller.activity || ''
+  };
+  var p = {
+    id: it.id,
+    name: it.name || it.title || '',
+    nameF: it.nameFr || it.nameF || it.name || '',
+    price: it.price,
+    cat: it.cat || it.category || it.categoryId || 'أزياء',
+    emoji: it.emoji || '🛍️',
+    images: it.images,
+    image: it.image,
+    gender: it.gender || '',
+    contactsLocked: !!it.contactsLocked
+  };
+  var item = _styNormalizeStoreProduct(p, store);
+  if(!item) return null;
+  if(it.href) item.href = it.href;
+  else if(item.storeId && item.productId){
+    item.href = 'rizq_store.html?id=' + encodeURIComponent(item.storeId)
+      + '&product=' + encodeURIComponent(item.productId);
+  }
+  item.contactsLocked = !!it.contactsLocked;
+  if(it.contactsLocked){
+    item.price = '';
+    item.priceFR = '';
+    item.priceOnContact = true;
+  }
+  return item;
+}
 function _styCollectStoreStyleItems(){
   var seen = {};
   var out = [];
-  var accounts = _styReadStoreAccounts();
   var storeIdsTouched = {};
 
-  function pushProduct(p, store){
-    var item = _styNormalizeStoreProduct(p, store);
+  function pushItem(item){
     if(!item || !_styIsStyleCat(item)) return;
     if(seen[item.id]) return;
     seen[item.id] = 1;
     out.push(item);
+    if(item.storeId) storeIdsTouched[item.storeId] = 1;
   }
 
-  /* 1) منتجات المحلات الحقيقية من localStorage */
+  /* 1) مصدر الخادم فقط — GET /api/catalog/home?section=styles (لا localStorage) */
   try {
-    for(var i = 0; i < localStorage.length; i++){
-      var key = localStorage.key(i);
-      if(!key || key.indexOf('store_products_') !== 0) continue;
-      var sid = key.slice('store_products_'.length);
-      if(!sid) continue;
-      var list = [];
-      try { list = JSON.parse(localStorage.getItem(key) || '[]'); } catch(eP){ list = []; }
-      if(!Array.isArray(list) || !list.length) continue;
-      var acc = accounts[sid] || { id: sid, name: sid, type: 'store' };
-      /* اقبل المحل إن كان موضة بالنشاط أو إن منتجاته أزياء */
-      var fashionAcc = _styIsFashionStoreAcc(acc);
-      var styleProds = list.filter(function(p){
-        return p && _styIsStyleCat({ title: p.name, cat: p.cat, catKey: p.cat, tags: [p.cat] });
-      });
-      if(!fashionAcc && !styleProds.length) continue;
-      storeIdsTouched[sid] = 1;
-      (fashionAcc ? list : styleProds).forEach(function(p){ pushProduct(p, acc); });
-    }
-  } catch(eScan){}
+    var apiItems = (window.__rizqHomeCatalog && window.__rizqHomeCatalog.styles)
+      || (window.__rizqStylesApiItems)
+      || [];
+    (apiItems || []).forEach(function(raw){
+      pushItem(_styMapHomeApiItem(raw));
+    });
+  } catch(eApi){}
 
-  /* 2) حسابات موضة بلا مفتاح منتجات بعد — لا شيء تُضاف */
-  Object.keys(accounts).forEach(function(sid){
-    if(storeIdsTouched[sid]) return;
-    if(!_styIsFashionStoreAcc(accounts[sid])) return;
-    /* يبقى فارغاً حتى يرفع التاجر منتجات */
-  });
-
-  /* 3) إن لم تكفِ المنتجات — كتالوجات محلات أزياء تجريبية (فقط قبل الإطلاق) */
+  /* 2) إن لم تكفِ المنتجات — كتالوجات محلات أزياء تجريبية (فقط قبل الإطلاق) */
   var styDemoOk = (window.RizqDemo && typeof RizqDemo.inventoryAllowed === 'function')
     ? RizqDemo.inventoryAllowed()
     : !(window.RIZQ_LAUNCH && RIZQ_LAUNCH.launchDate);
   if(styDemoOk && out.length < 9){
     _styDemoFashionStores().forEach(function(demo){
       if(storeIdsTouched[demo.id]) return;
-      (demo.products || []).forEach(function(p){ pushProduct(p, demo); });
+      (demo.products || []).forEach(function(p){
+        var item = _styNormalizeStoreProduct(p, demo);
+        pushItem(item);
+      });
     });
   }
   return out;
+}
+/** جلب أفكار الأنماط من مسار الرئيسية الموحّد */
+function _styHydrateFromApi(){
+  var base = (typeof window.RIZQ_BACKEND_BASE === 'string' ? window.RIZQ_BACKEND_BASE : '').replace(/\/$/,'');
+  if(!base) return;
+  if(window.__rizqStylesHydrating) return;
+  window.__rizqStylesHydrating = 1;
+  fetch(base + '/api/catalog/home?section=styles&limit=48')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(data){
+      if(!data || !data.ok || !Array.isArray(data.items)) return;
+      window.__rizqHomeCatalog = window.__rizqHomeCatalog || {};
+      window.__rizqHomeCatalog.styles = data.items;
+      window.__rizqStylesApiItems = data.items;
+      try { if(typeof buildStyleIdeas === 'function') buildStyleIdeas(false); } catch(eB){}
+    })
+    .catch(function(){})
+    .then(function(){ window.__rizqStylesHydrating = 0; });
 }
 /**
  * مصدر الإطلالات = منتجات محلات الموضة (لا إعلانات فردية).
@@ -1330,3 +1369,4 @@ function buildStyleIdeas(reshuffle){
 }
 try { buildStyleIdeas(false); } catch(eSty) {}
 try { _styStartAutoRefresh(); } catch(eAuto) {}
+try { _styHydrateFromApi(); } catch(eStyHyd) {}

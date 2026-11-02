@@ -422,7 +422,16 @@ function buildCards(){
     c.className='ad-card';
     const d = trAd(a);
     const media = (window.RizqAdCards && typeof RizqAdCards.mediaHtml === 'function')
-      ? RizqAdCards.mediaHtml(a, { fr: !isAr, price: d.price, pin: !!d.pin, emoji: d.emoji, bg: d.bg, title: d.title })
+      ? RizqAdCards.mediaHtml(a, {
+          fr: !isAr,
+          price: d.price,
+          pin: !!d.pin,
+          emoji: d.emoji,
+          bg: d.bg,
+          title: d.title,
+          badge: a.homeBadge || a.stripBadge || '',
+          contactsLocked: !!(a.contactsLocked || a.priceOnContact)
+        })
       : ('<div class="ad-card-img" style="background:'+_escCard(d.bg||'')+'">'+_adPhotoHtml(a,d,130)+'</div>');
     const actions = (window.RizqAdCards && typeof RizqAdCards.actionsHtml === 'function')
       ? RizqAdCards.actionsHtml(a, { fr: !isAr })
@@ -443,6 +452,13 @@ function buildCards(){
       </div>`;
     c.addEventListener('click',function(ev){
       if(ev.target && ev.target.closest && ev.target.closest('.rzq-adx-nav,.rzq-adx-fav,.rzq-adx-wa,.rzq-adx-tel,.rzq-adx-actions')) return;
+      if(a && (a.fromStore || a.source === 'store' || a.homeStoreProduct)){
+        var href = a.href || (a.storeId
+          ? ('rizq_store.html?id=' + encodeURIComponent(a.storeId)
+            + (a.productId ? ('&product=' + encodeURIComponent(a.productId)) : ''))
+          : '');
+        if(href){ window.location.href = href; return; }
+      }
       openCarouselAdById(a.id);
     });
     track.appendChild(c);

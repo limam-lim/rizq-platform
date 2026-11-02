@@ -892,14 +892,26 @@ function isDemoAd(a){
   /* محتوى التخرج (graduationDemo / acc_grad_) يُحسب حياً للعرض — ليس «acc_demo» */
   return acc.indexOf('acc_demo')===0 || /^RZQ-2026-1000\d/i.test(id);
 }
-function applyList(list){
+function applyList(list, storeItems){
     ADS.length = 0;
     (list||[]).filter(function(a){
       return a && !isDemoAd(a) && (a.status==='active' || !a.status)
         && (typeof _adHasPublicTitle !== 'function' || _adHasPublicTitle(a));
     }).forEach(function(a){
+      if(a && (a.homeStoreProduct || a.fromStore || a.source === 'store')){
+        ADS.push(a);
+        return;
+      }
       ADS.push(mapApiAdToHero(a));
     });
+    try {
+      if(storeItems && storeItems.length){
+        var mappedStores = storeItems.map(mapHomeStoreToHero).filter(Boolean);
+        var merged = mergeStoreProductsIntoAds(ADS.slice(), mappedStores);
+        ADS.length = 0;
+        merged.forEach(function(x){ ADS.push(x); });
+      }
+    } catch(eMerge){}
     /* لا إعلانات حية — أظهر نوافذ DEMO فقط ما دام launchDate فارغاً (أو ?demo=1) */
     var usingShowcase = false;
     var demoOk = (window.RizqDemo && typeof RizqDemo.inventoryAllowed === 'function')
@@ -971,15 +983,100 @@ function applyList(list){
     }
     track.innerHTML = sk;
   }
-  function finishHydrate(listOrNull){
+  function mapHomeStoreToHero(it){
+    if(!it || !it.id) return null;
+    if(it.homeStoreProduct) return it;
+    var seller = it.seller || {};
+    var storeId = String(it.accountId || seller.id || '');
+    var storeName = String(seller.name || '').slice(0, 40);
+    var priceNum = Number(it.price);
+    var priceStr = '';
+    if(it.contactsLocked){
+      priceStr = '';
+    } else if(isFinite(priceNum) && priceNum > 0){
+      try { priceStr = priceNum.toLocaleString('fr-FR') + ' MRU'; }
+      catch(eP){ priceStr = String(Math.round(priceNum)) + ' MRU'; }
+    }
+    var imgs = Array.isArray(it.images) ? it.images.filter(Boolean) : (it.image ? [it.image] : []);
+    return {
+      id: 'store:' + storeId + ':' + it.id,
+      productId: it.id,
+      storeId: storeId,
+      title: it.name || it.title || '',
+      titleFR: it.nameFr || it.name || '',
+      price: priceStr,
+      priceFR: priceStr,
+      priceNum: priceNum || 0,
+      cat: it.cat || it.category || 'محلات',
+      catKey: it.categoryId || it.cat || '',
+      loc: seller.city || '',
+      locFR: seller.city || '',
+      images: imgs,
+      image: imgs[0] || it.image || null,
+      emoji: it.emoji || '🛍️',
+      bg: 'linear-gradient(145deg,#0f2347,#1B3A6B)',
+      status: 'active',
+      contactsLocked: !!it.contactsLocked,
+      priceOnContact: !!it.contactsLocked,
+      homeBadge: it.homeBadge || (storeName ? ('جديد من ' + storeName) : 'جديد'),
+      stripBadge: it.homeBadge || (storeName ? ('جديد من ' + storeName) : 'جديد'),
+      fromStore: true,
+      source: 'store',
+      homeStoreProduct: true,
+      diamondActive: !!it.diamondActive,
+      href: it.href || ('rizq_store.html?id=' + encodeURIComponent(storeId)
+        + '&product=' + encodeURIComponent(it.id)),
+      accountId: storeId,
+      seller: storeName
+    };
+  }
+  function mergeStoreProductsIntoAds(adsList, storeItems){
+    var ads = Array.isArray(adsList) ? adsList.slice() : [];
+    var stores = (storeItems || []).map(mapHomeStoreToHero).filter(Boolean);
+    if(!stores.length) return ads;
+    /* سقف الشريط: منتجات المحلات ≤ ثلث العرض النهائي */
+    var maxStore = Math.max(0, Math.floor((ads.length + stores.length) / 3));
+    if(ads.length && maxStore < 1) maxStore = 1;
+    stores = stores.slice(0, Math.min(stores.length, maxStore || stores.length));
+    if(!ads.length) return stores;
+    var out = [];
+    var si = 0;
+    var ai = 0;
+    var storeBudget = stores.length;
+    var totalTarget = ads.length + storeBudget;
+    var storeEvery = storeBudget ? Math.max(2, Math.floor(totalTarget / storeBudget)) : 999;
+    for(var i = 0; i < totalTarget; i++){
+      if(storeBudget > 0 && si < stores.length && (i % storeEvery === storeEvery - 1 || ai >= ads.length)){
+        out.push(stores[si++]);
+        storeBudget--;
+      } else if(ai < ads.length){
+        out.push(ads[ai++]);
+      } else if(si < stores.length){
+        out.push(stores[si++]);
+      }
+    }
+    return out;
+  }
+  function finishHydrate(listOrNull, storeItems){
     var wait = Math.max(0, 700 - (Date.now() - skelShownAt));
     setTimeout(function(){
-      if(listOrNull) applyList(listOrNull);
+      if(listOrNull) applyList(listOrNull, storeItems || []);
+      else if(storeItems && storeItems.length) applyList([], storeItems);
       else if(typeof buildCards==='function') buildCards();
     }, wait);
   }
-  fetch(base+'/api/ads?limit=1000').then(function(r){ return r.ok?r.json():null; }).then(function(data){
-    if(data && data.ok && Array.isArray(data.ads)) finishHydrate(data.ads);
+  Promise.all([
+    fetch(base+'/api/ads?limit=1000').then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; }),
+    fetch(base+'/api/catalog/home?section=stores&limit=24').then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; })
+  ]).then(function(pair){
+    var data = pair[0];
+    var storeData = pair[1];
+    var ads = (data && data.ok && Array.isArray(data.ads)) ? data.ads : null;
+    var storeItems = (storeData && storeData.ok && Array.isArray(storeData.items)) ? storeData.items : [];
+    window.__rizqHomeCatalog = window.__rizqHomeCatalog || {};
+    window.__rizqHomeCatalog.stores = storeItems;
+    if(ads) finishHydrate(ads, storeItems);
+    else if(storeItems.length) finishHydrate([], storeItems);
     else finishHydrate(null);
   }).catch(function(){ finishHydrate(null); });
 }

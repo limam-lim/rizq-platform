@@ -2834,13 +2834,42 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
     receiptSha256 = stored.sha256 || null;
     receiptMeta = { mime: stored.mime, bytes: stored.bytes, sha256: receiptSha256 };
   }
-  const authoritativePrice = serverPrice;
+  const reqCategory = ['video', 'tender', 'investment', 'ad_boost', 'verified_plus'].indexOf(b.category) !== -1 ? b.category : 'package';
+  let packageCredit = null;
+  let authoritativePrice = serverPrice;
+  if (reqCategory === 'package') {
+    try {
+      const {
+        resolvePackageDurationDays,
+        resolveSwitchCreditForAccount,
+      } = require('./services/subRequestActivation');
+      const newDays = await resolvePackageDurationDays({
+        id: catalogPkg.id,
+        pkgName: catalogPkg.name || catalogPkg.id,
+      });
+      packageCredit = await resolveSwitchCreditForAccount(
+        String(b.accountId).slice(0, 60),
+        { id: catalogPkg.id, name: catalogPkg.name || catalogPkg.id },
+        serverPrice,
+        newDays,
+        getAccountRecord
+      );
+      if (packageCredit && packageCredit.applicable) {
+        authoritativePrice = Number(packageCredit.amountDue) || 0;
+      }
+    } catch (credErr) {
+      console.warn('[sub-requests] package credit:', credErr.message);
+      packageCredit = null;
+    }
+  }
   const rec = {
     id,
     pkg: String((catalogPkg && (catalogPkg.name || catalogPkg.id)) || pkgRef).slice(0, 60),
     packageId: String((catalogPkg && catalogPkg.id) || pkgRef).slice(0, 60),
     price: authoritativePrice,
-    expectedPrice: authoritativePrice,
+    expectedPrice: serverPrice,
+    listPrice: serverPrice,
+    packageCredit: packageCredit && packageCredit.applicable ? packageCredit : null,
     submittedAt: b.submittedAt || new Date().toISOString(),
     status: 'pending',
     account: String(b.account || '').slice(0, 120),
@@ -2853,7 +2882,7 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
     // activateSubscriptionForAccount العامة فتُلغي/تكتب فوق باقة الحساب
     // الحقيقية النشطة — بالضبط الخطأ الذي حذّرت منه تعليقات #219 أعلاه، وكان
     // لا يزال ممكناً فعلياً لأي طلب معزول يصل من جهاز غير جهاز الأدمن.
-    category: ['video', 'tender', 'investment', 'ad_boost', 'verified_plus'].indexOf(b.category) !== -1 ? b.category : 'package',
+    category: reqCategory,
     videoUrl: b.videoUrl ? String(b.videoUrl).slice(0, 500) : null,
     file: b.file ? String(b.file).slice(0, 200) : null,
     // لا نخزّن base64 الوصل في JSON — الملف على القرص فقط تحت uploads/receipts
@@ -2889,7 +2918,13 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
       console.warn('[sub-requests] pending package:', pendingErr.message);
     }
   }
-  res.json({ ok: true, id });
+  res.json({
+    ok: true,
+    id,
+    price: rec.price,
+    listPrice: serverPrice,
+    packageCredit: rec.packageCredit,
+  });
 
   // تحليل الوصل + موافقة مبدئية (أخضر) أو تعليق — ثم Telegram إن وُجد
   setImmediate(() => {
@@ -2909,6 +2944,57 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
       console.warn('[sub-requests] provisional pipeline init:', pipeErr.message);
     }
   });
+});
+
+/**
+ * GET /api/sub-requests/package-credit?accountId=&pkg=
+ * معاينة رصيد تبديل الباقة للتاجر قبل إرسال الطلب.
+ */
+app.get('/api/sub-requests/package-credit', async (req, res) => {
+  try {
+    const accountId = String((req.query && req.query.accountId) || '').slice(0, 60);
+    const token = req.header('x-account-token') || '';
+    if (!accountId) return res.status(400).json({ ok: false, error: 'accountId_required' });
+    const owner = await verifyAccountOwner(accountId, token);
+    if (!owner) return res.status(401).json({ ok: false, error: 'unauthorized' });
+    const pkgRef = (req.query && (req.query.pkg || req.query.packageId || req.query.pkgId)) || '';
+    if (!pkgRef) return res.status(400).json({ ok: false, error: 'pkg_required' });
+    const { findCatalogPackage } = require('./services/catalogConfig');
+    const catalogPkg = (await findCatalogPackage({
+      pkgName: pkgRef, name: pkgRef, id: pkgRef, category: 'package',
+    })) || (await findCatalogPackage(pkgRef));
+    if (!catalogPkg) return res.status(400).json({ ok: false, error: 'UNKNOWN_PKG' });
+    const serverPrice = catalogPkg.price != null && Number.isFinite(Number(catalogPkg.price))
+      ? Number(catalogPkg.price) : null;
+    if (serverPrice == null) return res.status(400).json({ ok: false, error: 'price_unset' });
+    const {
+      resolvePackageDurationDays,
+      resolveSwitchCreditForAccount,
+    } = require('./services/subRequestActivation');
+    const newDays = await resolvePackageDurationDays({
+      id: catalogPkg.id,
+      pkgName: catalogPkg.name || catalogPkg.id,
+    });
+    const credit = await resolveSwitchCreditForAccount(
+      accountId,
+      { id: catalogPkg.id, name: catalogPkg.name || catalogPkg.id },
+      serverPrice,
+      newDays,
+      getAccountRecord
+    );
+    return res.json({
+      ok: true,
+      listPrice: serverPrice,
+      price: credit && credit.applicable ? credit.amountDue : serverPrice,
+      days: newDays,
+      packageCredit: credit,
+      pkg: catalogPkg.name || catalogPkg.id,
+      packageId: catalogPkg.id || null,
+    });
+  } catch (err) {
+    console.error('[package-credit]', err && err.message);
+    return res.status(500).json({ ok: false, error: 'credit_preview_failed' });
+  }
 });
 
 /**
@@ -4171,6 +4257,8 @@ mountCatalogRoutes(app, {
   extractAccountToken,
   isAdminRequest,
   adminHasPermission,
+  resolveContactGate,
+  resolveOptionalAccountViewer,
 });
 
 /**

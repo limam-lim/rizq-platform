@@ -3540,6 +3540,25 @@ function rizqShare(title, url) {
               });
             });
             paintStoreProductsGrid(merged, id);
+            /* رابط عميق من الرئيسية: ?product=CAT-… أو BCAT-… */
+            try {
+              var wantPid = new URLSearchParams(location.search).get('product') || '';
+              if(wantPid){
+                var match = merged.find(function(p){
+                  if(!p) return false;
+                  var pid = String(p.id || '');
+                  return pid === wantPid || pid === ('B'+wantPid) || pid.replace(/^B/,'') === wantPid
+                    || String(p.rawId || '') === wantPid;
+                });
+                if(match && typeof openProduct === 'function'){
+                  setTimeout(function(){ try { openProduct(match.id); } catch(eOpen){} }, 350);
+                } else if(match && window.RizqStoreCommerce && typeof RizqStoreCommerce.openProductDetail === 'function'){
+                  setTimeout(function(){
+                    try { RizqStoreCommerce.openProductDetail(match, { fr: isFr() }); } catch(eOpen2){}
+                  }, 350);
+                }
+              }
+            } catch(eDeep){}
           }
         }catch(e){}
 

@@ -403,7 +403,12 @@
       +   nav
       +   dots
       +   (hidePrice || !price ? '' : '<div class="rzq-adx-price"><span class="rzq-adx-price-pill">' + esc(price) + '</span></div>')
-      +   (pin ? '<div class="rzq-adx-badge">' + (fr ? 'Vedette' : 'مميّز') + '</div>' : '')
+      +   (function(){
+            var custom = opts.badge || (ad && (ad.homeBadge || ad.stripBadge)) || '';
+            if(custom) return '<div class="rzq-adx-badge">' + esc(String(custom)) + '</div>';
+            if(pin) return '<div class="rzq-adx-badge">' + (fr ? 'Vedette' : 'مميّز') + '</div>';
+            return '';
+          })()
       +   (viewed ? seenHtml(fr) : '')
       + '</div>';
   }
