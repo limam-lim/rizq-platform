@@ -14,7 +14,7 @@
 		X-Frame-Options "DENY"
 		Referrer-Policy "strict-origin-when-cross-origin"
 		Permissions-Policy "camera=(), microphone=(), geolocation=(self), payment=(), usb=()"
-		Content-Security-Policy "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; frame-src 'self' https://www.openstreetmap.org https://openstreetmap.org; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; connect-src 'self' https: wss:;"
+		Content-Security-Policy "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; frame-src 'self' https://www.openstreetmap.org https://openstreetmap.org; img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; font-src 'self' data: https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; connect-src 'self' https: wss:;"
 		Cross-Origin-Opener-Policy "same-origin"
 		Cross-Origin-Resource-Policy "same-site"
 		X-DNS-Prefetch-Control "off"
@@ -70,7 +70,9 @@ rizq.mr, www.rizq.mr {
 			path /*.html
 			path /rizq_*.js
 			path /rizq_*.css
+			path /landing-*.js
 			path /rizq-theme.css
+			path /fonts /fonts/*
 			path /sw.js
 			path /favicon.ico /favicon.svg /favicon-*.png /apple-touch-icon.png
 			path /manifest.json /robots.txt /sitemap.xml
