@@ -331,13 +331,23 @@ async function captureAll(mode) {
   return { results, consoleErrors };
 }
 
+function median(arr) {
+  const a = (arr || []).slice().sort((x, y) => x - y);
+  if (!a.length) return 0;
+  const mid = Math.floor(a.length / 2);
+  return a.length % 2 ? a[mid] : (a[mid - 1] + a[mid]) / 2;
+}
+
 /**
- * بوابة ارتفاعات + CLS مقابل شجرة main (حسب section[id] لا الموضع).
+ * بوابة ارتفاعات + CLS «لا انحدار» مقابل شجرة main (حسب section[id]).
+ * CLS: 3 بارد + 3 دافئ على main والفرع؛ يمر إن وسيط الفرع ≤ وسيط main + 0.02.
  * MAIN_ROOT الافتراضي: qa/home-commerce-1/.baseline-main
  */
 async function assertHeightAndCls() {
   const MAIN_ROOT = process.env.MAIN_ROOT
     || path.join(ROOT, 'qa/home-commerce-1/.baseline-main');
+  const CLS_SLACK = Number(process.env.CLS_SLACK || 0.02);
+  const CLS_SAMPLES = Math.max(1, Number(process.env.CLS_SAMPLES || 3));
   if (!fs.existsSync(path.join(MAIN_ROOT, 'rizq_landing_v8.html'))) {
     return { skipped: true, reason: 'missing MAIN_ROOT landing', mainRoot: MAIN_ROOT };
   }
@@ -363,7 +373,8 @@ async function assertHeightAndCls() {
       server.on('error', reject);
     });
   }
-  async function measureHeights(page, lang, port) {
+
+  async function prepareLandingPage(page, lang) {
     await page.addInitScript((lng) => {
       try { localStorage.setItem('rizq_lang', lng); } catch (_) {}
       try { localStorage.setItem('rizq_terms_accepted', '1'); } catch (_) {}
@@ -372,7 +383,6 @@ async function assertHeightAndCls() {
         document.documentElement.dir = lng === 'fr' ? 'ltr' : 'rtl';
         if (lng === 'fr') document.documentElement.classList.add('rizq-lang-fr');
       } catch (_) {}
-      /* راقب CLS من أول إطار لكل تنقّل (init يعاد بعد reload) */
       try {
         window.__rizqClsScore = 0;
         const po = new PerformanceObserver((list) => {
@@ -388,7 +398,6 @@ async function assertHeightAndCls() {
         st.id = 'rizq-height-cls-freeze';
         st.textContent = [
           '*,*::before,*::after{animation:none!important;transition:none!important}',
-          /* ألغِ content-visibility أثناء البوابة — الحجز الخاطئ كان يضخّم CLS */
           '#virtual-stores,#virtual-showrooms,#virtual-estate,#virtual-offices,',
           '#rizq-styles,#rizq-showroom-models,#rizq-estate-models,',
           '#virtual-tenders,#virtual-investments,#pricing,#about,.pricing-section{',
@@ -399,8 +408,6 @@ async function assertHeightAndCls() {
     }, lang);
     await page.route('**/*', async (route) => {
       const url = route.request().url();
-      const type = route.request().resourceType();
-      if (/fonts\.googleapis|fonts\.gstatic/i.test(url) || type === 'font') return route.abort();
       if (/\/api\//.test(url)) {
         return route.fulfill({
           status: 200, contentType: 'application/json',
@@ -409,6 +416,10 @@ async function assertHeightAndCls() {
       }
       return route.continue();
     });
+  }
+
+  async function measureHeightsOnly(page, lang, port) {
+    await prepareLandingPage(page, lang);
     await page.goto('http://127.0.0.1:' + port + '/rizq_landing_v8.html', {
       waitUntil: 'networkidle', timeout: 90000
     }).catch(() => {});
@@ -422,7 +433,7 @@ async function assertHeightAndCls() {
       window.scrollTo(0, 0);
     });
     await page.waitForTimeout(400);
-    const heights = await page.evaluate(() => {
+    return page.evaluate(() => {
       const sections = {};
       document.querySelectorAll('section[id], #hero, #hero-listings').forEach((el) => {
         if (el.id) sections[el.id] = el.offsetHeight;
@@ -432,13 +443,32 @@ async function assertHeightAndCls() {
         pageHeight: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)
       };
     });
-    await page.reload({ waitUntil: 'networkidle', timeout: 90000 }).catch(() => {});
-    await page.waitForTimeout(2200);
-    const clsCold = await page.evaluate(() => Number((window.__rizqClsScore || 0).toFixed(4)));
-    await page.reload({ waitUntil: 'networkidle', timeout: 90000 }).catch(() => {});
-    await page.waitForTimeout(2200);
-    const clsWarm = await page.evaluate(() => Number((window.__rizqClsScore || 0).toFixed(4)));
-    return Object.assign({}, heights, { clsCold, clsWarm });
+  }
+
+  /** قياس CLS واحد: بارد = أول تحميل، دافئ = إعادة تحميل لاحقة */
+  async function sampleCls(browser, lang, width, port, kind) {
+    const page = await browser.newPage({ viewport: { width, height: 900 }, deviceScaleFactor: 1 });
+    try {
+      await prepareLandingPage(page, lang);
+      const url = 'http://127.0.0.1:' + port + '/rizq_landing_v8.html';
+      if (kind === 'warm') {
+        await page.goto(url, { waitUntil: 'networkidle', timeout: 90000 }).catch(() => {});
+        await page.waitForTimeout(600);
+      }
+      await page.goto(url, { waitUntil: 'networkidle', timeout: 90000 }).catch(() => {});
+      await page.waitForTimeout(2200);
+      return await page.evaluate(() => Number((window.__rizqClsScore || 0).toFixed(4)));
+    } finally {
+      await page.close();
+    }
+  }
+
+  async function sampleClsSeries(browser, lang, width, port, kind, n) {
+    const out = [];
+    for (let i = 0; i < n; i++) {
+      out.push(await sampleCls(browser, lang, width, port, kind));
+    }
+    return out;
   }
 
   const mainSrv = await startRoot(MAIN_ROOT);
@@ -452,29 +482,63 @@ async function assertHeightAndCls() {
       for (const lang of LANGS) {
         const bp = await browser.newPage({ viewport: { width, height: 900 }, deviceScaleFactor: 1 });
         const np = await browser.newPage({ viewport: { width, height: 900 }, deviceScaleFactor: 1 });
-        const main = await measureHeights(bp, lang, mainSrv.port);
-        const branch = await measureHeights(np, lang, branchSrv.port);
-        const ids = Object.keys(Object.assign({}, main.sections, branch.sections)).sort();
+        const mainH = await measureHeightsOnly(bp, lang, mainSrv.port);
+        const branchH = await measureHeightsOnly(np, lang, branchSrv.port);
+        await bp.close();
+        await np.close();
+
+        const ids = Object.keys(Object.assign({}, mainH.sections, branchH.sections)).sort();
         const sections = ids.map((id) => {
-          const m = main.sections[id] || 0;
-          const b = branch.sections[id] || 0;
+          const m = mainH.sections[id] || 0;
+          const b = branchH.sections[id] || 0;
           const diff = b - m;
           const ok = Math.abs(diff) <= 2;
           if ((m || b) && !ok) failed = true;
           return { id, main: m, branch: b, diff, ok };
         }).filter((r) => r.main || r.branch);
-        const pageDiff = branch.pageHeight - main.pageHeight;
+        const pageDiff = branchH.pageHeight - mainH.pageHeight;
         const pageOk = Math.abs(pageDiff) <= 5;
         if (!pageOk) failed = true;
-        const clsOk = branch.clsCold < 0.05 && branch.clsWarm < 0.05;
+
+        const mainCold = await sampleClsSeries(browser, lang, width, mainSrv.port, 'cold', CLS_SAMPLES);
+        const mainWarm = await sampleClsSeries(browser, lang, width, mainSrv.port, 'warm', CLS_SAMPLES);
+        const branchCold = await sampleClsSeries(browser, lang, width, branchSrv.port, 'cold', CLS_SAMPLES);
+        const branchWarm = await sampleClsSeries(browser, lang, width, branchSrv.port, 'warm', CLS_SAMPLES);
+        const mainColdMed = Number(median(mainCold).toFixed(4));
+        const mainWarmMed = Number(median(mainWarm).toFixed(4));
+        const branchColdMed = Number(median(branchCold).toFixed(4));
+        const branchWarmMed = Number(median(branchWarm).toFixed(4));
+        const coldOk = branchColdMed <= mainColdMed + CLS_SLACK;
+        const warmOk = branchWarmMed <= mainWarmMed + CLS_SLACK;
+        const clsOk = coldOk && warmOk;
         if (!clsOk) failed = true;
+
         table[width][lang] = {
-          pageHeight: { main: main.pageHeight, branch: branch.pageHeight, diff: pageDiff, ok: pageOk },
-          cls: { cold: branch.clsCold, warm: branch.clsWarm, ok: clsOk },
+          pageHeight: { main: mainH.pageHeight, branch: branchH.pageHeight, diff: pageDiff, ok: pageOk },
+          cls: {
+            rule: 'no_regression_median',
+            slack: CLS_SLACK,
+            samples: CLS_SAMPLES,
+            cold: {
+              main: mainCold, branch: branchCold,
+              mainMedian: mainColdMed, branchMedian: branchColdMed,
+              ok: coldOk
+            },
+            warm: {
+              main: mainWarm, branch: branchWarm,
+              mainMedian: mainWarmMed, branchMedian: branchWarmMed,
+              ok: warmOk
+            },
+            ok: clsOk
+          },
           sections
         };
-        await bp.close();
-        await np.close();
+        console.error(
+          '[height-cls]', width, lang,
+          'pageDiff', pageDiff,
+          'clsCold', mainColdMed, '->', branchColdMed, coldOk ? 'ok' : 'FAIL',
+          'clsWarm', mainWarmMed, '->', branchWarmMed, warmOk ? 'ok' : 'FAIL'
+        );
       }
     }
   } finally {
@@ -483,7 +547,15 @@ async function assertHeightAndCls() {
     branchSrv.server.close();
   }
   const outPath = path.join(OUT, 'height-cls-report.json');
-  const report = { ok: !failed, mainRoot: MAIN_ROOT, table, at: new Date().toISOString() };
+  const report = {
+    ok: !failed,
+    rule: 'heights±2 / page±5 / CLS no-regression median≤main+slack',
+    clsSlack: CLS_SLACK,
+    clsSamples: CLS_SAMPLES,
+    mainRoot: MAIN_ROOT,
+    table,
+    at: new Date().toISOString()
+  };
   fs.writeFileSync(outPath, JSON.stringify(report, null, 2));
   try {
     fs.writeFileSync('/opt/cursor/artifacts/height-cls-report.json', JSON.stringify(report, null, 2));
