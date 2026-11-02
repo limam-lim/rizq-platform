@@ -395,10 +395,30 @@
   function renderBuiltinGrid(grid) {
     if (!grid) return;
     var mount = grid.querySelector('#builtin-cats-mount');
-    if (!mount) return;
-    var html = BUILTIN.map(buildCatCardHtml).join('');
-    mount.insertAdjacentHTML('beforebegin', html);
-    mount.remove();
+    if (!mount) {
+      /* إعادة دخول بعد الرسم — أنشئ المثبت دون تفريغ الشبكة الظاهرة */
+      mount = document.createElement('div');
+      mount.id = 'builtin-cats-mount';
+      try { mount.style.display = 'contents'; } catch (eDisp) { /* */ }
+      var panel = grid.querySelector('#cat-inline-panel');
+      var extras = grid.querySelectorAll('.cat-card[data-extra="1"], .cat-card[data-suggest="1"]');
+      grid.querySelectorAll('.cat-card:not([data-extra="1"]):not([data-suggest="1"])').forEach(function (c) {
+        c.remove();
+      });
+      if (panel) grid.insertBefore(mount, panel);
+      else if (extras[0]) grid.insertBefore(mount, extras[0]);
+      else grid.appendChild(mount);
+    }
+    /* ابنِ خارج الصفحة ثم استبدل دفعة واحدة — بلا تفريغ مرئي أثناء البناء */
+    var tmp = document.createElement('div');
+    tmp.innerHTML = BUILTIN.map(buildCatCardHtml).join('');
+    var nodes = Array.prototype.slice.call(tmp.childNodes);
+    if (typeof mount.replaceChildren === 'function') {
+      mount.replaceChildren.apply(mount, nodes);
+    } else {
+      while (mount.firstChild) mount.removeChild(mount.firstChild);
+      nodes.forEach(function (n) { mount.appendChild(n); });
+    }
   }
 
   function catNamesArrays() {

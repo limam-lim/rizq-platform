@@ -33,7 +33,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.88';
+    link.href = 'rizq_header_mockup_trial.css?v=5.89';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -60,17 +60,87 @@
 
   function mockHeaderHtml() {
     var h = navHrefs();
+    var phone = false;
+    try { phone = isPhone(); } catch (ePh) { phone = false; }
+    var moreMenu =
+      '<div class="rmh-more-wrap" data-rmh="more">' +
+      '<button type="button" class="rmh-more-btn" id="rmh-more-btn" aria-haspopup="true" aria-expanded="false" aria-controls="rmh-more-menu">' +
+      '<span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/></svg></span>' +
+      '<span class="rmh-more-lbl">المزيد</span></button>' +
+      '<div class="rmh-more-menu" id="rmh-more-menu" role="menu" hidden>' +
+      (phone ? '<a href="' + h.models + '" class="rmh-more-item" role="menuitem" data-rmh="models" data-rmh-phone-only="1"><span aria-hidden="true">▦</span><strong>نماذج</strong></a>' : '') +
+      '<a href="' + h.cats + '" class="rmh-more-item" role="menuitem"><span aria-hidden="true">📂</span><strong>الأقسام</strong></a>' +
+      '<a href="rizq_ads_info.html" class="rmh-more-item" role="menuitem"><span aria-hidden="true">🎬</span><strong>Rizq ADS</strong></a>' +
+      '<a href="rizq_legal.html" class="rmh-more-item" role="menuitem"><span aria-hidden="true">⚖️</span><strong>المواد القانونية</strong></a>' +
+      '<a href="rizq_platform.html#who" class="rmh-more-item" role="menuitem"><span aria-hidden="true">ℹ️</span><strong>من نحن</strong></a>' +
+      '<a href="rizq_platform.html#why" class="rmh-more-item" role="menuitem"><span aria-hidden="true">❓</span><strong>لماذا رزق</strong></a>' +
+      '<a href="rizq_about.html" class="rmh-more-item" role="menuitem"><span aria-hidden="true">🏛️</span><strong>الشركة المالكة</strong></a>' +
+      '</div></div>';
+    var link = function (key, href, label, svg) {
+      return '<a href="' + href + '" data-rmh="' + key + '"><span class="rmh-nav-ico" aria-hidden="true">' + svg + '</span>' + label + '</a>';
+    };
+    var post = '<a class="rmh-post-nav" href="' + h.post + '" data-rmh="post"><span class="rmh-nav-ico rmh-post-plus" aria-hidden="true">+</span><span class="rmh-post-lbl">انشر إعلان</span></a>';
+    var svgHome = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7.2 14.2 12 12 16.8 9.8 12Z"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg>';
+    var svgAds = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10v4h2l5 3V7L6 10H4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 7a7 7 0 0 1 0 10"/></svg>';
+    var svgStores = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10 6 5h12l2 5"/><path d="M4 10v9h16v-9"/><path d="M9 19v-5h6v5"/></svg>';
+    var svgShow = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="7" width="16" height="12" rx="1"/><path d="M8 7V5h8v2M8 11h.01M12 11h.01M16 11h.01M8 15h8"/></svg>';
+    var svgEstate = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V10l8-6 8 6v10"/><path d="M10 20v-6h4v6"/></svg>';
+    var svgOff = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="16" height="11" rx="1"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M4 13h16"/></svg>';
+    var svgPulse = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h3l2-5 3 10 2-5h5"/><path d="M18 12h3"/></svg>';
+    var svgTend = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 4h8a2 2 0 0 1 2 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h6"/></svg>';
+    var svgInv = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 18V6M4 18h16"/><path d="M7 14l4-4 3 3 5-6"/></svg>';
+    var svgMod = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg>';
+    var navHtml;
+    if (phone) {
+      try { document.body && document.body.classList.add('rmh-phone-nav-split'); } catch (eCls) {}
+      navHtml =
+        '<nav class="rmh-nav rmh-nav-top" id="rmh-nav-top" aria-label="أقسام رزق — أعلى">' +
+        link('offices', h.offices, 'المكاتب', svgOff) +
+        link('pulse', h.pulse, 'نبض السوق', svgPulse) +
+        post +
+        link('investments', h.investments, 'الاستثمارات', svgInv) +
+        link('tenders', h.tenders, 'المناقصات', svgTend) +
+        moreMenu +
+        '</nav>' +
+        '<nav class="rmh-nav" aria-label="أقسام رزق">' +
+        link('home', h.home, 'الرئيسية', svgHome) +
+        link('ads', h.ads, 'الإعلانات', svgAds) +
+        link('stores', h.stores, 'المحلات', svgStores) +
+        link('showrooms', h.showrooms, 'المعارض والمصانع', svgShow) +
+        link('estate', h.estate, 'سوق العقارات', svgEstate) +
+        '</nav>';
+    } else {
+      navHtml =
+        '<nav class="rmh-nav" aria-label="أقسام رزق">' +
+        link('home', h.home, 'الرئيسية', svgHome) +
+        link('ads', h.ads, 'الإعلانات', svgAds) +
+        link('stores', h.stores, 'المحلات', svgStores) +
+        link('showrooms', h.showrooms, 'المعارض والمصانع', svgShow) +
+        link('estate', h.estate, 'سوق العقارات', svgEstate) +
+        post +
+        link('offices', h.offices, 'المكاتب', svgOff) +
+        link('pulse', h.pulse, 'نبض السوق', svgPulse) +
+        link('tenders', h.tenders, 'المناقصات', svgTend) +
+        link('investments', h.investments, 'الاستثمارات', svgInv) +
+        link('models', h.models, 'نماذج', svgMod) +
+        moreMenu +
+        '</nav>';
+    }
     return '' +
-      '<header id="rizq-mock-hdr" aria-label="شريط رزق">' +
+      '<header id="rizq-mock-hdr" aria-label="شريط رزق" style="position:fixed;top:0;left:0;right:0;z-index:10050;overflow:hidden;box-sizing:border-box">' +
       '<div class="rmh-util" hidden></div>' +
-      '<div class="ticker-wrap is-empty civic-ticker-wrap rmh-ticker" id="ticker-wrap" role="marquee" aria-label="إعلانات خدمة عامة">' +
+      '<div class="ticker-wrap is-empty civic-ticker-wrap rmh-ticker" id="ticker-wrap" role="marquee" aria-label="إعلانات خدمة عامة" style="position:relative;min-height:42px;height:42px;max-height:42px;overflow:hidden;box-sizing:border-box;margin:0;width:100%">' +
       '<div class="ticker-inner" id="ticker"></div></div>' +
-      '<div class="rmh-main">' +
+      (phone
+        ? '<div class="rmh-main" style="display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:\'brand . tools\' \'search search search\';gap:6px 8px;padding:8px 10px 7px;align-items:center;box-sizing:border-box">'
+        : '<div class="rmh-main" style="display:grid;grid-template-columns:minmax(120px,1fr) minmax(280px,460px) minmax(120px,1fr);align-items:center;gap:12px;padding:8px 20px;min-height:90px;box-sizing:border-box">') +
       '<a class="rmh-brand logo" href="rizq_landing_v8.html" aria-label="رزق" id="rmh-brand">' +
       '<img class="logo-mark-img rmh-mark" src="rizq-mark-inset.png?v=1" width="44" height="44" alt="رزق" decoding="async"/>' +
       '<div class="logo-text rmh-brand-text"><span class="logo-ar rmh-brand-ar">رزق</span>' +
       '<span class="logo-sub rmh-brand-sub">RIZQ PLATFORM</span></div></a>' +
-      '<form class="rmh-search" id="rmh-search-form" action="rizq_browse.html" method="get" role="search">' +
+      (phone
+        ? '<form class="rmh-search" id="rmh-search-form" action="rizq_browse.html" method="get" role="search" style="grid-column:1/-1;grid-row:2;min-height:34px;height:34px;max-height:34px;overflow:hidden;box-sizing:border-box;width:100%">'
+        : '<form class="rmh-search" id="rmh-search-form" action="rizq_browse.html" method="get" role="search" style="grid-column:2;min-height:74px;height:74px;max-height:74px;overflow:hidden;box-sizing:border-box;align-self:center">') +
       '<select class="rmh-search-cat" id="rmh-search-cat" name="cat" aria-label="كل الأقسام"><option value="">كل الأقسام</option></select>' +
       '<input class="rmh-search-input" id="rmh-search-q" type="search" name="q" autocomplete="off" ' +
       'placeholder="ابحث عن سيارة، شقة، محل، مكتب..." data-ph-fr="Cherchez une voiture, un appartement, un magasin, un bureau..." data-ph-fr-phone="Voiture, appart, boutiqu"/>' +
@@ -96,31 +166,8 @@
       '<a class="rizq-help-dd-item" role="menuitem" href="rizq_legal.html#s10"><span class="rizq-help-dd-item-lbl">اتصل بنا</span></a>' +
       '<a class="rizq-help-dd-item" role="menuitem" href="rizq_help.html"><span class="rizq-help-dd-item-lbl">مركز المساعدة</span></a>' +
       '</div></div></div></div>' +
-      '<nav class="rmh-nav" aria-label="أقسام رزق">' +
-      '<a href="' + h.home + '" data-rmh="home"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7.2 14.2 12 12 16.8 9.8 12Z"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg></span>الرئيسية</a>' +
-      '<a href="' + h.ads + '" data-rmh="ads"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10v4h2l5 3V7L6 10H4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 7a7 7 0 0 1 0 10"/></svg></span>الإعلانات</a>' +
-      '<a href="' + h.stores + '" data-rmh="stores"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 10 6 5h12l2 5"/><path d="M4 10v9h16v-9"/><path d="M9 19v-5h6v5"/></svg></span>المحلات</a>' +
-      '<a href="' + h.showrooms + '" data-rmh="showrooms"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="7" width="16" height="12" rx="1"/><path d="M8 7V5h8v2M8 11h.01M12 11h.01M16 11h.01M8 15h8"/></svg></span>المعارض والمصانع</a>' +
-      '<a href="' + h.estate + '" data-rmh="estate"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V10l8-6 8 6v10"/><path d="M10 20v-6h4v6"/></svg></span>سوق العقارات</a>' +
-      '<a class="rmh-post-nav" href="' + h.post + '" data-rmh="post"><span class="rmh-nav-ico rmh-post-plus" aria-hidden="true">+</span><span class="rmh-post-lbl">انشر إعلان</span></a>' +
-      '<a href="' + h.offices + '" data-rmh="offices"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="8" width="16" height="11" rx="1"/><path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M4 13h16"/></svg></span>المكاتب</a>' +
-      /* حاسوب/تابلت: بعد المكاتب — هاتف: بين المكاتب والاستثمارات عبر RMH_NAV_TOP_ORDER */
-      '<a href="' + h.pulse + '" data-rmh="pulse"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 12h3l2-5 3 10 2-5h5"/><path d="M18 12h3"/></svg></span>نبض السوق</a>' +
-      '<a href="' + h.tenders + '" data-rmh="tenders"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 4h8a2 2 0 0 1 2 2v14l-3-2-3 2-3-2-3 2V6a2 2 0 0 1 2-2z"/><path d="M9 9h6M9 13h6"/></svg></span>المناقصات</a>' +
-      '<a href="' + h.investments + '" data-rmh="investments"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 18V6M4 18h16"/><path d="M7 14l4-4 3 3 5-6"/></svg></span>الاستثمارات</a>' +
-      '<a href="' + h.models + '" data-rmh="models"><span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></svg></span>نماذج</a>' +
-      '<div class="rmh-more-wrap" data-rmh="more">' +
-      '<button type="button" class="rmh-more-btn" id="rmh-more-btn" aria-haspopup="true" aria-expanded="false" aria-controls="rmh-more-menu">' +
-      '<span class="rmh-nav-ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/></svg></span>' +
-      '<span class="rmh-more-lbl">المزيد</span></button>' +
-      '<div class="rmh-more-menu" id="rmh-more-menu" role="menu" hidden>' +
-      '<a href="' + h.cats + '" class="rmh-more-item" role="menuitem"><span aria-hidden="true">📂</span><strong>الأقسام</strong></a>' +
-      '<a href="rizq_ads_info.html" class="rmh-more-item" role="menuitem"><span aria-hidden="true">🎬</span><strong>Rizq ADS</strong></a>' +
-      '<a href="rizq_legal.html" class="rmh-more-item" role="menuitem"><span aria-hidden="true">⚖️</span><strong>المواد القانونية</strong></a>' +
-      '<a href="rizq_platform.html#who" class="rmh-more-item" role="menuitem"><span aria-hidden="true">ℹ️</span><strong>من نحن</strong></a>' +
-      '<a href="rizq_platform.html#why" class="rmh-more-item" role="menuitem"><span aria-hidden="true">❓</span><strong>لماذا رزق</strong></a>' +
-      '<a href="rizq_about.html" class="rmh-more-item" role="menuitem"><span aria-hidden="true">🏛️</span><strong>الشركة المالكة</strong></a>' +
-      '</div></div></nav></header>';
+      navHtml +
+      '</header>';
   }
 
   function migrateCartToLink() {
@@ -187,16 +234,80 @@
     __rmhNavSlots = null;
   }
 
+  function lockSearchFormSize() {
+    var form = document.getElementById('rmh-search-form');
+    var main = document.querySelector('#rizq-mock-hdr .rmh-main');
+    var hdr = document.getElementById('rizq-mock-hdr');
+    var phone = false;
+    try { phone = isPhone(); } catch (eP) { phone = false; }
+    var h = phone ? '34px' : '74px';
+    try {
+      if (form) {
+        form.style.setProperty('min-height', h, 'important');
+        form.style.setProperty('height', h, 'important');
+        form.style.setProperty('max-height', h, 'important');
+        form.style.setProperty('overflow', 'hidden', 'important');
+        form.style.setProperty('box-sizing', 'border-box', 'important');
+        if (phone) {
+          /* أزل قيود سطح المكتب المضمّنة — كانت تتصارع مع شبكة الهاتف عند 768 */
+          form.style.removeProperty('grid-column');
+          form.style.removeProperty('align-self');
+          form.style.setProperty('grid-column', '1 / -1', 'important');
+          form.style.setProperty('grid-row', '2', 'important');
+          form.style.setProperty('width', '100%', 'important');
+          form.style.setProperty('transform', 'none', 'important');
+        } else {
+          form.style.setProperty('grid-column', '2', 'important');
+          form.style.setProperty('align-self', 'center', 'important');
+        }
+      }
+      if (main) {
+        if (phone) {
+          main.style.removeProperty('grid-template-columns');
+          main.style.setProperty('display', 'grid', 'important');
+          main.style.setProperty('grid-template-columns', 'auto minmax(0,1fr) auto', 'important');
+          main.style.setProperty('grid-template-areas', '"brand . tools" "search search search"', 'important');
+          main.style.setProperty('gap', '6px 8px', 'important');
+          main.style.setProperty('padding', '8px 10px 7px', 'important');
+          main.style.setProperty('min-height', '0', 'important');
+        } else {
+          main.style.setProperty('display', 'grid', 'important');
+          main.style.setProperty('grid-template-columns', 'minmax(120px,1fr) minmax(280px,460px) minmax(120px,1fr)', 'important');
+          main.style.setProperty('align-items', 'center', 'important');
+          main.style.setProperty('gap', '12px', 'important');
+          main.style.setProperty('padding', '8px 20px', 'important');
+          main.style.setProperty('min-height', '90px', 'important');
+          main.style.removeProperty('grid-template-areas');
+        }
+      }
+      if (hdr) {
+        if (phone) {
+          hdr.style.setProperty('max-height', '210px', 'important');
+          hdr.style.setProperty('overflow', 'hidden', 'important');
+        } else {
+          hdr.style.setProperty('max-height', '203px', 'important');
+          hdr.style.setProperty('overflow', 'hidden', 'important');
+        }
+      }
+    } catch (eL) {}
+  }
+
   function ensureMockHeader() {
     if (document.getElementById('rizq-mock-hdr')) {
       try { migrateCartToLink(); } catch (eM) {}
       try { ensurePulseNavLink(); } catch (eP) {}
       applyNavHrefs();
       markActiveFromPage();
+      try { syncPhoneNavSplit(); } catch (eSp) {}
+      /* لا تعِد كتابة شبكة .rmh-main إن الهيدر مضمّن في HTML (الصفحة الرئيسية) —
+         كان lockSearchFormSize يتصارع مع FOUC ويُحدث تذبذب CLS عند reload */
       return;
     }
     document.body.insertAdjacentHTML('afterbegin', mockHeaderHtml());
     markActiveFromPage();
+    /* قسّم + اقفل شبكة الهاتف/المكتب فوراً قبل الإطار التالي */
+    try { syncPhoneNavSplit(); } catch (eSp2) {}
+    try { lockSearchFormSize(); } catch (eSf2) {}
   }
 
   function applyNavHrefs() {
@@ -457,6 +568,7 @@
     if (document.documentElement.lang !== wantLang) document.documentElement.lang = wantLang;
     if (document.documentElement.getAttribute('dir') !== wantDir) document.documentElement.setAttribute('dir', wantDir);
     document.body.classList.toggle('rizq-lang-fr', fr);
+    document.body.classList.toggle('rizq-lang-ar', !fr);
 
     var nav = {
       home: ['الرئيسية', 'Accueil'],
@@ -640,8 +752,8 @@
         } catch (eB) {}
         document.dispatchEvent(new CustomEvent('rizq:langchange', { bubbles: true, detail: { lang: next } }));
       }
-      setTimeout(applyMockLang, 30);
-      setTimeout(applyMockLang, 200);
+      setTimeout(applyMockLang, 1800);
+      setTimeout(applyMockLang, 3200);
     }, true);
 
     document.addEventListener('rizq:langchange', function () {
@@ -1176,7 +1288,14 @@
 
   function captureNavSlots(bottomNav) {
     if (__rmhNavSlots || !bottomNav) return;
-    __rmhNavSlots = Array.prototype.map.call(bottomNav.children, function (el) {
+    var hdr = document.getElementById('rizq-mock-hdr');
+    var topNav = hdr ? document.getElementById('rmh-nav-top') : null;
+    var nodes = [];
+    if (topNav) {
+      Array.prototype.forEach.call(topNav.children, function (el) { nodes.push(el); });
+    }
+    Array.prototype.forEach.call(bottomNav.children, function (el) { nodes.push(el); });
+    __rmhNavSlots = nodes.map(function (el) {
       var key = el.getAttribute('data-rmh');
       if (!key && el.classList && el.classList.contains('rmh-more-wrap')) key = 'more';
       return { key: key || '', el: el };
@@ -1226,6 +1345,12 @@
         topNav.parentNode && topNav.parentNode.removeChild(topNav);
       }
       document.body.classList.remove('rmh-phone-nav-split');
+      try {
+        bottomNav.style.setProperty('height', '85px', 'important');
+        bottomNav.style.setProperty('max-height', '85px', 'important');
+        bottomNav.style.setProperty('min-height', '85px', 'important');
+        bottomNav.style.setProperty('overflow', 'hidden', 'important');
+      } catch (eH) {}
       syncPhoneModelsInMore();
       return;
     }
@@ -1280,33 +1405,35 @@
       window.__rmhWasPhoneFr = phoneNow;
       try { applyMockLang(); } catch (eLang) {}
     }
-    var main = hdr.querySelector('.rmh-main');
-    var ticker = hdr.querySelector('.ticker-wrap:not(.is-empty)');
-    var topNav = document.getElementById('rmh-nav-top');
-    var bottomNav = hdr.querySelector('nav.rmh-nav:not(.rmh-nav-top)');
-    var topH;
-    if (isPhone() && main) {
-      topH = Math.ceil(main.getBoundingClientRect().height || 44);
-      if (ticker) topH += Math.ceil(ticker.getBoundingClientRect().height || 0);
-      if (topNav) topH += Math.ceil(topNav.getBoundingClientRect().height || 48);
-      topH = Math.max(topH, 96);
-      document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
-      /* browse/detail + legacy chrome read --rizq-header-h — keep it in sync with mock top bar */
-      document.body.style.setProperty('--rizq-header-h', topH + 'px');
-      document.documentElement.style.setProperty('--rizq-header-h', topH + 'px');
-      if (bottomNav) {
-        var nh = Math.ceil(bottomNav.getBoundingClientRect().height || 64);
-        document.body.style.setProperty('--rizq-mock-nav-h', nh + 'px');
-        /* نفس الارتفاع لـ thumb-dock-h حتى تبقى العوامات (ويدجت) فوق الشريط */
-        document.body.style.setProperty('--rizq-thumb-dock-h', nh + 'px');
+    /*
+     * ثبات CLS: لا تُحدّث --rizq-mock-hdr-h من القياس الحيّ (خطوط/ResizeObserver كانت
+     * ترفع الحجز 210→230 وتزيح .hero). القيم تُطابق CSS الحرج لكل عرض.
+     */
+    var PHONE_H = 210;
+    /* هيكل الهيدر ~203؛ حجز التدفق = 203+12 فجوة = 215 — لا تضبط --rizq-header-h على 203 وحدها */
+    var DESK_HDR = 203;
+    var DESK_PAD = 215;
+    var mode = phoneNow ? 'phone' : 'desk';
+    var hdrPx = phoneNow ? PHONE_H : DESK_HDR;
+    var padPx = phoneNow ? PHONE_H : DESK_PAD;
+    if (window.__rmhHdrMode !== mode || window.__rmhLastHdrH !== hdrPx) {
+      window.__rmhHdrMode = mode;
+      window.__rmhLastHdrH = hdrPx;
+      document.body.style.setProperty('--rizq-mock-hdr-h', hdrPx + 'px');
+      document.body.style.setProperty('--rizq-header-h', padPx + 'px');
+      document.documentElement.style.setProperty('--rizq-header-h', padPx + 'px');
+      document.documentElement.style.setProperty('--rizq-mock-hdr-h', hdrPx + 'px');
+      if (!phoneNow) {
+        document.body.style.setProperty('--rizq-mock-hdr-gap', '12px');
+        document.documentElement.style.setProperty('--rizq-mock-hdr-gap', '12px');
       }
-      return;
     }
-    var h = measureMockHdrExtent(hdr) || Math.ceil(hdr.getBoundingClientRect().height || 196);
-    document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
-    /* Sync legacy --rizq-header-h so .browse-right inset / detail max-height clear the capsule */
-    document.body.style.setProperty('--rizq-header-h', h + 'px');
-    document.documentElement.style.setProperty('--rizq-header-h', h + 'px');
+    if (phoneNow) {
+      var nh = 80;
+      document.body.style.setProperty('--rizq-mock-nav-h', nh + 'px');
+      document.documentElement.style.setProperty('--rizq-mock-nav-h', nh + 'px');
+      document.body.style.setProperty('--rizq-thumb-dock-h', nh + 'px');
+    }
   }
 
   function ensureHeroTagline() {
@@ -1392,7 +1519,16 @@
     renderCartPanel();
     wireCart();
     wireLang();
-    applyMockLang();
+    /* لا تستدعِ applyMockLang عند الإقلاع إذا الصفحة عربية كما في HTML — كانت تعيد كتابة DOM فتُحدث CLS */
+    try {
+      if (currentMockLang() === 'fr') {
+        if (typeof requestIdleCallback === 'function') {
+          requestIdleCallback(function () { try { applyMockLang(); } catch (eL0) {} }, { timeout: 4000 });
+        } else {
+          setTimeout(function () { try { applyMockLang(); } catch (eL1) {} }, 500);
+        }
+      }
+    } catch (eBootLang) {}
     wireHelp();
     ensureToolsInteractive();
     wireMore();
@@ -1402,7 +1538,6 @@
     syncMockHdrHeight();
     setTimeout(function () {
       fillCategories();
-      applyMockLang();
       ensureHeroTagline();
       syncMockHdrHeight();
       markActiveFromPage();
@@ -1451,5 +1586,9 @@
     ensureMockCss();
     ensureMockHeader();
     bootMockHeader();
+    try {
+      var sc = document.querySelector('script[src*="rizq_header_mockup_trial.js"]');
+      if (sc) sc.setAttribute('data-rmh-booted', '1');
+    } catch (eMark) {}
   });
 })();
