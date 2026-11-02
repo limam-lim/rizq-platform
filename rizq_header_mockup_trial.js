@@ -1432,18 +1432,11 @@
     var topH;
     var reserved = _cssHdrReservePx();
     if (phoneNow && mainEl) {
-      topH = Math.ceil(mainEl.getBoundingClientRect().height || 44);
-      if (ticker) topH += Math.ceil(ticker.getBoundingClientRect().height || 0);
-      if (topNav) topH += Math.ceil(topNav.getBoundingClientRect().height || 48);
-      topH = Math.max(topH, 96);
-      /* لا تحرّك padding إن الحجز CSS ≈ القياس (±2) — يمنع CLS 160↔171 */
-      if (reserved && Math.abs(topH - reserved) <= 2) {
-        topH = reserved;
-      }
-      document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
-      document.body.style.setProperty('--rizq-header-h', topH + 'px');
-      document.documentElement.style.setProperty('--rizq-header-h', topH + 'px');
-      document.documentElement.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
+      /*
+       * هاتف/تابلت: لا تعِد كتابة --rizq-header-h من القياس الحيّ.
+       * FOUC/mobile-critical يحجزان 160 أو 171 من أول إطار؛ إعادة الكتابة
+       * بعد تحميل الخطوط (خصوصاً reload دافئ) كانت تسبب CLS≈1.4.
+       */
       if (bottomNav) {
         var nh = Math.ceil(bottomNav.getBoundingClientRect().height || 64);
         document.body.style.setProperty('--rizq-mock-nav-h', nh + 'px');

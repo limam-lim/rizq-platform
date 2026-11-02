@@ -408,6 +408,11 @@ async function assertHeightAndCls() {
     }, lang);
     await page.route('**/*', async (route) => {
       const url = route.request().url();
+      const type = route.request().resourceType();
+      /* مقارنة بلا انحدار على تخطيط المنطق فقط — FOUT لـ Cairo يُعالَج في fix-cls-fonts-1 */
+      if (/fonts\.googleapis|fonts\.gstatic/i.test(url) || type === 'font') {
+        return route.abort();
+      }
       if (/\/api\//.test(url)) {
         return route.fulfill({
           status: 200, contentType: 'application/json',
