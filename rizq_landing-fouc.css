@@ -1,18 +1,8 @@
 /* === extracted from <style id="rizq-nav-fouc-guard"> (rizq-nav-fouc-guard) === */
 /* Critical: before external CSS — prevent navy bar + blue link flash on refresh */
-html,body{background:#eef2f8}
-#rizq-mock-hdr{background:#0a1628;color:#fff}
-#rizq-mock-hdr nav.rmh-nav,nav.rmh-nav{
-  display:flex!important;flex-wrap:nowrap;align-items:center;gap:2px;
-  background:#0a1628!important;background-image:none!important;color:#fff!important;
-  overflow-x:auto;-webkit-overflow-scrolling:touch
-}
-#rizq-mock-hdr nav.rmh-nav a,nav.rmh-nav a{
-  color:#fff!important;-webkit-text-fill-color:#fff!important;text-decoration:none!important;
-  flex:0 0 auto;display:inline-flex!important;flex-direction:column;align-items:center;justify-content:center;
-  gap:2px;padding:6px 8px;font-size:11px;font-weight:700;line-height:1.15;white-space:nowrap;min-width:64px;box-sizing:border-box
-}
-#rizq-mock-hdr nav.rmh-nav a .rmh-nav-ico,nav.rmh-nav a .rmh-nav-ico,
-#rizq-mock-hdr nav.rmh-nav a.is-active .rmh-nav-ico,nav.rmh-nav a.is-active .rmh-nav-ico{color:#fff!important}
-#rizq-mock-hdr nav.rmh-nav a:hover .rmh-nav-ico,nav.rmh-nav a:hover .rmh-nav-ico{color:#E8C96A!important}
-
+html,body{background:#eef2f8;}
+#rizq-mock-hdr{background:#0a1628;color:#fff;}
+#rizq-mock-hdr nav.rmh-nav,nav.rmh-nav{display:flex;flex-wrap:nowrap;align-items:center;gap:2px;background:#0a1628;background-image:none;color:#fff;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+#rizq-mock-hdr nav.rmh-nav a,nav.rmh-nav a{color:#fff;-webkit-text-fill-color:#fff;text-decoration:none;flex:0 0 auto;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 8px;font-size:11px;font-weight:700;line-height:1.15;white-space:nowrap;min-width:64px;box-sizing:border-box;}
+#rizq-mock-hdr nav.rmh-nav a .rmh-nav-ico,nav.rmh-nav a .rmh-nav-ico, #rizq-mock-hdr nav.rmh-nav a.is-active .rmh-nav-ico,nav.rmh-nav a.is-active .rmh-nav-ico{color:#fff;}
+#rizq-mock-hdr nav.rmh-nav a:hover .rmh-nav-ico,nav.rmh-nav a:hover .rmh-nav-ico{color:#E8C96A;}

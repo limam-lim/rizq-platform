@@ -1,0 +1,21 @@
+[
+  {
+    "section": "rizq_landing-ads-preview.css",
+    "removed": 1,
+    "ok": true,
+    "max": 0.025
+  },
+  {
+    "section": "rizq_landing-fouc.css",
+    "removed": 10,
+    "ok": true,
+    "max": 0.0749
+  },
+  {
+    "section": "rizq_landing-mobile-critical.css",
+    "removed": 70,
+    "ok": false,
+    "reverted": true,
+    "max": 4.0108
+  }
+]
