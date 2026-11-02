@@ -211,6 +211,65 @@ const near = (ms, expected, tolMs) => Math.abs(ms - expected) <= (tolMs || 90000
     const blocked = [r1, r2].filter((r) => r && (r.error === 'already_processed' || r.error === 'not_pending' || r.error === 'claim_failed'));
     ok('concurrent same id: exactly one succeeds', oks.length === 1, { r1: r1 && { ok: r1.ok, error: r1.error }, r2: r2 && { ok: r2.ok, error: r2.error } });
     ok('concurrent same id: other blocked', blocked.length === 1, { r1: r1 && r1.error, r2: r2 && r2.error });
+
+    console.log('\n— concurrent activations (two request ids) — no double credit —');
+    await life.syncAccountPackage({
+      accountId: acc.id,
+      accountName: acc.name,
+      accountType: 'store',
+      pkgName: 'شهرية',
+      packageId: 'st-month',
+      price: 3000,
+      days: 30,
+      periodStart: new Date(now - 20 * DAY).toISOString(),
+      periodEnd: new Date(now + 10 * DAY).toISOString(),
+      activatedBy: 'test',
+      paymentConfirmed: true,
+      paidAt: new Date(now - 20 * DAY).toISOString(),
+      isTrial: false,
+    });
+    const beforeRec = life.getAccountRecord(acc.id);
+    const beforeEnd = beforeRec && beforeRec.periodEnd;
+    const creditSnap = computePackageCredit({
+      switched: true, active: true,
+      oldPrice: 3000, oldDays: 30,
+      periodEnd: new Date(now + 10 * DAY).toISOString(),
+      newPrice: 500, newDays: 30, nowMs: now,
+    });
+    const dualA = {
+      id: 'sub_cred_dA_' + now,
+      status: 'pending', category: 'package', accountId: acc.id, account: acc.name,
+      pkg: 'أساسية', packageId: 'st-basic', price: 0,
+      expectedPrice: 500, listPrice: 500,
+      packageCredit: creditSnap,
+      submittedAt: new Date().toISOString(),
+    };
+    const dualB = {
+      id: 'sub_cred_dB_' + now,
+      status: 'pending', category: 'package', accountId: acc.id, account: acc.name,
+      pkg: 'أساسية', packageId: 'st-basic', price: 0,
+      expectedPrice: 500, listPrice: 500,
+      packageCredit: creditSnap,
+      submittedAt: new Date().toISOString(),
+    };
+    await repos.subRequests.upsert(dualA.id, dualA, { skipBackup: true });
+    await repos.subRequests.upsert(dualB.id, dualB, { skipBackup: true });
+    subIds.push(dualA.id, dualB.id);
+    const [d1, d2] = await Promise.all([
+      activateSubRequest(Object.assign({}, dualA), deps),
+      activateSubRequest(Object.assign({}, dualB), deps),
+    ]);
+    const dualOk = [d1, d2].filter((r) => r && r.ok);
+    const afterRec = await life.getAccountRecord(acc.id);
+    ok('concurrent two ids: at least one activates', dualOk.length >= 1, { d1: d1 && d1.ok, d2: d2 && d2.ok });
+    const skipped = [d1, d2].filter((r) => r && r.skippedDuplicate);
+    /* لا يُمدَّد مرتين بنفس الرصيد — نهاية الفترة ≈ تمديدة واحدة فقط */
+    const expectedEnd = now + creditSnap.totalDays * DAY;
+    ok('concurrent two ids: period not double-extended',
+      afterRec && near(new Date(afterRec.periodEnd).getTime(), expectedEnd, 180000),
+      { end: afterRec && afterRec.periodEnd, expectedDays: creditSnap.totalDays, beforeEnd, dualOk: dualOk.length, skipped: skipped.length });
+    ok('concurrent two ids: one skipped duplicate', skipped.length === 1 || dualOk.length === 1,
+      { skipped: skipped.length, dualOk: dualOk.length });
   } finally {
     for (const id of subIds) {
       try { await repos.subRequests.remove(id); } catch (e) { /* */ }

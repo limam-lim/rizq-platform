@@ -331,6 +331,164 @@ async function captureAll(mode) {
   return { results, consoleErrors };
 }
 
+/**
+ * بوابة ارتفاعات + CLS مقابل شجرة main (حسب section[id] لا الموضع).
+ * MAIN_ROOT الافتراضي: qa/home-commerce-1/.baseline-main
+ */
+async function assertHeightAndCls() {
+  const MAIN_ROOT = process.env.MAIN_ROOT
+    || path.join(ROOT, 'qa/home-commerce-1/.baseline-main');
+  if (!fs.existsSync(path.join(MAIN_ROOT, 'rizq_landing_v8.html'))) {
+    return { skipped: true, reason: 'missing MAIN_ROOT landing', mainRoot: MAIN_ROOT };
+  }
+  const { chromium } = loadPlaywright();
+  function startRoot(root) {
+    return new Promise((resolve, reject) => {
+      const server = http.createServer((req, res) => {
+        try {
+          const u = new URL(req.url, 'http://127.0.0.1');
+          let rel = decodeURIComponent(u.pathname);
+          if (rel === '/') rel = '/rizq_landing_v8.html';
+          const fp = path.normalize(path.join(root, rel.replace(/^\//, '')));
+          if (!fp.startsWith(root) || !fs.existsSync(fp) || fs.statSync(fp).isDirectory()) {
+            res.writeHead(404); res.end('missing'); return;
+          }
+          res.writeHead(200, { 'Content-Type': mime(fp), 'Cache-Control': 'no-store' });
+          fs.createReadStream(fp).pipe(res);
+        } catch (e) {
+          res.writeHead(500); res.end(String(e.message || e));
+        }
+      });
+      server.listen(0, '127.0.0.1', () => resolve({ server, port: server.address().port }));
+      server.on('error', reject);
+    });
+  }
+  async function measureCls(page) {
+    return page.evaluate(() => new Promise((resolve) => {
+      let cls = 0;
+      try {
+        const po = new PerformanceObserver((list) => {
+          list.getEntries().forEach((e) => { if (!e.hadRecentInput) cls += e.value; });
+        });
+        po.observe({ type: 'layout-shift', buffered: true });
+        setTimeout(() => {
+          try { po.disconnect(); } catch (_) {}
+          resolve(Number(cls.toFixed(4)));
+        }, 2000);
+      } catch (_) { resolve(0); }
+    }));
+  }
+  async function measureHeights(page, lang, port) {
+    await page.addInitScript((lng) => {
+      try { localStorage.setItem('rizq_lang', lng); } catch (_) {}
+      try { localStorage.setItem('rizq_terms_accepted', '1'); } catch (_) {}
+      try {
+        document.documentElement.lang = lng;
+        document.documentElement.dir = lng === 'fr' ? 'ltr' : 'rtl';
+      } catch (_) {}
+      try {
+        const st = document.createElement('style');
+        st.textContent = '*,*::before,*::after{animation:none!important;transition:none!important}';
+        (document.head || document.documentElement).appendChild(st);
+      } catch (_) {}
+    }, lang);
+    await page.route('**/*', async (route) => {
+      const url = route.request().url();
+      const type = route.request().resourceType();
+      if (/fonts\.googleapis|fonts\.gstatic/i.test(url) || type === 'font') return route.abort();
+      if (/\/api\//.test(url)) {
+        return route.fulfill({
+          status: 200, contentType: 'application/json',
+          body: JSON.stringify({ ok: true, ads: [], items: [], accounts: [], prices: {}, config: { enabled: false } })
+        });
+      }
+      return route.continue();
+    });
+    await page.goto('http://127.0.0.1:' + port + '/rizq_landing_v8.html?visualGate=1', {
+      waitUntil: 'domcontentloaded', timeout: 60000
+    });
+    await page.waitForTimeout(900);
+    await page.evaluate(async () => {
+      const st = document.createElement('style');
+      st.textContent = '*{content-visibility:visible!important;contain-intrinsic-size:auto!important}';
+      document.head.appendChild(st);
+      const els = Array.from(document.querySelectorAll('section[id], #hero, #hero-listings'));
+      for (const el of els) {
+        el.scrollIntoView({ block: 'center' });
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      }
+      window.scrollTo(0, 0);
+    });
+    await page.waitForTimeout(400);
+    const heights = await page.evaluate(() => {
+      const sections = {};
+      document.querySelectorAll('section[id], #hero, #hero-listings').forEach((el) => {
+        if (el.id) sections[el.id] = el.offsetHeight;
+      });
+      return {
+        sections,
+        pageHeight: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)
+      };
+    });
+    await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => {});
+    await page.waitForTimeout(500);
+    const clsCold = await measureCls(page);
+    await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => {});
+    await page.waitForTimeout(500);
+    const clsWarm = await measureCls(page);
+    return Object.assign({}, heights, { clsCold, clsWarm });
+  }
+
+  const mainSrv = await startRoot(MAIN_ROOT);
+  const branchSrv = await startRoot(ROOT);
+  const browser = await chromium.launch({ headless: true });
+  const table = {};
+  let failed = false;
+  try {
+    for (const width of WIDTHS) {
+      table[width] = {};
+      for (const lang of LANGS) {
+        const bp = await browser.newPage({ viewport: { width, height: 900 }, deviceScaleFactor: 1 });
+        const np = await browser.newPage({ viewport: { width, height: 900 }, deviceScaleFactor: 1 });
+        const main = await measureHeights(bp, lang, mainSrv.port);
+        const branch = await measureHeights(np, lang, branchSrv.port);
+        const ids = Object.keys(Object.assign({}, main.sections, branch.sections)).sort();
+        const sections = ids.map((id) => {
+          const m = main.sections[id] || 0;
+          const b = branch.sections[id] || 0;
+          const diff = b - m;
+          const ok = Math.abs(diff) <= 2;
+          if ((m || b) && !ok) failed = true;
+          return { id, main: m, branch: b, diff, ok };
+        }).filter((r) => r.main || r.branch);
+        const pageDiff = branch.pageHeight - main.pageHeight;
+        const pageOk = Math.abs(pageDiff) <= 5;
+        if (!pageOk) failed = true;
+        const clsOk = branch.clsCold < 0.05 && branch.clsWarm < 0.05;
+        if (!clsOk) failed = true;
+        table[width][lang] = {
+          pageHeight: { main: main.pageHeight, branch: branch.pageHeight, diff: pageDiff, ok: pageOk },
+          cls: { cold: branch.clsCold, warm: branch.clsWarm, ok: clsOk },
+          sections
+        };
+        await bp.close();
+        await np.close();
+      }
+    }
+  } finally {
+    await browser.close();
+    mainSrv.server.close();
+    branchSrv.server.close();
+  }
+  const outPath = path.join(OUT, 'height-cls-report.json');
+  const report = { ok: !failed, mainRoot: MAIN_ROOT, table, at: new Date().toISOString() };
+  fs.writeFileSync(outPath, JSON.stringify(report, null, 2));
+  try {
+    fs.writeFileSync('/opt/cursor/artifacts/height-cls-report.json', JSON.stringify(report, null, 2));
+  } catch (_) {}
+  return report;
+}
+
 async function main() {
   const mode = process.argv[2] || 'compare';
   fs.mkdirSync(OUT, { recursive: true });
@@ -345,6 +503,14 @@ async function main() {
       process.exit(2);
     }
     console.log(JSON.stringify({ ok: true, mode: 'baseline', shots: results.length }, null, 2));
+    return;
+  }
+
+  if (mode === 'heights' || mode === 'height-cls') {
+    const heightReport = await assertHeightAndCls();
+    console.log(JSON.stringify(heightReport, null, 2));
+    if (heightReport.skipped) process.exit(2);
+    if (!heightReport.ok) process.exit(1);
     return;
   }
 
@@ -375,11 +541,15 @@ async function main() {
   const fatal = consoleErrors.filter((e) => !/favicon|Failed to load resource|net::ERR|ResizeObserver/i.test(e.msg));
   if (fatal.length) failed = true;
 
+  const heightReport = await assertHeightAndCls();
+  if (!heightReport.skipped && !heightReport.ok) failed = true;
+
   const report = {
     ok: !failed,
     thresholdPct: THRESHOLD_PCT,
     diffs,
     consoleErrors: fatal,
+    heightCls: heightReport,
     at: new Date().toISOString()
   };
   fs.writeFileSync(path.join(OUT, 'compare-report.json'), JSON.stringify(report, null, 2));

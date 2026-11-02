@@ -209,36 +209,66 @@ async function buildHomeCatalog(opts, deps) {
   }
 
   const {
-    readCatalog,
+    queryHomeCatalogJoin,
     applyPublicCatalogCaps,
     resolveContactGate,
-    queryPublicAccounts,
     isDiamondActive,
+    /* توافق الاختبارات القديمة التي تمرّر readCatalog/queryPublicAccounts */
+    readCatalog,
+    queryPublicAccounts,
   } = deps;
 
-  let accounts = [];
-  if (section === 'styles' || section === 'stores') {
-    const { accounts: stores } = await queryPublicAccounts({ type: 'store', limit: 2000 });
-    accounts = (stores || []).filter(isStoreAccount);
-  } else {
-    const corp = await queryPublicAccounts({ type: 'corp', limit: 2000 });
-    const company = await queryPublicAccounts({ type: 'company', limit: 2000 });
-    const showroom = await queryPublicAccounts({ type: 'showroom', limit: 2000 });
-    const seen = {};
-    accounts = []
-      .concat(corp.accounts || [], company.accounts || [], showroom.accounts || [])
-      .filter((a) => {
-        if (!a || !a.id || seen[a.id]) return false;
-        seen[a.id] = 1;
-        return isShowroomAccount(a);
+  let joined = [];
+  if (typeof queryHomeCatalogJoin === 'function') {
+    const oversample = Math.max(limit * 20, 120);
+    if (section === 'styles' || section === 'stores') {
+      const q = await queryHomeCatalogJoin({
+        accountTypes: ['store', 'shop', 'boutique'],
+        limit: oversample,
+        createdAfterMs: section === 'stores' ? (Date.now() - 24 * 3600 * 1000) : null,
       });
+      joined = q.rows || [];
+    } else {
+      const q = await queryHomeCatalogJoin({
+        accountTypes: ['corp', 'company', 'showroom'],
+        limit: oversample,
+        categoryIlike: cat || 'سيارات',
+      });
+      joined = q.rows || [];
+    }
+  } else {
+    /* مسار اختبار/توافق: بدون SQL JOIN */
+    let accounts = [];
+    if (section === 'styles' || section === 'stores') {
+      const { accounts: stores } = await queryPublicAccounts({ type: 'store', limit: 2000 });
+      accounts = (stores || []).filter(isStoreAccount);
+    } else {
+      const corp = await queryPublicAccounts({ type: 'corp', limit: 2000 });
+      const company = await queryPublicAccounts({ type: 'company', limit: 2000 });
+      const showroom = await queryPublicAccounts({ type: 'showroom', limit: 2000 });
+      const seen = {};
+      accounts = []
+        .concat(corp.accounts || [], company.accounts || [], showroom.accounts || [])
+        .filter((a) => {
+          if (!a || !a.id || seen[a.id]) return false;
+          seen[a.id] = 1;
+          return isShowroomAccount(a);
+        });
+    }
+    const accByIdTmp = new Map();
+    accounts.forEach((a) => { if (a && a.id) accByIdTmp.set(String(a.id), a); });
+    let listTmp = (await readCatalog()).filter((it) => it && it.status === 'active' && it.kind === 'product');
+    listTmp = listTmp.filter((it) => accByIdTmp.has(String(it.accountId || '')));
+    joined = listTmp.map((it) => ({ item: it, account: accByIdTmp.get(String(it.accountId || '')) }));
   }
 
   const accById = new Map();
-  accounts.forEach((a) => { if (a && a.id) accById.set(String(a.id), a); });
+  joined.forEach((row) => {
+    if (row && row.account && row.account.id) accById.set(String(row.account.id), row.account);
+  });
+  const accounts = Array.from(accById.values());
 
-  let list = (await readCatalog()).filter((it) => it && it.status === 'active' && it.kind === 'product');
-  list = list.filter((it) => accById.has(String(it.accountId || '')));
+  let list = joined.map((row) => row.item).filter(Boolean);
   list = await applyPublicCatalogCaps(list);
 
   const diamondCache = new Map();

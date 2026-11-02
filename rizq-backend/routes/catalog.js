@@ -352,10 +352,9 @@ function mountCatalogRoutes(app, deps) {
         limit: q.limit,
         viewerId,
       }, {
-        readCatalog,
+        queryHomeCatalogJoin: platformStore.queryHomeCatalogJoin,
         applyPublicCatalogCaps,
         resolveContactGate,
-        queryPublicAccounts: platformStore.queryPublicAccounts,
         isDiamondActive,
       });
       res.set('Cache-Control', 'public, max-age=60');

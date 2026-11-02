@@ -129,18 +129,18 @@
     return '' +
       '<header id="rizq-mock-hdr" aria-label="شريط رزق" style="position:fixed;top:0;left:0;right:0;z-index:10050;overflow:hidden;box-sizing:border-box">' +
       '<div class="rmh-util" hidden></div>' +
-      '<div class="ticker-wrap is-empty civic-ticker-wrap rmh-ticker" id="ticker-wrap" role="marquee" aria-label="إعلانات خدمة عامة" style="position:relative;min-height:42px;height:42px;max-height:42px;overflow:hidden;box-sizing:border-box;margin:0;width:100%">' +
+      '<div class="ticker-wrap is-empty civic-ticker-wrap rmh-ticker" id="ticker-wrap" role="marquee" aria-label="إعلانات خدمة عامة">' +
       '<div class="ticker-inner" id="ticker"></div></div>' +
       (phone
         ? '<div class="rmh-main" style="display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:\'brand . tools\' \'search search search\';gap:6px 8px;padding:8px 10px 7px;align-items:center;box-sizing:border-box">'
-        : '<div class="rmh-main" style="display:grid;grid-template-columns:minmax(120px,1fr) minmax(280px,460px) minmax(120px,1fr);align-items:center;gap:12px;padding:8px 20px;min-height:90px;box-sizing:border-box">') +
+        : '<div class="rmh-main" style="display:grid;grid-template-columns:minmax(120px,1fr) minmax(280px,460px) minmax(120px,1fr);align-items:center;gap:12px;padding:8px 20px;box-sizing:border-box">') +
       '<a class="rmh-brand logo" href="rizq_landing_v8.html" aria-label="رزق" id="rmh-brand">' +
       '<img class="logo-mark-img rmh-mark" src="rizq-mark-inset.png?v=1" width="44" height="44" alt="رزق" decoding="async"/>' +
       '<div class="logo-text rmh-brand-text"><span class="logo-ar rmh-brand-ar">رزق</span>' +
       '<span class="logo-sub rmh-brand-sub">RIZQ PLATFORM</span></div></a>' +
       (phone
         ? '<form class="rmh-search" id="rmh-search-form" action="rizq_browse.html" method="get" role="search" style="grid-column:1/-1;grid-row:2;min-height:34px;height:34px;max-height:34px;overflow:hidden;box-sizing:border-box;width:100%">'
-        : '<form class="rmh-search" id="rmh-search-form" action="rizq_browse.html" method="get" role="search" style="grid-column:2;min-height:74px;height:74px;max-height:74px;overflow:hidden;box-sizing:border-box;align-self:center">') +
+        : '<form class="rmh-search" id="rmh-search-form" action="rizq_browse.html" method="get" role="search" style="grid-column:2;box-sizing:border-box;align-self:center">') +
       '<select class="rmh-search-cat" id="rmh-search-cat" name="cat" aria-label="كل الأقسام"><option value="">كل الأقسام</option></select>' +
       '<input class="rmh-search-input" id="rmh-search-q" type="search" name="q" autocomplete="off" ' +
       'placeholder="ابحث عن سيارة، شقة، محل، مكتب..." data-ph-fr="Cherchez une voiture, un appartement, un magasin, un bureau..." data-ph-fr-phone="Voiture, appart, boutiqu"/>' +
@@ -556,14 +556,17 @@
 
   /** يمنع تسرب العربية في الهيدر عند اختيار الفرنسية */
   var __rmhLangBusy = false;
+  var __rmhLangApplied = '';
   function applyMockLang() {
     if (__rmhLangBusy) return;
     var hdr = document.getElementById('rizq-mock-hdr');
     if (!hdr) return;
-    __rmhLangBusy = true;
-    try {
     var fr = currentMockLang() === 'fr';
     var wantLang = fr ? 'fr' : 'ar';
+    /* نفس اللغة طُبّقت مسبقاً — لا تعِد كتابة DOM (CLS عند reload دافئ/فرنسي) */
+    if (__rmhLangApplied === wantLang + (isPhone() ? '-p' : '-d')) return;
+    __rmhLangBusy = true;
+    try {
     var wantDir = fr ? 'ltr' : 'rtl';
     if (document.documentElement.lang !== wantLang) document.documentElement.lang = wantLang;
     if (document.documentElement.getAttribute('dir') !== wantDir) document.documentElement.setAttribute('dir', wantDir);
@@ -710,6 +713,7 @@
 
     try { refreshBadge(); } catch (eCart) {}
     try { ensureHeroTagline(); } catch (eHero) {}
+    __rmhLangApplied = wantLang + (isPhone() ? '-p' : '-d');
     } finally { __rmhLangBusy = false; }
   }
 
@@ -732,6 +736,7 @@
         e.stopPropagation();
         if (typeof e.stopImmediatePropagation === 'function') e.stopImmediatePropagation();
       } catch (eStop) {}
+      __rmhLangApplied = ''; /* السماح بإعادة تطبيق اللغة بعد تبديل يدوي */
 
       if (typeof toggleLang === 'function') {
         toggleLang();
@@ -1396,44 +1401,75 @@
     return Math.max(0, Math.ceil(bottom - top));
   }
 
-  function syncMockHdrHeight() {
+  function _cssHdrReservePx() {
+    var v = 0;
+    try {
+      v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--rizq-header-h')) || 0;
+    } catch (eR) { v = 0; }
+    if (!v) {
+      try { v = parseFloat(getComputedStyle(document.body).paddingTop) || 0; } catch (eP) { v = 0; }
+    }
+    return Math.round(v) || 0;
+  }
+
+  function syncMockHdrHeight(force) {
     var hdr = document.getElementById('rizq-mock-hdr');
     if (!hdr) return;
+    /* بعد الاستقرار: لا تُحدّث الحجز (كانت خطوط/RO تسبب CLS) */
+    if (window.__rmhHdrFrozen && !force) return;
     syncPhoneNavSplit();
     var phoneNow = isPhone();
     if (window.__rmhWasPhoneFr !== phoneNow) {
       window.__rmhWasPhoneFr = phoneNow;
       try { applyMockLang(); } catch (eLang) {}
+      window.__rmhHdrFrozen = false;
     }
-    /*
-     * ثبات CLS: لا تُحدّث --rizq-mock-hdr-h من القياس الحيّ (خطوط/ResizeObserver كانت
-     * ترفع الحجز 210→230 وتزيح .hero). القيم تُطابق CSS الحرج لكل عرض.
-     */
-    var PHONE_H = 210;
-    /* هيكل الهيدر ~203؛ حجز التدفق = 203+12 فجوة = 215 — لا تضبط --rizq-header-h على 203 وحدها */
-    var DESK_HDR = 203;
-    var DESK_PAD = 215;
-    var mode = phoneNow ? 'phone' : 'desk';
-    var hdrPx = phoneNow ? PHONE_H : DESK_HDR;
-    var padPx = phoneNow ? PHONE_H : DESK_PAD;
-    if (window.__rmhHdrMode !== mode || window.__rmhLastHdrH !== hdrPx) {
-      window.__rmhHdrMode = mode;
-      window.__rmhLastHdrH = hdrPx;
-      document.body.style.setProperty('--rizq-mock-hdr-h', hdrPx + 'px');
-      document.body.style.setProperty('--rizq-header-h', padPx + 'px');
-      document.documentElement.style.setProperty('--rizq-header-h', padPx + 'px');
-      document.documentElement.style.setProperty('--rizq-mock-hdr-h', hdrPx + 'px');
-      if (!phoneNow) {
-        document.body.style.setProperty('--rizq-mock-hdr-gap', '12px');
-        document.documentElement.style.setProperty('--rizq-mock-hdr-gap', '12px');
+    /* قياس حيّ كما في main — على الهاتف لا تُحسب nav السفلي الثابت عبر measureMockHdrExtent */
+    var mainEl = hdr.querySelector('.rmh-main');
+    var ticker = hdr.querySelector('.ticker-wrap:not(.is-empty)');
+    var topNav = document.getElementById('rmh-nav-top');
+    var bottomNav = hdr.querySelector('nav.rmh-nav:not(.rmh-nav-top)');
+    var topH;
+    var reserved = _cssHdrReservePx();
+    if (phoneNow && mainEl) {
+      topH = Math.ceil(mainEl.getBoundingClientRect().height || 44);
+      if (ticker) topH += Math.ceil(ticker.getBoundingClientRect().height || 0);
+      if (topNav) topH += Math.ceil(topNav.getBoundingClientRect().height || 48);
+      topH = Math.max(topH, 96);
+      /* لا تحرّك padding إن الحجز CSS ≈ القياس (±2) — يمنع CLS 160↔171 */
+      if (reserved && Math.abs(topH - reserved) <= 2) {
+        topH = reserved;
       }
+      document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
+      document.body.style.setProperty('--rizq-header-h', topH + 'px');
+      document.documentElement.style.setProperty('--rizq-header-h', topH + 'px');
+      document.documentElement.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
+      if (bottomNav) {
+        var nh = Math.ceil(bottomNav.getBoundingClientRect().height || 64);
+        document.body.style.setProperty('--rizq-mock-nav-h', nh + 'px');
+        document.documentElement.style.setProperty('--rizq-mock-nav-h', nh + 'px');
+        document.body.style.setProperty('--rizq-thumb-dock-h', nh + 'px');
+      }
+      return;
     }
-    if (phoneNow) {
-      var nh = 80;
-      document.body.style.setProperty('--rizq-mock-nav-h', nh + 'px');
-      document.documentElement.style.setProperty('--rizq-mock-nav-h', nh + 'px');
-      document.body.style.setProperty('--rizq-thumb-dock-h', nh + 'px');
+    var h = measureMockHdrExtent(hdr) || Math.ceil(hdr.getBoundingClientRect().height || 171);
+    /* استبعد شريط الأقسام الثابت إن وُجد خطأً في القياس */
+    if (bottomNav && getComputedStyle(bottomNav).position === 'fixed') {
+      h = Math.ceil(hdr.getBoundingClientRect().height || h);
     }
+    /* سطح المكتب: padding = mock-hdr-h + gap — ثبّت المجموع على reserved (≈183) */
+    if (reserved && Math.abs((h + 12) - reserved) <= 14) {
+      var mockKeep = Math.max(0, reserved - 12);
+      document.body.style.setProperty('--rizq-mock-hdr-h', mockKeep + 'px');
+      document.documentElement.style.setProperty('--rizq-mock-hdr-h', mockKeep + 'px');
+      document.body.style.setProperty('--rizq-header-h', reserved + 'px');
+      document.documentElement.style.setProperty('--rizq-header-h', reserved + 'px');
+      return;
+    }
+    document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
+    document.body.style.setProperty('--rizq-header-h', h + 'px');
+    document.documentElement.style.setProperty('--rizq-header-h', h + 'px');
+    document.documentElement.style.setProperty('--rizq-mock-hdr-h', h + 'px');
   }
 
   function ensureHeroTagline() {
@@ -1535,27 +1571,27 @@
     wireNavActive();
     wireModelsModal();
     ensureHeroTagline();
-    syncMockHdrHeight();
+    window.__rmhHdrFrozen = false;
+    syncMockHdrHeight(true);
+    window.__rmhHdrFrozen = true; /* جمّد فوراً بعد أول مزامنة — خطوط لاحقة لا تحرّك الحجز */
+    function settleAndFreezeHdr() {
+      /* بعد التجميد الأول: لا تعِد القياس (كانت fonts.ready تسبب CLS دافئ ≈0.5) */
+      if (window.__rmhHdrFrozen) return;
+      syncMockHdrHeight(true);
+      window.__rmhHdrFrozen = true;
+    }
     setTimeout(function () {
       fillCategories();
       ensureHeroTagline();
-      syncMockHdrHeight();
       markActiveFromPage();
       refreshBadge();
       refreshFavBadge();
-    }, 1200);
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(function () { syncMockHdrHeight(); }).catch(function () {});
-    }
-    var hdrEl = document.getElementById('rizq-mock-hdr');
-    if (hdrEl && typeof ResizeObserver !== 'undefined') {
-      if (window.__rmhHdrRo) {
-        try { window.__rmhHdrRo.disconnect(); } catch (eRo) {}
-      }
-      window.__rmhHdrRo = new ResizeObserver(function () { syncMockHdrHeight(); });
-      window.__rmhHdrRo.observe(hdrEl);
-    }
-    window.addEventListener('resize', syncMockHdrHeight);
+    }, 900);
+    window.addEventListener('resize', function () {
+      window.__rmhHdrFrozen = false;
+      syncMockHdrHeight(true);
+      window.__rmhHdrFrozen = true;
+    });
     window.addEventListener('storage', function (ev) {
       if (ev.key === 'rizq_cart') {
         refreshBadge();

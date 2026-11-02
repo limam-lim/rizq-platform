@@ -601,6 +601,79 @@ async function queryPublicAccounts(filters) {
   return { total, accounts };
 }
 
+/**
+ * كتالوج الرئيسية: JOIN واحد على الحسابات المعتمدة غير المعلّقة + LIMIT.
+ * لا يحمّل كل الكتالوج/الحسابات في الذاكرة.
+ * @returns {{ rows: Array<{ item: object, account: object }> }}
+ */
+async function queryHomeCatalogJoin(filters) {
+  filters = filters || {};
+  const where = [
+    "c.status = 'active'",
+    "COALESCE(c.data->>'kind','') = 'product'",
+    "a.status = 'approved'",
+    'a.suspended = 0',
+    "a.id NOT LIKE 'acc_demo%'",
+    "(COALESCE(a.data->>'isSentinel','') IS DISTINCT FROM 'true')",
+  ];
+  const params = [];
+  function push(val) {
+    params.push(val);
+    return '?';
+  }
+
+  const types = Array.isArray(filters.accountTypes) ? filters.accountTypes.filter(Boolean) : [];
+  if (types.length === 1) {
+    where.push('a.type = ' + push(String(types[0]).slice(0, 30)));
+  } else if (types.length > 1) {
+    const ph = types.map((t) => push(String(t).slice(0, 30))).join(', ');
+    where.push('a.type IN (' + ph + ')');
+  }
+
+  if (filters.createdAfterMs) {
+    const iso = new Date(Number(filters.createdAfterMs)).toISOString();
+    where.push(
+      "COALESCE(NULLIF(c.data->>'createdAt',''), c.updated_at::text) >= " + push(iso)
+    );
+  }
+
+  if (filters.categoryIlike) {
+    const s = '%' + String(filters.categoryIlike).slice(0, 80) + '%';
+    where.push(
+      '(COALESCE(c.data->>\'category\',\'\') ILIKE ' + push(s)
+      + ' OR COALESCE(c.data->>\'cat\',\'\') ILIKE ' + push(s)
+      + ' OR COALESCE(c.data->>\'categoryId\',\'\') ILIKE ' + push(s)
+      + ' OR COALESCE(c.data->>\'name\',\'\') ILIKE ' + push(s)
+      + ')'
+    );
+  }
+
+  const limit = Math.max(1, Math.min(500, Number(filters.limit) || 120));
+  const whereSql = where.join(' AND ');
+  const rows = await sql.query(
+    'SELECT c.data AS item_data, a.data AS account_data'
+    + ' FROM catalog_items c'
+    + ' INNER JOIN accounts a ON a.id = c.account_id'
+    + ' WHERE ' + whereSql
+    + " ORDER BY COALESCE(NULLIF(c.data->>'createdAt',''), c.updated_at::text) DESC"
+    + ' LIMIT ' + push(limit),
+    params
+  );
+
+  function parseMaybe(v) {
+    if (v == null) return null;
+    if (typeof v === 'object') return v;
+    try { return JSON.parse(v); } catch (e) { return null; }
+  }
+
+  return {
+    rows: (rows || []).map((r) => ({
+      item: parseMaybe(r.item_data),
+      account: parseMaybe(r.account_data),
+    })).filter((r) => r.item && r.account),
+  };
+}
+
 module.exports = {
   readAccounts,
   writeAccounts,
@@ -626,5 +699,6 @@ module.exports = {
   migrateAllPlatformStores,
   queryPublicAds,
   queryPublicAccounts,
+  queryHomeCatalogJoin,
   DATA_DIR,
 };

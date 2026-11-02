@@ -4,6 +4,11 @@
     if (savedLang === 'fr') {
       document.documentElement.lang = 'fr';
       document.documentElement.dir = 'ltr';
+      document.documentElement.classList.add('rizq-lang-fr');
+      if (document.body) document.body.classList.add('rizq-lang-fr');
+      else document.addEventListener('DOMContentLoaded', function () {
+        try { document.body.classList.add('rizq-lang-fr'); } catch (eBody) {}
+      });
     }
   } catch (e1) {}
   function unlockRizqPage(){

@@ -38,36 +38,36 @@ html.rizq-app-nav .nav-sticky-tools{
   display:none!important;visibility:hidden!important;pointer-events:none!important;
   height:0!important;max-height:0!important;overflow:hidden!important;opacity:0!important;
 }
-/* كمبيوتر: احجز الهيدر+فجوة من أول إطار (كان hero-geo يزاح ~7–25px) */
+/* كمبيوتر: احجز = النهائي في main (~171 hdr / ~183 pad) — لا 215/192 */
 @media(min-width:769px) and (min-height:501px){
-  html.rizq-app-nav{--rizq-header-h:215px;--rizq-mock-hdr-h:203px;--rizq-mock-hdr-gap:12px;--rizq-ticker-h:42px}
+  html.rizq-app-nav{--rizq-header-h:183px;--rizq-mock-hdr-h:171px;--rizq-mock-hdr-gap:12px;--rizq-ticker-h:19px}
   html.rizq-app-nav body{
-    /* قيمة ثابتة — لا تعتمد على --rizq-mock-hdr-h وحده (كان 203 بدون فجوة → CLS) */
-    padding-top:215px!important;
+    padding-top:183px!important;
   }
   #rmh-nav-top,nav.rmh-nav-top,#rizq-mock-hdr #rmh-nav-top{
     display:none!important;height:0!important;min-height:0!important;overflow:hidden!important;
     padding:0!important;margin:0!important;border:0!important
   }
   #rmh-search-form,#rizq-mock-hdr .rmh-search{
-    min-height:74px!important;height:74px!important;max-height:74px!important;overflow:hidden!important
+    box-sizing:border-box!important
   }
-  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top),nav.rmh-nav:not(.rmh-nav-top){
-    height:85px!important;min-height:85px!important;max-height:85px!important
-  }
+}
+/* تابلت عريض: النهائي في main ≈171 — لا تبدأ بـ160 ثم تقفز */
+@media(min-width:500px) and (max-width:768px){
+  html.rizq-app-nav{--rizq-header-h:171px;--rizq-mock-hdr-h:171px;--rizq-mock-nav-h:80px;--rizq-thumb-dock-h:var(--rizq-mock-nav-h,80px);--rizq-ticker-h:19px}
+  html.rizq-app-nav body{padding-top:171px!important;padding-bottom:var(--rizq-mock-nav-h,80px)!important}
 }
 @media(max-width:768px),(orientation:landscape) and (max-height:500px){
   /* هاتف: مساحة الهيدر الموحّد فقط (لا شريط قديم) */
   /* thumb-dock-h = ارتفاع الشريط السفلي rmh (لا 0) حتى لا يختبئ ويدجت الدردشة خلفه */
-  /* احجز الارتفاع النهائي للهيدر+تيكر+شريط علوي (~192–210) من أول إطار */
-  html.rizq-app-nav{--rizq-header-h:210px;--rizq-mock-hdr-h:210px;--rizq-mock-nav-h:80px;--rizq-thumb-dock-h:var(--rizq-mock-nav-h,80px);--rizq-ticker-h:42px}
+  /* احجز الارتفاع النهائي للهيدر في main (~169 hdr / ~160 pad) من أول إطار */
+  html.rizq-app-nav{--rizq-header-h:160px;--rizq-mock-hdr-h:160px;--rizq-mock-nav-h:80px;--rizq-thumb-dock-h:var(--rizq-mock-nav-h,80px);--rizq-ticker-h:19px}
   html.rizq-app-nav #rmh-nav-top,
   html.rizq-app-nav nav.rmh-nav-top{
-    display:flex!important;height:55px!important;min-height:55px!important;max-height:55px!important;
-    box-sizing:border-box!important;overflow:hidden!important;
+    display:flex!important;box-sizing:border-box!important;
   }
   html.rizq-app-nav body{
-    padding-top:var(--rizq-mock-hdr-h,var(--rizq-header-h,210px))!important;
+    padding-top:var(--rizq-mock-hdr-h,160px)!important;
     /* شريط الأقسام السفلي يحسب الـsafe-area داخله — لا نضاعف الفراغ */
     padding-bottom:var(--rizq-mock-nav-h,80px)!important;
   }
@@ -83,7 +83,9 @@ html.rizq-app-nav .nav-sticky-tools{
   html.rizq-app-nav .ticker-wrap,html.rizq-app-nav .ticker-wrap:not(.is-empty){
     position:relative!important;top:auto!important;left:auto!important;right:auto!important;
     z-index:2!important;margin:0!important;width:100%!important;flex:0 0 auto!important;align-self:stretch!important;
-    min-height:42px!important;box-sizing:border-box!important;
+    /* شريط ticker داخل mock-hdr مضغوط ≈19px (لا 42 القديمة التي ترفع الهيدر ثم تُقلَّص) */
+    min-height:19px!important;height:19px!important;max-height:19px!important;box-sizing:border-box!important;
+    padding:2px 0!important;overflow:hidden!important;
   }
   /* شريط الأقسام السفلي فقط — لا تُثبّت #rmh-nav-top أسفل الشاشة */
   html.rizq-app-nav #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top),
@@ -98,11 +100,15 @@ html.rizq-app-nav .nav-sticky-tools{
   html.rizq-app-nav #rmh-nav-top,
   html.rizq-app-nav nav.rmh-nav-top{
     position:relative!important;top:auto!important;bottom:auto!important;left:auto!important;right:auto!important;
-    height:55px!important;min-height:55px!important;max-height:55px!important;
     width:100%!important;margin:0!important;z-index:1!important;
   }
   html.rizq-app-nav .hero-content{padding-top:8px!important;padding-bottom:4px!important}
-  html.rizq-app-nav{--rizq-ticker-h:42px}
+  html.rizq-app-nav{--rizq-ticker-h:19px}
+  /* تابلت: أكّد 171 فوق قاعدة الهاتف 160 (نفس وسائط FOUC) */
+  @media(min-width:500px){
+    html.rizq-app-nav{--rizq-header-h:171px;--rizq-mock-hdr-h:171px}
+    html.rizq-app-nav body{padding-top:171px!important}
+  }
   /* شعار الهاتف/التابلت = نفس الكمبيوتر: علامة + رزق (Cairo) + PLATFORM */
   html.rizq-app-nav #nav > .logo{
     text-decoration:none!important;color:inherit!important;border:none!important;outline:none!important;

@@ -1623,7 +1623,35 @@ html[dir="ltr"] input[type="text"].m-input, html[dir="ltr"] textarea.m-input{dir
 /* Restore every landing block that fade-in had left invisible */
 #categories,#listings,#virtual-stores,#rizq-styles,#virtual-showrooms,#virtual-estate,#rizq-showroom-models,#virtual-offices,#virtual-tenders,#virtual-investments, #about,#prices,#pricing,#hero-listings,.listings-section,.why-section,.pricing-section,.cta-section,.section{visibility:visible!important;opacity:1!important;height:auto!important;max-height:none!important;}
 /* تخفيف الرسم أسفل الطية — يبقى المحتوى قابلاً للتمرير دون كسر الظهور */
-#virtual-stores,#virtual-showrooms,#virtual-estate,#virtual-offices,#virtual-tenders,#virtual-investments, #rizq-styles,#rizq-estate-models,#rizq-showroom-models,#pricing,#about,.pricing-section{content-visibility:auto;contain-intrinsic-size:1px 720px;}
+/* حجز content-visibility = الارتفاع النهائي الطبيعي (بعد الرسم الكامل) — لا 720 العامة الأكبر من أقسام فارغة */
+/* حجز = ارتفاع main الطبيعي (قياس Playwright) — لا أكبر */
+#virtual-stores{content-visibility:auto;contain-intrinsic-size:1px 742px}
+#virtual-showrooms{content-visibility:auto;contain-intrinsic-size:1px 731px}
+#virtual-estate{content-visibility:auto;contain-intrinsic-size:1px 207px}
+#virtual-offices{content-visibility:auto;contain-intrinsic-size:1px 1127px}
+#virtual-tenders,#virtual-investments{content-visibility:auto;contain-intrinsic-size:1px 400px}
+#rizq-styles{content-visibility:auto;contain-intrinsic-size:1px 810px}
+#rizq-showroom-models{content-visibility:auto;contain-intrinsic-size:1px 835px}
+#rizq-estate-models{content-visibility:auto;contain-intrinsic-size:1px 614px}
+#pricing,#about,.pricing-section{content-visibility:auto;contain-intrinsic-size:1px 720px}
+@media(min-width:769px){
+  #virtual-stores{contain-intrinsic-size:1px 692px}
+  #virtual-showrooms{contain-intrinsic-size:1px 684px}
+  #virtual-estate{contain-intrinsic-size:1px 188px}
+  #virtual-offices{contain-intrinsic-size:1px 983px}
+  #rizq-styles{contain-intrinsic-size:1px 904px}
+  #rizq-showroom-models{contain-intrinsic-size:1px 959px}
+  #rizq-estate-models{contain-intrinsic-size:1px 570px}
+}
+@media(min-width:1440px){
+  #virtual-stores{contain-intrinsic-size:1px 730px}
+  #virtual-showrooms{contain-intrinsic-size:1px 730px}
+  #virtual-estate{contain-intrinsic-size:1px 253px}
+  #virtual-offices{contain-intrinsic-size:1px 891px}
+  #rizq-styles{contain-intrinsic-size:1px 971px}
+  #rizq-showroom-models{contain-intrinsic-size:1px 985px}
+  #rizq-estate-models{contain-intrinsic-size:1px 573px}
+}
 .cat-card,.why-card,.listing-card,.section-header,.pricing-grid,.why-grid,.prices-board{visibility:visible!important;opacity:1!important;}
 /* ── DISCOVERY STRIPS — "آخر المحلات/المكاتب/المعارض" (شريط اكتشاف حي) ── */
 /* المسار يبقى LTR لحساب scrollLeft؛ اتجاه الحركة يُقلَب في JS حسب اللغة */

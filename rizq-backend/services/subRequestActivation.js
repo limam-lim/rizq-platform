@@ -20,6 +20,24 @@ const {
 
 const TENDER_PACKAGE_NAME = 'باقة المناقصة';
 
+/** أقفال داخل العملية — تمنع رصيداً مزدوجاً عند Promise.all على نفس الحساب */
+const _accountPkgLocks = new Map();
+async function withAccountPackageLock(accountId, fn) {
+  const key = String(accountId || '');
+  while (_accountPkgLocks.has(key)) {
+    try { await _accountPkgLocks.get(key); } catch (e) { /* */ }
+  }
+  let unlock;
+  const gate = new Promise((resolve) => { unlock = resolve; });
+  _accountPkgLocks.set(key, gate);
+  try {
+    return await fn();
+  } finally {
+    _accountPkgLocks.delete(key);
+    try { unlock(); } catch (e2) { /* */ }
+  }
+}
+
 const PLAUSIBILITY_AR = {
   clear: 'واضح ✅',
   low: 'منخفض',
@@ -502,71 +520,84 @@ async function _activateClaimed(req, deps) {
     }
 
     // package (default) — باقات الحساب العامة فقط
-    const existingPkg = await getAccountRecord(req.accountId);
-    const newPkgId = req.packageId || (await findCatalogPackage(req.pkg) || {}).id || null;
-    const catalogPrice = Number(req.expectedPrice != null ? req.expectedPrice : req.listPrice);
-    const paidPrice = Number(req.price) || 0;
-    const creditInfo = req.packageCredit && typeof req.packageCredit === 'object'
-      ? req.packageCredit
-      : await resolveSwitchCreditForAccount(
+    return withAccountPackageLock(req.accountId, async () => {
+      const existingPkg = await getAccountRecord(req.accountId);
+      const newPkgId = req.packageId || (await findCatalogPackage(req.pkg) || {}).id || null;
+      const catalogPrice = Number(req.expectedPrice != null ? req.expectedPrice : req.listPrice);
+      const paidPrice = Number(req.price) || 0;
+      const priorLive = priorPackageOf(existingPkg);
+      const nextRef = { packageId: newPkgId, pkgName: req.pkg };
+      /* طلب ثانٍ متزامن بعد تفعيل نفس الباقة — لا تُمدَّد/يُحتسب الرصيد مرة أخرى */
+      if (priorLive && isSamePackage(priorLive, nextRef) && isPackageStillActive(priorLive, Date.now())) {
+        return {
+          ok: true,
+          category: 'package',
+          result: { ok: true, skipped: 'already_active_same_package' },
+          accountName,
+          skippedDuplicate: true,
+        };
+      }
+      /* أعد حساب الرصيد من حالة الحساب الحية — لا تثق بـ packageCredit من الطلب (سباق متزامن) */
+      const creditInfo = await resolveSwitchCreditForAccount(
         req.accountId,
         { id: newPkgId, name: req.pkg },
         Number.isFinite(catalogPrice) && catalogPrice > 0 ? catalogPrice : paidPrice,
         days,
         getAccountRecord
       );
-    const { periodStart, periodEnd, now, switchedPackage } = computeActivationPeriod(
-      days,
-      existingPkg,
-      { packageId: newPkgId, pkgName: req.pkg },
-      creditInfo
-    );
-    const isTrial = isTrialPackage(req.pkg, req.price);
+      const { periodStart, periodEnd, now, switchedPackage } = computeActivationPeriod(
+        days,
+        existingPkg,
+        { packageId: newPkgId, pkgName: req.pkg },
+        creditInfo
+      );
+      const isTrial = isTrialPackage(req.pkg, req.price);
 
-    const result = await syncAccountPackage({
-      accountId: req.accountId,
-      accountName,
-      accountPhone,
-      accountEmail,
-      accountType,
-      pkgName: req.pkg,
-      packageId: newPkgId,
-      price: paidPrice,
-      listPrice: Number.isFinite(catalogPrice) ? catalogPrice : paidPrice,
-      days: (creditInfo && creditInfo.applicable && creditInfo.totalDays > 0)
-        ? creditInfo.totalDays
-        : days,
-      periodStart,
-      periodEnd,
-      activatedBy: 'admin',
-      paymentConfirmed: !isTrial,
-      paidAt: isTrial ? null : now.toISOString(),
-      isTrial,
-      packageCredit: creditInfo && creditInfo.applicable ? creditInfo : null,
-      switchedPackage: !!switchedPackage,
+      const result = await syncAccountPackage({
+        accountId: req.accountId,
+        accountName,
+        accountPhone,
+        accountEmail,
+        accountType,
+        pkgName: req.pkg,
+        packageId: newPkgId,
+        price: paidPrice,
+        listPrice: Number.isFinite(catalogPrice) ? catalogPrice : paidPrice,
+        days: (creditInfo && creditInfo.applicable && creditInfo.totalDays > 0)
+          ? creditInfo.totalDays
+          : days,
+        periodStart,
+        periodEnd,
+        activatedBy: 'admin',
+        paymentConfirmed: !isTrial,
+        paidAt: isTrial ? null : now.toISOString(),
+        isTrial,
+        packageCredit: creditInfo && creditInfo.applicable ? creditInfo : null,
+        switchedPackage: !!switchedPackage,
+      });
+      if (!result.ok) return result;
+
+      if (!isTrial && (await isDiamondPackageRef(req.pkg)) && accountPhone && typeof registerSubscriber === 'function') {
+        try {
+          await registerSubscriber(String(accountPhone).replace(/[^0-9+]/g, '').slice(0, 40), {
+            businessName: accountName,
+            accountId: req.accountId,
+            plan: 'diamond',
+            tier: 'diamond',
+            package: req.pkg,
+            pkgName: req.pkg,
+            widget_enabled: true,
+            whatsapp_enabled: true,
+            calls_enabled: true,
+            channels: { widget: true, whatsapp: true, calls: true },
+          });
+        } catch (e) { /* best-effort */ }
+      }
+
+      await maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts);
+
+      return { ok: true, category, result, accountName };
     });
-    if (!result.ok) return result;
-
-    if (!isTrial && (await isDiamondPackageRef(req.pkg)) && accountPhone && typeof registerSubscriber === 'function') {
-      try {
-        await registerSubscriber(String(accountPhone).replace(/[^0-9+]/g, '').slice(0, 40), {
-          businessName: accountName,
-          accountId: req.accountId,
-          plan: 'diamond',
-          tier: 'diamond',
-          package: req.pkg,
-          pkgName: req.pkg,
-          widget_enabled: true,
-          whatsapp_enabled: true,
-          calls_enabled: true,
-          channels: { widget: true, whatsapp: true, calls: true },
-        });
-      } catch (e) { /* best-effort */ }
-    }
-
-    await maybeGrantReferralBonus(req, accRow, readAccounts, writeAccounts);
-
-    return { ok: true, category, result, accountName };
   } catch (err) {
     return { ok: false, error: err.message || 'activation_failed' };
   }
