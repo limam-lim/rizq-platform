@@ -175,7 +175,8 @@
       imgData: imgs[0] || p.imgData || '',
       imgDataArr: imgs,
       images: imgs,
-      storeId: p.storeId || p.accountId || ''
+      storeId: p.storeId || p.accountId || '',
+      accountId: p.accountId || p.storeId || ''
     };
   }
 

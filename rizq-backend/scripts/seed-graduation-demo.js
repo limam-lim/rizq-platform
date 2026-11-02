@@ -27,6 +27,7 @@ function loadFixture() {
   if (!raw || !Array.isArray(raw.accounts) || !Array.isArray(raw.ads)) {
     throw new Error('Invalid graduation-demo.json');
   }
+  if (!Array.isArray(raw.catalog)) raw.catalog = [];
   return raw;
 }
 
@@ -48,10 +49,14 @@ function isDemoRecord(rec) {
 async function clearGraduation() {
   const accounts = (await store.readAccounts()) || [];
   const ads = (await store.readAds()) || [];
+  const catalog = (await store.readCatalog()) || [];
   let accRemoved = 0;
   let adRemoved = 0;
+  let catalogRemoved = 0;
+  const accIds = new Set();
   for (const a of accounts) {
     if (a && isDemoRecord(a)) {
+      accIds.add(String(a.id));
       if (await store.deleteAccount(a.id)) accRemoved++;
     }
   }
@@ -60,7 +65,13 @@ async function clearGraduation() {
       if (await store.deleteAd(ad.id)) adRemoved++;
     }
   }
-  return { accountsRemoved: accRemoved, adsRemoved: adRemoved };
+  for (const it of catalog) {
+    if (!it) continue;
+    if (isDemoRecord(it) || accIds.has(String(it.accountId || ''))) {
+      if (await store.deleteCatalogItem(it.id)) catalogRemoved++;
+    }
+  }
+  return { accountsRemoved: accRemoved, adsRemoved: adRemoved, catalogRemoved };
 }
 
 async function seed() {
@@ -114,6 +125,29 @@ async function seed() {
     adsUpserted++;
   }
 
+  let catalogUpserted = 0;
+  for (let idx = 0; idx < fixture.catalog.length; idx++) {
+    const row = fixture.catalog[idx];
+    const createdAt = new Date(Date.now() - (idx + 1) * 1800000).toISOString();
+    const item = Object.assign({
+      kind: 'product',
+      images: [],
+      emoji: '📦',
+    }, row, {
+      is_demo: true,
+      isDemo: true,
+      graduationDemo: true,
+      demoSource: 'graduation',
+      status: 'active',
+      createdAt: row.createdAt || createdAt,
+      updatedAt: now,
+      accountId: row.accountId,
+      storeId: row.accountId,
+    });
+    await store.upsertCatalogItem(item);
+    catalogUpserted++;
+  }
+
   // وسّم أسعار نبضة السوق التجريبية إن وُجدت
   try {
     const repos = require('../db/repos');
@@ -160,11 +194,13 @@ async function seed() {
   return {
     accountsUpserted,
     adsUpserted,
+    catalogUpserted,
     backfilled,
     stores: fixture.accounts.filter((a) => a.type === 'store').length,
     corps: fixture.accounts.filter((a) => a.type === 'corp').length,
     offices: fixture.accounts.filter((a) => a.type === 'office').length,
     ads: fixture.ads.length,
+    catalog: fixture.catalog.length,
     flagged: { is_demo: true, graduationDemo: true },
   };
 }

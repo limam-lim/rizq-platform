@@ -246,7 +246,10 @@
       "category": "إلكترونيات",
       "emoji": "📱",
       "wilaya": "نواكشوط",
-      "images": ["https://picsum.photos/seed/rizq-grad-ad01a/640/480", "https://picsum.photos/seed/rizq-grad-ad01b/640/480"],
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-ad01a/640/480",
+        "https://picsum.photos/seed/rizq-grad-ad01b/640/480"
+      ],
       "negotiable": false
     },
     {
@@ -258,7 +261,9 @@
       "category": "إلكترونيات",
       "emoji": "🎧",
       "wilaya": "نواكشوط",
-      "images": ["https://picsum.photos/seed/rizq-grad-ad02/640/480"],
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-ad02/640/480"
+      ],
       "negotiable": true
     },
     {
@@ -270,7 +275,10 @@
       "category": "أزياء",
       "emoji": "👕",
       "wilaya": "نواكشوط",
-      "images": ["https://picsum.photos/seed/rizq-grad-ad03a/640/480", "https://picsum.photos/seed/rizq-grad-ad03b/640/480"],
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-ad03a/640/480",
+        "https://picsum.photos/seed/rizq-grad-ad03b/640/480"
+      ],
       "negotiable": true,
       "installments": true
     },
@@ -283,7 +291,9 @@
       "category": "أغذية",
       "emoji": "🍚",
       "wilaya": "نواذيبو",
-      "images": ["https://picsum.photos/seed/rizq-grad-ad04/640/480"],
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-ad04/640/480"
+      ],
       "negotiable": false
     },
     {
@@ -295,7 +305,9 @@
       "category": "ذهب",
       "emoji": "💍",
       "wilaya": "روصو",
-      "images": ["https://picsum.photos/seed/rizq-grad-ad05/640/480"],
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-ad05/640/480"
+      ],
       "negotiable": false
     },
     {
@@ -307,7 +319,10 @@
       "category": "أثاث",
       "emoji": "🛋️",
       "wilaya": "نواكشوط",
-      "images": ["https://picsum.photos/seed/rizq-grad-ad06a/640/480", "https://picsum.photos/seed/rizq-grad-ad06b/640/480"],
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-ad06a/640/480",
+        "https://picsum.photos/seed/rizq-grad-ad06b/640/480"
+      ],
       "negotiable": true,
       "installments": true
     },
@@ -320,7 +335,11 @@
       "category": "سيارات",
       "emoji": "🚗",
       "wilaya": "نواكشوط",
-      "images": ["https://picsum.photos/seed/rizq-grad-ad07a/640/480", "https://picsum.photos/seed/rizq-grad-ad07b/640/480", "https://picsum.photos/seed/rizq-grad-ad07c/640/480"],
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-ad07a/640/480",
+        "https://picsum.photos/seed/rizq-grad-ad07b/640/480",
+        "https://picsum.photos/seed/rizq-grad-ad07c/640/480"
+      ],
       "negotiable": true
     },
     {
@@ -332,7 +351,9 @@
       "category": "سيارات",
       "emoji": "🚙",
       "wilaya": "نواكشوط",
-      "images": ["https://picsum.photos/seed/rizq-grad-ad08/640/480"],
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-ad08/640/480"
+      ],
       "negotiable": true,
       "installments": true
     },
@@ -345,7 +366,9 @@
       "category": "إلكترونيات",
       "emoji": "📺",
       "wilaya": "نواكشوط",
-      "images": ["https://picsum.photos/seed/rizq-grad-ad09/640/480"],
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-ad09/640/480"
+      ],
       "negotiable": false
     },
     {
@@ -357,7 +380,10 @@
       "category": "عقارات",
       "emoji": "🏠",
       "wilaya": "نواكشوط",
-      "images": ["https://picsum.photos/seed/rizq-grad-ad10a/640/480", "https://picsum.photos/seed/rizq-grad-ad10b/640/480"],
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-ad10a/640/480",
+        "https://picsum.photos/seed/rizq-grad-ad10b/640/480"
+      ],
       "negotiable": true
     },
     {
@@ -369,7 +395,9 @@
       "category": "سيارات",
       "emoji": "🛞",
       "wilaya": "أطار",
-      "images": ["https://picsum.photos/seed/rizq-grad-ad11/640/480"],
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-ad11/640/480"
+      ],
       "negotiable": true
     },
     {
@@ -381,8 +409,632 @@
       "category": "أثاث",
       "emoji": "🪑",
       "wilaya": "نواذيبو",
-      "images": ["https://picsum.photos/seed/rizq-grad-ad12/640/480"],
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-ad12/640/480"
+      ],
       "negotiable": false
+    }
+  ],
+  "catalog": [
+    {
+      "id": "CAT-GRAD-S01-01",
+      "accountId": "acc_grad_store_01",
+      "kind": "product",
+      "status": "active",
+      "name": "هاتف ذكي 128GB",
+      "nameF": "Smartphone 128Go",
+      "price": "185000",
+      "cat": "إلكترونيات",
+      "emoji": "📱",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s01-01/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S01-02",
+      "accountId": "acc_grad_store_01",
+      "kind": "product",
+      "status": "active",
+      "name": "شاحن سريع Type-C",
+      "nameF": "Chargeur rapide Type-C",
+      "price": "3500",
+      "cat": "إلكترونيات",
+      "emoji": "🔌",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s01-02/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S01-03",
+      "accountId": "acc_grad_store_01",
+      "kind": "product",
+      "status": "active",
+      "name": "سماعات لاسلكية",
+      "nameF": "Écouteurs sans fil",
+      "price": "6500",
+      "cat": "إلكترونيات",
+      "emoji": "🎧",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s01-03/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S01-04",
+      "accountId": "acc_grad_store_01",
+      "kind": "product",
+      "status": "active",
+      "name": "غطاء حماية شفاف",
+      "nameF": "Coque transparente",
+      "price": "1200",
+      "cat": "إلكترونيات",
+      "emoji": "🛡️",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s01-04/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S01-05",
+      "accountId": "acc_grad_store_01",
+      "kind": "product",
+      "status": "active",
+      "name": "باور بانك 20000mAh",
+      "nameF": "Powerbank 20000mAh",
+      "price": "9500",
+      "cat": "إلكترونيات",
+      "emoji": "🔋",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s01-05/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S01-06",
+      "accountId": "acc_grad_store_01",
+      "kind": "product",
+      "status": "active",
+      "name": "كابل USB-C أصلي",
+      "nameF": "Câble USB-C",
+      "price": "1800",
+      "cat": "إلكترونيات",
+      "emoji": "📎",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s01-06/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S02-01",
+      "accountId": "acc_grad_store_02",
+      "kind": "product",
+      "status": "active",
+      "name": "دراعة رجالية قطن",
+      "nameF": "Boubou homme coton",
+      "price": "18000",
+      "cat": "أزياء",
+      "emoji": "👔",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s02-01/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S02-02",
+      "accountId": "acc_grad_store_02",
+      "kind": "product",
+      "status": "active",
+      "name": "فستان سهرة",
+      "nameF": "Robe de soirée",
+      "price": "42000",
+      "cat": "أزياء",
+      "emoji": "👗",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s02-02/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S02-03",
+      "accountId": "acc_grad_store_02",
+      "kind": "product",
+      "status": "active",
+      "name": "قميص رجالي",
+      "nameF": "Chemise homme",
+      "price": "8500",
+      "cat": "أزياء",
+      "emoji": "👕",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s02-03/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S02-04",
+      "accountId": "acc_grad_store_02",
+      "kind": "product",
+      "status": "active",
+      "name": "حقيبة يد نسائية",
+      "nameF": "Sac à main",
+      "price": "12000",
+      "cat": "إكسسوارات",
+      "emoji": "👜",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s02-04/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S02-05",
+      "accountId": "acc_grad_store_02",
+      "kind": "product",
+      "status": "active",
+      "name": "حذاء نسائي أنيق",
+      "nameF": "Chaussures femme",
+      "price": "15000",
+      "cat": "أحذية",
+      "emoji": "👠",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s02-05/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S03-01",
+      "accountId": "acc_grad_store_03",
+      "kind": "product",
+      "status": "active",
+      "name": "خضروات طازجة — سلة يومية",
+      "nameF": "Légumes frais — panier",
+      "price": "350",
+      "cat": "أغذية",
+      "emoji": "🥬",
+      "desc": "طماطم وبصل وبطاطا موسمية.",
+      "unit": "سلة",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s03-01/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S03-02",
+      "accountId": "acc_grad_store_03",
+      "kind": "product",
+      "status": "active",
+      "name": "أرز بسمتي 25 كغ",
+      "nameF": "Riz basmati 25 kg",
+      "price": "3200",
+      "cat": "أغذية",
+      "emoji": "🍚",
+      "desc": "",
+      "unit": "كيس",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s03-02/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S03-03",
+      "accountId": "acc_grad_store_03",
+      "kind": "product",
+      "status": "active",
+      "name": "زيت نباتي 5 لتر",
+      "nameF": "Huile végétale 5 L",
+      "price": "780",
+      "cat": "أغذية",
+      "emoji": "🫒",
+      "desc": "",
+      "unit": "جالون",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s03-03/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S03-04",
+      "accountId": "acc_grad_store_03",
+      "kind": "product",
+      "status": "active",
+      "name": "سكر أبيض 1 كغ",
+      "nameF": "Sucre blanc 1 kg",
+      "price": "95",
+      "cat": "أغذية",
+      "emoji": "🧂",
+      "desc": "",
+      "unit": "كيس",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s03-04/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S03-05",
+      "accountId": "acc_grad_store_03",
+      "kind": "product",
+      "status": "active",
+      "name": "شاي أخضر فاخر 200غ",
+      "nameF": "Thé vert 200 g",
+      "price": "220",
+      "cat": "أغذية",
+      "emoji": "🍵",
+      "desc": "",
+      "unit": "علبة",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s03-05/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S03-06",
+      "accountId": "acc_grad_store_03",
+      "kind": "product",
+      "status": "active",
+      "name": "حليب سائل 1 لتر",
+      "nameF": "Lait 1 L",
+      "price": "85",
+      "cat": "أغذية",
+      "emoji": "🥛",
+      "desc": "",
+      "unit": "علبة",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s03-06/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S03-07",
+      "accountId": "acc_grad_store_03",
+      "kind": "product",
+      "status": "active",
+      "name": "تمر مجدول 1 كغ",
+      "nameF": "Dattes Majdoul 1 kg",
+      "price": "450",
+      "cat": "أغذية",
+      "emoji": "🌴",
+      "desc": "",
+      "unit": "كيس",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s03-07/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S03-08",
+      "accountId": "acc_grad_store_03",
+      "kind": "product",
+      "status": "active",
+      "name": "دقيق قمح 5 كغ",
+      "nameF": "Farine de blé 5 kg",
+      "price": "280",
+      "cat": "أغذية",
+      "emoji": "🌾",
+      "desc": "",
+      "unit": "كيس",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s03-08/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S04-01",
+      "accountId": "acc_grad_store_04",
+      "kind": "product",
+      "status": "active",
+      "name": "خاتم ذهب عيار 21",
+      "nameF": "Bague or 21K",
+      "price": "45000",
+      "cat": "ذهب",
+      "emoji": "💍",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s04-01/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S04-02",
+      "accountId": "acc_grad_store_04",
+      "kind": "product",
+      "status": "active",
+      "name": "سوار ذهب 10غ",
+      "nameF": "Bracelet or 10g",
+      "price": "82000",
+      "cat": "ذهب",
+      "emoji": "✨",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s04-02/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S04-03",
+      "accountId": "acc_grad_store_04",
+      "kind": "product",
+      "status": "active",
+      "name": "سلسلة ذهب خفيفة",
+      "nameF": "Chaîne or légère",
+      "price": "56000",
+      "cat": "ذهب",
+      "emoji": "📿",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s04-03/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S04-04",
+      "accountId": "acc_grad_store_04",
+      "kind": "product",
+      "status": "active",
+      "name": "أقراط ذهب",
+      "nameF": "Boucles d'oreilles or",
+      "price": "28000",
+      "cat": "ذهب",
+      "emoji": "💎",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s04-04/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S05-01",
+      "accountId": "acc_grad_store_05",
+      "kind": "product",
+      "status": "active",
+      "name": "كنبة زاوية عصرية",
+      "nameF": "Canapé d'angle",
+      "price": "195000",
+      "cat": "أثاث",
+      "emoji": "🛋️",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s05-01/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S05-02",
+      "accountId": "acc_grad_store_05",
+      "kind": "product",
+      "status": "active",
+      "name": "طاولة طعام 6 أشخاص",
+      "nameF": "Table à manger 6 places",
+      "price": "125000",
+      "cat": "أثاث",
+      "emoji": "🪵",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s05-02/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S05-03",
+      "accountId": "acc_grad_store_05",
+      "kind": "product",
+      "status": "active",
+      "name": "سرير زوجي خشبي",
+      "nameF": "Lit double bois",
+      "price": "98000",
+      "cat": "أثاث",
+      "emoji": "🛏️",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s05-03/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S05-04",
+      "accountId": "acc_grad_store_05",
+      "kind": "product",
+      "status": "active",
+      "name": "سجادة صالة 200×300",
+      "nameF": "Tapis salon 200×300",
+      "price": "35000",
+      "cat": "أثاث",
+      "emoji": "🧶",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s05-04/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S06-01",
+      "accountId": "acc_grad_store_06",
+      "kind": "product",
+      "status": "active",
+      "name": "فلتر زيت تويوتا",
+      "nameF": "Filtre à huile Toyota",
+      "price": "2500",
+      "cat": "سيارات",
+      "emoji": "🛢️",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s06-01/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S06-02",
+      "accountId": "acc_grad_store_06",
+      "kind": "product",
+      "status": "active",
+      "name": "بطارية 70 أمبير",
+      "nameF": "Batterie 70A",
+      "price": "18500",
+      "cat": "سيارات",
+      "emoji": "🔋",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s06-02/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S06-03",
+      "accountId": "acc_grad_store_06",
+      "kind": "product",
+      "status": "active",
+      "name": "مساحات زجاج أمامي",
+      "nameF": "Essuie-glaces",
+      "price": "3200",
+      "cat": "سيارات",
+      "emoji": "🚙",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s06-03/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
+    },
+    {
+      "id": "CAT-GRAD-S06-04",
+      "accountId": "acc_grad_store_06",
+      "kind": "product",
+      "status": "active",
+      "name": "إطار 265/65 R17",
+      "nameF": "Pneu 265/65 R17",
+      "price": "17500",
+      "cat": "سيارات",
+      "emoji": "🛞",
+      "desc": "",
+      "unit": "",
+      "images": [
+        "https://picsum.photos/seed/rizq-grad-cat-s06-04/640/480"
+      ],
+      "is_demo": true,
+      "isDemo": true,
+      "graduationDemo": true,
+      "demoSource": "graduation"
     }
   ]
 }

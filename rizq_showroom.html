@@ -1162,6 +1162,14 @@ var _params = new URLSearchParams(location.search);
 var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showroom') || '';
 
 (function applyDemoShowroomBootstrap(){
+  /* حساب له id حقيقي (غير نموذج بريستيج/الترويج) — ممنوع استبداله بكتالوج المعرض التجريبي */
+  if (_showroomId
+      && _showroomId !== 'demo_showroom'
+      && _showroomId !== 'demo-corp-001'
+      && _showroomId !== 'acc_promo_corp_rizq'
+      && !/^acc_promo_corp/.test(_showroomId)) {
+    return;
+  }
   var want = !_showroomId || _params.get('demo') === '1'
     || _showroomId === 'demo_showroom' || _showroomId === 'demo-corp-001'
     || _showroomId === 'acc_promo_corp_rizq' || /^acc_promo_corp/.test(_showroomId);
@@ -1310,6 +1318,11 @@ function loadData(){
       .then(function(res){ return res.ok ? res.json() : null; })
       .then(function(data){
         var items = (data && Array.isArray(data.items)) ? data.items : [];
+        items = items.filter(function(p){
+          if(!p) return false;
+          var owner = String(p.accountId || p.storeId || '');
+          return !owner || owner === String(_showroomId);
+        });
         if(!items.length) return;
         _allItems = items.map(function(p){
           return {
@@ -1322,7 +1335,9 @@ function loadData(){
             image: (Array.isArray(p.images) && p.images[0]) || p.image || '',
             emoji: p.emoji || '📦',
             stock: p.stock,
-            featured: false
+            featured: false,
+            accountId: _showroomId,
+            storeId: _showroomId
           };
         });
         applyAccountData();
