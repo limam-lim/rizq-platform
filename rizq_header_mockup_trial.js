@@ -1445,19 +1445,21 @@
       }
       return;
     }
-    var h = measureMockHdrExtent(hdr) || Math.ceil(hdr.getBoundingClientRect().height || 180);
-    /* استبعد شريط الأقسام الثابت إن وُجد خطأً في القياس */
-    if (bottomNav && getComputedStyle(bottomNav).position === 'fixed') {
-      h = Math.ceil(hdr.getBoundingClientRect().height || h);
-    }
-    /* سطح المكتب: padding = mock-hdr-h + gap — ثبّت المجموع على reserved (≈192) */
-    if (reserved && Math.abs((h + 12) - reserved) <= 14) {
+    /*
+     * سطح المكتب: ثق بحجز CSS فقط (192/180). إعادة القياس بعد applyMockLang
+     * كانت تحرّك NAV/hero وتضاعف CLS الدافئ (≈0.5+0.5).
+     */
+    if (reserved && reserved >= 160) {
       var mockKeep = Math.max(0, reserved - 12);
       document.body.style.setProperty('--rizq-mock-hdr-h', mockKeep + 'px');
       document.documentElement.style.setProperty('--rizq-mock-hdr-h', mockKeep + 'px');
       document.body.style.setProperty('--rizq-header-h', reserved + 'px');
       document.documentElement.style.setProperty('--rizq-header-h', reserved + 'px');
       return;
+    }
+    var h = measureMockHdrExtent(hdr) || Math.ceil(hdr.getBoundingClientRect().height || 180);
+    if (bottomNav && getComputedStyle(bottomNav).position === 'fixed') {
+      h = Math.ceil(hdr.getBoundingClientRect().height || h);
     }
     document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
     document.body.style.setProperty('--rizq-header-h', h + 'px');
