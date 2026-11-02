@@ -1,6 +1,6 @@
 /* === CLS+FOUC — حجز ≤ الارتفاع النهائي الطبيعي في main === */
 /* Critical: before external CSS — prevent navy bar + blue link flash on refresh */
-html,body{background:#eef2f8}
+html.rizq-landing,html.rizq-landing body{background:#eef2f8}
 #rizq-mock-hdr{
   position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:10050!important;
   background:#0a1628;color:#fff;box-sizing:border-box;
@@ -52,16 +52,16 @@ html,body{background:#eef2f8}
   .hero-lead-row{gap:14px!important}
 }
 /* احتياطي أولي قبل قياس JS الحيّ — يُحدَّث إلى النهائي */
-html.rizq-app-nav{--rizq-header-h:160px;--rizq-mock-hdr-h:160px;--rizq-ticker-h:19px;--rizq-mock-hdr-gap:12px}
+html.rizq-landing.rizq-app-nav{--rizq-header-h:160px;--rizq-mock-hdr-h:160px;--rizq-ticker-h:19px;--rizq-mock-hdr-gap:12px}
 /* تابلت/هاتف عريض (~768): النهائي في main ≈171 */
 @media(min-width:500px) and (max-width:768px){
-  html.rizq-app-nav{--rizq-header-h:171px;--rizq-mock-hdr-h:171px}
-  html.rizq-app-nav body{padding-top:171px!important}
+html.rizq-landing.rizq-app-nav{--rizq-header-h:171px;--rizq-mock-hdr-h:171px}
+html.rizq-landing.rizq-app-nav body{padding-top:171px!important}
 }
 @media(min-width:769px) and (min-height:501px){
   /* يطابق النهائي المستقر في main بعد syncMockHdrHeight (~180+12=192) */
-  html.rizq-app-nav{--rizq-header-h:192px;--rizq-mock-hdr-h:180px;--rizq-mock-hdr-gap:12px;--rizq-ticker-h:19px}
-  html.rizq-app-nav body{padding-top:192px!important}
+html.rizq-landing.rizq-app-nav{--rizq-header-h:192px;--rizq-mock-hdr-h:180px;--rizq-mock-hdr-gap:12px;--rizq-ticker-h:19px}
+html.rizq-landing.rizq-app-nav body{padding-top:192px!important}
   #rmh-nav-top,nav.rmh-nav-top,#rizq-mock-hdr #rmh-nav-top{
     display:none!important;height:0!important;min-height:0!important;max-height:0!important;
     overflow:hidden!important;padding:0!important;margin:0!important;border:0!important
@@ -78,7 +78,7 @@ html.rizq-app-nav{--rizq-header-h:160px;--rizq-mock-hdr-h:160px;--rizq-ticker-h:
   }
 }
 @media(max-width:768px),(orientation:landscape) and (max-height:500px){
-  html.rizq-app-nav body{padding-top:var(--rizq-mock-hdr-h,160px)!important;padding-bottom:80px!important}
+html.rizq-landing.rizq-app-nav body{padding-top:var(--rizq-mock-hdr-h,160px)!important;padding-bottom:80px!important}
   #rizq-mock-hdr #rmh-nav-top,nav.rmh-nav-top{
     display:flex!important;box-sizing:border-box!important
   }
