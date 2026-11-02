@@ -88,10 +88,20 @@ html.rizq-app-nav{--rizq-header-h:160px;--rizq-mock-hdr-h:160px;--rizq-ticker-h:
   box-sizing:border-box!important;
   animation:none!important;transform:none!important;
 }
+/* ثبّت المسار الداخلي — يمنع CLS≈1.0 من تمدّد/انكماش البطاقات أثناء applyMockLang */
+#hero-listings .cards-track-wrap,
+.hero > #hero-listings .cards-track-wrap{
+  min-height:320px!important;
+  box-sizing:border-box!important;
+}
 @media(max-width:768px){
   #hero-listings.hero-promo-strip,.hero-listings-section,
   .hero > #hero-listings.hero-promo-strip{
     margin:4px 0 0!important;padding:6px 0 16px!important
+  }
+  #hero-listings .cards-track-wrap,
+  .hero > #hero-listings .cards-track-wrap{
+    min-height:280px!important
   }
 }
 .hero-orb1,.hero-orb2,.hero-orb3{animation:none!important}
@@ -99,6 +109,10 @@ html.rizq-app-nav{--rizq-header-h:160px;--rizq-mock-hdr-h:160px;--rizq-ticker-h:
   #hero-listings.hero-promo-strip,.hero-listings-section,
   .hero > #hero-listings.hero-promo-strip{
     min-height:501px!important
+  }
+  #hero-listings .cards-track-wrap,
+  .hero > #hero-listings .cards-track-wrap{
+    min-height:404px!important
   }
 }
 #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top),nav.rmh-nav:not(.rmh-nav-top){
