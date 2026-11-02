@@ -216,6 +216,26 @@ function setShowroomModelCat(cat){
   });
   var rail = document.getElementById('rizq-srm-rail');
   if(rail) rail.setAttribute('aria-labelledby', _srmTabIdFor(cat));
+  /* إن وُجدت نتائج مسبقة لهذا التبويب استخدمها، وإلا اجلب من الخادم */
+  try {
+    var cached = window.__rizqHomeCatalog && window.__rizqHomeCatalog.showrooms
+      && window.__rizqHomeCatalog.showrooms[cat];
+    if(cached && cached.length){
+      var byAcc = {};
+      cached.forEach(function(it){
+        if(!it || !it.accountId) return;
+        var aid = String(it.accountId);
+        if(!byAcc[aid]){
+          byAcc[aid] = { acc: it.seller || { id: aid, type: 'corp' }, items: [] };
+        }
+        byAcc[aid].items.push(it);
+      });
+      window.__rizqSrmApiCatalog = Object.keys(byAcc).map(function(k){ return byAcc[k]; });
+    } else {
+      window.__rizqSrmHydrating = 0;
+      _srmHydrateFromApi();
+    }
+  } catch(eHyd){}
   buildShowroomModels(false);
   try { refreshLandingBrandStrips(); } catch(eBrand){}
 }
@@ -343,38 +363,35 @@ function buildShowroomModels(reshuffle){
   _srmUpdateTick(fr);
   requestAnimationFrame(function(){ syncMarqueeShift(rail); });
 }
-/** جلب كتالوجات المعارض من الخادم ثم إعادة بناء اللقطات */
+/** جلب كتالوجات المعارض — طلب واحد /api/catalog/home?section=showrooms&cat= */
 function _srmHydrateFromApi(){
   var base = (typeof window.RIZQ_BACKEND_BASE === 'string' ? window.RIZQ_BACKEND_BASE : '').replace(/\/$/,'');
   if(!base) return;
   if(window.__rizqSrmHydrating) return;
   window.__rizqSrmHydrating = 1;
-  fetch(base + '/api/accounts/public')
+  var cat = _rizqSrmCat || 'cars';
+  fetch(base + '/api/catalog/home?section=showrooms&cat=' + encodeURIComponent(cat) + '&limit=48')
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(data){
-      var list = (data && Array.isArray(data.accounts)) ? data.accounts : [];
-      var corps = list.filter(function(a){
-        var t = String(a && a.type || '').toLowerCase();
-        return t === 'corp' || t === 'showroom' || t === 'company';
+      if(!data || !data.ok || !Array.isArray(data.items) || !data.items.length) return;
+      window.__rizqHomeCatalog = window.__rizqHomeCatalog || {};
+      window.__rizqHomeCatalog.showrooms = window.__rizqHomeCatalog.showrooms || {};
+      window.__rizqHomeCatalog.showrooms[cat] = data.items;
+      /* توافق الجامع القديم: مصفوفة {acc, items} مجمّعة حسب الحساب */
+      var byAcc = {};
+      data.items.forEach(function(it){
+        if(!it || !it.accountId) return;
+        var aid = String(it.accountId);
+        if(!byAcc[aid]){
+          byAcc[aid] = {
+            acc: it.seller || { id: aid, name: (it.seller && it.seller.name) || aid, type: 'corp' },
+            items: []
+          };
+        }
+        byAcc[aid].items.push(it);
       });
-      if(!corps.length) return null;
-      return Promise.all(corps.map(function(acc){
-        return fetch(base + '/api/catalog?accountId=' + encodeURIComponent(acc.id) + '&kind=product')
-          .then(function(r){ return r.ok ? r.json() : null; })
-          .then(function(cdata){
-            var items = (cdata && Array.isArray(cdata.items)) ? cdata.items : [];
-            return { acc: acc, items: items };
-          })
-          .catch(function(){ return { acc: acc, items: [] }; });
-      }));
-    })
-    .then(function(rows){
-      if(!rows) return;
-      var withItems = rows.filter(function(row){ return row && row.items && row.items.length; });
-      if(withItems.length){
-        window.__rizqSrmApiCatalog = withItems;
-        try { buildShowroomModels(false); } catch(eB){}
-      }
+      window.__rizqSrmApiCatalog = Object.keys(byAcc).map(function(k){ return byAcc[k]; });
+      try { buildShowroomModels(false); } catch(eB){}
     })
     .catch(function(){})
     .then(function(){ window.__rizqSrmHydrating = 0; });

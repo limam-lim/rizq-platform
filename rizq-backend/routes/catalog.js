@@ -25,6 +25,8 @@ function mountCatalogRoutes(app, deps) {
     extractAccountToken,
     isAdminRequest,
     adminHasPermission,
+    resolveContactGate,
+    resolveOptionalAccountViewer,
   } = deps;
 
   const { scanContactLeakFields } = require('../services/contactLeakGuard');
@@ -329,6 +331,47 @@ function mountCatalogRoutes(app, deps) {
         price: it.price, image: it.image || null, createdAt: it.createdAt,
       }));
     res.json({ ok: true, items });
+  });
+
+  /**
+   * GET /api/catalog/home?section=styles|showrooms|stores&cat=&limit=
+   * مصدر موحّد لأقسام الرئيسية — منتجات معتمدة من حسابات فعّالة، كاش 60ث.
+   */
+  app.get('/api/catalog/home', async (req, res) => {
+    try {
+      const { buildHomeCatalog } = require('../services/homeCatalog');
+      const platformStore = require('../db/platformStore');
+      const { isDiamondActive } = require('../rizq_package_lifecycle_agent');
+      const q = req.query || {};
+      const viewerId = typeof resolveOptionalAccountViewer === 'function'
+        ? await resolveOptionalAccountViewer(req)
+        : null;
+      const payload = await buildHomeCatalog({
+        section: q.section,
+        cat: q.cat || q.category || '',
+        limit: q.limit,
+        viewerId,
+      }, {
+        readCatalog,
+        applyPublicCatalogCaps,
+        resolveContactGate,
+        queryPublicAccounts: platformStore.queryPublicAccounts,
+        isDiamondActive,
+      });
+      res.set('Cache-Control', 'public, max-age=60');
+      return res.json(payload);
+    } catch (err) {
+      const status = err && err.status ? err.status : 500;
+      if (status === 400) {
+        return res.status(400).json({
+          ok: false,
+          error: err.message || 'invalid_section',
+          message: 'section يجب أن يكون styles أو showrooms أو stores',
+        });
+      }
+      console.error('[catalog/home]', err && err.message);
+      return res.status(500).json({ ok: false, error: 'home_catalog_failed' });
+    }
   });
 
   /** GET /api/catalog/:id — عام فقط للعناصر النشطة؛ المالك/الأدمن يريان الباقي */
