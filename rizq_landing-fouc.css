@@ -4,7 +4,6 @@ html.rizq-landing,html.rizq-landing body{background:#eef2f8}
 html.rizq-landing #rizq-mock-hdr{
   position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:10050!important;
   background:#0a1628;color:#fff;box-sizing:border-box;
-  overflow:hidden!important;
 }
 html.rizq-landing #rizq-mock-hdr .ticker-wrap.is-empty:not(.civic-ticker-hidden),#ticker-wrap.rmh-ticker.is-empty:not(.civic-ticker-hidden){
   display:block!important;visibility:hidden!important;pointer-events:none!important;
