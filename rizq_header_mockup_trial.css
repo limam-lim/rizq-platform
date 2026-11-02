@@ -1138,9 +1138,8 @@ body > .rizq-help-dd-menu a,
   -webkit-user-select:none!important;
 }
 
-/* تابلت — أظهر تذييل الأقسام داخل شريط البحث دون تحريك موقعه */
+/* تابلت/هاتف ≤1024 — أظهر تذييل الأقسام داخل البحث؛ ارتفاع 180 للكمبيوتر اللوحي فقط */
 @media(max-width:1024px){
-  body.rizq-mockup-hdr-trial{--rizq-mock-hdr-h: 180px}
   #rizq-mock-hdr{--rmh-gutter-x:14px}
   .rmh-util{padding:4px 14px;font-size:10.5px}
   .rmh-main{
@@ -1159,6 +1158,9 @@ body > .rizq-help-dd-menu a,
   .rmh-nav a.rmh-post-nav{min-width:0;padding:clamp(5px,0.8vw,8px) clamp(2px,0.45vw,6px);font-size:clamp(10px,1.1vw,11px)}
   .rmh-nav a{min-width:0;padding:clamp(5px,0.8vw,8px) clamp(2px,0.45vw,6px);font-size:clamp(10px,1.1vw,11px);white-space:nowrap}
   .rmh-nav a[data-rmh="showrooms"]{min-width:0;font-size:clamp(9px,1vw,10.5px);white-space:nowrap!important}
+}
+@media(min-width:769px) and (max-width:1024px){
+  body.rizq-mockup-hdr-trial{--rizq-mock-hdr-h: 180px}
 }
 
 /*

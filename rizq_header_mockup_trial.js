@@ -1338,6 +1338,10 @@
     if (!hdr) return;
     var bottomNav = hdr.querySelector('nav.rmh-nav:not(.rmh-nav-top)');
     if (!bottomNav) return;
+    /* بعد أول تقسيم ناجح على الهاتف: لا تُعد ترتيب DOM (CLS دافئ) */
+    if (window.__rmhNavSplitDone && isPhone() && document.getElementById('rmh-nav-top')) {
+      return;
+    }
     captureNavSlots(bottomNav);
 
     var topNav = document.getElementById('rmh-nav-top');
@@ -1386,6 +1390,7 @@
       });
     }
     syncPhoneModelsInMore();
+    window.__rmhNavSplitDone = true;
   }
 
   function measureMockHdrExtent(hdr) {
