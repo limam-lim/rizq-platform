@@ -1555,15 +1555,9 @@
     renderCartPanel();
     wireCart();
     wireLang();
-    /* لا تستدعِ applyMockLang عند الإقلاع إذا الصفحة عربية كما في HTML — كانت تعيد كتابة DOM فتُحدث CLS */
+    /* طبّق اللغة فوراً قبل قياس الهيدر — تأخير idle كان يبدّل نصوص الشريط بعد الرسم (CLS فرنسي) */
     try {
-      if (currentMockLang() === 'fr') {
-        if (typeof requestIdleCallback === 'function') {
-          requestIdleCallback(function () { try { applyMockLang(); } catch (eL0) {} }, { timeout: 4000 });
-        } else {
-          setTimeout(function () { try { applyMockLang(); } catch (eL1) {} }, 500);
-        }
-      }
+      applyMockLang();
     } catch (eBootLang) {}
     wireHelp();
     ensureToolsInteractive();

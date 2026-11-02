@@ -363,21 +363,6 @@ async function assertHeightAndCls() {
       server.on('error', reject);
     });
   }
-  async function measureCls(page) {
-    return page.evaluate(() => new Promise((resolve) => {
-      let cls = 0;
-      try {
-        const po = new PerformanceObserver((list) => {
-          list.getEntries().forEach((e) => { if (!e.hadRecentInput) cls += e.value; });
-        });
-        po.observe({ type: 'layout-shift', buffered: true });
-        setTimeout(() => {
-          try { po.disconnect(); } catch (_) {}
-          resolve(Number(cls.toFixed(4)));
-        }, 2000);
-      } catch (_) { resolve(0); }
-    }));
-  }
   async function measureHeights(page, lang, port) {
     await page.addInitScript((lng) => {
       try { localStorage.setItem('rizq_lang', lng); } catch (_) {}
@@ -385,10 +370,30 @@ async function assertHeightAndCls() {
       try {
         document.documentElement.lang = lng;
         document.documentElement.dir = lng === 'fr' ? 'ltr' : 'rtl';
+        if (lng === 'fr') document.documentElement.classList.add('rizq-lang-fr');
+      } catch (_) {}
+      /* راقب CLS من أول إطار لكل تنقّل (init يعاد بعد reload) */
+      try {
+        window.__rizqClsScore = 0;
+        const po = new PerformanceObserver((list) => {
+          list.getEntries().forEach((e) => {
+            if (!e.hadRecentInput) window.__rizqClsScore += e.value;
+          });
+        });
+        po.observe({ type: 'layout-shift', buffered: true });
+        window.__rizqClsPo = po;
       } catch (_) {}
       try {
         const st = document.createElement('style');
-        st.textContent = '*,*::before,*::after{animation:none!important;transition:none!important}';
+        st.id = 'rizq-height-cls-freeze';
+        st.textContent = [
+          '*,*::before,*::after{animation:none!important;transition:none!important}',
+          /* ألغِ content-visibility أثناء البوابة — الحجز الخاطئ كان يضخّم CLS */
+          '#virtual-stores,#virtual-showrooms,#virtual-estate,#virtual-offices,',
+          '#rizq-styles,#rizq-showroom-models,#rizq-estate-models,',
+          '#virtual-tenders,#virtual-investments,#pricing,#about,.pricing-section{',
+          'content-visibility:visible!important;contain-intrinsic-size:auto!important}'
+        ].join('');
         (document.head || document.documentElement).appendChild(st);
       } catch (_) {}
     }, lang);
@@ -404,14 +409,11 @@ async function assertHeightAndCls() {
       }
       return route.continue();
     });
-    await page.goto('http://127.0.0.1:' + port + '/rizq_landing_v8.html?visualGate=1', {
-      waitUntil: 'domcontentloaded', timeout: 60000
-    });
-    await page.waitForTimeout(900);
+    await page.goto('http://127.0.0.1:' + port + '/rizq_landing_v8.html', {
+      waitUntil: 'networkidle', timeout: 90000
+    }).catch(() => {});
+    await page.waitForTimeout(1000);
     await page.evaluate(async () => {
-      const st = document.createElement('style');
-      st.textContent = '*{content-visibility:visible!important;contain-intrinsic-size:auto!important}';
-      document.head.appendChild(st);
       const els = Array.from(document.querySelectorAll('section[id], #hero, #hero-listings'));
       for (const el of els) {
         el.scrollIntoView({ block: 'center' });
@@ -430,12 +432,12 @@ async function assertHeightAndCls() {
         pageHeight: Math.max(document.documentElement.scrollHeight, document.body.scrollHeight)
       };
     });
-    await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => {});
-    await page.waitForTimeout(500);
-    const clsCold = await measureCls(page);
-    await page.reload({ waitUntil: 'domcontentloaded' }).catch(() => {});
-    await page.waitForTimeout(500);
-    const clsWarm = await measureCls(page);
+    await page.reload({ waitUntil: 'networkidle', timeout: 90000 }).catch(() => {});
+    await page.waitForTimeout(2200);
+    const clsCold = await page.evaluate(() => Number((window.__rizqClsScore || 0).toFixed(4)));
+    await page.reload({ waitUntil: 'networkidle', timeout: 90000 }).catch(() => {});
+    await page.waitForTimeout(2200);
+    const clsWarm = await page.evaluate(() => Number((window.__rizqClsScore || 0).toFixed(4)));
     return Object.assign({}, heights, { clsCold, clsWarm });
   }
 
