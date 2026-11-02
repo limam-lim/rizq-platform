@@ -107,9 +107,13 @@ async function readSiteConfigSafe() {
   }
 }
 
+const DEFAULT_MIN_ACTIVE_ADS_TO_SHOW = 50;
+
 function normalizeMinActiveAdsToShow(raw) {
+  if (raw == null || raw === '') return DEFAULT_MIN_ACTIVE_ADS_TO_SHOW;
   const n = Number(raw);
-  if (!Number.isFinite(n) || n < 0) return 0;
+  if (!Number.isFinite(n)) return DEFAULT_MIN_ACTIVE_ADS_TO_SHOW;
+  if (n < 0) return 0;
   return Math.min(1000000, Math.floor(n));
 }
 
@@ -121,7 +125,7 @@ function _settingsFromParts(launchDate, freeDays, freeUntil, source, minActiveAd
     source,
     maintenanceDryRun: !launchDate,
     minActiveAdsToShow: normalizeMinActiveAdsToShow(
-      minActiveAdsToShow != null ? minActiveAdsToShow : 0
+      minActiveAdsToShow != null ? minActiveAdsToShow : DEFAULT_MIN_ACTIVE_ADS_TO_SHOW
     ),
   };
 }
@@ -258,7 +262,7 @@ async function publicLaunchConfig(moduleFlags, nowMs) {
     trialClaimWindowDays: TRIAL_CLAIM_WINDOW_DAYS,
     minActiveAdsToShow: settings.minActiveAdsToShow != null
       ? settings.minActiveAdsToShow
-      : 0,
+      : DEFAULT_MIN_ACTIVE_ADS_TO_SHOW,
   };
 }
 
@@ -332,6 +336,7 @@ module.exports = {
   freeUntilEndMs,
   normalizeFreeDays,
   normalizeMinActiveAdsToShow,
+  DEFAULT_MIN_ACTIVE_ADS_TO_SHOW,
   getLaunchSettings,
   getLaunchFreeUntil,
   isMaintenanceDryRun,

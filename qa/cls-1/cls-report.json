@@ -42,7 +42,7 @@
       },
       "/rizq_browse.html": {
         "cold": 0.0012,
-        "warm": 0.0393,
+        "warm": 0.0013,
         "scrollRestoration": "manual"
       },
       "/rizq_products.html": {
@@ -58,7 +58,7 @@
     },
     "1440": {
       "/rizq_landing_v8.html": {
-        "cold": 0.018,
+        "cold": 0.0016,
         "warm": 0.0054,
         "scrollRestoration": "manual"
       },
@@ -73,7 +73,7 @@
         "scrollRestoration": "manual"
       },
       "/rizq_store.html": {
-        "cold": 0.0495,
+        "cold": 0.0496,
         "warm": 0.0496,
         "scrollRestoration": "manual"
       }

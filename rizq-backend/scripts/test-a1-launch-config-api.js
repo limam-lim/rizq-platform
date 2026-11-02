@@ -96,7 +96,15 @@ async function main() {
     check('future launch computes freeUntil', r.status === 200 && r.launch.freeUntil === '2026-12-30');
     check('not dry-run', r.launch.maintenanceDryRun === false);
     check('daysRemaining present', r.launch.daysRemaining != null);
-    check('minActiveAdsToShow default 0', r.launch.minActiveAdsToShow === 0);
+
+    {
+      const cur = (await repos.getSiteConfig()) || {};
+      const cleared = Object.assign({}, cur);
+      delete cleared.minActiveAdsToShow;
+      await repos.saveSiteConfig(cleared);
+      const pub = await launchMode.publicLaunchConfig({});
+      check('minActiveAdsToShow default 50 when unset', pub.minActiveAdsToShow === 50);
+    }
 
     r = await saveLaunch({ launchDate: '2026-10-01', freeDays: 90, minActiveAdsToShow: 5 });
     check('minActiveAdsToShow saved', r.status === 200 && r.stored.minActiveAdsToShow === 5
