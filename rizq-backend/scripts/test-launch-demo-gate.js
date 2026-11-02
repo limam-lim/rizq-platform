@@ -23,11 +23,15 @@ function extractInventoryAllowedSource() {
   ok('inventoryAllowed waits for cache or site-config',
     src.includes('__RIZQ_LAUNCH_FROM_CACHE') && src.includes('__RIZQ_SITE_CONFIG_READY'));
   ok('minActiveAdsToShow helper exported on RizqDemo', src.includes('minActiveAdsToShow'));
-  const landing = fs.readFileSync(path.join(__dirname, '..', '..', 'rizq_landing_v8.html'), 'utf8');
+  const landingHtml = fs.readFileSync(path.join(__dirname, '..', '..', 'rizq_landing_v8.html'), 'utf8');
+  const landingAds = fs.readFileSync(path.join(__dirname, '..', '..', 'landing-ads.js'), 'utf8');
+  const landingPrices = fs.readFileSync(path.join(__dirname, '..', '..', 'landing-prices.js'), 'utf8');
   ok('landing gates early buildCards via _rizqMaybePaintDemoInventory',
-    landing.includes('_rizqMaybePaintDemoInventory'));
+    landingAds.includes('_rizqMaybePaintDemoInventory')
+    || landingHtml.includes('_rizqMaybePaintDemoInventory'));
   ok('landing hides ads stat below minActiveAdsToShow',
-    landing.includes('minActiveAdsToShow') && landing.includes("data-stat=\"ads\""));
+    (landingPrices.includes('minActiveAdsToShow') || landingHtml.includes('minActiveAdsToShow'))
+    && landingHtml.includes("data-stat=\"ads\""));
   const browse = fs.readFileSync(path.join(__dirname, '..', '..', 'rizq_browse.html'), 'utf8');
   ok('browse syncs DEMO after rizq:launch', browse.includes('syncDemoWithLaunch'));
   const panel = fs.readFileSync(path.join(__dirname, '..', '..', 'rizq_cp_panel.html'), 'utf8');
@@ -45,9 +49,13 @@ async function main() {
 
   launchMode.setLaunchSettingsForTests({ launchDate: '', freeDays: 90, minActiveAdsToShow: 0 });
   pub = await launchMode.publicLaunchConfig({});
-  ok('empty launchDate ⇒ default min 0', pub.minActiveAdsToShow === 0);
+  ok('explicit minActiveAdsToShow 0 stays 0', pub.minActiveAdsToShow === 0);
+  launchMode.setLaunchSettingsForTests({ launchDate: '', freeDays: 90 });
+  pub = await launchMode.publicLaunchConfig({});
+  ok('unset minActiveAdsToShow ⇒ default 50', pub.minActiveAdsToShow === 50);
   ok('normalize clamps negative to 0', launchMode.normalizeMinActiveAdsToShow(-4) === 0);
   ok('normalize floors float', launchMode.normalizeMinActiveAdsToShow(2.9) === 2);
+  ok('normalize null ⇒ default 50', launchMode.normalizeMinActiveAdsToShow(null) === 50);
 
   launchMode.setLaunchSettingsForTests(null);
 

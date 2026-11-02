@@ -7547,7 +7547,20 @@ function renderSubRequests(){
         // النظام مثل r.pkg. كانت تُدرَج خاماً هنا (نفس علّة renderAds/renderUsers).
         '<td style="padding:10px">' + escapeHtml(r.account||'-') + '</td>' +
         '<td style="padding:10px;font-weight:700;color:#1B3A6B">' + r.pkg + videoBadge + tenderBadge + adBoostBadge + '</td>' +
-        '<td style="padding:10px;color:#C9A84C;font-weight:700">' + (r.price>0 ? Number(r.price).toLocaleString()+' MRU' : RizqI18n.t2('مجاناً','Gratuit')) + '</td>' +
+        '<td style="padding:10px;color:#C9A84C;font-weight:700">' + (function(){
+          var priceHtml = (r.price>0 ? Number(r.price).toLocaleString()+' MRU' : RizqI18n.t2('مجاناً','Gratuit'));
+          if(r.packageCredit && r.packageCredit.applicable){
+            var listP = (r.listPrice != null ? r.listPrice : r.expectedPrice);
+            var creditLine = '<div style="font-size:10.5px;color:#065f46;font-weight:600;margin-top:4px;max-width:180px;line-height:1.45">'
+              + escapeHtml(r.packageCredit.formulaAr || '')
+              + (listP != null && Number(listP) !== Number(r.price)
+                ? ('<br>'+RizqI18n.t2('سعر الباقة ','Prix ') + Number(listP).toLocaleString() + ' → ' + Number(r.price).toLocaleString() + ' MRU')
+                : '')
+              + '</div>';
+            return priceHtml + creditLine;
+          }
+          return priceHtml;
+        })() + '</td>' +
         '<td style="padding:10px;color:#2C3A4F">' + dt + '</td>' +
         '<td style="padding:10px">' + receiptCell + '</td>' +
         '<td style="padding:10px;max-width:180px">' + analysisCell + '</td>' +

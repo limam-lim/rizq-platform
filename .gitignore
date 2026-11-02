@@ -40,3 +40,15 @@ qa/ui-logic-1/console-*.json
 qa/ui-logic-1/*-report.json
 qa/ui-logic-1/node_modules/
 qa/ui-logic-1/package-lock.json
+
+# لقطات واختلافات بصرية — محلية فقط (لا تُرفع)
+qa/*/shots/
+qa/*/shots/**
+!qa/*/shots/.gitkeep
+qa/visual-diff/*-new.png
+qa/visual-diff/*-diff.png
+qa/**/*-diff.png
+qa/refactor-landing-1/package-lock.json
+qa/refactor-landing-1/node_modules/
+qa/home-commerce-1/.baseline-main/
+qa/home-commerce-1/height-*.json

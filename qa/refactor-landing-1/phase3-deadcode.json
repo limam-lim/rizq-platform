@@ -1,0 +1,58 @@
+{
+  "decision": "no-safe-deletes",
+  "reason": "JS modules all referenced from HTML; CSS unused ranges overlap interactive/media-query paths; repo search required before any selector delete",
+  "coverage_css_top": [
+    {
+      "url": "/rizq_landing-ads-preview.css?v=1.0",
+      "bytes": 1261,
+      "unusedPct": 69.31
+    },
+    {
+      "url": "/rizq_landing_ux.css?v=31.5",
+      "bytes": 39683,
+      "unusedPct": 59.47
+    },
+    {
+      "url": "/rizq_landing-main.css?v=1.0",
+      "bytes": 250203,
+      "unusedPct": 52.54
+    },
+    {
+      "url": "/rizq_landing-mobile-critical.css?v=1.0",
+      "bytes": 6956,
+      "unusedPct": 33.05
+    },
+    {
+      "url": "/rizq_landing-fouc.css?v=1.0",
+      "bytes": 7846,
+      "unusedPct": 17.13
+    }
+  ],
+  "coverage_js_top": [
+    {
+      "url": "/landing-scroll-boot.js?v=1.0",
+      "bytes": 0,
+      "unusedPct": 0
+    },
+    {
+      "url": "/landing-fonts-boot.js?v=1.0",
+      "bytes": 0,
+      "unusedPct": 0
+    },
+    {
+      "url": "/landing-url-boot.js?v=1.0",
+      "bytes": 0,
+      "unusedPct": 0
+    },
+    {
+      "url": "/landing-navclass-boot.js?v=1.0",
+      "bytes": 0,
+      "unusedPct": 0
+    },
+    {
+      "url": "/landing-lang-boot.js?v=1.0",
+      "bytes": 0,
+      "unusedPct": 0
+    }
+  ]
+}

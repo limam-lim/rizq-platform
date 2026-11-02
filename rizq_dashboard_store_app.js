@@ -2962,7 +2962,7 @@ var _payPkg = null;
 var _payFile = null;
 
 function openPayModal(pkgName, pkgPrice, category){
-  _payPkg = {name: pkgName, price: pkgPrice, category: category || 'package'};
+  _payPkg = {name: pkgName, price: pkgPrice, category: category || 'package', listPrice: pkgPrice};
   _payFile = null;
   document.getElementById('pay-pkg-name').textContent = pkgName;
   var amtEl = document.getElementById('pay-amount');
@@ -2975,6 +2975,46 @@ function openPayModal(pkgName, pkgPrice, category){
       amtEl.textContent = Number(pkgPrice).toLocaleString() + ' MRU';
     }
   }
+  var creditBox = document.getElementById('pay-credit-box');
+  if(creditBox){ creditBox.style.display = 'none'; creditBox.textContent = ''; }
+  /* رصيد تبديل الباقة — حساب خادمي واضح للتاجر */
+  try {
+    if((_payPkg.category || 'package') === 'package'
+      && window.RIZQ_BACKEND_BASE && SESSION_ID && SESSION_TOKEN
+      && !(typeof RizqSub !== 'undefined' && RizqSub.isPriceUnset && RizqSub.isPriceUnset(pkgPrice))){
+      var cUrl = window.RIZQ_BACKEND_BASE.replace(/\/$/,'')
+        + '/api/sub-requests/package-credit?accountId=' + encodeURIComponent(SESSION_ID)
+        + '&pkg=' + encodeURIComponent(pkgName);
+      fetch(cUrl, { headers: { 'x-account-token': (window.REAL_ACCESS_TOKEN || SESSION_TOKEN) } })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(data){
+          if(!data || !data.ok || !data.packageCredit || !data.packageCredit.applicable) return;
+          var c = data.packageCredit;
+          _payPkg.price = data.price;
+          _payPkg.listPrice = data.listPrice;
+          _payPkg.packageCredit = c;
+          if(amtEl){
+            amtEl.textContent = (Number(data.price) > 0)
+              ? (Number(data.price).toLocaleString() + ' MRU')
+              : _t2('مجاناً (رصيد الباقة)','Gratuit (crédit forfait)');
+          }
+          if(creditBox){
+            var fr = (typeof _storeLang !== 'undefined' && _storeLang === 'fr');
+            creditBox.style.display = 'block';
+            creditBox.innerHTML = '<div style="font-weight:800;margin-bottom:4px">'
+              + (fr ? 'Crédit du forfait actuel (pas de remboursement cash)' : 'رصيد الباقة الحالية (لا يُرد نقداً)')
+              + '</div>'
+              + '<div>' + (fr ? (c.formulaFr || '') : (c.formulaAr || '')) + '</div>'
+              + (Number(data.listPrice) !== Number(data.price)
+                ? ('<div style="margin-top:4px">' + (fr ? 'Prix catalogue : ' : 'سعر الباقة : ')
+                  + Number(data.listPrice).toLocaleString() + ' MRU → '
+                  + (fr ? 'après crédit : ' : 'بعد الرصيد : ')
+                  + Number(data.price).toLocaleString() + ' MRU</div>')
+                : '');
+          }
+        }).catch(function(){});
+    }
+  } catch(eCred){}
   document.getElementById('pay-receipt-name').style.display = 'none';
   document.getElementById('pay-receipt-file').value = '';
   var vidWrap = document.getElementById('pay-video-url-wrap');

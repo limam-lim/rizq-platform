@@ -88,7 +88,7 @@
     maintenanceDryRun: true,
     openSections: null,
     foundingDiscountPercent: 40,
-    minActiveAdsToShow: 0,
+    minActiveAdsToShow: 50,
   };
   window.RIZQ_LAUNCH = window.RIZQ_LAUNCH || Object.assign({}, _launchDefaults);
   window.__RIZQ_LAUNCH_FROM_CACHE = false;
