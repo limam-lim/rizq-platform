@@ -1378,25 +1378,18 @@ html[dir="ltr"] .rizq-lang-fallback-block{ text-align:left; }
 
 /* ── محلات / مكاتب / معارض: هيدر ومساحات مضغوطة على الهاتف ── */
 @media(max-width:768px){
-  /* لا تُصفّر min-height — كان hero-cover 308→410 يسبب CLS≈0.14 */
-  .store-hero{
-    min-height:410px!important;
-    height:auto!important;
-  }
+  .store-hero,
   .office-hero,
   .showroom-hero{
     min-height:0!important;
     height:auto!important;
   }
   .store-hero .hero-cover,
-  #store-hero .hero-cover{
-    padding:16px 12px 12px!important;
-    min-height:410px!important;
-  }
   .office-hero .hero-cover,
   .showroom-hero .hero-cover,
   .hero-cover{
     padding:16px 12px 12px!important;
+    min-height:0!important;
   }
   .store-logo-wrap,
   .office-logo,
