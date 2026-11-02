@@ -527,8 +527,28 @@ async function _activateClaimed(req, deps) {
       const paidPrice = Number(req.price) || 0;
       const priorLive = priorPackageOf(existingPkg);
       const nextRef = { packageId: newPkgId, pkgName: req.pkg };
-      /* طلب ثانٍ متزامن بعد تفعيل نفس الباقة — لا تُمدَّد/يُحتسب الرصيد مرة أخرى */
-      if (priorLive && isSamePackage(priorLive, nextRef) && isPackageStillActive(priorLive, Date.now())) {
+      /*
+       * تجديد نفس الباقة وهي فعّالة → يُمدَّد من periodEnd (لا تخطٍّ).
+       * رصيد التبديل فقط عند packageId مختلف.
+       * طلب تبديل متزامن وصل بعد أن اكتمل التبديل على الهدف → تخطٍّ (لا تمديد مزدوج).
+       */
+      const reqLooksLikeSwitch = !!(req.packageCredit && req.packageCredit.applicable);
+      let recentSwitchToTarget = false;
+      try {
+        const hist0 = Array.isArray(existingPkg && existingPkg.packageHistory)
+          ? existingPkg.packageHistory[0]
+          : null;
+        if (hist0 && hist0.endedAt) {
+          const age = Date.now() - new Date(hist0.endedAt).getTime();
+          recentSwitchToTarget = Number.isFinite(age) && age >= 0 && age < 15000;
+        }
+      } catch (eHist) { recentSwitchToTarget = false; }
+      if (
+        priorLive
+        && isSamePackage(priorLive, nextRef)
+        && isPackageStillActive(priorLive, Date.now())
+        && (reqLooksLikeSwitch || recentSwitchToTarget)
+      ) {
         return {
           ok: true,
           category: 'package',

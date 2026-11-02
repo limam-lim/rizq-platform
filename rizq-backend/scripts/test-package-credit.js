@@ -71,11 +71,24 @@ const near = (ms, expected, tolMs) => Math.abs(ms - expected) <= (tolMs || 90000
     ok('same package → not applicable', same.applicable === false && same.amountDue === 3000, same);
   }
 
-  console.log('\n— computeActivationPeriod + credit —');
+  console.log('\n— computeActivationPeriod: 4 cases (renew / expired / credit / same) —');
   {
     const t0 = Date.now();
     const in10 = new Date(t0 + 10 * DAY).toISOString();
+    const past = new Date(t0 - 2 * DAY).toISOString();
     const active = { packageId: 'st-month', pkgName: 'شهرية', status: 'active', periodEnd: in10, price: 3000 };
+    const expired = { packageId: 'st-month', pkgName: 'شهرية', status: 'expired', periodEnd: past, price: 3000 };
+
+    const renew = computeActivationPeriod(30, active, { packageId: 'st-month', pkgName: 'شهرية' });
+    ok('same package while active: extends from current end',
+      near(new Date(renew.periodEnd).getTime(), new Date(in10).getTime() + 30 * DAY) && renew.samePackage === true,
+      { end: renew.periodEnd, from: in10 });
+
+    const renewExpired = computeActivationPeriod(30, expired, { packageId: 'st-month', pkgName: 'شهرية' });
+    ok('same package expired: from today',
+      near(new Date(renewExpired.periodEnd).getTime(), t0 + 30 * DAY),
+      renewExpired.periodEnd);
+
     const credit = computePackageCredit({
       switched: true, active: true,
       oldPrice: 3000, oldDays: 30, periodEnd: in10,
@@ -83,8 +96,11 @@ const near = (ms, expected, tolMs) => Math.abs(ms - expected) <= (tolMs || 90000
     });
     const period = computeActivationPeriod(30, active, { packageId: 'st-basic', pkgName: 'أساسية' }, credit);
     ok('switch with surplus credit extends period',
-      near(new Date(period.periodEnd).getTime(), t0 + credit.totalDays * DAY),
+      near(new Date(period.periodEnd).getTime(), t0 + credit.totalDays * DAY) && period.switchedPackage === true,
       { end: period.periodEnd, totalDays: credit.totalDays });
+
+    const sameNoCredit = computePackageCredit({ switched: false, newPrice: 3000, newDays: 30 });
+    ok('same-package credit not applicable', sameNoCredit.applicable === false, sameNoCredit);
   }
 
   const now = Date.now();

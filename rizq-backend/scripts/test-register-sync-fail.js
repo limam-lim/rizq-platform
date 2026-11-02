@@ -1,7 +1,7 @@
 /**
  * يثبت أن فشل POST /api/accounts (429 / 409) لا يُعرض كنجاح في مسار التسجيل.
- * - يختبر رسائل _syncAccountFailMessage عبر تقييم الدالة من rizq_landing_v8.html
- * - يختبر مسار الواجهة: اعتراض fetch → لا تظهر #p-ok
+ * - الدوال في landing-chrome.js / بوابة ppFinalSubmit في landing-register.js (بعد تفكيك اللاندينغ)
+ * - مسار الواجهة: اعتراض fetch → لا تظهر #p-ok
  *
  * تشغيل: node scripts/test-register-sync-fail.js
  */
@@ -20,26 +20,13 @@ function ok(name, pass, detail) {
   console.log((pass ? 'OK  ' : 'FAIL') + ' ' + name + (detail ? ' — ' + detail : ''));
 }
 
-function extractFn(src, name) {
-  const re = new RegExp('function\\s+' + name + '\\s*\\([^)]*\\)\\s*\\{');
-  const m = re.exec(src);
-  if (!m) return null;
-  let i = m.index + m[0].length;
-  let depth = 1;
-  while (i < src.length && depth > 0) {
-    const c = src[i++];
-    if (c === '{') depth += 1;
-    else if (c === '}') depth -= 1;
-  }
-  return src.slice(m.index, i);
-}
-
 async function testMessageHelper() {
-  const html = fs.readFileSync(path.join(ROOT, 'rizq_landing_v8.html'), 'utf8');
-  ok('landing contains _syncAccountFailMessage', html.includes('function _syncAccountFailMessage'));
-  ok('landing rolls back on !res.ok', /if\s*\(\s*!res\.ok\s*\)/.test(html) && html.includes('_rollbackLocalAccount'));
-  ok('landing no longer returns ok:true on missing token', !/if\s*\(\s*!data\s*\|\|\s*!data\.ok\s*\|\|\s*!data\.accessToken\s*\)\s*return\s*\{\s*ok:\s*true\s*\}/.test(html));
-  ok('ppFinalSubmit gates on result.ok === false', html.includes('result.ok === false') && html.includes('_reenablePkgSubmitBtn'));
+  const chrome = fs.readFileSync(path.join(ROOT, 'landing-chrome.js'), 'utf8');
+  const register = fs.readFileSync(path.join(ROOT, 'landing-register.js'), 'utf8');
+  ok('landing-chrome contains _syncAccountFailMessage', chrome.includes('function _syncAccountFailMessage'));
+  ok('landing-chrome rolls back on !res.ok', /if\s*\(\s*!res\.ok\s*\)/.test(chrome) && chrome.includes('_rollbackLocalAccount'));
+  ok('landing-chrome no longer returns ok:true on missing token', !/if\s*\(\s*!data\s*\|\|\s*!data\.ok\s*\|\|\s*!data\.accessToken\s*\)\s*return\s*\{\s*ok:\s*true\s*\}/.test(chrome));
+  ok('landing-register ppFinalSubmit gates on result.ok === false', register.includes('result.ok === false') && register.includes('_reenablePkgSubmitBtn'));
   ok('estate register checks !res.ok', fs.readFileSync(path.join(ROOT, 'rizq_real_estate_register.html'), 'utf8').includes('!res.ok'));
 
   // Evaluate bilingual messages in a page context (uses isAr from landing)
