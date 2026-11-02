@@ -1,0 +1,32 @@
+{
+  "cssBytes": 275188,
+  "cssImportant": 1077,
+  "htmlBytes": 183721,
+  "htmlLines": 2044,
+  "files": [
+    "landing-core.js",
+    "landing-ads.js",
+    "landing-styles.js",
+    "landing-showrooms.js",
+    "landing-estate.js",
+    "landing-qcat.js",
+    "landing-hero.js",
+    "landing-categories.js",
+    "landing-i18n.js",
+    "landing-chrome.js",
+    "landing-register.js",
+    "landing-prices.js",
+    "landing-scroll-boot.js",
+    "landing-url-boot.js",
+    "landing-navclass-boot.js",
+    "landing-lang-boot.js",
+    "landing-ads-preview.js",
+    "landing-pkg-modal.js",
+    "landing-promo.js",
+    "landing-visitor-video.js",
+    "landing-trial-bar.js",
+    "landing-legal-notice.js",
+    "landing-discovery.js",
+    "landing-prices-date.js"
+  ]
+}

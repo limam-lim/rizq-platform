@@ -1,0 +1,16 @@
+{
+  "name": "refactor-landing-1",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Visual gate and extract tooling for landing refactor",
+  "scripts": {
+    "baseline": "node visual-gate.js baseline",
+    "gate": "node visual-gate.js compare",
+    "extract": "node extract-phase1.js"
+  },
+  "dependencies": {
+    "pixelmatch": "^5.3.0",
+    "pngjs": "^7.0.0",
+    "playwright": "1.49.1"
+  }
+}
