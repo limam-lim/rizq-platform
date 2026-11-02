@@ -78,7 +78,27 @@
     ]
   };
 
+  /**
+   * كتالوج التخرج التجريبي فقط عندما تسمح المنصة بالمخزون التجريبي
+   * (نفس RizqDemo.inventoryAllowed — لا منتجات بعد ضبط launchDate).
+   */
+  function inventoryAllowed() {
+    try {
+      var demo = global.RizqDemo || (global.window && global.window.RizqDemo);
+      if (demo && typeof demo.inventoryAllowed === 'function') {
+        return !!demo.inventoryAllowed();
+      }
+    } catch (eDemo) { /* fall through */ }
+    try {
+      var L = global.RIZQ_LAUNCH || (global.window && global.window.RIZQ_LAUNCH);
+      return !(L && L.launchDate);
+    } catch (eL) {
+      return true;
+    }
+  }
+
   function productsFor(accountId) {
+    if (!inventoryAllowed()) return [];
     var id = String(accountId || '');
     var list = BY_ACCOUNT[id];
     if (!list) return [];
@@ -112,6 +132,7 @@
   global.RizqGraduationCatalog = {
     BY_ACCOUNT: BY_ACCOUNT,
     productsFor: productsFor,
+    inventoryAllowed: inventoryAllowed,
     allAccountIds: allAccountIds,
     isAlNourDemoId: isAlNourDemoId,
     ownedOnly: ownedOnly

@@ -163,10 +163,29 @@ async function main() {
   assert.strictEqual(Grad.productsFor('acc_unknown_xyz').length, 0);
   assert.ok(Grad.isAlNourDemoId('demo_store'));
   assert.ok(!Grad.isAlNourDemoId('acc_grad_store_03'));
+  // بعد launchDate: لا منتجات تجريبية
+  sandbox.RIZQ_LAUNCH = { launchDate: '2025-06-01' };
+  sandbox.window.RIZQ_LAUNCH = sandbox.RIZQ_LAUNCH;
+  assert.strictEqual(Grad.productsFor('acc_grad_store_03').length, 0, 'productsFor empty after launchDate');
+  sandbox.RIZQ_LAUNCH = { launchDate: null };
+  sandbox.window.RIZQ_LAUNCH = sandbox.RIZQ_LAUNCH;
+  assert.strictEqual(Grad.productsFor('acc_grad_store_03').length, 8, 'productsFor restored without launchDate');
 
   const { server, base } = await startStaticServer();
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
+  // وضع ما قبل الإطلاق: يسمح بمخزون التخرج التجريبي
+  await page.addInitScript(() => {
+    try {
+      localStorage.setItem('rizq_launch_cache_v1', JSON.stringify({
+        launchDate: null,
+        freeDays: 90,
+        freeUntil: null,
+        minActiveAdsToShow: 0,
+        savedAt: Date.now()
+      }));
+    } catch (e) {}
+  });
   const report = [];
 
   try {
@@ -258,6 +277,71 @@ async function main() {
     await assertOwned(page, 'acc_grad_empty_test_99', { expectMin: 0 });
     const emptyBody = await page.evaluate(() => document.body.innerText);
     assert.ok(emptyBody.indexOf('دراعة رجالية فاخرة') < 0, 'empty account must not show Al-Nour fashion');
+
+    // بعد launchDate: سوق الأمل (acc_grad_store_03) → لا توجد منتجات بعد
+    const ctxLaunch = await browser.newContext();
+    await ctxLaunch.addInitScript(() => {
+      try {
+        localStorage.setItem('rizq_launch_cache_v1', JSON.stringify({
+          launchDate: '2025-06-01',
+          freeDays: 90,
+          freeUntil: '2025-08-30',
+          minActiveAdsToShow: 50,
+          savedAt: Date.now()
+        }));
+        localStorage.removeItem('store_products_acc_grad_store_03');
+      } catch (e) {}
+    });
+    const pageLaunch = await ctxLaunch.newPage();
+    await pageLaunch.route('**/api/catalog**', (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true, items: [] })
+      });
+    });
+    await pageLaunch.route('**/api/accounts/**', (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ok: true,
+          account: {
+            id: 'acc_grad_store_03',
+            type: 'store',
+            status: 'approved',
+            name: 'سوق الأمل للأغذية',
+            graduationDemo: true
+          }
+        })
+      });
+    });
+    await pageLaunch.goto(base + '/rizq_store.html?id=acc_grad_store_03', {
+      waitUntil: 'domcontentloaded',
+      timeout: 30000
+    });
+    await pageLaunch.waitForFunction(() => !!window.RizqGraduationCatalog && !!window.RizqDemo, null, { timeout: 10000 }).catch(() => {});
+    await pageLaunch.waitForTimeout(900);
+    const postLaunch = await pageLaunch.evaluate(() => {
+      const allowed = !!(window.RizqDemo && RizqDemo.inventoryAllowed && RizqDemo.inventoryAllowed());
+      const gradCount = (window.RizqGraduationCatalog && RizqGraduationCatalog.productsFor)
+        ? RizqGraduationCatalog.productsFor('acc_grad_store_03').length : -1;
+      const emptyEl = document.getElementById('products-empty');
+      const emptyVisible = !!(emptyEl && emptyEl.offsetParent !== null);
+      const emptyText = emptyEl ? (emptyEl.textContent || '') : '';
+      const cards = document.querySelectorAll('.product-card').length;
+      return { allowed, gradCount, emptyVisible, emptyText, cards, body: (document.body.innerText || '') };
+    });
+    assert.strictEqual(postLaunch.allowed, false, 'inventoryAllowed must be false after launchDate');
+    assert.strictEqual(postLaunch.gradCount, 0, 'graduation productsFor must be empty after launchDate');
+    assert.ok(
+      postLaunch.emptyVisible || /لا توجد منتجات بعد/.test(postLaunch.emptyText) || /لا توجد منتجات بعد/.test(postLaunch.body),
+      'acc_grad_store_03 must show empty state after launchDate: ' + JSON.stringify(postLaunch)
+    );
+    assert.ok(postLaunch.cards === 0, 'no product cards after launchDate, got ' + postLaunch.cards);
+    report.push({ id: 'acc_grad_store_03@post-launch', ok: true, empty: true });
+    await pageLaunch.close();
+    await ctxLaunch.close();
 
     console.log(JSON.stringify({ ok: true, stores: report.length, report }, null, 2));
     console.log('OK: store catalog ownership passed');

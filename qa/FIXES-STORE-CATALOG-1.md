@@ -8,6 +8,7 @@ Branch: `fix-store-catalog-1`
 | ب) كتالوج غذائي لـ سوق الأمل + محلات الدليل | `rizq_graduation_demo_catalog.js`, `graduation-demo.json`, `seed-graduation-demo.js` | seed smoke + Playwright | pass |
 | ج) فراغ بدل كتالوج افتراضي عند غياب المنتجات | شبكة المحل `products-empty` / منتجات `no-results` | حساب بلا كتالوج | pass |
 | د) وسم عرض + purge | `is_demo` / `graduationDemo` / `demoSource=graduation` | `seed --clear` / `purge:demo` | pass |
+| هـ) لا كتالوج تخرج بعد `launchDate` | `rizq_graduation_demo_catalog.js` عبر `RizqDemo.inventoryAllowed()` | `acc_grad_store_03` → «لا توجد منتجات بعد» | pass |
 
 ## السبب الجذري
 
