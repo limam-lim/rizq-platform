@@ -1,0 +1,535 @@
+{
+  "generatedAt": "2026-11-02T21:41:07.924Z",
+  "baseline": "/tmp/d9-baseline",
+  "branchRoot": "/workspace",
+  "pages": [
+    {
+      "id": "landing",
+      "file": "rizq_landing_v8.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "browse",
+      "file": "rizq_browse.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "products",
+      "file": "rizq_products.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "store",
+      "file": "rizq_store.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "showroom",
+      "file": "rizq_showroom.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "office",
+      "file": "rizq_office.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "estate",
+      "file": "rizq_estate.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "estate_agencies",
+      "file": "rizq_estate_agencies.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "directory",
+      "file": "rizq_directory.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "cart",
+      "file": "rizq_cart.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "tenders",
+      "file": "rizq_tenders.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "investments",
+      "file": "rizq_investments.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "post",
+      "file": "rizq_post.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "register",
+      "file": "rizq_register.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "profile",
+      "file": "rizq_profile.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "dashboard_store",
+      "file": "rizq_dashboard_store.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "dashboard_individual",
+      "file": "rizq_dashboard.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    }
+  ],
+  "totalDiffs": 0
+}

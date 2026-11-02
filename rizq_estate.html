@@ -2555,7 +2555,7 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
     rail.innerHTML = GALLERY.map(function(g, i){
       var cap = frRail ? (g.capFr || g.cap) : g.cap;
       return '<figure class="est-shot" data-gi="'+i+'" tabindex="0" role="button" aria-label="'+(frRail?'Agrandir: ':'تكبير: ')+esc(cap)+'">'
-        + '<img src="'+esc(g.img)+'" alt="'+esc(cap)+'" loading="lazy"/>'
+        + '<img src="'+esc(g.img)+'" alt="'+esc(cap)+'" loading="eager" decoding="async" referrerpolicy="no-referrer" fetchpriority="'+(i<2?'high':'low')+'"/>'
         + '<figcaption>'+esc(cap)+'</figcaption></figure>';
     }).join('');
   }

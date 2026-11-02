@@ -3,8 +3,8 @@
  * يُفعَّل بـ body.rizq-mockup-hdr-trial — سهل الإلغاء بحذف الكلاس أو الملف.
  */
 body.rizq-mockup-hdr-trial{
-  /* احتياطي = النهائي المستقر في main: pad≈192 (hdr≈180 + فجوة12) — لا 215 */
-  --rizq-mock-hdr-h: 180px;
+  /* احتياطي قبل قياس JS — أوسع قليلاً لتفادي قصّ المحتوى تحت الكبسولة */
+  --rizq-mock-hdr-h: 196px;
   --rizq-mock-hdr-gap: 12px;
   --rmh-navy: #0a1628;
   --rmh-navy-2: #0d1a2e;
@@ -109,15 +109,10 @@ body.rizq-mockup-hdr-trial #rizq-announce-ticker,
 body.rizq-mockup-hdr-trial .rizq-splash,
 body.rizq-mockup-hdr-trial .rmh-util,
 body.rizq-mockup-hdr-trial .est-top,
-body.rizq-mockup-hdr-trial > nav:not(#rizq-desk-nav):not(#rizq-thumb-dock):not(.rmh-nav):not(.rizq-thumb-dock),
-/* أخفِ .topnav بمجرد rizq-app-nav — لا تنتظر class الجسم (كان يسبب قفزة 61px) */
-html.rizq-app-nav .topnav,
-html.rizq-app-nav body > nav.topnav{
+body.rizq-mockup-hdr-trial > nav:not(#rizq-desk-nav):not(#rizq-thumb-dock):not(.rmh-nav):not(.rizq-thumb-dock){
   display:none!important;
   visibility:hidden!important;
   pointer-events:none!important;
-  height:0!important;max-height:0!important;min-height:0!important;
-  margin:0!important;padding:0!important;overflow:hidden!important;border:0!important;
 }
 /* أقوى من قواعد rizq-phone-thumb-dock — الشريط الموحّد rmh يكفي */
 html.rizq-app-nav.rizq-phone-thumb-dock body.rizq-mockup-hdr-trial #rizq-thumb-dock,
@@ -132,46 +127,24 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial .rizq-thumb-dock{
   padding:0!important;
   overflow:hidden!important;
 }
-/* شريط الخدمة — احجز الارتفاع النهائي الطبيعي (~19) حتى فارغاً؛ إخفاء إداري فقط يُسقطه */
-body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-empty:not(.civic-ticker-hidden){
-  display:block!important;
-  visibility:hidden!important;
-  pointer-events:none!important;
-  min-height:19px!important;
-  height:19px!important;
-  max-height:19px!important;
-  padding:2px 0!important;
-  margin:0!important;
-  overflow:hidden!important;
-  box-sizing:border-box!important;
-}
-body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-empty.civic-ticker-hidden,
-html.rizq-civic-ticker-off body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap{
+/* شريط الخدمة العامة (طوارئ من الأدمن) — يظهر ويتحرك داخل الهيدر */
+body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-empty{
   display:none!important;
-  min-height:0!important;
-  height:0!important;
-  padding:0!important;
 }
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap:not(.is-empty){
   display:block!important;
-  visibility:visible!important;
   position:relative!important;
-  top:auto!important;left:auto!important;right:auto!important;bottom:auto!important;
-  inset:auto!important;
+  top:auto!important;left:auto!important;right:auto!important;
   z-index:1!important;
   margin:0!important;
   border-radius:0!important;
   padding:2px 0!important;
-  min-height:19px!important;
-  height:19px!important;
-  max-height:19px!important;
-  box-sizing:border-box!important;
+  min-height:0!important;
+  height:auto!important;
   font-size:11px!important;
   line-height:1.15!important;
   border-top-width:1px!important;
   border-bottom-width:1px!important;
-  width:100%!important;
-  overflow:hidden!important;
 }
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap:not(.is-empty) .ticker-inner,
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap:not(.is-empty) #ticker{
@@ -308,10 +281,8 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pills,
 body.rizq-mockup-hdr-trial .hero-pills{
   width:100%!important;
   max-width:100%!important;
-  /* ارتفاع نهائي main ≈44–50 — بلا قفل 128 */
   min-height:0!important;
   height:auto!important;
-  max-height:none!important;
   padding:6px 5px!important;
   margin:0 auto!important;
   border-radius:14px!important;
@@ -408,8 +379,7 @@ body.rizq-mockup-hdr-trial #hero-tagline{
   text-shadow:none!important;
   filter:none!important;
   mix-blend-mode:normal!important;
-  /* بلا دخول متحرك — كان rmhTagRise يساهم في اهتزاز الهيرو */
-  animation:none!important;
+  animation:rmhTagRise .7s .15s ease both!important;
 }
 @keyframes rmhTagRise{
   from{opacity:0;transform:translateY(6px)}
@@ -440,9 +410,7 @@ body.rizq-mockup-hdr-trial #hero-tagline .hero-tagline-place{
   body.rizq-mockup-hdr-trial .hero-lead-row{
     max-width:min(560px,94vw)!important;
   }
-  body.rizq-mockup-hdr-trial .hero-subtitle-card{
-    max-width:100%!important;padding:8px 12px!important;
-  }
+  body.rizq-mockup-hdr-trial .hero-subtitle-card{max-width:100%!important;padding:8px 12px!important}
   body.rizq-mockup-hdr-trial .hero-subtitle-primary{font-size:clamp(14px,3.6vw,17px)!important}
   body.rizq-mockup-hdr-trial .hero-subtitle-secondary{font-size:clamp(12px,3.1vw,14px)!important}
   html.rizq-app-nav body.rizq-mockup-hdr-trial .hero-pills,
@@ -458,7 +426,6 @@ body.rizq-mockup-hdr-trial #hero-tagline .hero-tagline-place{
     padding:8px 10px!important;
     margin-top:8px!important;
     border-radius:10px!important;
-    animation:none!important;
   }
 }
 @media(prefers-reduced-motion:reduce){
@@ -466,25 +433,16 @@ body.rizq-mockup-hdr-trial #hero-tagline .hero-tagline-place{
   body.rizq-mockup-hdr-trial .hero-lead-row .hero-tagline,
   body.rizq-mockup-hdr-trial #hero-tagline{animation:none!important}
 }
-/* body padding تحت الهيدر الثابت — فضّل --rizq-header-h المستقر (≈192 سطح المكتب) */
+/* body padding تحت الهيدر الثابت — ارتفاع مقيس + فجوة أمان (كل الشاشات) */
 html.rizq-app-nav:has(#nav) body.rizq-mockup-hdr-trial,
 html.rizq-app-nav:has(#rizq-desk-nav) body.rizq-mockup-hdr-trial,
 html.rizq-app-nav.has-rizq-desk-nav body.rizq-mockup-hdr-trial,
 html.rizq-app-nav body.rizq-mockup-hdr-trial,
 body.rizq-mockup-hdr-trial{
-  padding-top:var(--rizq-header-h, calc(var(--rizq-mock-hdr-h) + var(--rizq-mock-hdr-gap,12px)))!important;
-}
-@media(min-width:769px) and (min-height:501px){
-  html.rizq-app-nav body.rizq-mockup-hdr-trial,
-  body.rizq-mockup-hdr-trial{
-    --rizq-header-h:192px;
-    --rizq-mock-hdr-h:180px;
-    --rizq-mock-hdr-gap:12px;
-    padding-top:192px!important;
-  }
+  padding-top:calc(var(--rizq-mock-hdr-h) + var(--rizq-mock-hdr-gap,12px))!important;
 }
 #rizq-mock-hdr{
-  position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:10050!important;
+  position:fixed;top:0;left:0;right:0;z-index:10050;
   font-family:'Cairo','Segoe UI',Tahoma,sans-serif;
   background:var(--rmh-navy);
   box-shadow:0 8px 24px rgba(2,6,14,.35);
@@ -637,7 +595,7 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial #detail-content{
   box-shadow:0 2px 10px rgba(0,0,0,.14);
   min-height:44px;
 }
-/* كمبيوتر: بحث في الوسط مع سحب طفيف يميناً نحو الشعار — بلا قفل 74>نهائي main (~60 لـ .rmh-main) */
+/* كمبيوتر: بحث في الوسط مع سحب طفيف يميناً نحو الشعار */
 @media(min-width:1025px){
   #rizq-mock-hdr .rmh-search{
     max-width:460px!important;
@@ -837,15 +795,14 @@ body.rizq-lang-fr #rizq-mock-hdr #rmh-lang-btn .lang-fr{
 .rmh-post-lbl{display:inline;color:inherit}
 
 /* شريط الأقسام — كبسولة طويلة بعرض الشعار→زر اللغة؛ الأزرار تبقى متوسّطة بحجمها دون مساس */
-#rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top),
-nav.rmh-nav:not(.rmh-nav-top){
+#rizq-mock-hdr nav.rmh-nav,
+nav.rmh-nav{
   position:static!important;
   top:auto!important;left:auto!important;right:auto!important;
-  /* ارتفاع ثابت على الكمبيوتر (~85) — يقلل قفزات 85.7↔المتغير */
-  height:85px!important;min-height:85px!important;max-height:85px!important;z-index:2!important;
+  height:auto!important;z-index:2!important;
   display:flex!important;align-items:stretch;
   justify-content:center;
-  gap:2px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;
+  gap:2px;overflow-x:auto;overflow-y:visible;scrollbar-width:none;
   /* خلفية الكبسولة فقط تمتد مع هامش الصف العلوي — لا نغيّر حجم الأزرار */
   width:calc(100% - (2 * var(--rmh-gutter-x,20px)));
   max-width:none;
@@ -858,14 +815,6 @@ nav.rmh-nav:not(.rmh-nav-top){
   border-radius:14px!important;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 4px 14px rgba(0,0,0,.18)!important;
   direction:rtl;
-}
-@media(max-width:768px){
-  /* الهاتف يعيد تعريف الشريط السفلي بارتفاع 80 — لا تُبقِ 85 هنا */
-  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top),
-  nav.rmh-nav:not(.rmh-nav-top){
-    height:80px!important;min-height:80px!important;max-height:80px!important;
-    overflow:hidden!important;
-  }
 }
 html[dir="ltr"] #rizq-mock-hdr nav.rmh-nav,
 html[dir="ltr"] nav.rmh-nav,
@@ -1138,8 +1087,9 @@ body > .rizq-help-dd-menu a,
   -webkit-user-select:none!important;
 }
 
-/* تابلت/هاتف ≤1024 — أظهر تذييل الأقسام داخل البحث؛ ارتفاع 180 للكمبيوتر اللوحي فقط */
+/* تابلت — أظهر تذييل الأقسام داخل شريط البحث دون تحريك موقعه */
 @media(max-width:1024px){
+  body.rizq-mockup-hdr-trial{--rizq-mock-hdr-h: 200px}
   #rizq-mock-hdr{--rmh-gutter-x:14px}
   .rmh-util{padding:4px 14px;font-size:10.5px}
   .rmh-main{
@@ -1158,9 +1108,6 @@ body > .rizq-help-dd-menu a,
   .rmh-nav a.rmh-post-nav{min-width:0;padding:clamp(5px,0.8vw,8px) clamp(2px,0.45vw,6px);font-size:clamp(10px,1.1vw,11px)}
   .rmh-nav a{min-width:0;padding:clamp(5px,0.8vw,8px) clamp(2px,0.45vw,6px);font-size:clamp(10px,1.1vw,11px);white-space:nowrap}
   .rmh-nav a[data-rmh="showrooms"]{min-width:0;font-size:clamp(9px,1vw,10.5px);white-space:nowrap!important}
-}
-@media(min-width:769px) and (max-width:1024px){
-  body.rizq-mockup-hdr-trial{--rizq-mock-hdr-h: 180px}
 }
 
 /*
@@ -1336,28 +1283,10 @@ body > .rizq-help-dd-menu a,
  */
 @media(max-width:768px){
   body.rizq-mockup-hdr-trial{
-    /* هاتف ضيق ≈160؛ تابلت 500–768 يُصحَّح أدناه إلى 171 — لا قفزة CLS */
-    --rizq-mock-hdr-h: 160px;
-    --rizq-header-h: 160px;
-    --rizq-mock-nav-h: 80px;
+    --rizq-mock-hdr-h: 148px;
+    --rizq-mock-nav-h: 72px;
     /* الشريط السفلي rmh بديل لـ thumb-dock — ارفع العوامات (ويدجت/رجوع) فوقه */
-    --rizq-thumb-dock-h: var(--rizq-mock-nav-h, 80px);
-  }
-}
-@media(min-width:500px) and (max-width:768px){
-  body.rizq-mockup-hdr-trial{
-    --rizq-mock-hdr-h: 171px;
-    --rizq-header-h: 171px;
-  }
-  html.rizq-app-nav body.rizq-mockup-hdr-trial,
-  body.rizq-mockup-hdr-trial{
-    padding-top:171px!important;
-  }
-}
-@media(max-width:768px){
-  body.rizq-mockup-hdr-trial{
-    --rizq-mock-nav-h: 80px;
-    --rizq-thumb-dock-h: var(--rizq-mock-nav-h, 80px);
+    --rizq-thumb-dock-h: var(--rizq-mock-nav-h, 72px);
   }
   /* ويدجت مدير رزق: فوق الشريط السفلي وبجانب آمن من الحافة */
   html.rizq-app-nav body.rizq-mockup-hdr-trial #rizq-chat-toggle,
@@ -1442,8 +1371,7 @@ body > .rizq-help-dd-menu a,
     z-index:2;
   }
   .rmh-search,
-  #rizq-mock-hdr .rmh-search,
-  #rmh-search-form{
+  #rizq-mock-hdr .rmh-search{
     grid-area:search;
     /* يجب تجاوز grid-row:1 من القاعدة العامة — وإلا يغطي البحث الشعار والأدوات */
     grid-column:1 / -1!important;
@@ -1452,11 +1380,8 @@ body > .rizq-help-dd-menu a,
     width:100%!important;
     max-width:none!important;
     min-width:0!important;
-    /* ثبّت 34px — كان 34↔64 مع تبديل placeholder يزيح #rmh-nav-top والهيرو (CLS≈0.6) */
     min-height:34px!important;
-    height:34px!important;
-    max-height:34px!important;
-    overflow:hidden!important;
+    height:34px;
     border-radius:10px!important;
     margin-inline:0!important;
     transform:none!important;
@@ -1553,11 +1478,6 @@ body > .rizq-help-dd-menu a,
     justify-content:space-between!important;
     gap:0!important;
     overflow-x:hidden!important;
-    box-sizing:border-box!important;
-  }
-  /* كمبيوتر: الشريط العلوي يُدمَج فوراً بالسكربت — أخفه إن بقي بالخطأ */
-  @media(min-width:769px) and (min-height:501px){
-    #rizq-mock-hdr nav.rmh-nav.rmh-nav-top{display:none!important;height:0!important;min-height:0!important;padding:0!important;border:0!important}
   }
   /* ——— نصف الأقسام أسفل الشاشة (قرب الإبهام) ——— */
   #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top),
@@ -1571,12 +1491,8 @@ body > .rizq-help-dd-menu a,
     width:100%!important;
     max-width:100%!important;
     margin:0!important;
-    /* ارتفاع ثابت من أول إطار — يمنع 85.7→80.7 CLS */
-    height:80px!important;
-    min-height:80px!important;
-    max-height:80px!important;
-    padding:4px 8px calc(8px + env(safe-area-inset-bottom,0px))!important;
-    box-sizing:border-box!important;
+    /* رئيسية يمين / سوق العقارات يسار داخل الكبسولة + فراغ بين النصوص */
+    padding:6px 8px calc(8px + max(env(safe-area-inset-bottom,0px),20px))!important;
     border-radius:0!important;
     border:0!important;
     background:#070e1a!important;
