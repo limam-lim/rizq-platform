@@ -1,6 +1,5 @@
 node_modules/
-shots/current/
-shots/diff__*.png
-shots/compare-report.json
+shots/
 coverage/
 *.log
+!shots/.gitkeep

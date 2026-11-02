@@ -200,9 +200,11 @@
 
   function hideStrip(wrap) {
     if (!wrap) return;
+    /* أبقِ is-empty فقط — بلا civic-ticker-hidden حتى يبقى حجز 42px (CLS) */
     wrap.classList.add('is-empty', 'civic-ticker-wrap');
-    wrap.classList.remove('ticker-has-urgent');
-    try { document.documentElement.style.setProperty('--rizq-ticker-h', '0px'); } catch (e) {}
+    wrap.classList.remove('ticker-has-urgent', 'civic-ticker-hidden');
+    try { document.documentElement.classList.remove('rizq-civic-ticker-off'); } catch (eCls) {}
+    try { document.documentElement.style.setProperty('--rizq-ticker-h', '42px'); } catch (e) {}
   }
 
   function render(list) {
@@ -228,8 +230,14 @@
       return;
     }
 
-    inner.innerHTML = html + html;
-    wrap.classList.remove('is-empty');
+    /* استبدال دفعة واحدة دون تفريغ الشريط المحجوز في HTML */
+    var tmp = document.createElement('div');
+    tmp.innerHTML = html + html;
+    var nodes = Array.prototype.slice.call(tmp.childNodes);
+    if (typeof inner.replaceChildren === 'function') inner.replaceChildren.apply(inner, nodes);
+    else { inner.innerHTML = ''; nodes.forEach(function (n) { inner.appendChild(n); }); }
+    wrap.classList.remove('is-empty', 'civic-ticker-hidden');
+    try { document.documentElement.classList.remove('rizq-civic-ticker-off'); } catch (eCls2) {}
     wrap.setAttribute('role', 'marquee');
     wrap.setAttribute('aria-label', getLang() === 'fr'
       ? 'Annonces de service public'
@@ -239,8 +247,8 @@
     wrap.classList.toggle('ticker-has-urgent', active.some(isUrgent));
 
     try {
-      var th = Math.max(36, Math.round(wrap.getBoundingClientRect().height || 42));
-      document.documentElement.style.setProperty('--rizq-ticker-h', th + 'px');
+      /* ثبّت متغيّر الارتفاع على 42px لتفادي قفزات 36↔42 */
+      document.documentElement.style.setProperty('--rizq-ticker-h', '42px');
     } catch (e) {}
 
     if (typeof global.syncMarqueeShift === 'function' && typeof global.requestAnimationFrame === 'function') {

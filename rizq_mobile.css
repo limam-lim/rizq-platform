@@ -692,8 +692,10 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
     justify-content:center!important;align-items:stretch!important;
     gap:8px!important;width:100%!important;max-width:100%!important;
-    overflow:visible!important;padding:0 10px!important;box-sizing:border-box!important;
+    /* overflow:hidden + ارتفاع ثابت — كان visible يسمح بـ CLS 212↔170 */
+    overflow:hidden!important;padding:5px 4px!important;box-sizing:border-box!important;
     margin:16px 0 14px!important;
+    min-height:128px!important;height:128px!important;max-height:128px!important;
   }
   .hero-pill{
     flex:1 1 0!important;min-width:0!important;max-width:none!important;width:auto!important;
@@ -1377,18 +1379,25 @@ html[dir="ltr"] .rizq-lang-fallback-block{ text-align:left; }
 
 /* ── محلات / مكاتب / معارض: هيدر ومساحات مضغوطة على الهاتف ── */
 @media(max-width:768px){
-  .store-hero,
+  /* لا تُصفّر min-height — كان hero-cover 308→410 يسبب CLS≈0.14 */
+  .store-hero{
+    min-height:410px!important;
+    height:auto!important;
+  }
   .office-hero,
   .showroom-hero{
     min-height:0!important;
     height:auto!important;
   }
   .store-hero .hero-cover,
+  #store-hero .hero-cover{
+    padding:16px 12px 12px!important;
+    min-height:410px!important;
+  }
   .office-hero .hero-cover,
   .showroom-hero .hero-cover,
   .hero-cover{
     padding:16px 12px 12px!important;
-    min-height:0!important;
   }
   .store-logo-wrap,
   .office-logo,

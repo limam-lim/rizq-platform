@@ -19,16 +19,141 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; media-src 'self' blob: https:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://www.facebook.com https://facebook.com"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=optional">
+<script>
+(function(){
+  function loadFonts(){
+    var l=document.createElement('link');
+    l.rel='stylesheet';
+    l.href='https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=optional';
+    document.head.appendChild(l);
+  }
+  if('requestIdleCallback' in window) requestIdleCallback(loadFonts,{timeout:4000});
+  else window.addEventListener('load', function(){ setTimeout(loadFonts, 2000); });
+})();
+</script>
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.88"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.89"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
 <link rel="stylesheet" href="rizq_product_detail.css?v=29.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.6"/>
 <link rel="preload" href="rizq_header.js?v=27.0" as="script"/>
-<script>document.documentElement.classList.add('rizq-app-nav')</script>
+<script>
+try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(eSR){}
+document.documentElement.classList.add('rizq-app-nav');
+</script>
 <title data-t-ar="محل — رزق" data-t-fr="Boutique — Rizq">محل — رزق</title>
 <style>
+/* احجز الارتفاع النهائي للهيدر+تيكر قبل حقن #rizq-mock-hdr */
+html.rizq-app-nav{--rizq-header-h:210px;--rizq-mock-hdr-h:210px;--rizq-mock-nav-h:80px;--rizq-ticker-h:42px;--rizq-mock-hdr-gap:12px}
+html.rizq-app-nav body{padding-top:210px!important;box-sizing:border-box}
+#rizq-mock-hdr{
+  position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:10050!important;
+  max-height:210px!important;overflow:hidden!important;box-sizing:border-box!important
+}
+/* أخفِ .topnav المحلي من أول إطار — كان يظهر 61px ثم يُخفى بعد mockup-hdr-trial → CLS */
+html.rizq-app-nav .topnav,
+html.rizq-app-nav body > nav.topnav{
+  display:none!important;visibility:hidden!important;pointer-events:none!important;
+  height:0!important;max-height:0!important;min-height:0!important;margin:0!important;padding:0!important;
+  overflow:hidden!important;border:0!important
+}
+#store-hero.store-hero,.store-hero{
+  min-height:443px!important;height:443px!important;max-height:443px!important;
+  box-sizing:border-box!important;overflow:hidden!important;animation:none!important;contain:strict;
+  position:relative!important
+}
+#store-hero .hero-cover,.store-hero .hero-cover,.hero-cover{
+  min-height:443px!important;height:443px!important;max-height:443px!important;
+  box-sizing:border-box!important;padding:56px 24px 72px!important;
+  display:flex!important;align-items:center!important;justify-content:center!important
+}
+.store-hero-stage{
+  min-height:280px!important;height:280px!important;max-height:280px!important;
+  box-sizing:border-box!important;overflow:hidden!important;flex-wrap:nowrap!important
+}
+.store-profile{
+  min-height:280px!important;height:280px!important;max-height:280px!important;
+  box-sizing:border-box!important;overflow:hidden!important
+}
+.store-logo-wrap{
+  width:88px!important;height:88px!important;min-width:88px!important;min-height:88px!important;
+  max-width:88px!important;max-height:88px!important;animation:none!important;
+  box-sizing:border-box!important;overflow:visible!important
+}
+.store-info{
+  min-height:180px!important;height:180px!important;max-height:180px!important;
+  overflow:hidden!important;box-sizing:border-box!important
+}
+.store-name{animation:none!important;min-height:1.2em!important}
+.store-badges{min-height:34px!important;max-height:72px!important;overflow:hidden!important}
+.store-meta{min-height:24px!important}
+.actions-bar{
+  min-height:183px!important;height:183px!important;max-height:183px!important;
+  overflow:hidden!important;box-sizing:border-box!important
+}
+@media(min-width:769px){
+  .actions-bar{
+    min-height:75px!important;height:auto!important;max-height:140px!important;
+    overflow:hidden!important
+  }
+}
+.store-logo-wrap{
+  overflow:hidden!important;contain:strict!important;
+  box-shadow:0 0 0 6px rgba(201,168,76,.1),0 8px 20px rgba(0,0,0,.5)!important
+}
+.store-logo-wrap.is-storefront::after{display:none!important}
+@media(max-width:768px){
+  html.rizq-app-nav body{padding-bottom:var(--rizq-mock-nav-h,80px)!important}
+  #rizq-mock-hdr{max-height:210px!important}
+  #store-hero.store-hero,.store-hero{
+    min-height:410px!important;height:410px!important;max-height:410px!important
+  }
+  #store-hero .hero-cover,.store-hero .hero-cover,.hero-cover{
+    min-height:410px!important;height:410px!important;max-height:410px!important;
+    padding:18px 14px 14px!important
+  }
+  .store-hero-stage,.store-profile{
+    min-height:280px!important;height:280px!important;max-height:280px!important;
+    width:100%!important;max-width:100%!important;box-sizing:border-box!important
+  }
+  .store-profile{
+    flex-direction:column!important;align-items:center!important;justify-content:center!important;
+    gap:8px!important
+  }
+  .store-logo-wrap{
+    width:48px!important;height:48px!important;min-width:48px!important;min-height:48px!important;
+    max-width:48px!important;max-height:48px!important;animation:none!important
+  }
+  .store-info{
+    min-height:100px!important;height:100px!important;max-height:100px!important;
+    overflow:hidden!important;width:100%!important;max-width:100%!important;text-align:center!important
+  }
+  .store-meta,.store-badges{
+    width:100%!important;max-width:100%!important;justify-content:center!important;
+    min-height:38px!important;box-sizing:border-box!important;overflow:hidden!important
+  }
+  .store-badges{min-height:34px!important;height:34px!important;max-height:34px!important}
+}
+@media(min-width:769px){
+  html.rizq-app-nav{--rizq-header-h:215px;--rizq-mock-hdr-h:203px}
+  html.rizq-app-nav body{padding-top:215px!important}
+  #rizq-mock-hdr{max-height:203px!important;min-height:203px!important}
+  #rizq-mock-hdr .rmh-main,.rmh-main{
+    display:grid!important;
+    grid-template-columns:minmax(120px,1fr) minmax(280px,460px) minmax(120px,1fr)!important;
+    grid-template-rows:auto!important;align-items:center!important;gap:12px!important;
+    padding:8px 20px!important;min-height:90px!important;box-sizing:border-box!important
+  }
+  #rmh-nav-top,nav.rmh-nav-top{display:none!important;height:0!important;overflow:hidden!important}
+  #rmh-search-form,#rizq-mock-hdr .rmh-search{
+    min-height:74px!important;height:74px!important;max-height:74px!important;overflow:hidden!important;
+    grid-column:2!important;align-self:center!important
+  }
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top),nav.rmh-nav:not(.rmh-nav-top){
+    height:85px!important;min-height:85px!important;max-height:85px!important;overflow:hidden!important
+  }
+}
 :root {
   --navy:   #1B3A6B;
   --navy2:  #0F2347;
@@ -196,7 +321,9 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 
 /* ====== HERO — نفس قياسات المعارض + هوية المحلات (تجارة / دفء ذهبي) ====== */
 /* خلفية محايدة من الإطار الأول — لا وميض اللون الزيتوني القديم قبل الغلاف */
-.store-hero{position:relative;min-height:clamp(300px,42vh,420px);overflow:hidden;background:#0D1B2A;display:flex;flex-direction:column;justify-content:center}
+.store-hero{position:relative;min-height:443px;overflow:hidden;background:#0D1B2A;display:flex;flex-direction:column;justify-content:center}
+.store-hero-stage{min-height:239px;box-sizing:border-box}
+.hero-cover{min-height:443px;box-sizing:border-box}
 .store-hero:not(.has-hero-photo){background:radial-gradient(ellipse 1200px 700px at 50% -10%,#1B3A6B 0%,#0F2347 45%,#0D1B2A 100%)}
 .store-hero .hero-photo{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;background:#0D1B2A center/cover no-repeat}
 .store-hero .hero-photo img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.04);animation:rzHeroKen 28s ease-in-out infinite alternate}
@@ -220,7 +347,7 @@ input[type="text"],input[type="tel"],input[type="email"],input[type="number"],te
 .store-hero .hero-glints span:nth-child(5){top:78%;left:45%;animation-delay:1.6s}
 @keyframes rzStGlint{0%,100%{opacity:0;transform:scale(.6)}50%{opacity:1;transform:scale(1.4)}}
 .store-hero .hero-floor{position:absolute;left:0;right:0;bottom:0;height:45%;background-image:linear-gradient(rgba(201,168,76,.16) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,.16) 1px,transparent 1px);background-size:64px 40px;-webkit-mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);mask-image:linear-gradient(180deg,transparent,rgba(0,0,0,.8) 60%,transparent);transform:perspective(280px) rotateX(58deg);transform-origin:bottom;opacity:.55;z-index:0}
-.hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:56px 24px 72px;width:100%;box-sizing:border-box;min-height:inherit}
+.hero-cover{position:relative;z-index:3;display:flex;align-items:center;justify-content:center;padding:56px 24px 72px;width:100%;box-sizing:border-box;min-height:443px}
 .store-hero-stage{display:flex;align-items:center;justify-content:center;gap:clamp(18px,3vw,36px);max-width:920px;width:100%;position:relative;z-index:1;flex-wrap:wrap}
 .store-profile{display:flex;align-items:center;justify-content:center;gap:20px;max-width:720px;width:auto;position:relative;z-index:1;flex:1 1 280px}
 /* بطاقات الفيديو — زوايا ثابتة: تعريفي يمين · إضافي يسار (لا تنعكس مع اللغة) */
@@ -310,8 +437,9 @@ body.rzq-storefront-lb-on{overflow:hidden}
 .store-hero .hero-scroll-cue{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:3;color:rgba(201,168,76,.55);font-size:20px;animation:rzStBounce 2s ease-in-out infinite}
 @keyframes rzStBounce{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
 @media(max-width:640px){
-  .store-hero{min-height:0!important;height:auto!important}
-  .hero-cover{padding:18px 14px 14px!important;min-height:0!important}
+  /* كان 0 فيُمدّد عند تحميل الغلاف/الفيديو (→410) ويُزيح .actions-bar */
+  .store-hero{min-height:410px!important;height:auto!important}
+  .hero-cover{padding:18px 14px 14px!important;min-height:410px!important}
   .store-hero.has-hero-videos .hero-cover{padding:18px 14px 112px!important}
   .store-hero.has-hero-videos .hero-video-card{width:min(140px,42vw);bottom:6px}
   .store-hero.has-hero-videos .hero-video-card--intro{right:6px}
@@ -334,6 +462,9 @@ body.rzq-storefront-lb-on{overflow:hidden}
   border-bottom:1px solid rgba(201,168,76,.28);
   padding:14px 20px;
   box-shadow:0 6px 18px rgba(0,0,0,.2);
+  /* ثبّت الارتفاع النهائي (~75 كمبيوتر / ~171 هاتف) لتقليل CLS عند اكتمال الأزرار */
+  min-height:75px;
+  box-sizing:border-box;
 }
 .actions-bar-inner{
   max-width:1100px;margin:0 auto;
@@ -1102,8 +1233,8 @@ footer{
   #reviews-section{order:7}
   #store-packages{padding:40px 4%!important;overflow:visible}
   #store-packages-grid{overflow:visible!important}
-  .store-hero{height:auto;min-height:0!important;padding:0;overflow:hidden}
-  .hero-cover{padding:18px 14px 14px!important;min-height:0!important}
+  .store-hero{height:auto;min-height:410px!important;padding:0;overflow:hidden}
+  .hero-cover{padding:18px 14px 14px!important;min-height:410px!important}
   .store-logo-wrap{width:56px;height:56px;font-size:26px;border-radius:50%}
   .store-name{font-size:18px!important}
   .store-tagline{font-size:12px!important}
@@ -1147,6 +1278,8 @@ footer{
     position:relative;top:auto;z-index:1;
     padding:0 12px;
     box-shadow:none;
+    /* أعلى ارتفاع عابر قيس أثناء التحميل (~220) — يمنع الانكماش 220→171 */
+    min-height:220px;
   }
   .cat-tabs{
     top:calc(var(--rizq-header-h, var(--rizq-mock-hdr-h, 68px)) + 2px);
@@ -1401,7 +1534,8 @@ footer{
   <script src="rizq_auth_gate.js?v=23.1" defer></script>
 </head>
 <body data-t-ns="store">
-<!-- حقن الهيدر الموحّد قبل أول رسم — يمنع الشريط الأبيض فوق الهيرو -->
+<!-- هيدر موحّد متزامن قبل .topnav — يقلّل CLS من الحقن المتأخر (defer) -->
+<script src="rizq_header_mockup_trial.js?v=5.89"></script>
 <script src="rizq_header.js?v=27.0"></script>
 <!-- مبدّل اللغة الوحيد من الهيدر الموحّد — لا زر مكرر هنا -->
 
