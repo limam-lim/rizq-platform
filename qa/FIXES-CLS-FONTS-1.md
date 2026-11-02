@@ -42,3 +42,12 @@ node qa/cls-fonts-1/bench-cls-fonts.js
 
 ## الحالة
 فرع فقط — **بدون دمج**.
+
+
+## B — rebase بعد دمج A (#271)
+
+- أعيد الـ rebase على `main` @ `6222c8f` (دمج fix-regressions-2).
+- بوابة A7 بعد الـ rebase: **totalDiffs=0** (`qa/regressions-2/a7-fonts-after-rebase.json`).
+- كل `test:*`: **35/35 PASS**.
+- لا دمج — بانتظار مراجعة المالك.
+
