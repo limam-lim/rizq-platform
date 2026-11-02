@@ -3,8 +3,8 @@
  * يُفعَّل بـ body.rizq-mockup-hdr-trial — سهل الإلغاء بحذف الكلاس أو الملف.
  */
 body.rizq-mockup-hdr-trial{
-  /* احتياطي = النهائي في main بعد القياس الحيّ: pad≈183 (hdr≈171 + فجوة12) — لا 215 ولا 192 */
-  --rizq-mock-hdr-h: 171px;
+  /* احتياطي = النهائي المستقر في main: pad≈192 (hdr≈180 + فجوة12) — لا 215 */
+  --rizq-mock-hdr-h: 180px;
   --rizq-mock-hdr-gap: 12px;
   --rmh-navy: #0a1628;
   --rmh-navy-2: #0d1a2e;
@@ -477,10 +477,10 @@ body.rizq-mockup-hdr-trial{
 @media(min-width:769px) and (min-height:501px){
   html.rizq-app-nav body.rizq-mockup-hdr-trial,
   body.rizq-mockup-hdr-trial{
-    --rizq-header-h:183px;
-    --rizq-mock-hdr-h:171px;
+    --rizq-header-h:192px;
+    --rizq-mock-hdr-h:180px;
     --rizq-mock-hdr-gap:12px;
-    padding-top:183px!important;
+    padding-top:192px!important;
   }
 }
 #rizq-mock-hdr{

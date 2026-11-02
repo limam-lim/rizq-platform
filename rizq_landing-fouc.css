@@ -54,8 +54,9 @@ html.rizq-app-nav{--rizq-header-h:160px;--rizq-mock-hdr-h:160px;--rizq-ticker-h:
   html.rizq-app-nav body{padding-top:171px!important}
 }
 @media(min-width:769px) and (min-height:501px){
-  html.rizq-app-nav{--rizq-header-h:183px;--rizq-mock-hdr-h:171px;--rizq-mock-hdr-gap:12px;--rizq-ticker-h:19px}
-  html.rizq-app-nav body{padding-top:183px!important}
+  /* يطابق النهائي المستقر في main بعد syncMockHdrHeight (~180+12=192) */
+  html.rizq-app-nav{--rizq-header-h:192px;--rizq-mock-hdr-h:180px;--rizq-mock-hdr-gap:12px;--rizq-ticker-h:19px}
+  html.rizq-app-nav body{padding-top:192px!important}
   #rmh-nav-top,nav.rmh-nav-top,#rizq-mock-hdr #rmh-nav-top{
     display:none!important;height:0!important;min-height:0!important;max-height:0!important;
     overflow:hidden!important;padding:0!important;margin:0!important;border:0!important

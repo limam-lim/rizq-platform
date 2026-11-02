@@ -1452,12 +1452,12 @@
       }
       return;
     }
-    var h = measureMockHdrExtent(hdr) || Math.ceil(hdr.getBoundingClientRect().height || 171);
+    var h = measureMockHdrExtent(hdr) || Math.ceil(hdr.getBoundingClientRect().height || 180);
     /* استبعد شريط الأقسام الثابت إن وُجد خطأً في القياس */
     if (bottomNav && getComputedStyle(bottomNav).position === 'fixed') {
       h = Math.ceil(hdr.getBoundingClientRect().height || h);
     }
-    /* سطح المكتب: padding = mock-hdr-h + gap — ثبّت المجموع على reserved (≈183) */
+    /* سطح المكتب: padding = mock-hdr-h + gap — ثبّت المجموع على reserved (≈192) */
     if (reserved && Math.abs((h + 12) - reserved) <= 14) {
       var mockKeep = Math.max(0, reserved - 12);
       document.body.style.setProperty('--rizq-mock-hdr-h', mockKeep + 'px');

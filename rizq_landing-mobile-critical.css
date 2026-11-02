@@ -38,11 +38,11 @@ html.rizq-app-nav .nav-sticky-tools{
   display:none!important;visibility:hidden!important;pointer-events:none!important;
   height:0!important;max-height:0!important;overflow:hidden!important;opacity:0!important;
 }
-/* كمبيوتر: احجز = النهائي في main (~171 hdr / ~183 pad) — لا 215/192 */
+/* كمبيوتر: احجز = النهائي المستقر في main (~180 hdr / ~192 pad) — لا 215 */
 @media(min-width:769px) and (min-height:501px){
-  html.rizq-app-nav{--rizq-header-h:183px;--rizq-mock-hdr-h:171px;--rizq-mock-hdr-gap:12px;--rizq-ticker-h:19px}
+  html.rizq-app-nav{--rizq-header-h:192px;--rizq-mock-hdr-h:180px;--rizq-mock-hdr-gap:12px;--rizq-ticker-h:19px}
   html.rizq-app-nav body{
-    padding-top:183px!important;
+    padding-top:192px!important;
   }
   #rmh-nav-top,nav.rmh-nav-top,#rizq-mock-hdr #rmh-nav-top{
     display:none!important;height:0!important;min-height:0!important;overflow:hidden!important;
