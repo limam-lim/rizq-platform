@@ -1,0 +1,175 @@
+{
+  "generatedAt": "2026-11-03T01:33:11.926Z",
+  "baseline": "/tmp/a7-main-baseline",
+  "branchRoot": "/workspace",
+  "pages": [
+    {
+      "id": "browse",
+      "file": "rizq_browse.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "products",
+      "file": "rizq_products.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr>nav.rmh-nav>a.rizq-phone-ltr:nth-of-type(4)",
+              "kind": "size",
+              "base": [
+                109,
+                66
+              ],
+              "cur": [
+                109,
+                63
+              ]
+            },
+            {
+              "path": "header#rizq-mock-hdr>nav.rmh-nav>a.rizq-phone-ltr:nth-of-type(5)",
+              "kind": "removed"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr>nav.rmh-nav>a.rizq-phone-ltr:nth-of-type(4)",
+              "kind": "size",
+              "base": [
+                109,
+                66
+              ],
+              "cur": [
+                109,
+                63
+              ]
+            },
+            {
+              "path": "header#rizq-mock-hdr>nav.rmh-nav>a.rizq-phone-ltr:nth-of-type(5)",
+              "kind": "removed"
+            }
+          ],
+          "error": null
+        }
+      ],
+      "diffCount": 4
+    },
+    {
+      "id": "store",
+      "file": "rizq_store.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [
+            {
+              "path": "div#store-hero>div.hero-cover:nth-of-type(6)>div.store-hero-stage>div.store-profile>div.store-info:nth-of-type(2)>div.store-badges:nth-of-type(4)",
+              "kind": "added"
+            },
+            {
+              "path": "div#store-packages-grid>div.rizq-pkg-grid-inner>div.store-pkg-card.rizq-pkg-card:nth-of-type(1)>div.rizq-pkg-desc:nth-of-type(3)",
+              "kind": "added"
+            }
+          ],
+          "error": null
+        }
+      ],
+      "diffCount": 2
+    },
+    {
+      "id": "estate",
+      "file": "rizq_estate.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    }
+  ],
+  "totalDiffs": 6
+}

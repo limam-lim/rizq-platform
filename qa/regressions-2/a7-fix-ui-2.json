@@ -1,0 +1,2131 @@
+{
+  "generatedAt": "2026-11-03T01:30:54.464Z",
+  "baseline": "/tmp/a7-main-baseline",
+  "branchRoot": "/workspace",
+  "pages": [
+    {
+      "id": "landing",
+      "file": "rizq_landing_v8.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "size",
+              "base": [
+                362,
+                190
+              ],
+              "cur": [
+                362,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginTop",
+              "base": "8px",
+              "cur": "4px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginBottom",
+              "base": "16px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "size",
+              "base": [
+                362,
+                190
+              ],
+              "cur": [
+                362,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingTop",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingRight",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingBottom",
+              "base": "12px",
+              "cur": "8px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingLeft",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#landing-ads-grid>div.listing-card.pin.fade-in:nth-of-type(3)>div.l-body:nth-of-type(2)>div.rzq-ad-brand-slot.has-brand:nth-of-type(1)>span.rzq-brand-chip>img.rzq-brand-chip-logo",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/toyota.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#landing-ads-grid>div.listing-card.fade-in:nth-of-type(16)>div.rzq-adx-media.has-multi:nth-of-type(1)>div.rzq-adx-slides:nth-of-type(1)>div.rzq-adx-slide:nth-of-type(1)>img.rzq-adx-zoomable",
+              "src": "https://picsum.photos/seed/rizq-cattle-a/640/480"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#landing-ads-grid>div.listing-card.fade-in:nth-of-type(16)>div.rzq-adx-media.has-multi:nth-of-type(1)>div.rzq-adx-slides:nth-of-type(1)>div.rzq-adx-slide:nth-of-type(2)>img.rzq-adx-zoomable",
+              "src": "https://picsum.photos/seed/rizq-cattle-b/640/480"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)>button.rzq-brand-tile:nth-of-type(1)>span.rzq-brand-tile-logo:nth-of-type(1)>img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/toyota.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(1)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(5)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/toyota.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(7)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(11)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/toyota.svg"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "size",
+              "base": [
+                362,
+                190
+              ],
+              "cur": [
+                362,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginTop",
+              "base": "8px",
+              "cur": "4px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginBottom",
+              "base": "16px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "size",
+              "base": [
+                362,
+                190
+              ],
+              "cur": [
+                362,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingTop",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingRight",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingBottom",
+              "base": "12px",
+              "cur": "8px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingLeft",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#landing-ads-grid>div.listing-card.pin.fade-in:nth-of-type(3)>div.l-body:nth-of-type(2)>div.rzq-ad-brand-slot.has-brand:nth-of-type(1)>span.rzq-brand-chip>img.rzq-brand-chip-logo",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/toyota.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#landing-ads-grid>div.listing-card.fade-in:nth-of-type(16)>div.rzq-adx-media.has-multi:nth-of-type(1)>div.rzq-adx-slides:nth-of-type(1)>div.rzq-adx-slide:nth-of-type(1)>img.rzq-adx-zoomable",
+              "src": "https://picsum.photos/seed/rizq-cattle-a/640/480"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#landing-ads-grid>div.listing-card.fade-in:nth-of-type(16)>div.rzq-adx-media.has-multi:nth-of-type(1)>div.rzq-adx-slides:nth-of-type(1)>div.rzq-adx-slide:nth-of-type(2)>img.rzq-adx-zoomable",
+              "src": "https://picsum.photos/seed/rizq-cattle-b/640/480"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)>button.rzq-brand-tile:nth-of-type(1)>span.rzq-brand-tile-logo:nth-of-type(1)>img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/toyota.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(1)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(3)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/toyota.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(7)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(9)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/toyota.svg"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "size",
+              "base": [
+                1364,
+                190
+              ],
+              "cur": [
+                1364,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginTop",
+              "base": "8px",
+              "cur": "4px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginBottom",
+              "base": "16px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "size",
+              "base": [
+                1364,
+                190
+              ],
+              "cur": [
+                1364,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingTop",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingRight",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingBottom",
+              "base": "12px",
+              "cur": "8px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingLeft",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "path": "div#rizq-styles-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "gap",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "size",
+              "base": [
+                1334,
+                132
+              ],
+              "cur": [
+                1338,
+                100
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "paddingTop",
+              "base": "4px",
+              "cur": "2px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "paddingBottom",
+              "base": "10px",
+              "cur": "6px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "gap",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-styles-rail>article.rizq-style-card:nth-of-type(2)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/casio.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-styles-rail>article.rizq-style-card:nth-of-type(4)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/casio.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-styles-rail>article.rizq-style-card:nth-of-type(8)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/casio.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-styles-rail>article.rizq-style-card:nth-of-type(10)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/casio.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(1)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(5)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(7)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(11)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "size",
+              "base": [
+                1364,
+                190
+              ],
+              "cur": [
+                1364,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginTop",
+              "base": "8px",
+              "cur": "4px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginBottom",
+              "base": "16px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "size",
+              "base": [
+                1364,
+                190
+              ],
+              "cur": [
+                1364,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingTop",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingRight",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingBottom",
+              "base": "12px",
+              "cur": "8px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingLeft",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "path": "div#rizq-styles-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "gap",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "size",
+              "base": [
+                1334,
+                132
+              ],
+              "cur": [
+                1338,
+                100
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "paddingTop",
+              "base": "4px",
+              "cur": "2px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "paddingBottom",
+              "base": "10px",
+              "cur": "6px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "gap",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-styles-rail>article.rizq-style-card:nth-of-type(5)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/nike.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-styles-rail>article.rizq-style-card:nth-of-type(11)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/nike.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(3)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(5)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(9)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(11)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            }
+          ],
+          "error": null
+        }
+      ],
+      "diffCount": 72
+    },
+    {
+      "id": "browse",
+      "file": "rizq_browse.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 37, 53)",
+              "cur": "rgb(255, 255, 255)"
+            }
+          ],
+          "error": null
+        }
+      ],
+      "diffCount": 30
+    },
+    {
+      "id": "products",
+      "file": "rizq_products.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "form#rmh-search-form",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "form#rmh-search-form",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "form#rmh-search-form",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>nav.rmh-nav>a.rizq-phone-ltr:nth-of-type(4)",
+              "kind": "size",
+              "base": [
+                109,
+                66
+              ],
+              "cur": [
+                109,
+                63
+              ]
+            },
+            {
+              "path": "a#rmh-brand",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "a#rmh-brand",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "a#rmh-brand",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "a#rmh-brand",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "a#rmh-brand",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>nav.rmh-nav>a.rizq-phone-ltr:nth-of-type(5)",
+              "kind": "removed"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "form#rmh-search-form",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>nav.rmh-nav>a.rizq-phone-ltr:nth-of-type(4)",
+              "kind": "size",
+              "base": [
+                109,
+                66
+              ],
+              "cur": [
+                109,
+                63
+              ]
+            },
+            {
+              "path": "a#rmh-brand",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "a#rmh-brand",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "a#rmh-brand",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "a#rmh-brand",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "a#rmh-brand",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>nav.rmh-nav>a.rizq-phone-ltr:nth-of-type(5)",
+              "kind": "removed"
+            }
+          ],
+          "error": null
+        }
+      ],
+      "diffCount": 78
+    },
+    {
+      "id": "store",
+      "file": "rizq_store.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "form#rmh-search-form",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "form#rmh-search-form",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "form#rmh-search-form",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "form#rmh-search-form",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)>div.rmh-tools",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(26, 42, 58)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "div#store-hero>div.hero-cover:nth-of-type(6)>div.store-hero-stage>div.store-profile>div.store-info:nth-of-type(2)>div.store-badges:nth-of-type(4)",
+              "kind": "added"
+            },
+            {
+              "path": "div#store-packages-grid>div.rizq-pkg-grid-inner>div.store-pkg-card.rizq-pkg-card:nth-of-type(1)>div.rizq-pkg-desc:nth-of-type(3)",
+              "kind": "added"
+            }
+          ],
+          "error": null
+        }
+      ],
+      "diffCount": 56
+    },
+    {
+      "id": "estate",
+      "file": "rizq_estate.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "form#rmh-search-form",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "form#rmh-search-form",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "form#rmh-search-form",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderTopColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderRightColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderBottomColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "header#rizq-mock-hdr>div.rmh-main:nth-of-type(3)",
+              "kind": "style",
+              "prop": "borderLeftColor",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            },
+            {
+              "path": "form#rmh-search-form",
+              "kind": "style",
+              "prop": "color",
+              "base": "rgb(11, 28, 51)",
+              "cur": "rgb(255, 255, 255)"
+            }
+          ],
+          "error": null
+        }
+      ],
+      "diffCount": 44
+    }
+  ],
+  "totalDiffs": 280
+}

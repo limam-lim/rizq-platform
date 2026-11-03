@@ -1,0 +1,487 @@
+{
+  "generatedAt": "2026-11-03T01:34:31.577Z",
+  "baseline": "/tmp/a7-main-baseline",
+  "branchRoot": "/workspace",
+  "pages": [
+    {
+      "id": "landing",
+      "file": "rizq_landing_v8.html",
+      "cells": [
+        {
+          "viewport": 390,
+          "lang": "ar",
+          "diffs": [
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "size",
+              "base": [
+                362,
+                190
+              ],
+              "cur": [
+                362,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginTop",
+              "base": "8px",
+              "cur": "4px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginBottom",
+              "base": "16px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "size",
+              "base": [
+                362,
+                190
+              ],
+              "cur": [
+                362,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingTop",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingRight",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingBottom",
+              "base": "12px",
+              "cur": "8px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingLeft",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(4)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(6)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(10)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(12)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "lang": "fr",
+          "diffs": [
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "size",
+              "base": [
+                362,
+                190
+              ],
+              "cur": [
+                362,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginTop",
+              "base": "8px",
+              "cur": "4px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginBottom",
+              "base": "16px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "size",
+              "base": [
+                362,
+                190
+              ],
+              "cur": [
+                362,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingTop",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingRight",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingBottom",
+              "base": "12px",
+              "cur": "8px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingLeft",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(2)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(6)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(8)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(12)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "ar",
+          "diffs": [
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "size",
+              "base": [
+                1364,
+                190
+              ],
+              "cur": [
+                1364,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginTop",
+              "base": "8px",
+              "cur": "4px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginBottom",
+              "base": "16px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "size",
+              "base": [
+                1364,
+                190
+              ],
+              "cur": [
+                1364,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingTop",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingRight",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingBottom",
+              "base": "12px",
+              "cur": "8px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingLeft",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "path": "div#rizq-styles-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "gap",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "size",
+              "base": [
+                1334,
+                132
+              ],
+              "cur": [
+                1338,
+                100
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "paddingTop",
+              "base": "4px",
+              "cur": "2px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "paddingBottom",
+              "base": "10px",
+              "cur": "6px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "gap",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-styles-rail>article.rizq-style-card:nth-of-type(1)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/casio.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-styles-rail>article.rizq-style-card:nth-of-type(7)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/casio.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(3)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(9)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 1440,
+          "lang": "fr",
+          "diffs": [
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "size",
+              "base": [
+                1364,
+                190
+              ],
+              "cur": [
+                1364,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginTop",
+              "base": "8px",
+              "cur": "4px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip",
+              "kind": "style",
+              "prop": "marginBottom",
+              "base": "16px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "size",
+              "base": [
+                1364,
+                190
+              ],
+              "cur": [
+                1364,
+                146
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingTop",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingRight",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingBottom",
+              "base": "12px",
+              "cur": "8px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel",
+              "kind": "style",
+              "prop": "paddingLeft",
+              "base": "14px",
+              "cur": "12px"
+            },
+            {
+              "path": "div#rizq-styles-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "gap",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "size",
+              "base": [
+                1334,
+                132
+              ],
+              "cur": [
+                1338,
+                100
+              ]
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "paddingTop",
+              "base": "4px",
+              "cur": "2px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "paddingBottom",
+              "base": "10px",
+              "cur": "6px"
+            },
+            {
+              "path": "div#rizq-srm-brand-strip>div.rzq-brand-strip-panel>div.rzq-brand-strip.rzq-brand-tile-strip:nth-of-type(2)",
+              "kind": "style",
+              "prop": "gap",
+              "base": "14px",
+              "cur": "10px"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-styles-rail>article.rizq-style-card:nth-of-type(4)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/casio.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-styles-rail>article.rizq-style-card:nth-of-type(10)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/casio.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(2)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(3)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(6)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(8)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(9)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            },
+            {
+              "kind": "imgBroken",
+              "path": "div#rizq-srm-rail>article.rizq-style-card:nth-of-type(12)>div.rizq-style-body:nth-of-type(2)>div.rizq-style-brand-row:nth-of-type(1)>div.rzq-brand-logo-name.is-inline>img.rzq-brand-logo-name-img",
+              "src": "https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/hyundai.svg"
+            }
+          ],
+          "error": null
+        }
+      ],
+      "diffCount": 62
+    }
+  ],
+  "totalDiffs": 62
+}
