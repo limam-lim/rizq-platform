@@ -48,14 +48,14 @@ html,body{background:#eef2f8}
 
 /* CLS: اقفل ارتفاع الهيدر قبل قياس JS — يمنع قفز hero/orbs/nav */
 body.rizq-mockup-hdr-trial{
-  --rizq-mock-hdr-h:171px;
+  --rizq-mock-hdr-h:180px;
   --rizq-mock-body-gap:0px;
-  --rizq-header-h:171px;
+  --rizq-header-h:180px;
 }
 @media(max-width:768px){
   body.rizq-mockup-hdr-trial{
-    --rizq-mock-hdr-h:160px;
-    --rizq-header-h:160px;
+    --rizq-mock-hdr-h:170px;
+    --rizq-header-h:170px;
   }
 }
 </style>
@@ -535,11 +535,12 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
    HERO — الجديد الكامل
 ══════════════════════════════════ */
 /* سطح المكتب: ابدأ من أعلى الشاشة ولا توسّط المحتوى الطويل — حتى لا تختفي العناوين خلف الصور/الفيديو */
-.hero{min-height:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-x:hidden;overflow-y:visible;padding-top:86px;padding-bottom:28px}
+.hero{min-height:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-x:hidden;overflow-y:visible;padding-top:86px;padding-bottom:28px;contain:layout}
 
 /* خلفية متحركة */
 .hero-bg{position:absolute;inset:0;background:#ffffff;pointer-events:none}
-.hero-orb1,.hero-orb2,.hero-orb3{contain:layout paint;will-change:transform;pointer-events:none}
+.hero-orb1,.hero-orb2,.hero-orb3{contain:layout paint;will-change:transform;pointer-events:none;animation-play-state:paused}
+html.rizq-orbs-ready .hero-orb1,html.rizq-orbs-ready .hero-orb2,html.rizq-orbs-ready .hero-orb3{animation-play-state:running}
 .hero-orb1{position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06) 0%,transparent 65%);top:-100px;left:50%;transform:translateX(-50%);animation:orb1 8s ease-in-out infinite}
 .hero-orb2{position:absolute;width:min(360px,52vw);height:min(360px,52vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.07) 0%,transparent 70%);bottom:100px;right:0;transform:translateX(15%);animation:orb2 10s ease-in-out infinite}
 .hero-orb3{position:absolute;width:min(280px,44vw);height:min(280px,44vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06) 0%,transparent 70%);bottom:50px;left:0;transform:translateX(-15%);animation:orb3 7s ease-in-out infinite}
@@ -861,6 +862,8 @@ html[dir="ltr"] .rizq-feat-card.rizq-feat-card--row{text-align:left}
   overflow:hidden;
   text-align:center;
 }
+.hero-title-card{min-height:3.2em;box-sizing:border-box}
+
 .hero-brand-row .hero-eyebrow{
   width:100%;
   max-width:100%;
@@ -5277,14 +5280,14 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 .modal-overlay.open,.modal-overlay.open *{pointer-events:auto!important}
 
 /* CLS reserves — min-height / skeleton only (no fixed height + overflow:hidden) */
-#categories{min-height:168px}
+#categories{min-height:580px}
 @media(max-width:768px){
-  #categories{min-height:220px}
+  #categories{min-height:1440px}
   #hero-listings.hero-promo-strip,
-  .hero-listings-section{min-height:400px}
+  .hero-listings-section{min-height:426px}
 }
 @media(max-width:390px){
-  #categories{min-height:200px}
+  #categories{min-height:1420px}
 }
 #builtin-cats-mount:empty::before{
   content:'';display:block;min-height:120px;
@@ -5360,8 +5363,11 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_seller_branding.js?v=1"></script>
 <script src="rizq_ux_polish.js?v=23.2"></script>
 <script src="rizq_ad_cards.js?v=3.12"></script>
+<script>(function(){function go(){try{document.documentElement.classList.add('rizq-orbs-ready');}catch(e){}}
+if('requestIdleCallback' in window)requestIdleCallback(go,{timeout:2500});
+else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go,0);});})();</script>
 </head>
-<body class="rizq-mockup-hdr-trial" style="--rizq-mock-hdr-h:171px;--rizq-mock-body-gap:0px;--rizq-header-h:171px"><script>(function(){try{if(matchMedia('(max-width:768px)').matches){document.body.style.setProperty('--rizq-mock-hdr-h','160px');document.body.style.setProperty('--rizq-header-h','160px');}}catch(e){}})();</script>
+<body class="rizq-mockup-hdr-trial" style="--rizq-mock-hdr-h:180px;--rizq-mock-body-gap:0px;--rizq-header-h:180px"><script>(function(){try{if(matchMedia('(max-width:768px)').matches){document.body.style.setProperty('--rizq-mock-hdr-h','170px');document.body.style.setProperty('--rizq-header-h','170px');}}catch(e){}})();</script>
 
 <!-- معاينة قابلة للرجوع — فرع منفصل؛ إخفاء الشريط لا يلغي الكود -->
 <div id="rizq-ads-preview-banner" role="status" hidden>

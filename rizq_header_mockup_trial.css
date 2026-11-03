@@ -4,7 +4,7 @@
  */
 body.rizq-mockup-hdr-trial{
   /* احتياطي قبل قياس JS — أوسع قليلاً لتفادي قصّ المحتوى تحت الكبسولة */
-  --rizq-mock-hdr-h: 196px;
+  --rizq-mock-hdr-h: 180px;
   --rizq-mock-hdr-gap: 12px;
   --rmh-navy: #0a1628;
   --rmh-navy-2: #0d1a2e;
@@ -1283,7 +1283,7 @@ body > .rizq-help-dd-menu a,
  */
 @media(max-width:768px){
   body.rizq-mockup-hdr-trial{
-    --rizq-mock-hdr-h: 148px;
+    --rizq-mock-hdr-h: 170px;
     --rizq-mock-nav-h: 72px;
     /* الشريط السفلي rmh بديل لـ thumb-dock — ارفع العوامات (ويدجت/رجوع) فوقه */
     --rizq-thumb-dock-h: var(--rizq-mock-nav-h, 72px);
