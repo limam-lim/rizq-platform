@@ -1,0 +1,166 @@
+{
+  "generatedAt": "2026-11-03T01:53:15.627Z",
+  "baseline": "/tmp/fix-logic-3-baseline",
+  "branchRoot": "/workspace",
+  "pages": [
+    {
+      "id": "landing",
+      "file": "rizq_landing_v8.html",
+      "cells": [
+        {
+          "viewport": 1440,
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 768,
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "browse",
+      "file": "rizq_browse.html",
+      "cells": [
+        {
+          "viewport": 1440,
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 768,
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "store",
+      "file": "rizq_store.html",
+      "cells": [
+        {
+          "viewport": 1440,
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 768,
+          "diffs": [
+            {
+              "path": "section#store-close-band>div.store-close-inner>h3.store-close-title",
+              "kind": "added"
+            }
+          ],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "diffs": [
+            {
+              "path": "div#open-now-box-el",
+              "kind": "added"
+            },
+            {
+              "path": "div#cat-tabs-cats",
+              "kind": "added"
+            }
+          ],
+          "error": null
+        }
+      ],
+      "diffCount": 3
+    },
+    {
+      "id": "estate",
+      "file": "rizq_estate.html",
+      "cells": [
+        {
+          "viewport": 1440,
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 768,
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    },
+    {
+      "id": "products",
+      "file": "rizq_products.html",
+      "cells": [
+        {
+          "viewport": 1440,
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 768,
+          "diffs": [],
+          "error": null
+        },
+        {
+          "viewport": 390,
+          "diffs": [],
+          "error": null
+        }
+      ],
+      "diffCount": 0
+    }
+  ],
+  "totalDiffs": 3,
+  "gaps": {
+    "390": {
+      "base": 6985,
+      "cur": 16
+    },
+    "768": {
+      "base": 8899,
+      "cur": 16
+    },
+    "1440": {
+      "base": 4284,
+      "cur": 16
+    }
+  },
+  "literalDiffs": [
+    {
+      "page": "store",
+      "viewport": 768,
+      "path": "section#store-close-band>div.store-close-inner>h3.store-close-title",
+      "kind": "added"
+    },
+    {
+      "page": "store",
+      "viewport": 390,
+      "path": "div#open-now-box-el",
+      "kind": "added"
+    },
+    {
+      "page": "store",
+      "viewport": 390,
+      "path": "div#cat-tabs-cats",
+      "kind": "added"
+    }
+  ]
+}
