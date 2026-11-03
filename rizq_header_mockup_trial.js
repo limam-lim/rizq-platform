@@ -1290,7 +1290,11 @@
       if (ticker) topH += Math.ceil(ticker.getBoundingClientRect().height || 0);
       if (topNav) topH += Math.ceil(topNav.getBoundingClientRect().height || 48);
       topH = Math.max(topH, 96);
-      document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
+            try {
+        var curP = parseFloat(document.body.style.getPropertyValue('--rizq-mock-hdr-h')) || parseFloat(getComputedStyle(document.body).getPropertyValue('--rizq-mock-hdr-h')) || 0;
+        if (curP && topH + 2 < curP && performance.now() < 2500) topH = curP;
+      } catch (eKeepP) {}
+document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
       /* browse/detail + legacy chrome read --rizq-header-h — keep it in sync with mock top bar */
       document.body.style.setProperty('--rizq-header-h', topH + 'px');
       document.documentElement.style.setProperty('--rizq-header-h', topH + 'px');
@@ -1303,7 +1307,12 @@
       return;
     }
     var h = measureMockHdrExtent(hdr) || Math.ceil(hdr.getBoundingClientRect().height || 196);
-    document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
+        /* Avoid boot-time shrink (incomplete layout) that causes CLS: keep the higher reserved value until settled */
+    try {
+      var curH = parseFloat(document.body.style.getPropertyValue('--rizq-mock-hdr-h')) || parseFloat(getComputedStyle(document.body).getPropertyValue('--rizq-mock-hdr-h')) || 0;
+      if (curH && h + 2 < curH && performance.now() < 2500) h = curH;
+    } catch (eKeep) {}
+document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
     /* Sync legacy --rizq-header-h so .browse-right inset / detail max-height clear the capsule */
     document.body.style.setProperty('--rizq-header-h', h + 'px');
     document.documentElement.style.setProperty('--rizq-header-h', h + 'px');
