@@ -101,9 +101,10 @@ function isStoreAccount(acc) {
 }
 
 function itemCatBlob(it) {
+  /* حقول التصنيف فقط — لا name/title (تجنّب دخول تصنيف بالاسم النصي) */
   return [
     it && it.categoryId, it && it.category, it && it.categoryKey, it && it.cat,
-    it && it.subcat, it && it.subCategoryId, it && it.name, it && it.title,
+    it && it.subcat, it && it.subCategoryId,
   ].filter(Boolean).join(' ');
 }
 
@@ -399,5 +400,6 @@ module.exports = {
   buildHomeCatalog,
   clearHomeCatalogCache,
   isFashionStore,
+  matchesShowroomCat,
   HOME_CACHE_TTL_MS,
 };

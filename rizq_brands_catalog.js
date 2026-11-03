@@ -585,7 +585,8 @@
     {
       id: 'xiaomi', nameAr: 'شاومي', nameFr: 'Xiaomi', sector: 'electronics',
       categories: ['إلكترونيات'], color: '#FF6900', letter: 'MI',
-      aliases: ['xiaomi', 'mi', 'شاومي'],
+      /* لا تستخدم 'mi' وحدها كـ substring — تُطابق كلمة مستقلة فقط عبر findByAlias */
+      aliases: ['xiaomi', 'شاومي', 'redmi', 'poco'],
       models: [
         M('redmi', 'ريدمي', 'Redmi'), M('poco', 'بوكو', 'POCO'),
         M('note', 'نوت', 'Note'), M('mi-tv', 'تلفزيون', 'Mi TV')
@@ -1175,21 +1176,42 @@
 
   function searchMatch(brand, q) {
     if (!brand || !q) return false;
-    var s = String(q).toLowerCase();
-    var blob = [
+    var s = String(q).toLowerCase().trim();
+    var tokens = [
       brand.id, brand.nameAr, brand.nameFr
-    ].concat(brand.aliases || []).join(' ').toLowerCase();
-    return blob.indexOf(s) >= 0;
+    ].concat(brand.aliases || []).map(function (x) { return String(x || '').toLowerCase(); });
+    for (var i = 0; i < tokens.length; i++) {
+      if (tokens[i] && tokens[i] === s) return true;
+    }
+    return false;
+  }
+
+  /** حدود كلمة لاتينية/عربية/أرقام — بلا substring داخل Mini/Premium/Camion/Mixeur */
+  function _aliasWordRe(alias) {
+    var a = String(alias || '').trim();
+    if (!a || a.length < 2) return null;
+    var esc = a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(
+      '(?:^|[^A-Za-z0-9_\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF])'
+      + esc
+      + '(?=$|[^A-Za-z0-9_\\u0600-\\u06FF\\u0750-\\u077F\\u08A0-\\u08FF])',
+      'i'
+    );
   }
 
   function findByAlias(text) {
-    var t = String(text || '').toLowerCase().trim();
+    var t = String(text || '').trim();
     if (!t) return null;
+    var tLower = t.toLowerCase();
     for (var i = 0; i < BRANDS.length; i++) {
-      if (searchMatch(BRANDS[i], t)) return BRANDS[i];
-      var names = [BRANDS[i].nameAr, BRANDS[i].nameFr].concat(BRANDS[i].aliases || []);
+      var names = [BRANDS[i].id, BRANDS[i].nameAr, BRANDS[i].nameFr]
+        .concat(BRANDS[i].aliases || []);
       for (var j = 0; j < names.length; j++) {
-        if (t.indexOf(String(names[j]).toLowerCase()) >= 0) return BRANDS[i];
+        var alias = String(names[j] || '').trim();
+        if (!alias) continue;
+        if (tLower === alias.toLowerCase()) return BRANDS[i];
+        var re = _aliasWordRe(alias);
+        if (re && re.test(t)) return BRANDS[i];
       }
     }
     return null;
