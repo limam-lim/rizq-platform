@@ -166,6 +166,7 @@ function toPublicCatalogGated(item, gate, seller, extra) {
     updatedAt: item.updatedAt,
     status: 'active',
     gender: item.gender || '',
+    brandId: item.brandId || '',
     brandName: item.brandName || '',
     brandNameFr: item.brandNameFr || '',
     contactsLocked: !unlocked,

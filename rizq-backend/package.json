@@ -57,7 +57,8 @@
     "test:caddy-security": "node scripts/run-with-test-db.js scripts/test-caddy-security.js",
     "test:package-credit": "node scripts/run-with-test-db.js scripts/test-package-credit.js",
     "test:home-catalog": "node scripts/run-with-test-db.js scripts/test-home-catalog.js",
-    "admin:2fa": "node scripts/admin-2fa.js"
+    "admin:2fa": "node scripts/admin-2fa.js",
+    "test:home-catalog-integrity": "node scripts/run-with-test-db.js scripts/test-home-catalog-integrity.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
