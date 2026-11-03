@@ -10157,6 +10157,14 @@ function goToListing(a) {
     if (window.RizqAdCards && typeof RizqAdCards.markViewed === 'function') RizqAdCards.markViewed(a.id);
     else if (typeof window.rizqMarkAdViewed === 'function') window.rizqMarkAdViewed(a.id);
   } catch (eView) {}
+  /* منتجات المحلات من شريط الرئيسية → صفحة المحل (نفس مسار rizqOpenStyleItem) */
+  if(a.fromStore || a.source === 'store' || a.homeBadge || (a.href && /rizq_store\.html/.test(String(a.href)))){
+    var storeHref = a.href || (a.storeId || a.accountId
+      ? ('rizq_store.html?id=' + encodeURIComponent(a.storeId || a.accountId))
+      : '');
+    var safeStore = typeof _rizqSafeNavHref === 'function' ? _rizqSafeNavHref(storeHref) : storeHref;
+    if(safeStore){ window.location.href = safeStore; return; }
+  }
   try {
     if(typeof rizqFeedStyleSeed === 'function'){
       rizqFeedStyleSeed({
@@ -10684,7 +10692,10 @@ function mapApiAdToHero(a){
     homeBadge: a.homeBadge || null,
     accountId: a.accountId || null,
     diamondActive: !!a.diamondActive,
-    href: a.href || null
+    href: a.href || null,
+    fromStore: !!(a.fromStore || a.source === 'store' || a.homeBadge || (a.href && /rizq_store\.html/.test(String(a.href)))),
+    source: (a.fromStore || a.source === 'store' || a.homeBadge) ? 'store' : (a.source || null),
+    storeId: a.storeId || a.accountId || null
   };
 }
 /** منتجات المحلات (غير الأزياء) من /api/catalog/home?section=stores — 1 لكل محل، حد 8 */
@@ -10887,7 +10898,9 @@ function applyList(list){
     setTimeout(function(){
       var list = listOrNull;
       if(list && storeItems && storeItems.length){
-        var picked = pickHomeStoreProducts(storeItems);
+        var picked = pickHomeStoreProducts(storeItems).map(function(it){
+          return Object.assign({}, it, { fromStore: true, source: 'store', storeId: it.accountId || it.storeId || null });
+        });
         if(picked.length) list = interleaveHomeStores(list, picked);
       }
       if(list) applyList(list);
