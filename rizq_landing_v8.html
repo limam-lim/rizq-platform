@@ -54,10 +54,39 @@ body.rizq-mockup-hdr-trial{
 }
 @media(max-width:768px){
   body.rizq-mockup-hdr-trial{
-    --rizq-mock-hdr-h:170px;
-    --rizq-header-h:170px;
+    --rizq-mock-hdr-h:180px;
+    --rizq-header-h:180px;
+  }
+  /* Critical: ثبّت شريط الهاتف السفلي قبل وصول mockup CSS */
+  body.rmh-phone-nav-split #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top),
+  body.rmh-phone-nav-split nav.rmh-nav:not(.rmh-nav-top){
+    position:fixed!important;top:auto!important;left:0!important;right:0!important;bottom:0!important;
+    z-index:10055!important;width:100%!important;margin:0!important;background:#070e1a!important;
   }
 }
+/* CLS: اقفل مقاس أيقونات SVG قبل وصول mockup CSS (كان 0→22 يُنسب ~0.38) */
+#rizq-mock-hdr .rmh-nav-ico,
+#rizq-mock-hdr .rmh-nav a .rmh-nav-ico,
+#rizq-mock-hdr .rmh-more-btn .rmh-nav-ico{
+  width:22px!important;height:22px!important;display:inline-flex!important;
+  align-items:center;justify-content:center;flex:0 0 auto;
+}
+#rizq-mock-hdr .rmh-nav-ico svg,
+#rizq-mock-hdr .rmh-nav a .rmh-nav-ico svg,
+#rizq-mock-hdr .rmh-more-btn .rmh-nav-ico svg,
+#rizq-mock-hdr .rmh-ico svg,
+#rizq-mock-hdr .rizq-help-svg{
+  width:18px!important;height:18px!important;display:block!important;
+  overflow:hidden!important;flex:0 0 auto;
+}
+/* تيكر النموذج نسبي من أول طلاء — لا fixed→relative متأخر */
+body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap,
+#rizq-mock-hdr > .ticker-wrap{
+  position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+  z-index:1!important;transform:none!important;
+}
+body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-empty,
+#rizq-mock-hdr > .ticker-wrap.is-empty{display:none!important}
 </style>
 
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -84,7 +113,8 @@ body.rizq-mockup-hdr-trial{
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link rel="preload" href="fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/cairo-latin.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="fonts/cairo.css?v=1.0"/>
+<link rel="preload" href="fonts/cairo-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/cairo.css?v=1.1"/>
 <link rel="stylesheet" href="rizq_landing_ux.css?v=31.5"/>
 <!-- deploy: ad-card clip fix v27.5 -->
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.5"/>
@@ -103,7 +133,7 @@ body.rizq-mockup-hdr-trial{
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.88"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.92"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — الشريط القديم متوقف نهائياً */
@@ -554,6 +584,13 @@ html.rizq-orbs-ready .hero-orb1,html.rizq-orbs-ready .hero-orb2,html.rizq-orbs-r
 
 /* ── TICKER (شريط إعلانات متحرك تحت النافبار) ── */
 .ticker-wrap{width:100%;overflow:hidden;background:linear-gradient(90deg,var(--dark),var(--royal),var(--dark));border-top:1px solid rgba(201,168,76,.2);border-bottom:1px solid rgba(201,168,76,.2);padding:10px 0;position:fixed;top:var(--rizq-header-h,70px);left:0;right:0;z-index:9990;box-sizing:border-box;contain:layout paint;transform:translateZ(0)}
+body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap,
+#rizq-mock-hdr > .ticker-wrap{
+  position:relative!important;top:auto!important;left:auto!important;right:auto!important;z-index:1!important;
+  transform:none!important;padding:2px 0!important;
+}
+body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-empty,
+#rizq-mock-hdr > .ticker-wrap.is-empty{display:none!important}
 /* مخفي دائماً في الواجهة العامة — المنطق الخلفي (launchDate/freeDays) يبقى */
 .rizq-free-countdown,
 .rizq-free-countdown.is-on,
@@ -569,17 +606,17 @@ html:has(#ticker-wrap:not(.is-empty)) .section-jump-bar,
 html.rizq-has-announce .section-jump-bar{
   display:none!important;visibility:hidden!important;pointer-events:none!important;
 }
-/* Desktop: تيكر ثابت — body مبطَّن بالهيدر؛ هنا فجوة التيكر فقط */
+/* Desktop: تيكر ثابت — استثناء هيدر النموذج (التيكر داخله؛ لا تُضف padding على .hero) */
 @media (min-width:769px) and (min-height:501px){
-  html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero,
-  html:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce) .hero{
+  html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce):not(:has(body.rizq-mockup-hdr-trial)) .hero,
+  html:has(#ticker-wrap:not(.is-empty)):not(.rizq-has-announce):not(:has(body.rizq-mockup-hdr-trial)) .hero{
     padding-top:calc(var(--rizq-ticker-h,42px) + 12px)!important
   }
-  html.rizq-has-announce:has(#ticker-wrap:not(.is-empty)) .hero{
+  html.rizq-has-announce:has(#ticker-wrap:not(.is-empty)):not(:has(body.rizq-mockup-hdr-trial)) .hero{
     padding-top:12px!important
   }
-  html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)) .hero-content,
-  html:has(#ticker-wrap:not(.is-empty)) .hero-content{
+  html.rizq-app-nav:has(#ticker-wrap:not(.is-empty)):not(:has(body.rizq-mockup-hdr-trial)) .hero-content,
+  html:has(#ticker-wrap:not(.is-empty)):not(:has(body.rizq-mockup-hdr-trial)) .hero-content{
     padding-top:4px!important
   }
 }
@@ -5283,11 +5320,25 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 #categories{min-height:580px}
 @media(max-width:768px){
   #categories{min-height:1440px}
+  .hero > #hero-listings.hero-promo-strip,
   #hero-listings.hero-promo-strip,
-  .hero-listings-section{min-height:426px}
+  .hero-listings-section{min-height:460px!important}
+  .hero-content{min-height:310px!important;box-sizing:border-box!important}
+  .hero-lead-row{min-height:172px!important;box-sizing:border-box!important}
+  .hero-brand-row{min-height:104px!important;box-sizing:border-box!important}
 }
 @media(max-width:390px){
-  #categories{min-height:1420px}
+  #categories{min-height:1620px}
+  .hero > #hero-listings.hero-promo-strip,
+  #hero-listings.hero-promo-strip,
+  .hero-listings-section{min-height:470px!important}
+}
+/* إلغاء fadeUp فوق الطية — translateY كان يُنسب كـ CLS (~0.35) */
+.hero-eyebrow,.hero-title-card,.hero-brand-row .hero-eyebrow,.hero-subtitle-card,
+.hero-subtitle-primary,.hero-subtitle-secondary,.hero-stage,
+.hero > #hero-listings.hero-promo-strip,#hero-listings.hero-promo-strip,
+.listings-label,.hero-search,.quick-cats,.hero-lead-row,.hero-headline,.hero-headline em{
+  animation:none!important;transform:none!important;opacity:1!important;
 }
 #builtin-cats-mount:empty::before{
   content:'';display:block;min-height:120px;
@@ -5344,9 +5395,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 </script>
     <script src="rizq_announcements.js"></script>
     <script src="rizq_marquee_kit.js?v=1.3"></script>
-    <script src="rizq_civic_ticker.js?v=1.3"></script>
+    <script src="rizq_civic_ticker.js?v=1.4"></script>
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_header_mockup_trial.js?v=5.90"></script>
+<script src="rizq_header_mockup_trial.js?v=5.92"></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
@@ -5355,7 +5406,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_contact_gate.js"></script>
 <script src="rizq_dynamic_nav.js?v=23.5"></script>
 <script src="rizq_module_flags.js?v=1.2"></script>
-<script src="rizq_pwa.js?v=31.21" defer></script>
+<script src="rizq_pwa.js?v=31.27" defer></script>
 <script src="rizq_footer_toggle.js?v=23.8" defer></script>
 <script src="rizq_social_links.js?v=23.13" defer></script>
 <script src="rizq_account_route.js?v=23.0"></script>
@@ -5367,7 +5418,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 if('requestIdleCallback' in window)requestIdleCallback(go,{timeout:2500});
 else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go,0);});})();</script>
 </head>
-<body class="rizq-mockup-hdr-trial" style="--rizq-mock-hdr-h:180px;--rizq-mock-body-gap:0px;--rizq-header-h:180px"><script>(function(){try{if(matchMedia('(max-width:768px)').matches){document.body.style.setProperty('--rizq-mock-hdr-h','170px');document.body.style.setProperty('--rizq-header-h','170px');}}catch(e){}})();</script>
+<body class="rizq-mockup-hdr-trial" style="--rizq-mock-hdr-h:180px;--rizq-mock-body-gap:0px;--rizq-header-h:180px"><script>(function(){try{if(matchMedia('(max-width:768px)').matches){document.body.classList.add('rmh-phone-nav-split');document.body.style.setProperty('--rizq-mock-hdr-h','180px');document.body.style.setProperty('--rizq-header-h','180px');}}catch(e){}})();</script>
 
 <!-- معاينة قابلة للرجوع — فرع منفصل؛ إخفاء الشريط لا يلغي الكود -->
 <div id="rizq-ads-preview-banner" role="status" hidden>
@@ -5529,6 +5580,20 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
     </div>
   </nav>
 </header>
+<script>
+/* مزامنة خفيفة مباشرة بعد الهيدر — قبل طلاء hero (لا boot كامل؛ يمنع السباق مع MutationObserver) */
+(function(){
+  try{
+    if(matchMedia('(max-width:768px)').matches){
+      document.body.classList.add('rmh-phone-nav-split');
+      if(typeof window.__rizqSyncPhoneNavSplit==='function') window.__rizqSyncPhoneNavSplit();
+    }
+    if(typeof window.__rizqApplyMockLang==='function') window.__rizqApplyMockLang();
+    if(typeof window.__rizqSyncMockHdrHeight==='function') window.__rizqSyncMockHdrHeight();
+    document.body.setAttribute('data-rizq-hdr-synced','1');
+  }catch(eSync){}
+})();
+</script>
 
 <!-- ══ NAVBAR القديم — متوقف نهائياً (الهيدر الموحّد أعلاه هو الوحيد) ══ -->
 <nav id="nav" hidden aria-hidden="true" style="display:none!important">
@@ -7729,9 +7794,9 @@ function buildCards(){
   track.innerHTML='';
   var source = (typeof ADS !== 'undefined' ? ADS : []).filter(_adHasPublicTitle);
   if(!source.length){
-    track.innerHTML='';
+    /* أبقِ min-height — display:none يُسقط الشريط ويحرّك #categories (CLS) */
     var heroSecEmpty=document.getElementById('hero-listings');
-    if(heroSecEmpty) heroSecEmpty.style.display='none';
+    if(heroSecEmpty) heroSecEmpty.style.display='';
     return;
   }
   var heroSec=document.getElementById('hero-listings');
@@ -10806,7 +10871,7 @@ function applyList(list){
     if(typeof buildEstateModels==='function') buildEstateModels(false);
     if(typeof refreshLandingBrandStrips==='function') refreshLandingBrandStrips();
     var heroSec=document.getElementById('hero-listings');
-    if(heroSec) heroSec.style.display=ADS.length?'':'none';
+    if(heroSec) heroSec.style.display='';
     renderTickerFromAds();
     applyCatCountsFromAds();
     if(typeof window.refreshPlatformLiveStats === 'function') window.refreshPlatformLiveStats();
@@ -11081,10 +11146,22 @@ function _bindCard(card) {
 
 document.querySelectorAll('.cat-card').forEach(_bindCard);
 
-function _rizqInitBuiltinCategories() {
+function _rizqBootLang() {
+  var bootLang = 'ar';
+  try {
+    var m = document.cookie.match(/(?:^|;\s*)rizq_lang=(fr|ar)/);
+    if (m) bootLang = m[1];
+    else if (document.documentElement && document.documentElement.lang) bootLang = document.documentElement.lang;
+    else bootLang = localStorage.getItem('rizq_lang') || 'ar';
+  } catch (eL) { try { bootLang = localStorage.getItem('rizq_lang') || 'ar'; } catch (e2) {} }
+  return (String(bootLang).indexOf('fr') === 0) ? 'fr' : 'ar';
+}
+
+function _rizqInitBuiltinCategories(lang) {
   if (typeof RizqCategories === 'undefined') return;
   var grid = document.querySelector('.cats-grid');
-  RizqCategories.renderBuiltinGrid(grid);
+  var bootLang = (lang === 'fr' || lang === 'ar') ? lang : _rizqBootLang();
+  RizqCategories.renderBuiltinGrid(grid, bootLang);
   if (grid) {
     grid.querySelectorAll('.cat-card:not([data-suggest="1"]):not([data-extra="1"])').forEach(function(card) {
       if (typeof obs !== 'undefined' && obs && obs.observe) obs.observe(card);
@@ -11553,19 +11630,11 @@ function _rizqBootCategoryGrid() {
     }
   } catch (eBootNames) { /* ignore */ }
   try { if (typeof mergeSubFrFromConfig === 'function') mergeSubFrFromConfig(); } catch (eMerge) { /* ignore */ }
-  _rizqInitBuiltinCategories();
+  /* ابنِ الشبكة بلغة الإقلاع مباشرة — لا تبنِ AR ثم translateCatTaxonomy(FR) (CLS). */
+  _rizqInitBuiltinCategories(_rizqBootLang());
   try { if (typeof renderExtraCategories === 'function') renderExtraCategories(); } catch (eEx) { /* ignore */ }
   try { if (typeof renderSuggestCard === 'function') renderSuggestCard(); } catch (eSug) { /* ignore */ }
   try { if (typeof refreshCatStatsText === 'function') refreshCatStatsText(); } catch (eSt) { /* ignore */ }
-  /* بطاقات الأقسام تُبنى بالعربية دائماً — أعد تطبيق الترجمة إن كانت FR
-     محفوظة، حتى لا تبقى الفروع عربية بعد سباق DOMContentLoaded. */
-  try {
-    var bootLang = 'ar';
-    try { bootLang = localStorage.getItem('rizq_lang') || 'ar'; } catch (eL) {}
-    if (bootLang === 'fr' && typeof translateCatTaxonomy === 'function') {
-      translateCatTaxonomy(true);
-    }
-  } catch (eTxBoot) { /* ignore */ }
 }
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', _rizqBootCategoryGrid);

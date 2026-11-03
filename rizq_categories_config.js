@@ -363,40 +363,54 @@
     return ALIAS[raw] || raw;
   }
 
-  function buildCatDropHtml(cat) {
+  function buildCatDropHtml(cat, lang) {
+    var fr = lang === 'fr';
     var groups = cat.groups;
     if (!groups || !groups.length) {
       var subs = cat.subcats || [];
       if (!subs.length) return '';
-      return '<div class="cat-drop"><div class="drop-group"><div class="drop-group-title">أقسام فرعية</div>'
-        + subs.map(function (s) { return '<a class="drop-link" href="#">' + s + '</a>'; }).join('')
+      var subLabels = translateSubcats(subs, fr ? 'fr' : 'ar');
+      return '<div class="cat-drop"><div class="drop-group"><div class="drop-group-title" data-ar="أقسام فرعية">'
+        + (fr ? 'Sous-catégories' : 'أقسام فرعية') + '</div>'
+        + subs.map(function (s, i) {
+          return '<a class="drop-link" href="#" data-ar="' + s + '">' + (subLabels[i] || s) + '</a>';
+        }).join('')
         + '</div></div>';
     }
     return '<div class="cat-drop">' + groups.map(function (g) {
-      return '<div class="drop-group"><div class="drop-group-title">' + g.title + '</div>'
-        + (g.subs || []).map(function (s) { return '<a class="drop-link" href="#">' + s + '</a>'; }).join('')
+      var titleAr = g.title;
+      var title = translateGroupTitle(titleAr, fr ? 'fr' : 'ar');
+      var subKeys = g.subs || [];
+      var subLabels = translateSubcats(subKeys, fr ? 'fr' : 'ar');
+      return '<div class="drop-group"><div class="drop-group-title" data-ar="' + titleAr + '">' + title + '</div>'
+        + subKeys.map(function (s, i) {
+          return '<a class="drop-link" href="#" data-ar="' + s + '">' + (subLabels[i] || s) + '</a>';
+        }).join('')
         + '</div>';
     }).join('') + '</div>';
   }
 
-  function buildCatCardHtml(cat) {
+  function buildCatCardHtml(cat, lang) {
+    var fr = lang === 'fr';
     var goldCls = cat.gold ? ' cat-gold' : '';
     var iconStyle = cat.gold
       ? ' style="background:linear-gradient(135deg,#b8860b,#FFD700);border-color:rgba(255,215,0,.4)"'
       : '';
+    var name = fr ? (cat.nameFr || cat.nameAr) : cat.nameAr;
     return '<div class="cat-card fade-in' + goldCls + '" style="position:relative;cursor:pointer" data-cat-key="' + cat.key + '" data-cat-ar="' + cat.nameAr + '">'
       + '<div class="cat-icon-box"' + iconStyle + '>' + cat.icon + '</div>'
-      + '<span class="cat-name" data-ar="' + cat.nameAr + '">' + cat.nameAr + '</span>'
+      + '<span class="cat-name" data-ar="' + cat.nameAr + '">' + name + '</span>'
       + '<span class="cat-count">—</span>'
-      + buildCatDropHtml(cat)
+      + buildCatDropHtml(cat, fr ? 'fr' : 'ar')
       + '</div>';
   }
 
-  function renderBuiltinGrid(grid) {
+  function renderBuiltinGrid(grid, lang) {
     if (!grid) return;
     var mount = grid.querySelector('#builtin-cats-mount');
     if (!mount) return;
-    var html = BUILTIN.map(buildCatCardHtml).join('');
+    var bootLang = (lang === 'fr' || lang === 'ar') ? lang : 'ar';
+    var html = BUILTIN.map(function (c) { return buildCatCardHtml(c, bootLang); }).join('');
     mount.insertAdjacentHTML('beforebegin', html);
     mount.remove();
   }

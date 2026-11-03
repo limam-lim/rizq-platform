@@ -220,7 +220,11 @@
     }
 
     var active = sortedActive(list);
-    if (!active.length) active = FALLBACK.slice();
+    /* قائمة فارغة صراحة = إخفاء — لا تُظهر FALLBACK هنا (كان يفتح الشريط بعد is-empty → CLS ~1.2) */
+    if (!active.length) {
+      hideStrip(wrap);
+      return;
+    }
 
     var html = active.map(buildItemHtml).filter(Boolean).join('');
     if (!html) {
@@ -301,7 +305,12 @@
 
   function init() {
     var cached = fromCache();
-    render(cached.length ? cached : FALLBACK);
+    /* لا تُظهر FALLBACK قبل معرفة إعدادات الخادم — يمنع قفزة التيكر بعد أول طلاء */
+    if (cached.length) render(cached);
+    else {
+      var wrap0 = document.getElementById('ticker-wrap');
+      if (wrap0) hideStrip(wrap0);
+    }
 
     fetchRemote().then(function (remote) {
       if (remote) {
@@ -310,11 +319,15 @@
           applyRemote(remote);
         } else {
           if (typeof remote.hidden === 'boolean') setStripHidden(remote.hidden);
-          if (!cached.length) applyList([]);
-          else render(cached);
+          if (cached.length) render(cached);
+          else {
+            var wrapHide = document.getElementById('ticker-wrap');
+            if (wrapHide) hideStrip(wrapHide);
+          }
         }
       } else if (!cached.length) {
-        applyList([]);
+        /* بلا خلفية/شبكة: FALLBACK للعرض التجريبي فقط */
+        render(FALLBACK);
       }
     });
 
@@ -348,8 +361,10 @@
   // توافق: نداءات قديمة كانت تملأ الشريط من عناوين الإعلانات التجارية
   global.renderTickerFromAds = function () {
     if (!document.getElementById('ticker-wrap') || !document.getElementById('ticker')) return;
+    /* التوافق القديم: لا تخلط إعلانات تجارية مع الشريط المدني، ولا تُظهر FALLBACK هنا */
     var cached = fromCache();
-    render(cached.length ? cached : FALLBACK);
+    if (cached.length) render(cached);
+    else hideStrip(document.getElementById('ticker-wrap'));
   };
 
   if (document.readyState === 'loading') {

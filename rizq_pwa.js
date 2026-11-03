@@ -5,8 +5,8 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '31.26';
-  var MOCK_HDR_V = '5.88';
+  var ASSET_V = '31.27';
+  var MOCK_HDR_V = '5.92';
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -137,12 +137,19 @@
       if (!mockJsEl) {
         appendScript(mockJsWant, { defer: true });
       } else if ((mockJsEl.getAttribute('src') || '').indexOf('v=' + MOCK_HDR_V) < 0) {
-        /* استبدال الوسم القديم حتى تُحمَّل الكبسولة بالإصدار الصحيح على كل الصفحات */
-        var fresh = document.createElement('script');
-        fresh.src = mockJsWant;
-        fresh.defer = true;
-        mockJsEl.parentNode.insertBefore(fresh, mockJsEl.nextSibling);
-        try { mockJsEl.parentNode.removeChild(mockJsEl); } catch (eRmMock) {}
+        /* إن نُفِّذ الهيدر مسبقاً — لا تستبدل الوسم (إعادة التحميل = boot ثانٍ → CLS كارثي) */
+        var mockAlreadyLive = false;
+        try {
+          mockAlreadyLive = typeof window.__rizqSyncPhoneNavSplit === 'function'
+            || (document.body && document.body.getAttribute('data-rizq-mock-booted') === '1');
+        } catch (eLive) {}
+        if (!mockAlreadyLive) {
+          var fresh = document.createElement('script');
+          fresh.src = mockJsWant;
+          fresh.defer = true;
+          mockJsEl.parentNode.insertBefore(fresh, mockJsEl.nextSibling);
+          try { mockJsEl.parentNode.removeChild(mockJsEl); } catch (eRmMock) {}
+        }
       }
     }
     if (!document.querySelector('script[src*="rizq_account_route.js"]')) {

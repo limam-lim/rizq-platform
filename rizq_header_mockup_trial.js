@@ -5,6 +5,10 @@
 (function () {
   'use strict';
 
+  /* منع boot مزدوج إن أُعيد حقن السكربت بإصدار مختلف (PWA/header cache-bust) */
+  if (window.__rizqMockupHdrTrialInit) return;
+  window.__rizqMockupHdrTrialInit = true;
+
   function pathName() {
     try { return (location.pathname || '').split('/').pop() || ''; }
     catch (e) { return ''; }
@@ -33,7 +37,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.88';
+    link.href = 'rizq_header_mockup_trial.css?v=5.92';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -1212,6 +1216,7 @@
   function syncPhoneNavSplit() {
     var hdr = document.getElementById('rizq-mock-hdr');
     if (!hdr) return;
+    /* مُصدَّر للاستدعاء المتزامن مباشرة بعد </header> قبل طلاء hero */
     var bottomNav = hdr.querySelector('nav.rmh-nav:not(.rmh-nav-top)');
     if (!bottomNav) return;
     captureNavSlots(bottomNav);
@@ -1230,6 +1235,7 @@
       return;
     }
 
+    /* الصنف قبل نقل العقد — حتى يطبَّق position:fixed من FOUC قبل إعادة التخطيط */
     document.body.classList.add('rmh-phone-nav-split');
     if (!topNav) {
       topNav = document.createElement('nav');
@@ -1291,9 +1297,9 @@
       if (topNav) topH += Math.ceil(topNav.getBoundingClientRect().height || 48);
       topH = Math.max(topH, 96);
             try {
-        /* تجميد قيمة الحجز أول 4ث — ممنوع النمو أو الانكماش (كلاهما يسبب CLS) */
+        /* تجميد قيمة الحجز أول 8ث — ممنوع النمو أو الانكماش (كلاهما يسبب CLS) */
         var curP = parseFloat(document.body.style.getPropertyValue('--rizq-mock-hdr-h')) || parseFloat(getComputedStyle(document.body).getPropertyValue('--rizq-mock-hdr-h')) || 0;
-        if (curP && performance.now() < 4000) topH = curP;
+        if (curP && performance.now() < 8000) topH = curP;
       } catch (eKeepP) {}
 document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
       /* browse/detail + legacy chrome read --rizq-header-h — keep it in sync with mock top bar */
@@ -1308,10 +1314,10 @@ document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
       return;
     }
     var h = measureMockHdrExtent(hdr) || Math.ceil(hdr.getBoundingClientRect().height || 196);
-        /* Freeze reserved header height for first 4s — neither grow nor shrink (both cause CLS) */
+        /* Freeze reserved header height for first 8s — neither grow nor shrink (both cause CLS) */
     try {
       var curH = parseFloat(document.body.style.getPropertyValue('--rizq-mock-hdr-h')) || parseFloat(getComputedStyle(document.body).getPropertyValue('--rizq-mock-hdr-h')) || 0;
-      if (curH && performance.now() < 4000) h = curH;
+      if (curH && performance.now() < 8000) h = curH;
     } catch (eKeep) {}
 document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
     /* Sync legacy --rizq-header-h so .browse-right inset / detail max-height clear the capsule */
@@ -1410,6 +1416,7 @@ document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
     wireModelsModal();
     ensureHeroTagline();
     syncMockHdrHeight();
+    /* أُجّل إعادة التطبيق لما بعد نافذة CLS (~5ث) لتفادي إعادة تدفّق الهيدر */
     setTimeout(function () {
       fillCategories();
       applyMockLang();
@@ -1418,7 +1425,7 @@ document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
       markActiveFromPage();
       refreshBadge();
       refreshFavBadge();
-    }, 1200);
+    }, 5500);
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(function () { syncMockHdrHeight(); }).catch(function () {});
     }
@@ -1454,12 +1461,53 @@ document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
     });
   }
 
-  /* التشغيل في النهاية — بعد تهيئة DEMO_CART وكل الدوال */
-  waitBody(function () {
-    document.body.classList.add('rizq-mockup-hdr-trial');
-    document.documentElement.classList.add('rizq-app-nav');
-    ensureMockCss();
-    ensureMockHeader();
-    bootMockHeader();
-  });
+  window.__rizqSyncPhoneNavSplit = syncPhoneNavSplit;
+  window.__rizqSyncMockHdrHeight = syncMockHdrHeight;
+  window.__rizqApplyMockLang = applyMockLang;
+
+  /* التشغيل مبكراً عند ظهور الهيدر — قبل طلاء hero/categories (يقلّل CLS تقسيم الهاتف) */
+  function bootWhenHdrReady() {
+    var started = false;
+    function go() {
+      if (started) return true;
+      if (!document.body) return false;
+      var hdrReady = document.getElementById('rizq-mock-hdr');
+      if (!hdrReady) return false;
+      /* انتظر اكتمال nav داخل الهيدر — تفادي boot على وسم فارغ أثناء التحليل */
+      if (!hdrReady.querySelector('nav.rmh-nav')) return false;
+      started = true;
+      document.body.classList.add('rizq-mockup-hdr-trial');
+      document.documentElement.classList.add('rizq-app-nav');
+      ensureMockCss();
+      ensureMockHeader();
+      /* إن زامن السكربت بعد </header> مسبقاً — لا تُعد التقسيم/الترجمة قبل boot (CLS من إعادة التدفّق) */
+      var alreadySynced = false;
+      try { alreadySynced = document.body.getAttribute('data-rizq-hdr-synced') === '1'; } catch (eAttr) {}
+      if (!alreadySynced) {
+        try { syncPhoneNavSplit(); } catch (eSplit) {}
+        try { applyMockLang(); } catch (eLang) {}
+        try { syncMockHdrHeight(); } catch (eH) {}
+      }
+      bootMockHeader();
+      try { document.body.setAttribute('data-rizq-mock-booted', '1'); } catch (eBoot) {}
+      return true;
+    }
+    if (go()) return;
+    var mo = null;
+    try {
+      mo = new MutationObserver(function () {
+        if (go() && mo) {
+          try { mo.disconnect(); } catch (eD) {}
+        }
+      });
+      mo.observe(document.documentElement, { childList: true, subtree: true });
+    } catch (eMo) { mo = null; }
+    waitBody(function () {
+      go();
+      if (mo) {
+        try { mo.disconnect(); } catch (eD2) {}
+      }
+    });
+  }
+  bootWhenHdrReady();
 })();

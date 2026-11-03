@@ -1835,7 +1835,7 @@
   function ensureMockHeaderAssets() {
     try {
       if (isDashShell()) return;
-      var v = '5.90';
+      var v = '5.92';
       var cssWant = 'rizq_header_mockup_trial.css?v=' + v;
       var jsWant = 'rizq_header_mockup_trial.js?v=' + v;
       var l = document.querySelector('link[href*="rizq_header_mockup_trial.css"]');
@@ -1852,11 +1852,19 @@
         s.defer = true;
         (document.head || document.documentElement).appendChild(s);
       } else if ((s.getAttribute('src') || '').indexOf('v=' + v) < 0) {
-        var fresh = document.createElement('script');
-        fresh.src = jsWant;
-        fresh.defer = true;
-        s.parentNode.insertBefore(fresh, s.nextSibling);
-        try { s.parentNode.removeChild(s); } catch (eRm) {}
+        /* لا تُعد تحميل سكربت حيّ — إعادة التنفيذ تعيد boot وتسبب CLS */
+        var live = false;
+        try {
+          live = typeof window.__rizqSyncPhoneNavSplit === 'function'
+            || (document.body && document.body.getAttribute('data-rizq-mock-booted') === '1');
+        } catch (eLive) {}
+        if (!live) {
+          var fresh = document.createElement('script');
+          fresh.src = jsWant;
+          fresh.defer = true;
+          s.parentNode.insertBefore(fresh, s.nextSibling);
+          try { s.parentNode.removeChild(s); } catch (eRm) {}
+        }
       }
     } catch (eMock) { /* ignore */ }
   }
