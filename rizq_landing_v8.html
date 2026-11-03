@@ -245,7 +245,9 @@ html.rizq-app-nav .nav-sticky-tools{
 html{scroll-behavior:smooth;scroll-padding-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,42px) + 12px)}
 #virtual-stores,#virtual-showrooms,#virtual-estate,#virtual-offices,#virtual-tenders,#virtual-investments,
 #rzq-disc-store,#rzq-disc-corp,#rzq-disc-office,#rzq-disc-tenders,#rzq-disc-investments,
-#rizq-estate-models,#listings,#categories,#pricing,#prices,#about{scroll-margin-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,42px) + 12px)}
+#rizq-estate-models,#rizq-styles,#rizq-showroom-models,#models,#listings,#categories,#pricing,#prices,#about{
+  scroll-margin-top:calc(var(--rizq-header-h,70px) + var(--rizq-announce-h,0px) + var(--rizq-ticker-h,42px) + 12px)
+}
 /* ارتفاع أدنى لمراسي الاكتشاف قبل ملء JS حتى لا يفشل تمرير الهاش من صفحات أخرى */
 #rzq-disc-store,#rzq-disc-corp,#rzq-disc-office,#rzq-disc-tenders,#rzq-disc-investments{min-height:1px}
 body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:var(--bg-page);color:var(--text-main);cursor:auto;font-weight:600}
@@ -2523,6 +2525,8 @@ html[dir="ltr"] #all-ads-title{
   position:relative;z-index:1;overflow:hidden;border-radius:0;
   direction:ltr; /* يمنع انزياح RTL الذي يُخرج البطاقات عن الشاشة أثناء slide */
   padding:8px 14px;
+  /* هامش نهاية الشريط حتى لا يغطي ↑/دردشة أسعار آخر بطاقة */
+  padding-inline-end:72px;
   background:transparent;
   border:none;
   box-shadow:none;
@@ -4576,9 +4580,9 @@ html[dir="ltr"] .rzq-disc-live-head{direction:ltr}
   font-size:12.5px;font-weight:600;color:rgba(255,255,255,.9);line-height:1.4
 }
 /* overflow:hidden + تحريك transform — لا يعتمد على فيض العرض (محل واحد كان يتجمد على الهاتف) */
-.rzq-disc-strip{overflow:hidden;padding-bottom:4px;direction:ltr;touch-action:pan-y;cursor:grab}
+.rzq-disc-strip{overflow:hidden;padding-bottom:4px;padding-inline-end:64px;direction:ltr;touch-action:pan-y;cursor:grab}
 .rzq-disc-strip:active{cursor:grabbing}
-.rzq-disc-track{display:flex;flex-wrap:nowrap;gap:16px;padding:2px;direction:ltr;width:max-content;will-change:transform;backface-visibility:hidden}
+.rzq-disc-track{display:flex;flex-wrap:nowrap;gap:16px;padding:2px;padding-inline-end:8px;direction:ltr;width:max-content;will-change:transform;backface-visibility:hidden}
 .rzq-disc-card{flex:0 0 auto;width:210px;background:#fff;border-radius:16px;overflow:hidden;text-decoration:none;box-shadow:0 4px 18px rgba(27,58,107,.1);border:1px solid rgba(27,58,107,.08);transition:transform .25s,box-shadow .25s}
 .rzq-disc-card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(27,58,107,.16)}
 .rzq-disc-img{position:relative;width:100%;height:132px;background:linear-gradient(145deg,#0D1B2A,#1B3A6B);overflow:hidden}
@@ -4873,6 +4877,7 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   border-radius:0;
   direction:ltr;
   padding:8px 14px;
+  padding-inline-end:72px;
   background:transparent;
   border:none;
   box-shadow:none;
@@ -4975,7 +4980,9 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   transition:transform .35s ease, box-shadow .25s;
   cursor:default;border:0;padding:0;appearance:none;-webkit-appearance:none;
   color:inherit;font-family:inherit;pointer-events:none;
+  text-decoration:none;box-sizing:border-box;
 }
+a.rizq-style-tile{color:inherit;text-decoration:none}
 .rizq-style-tile.is-linked{
   cursor:pointer;pointer-events:auto;
 }
@@ -6082,7 +6089,7 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
         <a class="landing-ads-browse-full" href="rizq_directory.html?type=store" data-t="browse-stores">عرض كل المحلات ←</a>
         <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=store" onclick="return goSubscribePackage('stores')" class="rizq-dual-cta-own" data-t="vs-btn1">امتلك واجهة محلك الإلكترونية</a>
       </div>
-      <p class="rizq-sub-cta-sub" data-t="vs-btn1-sub">اشترك الآن. سوقك الإلكتروني يبدأ من هنا.</p>
+      <p class="rizq-sub-cta-sub" data-t="vs-btn1-sub">اشترك الآن — سوقك الإلكتروني يبدأ من هنا.</p>
     </div>
   </div>
 </section>
@@ -6162,7 +6169,7 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
         <a href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=corp" onclick="return goSubscribePackage('corp')"
            class="rizq-dual-cta-own" data-t="vsh-btn1">امتلك واجهة كتالوج معرضك الإلكتروني</a>
       </div>
-      <p class="rizq-sub-cta-sub" data-t="vsh-btn1-sub">اشترك الآن. عرضك يصل حيث يبحث الجادّون.</p>
+      <p class="rizq-sub-cta-sub" data-t="vsh-btn1-sub">اشترك الآن — عرضك يصل حيث يبحث الجادّون.</p>
     </div>
 
   </div>
@@ -6261,7 +6268,7 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
         <a href="rizq_real_estate_register.html" onclick="openRegisterAs('estate');return false"
            class="rizq-dual-cta-own" data-t="ve-btn1">امتلك واجهتك العقارية على رزق</a>
       </div>
-      <p class="rizq-sub-cta-sub" data-t="ve-btn1-sub">اشترك الآن. عقارك يصل لمن يبحث بجدية.</p>
+      <p class="rizq-sub-cta-sub" data-t="ve-btn1-sub">اشترك الآن — عقارك يصل لمن يبحث بجدية.</p>
     </div>
   </div>
 </section>
@@ -6359,7 +6366,7 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
         <a class="landing-ads-browse-full" href="rizq_directory.html?type=office" data-t="browse-offices">عرض كل المكاتب ←</a>
         <a id="vo-create-btn" href="./?openRegister=1&amp;regPage=1&amp;preType=company&amp;preBiz=office" onclick="return goSubscribePackage('offices')" class="rizq-dual-cta-own" data-t="vo-btn1">امتلك واجهتك المهنية الإلكترونية</a>
       </div>
-      <p class="rizq-sub-cta-sub" data-t="vo-btn1-sub">اشترك الآن. حضورك المهني لا يتوقف.</p>
+      <p class="rizq-sub-cta-sub" data-t="vo-btn1-sub">اشترك الآن — حضورك المهني لا يتوقف.</p>
     </div>
 
   </div>
@@ -8686,6 +8693,26 @@ function _styFindAdById(id){
   } catch(e){}
   return null;
 }
+/** رابط آمن لبلاطة/بطاقة من معرّف منتج أو محل/معرض */
+function _styHrefForAdId(adId){
+  if(adId == null || adId === '') return '';
+  var sid = String(adId);
+  var m = sid.match(/^store:([^:]+):/);
+  if(m) return _rizqSafeNavHref('rizq_store.html?id=' + encodeURIComponent(m[1]));
+  var ms = sid.match(/^showroom:([^:]+):/);
+  if(ms) return _rizqSafeNavHref('rizq_showroom.html?id=' + encodeURIComponent(ms[1]));
+  var ad = _styFindAdById(adId);
+  if(!ad) return '';
+  if(ad.fromShowroom || ad.source === 'showroom' || String(ad.id).indexOf('showroom:') === 0){
+    return _rizqSafeNavHref(ad.href || (ad.showroomId || ad.storeId
+      ? ('rizq_showroom.html?id=' + encodeURIComponent(ad.showroomId || ad.storeId)) : ''));
+  }
+  if(ad.fromStore || ad.source === 'store' || String(ad.id).indexOf('store:') === 0){
+    return _rizqSafeNavHref(ad.href || (ad.storeId ? ('rizq_store.html?id=' + encodeURIComponent(ad.storeId)) : ''));
+  }
+  if(ad.href && ad.fromView) return _rizqSafeNavHref(ad.href);
+  return _rizqSafeNavHref('rizq_browse.html?id=' + encodeURIComponent(ad.id));
+}
 function rizqOpenStyleItem(ev, adId){
   /* فتح المنتج المضغوط عليه فقط — لا تسريب لنقر بطاقة الإطلالة */
   if(ev){
@@ -8693,45 +8720,14 @@ function rizqOpenStyleItem(ev, adId){
     try { ev.stopPropagation(); } catch(e1){}
     if(ev.stopImmediatePropagation) try { ev.stopImmediatePropagation(); } catch(e2){}
   }
+  var href = _styHrefForAdId(adId);
+  if(href){
+    window.location.href = href;
+    return false;
+  }
   if(adId == null || adId === '') return false;
   var ad = _styFindAdById(adId);
-  if(!ad){
-    /* معرّف محل: store:storeId:productId */
-    var m = String(adId).match(/^store:([^:]+):/);
-    if(m){
-      window.location.href = 'rizq_store.html?id=' + encodeURIComponent(m[1]);
-      return false;
-    }
-    var ms = String(adId).match(/^showroom:([^:]+):/);
-    if(ms){
-      window.location.href = 'rizq_showroom.html?id=' + encodeURIComponent(ms[1]);
-      return false;
-    }
-    return false;
-  }
-  /* منتجات المعارض → صفحة المعرض / الكتالوج */
-  if(ad.fromShowroom || ad.source === 'showroom' || String(ad.id).indexOf('showroom:') === 0){
-    var srHref = ad.href || (ad.showroomId || ad.storeId
-      ? ('rizq_showroom.html?id=' + encodeURIComponent(ad.showroomId || ad.storeId))
-      : '');
-    var safeSr = _rizqSafeNavHref(srHref);
-    if(safeSr) window.location.href = safeSr;
-    return false;
-  }
-  /* منتجات المحلات → صفحة المحل */
-  if(ad.fromStore || ad.source === 'store' || String(ad.id).indexOf('store:') === 0){
-    var storeHref = ad.href || (ad.storeId ? ('rizq_store.html?id=' + encodeURIComponent(ad.storeId)) : '');
-    var safeStore = _rizqSafeNavHref(storeHref);
-    if(safeStore) window.location.href = safeStore;
-    return false;
-  }
-  if(ad.href && ad.fromView){
-    var safeHref = _rizqSafeNavHref(ad.href);
-    if(safeHref) window.location.href = safeHref;
-    return false;
-  }
-  if(typeof goToListing === 'function') goToListing(ad);
-  else window.location.href = 'rizq_browse.html?id=' + encodeURIComponent(ad.id);
+  if(ad && typeof goToListing === 'function') goToListing(ad);
   return false;
 }
 /** روابط تنقّل داخل المنصة فقط — يمنع javascript: وhttp://خارجي */
@@ -8748,21 +8744,25 @@ function _rizqSafeNavHref(href){
   } catch(e){ return ''; }
 }
 function rizqOpenStyleLook(ev, primaryId, fallbackHref){
-  /* زر «تسوّق الإطلالة» فقط — بلا فتح عند نقر بلاطة منتج */
+  /* توافق قديم — التنقل الأساسي عبر <a href>؛ يُستخدم فقط إن بقي onclick */
   if(ev){
     var t = ev.target;
-    /* بلاطة مرتبطة بإعلانها — لا تسرق النقرة لبطاقة الإطلالة */
     if(t && t.closest && t.closest('.rizq-style-tile.is-linked')){
       try { ev.preventDefault(); } catch(eP){}
       return false;
     }
-    try { ev.preventDefault(); } catch(e2){}
   }
   if(primaryId){
+    if(ev){ try { ev.preventDefault(); } catch(e2){} }
     return rizqOpenStyleItem(null, primaryId);
   }
   var safeFb = _rizqSafeNavHref(fallbackHref);
-  if(safeFb) window.location.href = safeFb;
+  if(safeFb){
+    if(ev && ev.currentTarget && ev.currentTarget.getAttribute && ev.currentTarget.getAttribute('href')){
+      return true; /* اسمح للرابط الأصلي */
+    }
+    window.location.href = safeFb;
+  }
   return false;
 }
 window.rizqOpenStyleItem = rizqOpenStyleItem;
@@ -8853,10 +8853,25 @@ function _styClearMeta(items, fr){
     ? (n + ' article' + (n > 1 ? 's' : ''))
     : (n + ' منتجات');
   var parts = [];
-  if(storeName) parts.push(storeName);
-  parts.push(countLbl);
-  if(priceStr) parts.push((fr ? 'dès ' : 'من ') + priceStr);
+  if(storeName) parts.push(_styEsc(storeName));
+  parts.push(_styEsc(countLbl));
+  if(priceStr){
+    /* من + الرقم كتلة واحدة لا تنكسر سطراً */
+    parts.push(
+      '<span style="white-space:nowrap">'
+      + (fr ? 'dès ' : 'من ')
+      + '<bdi dir="ltr" style="unicode-bidi:isolate">'
+      + _styEsc(priceStr)
+      + '</bdi></span>'
+    );
+  }
   return parts.join(' · ');
+}
+/** placeholder رزق للصور المكسورة — كحلي/ذهبي بلا وردي/أحمر */
+function _rizqImgPlaceholderOnError(){
+  return ' onerror="this.onerror=null;this.src=\'data:image/svg+xml;charset=utf-8,'
+    + encodeURIComponent('<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"400\" height=\"300\" viewBox=\"0 0 400 300\"><rect fill=\"#0f1f3d\" width=\"400\" height=\"300\"/><text x=\"200\" y=\"158\" text-anchor=\"middle\" fill=\"#C9A84C\" font-family=\"Cairo,Segoe UI,sans-serif\" font-size=\"28\" font-weight=\"800\">رزق</text></svg>')
+    + '\';this.style.objectFit=\'cover\'"';
 }
 function _styBuildCardHtml(opts){
   opts = opts || {};
@@ -8868,13 +8883,14 @@ function _styBuildCardHtml(opts){
     ? String(opts.primaryId).replace(/'/g,'&#39;')
     : '';
   var href = opts.href || 'rizq_browse.html';
-  var hrefEsc = _styEsc(href).replace(/'/g,'&#39;');
+  var safeHref = _rizqSafeNavHref(href) || 'rizq_browse.html';
   var fromView = opts.fromViewLbl
     ? '<div class="rizq-style-from-view">'+_styEsc(opts.fromViewLbl)+'</div>'
     : '';
   var brandRow = opts.brandHtml
     ? '<div class="rizq-style-brand-row" aria-label="الماركة">'+opts.brandHtml+'</div>'
     : '';
+  /* رابط حقيقي — بدون preventDefault؛ البلاطات المرتبطة تمنع التقاط النقرة عبر stopPropagation */
   return '<article'+attrs+'>'
     + '<div class="rizq-style-mosaic">'+(opts.tilesHtml || '')+'</div>'
     + '<div class="rizq-style-body">'
@@ -8882,8 +8898,12 @@ function _styBuildCardHtml(opts){
     +   brandRow
     +   '<div class="rizq-style-badge">'+_styEsc(opts.badge || '')+'</div>'
     +   '<div class="rizq-style-name">'+_styEsc(opts.name || '')+'</div>'
-    +   '<div class="rizq-style-meta">'+_styEsc(opts.meta || '')+'</div>'
-    +   '<a class="rizq-style-cta" href="'+_styEsc(href)+'" onclick="return rizqOpenStyleLook(event,\''+idAttr+'\',\''+hrefEsc+'\')">'+_styEsc(opts.cta || '')+'</a>'
+    +   '<div class="rizq-style-meta">'+(
+          opts.meta && String(opts.meta).indexOf('<') >= 0
+            ? opts.meta
+            : _styEsc(opts.meta || '')
+        )+'</div>'
+    +   '<a class="rizq-style-cta" href="'+_styEsc(safeHref)+'">'+_styEsc(opts.cta || '')+'</a>'
     + '</div></article>';
 }
 
@@ -8922,14 +8942,15 @@ function _styTileHtml(ad, fallbackEmoji, fallbackBg){
   var aria = linked
     ? ' aria-label="'+_styEsc((title ? title + ' — ' : '') + (priceBadge ? String(ad.price||'') : '') || String(ad.id))+'"'
     : ' aria-hidden="true"';
-  /* span قابل للنقر — يعمل داخل الموزاييك ويفتح إعلان البلاطة */
-  var openAttr = linked
-    ? ' role="button" tabindex="0" data-sty-ad="'+_styEsc(String(ad.id))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(ad.id)).replace(/'/g,'&#39;')+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();return rizqOpenStyleItem(event,\''+_styEsc(String(ad.id)).replace(/'/g,'&#39;')+'\');}" class="rizq-style-tile is-linked"'+aria
-    : ' class="rizq-style-tile"'+aria;
+  var tileHref = linked ? _styHrefForAdId(ad.id) : '';
+  var openTag = linked && tileHref
+    ? '<a href="'+_styEsc(tileHref)+'" class="rizq-style-tile is-linked"'+aria+' style="background:'+_styEsc(bg)+';text-decoration:none;color:inherit">'
+    : '<span class="rizq-style-tile"'+aria+' style="background:'+_styEsc(bg)+'">';
+  var closeTag = linked && tileHref ? '</a>' : '</span>';
   if(src){
-    return '<span'+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" loading="lazy" decoding="async"/>'+priceBadge+'</span>';
+    return openTag+'<img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" width="200" height="200" loading="lazy" decoding="async"'+_rizqImgPlaceholderOnError()+'/>'+priceBadge+closeTag;
   }
-  return '<span'+openAttr+' style="background:'+_styEsc(bg)+'">'+emoji+priceBadge+'</span>';
+  return openTag+emoji+priceBadge+closeTag;
 }
 function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId, titleHint, priceHint){
   var bg = fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
@@ -8944,13 +8965,15 @@ function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId, titleHint, priceH
   var aria = linked
     ? ' aria-label="'+_styEsc(title || String(adId))+'"'
     : ' aria-hidden="true"';
-  var openAttr = linked
-    ? ' role="button" tabindex="0" data-sty-ad="'+_styEsc(String(adId))+'" onclick="return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();return rizqOpenStyleItem(event,\''+_styEsc(String(adId)).replace(/'/g,'&#39;')+'\');}" class="rizq-style-tile is-linked"'+aria
-    : ' class="rizq-style-tile"'+aria;
+  var tileHref = linked ? _styHrefForAdId(adId) : '';
+  var openTag = linked && tileHref
+    ? '<a href="'+_styEsc(tileHref)+'" class="rizq-style-tile is-linked"'+aria+' style="background:'+_styEsc(bg)+';text-decoration:none;color:inherit">'
+    : '<span class="rizq-style-tile"'+aria+' style="background:'+_styEsc(bg)+'">';
+  var closeTag = linked && tileHref ? '</a>' : '</span>';
   if(src){
-    return '<span'+openAttr+' style="background:'+_styEsc(bg)+'"><img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" loading="lazy" decoding="async"/>'+priceBadge+'</span>';
+    return openTag+'<img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" width="200" height="200" loading="lazy" decoding="async"'+_rizqImgPlaceholderOnError()+'/>'+priceBadge+closeTag;
   }
-  return '<span'+openAttr+' style="background:'+_styEsc(bg)+'">'+(fallbackEmoji||'✨')+priceBadge+'</span>';
+  return openTag+(fallbackEmoji||'✨')+priceBadge+closeTag;
 }
 
 /* بذور الإطلالة من مشاهدة منتج/إعلان (محلي عبر localStorage) */
@@ -10752,7 +10775,7 @@ function _adPhotoHtml(a, d, h){
   }
   var esc = function(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); };
   if(src){
-    return '<div class="rizq-img-wrap" style="width:100%;height:'+h+'px"><img src="'+esc(src)+'" alt="'+esc(d&&d.title||'')+'" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block" onload="var w=this.closest(\'.rizq-img-wrap\');if(w)w.classList.add(\'loaded\')"></div>';
+    return '<div class="rizq-img-wrap" style="width:100%;height:'+h+'px"><img src="'+esc(src)+'" alt="'+esc(d&&d.title||'')+'" width="400" height="'+h+'" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block" onload="var w=this.closest(\'.rizq-img-wrap\');if(w)w.classList.add(\'loaded\')"'+_rizqImgPlaceholderOnError()+'></div>';
   }
   return '<span>'+(d&&d.emoji?d.emoji:'📦')+'</span>';
 }
@@ -11285,14 +11308,14 @@ const LANG = {
     'vsh-title': 'معرضك على <span>رزق</span>: كتالوج فاخر ومشترون جادّون',
     'vsh-desc': 'سيارات وإلكترونيات وأثاث ومعدات تصل لمشترين جادّين يبحثون الآن.',
     'vsh-btn1': 'امتلك واجهة كتالوج معرضك الإلكتروني',
-    'vsh-btn1-sub': 'اشترك الآن. عرضك يصل حيث يبحث الجادّون.',
+    'vsh-btn1-sub': 'اشترك الآن — عرضك يصل حيث يبحث الجادّون.',
     'vsh-card1-title': 'عرض يبيع قبل الرسالة', 'vsh-card1-desc': 'صور وأسعار تُقنع المشتري من أول نظرة قبل أن يراسلك.',
     'vsh-card2-title': 'تواصل بثقة عبر رزق', 'vsh-card2-desc': 'مشترون جادّون يصلون إليك مع خصوصية محمية دائماً.',
     'vsh-card3-title': 'شارة معرض موثّق', 'vsh-card3-desc': 'شارة رسمية على رزق تظهر على عروضك وتعزّز ثقة المشترين.',
     've-title': 'عقارك على <span>رزق</span>: واجهة واضحة ومشترون يبحثون الآن',
     've-desc': 'شقق ومنازل وأراضي ومحلات — اعرض عقارك حيث يبحث الجادّون في موريتانيا.',
     've-btn1': 'امتلك واجهتك العقارية على رزق',
-    've-btn1-sub': 'اشترك الآن. عقارك يصل لمن يبحث بجدية.',
+    've-btn1-sub': 'اشترك الآن — عقارك يصل لمن يبحث بجدية.',
     've-card1-title': 'عرض يُقنع من أول نظرة', 've-card1-desc': 'صور ومساحة وسعر وموقع واضح — المشتري يفهم عرضك قبل أن يراسلك.',
     've-card2-title': 'وصول لمن يبحث عن عقار', 've-card2-desc': 'طلبة كراء ومشترون ومستأجرون يصلون إليك عبر بحث العقارات على رزق.',
     've-card3-title': 'ثقة ووضوح في التعامل', 've-card3-desc': 'تواصل مباشر عبر المنصة مع خصوصية محمية وشارات تساعد على بناء الثقة.',
@@ -16910,7 +16933,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
     function cardHTML(acc, cfg, fr){
       var media = accountCardMedia(acc, acc && acc.type || cfg.bizType);
       var img = media
-        ? '<img src="'+esc(media)+'" alt="" loading="lazy" decoding="async"/>'
+        ? '<img src="'+esc(media)+'" alt="" width="210" height="132" loading="lazy" decoding="async"'+(typeof _rizqImgPlaceholderOnError==='function'?_rizqImgPlaceholderOnError():'')+'/>'
         : '<div class="rzq-disc-img-fallback" aria-hidden="true">'+cfg.icon+'</div>';
       var tagline = (acc.tagline||'').slice(0,50);
       return '<a class="rzq-disc-card" href="'+cfg.page+'?id='+encodeURIComponent(acc.id)+'">'
@@ -17059,15 +17082,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
         known[a.id] = true;
         out.push(a);
       });
-      /* إن بقيت قليلة: كرّر الموجود بأسماء ظاهرة حتى يشتغل الشريط */
-      if(out.length && out.length < DISCOVERY_MIN_STRIP_CARDS){
-        var base = out.slice();
-        var i = 0;
-        while(out.length < DISCOVERY_MIN_STRIP_CARDS && i < 20){
-          out.push(base[i % base.length]);
-          i++;
-        }
-      }
+      /* لا تكرار هوية ظاهرية (أمل×N) — التكرار البصري لدورة الـ marquee فقط عبر mountStrip */
       return out;
     }
 

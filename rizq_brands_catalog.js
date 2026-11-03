@@ -1047,7 +1047,8 @@
 
   /** مونوغرام نظيف فقط كاحتياطي عند فشل التحميل — ليس تقليداً لشعار */
   function monogramMark(brand, size) {
-    var fill = (brand && brand.color) || '#111111';
+    /* خلفية رزق كحلي إن لم تُعرَّف ألوان الماركة — لا وردي/أحمر عشوائي */
+    var fill = (brand && brand.color) || '#0f1f3d';
     var letter = String((brand && brand.nameFr) || (brand && brand.id) || '?').replace(/[^a-zA-Z]/g, '').charAt(0).toUpperCase()
       || String((brand && brand.letter) || '?').charAt(0).toUpperCase();
     var isAuto = brand && brand.sector === 'auto';
