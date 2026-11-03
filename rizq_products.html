@@ -18,29 +18,13 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://www.youtube.com https://www.facebook.com"/>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=optional">
-<script>
-(function(){
-  function loadFonts(){
-    var l=document.createElement('link');
-    l.rel='stylesheet';
-    l.href='https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=optional';
-    document.head.appendChild(l);
-  }
-  if('requestIdleCallback' in window) requestIdleCallback(loadFonts,{timeout:4000});
-  else window.addEventListener('load', function(){ setTimeout(loadFonts, 2000); });
-})();
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
 <link rel="stylesheet" href="rizq_product_detail.css?v=29.0"/>
 <link rel="preload" href="rizq_header.js?v=27.0" as="script"/>
-<script>
-try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(eSR){}
-document.documentElement.classList.add('rizq-app-nav');
-</script>
+<script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>المنتجات — متجر النور | Rizq</title>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.89"/>
 <style>
 :root{
   --navy:#1B3A6B;--navy2:#0F2347;
@@ -586,7 +570,6 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_ux_polish.js?v=23.4" defer></script>
 </head>
 <body data-t-ns="products">
-<script src="rizq_header_mockup_trial.js?v=5.89"></script>
 <script src="rizq_header.js?v=27.0"></script>
 <button class="btn-lang-primary btn-lang" id="lang-btn" dir="ltr" aria-label="FR | AR"><span class="lang-fr" dir="ltr">FR</span><span class="lang-sep" aria-hidden="true"> | </span><span class="lang-ar" dir="ltr">AR</span></button>
 

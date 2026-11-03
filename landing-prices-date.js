@@ -1,1 +1,0 @@
-(function(){try{var el=document.getElementById('prices-updated-date');if(!el)return;var ar=(document.documentElement.lang||'ar').indexOf('fr')!==0;el.textContent=new Date().toLocaleDateString(ar?'ar-MR-u-nu-latn':'fr-FR',{day:'numeric',month:'long',year:'numeric'});}catch(e){}})();

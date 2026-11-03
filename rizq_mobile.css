@@ -687,14 +687,13 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     gap:12px!important;
     width:100%!important;max-width:100%!important;
   }
-  /* بيع · اشتر · تميز — 3 أعمدة أفقية على سطر واحد (ارتفاع نهائي main ≈44) */
+  /* بيع · اشتر · تميز — 3 أعمدة أفقية على سطر واحد */
   .hero-pills{
     display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
     justify-content:center!important;align-items:stretch!important;
     gap:8px!important;width:100%!important;max-width:100%!important;
     overflow:visible!important;padding:0 10px!important;box-sizing:border-box!important;
     margin:16px 0 14px!important;
-    min-height:0!important;height:auto!important;max-height:none!important;
   }
   .hero-pill{
     flex:1 1 0!important;min-width:0!important;max-width:none!important;width:auto!important;

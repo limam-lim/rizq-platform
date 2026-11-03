@@ -18,7 +18,6 @@ function ok(name, pass, detail) {
 function main() {
   const browse = fs.readFileSync(path.join(ROOT, 'rizq_browse.html'), 'utf8');
   const landing = fs.readFileSync(path.join(ROOT, 'rizq_landing_v8.html'), 'utf8');
-  const landingAds = fs.readFileSync(path.join(ROOT, 'landing-ads.js'), 'utf8');
   const cards = fs.readFileSync(path.join(ROOT, 'rizq_ad_cards.js'), 'utf8');
   const server = fs.readFileSync(path.join(ROOT, 'rizq-backend', 'server.js'), 'utf8');
   const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'rizq-backend', 'package.json'), 'utf8'));
@@ -44,13 +43,12 @@ function main() {
     && !/\(price \? '<div class="rzq-adx-price"/.test(cards));
 
   ok('landing seeds FEATURED into ADS when empty + demoOk',
-    /function _rizqMaybePaintDemoInventory[\s\S]*?!ADS\.length[\s\S]*?FEATURED_ADS\.forEach/.test(landingAds)
-    && /function buildCards[\s\S]*?!ADS\.length && demoOk[\s\S]*?FEATURED_ADS/.test(landingAds));
+    /function _rizqMaybePaintDemoInventory[\s\S]*?!ADS\.length[\s\S]*?FEATURED_ADS\.forEach/.test(landing)
+    && /function buildCards[\s\S]*?!ADS\.length && demoOk[\s\S]*?FEATURED_ADS/.test(landing));
 
   ok('landing filters public title',
-    (/function _adHasPublicTitle/.test(landingAds) || /function _adHasPublicTitle/.test(landing))
-    && (/_landingAdsPool[\s\S]*?_adHasPublicTitle/.test(landingAds)
-      || /_landingAdsPool[\s\S]*?_adHasPublicTitle/.test(landing)));
+    /function _adHasPublicTitle/.test(landing)
+    && /_landingAdsPool[\s\S]*?_adHasPublicTitle/.test(landing));
 
   ok('server.js preserves DATABASE_URL across dotenv override',
     /preserve\.DATABASE_URL/.test(server)
