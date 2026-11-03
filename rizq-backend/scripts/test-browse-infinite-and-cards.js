@@ -103,7 +103,22 @@ function main() {
     ok('mediaHtml FR empty price → Prix à la demande', false, 'RizqAdCards not loaded in vm');
   }
 
-  const failed = results.filter((r) => !r.pass);
+  ok('browse disables auto infinite scroll (no loadMoreAds from scroll/IO)',
+    !/body\.addEventListener\('scroll'[\s\S]*?loadMoreAds\(\)/.test(browse)
+    && !/window\.addEventListener\('scroll'[\s\S]*?loadMoreAds\(\)/.test(browse)
+    && !/new IntersectionObserver[\s\S]*?loadMoreAds\(\)/.test(browse)
+    && /function _bindInfiniteScroll\(\)\{[\s\S]*?_teardownInfiniteObserver\(\)/.test(browse));
+
+  ok('loadMoreAds still advances by PER_PAGE via button',
+    /function loadMoreAds\(\)\{[\s\S]*?visibleCount=Math\.min\(visibleCount\+PER_PAGE/.test(browse)
+    && /onclick="loadMoreAds\(\)"/.test(browse));
+
+  ok('browse counters share filtered.length via _rizqSyncBrowseCounts',
+    /function _rizqSyncBrowseCounts\(/.test(browse)
+    && /_rizqSyncBrowseCounts\(\)/.test(browse)
+    && /function _rizqDedupeAllAds\(/.test(browse));
+
+    const failed = results.filter((r) => !r.pass);
   console.log('\n' + (failed.length ? 'FAILED ' + failed.length : 'ALL OK') + ' / ' + results.length);
   process.exit(failed.length ? 1 : 0);
 }

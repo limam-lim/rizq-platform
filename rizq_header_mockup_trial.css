@@ -4,7 +4,7 @@
  */
 body.rizq-mockup-hdr-trial{
   /* احتياطي قبل قياس JS — أوسع قليلاً لتفادي قصّ المحتوى تحت الكبسولة */
-  --rizq-mock-hdr-h: 196px;
+  --rizq-mock-hdr-h: 152px;
   --rizq-mock-hdr-gap: 12px;
   --rmh-navy: #0a1628;
   --rmh-navy-2: #0d1a2e;
@@ -439,7 +439,7 @@ html.rizq-app-nav:has(#rizq-desk-nav) body.rizq-mockup-hdr-trial,
 html.rizq-app-nav.has-rizq-desk-nav body.rizq-mockup-hdr-trial,
 html.rizq-app-nav body.rizq-mockup-hdr-trial,
 body.rizq-mockup-hdr-trial{
-  padding-top:calc(var(--rizq-mock-hdr-h) + var(--rizq-mock-hdr-gap,12px))!important;
+  padding-top:calc(var(--rizq-mock-hdr-h) + var(--rizq-mock-body-gap,0px))!important;
 }
 #rizq-mock-hdr{
   position:fixed;top:0;left:0;right:0;z-index:10050;
@@ -1127,7 +1127,7 @@ body > .rizq-help-dd-menu a,
   html.rizq-app-nav:has(#nav) body.rizq-mockup-hdr-trial:not(.rizq-reg-open),
   html.rizq-app-nav.has-rizq-desk-nav:not(.rizq-reg-page) body.rizq-mockup-hdr-trial:not(.rizq-reg-open),
   html.rizq-app-nav:has(#rizq-desk-nav) body.rizq-mockup-hdr-trial{
-    padding-top:calc(var(--rizq-mock-hdr-h,212px) + var(--rizq-mock-hdr-gap,4px))!important;
+    padding-top:calc(var(--rizq-mock-hdr-h,212px) + var(--rizq-mock-body-gap,0px))!important;
   }
   /* شعار | بحث في فراغ الوسط | أدوات — البحث يتوسّط المسافة بينهما (لا عمودين 1fr يزيّفانه بصرياً) */
   #rizq-mock-hdr{--rmh-gutter-x:16px}
@@ -1283,7 +1283,7 @@ body > .rizq-help-dd-menu a,
  */
 @media(max-width:768px){
   body.rizq-mockup-hdr-trial{
-    --rizq-mock-hdr-h: 148px;
+    --rizq-mock-hdr-h: 141px;
     --rizq-mock-nav-h: 72px;
     /* الشريط السفلي rmh بديل لـ thumb-dock — ارفع العوامات (ويدجت/رجوع) فوقه */
     --rizq-thumb-dock-h: var(--rizq-mock-nav-h, 72px);

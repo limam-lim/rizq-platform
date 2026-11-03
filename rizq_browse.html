@@ -13,6 +13,42 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
+  <link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.88"/>
+  <link rel="stylesheet" href="rizq_mobile.css?v=31.26"/>
+  <style id="rizq-nav-fouc-guard">
+/* Critical: reserve navy header + page bg before mockup CSS/JS — no white flash, no content jump */
+html,body{background:#eef1f5}
+html.rizq-app-nav body.rizq-mockup-hdr-trial{
+  --rizq-mock-hdr-h:152px;
+  --rizq-mock-hdr-gap:12px;
+  --rizq-mock-body-gap:0px;
+  background:#eef1f5;
+  padding-top:calc(var(--rizq-mock-hdr-h) + var(--rizq-mock-body-gap,0px))!important;
+}
+@media(max-width:768px){
+  html.rizq-app-nav body.rizq-mockup-hdr-trial{
+    --rizq-mock-hdr-h:141px;
+    --rizq-mock-nav-h:72px;
+    padding-top:var(--rizq-mock-hdr-h)!important;
+    padding-bottom:var(--rizq-mock-nav-h,72px)!important;
+  }
+  /* Phone: pin section nav to bottom from first paint (before mockup CSS) */
+  #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top),
+  nav.rmh-nav:not(.rmh-nav-top){
+    position:fixed!important;top:auto!important;left:0!important;right:0!important;bottom:0!important;
+    z-index:10055!important;width:100%!important;background:#070e1a!important;color:#fff!important;
+  }
+}
+#rizq-mock-hdr{background:#0a1628;color:#fff}
+#rizq-mock-hdr nav.rmh-nav,nav.rmh-nav{
+  display:flex!important;flex-wrap:nowrap;align-items:center;gap:2px;
+  background:#0a1628!important;background-image:none!important;color:#fff!important;
+}
+#rizq-mock-hdr nav.rmh-nav a,nav.rmh-nav a{
+  color:#fff!important;-webkit-text-fill-color:#fff!important;text-decoration:none!important;
+}
+</style>
+
   <link rel="stylesheet" href="rizq_ad_cards.css?v=27.5"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.6"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
@@ -34,7 +70,7 @@
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:auto}
-body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#f8faff;color:#1a2535;overflow-x:hidden}
+body{font-family:'Cairo',system-ui,-apple-system,sans-serif;background:#eef1f5;color:#1a2535;overflow-x:hidden}
 #result-list-body{min-height:min(60vh,520px)}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--gold);border-radius:2px}
 a{text-decoration:none;color:inherit}
@@ -1080,7 +1116,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     align-items:center;
     justify-content:center;
     gap:6px;
-    bottom:calc(18px + env(safe-area-inset-bottom,0));
+    bottom:calc(84px + env(safe-area-inset-bottom,0));
     left:50%;
     transform:translateX(-50%);
     z-index:400!important;
@@ -1214,7 +1250,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   .dp-price-main{font-size:22px}
   .dp-similar-grid{grid-template-columns:1fr}
   .mobile-filter-btn{
-    bottom:calc(16px + env(safe-area-inset-bottom,0));
+    bottom:calc(84px + env(safe-area-inset-bottom,0));
     padding:11px 22px;
     font-size:13px;
   }
@@ -1467,8 +1503,9 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 })();
 </script>
 </head>
-<body>
-<!-- الهيدر الموحّد + كبسولة التجربة — يحقن #rizq-desk-nav / #rizq-mock-hdr ويحوّل الشريط المحلي لوضع البحث -->
+<body class="rizq-mockup-hdr-trial" style="--rizq-mock-hdr-h:152px;--rizq-mock-body-gap:0px"><script>(function(){try{if(matchMedia('(max-width:768px)').matches)document.body.style.setProperty('--rizq-mock-hdr-h','141px');}catch(e){}})();</script>
+<!-- الهيدر الموحّد + كبسولة التجربة — حقن متزامن قبل المحتوى لمنع CLS -->
+<script src="rizq_header_mockup_trial.js?v=5.88"></script>
 <script src="rizq_header.js?v=31.6"></script>
 
 <!-- NAV -->
@@ -2096,8 +2133,10 @@ function _rizqMergeBackendAds(){
           if(showedSkel && typeof applyFilters === 'function') applyFilters({ soft: true, skipUrl: true });
           return false;
         }
-        mapped.forEach(function(a){ ALL_ADS.push(a); });
+        mapped.forEach(function(a){ _rizqPushUniqueAd(a); });
+        _rizqDedupeAllAds(ALL_ADS);
         if(typeof applyFilters === 'function') applyFilters({ soft: true, skipUrl: true });
+        else _rizqSyncBrowseCounts();
         return true;
       })
       .catch(function(){
@@ -2118,10 +2157,12 @@ function _rizqFetchAndOpenAd(id){
       if(!data || !data.ok || !data.ad) return false;
       var mapped = _mapRawAdsToDisplay([data.ad]);
       if(!mapped.length) return false;
-      var existing = ALL_ADS.findIndex(function(a){ return String(a.id)===String(id); });
+      var existing = ALL_ADS.findIndex(function(a){ return _rizqNormalizeAdId(a.id)===_rizqNormalizeAdId(id); });
       if(existing >= 0) ALL_ADS[existing] = Object.assign({}, ALL_ADS[existing], mapped[0]);
-      else ALL_ADS.unshift(mapped[0]);
+      else _rizqPushUniqueAd(mapped[0]) || ALL_ADS.unshift(mapped[0]);
+      _rizqDedupeAllAds(ALL_ADS);
       if(typeof applyFilters === 'function') applyFilters();
+      else _rizqSyncBrowseCounts();
       selectAd(id);
       if(window.innerWidth <= 900) switchTab('detail');
       return true;
@@ -2129,6 +2170,65 @@ function _rizqFetchAndOpenAd(id){
     .catch(function(){ return false; });
 }
 const ALL_ADS = loadRealSearchAds().concat((window.RizqDemo && RizqDemo.inventoryAllowed && RizqDemo.inventoryAllowed()) ? DEMO_ADS : []);
+
+/** تطبيع معرّف الإعلان: ad_123 ↔ 123 */
+function _rizqNormalizeAdId(id){
+  var s = String(id == null ? '' : id).trim();
+  if(!s) return '';
+  if(/^ad_/i.test(s)) s = s.slice(3);
+  return s.toLowerCase();
+}
+function _rizqAdContentKey(a){
+  if(!a) return '';
+  var title = String(a.title || a.titleFr || a.titleFR || '').trim().toLowerCase();
+  if(!title) return '';
+  var price = (a.priceNum != null && Number.isFinite(Number(a.priceNum))) ? String(a.priceNum) : String(a.price || '').replace(/[^\d]/g,'');
+  var wilaya = String(a.wilaya || '').trim().toLowerCase();
+  var account = String(a.accountId || '').trim().toLowerCase();
+  return title + '|' + price + '|' + wilaya + '|' + account;
+}
+function _rizqDedupeAllAds(list){
+  var arr = Array.isArray(list) ? list : ALL_ADS;
+  if(!Array.isArray(arr) || !arr.length){ window._rizqBrowseDedupeRemoved = 0; return 0; }
+  var seenId = Object.create(null), seenContent = Object.create(null), kept = [], removed = 0;
+  for(var i = 0; i < arr.length; i++){
+    var a = arr[i];
+    if(!a){ removed++; continue; }
+    var nid = _rizqNormalizeAdId(a.id);
+    var ckey = _rizqAdContentKey(a);
+    if(nid && seenId[nid]){ removed++; continue; }
+    if(ckey && seenContent[ckey]){ removed++; continue; }
+    if(nid) seenId[nid] = true;
+    if(ckey) seenContent[ckey] = true;
+    kept.push(a);
+  }
+  if(removed){ arr.length = 0; for(var k = 0; k < kept.length; k++) arr.push(kept[k]); }
+  window._rizqBrowseDedupeRemoved = (window._rizqBrowseDedupeRemoved || 0) + removed;
+  try{ console.info('[rizq-browse] dedupe removed=' + removed + ' totalRemoved=' + window._rizqBrowseDedupeRemoved + ' remaining=' + arr.length); }catch(eLog){}
+  return removed;
+}
+function _rizqPushUniqueAd(ad){
+  if(!ad || ad.id == null) return false;
+  var nid = _rizqNormalizeAdId(ad.id);
+  var ckey = _rizqAdContentKey(ad);
+  for(var i = 0; i < ALL_ADS.length; i++){
+    var cur = ALL_ADS[i];
+    if(!cur) continue;
+    if(nid && _rizqNormalizeAdId(cur.id) === nid) return false;
+    if(ckey && _rizqAdContentKey(cur) === ckey) return false;
+  }
+  ALL_ADS.push(ad);
+  return true;
+}
+function _rizqSyncBrowseCounts(){
+  var total = (typeof filtered !== 'undefined' && Array.isArray(filtered)) ? filtered.length : ALL_ADS.length;
+  var countEl = document.getElementById('rl-count-num');
+  if(countEl) countEl.textContent = total;
+  var statAds = document.getElementById('stat-ads-num');
+  if(statAds) statAds.textContent = total > 0 ? (total >= 100 ? total + '+' : String(total)) : '0';
+  try{ _updateInfiniteStatus(_rizqLang() === 'fr'); }catch(eSt){}
+}
+_rizqDedupeAllAds(ALL_ADS);
 
 /* عند ضبط launchDate: أزل DEMO. عند السماح لاحقاً (بعد site-config بلا إطلاق): أضف DEMO إن غاب */
 (function(){
@@ -2148,11 +2248,12 @@ const ALL_ADS = loadRealSearchAds().concat((window.RizqDemo && RizqDemo.inventor
         ALL_ADS.forEach(function(a){ if(a&&a.id!=null) have[String(a.id)] = true; });
         (DEMO_ADS||[]).forEach(function(a){
           if(!a || a.id==null || have[String(a.id)]) return;
-          ALL_ADS.push(a);
-          have[String(a.id)] = true;
+          if(_rizqPushUniqueAd(a)) have[String(a.id)] = true;
         });
       }
+      _rizqDedupeAllAds(ALL_ADS);
       if (typeof applyFilters === 'function') applyFilters({ soft: true, skipUrl: true });
+      else _rizqSyncBrowseCounts();
     } catch (eStrip) {}
   }
   document.addEventListener('rizq:launch', syncDemoWithLaunch);
@@ -2177,9 +2278,8 @@ const ALL_ADS = loadRealSearchAds().concat((window.RizqDemo && RizqDemo.inventor
     {id:210,subcat:'تصميم وبرمجة',cat:'خدمات',wilaya:'نواكشوط',title:'تصميم مواقع ومتاجر إلكترونية احترافية',titleFr:'Création de sites web et boutiques en ligne professionnels',desc:'متخصص في تصميم مواقع الشركات والمتاجر الإلكترونية. تسليم في 7 أيام.',descFr:'Sites vitrines et e-commerce. Livraison en 7 jours.',price:'85,000 MRU',priceNum:85000,verified:true,pin:true,emoji:'💻',loc:'📍 نواكشوط',seller:'محمد ليمام | ADMINIA'},
     {id:215,subcat:'إكسسوار',cat:'ذهب',wilaya:'نواكشوط',title:'سبحة كهرمان رجالية فاخرة',titleFr:'Chapelet ambre homme — luxe',desc:'سبحة كهرمان طبيعي، 33 حبة، مناسبة للإهداء والمناسبات.',descFr:'Chapelet en ambre naturel, 33 grains, idéal cadeau.',price:'18,000 MRU',priceNum:18000,verified:true,pin:false,emoji:'📿',bg:'linear-gradient(135deg,#3a2200,#7a4a00)',loc:'📍 نواكشوط',seller:'ورشة الكنوز'}
   ];
-  showcase.forEach(function(s){
-    if(!ALL_ADS.some(function(a){ return String(a.id)===String(s.id); })) ALL_ADS.push(s);
-  });
+  showcase.forEach(function(s){ _rizqPushUniqueAd(s); });
+  _rizqDedupeAllAds(ALL_ADS);
 })();
 
 // getAdById — merges DEMO_ADS + ALL_ADS_DATA + localStorage['rizq_active_ad']
@@ -2741,7 +2841,7 @@ function _infiniteStatusHtml(fr){
     return `<div class="rl-infinite done" id="rl-infinite"><span>${fr?('Fin — '+total+' annonces'):('تم عرض كل الإعلانات — '+total)}</span></div>`;
   }
   return `<div class="rl-infinite" id="rl-infinite">
-    <span>${fr?('Affichage '+shown+' / '+total+' — continuez à défiler'):('عرض '+shown+' من '+total+' — مرّر للأسفل للمزيد')}</span>
+    <span>${fr?('Affichage '+shown+' / '+total):('عرض '+shown+' من '+total)}</span>
     <div class="ri-bar" aria-hidden="true"><i></i></div>
     <button type="button" onclick="loadMoreAds()">${fr?'Charger plus':'تحميل المزيد'}</button>
   </div>`;
@@ -2769,13 +2869,7 @@ function _updateInfiniteStatus(fr){
 function renderResultList(){
   const body=document.getElementById('result-list-body');
   const pagEl=document.getElementById('result-pagination');
-  const countEl=document.getElementById('rl-count-num');
-  if(countEl)countEl.textContent=filtered.length;
-  const statAds=document.getElementById('stat-ads-num');
-  if(statAds){
-    const total=typeof ALL_ADS!=='undefined'?ALL_ADS.length:filtered.length;
-    statAds.textContent=total>0?(total>=100?total+'+':String(total)):'0';
-  }
+  _rizqSyncBrowseCounts();
   if(visibleCount<PER_PAGE) visibleCount=PER_PAGE;
   const items=filtered.slice(0, visibleCount);
   const fr=_rizqLang()==='fr';
@@ -2853,46 +2947,10 @@ function _teardownInfiniteObserver(){
 }
 
 function _bindInfiniteScroll(){
-  const body=document.getElementById('result-list-body');
-  const sentinel=document.getElementById('rl-infinite');
-  if(!body) return;
-  if(!body._rizqInfiniteBound){
-    body._rizqInfiniteBound=true;
-    body._rizqUserScrolled=false;
-    body.addEventListener('scroll', function(){
-      if(body.scrollTop>40) body._rizqUserScrolled=true;
-      if(_infiniteLoading) return;
-      if(visibleCount>=filtered.length) return;
-      if(body.scrollTop+body.clientHeight >= body.scrollHeight-320) loadMoreAds();
-    }, {passive:true});
-  }
-  if(!window._rizqWinInfiniteBound){
-    window._rizqWinInfiniteBound=true;
-    window.addEventListener('scroll', function(){
-      if(!_browseListScrollsWindow()) return;
-      const body2=document.getElementById('result-list-body');
-      if(body2) body2._rizqUserScrolled=true;
-      if(_infiniteLoading) return;
-      if(visibleCount>=filtered.length) return;
-      const y=window.scrollY||window.pageYOffset||0;
-      const docH=Math.max(document.documentElement.scrollHeight, document.body.scrollHeight||0);
-      if(y+window.innerHeight >= docH-320) loadMoreAds();
-    }, {passive:true});
-  }
+  /* 4-ب: أوقف التحميل التلقائي — زر «تحميل المزيد» فقط */
   _teardownInfiniteObserver();
-  if(!sentinel || visibleCount>=filtered.length) return;
-  if(typeof IntersectionObserver==='undefined') return;
-  const useWin=_browseListScrollsWindow();
-  window._rizqIO=new IntersectionObserver(function(entries){
-    entries.forEach(function(en){
-      if(!en.isIntersecting) return;
-      if(_infiniteLoading) return;
-      // لا تحمّل دفعة تلو الأخرى تلقائياً عند أول رسم — فقط بعد تمرير المستخدم
-      if(!body._rizqUserScrolled) return;
-      loadMoreAds();
-    });
-  }, {root: useWin ? null : body, rootMargin:'120px 0px', threshold:0});
-  window._rizqIO.observe(sentinel);
+  const body=document.getElementById('result-list-body');
+  if(body) body._rizqUserScrolled=false;
 }
 
 function gotoPage(p){
