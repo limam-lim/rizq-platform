@@ -1630,3 +1630,35 @@ body > .rizq-help-dd-menu a,
 
 /* cart popup removed — cart icon navigates to rizq_cart.html */
 #rmh-cart-panel,.rmh-cart-panel{display:none!important}
+
+
+/* CLS: ثابت ارتفاع شريط rmh-nav + هيكل عرض ثابت للحساب/اللغة */
+#rizq-mock-hdr nav.rmh-nav,
+nav.rmh-nav{
+  min-height:48px;
+  height:48px;
+  box-sizing:border-box;
+  contain:layout;
+}
+@media(max-width:768px){
+  #rizq-mock-hdr nav.rmh-nav,
+  nav.rmh-nav{
+    min-height:44px;
+    height:auto;
+    max-height:none;
+  }
+}
+#rizq-mock-hdr .rmh-account,
+#rizq-mock-hdr .rmh-lang,
+#rizq-mock-hdr [data-rmh-account],
+#rizq-mock-hdr #rmh-lang-btn,
+#rizq-mock-hdr .rmh-tools .rmh-lang-btn{
+  min-width:44px;
+  min-height:36px;
+  box-sizing:border-box;
+}
+#rizq-mock-hdr .rmh-account:empty,
+#rizq-mock-hdr .rmh-lang:empty{
+  background:rgba(255,255,255,.08);
+  border-radius:10px;
+}

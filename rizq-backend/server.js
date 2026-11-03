@@ -4969,12 +4969,52 @@ setupIntegrationAPI(app, {
 });
 
 // ── تطوير محلي: صفحات HTML + API على نفس المنفذ (localhost:3000) ──
+
+function resolveRizqHtmlLang(req) {
+  try {
+    const cookie = String(req.headers.cookie || '');
+    const m = cookie.match(/(?:^|;\s*)rizq_lang=(fr|ar)\b/i);
+    if (m) return m[1].toLowerCase() === 'fr' ? 'fr' : 'ar';
+  } catch (eC) {}
+  try {
+    const al = String(req.headers['accept-language'] || '').toLowerCase();
+    const first = (al.split(',')[0] || '').trim();
+    if (first.startsWith('fr')) return 'fr';
+  } catch (eA) {}
+  return 'ar';
+}
+
+function injectRizqHtmlLangDir(html, lang) {
+  const dir = lang === 'fr' ? 'ltr' : 'rtl';
+  return String(html || '').replace(
+    /<html\b([^>]*)>/i,
+    function (_m, attrs) {
+      let a = String(attrs || '');
+      if (/\blang\s*=/.test(a)) a = a.replace(/\blang\s*=\s*(["']).*?\1|\blang\s*=\s*[^\s>]+/i, 'lang="' + lang + '"');
+      else a += ' lang="' + lang + '"';
+      if (/\bdir\s*=/.test(a)) a = a.replace(/\bdir\s*=\s*(["']).*?\1|\bdir\s*=\s*[^\s>]+/i, 'dir="' + dir + '"');
+      else a += ' dir="' + dir + '"';
+      return '<html' + a + '>';
+    }
+  );
+}
+
+async function sendRizqHtmlFile(req, res, filePath) {
+  const fsP = require('fs').promises;
+  const lang = resolveRizqHtmlLang(req);
+  let html = await fsP.readFile(filePath, 'utf8');
+  html = injectRizqHtmlLangDir(html, lang);
+  res.setHeader('Content-Type', 'text/html; charset=utf-8');
+  res.setHeader('Cache-Control', 'no-store');
+  res.send(html);
+}
+
 const FRONTEND_ROOT = path.join(__dirname, '..');
 installAdminPanelGate(app, FRONTEND_ROOT);
 if (process.env.NODE_ENV !== 'production' && process.env.RIZQ_SERVE_STATIC !== '0') {
-  app.get('/', (_req, res) => {
+  app.get('/', (req, res) => {
     // Canonical home is rizq_landing_v8.html (index.html is a thin redirect stub).
-    res.sendFile(path.join(FRONTEND_ROOT, 'rizq_landing_v8.html'));
+    return sendRizqHtmlFile(req, res, path.join(FRONTEND_ROOT, 'rizq_landing_v8.html'));
   });
   app.get(['/real-estate', '/real-estate/', '/estates', '/estates/'], (_req, res) => {
     res.sendFile(path.join(FRONTEND_ROOT, 'rizq_real_estate_register.html'));
@@ -5003,6 +5043,22 @@ if (process.env.NODE_ENV !== 'production' && process.env.RIZQ_SERVE_STATIC !== '
     }
     next();
   });
+  
+  app.use(async function rizqHtmlLangInject(req, res, next) {
+    try {
+      if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+      const rel = decodeURIComponent(String(req.path || ''));
+      if (!/\.html$/i.test(rel) && rel !== '/' && rel !== '') return next();
+      let fileRel = rel === '/' || rel === '' ? '/rizq_landing_v8.html' : rel;
+      const fp = path.normalize(path.join(FRONTEND_ROOT, fileRel.replace(/^\//, '')));
+      if (!fp.startsWith(FRONTEND_ROOT) || !fs.existsSync(fp) || !fs.statSync(fp).isFile()) return next();
+      if (!/\.html$/i.test(fp)) return next();
+      return sendRizqHtmlFile(req, res, fp);
+    } catch (eInj) {
+      return next();
+    }
+  });
+
   app.use(express.static(FRONTEND_ROOT, { index: false, dotfiles: 'ignore', extensions: ['html'] }));
   console.log('[rizq-backend] dev static files → ' + FRONTEND_ROOT);
 }

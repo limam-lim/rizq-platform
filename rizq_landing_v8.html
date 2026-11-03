@@ -526,19 +526,20 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
 
 /* خلفية متحركة */
 .hero-bg{position:absolute;inset:0;background:#ffffff;pointer-events:none}
-.hero-orb1{position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06) 0%,transparent 65%);top:-100px;left:50%;transform:translateX(-50%);animation:orb1 8s ease-in-out infinite;pointer-events:none}
-.hero-orb2{position:absolute;width:min(360px,52vw);height:min(360px,52vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.07) 0%,transparent 70%);bottom:100px;right:0;transform:translateX(15%);animation:orb2 10s ease-in-out infinite;pointer-events:none}
-.hero-orb3{position:absolute;width:min(280px,44vw);height:min(280px,44vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06) 0%,transparent 70%);bottom:50px;left:0;transform:translateX(-15%);animation:orb3 7s ease-in-out infinite;pointer-events:none}
+.hero-orb1,.hero-orb2,.hero-orb3{contain:layout paint;will-change:transform;pointer-events:none}
+.hero-orb1{position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06) 0%,transparent 65%);top:-100px;left:50%;transform:translateX(-50%);animation:orb1 8s ease-in-out infinite}
+.hero-orb2{position:absolute;width:min(360px,52vw);height:min(360px,52vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.07) 0%,transparent 70%);bottom:100px;right:0;transform:translateX(15%);animation:orb2 10s ease-in-out infinite}
+.hero-orb3{position:absolute;width:min(280px,44vw);height:min(280px,44vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06) 0%,transparent 70%);bottom:50px;left:0;transform:translateX(-15%);animation:orb3 7s ease-in-out infinite}
 @keyframes orb1{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06)}}
 @keyframes orb2{0%,100%{transform:translateX(15%) scale(1)}50%{transform:translateX(15%) scale(1.04)}}
 @keyframes orb3{0%,100%{transform:translateX(-15%) scale(1)}50%{transform:translateX(-15%) scale(1.04)}}
 
 /* نقش هندسي موريتاني */
-.hero-geo{position:absolute;inset:0;overflow:hidden;pointer-events:none}
-.hero-geo svg{position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:100%;opacity:.03}
+.hero-geo{position:absolute;inset:0;overflow:hidden;pointer-events:none;contain:layout paint}
+.hero-geo svg{position:absolute;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:100%;opacity:.03;contain:layout paint}
 
 /* ── TICKER (شريط إعلانات متحرك تحت النافبار) ── */
-.ticker-wrap{width:100%;overflow:hidden;background:linear-gradient(90deg,var(--dark),var(--royal),var(--dark));border-top:1px solid rgba(201,168,76,.2);border-bottom:1px solid rgba(201,168,76,.2);padding:10px 0;position:fixed;top:var(--rizq-header-h,70px);left:0;right:0;z-index:9990;box-sizing:border-box}
+.ticker-wrap{width:100%;overflow:hidden;background:linear-gradient(90deg,var(--dark),var(--royal),var(--dark));border-top:1px solid rgba(201,168,76,.2);border-bottom:1px solid rgba(201,168,76,.2);padding:10px 0;position:fixed;top:var(--rizq-header-h,70px);left:0;right:0;z-index:9990;box-sizing:border-box;contain:layout paint;transform:translateZ(0)}
 /* مخفي دائماً في الواجهة العامة — المنطق الخلفي (launchDate/freeDays) يبقى */
 .rizq-free-countdown,
 .rizq-free-countdown.is-on,
@@ -1047,7 +1048,7 @@ body.rizq-lang-ar .hero-lead-row{
   box-sizing:border-box;
   animation:fadeUp .8s .28s ease both;
   overflow:visible;
-  min-height:280px;
+  min-height:426px;
 }
 .hero > #hero-listings .cards-track-wrap,
 #hero-listings.hero-promo-strip .cards-track-wrap{
@@ -2402,10 +2403,10 @@ html[dir="ltr"] #all-ads-title{
 @media(max-width:1024px){.all-ads-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 /* ── شريط مباشر فاخر — أحدث الإعلانات ── */
 .hero-listings-section{
-  position:relative;z-index:2;width:100%;overflow:hidden;
+  position:relative;z-index:2;width:100%;overflow:visible;
   padding:8px 0 52px;
-  /* ثبّت الارتفاع أثناء الهيكل العظمي → المحتوى النهائي لتقليل CLS عند F5 */
-  min-height:280px;
+  /* حجز المساحة بهيكل min-height فقط — ممنوع height ثابت + overflow:hidden */
+  min-height:426px;
   /* ابعد عنوان «مباشر» عن قرص البحث الثابت عند التمرير */
   scroll-margin-top:calc(var(--rizq-search-top, 110px) + 56px);
 }
@@ -5261,15 +5262,36 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 .rizq-promo-overlay:not(.active),.modal-overlay:not(.open),.disc-overlay:not(.open),.mobile-drawer-overlay:not(.open),.rzq-sheet-backdrop:not(.open),.rzq-sheet:not(.open),.cs-modal-overlay:not(.active){display:none!important;pointer-events:none!important}
 .rizq-promo-overlay:not(.active) *,.modal-overlay:not(.open) *,.cs-modal-overlay:not(.active) *{pointer-events:none!important}
 .modal-overlay.open,.modal-overlay.open *{pointer-events:auto!important}
+
+/* CLS reserves — min-height / skeleton only (no fixed height + overflow:hidden) */
+#categories{min-height:148px}
+@media(max-width:768px){
+  #categories{min-height:160px}
+  #hero-listings.hero-promo-strip,
+  .hero-listings-section{min-height:360px}
+}
+#builtin-cats-mount:empty::before{
+  content:'';display:block;min-height:120px;
+}
 .cat-card,.qcat,.btn-lang,#nav-lang-btn,#rizq-lang-btn{pointer-events:auto!important;cursor:pointer!important;position:relative;z-index:6}
 </style>
 <script>
 (function(){
   try {
-    var savedLang = localStorage.getItem('rizq_lang');
-    if (savedLang === 'fr') {
+    /* لا تقلب lang/dir بعد الطلاء إن طابقت الكوكي/الخادم — يقلّل CLS فرنسي */
+    var savedLang = null;
+    try {
+      var cm = document.cookie.match(/(?:^|;\s*)rizq_lang=(fr|ar)/);
+      if (cm) savedLang = cm[1];
+    } catch (eC) {}
+    if (!savedLang) savedLang = localStorage.getItem('rizq_lang');
+    var cur = document.documentElement.lang || 'ar';
+    if (savedLang === 'fr' && cur.indexOf('fr') !== 0) {
       document.documentElement.lang = 'fr';
       document.documentElement.dir = 'ltr';
+    } else if (savedLang === 'ar' && cur.indexOf('ar') !== 0 && cur.indexOf('fr') === 0) {
+      document.documentElement.lang = 'ar';
+      document.documentElement.dir = 'rtl';
     }
   } catch (e1) {}
   function unlockRizqPage(){
@@ -11649,6 +11671,8 @@ function applyLandingLang(toAr) {
   isAr = !!toAr;
   const lang = isAr ? 'ar' : 'fr';
   try { localStorage.setItem('rizq_lang', lang); } catch(e) {}
+  try { document.cookie = 'rizq_lang=' + encodeURIComponent(lang) + ';path=/;max-age=31536000;SameSite=Lax'; } catch(eCk) {}
+  try { document.cookie = 'rizq_lang=' + encodeURIComponent(lang) + ';path=/;max-age=31536000;SameSite=Lax'; } catch(eCk) {}
   mergeSubFrFromConfig();
   const t = LANG[lang] || LANG.ar || {};
   if (!t || typeof t !== 'object') return;
