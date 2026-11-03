@@ -1,6 +1,6 @@
 /* rizq_header.css — mobile two-tier ONLY below 768px; desktop uses original page nav */
 
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap');
+@import url('fonts/cairo.css?v=1.0');
 
 :root{
   --rizq-header-navy:#0a1220;

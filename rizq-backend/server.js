@@ -117,8 +117,8 @@ app.use((req, res, next) => {
       "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'; "
       + "frame-src 'self' https://www.openstreetmap.org https://openstreetmap.org; "
       + "img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; "
-      + "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; "
-      + "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; "
+      + "font-src 'self' data: https://cdn.jsdelivr.net; "
+      + "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
       /* إبقاء unsafe-inline مؤقتاً لصفحات HTML المضمنة؛ منع script من أي https: عام */
       + "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
       + "connect-src 'self' https: wss:;"
@@ -133,8 +133,8 @@ app.use((req, res, next) => {
       + "frame-ancestors *; "
       + "frame-src 'self' https://www.openstreetmap.org https://openstreetmap.org https:; "
       + "img-src 'self' data: blob: https:; media-src 'self' data: blob: https:; "
-      + "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; "
-      + "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://unpkg.com; "
+      + "font-src 'self' data: https://cdn.jsdelivr.net; "
+      + "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
       + "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; "
       + "connect-src 'self' https: wss: http: ws:;"
     );
