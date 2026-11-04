@@ -608,11 +608,26 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
 
 /* خلفية متحركة */
 .hero-bg{position:absolute;inset:0;background:#ffffff;pointer-events:none}
-.hero-orb1,.hero-orb2,.hero-orb3{contain:layout paint;will-change:transform;pointer-events:none;animation-play-state:paused}
+/*
+ * طبقة orbs بارتفاع ثابت (viewport) — لا تتوسّع مع محتوى .hero.
+ * كانت orb2/3 بـ bottom داخل .hero فتقفز ~470px عند نمو الهيرو (CLS نادرة).
+ * الحركة: transform/opacity فقط؛ الشكل البصري كما هو.
+ */
+.hero-orbs{
+  position:absolute;top:0;left:0;right:0;
+  height:100vh;height:100dvh;
+  overflow:hidden;pointer-events:none;z-index:0;
+  contain:strict;
+}
+.hero-orb1,.hero-orb2,.hero-orb3{
+  position:absolute;margin:0;border:0;
+  contain:layout;will-change:transform;
+  pointer-events:none;animation-play-state:paused;
+}
 html.rizq-orbs-ready .hero-orb1,html.rizq-orbs-ready .hero-orb2,html.rizq-orbs-ready .hero-orb3{animation-play-state:running}
-.hero-orb1{position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06) 0%,transparent 65%);top:-100px;left:50%;transform:translateX(-50%);animation:orb1 8s ease-in-out infinite}
-.hero-orb2{position:absolute;width:min(360px,52vw);height:min(360px,52vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.07) 0%,transparent 70%);bottom:100px;right:0;transform:translateX(15%);animation:orb2 10s ease-in-out infinite}
-.hero-orb3{position:absolute;width:min(280px,44vw);height:min(280px,44vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06) 0%,transparent 70%);bottom:50px;left:0;transform:translateX(-15%);animation:orb3 7s ease-in-out infinite}
+.hero-orb1{width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06) 0%,transparent 65%);top:-100px;left:50%;transform:translateX(-50%);animation:orb1 8s ease-in-out infinite}
+.hero-orb2{width:min(360px,52vw);height:min(360px,52vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.07) 0%,transparent 70%);bottom:100px;right:0;transform:translateX(15%);animation:orb2 10s ease-in-out infinite}
+.hero-orb3{width:min(280px,44vw);height:min(280px,44vw);border-radius:50%;background:radial-gradient(circle,rgba(27,58,107,.06) 0%,transparent 70%);bottom:50px;left:0;transform:translateX(-15%);animation:orb3 7s ease-in-out infinite}
 @keyframes orb1{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.06)}}
 @keyframes orb2{0%,100%{transform:translateX(15%) scale(1)}50%{transform:translateX(15%) scale(1.04)}}
 @keyframes orb3{0%,100%{transform:translateX(-15%) scale(1)}50%{transform:translateX(-15%) scale(1.04)}}
@@ -5788,9 +5803,11 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
 <!-- ══ HERO ══ -->
 <section class="hero" id="hero">
   <div class="hero-bg"></div>
-  <div class="hero-orb1"></div>
-  <div class="hero-orb2"></div>
-  <div class="hero-orb3"></div>
+  <div class="hero-orbs" aria-hidden="true">
+    <div class="hero-orb1"></div>
+    <div class="hero-orb2"></div>
+    <div class="hero-orb3"></div>
+  </div>
 
   <!-- ✨ تحسين — لمعة شعار "رزق" فقط (rzqShine في CSS)، بلا أي طبقات إضافية
        فوق خلفية الهيرو حتى تبقى نقية كما هي. -->
