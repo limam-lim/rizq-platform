@@ -335,6 +335,14 @@ async function main() {
       '/rizq_ad_cards.js Permissions-Policy matches server.js'
     );
 
+    const versioned = curl('/rizq_ad_cards.js?v=3.13');
+    ok(versioned.status === 200, '/rizq_ad_cards.js?v= → 200', 'status=' + versioned.status);
+    ok(
+      /immutable/.test(versioned.headers['cache-control'] || ''),
+      '/rizq_ad_cards.js?v= Cache-Control immutable',
+      versioned.headers['cache-control'] || '(missing)'
+    );
+
     const direct = spawnSync('curl', ['-sS', '--max-time', '3', 'http://127.0.0.1:' + NODE_PORT + '/api/ads'], {
       encoding: 'utf8',
     });
