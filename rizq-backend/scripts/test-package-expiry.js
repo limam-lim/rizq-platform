@@ -165,6 +165,7 @@ const DAY = 86400000;
     });
     const beforeIds = (before.items || []).map((it) => it.accountId);
     ok('active store appears in home styles before expiry', beforeIds.includes(storeId), beforeIds.slice(0, 12));
+    ok('active peer appears in home styles before expiry', beforeIds.includes(activeId), beforeIds.slice(0, 12));
 
     /* فرض انتهاء عبر المسح */
     await repos.packages.upsert(storeId, pkgRec(storeId, 'active', new Date(stamp - 3600000).toISOString()));
@@ -195,7 +196,19 @@ const DAY = 86400000;
     });
     const afterIds = (after.items || []).map((it) => it.accountId);
     ok('expired store absent from home styles', !afterIds.includes(storeId), afterIds.slice(0, 12));
-    ok('active peer still listable in styles', afterIds.includes(activeId) || true);
+    ok('active peer still listable in styles', afterIds.includes(activeId), afterIds.slice(0, 12));
+
+    /* غياب المنتهي من كل أقسام الرئيسية (styles + stores) مع بقاء النظير */
+    for (const section of ['styles', 'stores']) {
+      const sec = await buildHomeCatalog({ section: section, limit: 48 }, {
+        queryHomeCatalogJoin: platformStore.queryHomeCatalogJoin,
+        applyPublicCatalogCaps: async (items) => items,
+        resolveContactGate: async () => ({ contactsUnlocked: false, contactsLocked: true, lockReason: 'locked' }),
+        isDiamondActive: async () => false,
+      });
+      const idsSec = (sec.items || []).map((it) => it.accountId);
+      ok('expired absent from home section=' + section, !idsSec.includes(storeId), idsSec.slice(0, 12));
+    }
 
     /* HTTP */
     srv = await spawnHttpTestServer({ timeoutMs: 60000 });
@@ -205,6 +218,7 @@ const DAY = 86400000;
     ok('home HTTP ok', homeHttp.status === 200 && homeHttp.json && homeHttp.json.ok, homeHttp.status);
     const homeAccIds = ((homeHttp.json && homeHttp.json.items) || []).map((it) => it.accountId);
     ok('expired store not in /api/catalog/home', !homeAccIds.includes(storeId), homeAccIds.slice(0, 15));
+    ok('active peer still in /api/catalog/home HTTP', homeAccIds.includes(activeId), homeAccIds.slice(0, 15));
 
     const pub = await api(base, 'GET', '/api/accounts/public/' + encodeURIComponent(storeId));
     ok('frozen store page still reachable', pub.status === 200 && pub.json && pub.json.account, pub.status);
@@ -224,8 +238,9 @@ const DAY = 86400000;
 
     const catGet = await api(base, 'GET', '/api/catalog?accountId=' + encodeURIComponent(storeId));
     ok('catalog get for frozen store', catGet.status === 200 && catGet.json && Array.isArray(catGet.json.items), catGet.status);
-    ok('inventoryUnconfirmed on catalog', catGet.json.inventoryUnconfirmed === true
-      || (catGet.json.items[0] && catGet.json.items[0].inventoryUnconfirmed === true), catGet.json);
+    ok('inventoryUnconfirmed on catalog root', catGet.json.inventoryUnconfirmed === true, catGet.json);
+    ok('inventoryUnconfirmed on catalog item',
+      !!(catGet.json.items[0] && catGet.json.items[0].inventoryUnconfirmed === true), catGet.json.items[0]);
 
     const postProd = await api(base, 'POST', '/api/catalog', {
       accountId: storeId,
@@ -244,8 +259,22 @@ const DAY = 86400000;
       body: 'مرحبا هل متاح؟',
     });
     ok('new chat → rejected package_expired',
-      msgNew.status === 403 && msgNew.json && msgNew.json.code === 'package_expired',
+      msgNew.status === 403 && msgNew.json && msgNew.json.code === 'package_expired' && msgNew.json.chatReadOnly === true,
       { status: msgNew.status, body: msgNew.json });
+
+    const threadsFrozen = await api(base, 'GET',
+      '/api/messages/threads?accountId=' + encodeURIComponent(storeId),
+      null,
+      { 'x-account-token': tokenStore });
+    ok('threads GET marks chatReadOnly while frozen',
+      threadsFrozen.status === 200 && threadsFrozen.json && threadsFrozen.json.chatReadOnly === true
+      && threadsFrozen.json.packageFrozen === true,
+      { status: threadsFrozen.status, body: threadsFrozen.json });
+
+    /* شريط الإعلانات: فلترة الحساب المنتهي عبر filterListableAccountIds */
+    const listable = await freeze.filterListableAccountIds([storeId, activeId, officeId]);
+    ok('ads filter drops expired store', !listable.has(storeId) && listable.has(activeId), [...listable]);
+    ok('ads filter drops expired office', !listable.has(officeId), [...listable]);
 
     const dir = await api(base, 'GET', '/api/accounts/public?type=office');
     const dirIds = ((dir.json && dir.json.accounts) || []).map((a) => a.id);
@@ -298,6 +327,27 @@ const DAY = 86400000;
 
     const pub2 = await api(base, 'GET', '/api/accounts/public/' + encodeURIComponent(storeId));
     ok('renewed store not frozen', pub2.json && pub2.json.account && pub2.json.account.packageFrozen !== true, pub2.json && pub2.json.account);
+    /* جهات الاتصال ما زالت قد تُحجب ببوابة التواصل للزائر غير المسجّل —
+       بعد التجديد يجب أن تزول أعلام التجميد (لا packageFrozen / inventoryUnconfirmed / shareDisabled). */
+    ok('renewed store freeze flags cleared',
+      pub2.json && pub2.json.account
+      && pub2.json.account.packageFrozen !== true
+      && pub2.json.account.inventoryUnconfirmed !== true
+      && pub2.json.account.shareDisabled !== true,
+      pub2.json && pub2.json.account);
+
+    const og2 = await api(base, 'GET', '/api/accounts/public/' + encodeURIComponent(storeId) + '/og');
+    ok('renewed OG no longer says unavailable',
+      og2.status === 200 && og2.json && !/غير متاح/.test(String(og2.json.description || '')),
+      og2.json && og2.json.description);
+
+    const threadsRenewed = await api(base, 'GET',
+      '/api/messages/threads?accountId=' + encodeURIComponent(storeId),
+      null,
+      { 'x-account-token': tokenStore });
+    ok('threads GET chatReadOnly cleared after renew',
+      threadsRenewed.status === 200 && threadsRenewed.json && threadsRenewed.json.chatReadOnly !== true,
+      { status: threadsRenewed.status, body: threadsRenewed.json });
 
     /* أرشفة بعد 90 يوماً */
     const archivedId = 'acc_exp_arch_' + stamp;

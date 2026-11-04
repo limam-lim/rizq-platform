@@ -148,11 +148,21 @@ async function assertPackageAllowsNewChat(accountId) {
   return state;
 }
 
-/** معاينة رابط بلا أي وسيلة اتصال */
+/**
+ * معاينة رابط (Open Graph / Twitter).
+ * - عند التجميد/الأرشفة: وصف «غير متاح للتواصل» بلا أي وسيلة اتصال.
+ * - عند الباقة النشطة: وصف من بيانات المحل، وما زال بلا هاتف/بريد في الـ OG.
+ */
 function buildFrozenOgMeta(acc, state) {
   const name = String((acc && (acc.name || acc.nameFr)) || 'رزق').slice(0, 120);
   const image = (acc && (acc.cover || acc.thumb || acc.image)) || null;
-  const desc = (state && state.unavailableAr) || MSG_UNAVAILABLE_AR;
+  const frozen = !!(state && (state.packageFrozen || state.packageArchived));
+  const activeDesc = String(
+    (acc && (acc.tagline || acc.desc || acc.activity || acc.name)) || name
+  ).slice(0, 200);
+  const desc = frozen
+    ? ((state && state.unavailableAr) || MSG_UNAVAILABLE_AR)
+    : activeDesc;
   return {
     ok: true,
     packageFrozen: !!(state && state.packageFrozen),
