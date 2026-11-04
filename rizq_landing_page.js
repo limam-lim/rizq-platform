@@ -4673,7 +4673,16 @@ function applyLandingLang(toAr) {
     var _ptabAR = ['الأفراد','المحلات التجارية','المكاتب الافتراضية','الشركات والمعارض','غرفة المناقصة','غرفة الاستثمارات','الإعلانات'];
     var _ptabFR = ['Particuliers','Boutiques','Bureaux virtuels','Entreprises & showrooms','Appels d\'offres','Investissements','Annonces'];
     _ptabLabelsEarly.forEach(function(el,i){ if(_ptabAR[i]) el.textContent = isAr ? _ptabAR[i] : _ptabFR[i]; });
-    if (typeof renderPricingSection === 'function') renderPricingSection();
+    /* الباقات تُحمَّل عند الحاجة — إن لم تكن جاهزة اترك الهيكل / IO في ondemand */
+    if (typeof renderPricingSection === 'function') {
+      if (window.RizqPackagesConfig || window.RizqPackagesUI) renderPricingSection();
+      else if (window.RizqEnsure && typeof RizqEnsure.packages === 'function') {
+        /* لا تنتظر على المسار الحرج — الهيكل المحلي يكفي حتى يقترب #pricing */
+        renderPricingSection();
+      } else {
+        renderPricingSection();
+      }
+    }
   } catch (eEarlyPkg) { console.warn('early pricing lang sync failed', eEarlyPkg); }
 
 

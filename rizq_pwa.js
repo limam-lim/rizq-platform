@@ -5,10 +5,10 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '31.30';
+  var ASSET_V = '31.31';
   var MOCK_HDR_V = '5.97';
   /* يجب أن يطابق CACHE_NAME في sw.js حرفياً */
-  var SW_CACHE = 'rizq-cache-v31.30';
+  var SW_CACHE = 'rizq-cache-v31.31';
   var SW_URL = 'sw.js?v=' + ASSET_V;
 
   if (typeof window.showToast !== 'function') {
@@ -174,7 +174,13 @@
       appendScript('rizq_dynamic_nav.js?v=' + ASSET_V, { defer: true });
       appendScript('rizq_module_flags.js?v=' + ASSET_V, { defer: true });
     }
-    if (isPublicShell() && !document.querySelector('script[src*="rizq_packages_ui.js"]')) {
+    /* الرئيسية تحمّل الباقات عند الطلب (rizq_landing_ondemand) — لا تحقنها مبكراً */
+    var landingPage = false;
+    try {
+      var leaf = (location.pathname || '').split('/').pop() || '';
+      landingPage = !leaf || leaf === 'index.html' || /^rizq_landing/i.test(leaf);
+    } catch (eLand) {}
+    if (isPublicShell() && !landingPage && !document.querySelector('script[src*="rizq_packages_ui.js"]')) {
       appendScript('rizq_packages_ui.js?v=' + ASSET_V, { defer: true });
     }
     if (!document.querySelector('link[rel="stylesheet"][href*="rizq_mobile.css"]')) {
