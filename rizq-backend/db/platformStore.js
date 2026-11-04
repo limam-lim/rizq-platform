@@ -638,12 +638,15 @@ async function queryHomeCatalogJoin(filters) {
   }
 
   if (filters.categoryIlike) {
+    /* حقول التصنيف فقط — ممنوع مطابقة name (تجنّب «رجال» في العنوان → تصنيف رجال) */
     const s = '%' + String(filters.categoryIlike).slice(0, 80) + '%';
     where.push(
       '(COALESCE(c.data->>\'category\',\'\') ILIKE ' + push(s)
       + ' OR COALESCE(c.data->>\'cat\',\'\') ILIKE ' + push(s)
       + ' OR COALESCE(c.data->>\'categoryId\',\'\') ILIKE ' + push(s)
-      + ' OR COALESCE(c.data->>\'name\',\'\') ILIKE ' + push(s)
+      + ' OR COALESCE(c.data->>\'categoryKey\',\'\') ILIKE ' + push(s)
+      + ' OR COALESCE(c.data->>\'subcat\',\'\') ILIKE ' + push(s)
+      + ' OR COALESCE(c.data->>\'subCategoryId\',\'\') ILIKE ' + push(s)
       + ')'
     );
   }

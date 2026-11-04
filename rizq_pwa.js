@@ -5,8 +5,11 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '31.26';
-  var MOCK_HDR_V = '5.88';
+  var ASSET_V = '31.28';
+  var MOCK_HDR_V = '5.93';
+  /* يجب أن يطابق CACHE_NAME في sw.js حرفياً */
+  var SW_CACHE = 'rizq-cache-v31.28';
+  var SW_URL = 'sw.js?v=' + ASSET_V;
 
   if (typeof window.showToast !== 'function') {
     window.showToast = function (msg, type) {
@@ -102,10 +105,10 @@
         (document.head || document.documentElement).appendChild(kill);
       }
     }
-    if (!document.querySelector('link[href*="fonts.googleapis.com"][href*="Cairo"]')) {
+    if (!document.querySelector('link[href*="fonts/cairo.css"], link[href*="cairo.css"]')) {
       var fontLink = document.createElement('link');
       fontLink.rel = 'stylesheet';
-      fontLink.href = 'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap';
+      fontLink.href = 'fonts/cairo.css?v=1.0';
       document.head.appendChild(fontLink);
     }
     if (!document.querySelector('link[rel="stylesheet"][href*="rizq-theme.css"]')) {
@@ -137,12 +140,19 @@
       if (!mockJsEl) {
         appendScript(mockJsWant, { defer: true });
       } else if ((mockJsEl.getAttribute('src') || '').indexOf('v=' + MOCK_HDR_V) < 0) {
-        /* استبدال الوسم القديم حتى تُحمَّل الكبسولة بالإصدار الصحيح على كل الصفحات */
-        var fresh = document.createElement('script');
-        fresh.src = mockJsWant;
-        fresh.defer = true;
-        mockJsEl.parentNode.insertBefore(fresh, mockJsEl.nextSibling);
-        try { mockJsEl.parentNode.removeChild(mockJsEl); } catch (eRmMock) {}
+        /* إن نُفِّذ الهيدر مسبقاً — لا تستبدل الوسم (إعادة التحميل = boot ثانٍ → CLS كارثي) */
+        var mockAlreadyLive = false;
+        try {
+          mockAlreadyLive = typeof window.__rizqSyncPhoneNavSplit === 'function'
+            || (document.body && document.body.getAttribute('data-rizq-mock-booted') === '1');
+        } catch (eLive) {}
+        if (!mockAlreadyLive) {
+          var fresh = document.createElement('script');
+          fresh.src = mockJsWant;
+          fresh.defer = true;
+          mockJsEl.parentNode.insertBefore(fresh, mockJsEl.nextSibling);
+          try { mockJsEl.parentNode.removeChild(mockJsEl); } catch (eRmMock) {}
+        }
       }
     }
     if (!document.querySelector('script[src*="rizq_account_route.js"]')) {
@@ -395,8 +405,8 @@
     try {
       caches.keys().then(function (keys) {
         keys.forEach(function (k) {
-          /* امسح كاشات قديمة كانت تجمّد شريط المحلات على الهاتف */
-          if (/^rizq-cache-v/.test(k) && k !== 'rizq-cache-v22.1') caches.delete(k);
+          /* احذف أي كاش رزق غير الإصدار الحالي — يمنع JS/CSS قديماً بعد التفعيل */
+          if (/^rizq-cache-v/.test(k) && k !== SW_CACHE) caches.delete(k);
         });
       });
     } catch (eCache) {}
@@ -412,8 +422,32 @@
         }).catch(function () {});
         return;
       }
-      navigator.serviceWorker.register('sw.js?v=31.20').then(function (reg) {
+      navigator.serviceWorker.register(SW_URL).then(function (reg) {
         try { if (reg && reg.update) reg.update(); } catch (eUp) {}
+        /* تحديث فقط: فعّل العامل الجديد وأعد التحميل مرة واحدة — لا boot مزدوج عند أول زيارة */
+        try {
+          var awaitingRefresh = false;
+          var refreshing = false;
+          function askSkip(worker) {
+            if (!worker || !navigator.serviceWorker.controller) return;
+            awaitingRefresh = true;
+            worker.postMessage({ type: 'SKIP_WAITING' });
+          }
+          if (reg && reg.waiting) askSkip(reg.waiting);
+          reg.addEventListener('updatefound', function () {
+            var nw = reg.installing;
+            if (!nw) return;
+            nw.addEventListener('statechange', function () {
+              if (nw.state === 'installed') askSkip(nw);
+            });
+          });
+          navigator.serviceWorker.addEventListener('controllerchange', function () {
+            if (!awaitingRefresh || refreshing) return;
+            refreshing = true;
+            try { sessionStorage.setItem('rizq_sw_reloaded', ASSET_V); } catch (eS) {}
+            location.reload();
+          });
+        } catch (eSwUp) {}
       }).catch(function (err) {
         console.warn('Rizq PWA: تعذّر تسجيل service worker', err);
       });

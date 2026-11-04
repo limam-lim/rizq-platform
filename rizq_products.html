@@ -15,10 +15,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
 <meta http-equiv="X-Frame-Options" content="SAMEORIGIN"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; frame-src https://www.youtube.com https://www.facebook.com"/>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; connect-src 'self' http://127.0.0.1:* http://localhost:* https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-src https://www.youtube.com https://www.facebook.com"/>
+<link rel="preload" href="fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/cairo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/cairo.css?v=1.0"/>
 <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
 <link rel="stylesheet" href="rizq_product_detail.css?v=29.0"/>
@@ -563,7 +563,7 @@ main, .page-content.active, .main-content, .results-area,
   <script src="rizq_i18n.js" defer></script>
   <script src="rizq_lang_guard.js?v=1.0" defer></script>
   <script src="rizq_subscription_engine.js" defer></script>
-  <script src="rizq_pwa.js?v=31.20" defer></script>
+  <script src="rizq_pwa.js?v=31.28" defer></script>
   <script src="rizq_footer_toggle.js?v=20" defer></script>
   <script src="rizq_terms_gate.js" defer></script>
   <script src="rizq_auth_gate.js" defer></script>

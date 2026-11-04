@@ -13,21 +13,22 @@
  */
 'use strict';
 
-var CACHE_NAME = 'rizq-cache-v31.24';
+/* يطابق ASSET_V / SW_CACHE في rizq_pwa.js — ارفع الاثنين معاً عند كل إصدار */
+var CACHE_NAME = 'rizq-cache-v31.28';
 var CORE_ASSETS = [
-  'rizq-theme.css',
-  'rizq_header.css',
-  'rizq_header_mockup_trial.css',
-  'rizq_account_route.js',
-  'rizq_header.js',
-  'rizq_header_mockup_trial.js',
-  'rizq_agent.js',
-  'rizq_dynamic_nav.js',
-  'rizq_manager_agent_config.js',
-  'rizq_widget_embed.js',
-  'rizq_productivity.js',
-  'rizq_i18n.js',
-  'rizq_i18n_data.js',
+  'rizq-theme.css?v=31.28',
+  'rizq_header.css?v=31.28',
+  'rizq_header_mockup_trial.css?v=5.93',
+  'rizq_account_route.js?v=31.28',
+  'rizq_header.js?v=31.28',
+  'rizq_header_mockup_trial.js?v=5.93',
+  'rizq_agent.js?v=31.28',
+  'rizq_dynamic_nav.js?v=31.28',
+  'rizq_manager_agent_config.js?v=31.28',
+  'rizq_widget_embed.js?v=31.28',
+  'rizq_productivity.js?v=31.28',
+  'rizq_i18n.js?v=31.28',
+  'rizq_i18n_data.js?v=31.28',
   'favicon-192.png',
   'favicon-32.png',
   'favicon-16.png',
@@ -55,9 +56,16 @@ self.addEventListener('activate', function (event) {
           .filter(function (k) { return k !== CACHE_NAME; })
           .map(function (k) { return caches.delete(k); })
       );
+    }).then(function () {
+      return self.clients.claim();
     })
   );
-  self.clients.claim();
+});
+
+self.addEventListener('message', function (event) {
+  if (event && event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('fetch', function (event) {
