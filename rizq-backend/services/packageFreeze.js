@@ -49,12 +49,17 @@ function isPackageArchived(rec) {
   return false;
 }
 
-/** يظهر في الإطلالات / الدليل / البحث — باقة فعّالة فقط */
+/**
+ * يظهر في الإطلالات / الدليل / البحث / شريط الإعلانات.
+ * بلا سجل باقة: يبقى ظاهراً (توافق الحسابات القديمة/التجارب).
+ * المجمّد/المؤرشف/المنتهي/الموقوف: يُفلتر (لا يُحذف).
+ */
 function isPackageListable(rec) {
-  if (!rec) return false;
+  if (!rec) return true;
   if (isPackageArchived(rec) || isPackageFrozen(rec)) return false;
   const st = _recStatus(rec);
-  return st === 'active' || st === 'expiring_soon';
+  if (st === 'expired' || st === 'suspended') return false;
+  return true;
 }
 
 async function getPackageRecord(accountId) {
@@ -167,7 +172,7 @@ function buildFrozenOgMeta(acc, state) {
   };
 }
 
-async function clearHomeCatalogCacheSafe() {
+function clearHomeCatalogCacheSafe() {
   try {
     const { clearHomeCatalogCache } = require('./homeCatalog');
     clearHomeCatalogCache();
@@ -231,7 +236,7 @@ async function filterListableAccountIds(accountIds) {
   await Promise.all(ids.map(async (id) => {
     try {
       const pkg = await getPackageRecord(id);
-      if (pkg && isPackageListable(pkg)) out.add(id);
+      if (isPackageListable(pkg)) out.add(id);
     } catch (e) { /* skip */ }
   }));
   return out;

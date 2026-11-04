@@ -134,7 +134,7 @@ function mountAccountsManageRoutes(app, deps) {
       /* الدليل/البحث: باقة فعّالة فقط — المنتهية تُفلتر (المكاتب تختفي من الدليل) */
       try {
         const pkg = await freeze.getPackageRecord(acc.id);
-        if (!pkg || !freeze.isPackageListable(pkg)) continue;
+        if (!freeze.isPackageListable(pkg)) continue;
       } catch (eF) { continue; }
       accounts.push(await toPublicAccountForViewer(acc, viewerId));
     }

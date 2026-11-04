@@ -277,8 +277,8 @@ async function buildHomeCatalog(opts, deps) {
     await Promise.all(ids.map(async (id) => {
       try {
         const pkg = await getPackageRecord(id);
-        /* بلا سجل باقة: لا يظهر في الإطلالات المدفوعة (يتوافق مع فلترة المنتهية) */
-        if (pkg && isPackageListable(pkg)) listableIds.add(id);
+        /* فلترة المنتهي/المجمّد فقط — بلا سجل باقة يبقى ظاهراً */
+        if (isPackageListable(pkg)) listableIds.add(id);
       } catch (eL) { /* skip */ }
     }));
   } catch (eFreeze) {
