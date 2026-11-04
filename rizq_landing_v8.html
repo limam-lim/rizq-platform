@@ -8616,19 +8616,19 @@ function _srmNormalizeCatalogProduct(p, showroom){
 /** كتالوجات معارض تجريبية — عندما لا يوجد كتالوج معرض مسجّل بعد */
 function _srmDemoShowroomCatalogs(){
   var carImgs = [
-    'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=800&q=70',
-    'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=800&q=70',
-    'https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=800&q=70'
+    '/demo-media/u-1606664515524-ed2f786a0bd6.svg',
+    '/demo-media/u-1519641471654-76ce0107ad1b.svg',
+    '/demo-media/u-1542362567-b07e54358753.svg'
   ];
   var elecImgs = [
-    'https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?auto=format&fit=crop&w=800&q=70',
-    'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=800&q=70',
-    'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=70'
+    '/demo-media/u-1593359677879-a4bb92f829d1.svg',
+    '/demo-media/u-1496181133206-80ce9b88a853.svg',
+    '/demo-media/u-1511707171634-5f897ff02aa9.svg'
   ];
   var furnImgs = [
-    'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=70',
-    'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=800&q=70',
-    'https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?auto=format&fit=crop&w=800&q=70'
+    '/demo-media/u-1555041469-a586c61ea9bc.svg',
+    '/demo-media/u-1586023492125-27b2c045efd7.svg',
+    '/demo-media/u-1493663284031-b7e3aefcae8e.svg'
   ];
   return [
     {
@@ -8639,12 +8639,12 @@ function _srmDemoShowroomCatalogs(){
       products: [
         { id: 'SR-C1', name: 'هيونداي توسان 2022 — SUV', nameF: 'Hyundai Tucson 2022 — SUV', price: 5800000, cat: 'سيارات', emoji: '🚙', images: carImgs.slice() },
         { id: 'SR-C2', name: 'تويوتا كورولا 2021', nameF: 'Toyota Corolla 2021', price: 4500000, cat: 'سيارات', emoji: '🚗', images: [carImgs[1], carImgs[2], carImgs[0]] },
-        { id: 'SR-C3', name: 'مفتاح وريموت أصلي', nameF: 'Clé / télécommande', price: 8500, cat: 'سيارات', emoji: '🔑', images: ['https://picsum.photos/seed/rizq-sr-keys/640/480'] },
-        { id: 'SR-C4', name: 'إطارات SUV طقم', nameF: 'Pneus SUV jeu', price: 68000, cat: 'سيارات', emoji: '🛞', images: ['https://picsum.photos/seed/rizq-sr-tires/640/480'] },
+        { id: 'SR-C3', name: 'مفتاح وريموت أصلي', nameF: 'Clé / télécommande', price: 8500, cat: 'سيارات', emoji: '🔑', images: ['/demo-media/p-rizq-sr-keys-640x480.svg'] },
+        { id: 'SR-C4', name: 'إطارات SUV طقم', nameF: 'Pneus SUV jeu', price: 68000, cat: 'سيارات', emoji: '🛞', images: ['/demo-media/p-rizq-sr-tires-640x480.svg'] },
         { id: 'SR-E1', name: 'لابتوب احترافي', nameF: 'Laptop pro', price: 85000, cat: 'إلكترونيات', emoji: '💻', images: elecImgs.slice() },
         { id: 'SR-E2', name: 'شاشة Smart TV 55"', nameF: 'Smart TV 55"', price: 95000, cat: 'إلكترونيات', emoji: '📺', images: [elecImgs[0], elecImgs[2]] },
         { id: 'SR-F1', name: 'طقم صالون', nameF: 'Salon', price: 120000, cat: 'أثاث', emoji: '🛋️', images: furnImgs.slice() },
-        { id: 'SR-Q1', name: 'مولد كهرباء', nameF: 'Groupe électrogène', price: 95000, cat: 'معدات', emoji: '⚙️', images: ['https://picsum.photos/seed/rizq-sr-gen/640/480'] }
+        { id: 'SR-Q1', name: 'مولد كهرباء', nameF: 'Groupe électrogène', price: 95000, cat: 'معدات', emoji: '⚙️', images: ['/demo-media/p-rizq-sr-gen-640x480.svg'] }
       ]
     },
     {
@@ -8653,9 +8653,9 @@ function _srmDemoShowroomCatalogs(){
       nameF: 'Showroom Amal Auto',
       type: 'corp',
       products: [
-        { id: 'GA1', name: 'Toyota Corolla 2021 — مفحوصة', nameF: 'Toyota Corolla 2021', price: 6200000, cat: 'سيارات', emoji: '🚗', images: ['https://picsum.photos/seed/rizq-grad-ad07a/640/480', 'https://picsum.photos/seed/rizq-grad-ad07b/640/480'] },
-        { id: 'GA2', name: 'Hyundai Tucson 2019', nameF: 'Hyundai Tucson 2019', price: 7800000, cat: 'سيارات', emoji: '🚙', images: ['https://picsum.photos/seed/rizq-grad-ad08/640/480', carImgs[0]] },
-        { id: 'GA3', name: 'إطارات 265/65 R17', nameF: 'Pneus 265/65 R17', price: 68000, cat: 'سيارات', emoji: '🛞', images: ['https://picsum.photos/seed/rizq-grad-ad11/640/480'] }
+        { id: 'GA1', name: 'Toyota Corolla 2021 — مفحوصة', nameF: 'Toyota Corolla 2021', price: 6200000, cat: 'سيارات', emoji: '🚗', images: ['/demo-media/p-rizq-grad-ad07a-640x480.svg', '/demo-media/p-rizq-grad-ad07b-640x480.svg'] },
+        { id: 'GA2', name: 'Hyundai Tucson 2019', nameF: 'Hyundai Tucson 2019', price: 7800000, cat: 'سيارات', emoji: '🚙', images: ['/demo-media/p-rizq-grad-ad08-640x480.svg', carImgs[0]] },
+        { id: 'GA3', name: 'إطارات 265/65 R17', nameF: 'Pneus 265/65 R17', price: 68000, cat: 'سيارات', emoji: '🛞', images: ['/demo-media/p-rizq-grad-ad11-640x480.svg'] }
       ]
     },
     {
@@ -8664,7 +8664,7 @@ function _srmDemoShowroomCatalogs(){
       nameF: 'Showroom Océan Tech',
       type: 'corp',
       products: [
-        { id: 'GE1', name: 'شاشة Smart TV 55 بوصة', nameF: 'Smart TV 55"', price: 95000, cat: 'إلكترونيات', emoji: '📺', images: ['https://picsum.photos/seed/rizq-grad-ad09/640/480'].concat(elecImgs.slice(0, 2)) },
+        { id: 'GE1', name: 'شاشة Smart TV 55 بوصة', nameF: 'Smart TV 55"', price: 95000, cat: 'إلكترونيات', emoji: '📺', images: ['/demo-media/p-rizq-grad-ad09-640x480.svg'].concat(elecImgs.slice(0, 2)) },
         { id: 'GE2', name: 'لابتوب للعمل', nameF: 'Laptop travail', price: 110000, cat: 'إلكترونيات', emoji: '💻', images: elecImgs.slice() },
         { id: 'GE3', name: 'هاتف ذكي', nameF: 'Smartphone', price: 45000, cat: 'إلكترونيات', emoji: '📱', images: [elecImgs[2], elecImgs[0]] }
       ]
@@ -8675,7 +8675,7 @@ function _srmDemoShowroomCatalogs(){
       nameF: 'Showroom Oasis Meubles',
       type: 'corp',
       products: [
-        { id: 'GF1', name: 'مكتب إداري خشبي مع كرسي', nameF: 'Bureau bois + chaise', price: 45000, cat: 'أثاث', emoji: '🪑', images: ['https://picsum.photos/seed/rizq-grad-ad12/640/480'].concat(furnImgs.slice(0, 2)) },
+        { id: 'GF1', name: 'مكتب إداري خشبي مع كرسي', nameF: 'Bureau bois + chaise', price: 45000, cat: 'أثاث', emoji: '🪑', images: ['/demo-media/p-rizq-grad-ad12-640x480.svg'].concat(furnImgs.slice(0, 2)) },
         { id: 'GF2', name: 'طقم صالون أنيق', nameF: 'Salon élégant', price: 185000, cat: 'أثاث', emoji: '🛋️', images: furnImgs.slice() },
         { id: 'GF3', name: 'غرفة نوم متكاملة', nameF: 'Chambre complète', price: 220000, cat: 'أثاث', emoji: '🛏️', images: [furnImgs[1], furnImgs[2], furnImgs[0]] }
       ]
@@ -9932,59 +9932,59 @@ if(document.readyState === 'loading'){
 var RIZQ_EST_MODELS = [
   {id:'est1', cat:'villa', titleAr:'فيلا راقية بإطلالة بانورامية', titleFr:'Villa premium vue panoramique', locAr:'نواكشوط الغربية', locFr:'Nouakchott Ouest', price:'4.8M MRU', beds:'5', baths:'4', area:'420 م²', badgeAr:'مميّز', badgeFr:'Premium',
     imgs:[
-      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=700&q=80'
+      '/demo-media/u-1613490493576-7fde63acd811.svg',
+      '/demo-media/u-1600585154340-be6161a56a0c.svg',
+      '/demo-media/u-1600596542815-ffad4c1539a9.svg',
+      '/demo-media/u-1512917774080-9991f1c4c750.svg'
     ]},
   {id:'est2', cat:'apartment', titleAr:'شقة فاخرة 3 غرف — تشطيب حديث', titleFr:'Appartement 3 chambres premium', locAr:'تفرغ زينة', locFr:'Tevragh Zeina', price:'150K / شهر', beds:'3', baths:'2', area:'145 م²', badgeAr:'للكراء', badgeFr:'Location',
     imgs:[
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=700&q=80'
+      '/demo-media/u-1502672260266-1c1ef2d93688.svg',
+      '/demo-media/u-1560448204-e02f11c3d0e2.svg',
+      '/demo-media/u-1493809842364-78817add7ffb.svg',
+      '/demo-media/u-1522708323590-d24dbb6b0267.svg'
     ]},
   {id:'est3', cat:'apartment', titleAr:'شقة مفروشة بإطلالة مدينة', titleFr:'Appartement meublé vue ville', locAr:'لكصر', locFr:'Ksar', price:'2.1M MRU', beds:'2', baths:'2', area:'110 م²', badgeAr:'للبيع', badgeFr:'Vente',
     imgs:[
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=700&q=80'
+      '/demo-media/u-1560448204-e02f11c3d0e2.svg',
+      '/demo-media/u-1502672260266-1c1ef2d93688.svg',
+      '/demo-media/u-1522708323590-d24dbb6b0267.svg',
+      '/demo-media/u-1493809842364-78817add7ffb.svg'
     ]},
   {id:'est4', cat:'land', titleAr:'أرض سكنية 600 م² — موقع استراتيجي', titleFr:'Terrain 600 m² — emplacement stratégique', locAr:'نواذيبو', locFr:'Nouadhibou', price:'2.2M MRU', beds:'—', baths:'—', area:'600 م²', badgeAr:'أرض', badgeFr:'Terrain',
     imgs:[
-      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1464146072230-91cabc968266?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=700&q=80'
+      '/demo-media/u-1500382017468-9049fed747ef.svg',
+      '/demo-media/u-1464146072230-91cabc968266.svg',
+      '/demo-media/u-1500530855697-b586d89ba3ee.svg',
+      '/demo-media/u-1472214103451-9374bd1c798e.svg'
     ]},
   {id:'est5', cat:'villa', titleAr:'منزل عائلي بحديقة خاصة', titleFr:'Maison familiale avec jardin', locAr:'كيفة', locFr:'Kiffa', price:'3.4M MRU', beds:'4', baths:'3', area:'280 م²', badgeAr:'منزل', badgeFr:'Maison',
     imgs:[
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=700&q=80'
+      '/demo-media/u-1600596542815-ffad4c1539a9.svg',
+      '/demo-media/u-1600585154340-be6161a56a0c.svg',
+      '/demo-media/u-1613490493576-7fde63acd811.svg',
+      '/demo-media/u-1564013799919-ab600027ffc6.svg'
     ]},
   {id:'est6', cat:'shop', titleAr:'محل تجاري على شارع رئيسي', titleFr:'Local commercial sur artère principale', locAr:'سوق العاصمة', locFr:'Marché capital', price:'85K / شهر', beds:'—', baths:'—', area:'75 م²', badgeAr:'محل', badgeFr:'Local',
     imgs:[
-      'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1555529902-54637c40857f?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&w=700&q=80'
+      '/demo-media/u-1441986300917-64674bd600d8.svg',
+      '/demo-media/u-1441984904996-e0b6ba687e04.svg',
+      '/demo-media/u-1555529902-54637c40857f.svg',
+      '/demo-media/u-1472851294608-062f824d29cc.svg'
     ]},
   {id:'est7', cat:'apartment', titleAr:'بنتهاوس بإطلالة غروب', titleFr:'Penthouse vue coucher de soleil', locAr:'القطب', locFr:'Le Pôle', price:'6.5M MRU', beds:'4', baths:'3', area:'260 م²', badgeAr:'بنتهاوس', badgeFr:'Penthouse',
     imgs:[
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=700&q=80'
+      '/demo-media/u-1512917774080-9991f1c4c750.svg',
+      '/demo-media/u-1502672260266-1c1ef2d93688.svg',
+      '/demo-media/u-1560448204-e02f11c3d0e2.svg',
+      '/demo-media/u-1600607687939-ce8a6c25118c.svg'
     ]},
   {id:'est8', cat:'villa', titleAr:'فيلا حديثة بإضاءة ذهبية', titleFr:'Villa contemporaine lumière dorée', locAr:'سبخة', locFr:'Sebkha', price:'5.2M MRU', beds:'6', baths:'5', area:'510 م²', badgeAr:'فلل', badgeFr:'Villa',
     imgs:[
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80',
-      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=700&q=80',
-      'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=700&q=80'
+      '/demo-media/u-1600585154340-be6161a56a0c.svg',
+      '/demo-media/u-1613490493576-7fde63acd811.svg',
+      '/demo-media/u-1600596542815-ffad4c1539a9.svg',
+      '/demo-media/u-1564013799919-ab600027ffc6.svg'
     ]}
 ];
 var _rizqEstCat = 'all';
@@ -16998,28 +16998,28 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
     /** معاينات عند الفراغ التام فقط — بصور غلاف حقيقية مثل واجهة المحل */
     var EMPTY_EXAMPLES = {
       store: [
-        { href:'rizq_store.html?demo=1', nameAr:'محل النور', nameFr:'Boutique Al-Nour', tagAr:'أزياء وعطور وإكسسوارات', tagFr:'Mode, parfums et accessoires', icon:'🏪', cover:'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=640&q=80' },
-        { href:'rizq_store.html?demo=1', nameAr:'واجهة محل بالصور والاسم', nameFr:'Vitrine photo + nom', tagAr:'أزياء وموضة', tagFr:'Mode', icon:'👗', cover:'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=640&q=80' }
+        { href:'rizq_store.html?demo=1', nameAr:'محل النور', nameFr:'Boutique Al-Nour', tagAr:'أزياء وعطور وإكسسوارات', tagFr:'Mode, parfums et accessoires', icon:'🏪', cover:'/demo-media/u-1441986300917-64674bd600d8.svg' },
+        { href:'rizq_store.html?demo=1', nameAr:'واجهة محل بالصور والاسم', nameFr:'Vitrine photo + nom', tagAr:'أزياء وموضة', tagFr:'Mode', icon:'👗', cover:'/demo-media/u-1483985988355-763728e1935b.svg' }
       ],
       corp: [
-        { href:'rizq_showroom.html?demo=1', nameAr:'معرض نموذجي على رزق', nameFr:'Showroom modèle Rizq', tagAr:'معارض سيارات', tagFr:'Showroom auto', icon:'🚗', cover:'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=640&q=80' },
-        { href:'rizq_showroom.html?demo=1', nameAr:'كتالوج معرض بالصور', nameFr:'Catalogue showroom', tagAr:'أثاث وإلكترونيات', tagFr:'Meubles & tech', icon:'🏬', cover:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=640&q=80' }
+        { href:'rizq_showroom.html?demo=1', nameAr:'معرض نموذجي على رزق', nameFr:'Showroom modèle Rizq', tagAr:'معارض سيارات', tagFr:'Showroom auto', icon:'🚗', cover:'/demo-media/u-1492144534655-ae79c964c9d7.svg' },
+        { href:'rizq_showroom.html?demo=1', nameAr:'كتالوج معرض بالصور', nameFr:'Catalogue showroom', tagAr:'أثاث وإلكترونيات', tagFr:'Meubles & tech', icon:'🏬', cover:'/demo-media/u-1555041469-a586c61ea9bc.svg' }
       ],
       office: [
-        { href:'rizq_office.html?demo=1', nameAr:'مكتب محاماة نموذجي', nameFr:'Cabinet d\'avocats modèle', tagAr:'محامون وقانون', tagFr:'Avocats & droit', icon:'⚖️', cover:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=640&q=80' },
-        { href:'rizq_office.html?demo=1', nameAr:'مكتب خدمات إدارية', nameFr:'Bureau administratif', tagAr:'خدمات إدارية', tagFr:'Services admin.', icon:'🏛️', cover:'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=640&q=80' }
+        { href:'rizq_office.html?demo=1', nameAr:'مكتب محاماة نموذجي', nameFr:'Cabinet d\'avocats modèle', tagAr:'محامون وقانون', tagFr:'Avocats & droit', icon:'⚖️', cover:'/demo-media/u-1497366216548-37526070297c.svg' },
+        { href:'rizq_office.html?demo=1', nameAr:'مكتب خدمات إدارية', nameFr:'Bureau administratif', tagAr:'خدمات إدارية', tagFr:'Services admin.', icon:'🏛️', cover:'/demo-media/u-1521791136064-7986c2920216.svg' }
       ],
       estate: [
-        { href:'rizq_estate.html?demo=1', nameAr:'فيلا بإطلالة غروب', nameFr:'Villa vue coucher de soleil', tagAr:'فلل راقية', tagFr:'Villas premium', icon:'🏡', cover:'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=640&q=80' },
-        { href:'rizq_estate.html?demo=1', nameAr:'شقة فاخرة في المدينة', nameFr:'Appartement premium', tagAr:'شقق للكراء والبيع', tagFr:'Appartements', icon:'🏠', cover:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=640&q=80' }
+        { href:'rizq_estate.html?demo=1', nameAr:'فيلا بإطلالة غروب', nameFr:'Villa vue coucher de soleil', tagAr:'فلل راقية', tagFr:'Villas premium', icon:'🏡', cover:'/demo-media/u-1613490493576-7fde63acd811.svg' },
+        { href:'rizq_estate.html?demo=1', nameAr:'شقة فاخرة في المدينة', nameFr:'Appartement premium', tagAr:'شقق للكراء والبيع', tagFr:'Appartements', icon:'🏠', cover:'/demo-media/u-1502672260266-1c1ef2d93688.svg' }
       ]
     };
 
     var DEMO_COVER_BY_TYPE = {
-      store: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=960&q=80',
-      corp: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=960&q=80',
-      office: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=960&q=80',
-      estate: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=960&q=80'
+      store: '/demo-media/u-1441986300917-64674bd600d8.svg',
+      corp: '/demo-media/u-1492144534655-ae79c964c9d7.svg',
+      office: '/demo-media/u-1497366216548-37526070297c.svg',
+      estate: '/demo-media/u-1613490493576-7fde63acd811.svg'
     };
 
     function safeDiscMediaUrl(u){
@@ -17057,33 +17057,33 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       };
       if(type === 'store'){
         return [
-          mk('acc_grad_store_01', 'تقنية الشنقيط', 'هواتف وإكسسوارات أصلية بأسعار واضحة', 'نواكشوط', 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=640&q=80', 2),
-          mk('acc_grad_store_02', 'أناقة موريتانيا', 'دراعة وأزياء رجالية ونسائية', 'نواكشوط', 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=640&q=80', 8),
-          mk('acc_grad_store_03', 'سوق الأمل للأغذية', 'تموين يومي ومواد غذائية جملة وتجزئة', 'نواذيبو', 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=640&q=80', 14),
-          mk('acc_grad_store_04', 'ذهبيات روصو', 'ذهب ومجوهرات بأوزان وأسعار معلنة', 'روصو', 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=640&q=80', 20),
-          mk('acc_grad_store_05', 'بيت الديكور', 'أثاث ومفروشات منزلية عصرية', 'نواكشوط', 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=640&q=80', 30)
+          mk('acc_grad_store_01', 'تقنية الشنقيط', 'هواتف وإكسسوارات أصلية بأسعار واضحة', 'نواكشوط', '/demo-media/u-1511707171634-5f897ff02aa9.svg', 2),
+          mk('acc_grad_store_02', 'أناقة موريتانيا', 'دراعة وأزياء رجالية ونسائية', 'نواكشوط', '/demo-media/u-1483985988355-763728e1935b.svg', 8),
+          mk('acc_grad_store_03', 'سوق الأمل للأغذية', 'تموين يومي ومواد غذائية جملة وتجزئة', 'نواذيبو', '/demo-media/u-1542838132-92c53300491e.svg', 14),
+          mk('acc_grad_store_04', 'ذهبيات روصو', 'ذهب ومجوهرات بأوزان وأسعار معلنة', 'روصو', '/demo-media/u-1515562141207-7a88fb7ce338.svg', 20),
+          mk('acc_grad_store_05', 'بيت الديكور', 'أثاث ومفروشات منزلية عصرية', 'نواكشوط', '/demo-media/u-1555041469-a586c61ea9bc.svg', 30)
         ];
       }
       if(type === 'corp'){
         return [
-          mk('acc_grad_corp_01', 'معرض أمل للسيارات', 'سيارات جديدة ومستعملة موثّقة بالوثائق', 'نواكشوط', 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=640&q=80', 3),
-          mk('acc_grad_corp_02', 'معرض المحيط للإلكترونيات', 'أجهزة وشاشات وكمبيوترات للجملة والتجزئة', 'نواكشوط', 'https://images.unsplash.com/photo-1498049860655-afd7e5aa8d6f?auto=format&fit=crop&w=640&q=80', 12),
-          mk('acc_grad_corp_03', 'معرض الواحة للأثاث', 'أطقم وصالات ومكاتب للشركات والمنازل', 'نواذيبو', 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=640&q=80', 22)
+          mk('acc_grad_corp_01', 'معرض أمل للسيارات', 'سيارات جديدة ومستعملة موثّقة بالوثائق', 'نواكشوط', '/demo-media/u-1492144534655-ae79c964c9d7.svg', 3),
+          mk('acc_grad_corp_02', 'معرض المحيط للإلكترونيات', 'أجهزة وشاشات وكمبيوترات للجملة والتجزئة', 'نواكشوط', '/demo-media/u-1498049860655-afd7e5aa8d6f.svg', 12),
+          mk('acc_grad_corp_03', 'معرض الواحة للأثاث', 'أطقم وصالات ومكاتب للشركات والمنازل', 'نواذيبو', '/demo-media/u-1555041469-a586c61ea9bc.svg', 22)
         ];
       }
       if(type === 'office'){
         return [
-          mk('acc_grad_office_01', 'مكتب أطوار للعقارات', 'بيع وإيجار واستشارات عقارية في كل الولايات', 'نواكشوط', 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=640&q=80', 5),
-          mk('acc_grad_office_02', 'مكتب النخبة للمحاماة', 'استشارات وقضايا مدنية وتجارية', 'نواكشوط', 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=640&q=80', 16),
-          mk('acc_grad_office_03', 'وكالة الصدى الإدارية', 'خدمات إدارية ومعاملات بسرعة ووضوح', 'روصو', 'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=640&q=80', 28)
+          mk('acc_grad_office_01', 'مكتب أطوار للعقارات', 'بيع وإيجار واستشارات عقارية في كل الولايات', 'نواكشوط', '/demo-media/u-1560518883-ce09059eeffa.svg', 5),
+          mk('acc_grad_office_02', 'مكتب النخبة للمحاماة', 'استشارات وقضايا مدنية وتجارية', 'نواكشوط', '/demo-media/u-1497366216548-37526070297c.svg', 16),
+          mk('acc_grad_office_03', 'وكالة الصدى الإدارية', 'خدمات إدارية ومعاملات بسرعة ووضوح', 'روصو', '/demo-media/u-1521791136064-7986c2920216.svg', 28)
         ];
       }
       if(type === 'estate'){
         return [
-          mk('acc_grad_estate_01', 'أطوار للعقارات', 'فلل وشقق وأراضي بصور احترافية', 'نواكشوط', 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=640&q=80', 4),
-          mk('acc_grad_estate_02', 'واجهة القطب السكني', 'شقق فاخرة للكراء والبيع', 'تفرغ زينة', 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=640&q=80', 11),
-          mk('acc_grad_estate_03', 'أراضي الساحل', 'قطع سكنية وتجارية بوثائق واضحة', 'نواذيبو', 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=640&q=80', 19),
-          mk('acc_grad_estate_04', 'منزل الواحة', 'منازل عائلية بحدائق خاصة', 'كيفة', 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=640&q=80', 27)
+          mk('acc_grad_estate_01', 'أطوار للعقارات', 'فلل وشقق وأراضي بصور احترافية', 'نواكشوط', '/demo-media/u-1613490493576-7fde63acd811.svg', 4),
+          mk('acc_grad_estate_02', 'واجهة القطب السكني', 'شقق فاخرة للكراء والبيع', 'تفرغ زينة', '/demo-media/u-1502672260266-1c1ef2d93688.svg', 11),
+          mk('acc_grad_estate_03', 'أراضي الساحل', 'قطع سكنية وتجارية بوثائق واضحة', 'نواذيبو', '/demo-media/u-1500382017468-9049fed747ef.svg', 19),
+          mk('acc_grad_estate_04', 'منزل الواحة', 'منازل عائلية بحدائق خاصة', 'كيفة', '/demo-media/u-1600596542815-ffad4c1539a9.svg', 27)
         ];
       }
       return [];
