@@ -252,7 +252,7 @@ const ACCOUNT_PUBLIC_SAFE = [
   'id', 'type', 'name', 'city', 'address', 'promo_video', 'promo_video_extra', 'category',
   'activityId', 'activity', 'storeTopics',
   'facebook', 'thumb', 'cover', 'tagline', 'status', 'approvedAt', 'createdAt',
-  'foundingPartner', 'foundingDiscountPercent',
+  'foundingPartner',
   'seller_trust_score', 'reviewCount', 'reviewAverage', 'id_verified',
 ];
 

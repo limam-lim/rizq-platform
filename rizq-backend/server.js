@@ -2430,11 +2430,8 @@ app.post('/api/accounts', accountsRegisterLimiter, async (req, res) => {
     // activateVerifiedPlusForRequest في rizq_admin.html) أو منحاً يدوياً.
     verifiedPlus: false,
     verifiedPlusExpiresAt: null,
-    /* شريك مؤسس — محلات وعقارات المسجّلة قبل نهاية الفترة المجانية */
+    /* شريك مؤسس — شارة تكريم فقط بلا أثر على السعر (الخصم عبر العروض الموسمية لاحقاً) */
     foundingPartner: await launchMode.shouldMarkFoundingPartner(reqType),
-    foundingDiscountPercent: (await launchMode.shouldMarkFoundingPartner(reqType))
-      ? launchMode.getFoundingDiscountPercent()
-      : undefined,
     passHash: passHash || undefined,
     status: autoApproved ? 'approved' : 'pending',
     approvedAt: autoApproved ? new Date().toISOString() : null,

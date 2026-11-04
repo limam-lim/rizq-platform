@@ -207,12 +207,6 @@ async function daysRemaining(nowMs) {
   return Math.ceil((end - now) / MS_DAY);
 }
 
-function getFoundingDiscountPercent() {
-  const n = Number(process.env.RIZQ_FOUNDING_DISCOUNT_PERCENT);
-  if (Number.isFinite(n) && n >= 0 && n <= 90) return Math.round(n);
-  return 40;
-}
-
 function isOpenModule(flags, moduleKey) {
   const key = SECTION_ALIASES[String(moduleKey || '').toLowerCase()] || moduleKey;
   if (!key) return true;
@@ -255,7 +249,6 @@ async function publicLaunchConfig(moduleFlags, nowMs) {
     source: settings.source,
     openSections: open,
     closedSections: closed,
-    foundingDiscountPercent: getFoundingDiscountPercent(),
     paidGraceDays: PAID_GRACE_DAYS,
     trialOfferVisible: await isTrialOfferVisible(nowMs),
     trialDurationDays: TRIAL_DURATION_DAYS,
@@ -344,7 +337,6 @@ module.exports = {
   getEnvOpenSectionFlags,
   isLaunchFreePeriodActive,
   daysRemaining,
-  getFoundingDiscountPercent,
   isOpenModule,
   isTrialOfferVisible,
   publicLaunchConfig,
