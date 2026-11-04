@@ -7,23 +7,23 @@
   'use strict';
 
   var U = {
-    villaExt: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1600&q=80',
-    villaNight: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80',
-    living: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1400&q=80',
-    kitchen: 'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1400&q=80',
-    kitchen2: 'https://images.unsplash.com/photo-1556912173-3bb406ef7e77?auto=format&fit=crop&w=1400&q=80',
-    bath: 'https://images.unsplash.com/photo-1600573472592-401b489a3cdc?auto=format&fit=crop&w=1400&q=80',
-    bath2: 'https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?auto=format&fit=crop&w=1400&q=80',
-    bedroom: 'https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?auto=format&fit=crop&w=1400&q=80',
-    bedroom2: 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?auto=format&fit=crop&w=1400&q=80',
-    terrace: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1400&q=80',
-    apt: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1400&q=80',
-    apt2: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1400&q=80',
-    house: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80',
-    penthouse: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1400&q=80',
-    land: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1400&q=80',
-    shop: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1400&q=80',
-    garage: 'https://images.unsplash.com/photo-1486006920555-c31d558a1733?auto=format&fit=crop&w=1400&q=80'
+    villaExt: '/demo-media/u-1613490493576-7fde63acd811.svg',
+    villaNight: '/demo-media/u-1600585154340-be6161a56a0c.svg',
+    living: '/demo-media/u-1600607687939-ce8a6c25118c.svg',
+    kitchen: '/demo-media/u-1600566753190-17f0baa2a6c3.svg',
+    kitchen2: '/demo-media/u-1556912173-3bb406ef7e77.svg',
+    bath: '/demo-media/u-1600573472592-401b489a3cdc.svg',
+    bath2: '/demo-media/u-1552321554-5fefe8c9ef14.svg',
+    bedroom: '/demo-media/u-1600047509807-ba8f99d2cdde.svg',
+    bedroom2: '/demo-media/u-1616594039964-ae9021a400a0.svg',
+    terrace: '/demo-media/u-1600210492486-724fe5c67fb0.svg',
+    apt: '/demo-media/u-1502672260266-1c1ef2d93688.svg',
+    apt2: '/demo-media/u-1560448204-e02f11c3d0e2.svg',
+    house: '/demo-media/u-1600596542815-ffad4c1539a9.svg',
+    penthouse: '/demo-media/u-1512917774080-9991f1c4c750.svg',
+    land: '/demo-media/u-1500382017468-9049fed747ef.svg',
+    shop: '/demo-media/u-1441986300917-64674bd600d8.svg',
+    garage: '/demo-media/u-1486006920555-c31d558a1733.svg'
   };
 
   var LABEL = {

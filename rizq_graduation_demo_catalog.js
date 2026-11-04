@@ -6,7 +6,7 @@
   'use strict';
 
   function img(seed) {
-    return 'https://picsum.photos/seed/' + seed + '/640/480';
+    return '/demo-media/p-ed6ac61c0def.svg' + seed + '/640/480';
   }
 
   function item(opts) {

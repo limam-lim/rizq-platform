@@ -65,7 +65,8 @@
     "test:home-catalog-negatives": "node scripts/run-with-test-db.js scripts/test-home-catalog-negatives.js",
     "test:asset-versions": "node scripts/test-asset-versions.js",
     "test:founding-no-discount": "node scripts/run-with-test-db.js scripts/test-founding-no-discount.js",
-    "test:all": "node scripts/test-all.js"
+    "test:all": "node scripts/test-all.js",
+    "test:demo-images-local": "node scripts/test-demo-images-local.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
