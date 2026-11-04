@@ -108,7 +108,7 @@
     if (!document.querySelector('link[href*="fonts/cairo.css"], link[href*="cairo.css"]')) {
       var fontLink = document.createElement('link');
       fontLink.rel = 'stylesheet';
-      fontLink.href = 'fonts/cairo.css?v=1.0';
+      fontLink.href = 'fonts/cairo.css?v=1.1';
       document.head.appendChild(fontLink);
     }
     if (!document.querySelector('link[rel="stylesheet"][href*="rizq-theme.css"]')) {
@@ -205,13 +205,21 @@
     function loadAssistantStack(force) {
       if (window.__rizqAssistantLoaded) return;
       window.__rizqAssistantLoaded = true;
-      appendScript('rizq_packages_config.js?v=' + ASSET_V, { defer: true });
-      appendScript('rizq_agent.js?v=' + ASSET_V, { defer: true });
-      appendScript('rizq_manager_agent_config.js?v=' + ASSET_V, { defer: true });
+      if (!document.querySelector('script[src*="rizq_packages_config.js"]')) {
+        appendScript('rizq_packages_config.js?v=' + ASSET_V, { defer: true });
+      }
+      if (!document.querySelector('script[src*="rizq_agent.js"]')) {
+        appendScript('rizq_agent.js?v=' + ASSET_V, { defer: true });
+      }
+      if (!document.querySelector('script[src*="rizq_manager_agent_config.js"]')) {
+        appendScript('rizq_manager_agent_config.js?v=' + ASSET_V, { defer: true });
+      }
       if (!document.querySelector('script[src*="rizq_widget_markdown.js"]')) {
         appendScript('rizq_widget_markdown.js?v=' + ASSET_V, { defer: true });
       }
-      appendScript('rizq_widget_embed.js?v=' + ASSET_V, { defer: true });
+      if (!document.querySelector('script[src*="rizq_widget_embed.js"]')) {
+        appendScript('rizq_widget_embed.js?v=' + ASSET_V, { defer: true });
+      }
     }
     window.RizqLoadAssistant = loadAssistantStack;
 

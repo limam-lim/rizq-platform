@@ -259,10 +259,7 @@ html.rizq-app-nav .nav-sticky-tools{
   }
 }
 </style>
-<script src="rizq_packages_config.js?v=23.0"></script>
-<script src="rizq_packages_ui.js?v=23.0"></script>
-<script src="rizq_merchant_activities.js?v=23.0"></script>
-<script src="rizq_activity_select.js?v=23.0"></script>
+<!-- الباقات/الأنشطة: نسخة واحدة في نهاية الصفحة — لا تكرار حاجب في <head> -->
 <title>رزق | Rizq — سوق موريتانيا الإلكتروني</title><style>
 :root{
   --royal:#1B3A6B;--royal-light:#234d8f;--royal-dark:#0f2347;--royal-deep:#080f1e;
@@ -16614,12 +16611,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeRizqPro
     </div>
   </div>
 </div>
-<!-- إصلاح: عنوان الخادم أصبح مضبوطاً من ملف مشترك واحد (rizq_backend_config.js)
-     بدل تكراره داخل كل صفحة على حدة — راجع تعليقات ذلك الملف للتفاصيل. -->
-<script src="rizq_backend_config.js"></script>
-<script src="rizq_phone_utils.js?v=1.0"></script>
-<script src="rizq_verification_policy.js"></script>
-<script src="rizq_contact_gate.js"></script>
+<!-- backend/phone/verification/contact: محمّلة مرة واحدة أعلى الصفحة — بلا تكرار هنا -->
 <script>
 // ══ الفيديو الإعلاني للزوار — يقرأ إعدادات حقيقية من rizq-backend (لا بيانات وهمية) ══
 
