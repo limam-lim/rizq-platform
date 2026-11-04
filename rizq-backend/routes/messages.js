@@ -121,6 +121,17 @@ function mountMessagesRoutes(app, deps) {
     const b = req.body || {};
     if (!b.sellerAccountId) return res.status(400).json({ error: 'sellerAccountId مطلوب' });
     if (!b.body || !String(b.body).trim()) return res.status(400).json({ error: 'نص الرسالة مطلوب' });
+    try {
+      await require('../services/packageFreeze').assertPackageAllowsNewChat(b.sellerAccountId);
+    } catch (freezeErr) {
+      return res.status(freezeErr.status || 403).json({
+        ok: false,
+        error: freezeErr.message || 'غير متاح للتواصل حالياً',
+        code: freezeErr.code || 'package_expired',
+        chatReadOnly: true,
+        details: freezeErr.details,
+      });
+    }
     let buyerAccountId = null;
     if (b.buyerAccountId) {
       const token = req.header('x-account-token') || '';
@@ -208,6 +219,17 @@ function mountMessagesRoutes(app, deps) {
     const token = req.header('x-account-token') || '';
     const seller = await verifyAccountOwner(b.sellerAccountId, token);
     if (!seller) return res.status(401).json({ error: 'unauthorized' });
+    try {
+      await require('../services/packageFreeze').assertPackageAllowsNewChat(b.sellerAccountId);
+    } catch (freezeErr) {
+      return res.status(freezeErr.status || 403).json({
+        ok: false,
+        error: freezeErr.message || 'غير متاح للتواصل حالياً',
+        code: freezeErr.code || 'package_expired',
+        chatReadOnly: true,
+        details: freezeErr.details,
+      });
+    }
     if (!b.threadKey || b.threadKey.indexOf(b.sellerAccountId + '::') !== 0) {
       return res.status(400).json({ error: 'threadKey غير صالح' });
     }
@@ -252,6 +274,10 @@ function mountMessagesRoutes(app, deps) {
     const token = extractAccountToken(req) || '';
     const acc = await verifyAccountOwner(accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
+    const freeze = require('../services/packageFreeze');
+    const freezeState = await freeze.resolveFreezeState(accountId);
+    const chatReadOnly = !freezeState.canStartChat;
+    const unavailableMessage = chatReadOnly ? (freezeState.unavailableAr || freeze.MSG_UNAVAILABLE_AR) : null;
     const list = (await readMessages()).filter((m) => m.sellerAccountId === accountId);
     const accountsById = new Map((await readAccounts()).map((a) => [a.id, a]));
     const byThread = new Map();
@@ -276,9 +302,17 @@ function mountMessagesRoutes(app, deps) {
         adTitle: adRef ? adRef.adTitle : null,
         lastMessage,
         unreadCount: msgs.filter((m) => m.fromRole === 'buyer' && !m.read).length,
+        chatReadOnly: chatReadOnly,
+        unavailableMessage: unavailableMessage,
       };
     }).sort((a, b) => new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt));
-    res.json({ ok: true, threads });
+    res.json({
+      ok: true,
+      threads,
+      chatReadOnly: chatReadOnly,
+      unavailableMessage: unavailableMessage,
+      packageFrozen: !!freezeState.packageFrozen,
+    });
   });
 
   /** GET /api/messages/mine — صندوق وارد المشتري (تطابق حساب دقيق فقط — لا prefix) */
@@ -287,6 +321,7 @@ function mountMessagesRoutes(app, deps) {
     const token = extractAccountToken(req) || '';
     const acc = await verifyAccountOwner(accountId, token);
     if (!acc) return res.status(401).json({ error: 'unauthorized' });
+    const freeze = require('../services/packageFreeze');
     const list = (await readMessages()).filter((m) =>
       m.buyerAccountId === accountId || threadBelongsToBuyer(m.threadKey, accountId)
     );
@@ -297,7 +332,20 @@ function mountMessagesRoutes(app, deps) {
         byThread.set(m.threadKey, { threadKey: m.threadKey, sellerAccountId: m.sellerAccountId, adId: m.adId, adTitle: m.adTitle, lastMessage: m });
       }
     });
-    const threads = Array.from(byThread.values()).sort((a, b) => new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt));
+    const sellerIds = Array.from(new Set(Array.from(byThread.values()).map((t) => t.sellerAccountId).filter(Boolean)));
+    const sellerFreeze = new Map();
+    await Promise.all(sellerIds.map(async (sid) => {
+      try { sellerFreeze.set(sid, await freeze.resolveFreezeState(sid)); } catch (e) { /* */ }
+    }));
+    const threads = Array.from(byThread.values()).map((t) => {
+      const st = sellerFreeze.get(t.sellerAccountId);
+      const readOnly = st ? !st.canStartChat : false;
+      return Object.assign({}, t, {
+        chatReadOnly: readOnly,
+        unavailableMessage: readOnly ? ((st && st.unavailableAr) || freeze.MSG_UNAVAILABLE_AR) : null,
+        packageFrozen: !!(st && st.packageFrozen),
+      });
+    }).sort((a, b) => new Date(b.lastMessage.createdAt) - new Date(a.lastMessage.createdAt));
     res.json({ ok: true, threads });
   });
 
@@ -323,8 +371,17 @@ function mountMessagesRoutes(app, deps) {
       }
     }
     if (!asSeller && !asBuyer && !asGuest) return res.status(401).json({ error: 'unauthorized' });
+    const freeze = require('../services/packageFreeze');
+    const freezeState = await freeze.resolveFreezeState(sellerAccountId);
+    const chatReadOnly = !freezeState.canStartChat;
     const list = (await readMessages()).filter((m) => m.threadKey === threadKey).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-    res.json({ ok: true, messages: list });
+    res.json({
+      ok: true,
+      messages: list,
+      chatReadOnly: chatReadOnly,
+      unavailableMessage: chatReadOnly ? (freezeState.unavailableAr || freeze.MSG_UNAVAILABLE_AR) : null,
+      packageFrozen: !!freezeState.packageFrozen,
+    });
   });
 
   /** PATCH /api/messages/thread/:threadKey/read — البائع يعلّم المحادثة كمقروءة */

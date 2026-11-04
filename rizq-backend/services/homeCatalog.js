@@ -268,6 +268,32 @@ async function buildHomeCatalog(opts, deps) {
   joined.forEach((row) => {
     if (row && row.account && row.account.id) accById.set(String(row.account.id), row.account);
   });
+
+  /* تجميد الباقة: لا إظهار حسابات منتهية/مؤرشفة في إطلالات الرئيسية (فلترة لا حذف) */
+  const listableIds = new Set();
+  try {
+    const { getPackageRecord, isPackageListable } = require('./packageFreeze');
+    const ids = Array.from(accById.keys());
+    await Promise.all(ids.map(async (id) => {
+      try {
+        const pkg = await getPackageRecord(id);
+        /* بلا سجل باقة: لا يظهر في الإطلالات المدفوعة (يتوافق مع فلترة المنتهية) */
+        if (pkg && isPackageListable(pkg)) listableIds.add(id);
+      } catch (eL) { /* skip */ }
+    }));
+  } catch (eFreeze) {
+    /* إن تعذّر التحميل — لا نكسر الرئيسية: نُبقي السلوك السابق */
+    accById.forEach((_v, id) => listableIds.add(id));
+  }
+
+  joined = joined.filter((row) => {
+    const id = row && row.account && row.account.id ? String(row.account.id) : '';
+    return id && listableIds.has(id);
+  });
+  accById.clear();
+  joined.forEach((row) => {
+    if (row && row.account && row.account.id) accById.set(String(row.account.id), row.account);
+  });
   const accounts = Array.from(accById.values());
 
   let list = joined.map((row) => row.item).filter(Boolean);

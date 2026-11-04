@@ -695,12 +695,19 @@
       }
     } else if(daysLeft === 0) {
       status = 'expired'; // ينتهي اليوم = منتهٍ
-    } else if(daysLeft <= 1) {
+    } else if(daysLeft <= 7) {
+      /* نوافذ التذكير الخادمية: 7 / 3 / 1 — الواجهة تتبع نفس العتبة */
       status = isTrial ? 'trial_expiring' : 'expiring_soon';
     } else if(isTrial) {
       status = 'trial';
     } else {
       status = 'active';
+    }
+    /* الخادم مصدر الحقيقة إن وُجدت حالة مزامَنة */
+    if (acc.subscriptionStatus === 'expired' || acc.pkg_status === 'expired') {
+      status = 'expired';
+    } else if (acc.subscriptionStatus === 'expiring_soon' && status !== 'expired') {
+      status = isTrial ? 'trial_expiring' : 'expiring_soon';
     }
 
     // تحديد المزايا المتاحة

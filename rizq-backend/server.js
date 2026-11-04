@@ -1014,14 +1014,31 @@ app.post('/api/widget/chat', widgetChatLimiter, async (req, res) => {
         }
       }
       try {
+        await require('./services/packageFreeze').assertPackageAllowsNewChat(accountId);
+      } catch (freezeChat) {
+        return res.status(freezeChat.status || 403).json({
+          ok: false,
+          error: freezeChat.message || 'غير متاح للتواصل حالياً',
+          code: freezeChat.code || 'package_expired',
+          chatReadOnly: true,
+          details: freezeChat.details,
+        });
+      }
+      try {
         await assertAiAgentAccess(acc, { channel: 'widget' });
       } catch (e) {
         const ent = await getAccountEntitlements(acc);
         const status = e.status && e.status >= 400 ? e.status : 403;
+        const code = (e.code === 'subscription_expired' || ent.subscriptionStatus === 'expired')
+          ? 'package_expired'
+          : (e.code || ent.subscriptionStatus);
         return res.status(status).json({
           ok: false,
-          error: e.code === 'quota_exhausted' ? (e.message || 'تم استنفاد الحصة') : resolveAccessDenialMessage(ent),
-          code: e.code || ent.subscriptionStatus,
+          error: e.code === 'quota_exhausted'
+            ? (e.message || 'تم استنفاد الحصة')
+            : (code === 'package_expired' ? 'غير متاح للتواصل حالياً' : resolveAccessDenialMessage(ent)),
+          code: code,
+          chatReadOnly: code === 'package_expired',
         });
       }
       merchantAcc = acc;
