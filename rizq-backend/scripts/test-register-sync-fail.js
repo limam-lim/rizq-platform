@@ -9,10 +9,27 @@
 
 const fs = require('fs');
 const path = require('path');
-const { chromium } = require(path.join(__dirname, '..', '..', 'qa', 'journeys', 'node_modules', 'playwright'));
 
-const BASE = process.env.JOURNEY_BASE || process.env.RIZQ_BASE || 'http://127.0.0.1:3000';
 const ROOT = path.join(__dirname, '..', '..');
+function loadPlaywright() {
+  const candidates = [
+    path.join(ROOT, 'qa', 'ui-logic-1', 'node_modules', 'playwright'),
+    path.join(ROOT, 'qa', 'journeys', 'node_modules', 'playwright'),
+    path.join(ROOT, 'qa', 'cls-1', 'node_modules', 'playwright'),
+    'playwright',
+  ];
+  for (let i = 0; i < candidates.length; i++) {
+    try { return require(candidates[i]); } catch (e) { /* */ }
+  }
+  throw new Error('playwright not found — run npm run test:all (installs qa/ui-logic-1) or npm i in qa/ui-logic-1');
+}
+const { chromium } = loadPlaywright();
+
+const BASE = process.env.BASE_URL
+  || process.env.STATIC_BASE_URL
+  || process.env.JOURNEY_BASE
+  || process.env.RIZQ_BASE
+  || 'http://127.0.0.1:3000';
 const results = [];
 
 function ok(name, pass, detail) {

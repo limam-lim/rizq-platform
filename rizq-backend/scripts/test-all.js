@@ -51,6 +51,16 @@ function ensureGatePassword() {
   if (!process.env.ADMIN_PANEL_PATH || !String(process.env.ADMIN_PANEL_PATH).trim()) {
     process.env.ADMIN_PANEL_PATH = 'cp-test-local';
   }
+  /* Sentinel DB role — نفس أسلوب بوابة الأدمن على آلة نظيفة */
+  if (!process.env.SENTINEL_DB_PASSWORD || !String(process.env.SENTINEL_DB_PASSWORD).trim()) {
+    process.env.SENTINEL_DB_PASSWORD = 'sentinel_test_pass_9d2d';
+    console.log('[test:all] SENTINEL_DB_PASSWORD → test default (not for production)');
+  } else {
+    console.log('[test:all] SENTINEL_DB_PASSWORD present');
+  }
+  if (!process.env.RIZQ_SENTINEL_PASSWORD || !String(process.env.RIZQ_SENTINEL_PASSWORD).trim()) {
+    process.env.RIZQ_SENTINEL_PASSWORD = process.env.SENTINEL_DB_PASSWORD;
+  }
 }
 
 function playwrightRoots() {
@@ -200,12 +210,17 @@ async function main() {
   const scripts = listNpmTestScripts();
   console.log('[test:all] npm test scripts:', scripts.length);
 
+  const childEnv = {
+    BASE_URL: staticSrv.base,
+    STATIC_BASE_URL: staticSrv.base,
+    JOURNEY_BASE: staticSrv.base,
+    RIZQ_BASE: staticSrv.base,
+    ADMIN_PANEL_GATE_KEY: process.env.ADMIN_PANEL_GATE_KEY,
+    SENTINEL_DB_PASSWORD: process.env.SENTINEL_DB_PASSWORD,
+    RIZQ_SENTINEL_PASSWORD: process.env.RIZQ_SENTINEL_PASSWORD,
+  };
   for (const script of scripts) {
-    results.push(await runNpm(script, {
-      BASE_URL: staticSrv.base,
-      STATIC_BASE_URL: staticSrv.base,
-      ADMIN_PANEL_GATE_KEY: process.env.ADMIN_PANEL_GATE_KEY,
-    }));
+    results.push(await runNpm(script, childEnv));
   }
 
   /* واجهة / CLS تعتمد على Playwright + خادم ستاتيكي */
@@ -215,10 +230,7 @@ async function main() {
   ];
   for (const rel of uiTests) {
     if (!fs.existsSync(path.join(ROOT, rel))) continue;
-    results.push(await runNode(rel, {
-      BASE_URL: staticSrv.base,
-      STATIC_BASE_URL: staticSrv.base,
-    }));
+    results.push(await runNode(rel, childEnv));
   }
 
   await staticSrv.stop();
