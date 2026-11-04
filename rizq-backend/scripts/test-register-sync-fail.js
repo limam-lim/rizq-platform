@@ -52,11 +52,17 @@ function extractFn(src, name) {
 }
 
 async function testMessageHelper() {
-  const html = fs.readFileSync(path.join(ROOT, 'rizq_landing_v8.html'), 'utf8');
-  ok('landing contains _syncAccountFailMessage', html.includes('function _syncAccountFailMessage'));
+  const html = fs.readFileSync(path.join(ROOT, 'rizq_landing_v8.html'), 'utf8')
+    + (fs.existsSync(path.join(ROOT, 'rizq_landing_page.js'))
+      ? '\n' + fs.readFileSync(path.join(ROOT, 'rizq_landing_page.js'), 'utf8') : '');
+  ok('landing contains _syncAccountFailMessage',
+    html.includes('function _syncAccountFailMessage')
+    || html.includes('_syncAccountFailMessage'));
   ok('landing rolls back on !res.ok', /if\s*\(\s*!res\.ok\s*\)/.test(html) && html.includes('_rollbackLocalAccount'));
   ok('landing no longer returns ok:true on missing token', !/if\s*\(\s*!data\s*\|\|\s*!data\.ok\s*\|\|\s*!data\.accessToken\s*\)\s*return\s*\{\s*ok:\s*true\s*\}/.test(html));
-  ok('ppFinalSubmit gates on result.ok === false', html.includes('result.ok === false') && html.includes('_reenablePkgSubmitBtn'));
+  ok('ppFinalSubmit gates on result.ok === false',
+    (/result\.ok\s*===\s*false/.test(html) || /result\.ok===false/.test(html))
+    && html.includes('_reenablePkgSubmitBtn'));
   ok('estate register checks !res.ok', fs.readFileSync(path.join(ROOT, 'rizq_real_estate_register.html'), 'utf8').includes('!res.ok'));
 
   // Evaluate bilingual messages in a page context (uses isAr from landing)

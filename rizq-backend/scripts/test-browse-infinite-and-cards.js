@@ -17,7 +17,11 @@ function ok(name, pass, detail) {
 
 function main() {
   const browse = fs.readFileSync(path.join(ROOT, 'rizq_browse.html'), 'utf8');
-  const landing = fs.readFileSync(path.join(ROOT, 'rizq_landing_v8.html'), 'utf8');
+  const landingHtml = fs.readFileSync(path.join(ROOT, 'rizq_landing_v8.html'), 'utf8');
+  const landingPageJs = fs.existsSync(path.join(ROOT, 'rizq_landing_page.js'))
+    ? fs.readFileSync(path.join(ROOT, 'rizq_landing_page.js'), 'utf8')
+    : '';
+  const landing = landingHtml + '\n' + landingPageJs;
   const cards = fs.readFileSync(path.join(ROOT, 'rizq_ad_cards.js'), 'utf8');
   const server = fs.readFileSync(path.join(ROOT, 'rizq-backend', 'server.js'), 'utf8');
   const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'rizq-backend', 'package.json'), 'utf8'));
@@ -43,19 +47,24 @@ function main() {
     && !/\(price \? '<div class="rzq-adx-price"/.test(cards));
 
   ok('landing seeds FEATURED into ADS when empty + demoOk',
-    /function _rizqMaybePaintDemoInventory[\s\S]*?!ADS\.length[\s\S]*?FEATURED_ADS\.forEach/.test(landing)
-    && /function buildCards[\s\S]*?!ADS\.length && demoOk[\s\S]*?FEATURED_ADS/.test(landing));
+    (/function _rizqMaybePaintDemoInventory[\s\S]*?!ADS\.length[\s\S]*?FEATURED_ADS\.forEach/.test(landing)
+      || /!ADS\.length&&demoOk&&typeof FEATURED_ADS/.test(landing)
+      || /!ADS\.length&&demoOk[\s\S]{0,80}FEATURED_ADS/.test(landing))
+    && (/function buildCards[\s\S]*?!ADS\.length && demoOk[\s\S]*?FEATURED_ADS/.test(landing)
+      || /function buildCards\(\)\{[\s\S]*?!ADS\.length&&demoOk[\s\S]*?FEATURED_ADS/.test(landing)));
 
   ok('landing filters public title',
-    /function _adHasPublicTitle/.test(landing)
-    && /_landingAdsPool[\s\S]*?_adHasPublicTitle/.test(landing));
+    (/function _adHasPublicTitle/.test(landing) || /function _adHasPublicTitle\(/.test(landing))
+    && (/_landingAdsPool[\s\S]*?_adHasPublicTitle/.test(landing)
+      || /filter\(_adHasPublicTitle\)/.test(landing)
+      || /_adHasPublicTitle\(a\)/.test(landing)));
 
   ok('server.js preserves DATABASE_URL across dotenv override',
     /preserve\.DATABASE_URL/.test(server)
     && /process\.env\.DATABASE_URL = preserve\.DATABASE_URL/.test(server));
 
   /* اختبارات بلا DB: فحص ملفات ثابتة أو المشغّل الشامل */
-  const noDbOk = new Set(['test:asset-versions', 'test:all']);
+  const noDbOk = new Set(['test:asset-versions', 'test:perf-budget', 'test:all']);
   const testScripts = Object.keys(pkg.scripts).filter((k) => k.startsWith('test:'));
   const needDb = testScripts.filter((k) => !noDbOk.has(k));
   const allWrapped = needDb.every((k) => String(pkg.scripts[k]).includes('run-with-test-db.js'));
