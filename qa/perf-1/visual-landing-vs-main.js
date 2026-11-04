@@ -104,8 +104,17 @@ async function capture(browser, base, label) {
         return !!live && !ph;
       }, { timeout: 45000 }).catch(() => {});
       await page.waitForTimeout(2500);
-      /* إخفاء عناصر متحركة غير حتمية */
+      /* إيقاف الحركة وإعادة الشريط الحي لموضع 0 — الماركي يزيّف مقارنة البكسل */
       await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important;caret-color:transparent!important}' });
+      await page.evaluate(() => {
+        document.querySelectorAll('#cards-track, .cards-track, [data-rizq-marquee]').forEach((el) => {
+          el.style.transform = 'none';
+          el.style.translate = 'none';
+          try { el.style.setProperty('--marquee-shift', '0px'); } catch (e) { /* */ }
+        });
+        window.scrollTo(0, 0);
+      });
+      await page.waitForTimeout(300);
       const file = path.join(dir, w + '-' + lang + '.png');
       await page.screenshot({ path: file, fullPage: false });
       await page.close();
