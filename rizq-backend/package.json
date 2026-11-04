@@ -60,7 +60,8 @@
     "test:monthly-only": "node scripts/run-with-test-db.js scripts/test-monthly-only.js",
     "admin:2fa": "node scripts/admin-2fa.js",
     "test:home-catalog-integrity": "node scripts/run-with-test-db.js scripts/test-home-catalog-integrity.js",
-    "test:home-catalog-negatives": "node scripts/run-with-test-db.js scripts/test-home-catalog-negatives.js"
+    "test:home-catalog-negatives": "node scripts/run-with-test-db.js scripts/test-home-catalog-negatives.js",
+    "test:asset-versions": "node scripts/test-asset-versions.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
