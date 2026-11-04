@@ -66,6 +66,11 @@ async function getSellerContactEligibility(targetAccountId, accountTypeHint) {
     };
   }
 
+  /* تجميد الباقة المنتهية يغلب فترة الإطلاق — لا تُرسل جهات اتصال أبداً */
+  if (status === 'expired') {
+    return { canExpose: false, reason: status, isTrial: false, isExpired: true, subscriptionStatus: status };
+  }
+
   /* فترة الإطلاق المجانية: حساب موثّق أو قيد المراجعة في الأقسام المفتوحة يُعامل كباقة فعّالة */
   try {
     const launchMode = require('../config/launchMode');
@@ -88,10 +93,6 @@ async function getSellerContactEligibility(targetAccountId, accountTypeHint) {
       }
     }
   } catch (eLaunch) { /* ignore */ }
-
-  if (status === 'expired') {
-    return { canExpose: false, reason: status, isTrial: false, isExpired: true, subscriptionStatus: status };
-  }
   if (status === 'no_subscription' || status === 'pending') {
     return {
       canExpose: false,
@@ -276,6 +277,31 @@ async function toPublicAccountGated(acc, gate) {
   out.whatsapp = contact.whatsapp;
   out.hidePhone = contact.hidePhone;
   if (gate) out.contactAccess = { lockReason: gate.lockReason, fomoEligible: gate.fomoEligible };
+
+  /* أعلام التجميد — الواجهة تعرض فقط ما يرسله الخادم */
+  try {
+    const freeze = require('./packageFreeze');
+    const state = await freeze.resolveFreezeState(acc.id);
+    out.packageFrozen = !!state.packageFrozen;
+    out.packageArchived = !!state.packageArchived;
+    out.subscriptionStatus = state.subscriptionStatus;
+    out.inventoryUnconfirmed = !!state.inventoryUnconfirmed;
+    out.shareDisabled = !!state.shareDisabled;
+    out.renewCta = !!state.renewCta;
+    out.chatReadOnly = !state.canStartChat;
+    if (state.packageFrozen || state.packageArchived) {
+      out.unavailableMessage = state.unavailableAr;
+      out.renewMessage = state.messageAr;
+      /* لا روابط تواصل ولا QR/مشاركة من الخادم */
+      out.phone = null;
+      out.email = null;
+      out.whatsapp = null;
+      out.contactsLocked = true;
+      out.shareUrl = null;
+      out.qrPayload = null;
+      out.readyMessages = null;
+    }
+  } catch (eFreeze) { /* optional */ }
   // طرق الدفع حساسة — تُكشف فقط بعد فتح بوابة التواصل
   if (gate && gate.contactsUnlocked && Array.isArray(acc.paymentMethods) && acc.paymentMethods.length) {
     out.paymentMethods = acc.paymentMethods.slice(0, 10);

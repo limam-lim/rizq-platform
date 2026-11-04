@@ -195,9 +195,12 @@ function initSubscriptionLifecycle(accId, accType) {
 
     onExpiringReminder: function(sub) {
       _applyFeatureGates(sub);
+      var d = Number(sub.daysLeft) || 0;
+      var whenAr = d <= 0 ? 'اليوم' : (d === 1 ? 'غداً' : ('خلال ' + d + ' أيام'));
+      var whenFr = d <= 0 ? 'aujourd\'hui' : (d === 1 ? 'demain' : ('dans ' + d + ' jours'));
       _showSubBanner({
         icon:'⚠️', color:'#d97706',
-        title:_t2('باقتك تنتهي '+(sub.daysLeft<=0?'اليوم':'غداً')+'!','Votre forfait expire '+(sub.daysLeft<=0?'aujourd\'hui':'demain')+'!'),
+        title:_t2('باقتك تنتهي '+whenAr+'!','Votre forfait expire '+whenFr+'!'),
         msg: _t2('جدّد باقة <strong>'+sub.pkg+'</strong> الآن حتى لا تفقد مزاياك','Renouvelez le forfait <strong>'+sub.pkg+'</strong> maintenant pour ne pas perdre vos avantages'),
         cta:_t2('🔄 جدّد الآن','🔄 Renouveler maintenant'), ctaFn:'_openRenewalPanel()',
         urgent: true
@@ -207,15 +210,17 @@ function initSubscriptionLifecycle(accId, accType) {
     onExpired: function(sub) {
       _applyFeatureGates(sub);
       window._rizqDashReadOnly = true;
+      window._rizqPackageFrozen = true;
       var upgradeAr = 'انتهت الفترة المجانية. يرجى الاشتراك في إحدى الباقات لتتمكن من إضافة إعلانات جديدة وتفعيل زر الاتصال للزبائن';
       var upgradeFr = 'La période d’essai est terminée. Veuillez souscrire à une offre pour publier de nouvelles annonces et activer le bouton d’appel pour vos clients.';
       _showSubBanner({
         icon:'🔒', color:'#dc2626',
         title:_t2('انتهت الفترة المجانية / الاشتراك','Essai ou abonnement terminé'),
         msg:_t2(upgradeAr, upgradeFr),
-        cta:_t2('♻️ اشترك الآن','♻️ Souscrire maintenant'), ctaFn:'_openRenewalPanel()',
+        cta:_t2('🔄 جدّد الآن','🔄 Renouveler maintenant'), ctaFn:'_openRenewalPanel()',
         persistent: true
       });
+      _disableShareAndQrForFrozen();
       _showExpiredOverlay(sub);
       _applyDashboardReadOnly();
     },
@@ -2744,6 +2749,15 @@ function renderAgents(){
   var badge  = document.getElementById('auto-reply-badge');
   var content= document.getElementById('auto-reply-content');
   if(!badge||!content) return;
+  if(window._rizqPackageFrozen || window._rizqDashReadOnly){
+    badge.textContent=_t2('⏹ متوقف','⏹ Arrêté');
+    badge.style.cssText='background:#fee2e2;color:#991b1b;font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px';
+    content.innerHTML='<div style="padding:16px;border:1px solid rgba(201,168,76,.35);border-radius:12px;background:#fff">'+
+      '<div style="font-size:14px;font-weight:700;color:#0f1f3d;margin-bottom:8px">'+_t2('الوكيل الذكي متوقف','Agent intelligent arrêté')+'</div>'+
+      '<div style="font-size:13px;color:#2C3A4F;margin-bottom:12px">'+_t2('غير متاح للتواصل حالياً — جدّد باقتك لاستعادة الوكيل.','Indisponible pour le moment — renouvelez pour réactiver l\'agent.')+'</div>'+
+      '<button type="button" class="btn btn-gold btn-sm" onclick="_openRenewalPanel()">'+_t2('🔄 جدّد الآن','🔄 Renouveler maintenant')+'</button></div>';
+    return;
+  }
   if(isDiamond){
     badge.textContent=_t2('✅ مفعّل','✅ Activé');
     badge.style.cssText='background:#d1fae5;color:#065f46;font-size:11px;font-weight:700;padding:4px 12px;border-radius:10px';
@@ -2901,7 +2915,21 @@ init();
 
 // ══ Share & QR ══
 var _qrDone = false;
+function _disableShareAndQrForFrozen(){
+  window._rizqShareDisabled = true;
+  document.querySelectorAll('[onclick*="openShareModal"], [onclick*="printQRCode"]').forEach(function(el){
+    el.style.opacity = '0.45';
+    el.style.pointerEvents = 'none';
+    el.setAttribute('aria-disabled', 'true');
+    el.title = _t2('جدّد باقتك','Renouvelez votre forfait');
+  });
+}
 function openShareModal(){
+  if(window._rizqShareDisabled || window._rizqPackageFrozen || window._rizqDashReadOnly){
+    if(typeof showToast==='function') showToast(_t2('غير متاح — جدّد باقتك','Indisponible — renouvelez votre forfait'),'error');
+    if(typeof _openRenewalPanel==='function') _openRenewalPanel();
+    return;
+  }
   document.getElementById('share-modal').classList.add('open');
   if(!_qrDone && window.QRCode){
     var c = document.getElementById('qr-container');
@@ -2939,6 +2967,11 @@ function shareWhatsAppLink(){
   window.open('https://wa.me/?text='+encodeURIComponent(_t2('تفضّل بزيارة '+name+' على منصة رزق:\n','Découvrez '+name+' sur la plateforme Rizq :\n')+(i&&i.value||location.href)),'_blank');
 }
 function printQRCode(){
+  if(window._rizqShareDisabled || window._rizqPackageFrozen || window._rizqDashReadOnly){
+    if(typeof showToast==='function') showToast(_t2('غير متاح — جدّد باقتك','Indisponible — renouvelez votre forfait'),'error');
+    if(typeof _openRenewalPanel==='function') _openRenewalPanel();
+    return;
+  }
   var qr=document.getElementById('qr-container');
   if(!qr)return;
   var img=qr.querySelector('img')||qr.querySelector('canvas');

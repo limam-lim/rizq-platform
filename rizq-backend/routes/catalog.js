@@ -71,6 +71,16 @@ function mountCatalogRoutes(app, deps) {
     if (!b.name && b.title) b.name = b.title;
     const leak = catalogLeak(b);
     if (leak) return res.status(422).json(leak);
+    try {
+      await require('../services/packageFreeze').assertPackageAllowsWrite(b.accountId);
+    } catch (freezeErr) {
+      return res.status(freezeErr.status || 403).json({
+        ok: false,
+        error: freezeErr.message || 'جدّد باقتك',
+        code: freezeErr.code || 'package_expired',
+        details: freezeErr.details,
+      });
+    }
     const ent = await getEntitlements(b.accountId, acc.type);
     // الحد يشمل العناصر بانتظار المراجعة أيضاً (وإلا تُضاف عناصر بلا حد ثم تُعتمد كلها)
     const activeCount = (await readCatalog()).filter((it) => it.accountId === b.accountId && (it.status === 'active' || it.status === 'pending_review')).length;
@@ -79,7 +89,9 @@ function mountCatalogRoutes(app, deps) {
       assertCanAddCatalogItem(ent, activeCount);
       if (imageCount) assertPhotoCount(ent, imageCount);
     } catch (gateErr) {
-      return res.status(gateErr.status || 403).json({ ok: false, error: gateErr.message, code: gateErr.code, details: gateErr.details });
+      const code = gateErr.code === 'subscription_expired' ? 'package_expired' : gateErr.code;
+      const msg = code === 'package_expired' ? 'جدّد باقتك' : gateErr.message;
+      return res.status(gateErr.status || 403).json({ ok: false, error: msg, code: code, details: gateErr.details });
     }
     // Contextual binding: force server-side account identity (never trust client type alone)
     const accountType = String(acc.type || b.accountType || '').slice(0, 24);
@@ -306,7 +318,27 @@ function mountCatalogRoutes(app, deps) {
     }
     list = await applyPublicCatalogCaps(list);
     list = list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    res.json({ ok: true, items: list });
+    /* شارة «المخزون غير مؤكد» لصفحة محل مجمّد — الخادم يعلنها صراحة */
+    let inventoryUnconfirmed = false;
+    if (q.accountId) {
+      try {
+        const st = await require('../services/packageFreeze').resolveFreezeState(q.accountId);
+        inventoryUnconfirmed = !!st.inventoryUnconfirmed;
+        if (st.packageArchived) {
+          return res.status(404).json({ ok: false, error: 'account_archived', items: [] });
+        }
+      } catch (eInv) { /* */ }
+    }
+    const items = inventoryUnconfirmed
+      ? list.map((it) => Object.assign({}, it, {
+        inventoryUnconfirmed: true,
+        inventoryBadge: 'المخزون غير مؤكد',
+        phone: null,
+        email: null,
+        whatsapp: null,
+      }))
+      : list;
+    res.json({ ok: true, items: items, inventoryUnconfirmed: inventoryUnconfirmed });
   });
 
   /** GET /api/catalog/mine?accountId=... — كل عناصر صاحب الحساب (كل الحالات)، للوحة التحكم */
@@ -397,6 +429,18 @@ function mountCatalogRoutes(app, deps) {
     const token = req.header('x-account-token') || '';
     const isOwner = !!(item.accountId && await verifyAccountOwner(item.accountId, token));
     if (!isAdmin && !isOwner) return res.status(401).json({ error: 'unauthorized' });
+    if (!isAdmin && item.accountId) {
+      try {
+        await require('../services/packageFreeze').assertPackageAllowsWrite(item.accountId);
+      } catch (freezeErr) {
+        return res.status(freezeErr.status || 403).json({
+          ok: false,
+          error: freezeErr.message || 'جدّد باقتك',
+          code: freezeErr.code || 'package_expired',
+          details: freezeErr.details,
+        });
+      }
+    }
     const b = req.body || {};
     if (!isAdmin) {
       const leak = catalogLeak(b);

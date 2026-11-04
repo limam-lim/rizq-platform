@@ -347,9 +347,12 @@ function initSubscriptionLifecycle(accId, accType) {
 
     onExpiringReminder: function(sub) {
       _applyFeatureGates(sub);
+      var d = Number(sub.daysLeft) || 0;
+      var whenAr = d <= 0 ? 'اليوم' : (d === 1 ? 'غداً' : ('خلال ' + d + ' أيام'));
+      var whenFr = d <= 0 ? 'aujourd\'hui' : (d === 1 ? 'demain' : ('dans ' + d + ' jours'));
       _showSubBanner({
         icon:'⚠️', color:'#d97706',
-        title:_t2('باقتك تنتهي '+(sub.daysLeft<=0?'اليوم':'غداً')+'!','Votre forfait expire '+(sub.daysLeft<=0?'aujourd\'hui':'demain')+'!'),
+        title:_t2('باقتك تنتهي '+whenAr+'!','Votre forfait expire '+whenFr+'!'),
         msg: _t2('جدّد باقة <strong>'+sub.pkg+'</strong> الآن حتى لا تفقد مزاياك','Renouvelez le forfait <strong>'+sub.pkg+'</strong> maintenant pour ne pas perdre vos avantages'),
         cta:_t2('🔄 جدّد الآن','🔄 Renouveler maintenant'), ctaFn:'_openRenewalPanel()',
         urgent: true
@@ -358,13 +361,15 @@ function initSubscriptionLifecycle(accId, accType) {
 
     onExpired: function(sub) {
       _applyFeatureGates(sub);
+      window._rizqPackageFrozen = true;
+      window._rizqShareDisabled = true;
       var rem  = (sub.monthlyAdsRemaining !== undefined) ? sub.monthlyAdsRemaining : 0;
       var limit = sub.freeAdsLimit || 3;
       _showSubBanner({
         icon:'🔒', color:'#dc2626',
         title:_t2('انتهت باقتك — '+sub.pkg,'Votre forfait a expiré — '+sub.pkg),
         msg:_t2('حسابك على الخطة المجانية — <strong>'+rem+'/'+limit+'</strong> إعلانات متبقية هذا الشهر · شارة موثق ✅ محفوظة · إعلاناتك القديمة ظاهرة','Compte gratuit — <strong>'+rem+'/'+limit+'</strong> annonces restantes ce mois · Badge vérifié ✅ conservé · Vos anciennes annonces restent visibles'),
-        cta:_t2('♻️ جدّد الاشتراك','♻️ Renouveler l\'abonnement'), ctaFn:'_openRenewalPanel()',
+        cta:_t2('🔄 جدّد الآن','🔄 Renouveler maintenant'), ctaFn:'_openRenewalPanel()',
         persistent: true
       });
       _showExpiredOverlay(sub);
@@ -1798,6 +1803,11 @@ init();
 
 var _qrDone=false;
 function openShareModal(){
+  if(window._rizqShareDisabled || window._rizqPackageFrozen){
+    if(typeof showToast==='function') showToast(_t2('غير متاح — جدّد باقتك','Indisponible — renouvelez votre forfait'),'error');
+    if(typeof _openRenewalPanel==='function') _openRenewalPanel();
+    return;
+  }
   document.getElementById('share-modal').classList.add('open');
   if(!_qrDone&&window.QRCode){
     var c=document.getElementById('qr-container');
@@ -1815,7 +1825,14 @@ function copyShareLink(){
   } else { _fallback(); }
 }
 function shareWhatsAppLink(){var i=document.getElementById('share-link-input');var name=(OFFICE&&OFFICE.name)||_t2('مكتبنا','notre bureau');window.open('https://wa.me/?text='+encodeURIComponent(_t2('تفضّل بزيارة ','Visitez ')+name+_t2(' على منصة رزق:\n',' sur la plateforme Rizq :\n')+(i&&i.value||location.href)),'_blank');}
-function printQRCode(){var qr=document.getElementById('qr-container');if(!qr)return;var img=qr.querySelector('img')||qr.querySelector('canvas');if(!img){showToast(_t2('انتظر تحميل QR','Attendez le chargement du QR'),'error');return;}var src=img.src||(img.toDataURL&&img.toDataURL());var name=(OFFICE&&OFFICE.name)||_t2('مكتبنا','notre bureau');var isFr=_officeLang==='fr';var qrTitle=_t2('داشبورد المكتب','Tableau de bord bureau');var qrScan=_t2('امسح QR لزيارة الصفحة','Scannez le QR pour visiter la page');var qrBrand=_t2('منصة رزق · rizq.mr','Plateforme Rizq · rizq.mr');var w=window.open('','_blank');w.document.write('<html dir="'+(isFr?'ltr':'rtl')+'" lang="'+(isFr?'fr':'ar')+'"><head><title>'+qrTitle+' · v1781382349</title></head><body><!-- RIZQ-BUILD:202606131951 --><h2>'+name+'</h2><img src="'+src+'" width="200" height="200"><p>'+qrScan+'</p><p style="color:#C9A84C;font-weight:700">'+qrBrand+'</p></body></html>');w.print();}
+function printQRCode(){
+  if(window._rizqShareDisabled || window._rizqPackageFrozen){
+    if(typeof showToast==='function') showToast(_t2('غير متاح — جدّد باقتك','Indisponible — renouvelez votre forfait'),'error');
+    if(typeof _openRenewalPanel==='function') _openRenewalPanel();
+    return;
+  }
+  var qr=document.getElementById('qr-container');if(!qr)return;var img=qr.querySelector('img')||qr.querySelector('canvas');if(!img){showToast(_t2('انتظر تحميل QR','Attendez le chargement du QR'),'error');return;}var src=img.src||(img.toDataURL&&img.toDataURL());var name=(OFFICE&&OFFICE.name)||_t2('مكتبنا','notre bureau');var isFr=_officeLang==='fr';var qrTitle=_t2('داشبورد المكتب','Tableau de bord bureau');var qrScan=_t2('امسح QR لزيارة الصفحة','Scannez le QR pour visiter la page');var qrBrand=_t2('منصة رزق · rizq.mr','Plateforme Rizq · rizq.mr');var w=window.open('','_blank');w.document.write('<html dir="'+(isFr?'ltr':'rtl')+'" lang="'+(isFr?'fr':'ar')+'"><head><title>'+qrTitle+' · v1781382349</title></head><body><!-- RIZQ-BUILD:202606131951 --><h2>'+name+'</h2><img src="'+src+'" width="200" height="200"><p>'+qrScan+'</p><p style="color:#C9A84C;font-weight:700">'+qrBrand+'</p></body></html>');w.print();
+}
 
 
 ;

@@ -116,6 +116,7 @@ function mountAccountsManageRoutes(app, deps) {
     const viewerId = await resolveOptionalAccountViewer(req);
     const q = req.query || {};
     const platformStore = require('../db/platformStore');
+    const freeze = require('../services/packageFreeze');
     const filters = {
       type: q.type || q.category || '',
       city: q.city || '',
@@ -127,14 +128,19 @@ function mountAccountsManageRoutes(app, deps) {
       filters.limit = q.limit;
       filters.offset = q.offset || 0;
     }
-    const { total, accounts: list } = await platformStore.queryPublicAccounts(filters);
+    const { accounts: list } = await platformStore.queryPublicAccounts(filters);
     const accounts = [];
     for (const acc of list) {
+      /* الدليل/البحث: باقة فعّالة فقط — المنتهية تُفلتر (المكاتب تختفي من الدليل) */
+      try {
+        const pkg = await freeze.getPackageRecord(acc.id);
+        if (!freeze.isPackageListable(pkg)) continue;
+      } catch (eF) { continue; }
       accounts.push(await toPublicAccountForViewer(acc, viewerId));
     }
     res.json({
       ok: true,
-      total,
+      total: accounts.length,
       accounts,
       viewerId: viewerId || null,
     });
@@ -152,7 +158,38 @@ function mountAccountsManageRoutes(app, deps) {
     if (!acc || acc.status !== 'approved' || acc.suspended || String(acc.id || '').startsWith('acc_demo') || isSentinelAccount(acc)) {
       return res.status(404).json({ ok: false, error: 'account_not_found' });
     }
+    try {
+      const freeze = require('../services/packageFreeze');
+      const state = await freeze.resolveFreezeState(acc.id);
+      if (state.packageArchived) {
+        return res.status(404).json({
+          ok: false,
+          error: 'account_archived',
+          message: state.messageAr || 'جدّد باقتك',
+          packageArchived: true,
+        });
+      }
+    } catch (eArch) { /* keep serving */ }
     res.json({ ok: true, account: await toPublicAccountForViewer(acc, viewerId) });
+  });
+
+  /**
+   * GET /api/accounts/public/:id/og — معاينة رابط بلا أي وسيلة اتصال
+   * (Open Graph / Twitter) — الخادم مصدر الحقيقة عند التجميد.
+   */
+  app.get('/api/accounts/public/:id/og', async (req, res) => {
+    res.set('Cache-Control', 'public, max-age=60');
+    const acc = (await readAccounts()).find((a) => a && a.id === req.params.id);
+    const { isSentinelAccount } = require('../lib/sentinelAccount');
+    if (!acc || acc.status !== 'approved' || acc.suspended || String(acc.id || '').startsWith('acc_demo') || isSentinelAccount(acc)) {
+      return res.status(404).json({ ok: false, error: 'account_not_found' });
+    }
+    const freeze = require('../services/packageFreeze');
+    const state = await freeze.resolveFreezeState(acc.id);
+    if (state.packageArchived) {
+      return res.status(404).json({ ok: false, error: 'account_archived', packageArchived: true });
+    }
+    return res.json(freeze.buildFrozenOgMeta(acc, state));
   });
 
   /**
