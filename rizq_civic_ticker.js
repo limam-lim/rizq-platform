@@ -257,6 +257,7 @@
     }
 
     inner.innerHTML = html + html;
+    /* لا تُسقط الشريط من التدفق؛ min-height محجوز بـ CSS للهيدر الموحّد بغضّ النظر عن is-invite */
     wrap.classList.remove('is-empty', 'is-invite');
     wrap.setAttribute('role', 'marquee');
     wrap.setAttribute('aria-label', getLang() === 'fr'

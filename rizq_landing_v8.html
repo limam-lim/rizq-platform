@@ -31,7 +31,20 @@
 <style id="rizq-nav-fouc-guard">
 /* Critical: before external CSS — prevent navy bar + blue link flash on refresh */
 html,body{background:#eef2f8}
-#rizq-mock-hdr{background:#0a1628;color:#fff}
+#rizq-mock-hdr{position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:10050!important;background:#0a1628;color:#fff}
+/* CLS: شبكة الصف الرئيسي قبل mock CSS — إن أُعيد تحميل الشيت لا ينهار brand|search|tools */
+#rizq-mock-hdr .rmh-main,.rmh-main{
+  display:grid!important;
+  grid-template-columns:minmax(120px,1fr) minmax(280px,460px) minmax(120px,1fr)!important;
+  grid-template-rows:auto!important;align-items:center!important;gap:12px!important;
+  padding:8px 20px!important;box-sizing:border-box!important;background:#0a1628!important;
+}
+#rizq-mock-hdr .rmh-brand,.rmh-brand{grid-column:1!important;grid-row:1!important;justify-self:start!important}
+#rizq-mock-hdr .rmh-search,.rmh-search{grid-column:2!important;grid-row:1!important;justify-self:center!important;width:100%!important;max-width:460px!important;min-width:0!important}
+#rizq-mock-hdr .rmh-tools,.rmh-tools{
+  grid-column:3!important;grid-row:1!important;justify-self:end!important;
+  display:flex!important;align-items:center!important;gap:7px!important;flex-shrink:0!important;
+}
 #rizq-mock-hdr nav.rmh-nav,nav.rmh-nav{
   display:flex!important;flex-wrap:nowrap;align-items:center;gap:2px;
   background:#0a1628!important;background-image:none!important;color:#fff!important;
@@ -57,6 +70,15 @@ body.rizq-mockup-hdr-trial{
     --rizq-mock-hdr-h:180px;
     --rizq-header-h:180px;
   }
+  /* هاتف: بحث صف ثانٍ قبل mock CSS — لا تُبقِ شبكة سطح المكتب */
+  #rizq-mock-hdr .rmh-main,.rmh-main{
+    grid-template-columns:auto minmax(0,1fr) auto!important;
+    grid-template-areas:"brand . tools" "search search search"!important;
+    gap:6px 8px!important;padding:8px 10px 7px!important;
+  }
+  #rizq-mock-hdr .rmh-brand,.rmh-brand{grid-area:brand!important;grid-column:1!important;grid-row:1!important}
+  #rizq-mock-hdr .rmh-tools,.rmh-tools{grid-area:tools!important;grid-column:3!important;grid-row:1!important}
+  #rizq-mock-hdr .rmh-search,.rmh-search{grid-area:search!important;grid-column:1/-1!important;grid-row:2!important;max-width:none!important;justify-self:stretch!important}
   /* Critical: ثبّت شريط الهاتف السفلي قبل وصول mockup CSS */
   body.rmh-phone-nav-split #rizq-mock-hdr nav.rmh-nav:not(.rmh-nav-top),
   body.rmh-phone-nav-split nav.rmh-nav:not(.rmh-nav-top){
@@ -79,19 +101,19 @@ body.rizq-mockup-hdr-trial{
   width:18px!important;height:18px!important;display:block!important;
   overflow:hidden!important;flex:0 0 auto;
 }
-/* تيكر النموذج نسبي من أول طلاء — لا fixed→relative متأخر */
+/* تيكر النموذج نسبي من أول طلاء — لا fixed→relative متأخر؛ min-height حتمي بلا اعتماد على is-invite */
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap,
 #rizq-mock-hdr > .ticker-wrap{
   position:relative!important;top:auto!important;left:auto!important;right:auto!important;
   z-index:1!important;transform:none!important;
+  min-height:28px!important;padding:2px 0!important;box-sizing:border-box!important;
 }
-/* is-empty = مخفي من الأدمن فقط؛ is-invite = رسالة هوية محجوزة الارتفاع (بلا قفزة CLS) */
+/* is-empty = مخفي من الأدمن فقط؛ is-invite = رسالة هوية (الارتفاع محجوز أعلاه دائماً) */
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-empty,
-#rizq-mock-hdr > .ticker-wrap.is-empty{display:none!important}
+#rizq-mock-hdr > .ticker-wrap.is-empty{display:none!important;min-height:0!important;padding:0!important}
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-invite,
 #rizq-mock-hdr > .ticker-wrap.is-invite{
   display:block!important;position:relative!important;top:auto!important;
-  min-height:28px!important;padding:2px 0!important;
 }
 </style>
 
@@ -139,7 +161,7 @@ body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-invite,
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.95"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.97"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — الشريط القديم متوقف نهائياً */
@@ -147,8 +169,17 @@ document.documentElement.classList.add('rizq-app-nav');
 <style id="rizq-mobile-header-critical">
 /* منع وميض التحديث: شريط .rmh-nav كحلي بنص أزرق المتصفح قبل اكتمال mockup CSS */
 #rizq-mock-hdr{
+  position:fixed!important;top:0!important;left:0!important;right:0!important;z-index:10050!important;
   background:#0a1628;color:#fff;
 }
+#rizq-mock-hdr .rmh-main,.rmh-main{
+  display:grid!important;
+  grid-template-columns:minmax(120px,1fr) minmax(280px,460px) minmax(120px,1fr)!important;
+  align-items:center!important;gap:12px!important;padding:8px 20px!important;box-sizing:border-box!important;
+}
+#rizq-mock-hdr .rmh-brand,.rmh-brand{grid-column:1!important;grid-row:1!important;justify-self:start!important}
+#rizq-mock-hdr .rmh-search,.rmh-search{grid-column:2!important;grid-row:1!important;justify-self:center!important;width:100%!important;max-width:460px!important;min-width:0!important}
+#rizq-mock-hdr .rmh-tools,.rmh-tools{grid-column:3!important;grid-row:1!important;justify-self:end!important;display:flex!important;align-items:center!important;gap:7px!important}
 #rizq-mock-hdr nav.rmh-nav,
 nav.rmh-nav{
   display:flex!important;flex-wrap:nowrap;align-items:center;gap:2px;
@@ -595,13 +626,13 @@ html.rizq-orbs-ready .hero-orb1,html.rizq-orbs-ready .hero-orb2,html.rizq-orbs-r
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap,
 #rizq-mock-hdr > .ticker-wrap{
   position:relative!important;top:auto!important;left:auto!important;right:auto!important;z-index:1!important;
-  transform:none!important;padding:2px 0!important;
+  transform:none!important;padding:2px 0!important;min-height:28px!important;box-sizing:border-box!important;
 }
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-empty,
-#rizq-mock-hdr > .ticker-wrap.is-empty{display:none!important}
+#rizq-mock-hdr > .ticker-wrap.is-empty{display:none!important;min-height:0!important;padding:0!important}
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-invite,
 #rizq-mock-hdr > .ticker-wrap.is-invite{
-  display:block!important;position:relative!important;min-height:28px!important;padding:2px 0!important;
+  display:block!important;position:relative!important;
 }
 .ticker-wrap.is-invite .ticker-item{opacity:.92}
 /* مخفي دائماً في الواجهة العامة — المنطق الخلفي (launchDate/freeDays) يبقى */
@@ -2473,7 +2504,7 @@ html[dir="ltr"] #all-ads-title{
   position:relative;z-index:2;width:100%;overflow:visible;
   padding:8px 0 52px;
   /* حجز المساحة بهيكل min-height فقط — ممنوع height ثابت + overflow:hidden */
-  min-height:426px;
+  min-height:426px!important;
   /* ابعد عنوان «مباشر» عن قرص البحث الثابت عند التمرير */
   scroll-margin-top:calc(var(--rizq-search-top, 110px) + 56px);
 }
@@ -4544,8 +4575,13 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 
 /* Restore every landing block that fade-in had left invisible */
 #categories,#listings,#virtual-stores,#rizq-styles,#virtual-showrooms,#virtual-estate,#rizq-showroom-models,#virtual-offices,#virtual-tenders,#virtual-investments,
-#about,#prices,#pricing,#hero-listings,.listings-section,.why-section,.pricing-section,.cta-section,.section{
+#about,#prices,#pricing,.listings-section,.why-section,.pricing-section,.cta-section,.section{
   visibility:visible!important;opacity:1!important;height:auto!important;max-height:none!important;
+}
+/* #hero-listings: لا height:auto — أبقِ min-height حتى لا ينهار الشريط عند تفريغ البطاقات (CLS) */
+#hero-listings{
+  visibility:visible!important;opacity:1!important;max-height:none!important;
+  min-height:426px!important;
 }
 /* تخفيف الرسم أسفل الطية — يبقى المحتوى قابلاً للتمرير دون كسر الظهور */
 #virtual-stores,#virtual-showrooms,#virtual-estate,#virtual-offices,#virtual-tenders,#virtual-investments,
@@ -5418,9 +5454,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 </script>
     <script src="rizq_announcements.js"></script>
     <script src="rizq_marquee_kit.js?v=1.3"></script>
-    <script src="rizq_civic_ticker.js?v=1.6"></script>
+    <script src="rizq_civic_ticker.js?v=1.7"></script>
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_header_mockup_trial.js?v=5.95"></script>
+<script src="rizq_header_mockup_trial.js?v=5.97"></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
@@ -5429,7 +5465,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_contact_gate.js"></script>
 <script src="rizq_dynamic_nav.js?v=23.5"></script>
 <script src="rizq_module_flags.js?v=1.2"></script>
-<script src="rizq_pwa.js?v=31.28" defer></script>
+<script src="rizq_pwa.js?v=31.29" defer></script>
 <script src="rizq_footer_toggle.js?v=23.8" defer></script>
 <script src="rizq_social_links.js?v=23.13" defer></script>
 <script src="rizq_account_route.js?v=23.0"></script>
@@ -7814,14 +7850,26 @@ function buildCards(){
   if(window.RizqAdCards && typeof RizqAdCards.seedDemoGalleries === 'function'){
     try{ RizqAdCards.seedDemoGalleries(ADS); RizqAdCards.seedDemoGalleries(FEATURED_ADS); }catch(eSeed){}
   }
-  track.innerHTML='';
   var source = (typeof ADS !== 'undefined' ? ADS : []).filter(_adHasPublicTitle);
   if(!source.length){
-    /* أبقِ min-height — display:none يُسقط الشريط ويحرّك #categories (CLS) */
+    /* لا تُفرّغ الهيكل العظمي — إفراغ #cards-track يُسقط ارتفاع الشريط رغم min-height في بعض المسارات */
     var heroSecEmpty=document.getElementById('hero-listings');
     if(heroSecEmpty) heroSecEmpty.style.display='';
+    if(track && !track.querySelector('.ad-card')){
+      var sk0='', si0;
+      for(si0=0; si0<5; si0++){
+        sk0 += '<div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true">'
+          + '<div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div>'
+          + '<div style="padding:12px;display:flex;flex-direction:column;gap:8px">'
+          + '<div class="rizq-skel rizq-skel-line mid" style="margin:0"></div>'
+          + '<div class="rizq-skel rizq-skel-line short" style="margin:0"></div>'
+          + '</div></div>';
+      }
+      track.innerHTML = sk0;
+    }
     return;
   }
+  track.innerHTML='';
   var heroSec=document.getElementById('hero-listings');
   if(heroSec) heroSec.style.display='';
   function _escCard(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
