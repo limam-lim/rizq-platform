@@ -56,6 +56,7 @@
     "test:ops-1": "node scripts/run-with-test-db.js scripts/test-ops-1.js",
     "test:caddy-security": "node scripts/run-with-test-db.js scripts/test-caddy-security.js",
     "test:package-credit": "node scripts/run-with-test-db.js scripts/test-package-credit.js",
+    "test:header-layout": "node ../qa/cls-1/test-header-layout.js",
     "test:home-catalog": "STRICT_HOME_WIRING=1 node scripts/run-with-test-db.js scripts/test-home-catalog.js",
     "test:monthly-only": "node scripts/run-with-test-db.js scripts/test-monthly-only.js",
     "admin:2fa": "node scripts/admin-2fa.js",
