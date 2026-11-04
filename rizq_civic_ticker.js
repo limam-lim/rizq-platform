@@ -199,10 +199,35 @@
   }
 
   function hideStrip(wrap) {
+    /* إخفاء أدمن فقط — يُسقط الشريط من التدفق */
     if (!wrap) return;
     wrap.classList.add('is-empty', 'civic-ticker-wrap');
-    wrap.classList.remove('ticker-has-urgent');
+    wrap.classList.remove('is-invite', 'ticker-has-urgent');
     try { document.documentElement.style.setProperty('--rizq-ticker-h', '0px'); } catch (e) {}
+  }
+
+  function inviteHtml() {
+    var fr = getLang() === 'fr';
+    var msg = fr
+      ? 'Soyez le premier à publier votre annonce sur Rizq'
+      : 'كن أول من ينشر إعلانه على رزق';
+    return '<div class="ticker-item ticker-invite">'
+      + '<div class="ticker-dot"></div>'
+      + '<span data-ar="كن أول من ينشر إعلانه على رزق" data-fr="Soyez le premier à publier votre annonce sur Rizq">'
+      + msg + '</span></div>';
+  }
+
+  function showInviteStrip(wrap, inner) {
+    /* قائمة فارغة: رسالة هوية محجوزة الارتفاع من أول طلاء — بلا قفزة CLS */
+    if (!wrap || !inner) return;
+    wrap.classList.add('civic-ticker-wrap', 'is-invite');
+    wrap.classList.remove('is-empty', 'ticker-has-urgent');
+    inner.innerHTML = inviteHtml();
+    wrap.setAttribute('role', 'status');
+    wrap.setAttribute('aria-label', getLang() === 'fr'
+      ? 'Invitation à publier sur Rizq'
+      : 'دعوة للنشر على رزق');
+    try { document.documentElement.style.setProperty('--rizq-ticker-h', '42px'); } catch (e) {}
   }
 
   function render(list) {
@@ -220,20 +245,19 @@
     }
 
     var active = sortedActive(list);
-    /* قائمة فارغة صراحة = إخفاء — لا تُظهر FALLBACK هنا (كان يفتح الشريط بعد is-empty → CLS ~1.2) */
     if (!active.length) {
-      hideStrip(wrap);
+      showInviteStrip(wrap, inner);
       return;
     }
 
     var html = active.map(buildItemHtml).filter(Boolean).join('');
     if (!html) {
-      hideStrip(wrap);
+      showInviteStrip(wrap, inner);
       return;
     }
 
     inner.innerHTML = html + html;
-    wrap.classList.remove('is-empty');
+    wrap.classList.remove('is-empty', 'is-invite');
     wrap.setAttribute('role', 'marquee');
     wrap.setAttribute('aria-label', getLang() === 'fr'
       ? 'Annonces de service public'
@@ -305,11 +329,12 @@
 
   function init() {
     var cached = fromCache();
-    /* لا تُظهر FALLBACK قبل معرفة إعدادات الخادم — يمنع قفزة التيكر بعد أول طلاء */
+    /* الدعوة محجوزة في HTML من أول طلاء؛ إن وُجد كاش نعرضه فوراً */
     if (cached.length) render(cached);
     else {
       var wrap0 = document.getElementById('ticker-wrap');
-      if (wrap0) hideStrip(wrap0);
+      var inner0 = document.getElementById('ticker');
+      if (wrap0) showInviteStrip(wrap0, inner0);
     }
 
     fetchRemote().then(function (remote) {
@@ -319,15 +344,17 @@
           applyRemote(remote);
         } else {
           if (typeof remote.hidden === 'boolean') setStripHidden(remote.hidden);
-          if (cached.length) render(cached);
-          else {
-            var wrapHide = document.getElementById('ticker-wrap');
-            if (wrapHide) hideStrip(wrapHide);
+          if (isStripHidden()) {
+            hideStrip(document.getElementById('ticker-wrap'));
+          } else if (cached.length) {
+            render(cached);
+          } else {
+            showInviteStrip(document.getElementById('ticker-wrap'), document.getElementById('ticker'));
           }
         }
       } else if (!cached.length) {
-        /* بلا خلفية/شبكة: FALLBACK للعرض التجريبي فقط */
-        render(FALLBACK);
+        /* بلا شبكة: أبقِ الدعوة المحجوزة (لا FALLBACK طوارئ بعد الطلاء) */
+        showInviteStrip(document.getElementById('ticker-wrap'), document.getElementById('ticker'));
       }
     });
 
@@ -361,10 +388,9 @@
   // توافق: نداءات قديمة كانت تملأ الشريط من عناوين الإعلانات التجارية
   global.renderTickerFromAds = function () {
     if (!document.getElementById('ticker-wrap') || !document.getElementById('ticker')) return;
-    /* التوافق القديم: لا تخلط إعلانات تجارية مع الشريط المدني، ولا تُظهر FALLBACK هنا */
     var cached = fromCache();
     if (cached.length) render(cached);
-    else hideStrip(document.getElementById('ticker-wrap'));
+    else showInviteStrip(document.getElementById('ticker-wrap'), document.getElementById('ticker'));
   };
 
   if (document.readyState === 'loading') {

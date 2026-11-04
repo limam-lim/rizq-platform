@@ -37,7 +37,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.92';
+    link.href = 'rizq_header_mockup_trial.css?v=5.93';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -67,8 +67,9 @@
     return '' +
       '<header id="rizq-mock-hdr" aria-label="شريط رزق">' +
       '<div class="rmh-util" hidden></div>' +
-      '<div class="ticker-wrap is-empty civic-ticker-wrap rmh-ticker" id="ticker-wrap" role="marquee" aria-label="إعلانات خدمة عامة">' +
-      '<div class="ticker-inner" id="ticker"></div></div>' +
+      '<div class="ticker-wrap is-invite civic-ticker-wrap rmh-ticker" id="ticker-wrap" role="status" aria-label="دعوة للنشر على رزق">' +
+      '<div class="ticker-inner" id="ticker"><div class="ticker-item ticker-invite"><div class="ticker-dot"></div>' +
+      '<span data-ar="كن أول من ينشر إعلانه على رزق" data-fr="Soyez le premier à publier votre annonce sur Rizq">كن أول من ينشر إعلانه على رزق</span></div></div></div>' +
       '<div class="rmh-main">' +
       '<a class="rmh-brand logo" href="rizq_landing_v8.html" aria-label="رزق" id="rmh-brand">' +
       '<img class="logo-mark-img rmh-mark" src="rizq-mark-inset.png?v=1" width="44" height="44" alt="رزق" decoding="async"/>' +

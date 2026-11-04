@@ -85,8 +85,14 @@ body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap,
   position:relative!important;top:auto!important;left:auto!important;right:auto!important;
   z-index:1!important;transform:none!important;
 }
+/* is-empty = مخفي من الأدمن فقط؛ is-invite = رسالة هوية محجوزة الارتفاع (بلا قفزة CLS) */
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-empty,
 #rizq-mock-hdr > .ticker-wrap.is-empty{display:none!important}
+body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-invite,
+#rizq-mock-hdr > .ticker-wrap.is-invite{
+  display:block!important;position:relative!important;top:auto!important;
+  min-height:28px!important;padding:2px 0!important;
+}
 </style>
 
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -133,7 +139,7 @@ body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-empty,
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.92"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.93"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — الشريط القديم متوقف نهائياً */
@@ -593,6 +599,11 @@ body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap,
 }
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-empty,
 #rizq-mock-hdr > .ticker-wrap.is-empty{display:none!important}
+body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-invite,
+#rizq-mock-hdr > .ticker-wrap.is-invite{
+  display:block!important;position:relative!important;min-height:28px!important;padding:2px 0!important;
+}
+.ticker-wrap.is-invite .ticker-item{opacity:.92}
 /* مخفي دائماً في الواجهة العامة — المنطق الخلفي (launchDate/freeDays) يبقى */
 .rizq-free-countdown,
 .rizq-free-countdown.is-on,
@@ -602,7 +613,8 @@ body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-empty,
   overflow:hidden!important;padding:0!important;margin:0!important;border:0!important;
 }
 .ticker-wrap.is-empty{display:none}
-html:has(#ticker-wrap:not(.is-empty)){--rizq-ticker-h:42px}
+html:has(#ticker-wrap:not(.is-empty)),
+html:has(#ticker-wrap.is-invite){--rizq-ticker-h:42px}
 /* شريط القفز الثانوي مُلغى — لا يعيد ضبط موضعه فوق التيكر */
 html:has(#ticker-wrap:not(.is-empty)) .section-jump-bar,
 html.rizq-has-announce .section-jump-bar{
@@ -3658,7 +3670,8 @@ main, .page-content.active, .main-content, .results-area,
 .logo-text{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right;direction:ltr}
 
 /* Animations */
-@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+/* fadeUp: opacity + transform فقط (translateY) — بلا خصائص تخطيط تسبب CLS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 @keyframes fb1{0%,100%{transform:rotate(-3deg) translate(0,0)}50%{transform:rotate(3deg) translate(-4px,-6px)}}
 @keyframes fb2{0%,100%{transform:rotate(3deg) translate(0,0)}50%{transform:rotate(-3deg) translate(4px,-4px)}}
@@ -4496,8 +4509,9 @@ body.rizq-reg-open #modal .modal-box p{color:#475569 !important}
 @keyframes rzqShine{0%,40%{left:-45%}70%,100%{left:115%}}
 
 /* طفو خفيف — للأسفل فقط حتى لا تُقصّ كبسولة رزق تحت الهيدر الثابت */
-.hero-title-card{animation:rzqFloat 4.5s ease-in-out infinite}
-.hero-vid-wrap:not(.hero-vid-compact){animation:rzqFloat 5.5s ease-in-out infinite .4s}
+/* fadeUp أولاً (opacity+translateY) ثم rzqFloat بعد انتهاء الدخول — بدونoverwrite للظهور */
+.hero-title-card{animation:fadeUp .8s ease both,rzqFloat 4.5s ease-in-out .8s infinite}
+.hero-vid-wrap:not(.hero-vid-compact){animation:fadeUp .8s .28s ease both,rzqFloat 5.5s ease-in-out 1.1s infinite}
 .hero-spaces-title,.hero-browse-title,.hero-tagline{
   font-family:'Noto Naskh Arabic','Cairo',Georgia,serif!important;
 }
@@ -5340,12 +5354,14 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   #hero-listings.hero-promo-strip,
   .hero-listings-section{min-height:470px!important}
 }
-/* إلغاء fadeUp فوق الطية — translateY كان يُنسب كـ CLS (~0.35) */
-.hero-eyebrow,.hero-title-card,.hero-brand-row .hero-eyebrow,.hero-subtitle-card,
-.hero-subtitle-primary,.hero-subtitle-secondary,.hero-stage,
-.hero > #hero-listings.hero-promo-strip,#hero-listings.hero-promo-strip,
-.listings-label,.hero-search,.quick-cats,.hero-lead-row,.hero-headline,.hero-headline em{
-  animation:none!important;transform:none!important;opacity:1!important;
+/* fadeUp موحّد: opacity + transform فقط (لا width/height/top/margin) */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(24px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes fadeUpMotion{
+  from{opacity:0;transform:translateY(30px)}
+  to{opacity:1;transform:translateY(0)}
 }
 #builtin-cats-mount:empty::before{
   content:'';display:block;min-height:120px;
@@ -5402,9 +5418,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 </script>
     <script src="rizq_announcements.js"></script>
     <script src="rizq_marquee_kit.js?v=1.3"></script>
-    <script src="rizq_civic_ticker.js?v=1.4"></script>
+    <script src="rizq_civic_ticker.js?v=1.6"></script>
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_header_mockup_trial.js?v=5.92"></script>
+<script src="rizq_header_mockup_trial.js?v=5.93"></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
@@ -5413,7 +5429,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_contact_gate.js"></script>
 <script src="rizq_dynamic_nav.js?v=23.5"></script>
 <script src="rizq_module_flags.js?v=1.2"></script>
-<script src="rizq_pwa.js?v=31.27" defer></script>
+<script src="rizq_pwa.js?v=31.28" defer></script>
 <script src="rizq_footer_toggle.js?v=23.8" defer></script>
 <script src="rizq_social_links.js?v=23.13" defer></script>
 <script src="rizq_account_route.js?v=23.0"></script>
@@ -5504,8 +5520,8 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
     <span class="rmh-util-notice">تنويه خدمة عامة — تحقق من المصادر الرسمية قبل إعادة النشر</span>
   </div>
   <!-- شريط الخدمة العامة / الطوارئ — يُدار من الأدمن ويتحرك -->
-  <div class="ticker-wrap is-empty civic-ticker-wrap rmh-ticker" id="ticker-wrap" role="marquee" aria-label="إعلانات خدمة عامة">
-    <div class="ticker-inner" id="ticker"></div>
+  <div class="ticker-wrap is-invite civic-ticker-wrap rmh-ticker" id="ticker-wrap" role="status" aria-label="دعوة للنشر على رزق">
+    <div class="ticker-inner" id="ticker"><div class="ticker-item ticker-invite"><div class="ticker-dot"></div><span data-ar="كن أول من ينشر إعلانه على رزق" data-fr="Soyez le premier à publier votre annonce sur Rizq">كن أول من ينشر إعلانه على رزق</span></div></div>
   </div>
   <div id="rizq-free-countdown" class="rizq-free-countdown" hidden role="status" aria-live="polite"></div>
   <div class="rmh-main">

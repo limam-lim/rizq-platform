@@ -131,6 +131,7 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial .rizq-thumb-dock{
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-empty{
   display:none!important;
 }
+body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-invite,
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap:not(.is-empty){
   display:block!important;
   position:relative!important;
@@ -139,14 +140,16 @@ body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap:not(.is-empty){
   margin:0!important;
   border-radius:0!important;
   padding:2px 0!important;
-  min-height:0!important;
+  min-height:28px!important;
   height:auto!important;
   font-size:11px!important;
   line-height:1.15!important;
   border-top-width:1px!important;
   border-bottom-width:1px!important;
 }
+body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-invite .ticker-inner,
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap:not(.is-empty) .ticker-inner,
+body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-invite #ticker,
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap:not(.is-empty) #ticker{
   font-size:11px!important;
   line-height:1.15!important;
@@ -154,12 +157,14 @@ body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap:not(.is-empty) #ticker{
   margin:0!important;
   align-items:center!important;
 }
+body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-invite .ticker-item,
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap:not(.is-empty) .ticker-item{
   font-size:11px!important;
   line-height:1.15!important;
   padding:0 22px!important;
   gap:6px!important;
 }
+body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-invite .ticker-dot,
 body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap:not(.is-empty) .ticker-dot{
   width:4px!important;height:4px!important;
 }
@@ -208,7 +213,8 @@ body.rizq-mockup-hdr-trial .hero-title-card{
   align-items:center!important;
   justify-content:center!important;
   overflow:hidden!important;
-  animation:none!important;
+  /* أبقِ fadeUp مرئياً (opacity+transform فقط) ثم الطفو — كان animation:none يقتل الظهور */
+  animation:fadeUp .8s ease both,rzqFloat 4.5s ease-in-out .8s infinite!important;
   padding:10px 22px!important;
   margin:0 auto!important;
   min-height:0!important;
