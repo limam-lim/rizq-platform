@@ -5464,27 +5464,35 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   window.addEventListener('load', unlockRizqPage);
 })();
 </script>
-    <script src="rizq_announcements.js"></script>
-    <script src="rizq_marquee_kit.js?v=1.3"></script>
-    <script src="rizq_civic_ticker.js?v=1.7"></script>
-<script src="rizq_backend_config.js"></script>
-<script src="rizq_header_mockup_trial.js?v=5.97"></script>
-<script src="rizq_phone_utils.js?v=1.0"></script>
-    <script src="rizq_site_banner.js"></script>
-<script src="rizq_input_bidi.js?v=23.4"></script>
-<script src="rizq_terms_gate.js?v=23.0"></script>
-<script src="rizq_verification_policy.js"></script>
-<script src="rizq_contact_gate.js"></script>
-<script src="rizq_dynamic_nav.js?v=23.5"></script>
-<script src="rizq_module_flags.js?v=1.2"></script>
+    <!--
+      SYNC-ALLOWED (قبل الرسم — صغير ومتزامن فقط):
+      1) سكربت lang/dir في أعلى <head>
+      2) سكربت scrollRestoration / pinTop
+      3) سكربت إضافة rizq-app-nav على html
+      4) سكربت rmh-phone-nav-split على <body> مباشرة
+      باقي السكربتات الخارجية: defer (يحفظ الترتيب، لا يحجب التحليل).
+    -->
+    <script src="rizq_announcements.js" defer></script>
+    <script src="rizq_marquee_kit.js?v=1.3" defer></script>
+    <script src="rizq_civic_ticker.js?v=1.7" defer></script>
+<script src="rizq_backend_config.js" defer></script>
+<script src="rizq_header_mockup_trial.js?v=5.97" defer></script>
+<script src="rizq_phone_utils.js?v=1.0" defer></script>
+    <script src="rizq_site_banner.js" defer></script>
+<script src="rizq_input_bidi.js?v=23.4" defer></script>
+<script src="rizq_terms_gate.js?v=23.0" defer></script>
+<script src="rizq_verification_policy.js" defer></script>
+<script src="rizq_contact_gate.js" defer></script>
+<script src="rizq_dynamic_nav.js?v=23.5" defer></script>
+<script src="rizq_module_flags.js?v=1.2" defer></script>
 <script src="rizq_pwa.js?v=31.29" defer></script>
 <script src="rizq_footer_toggle.js?v=23.8" defer></script>
 <script src="rizq_social_links.js?v=23.13" defer></script>
-<script src="rizq_account_route.js?v=23.0"></script>
+<script src="rizq_account_route.js?v=23.0" defer></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
-<script src="rizq_seller_branding.js?v=1"></script>
-<script src="rizq_ux_polish.js?v=23.2"></script>
-<script src="rizq_ad_cards.js?v=3.12"></script>
+<script src="rizq_seller_branding.js?v=1" defer></script>
+<script src="rizq_ux_polish.js?v=23.2" defer></script>
+<script src="rizq_ad_cards.js?v=3.12" defer></script>
 <script>(function(){function go(){try{document.documentElement.classList.add('rizq-orbs-ready');}catch(e){}}
 if('requestIdleCallback' in window)requestIdleCallback(go,{timeout:2500});
 else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go,0);});})();</script>
@@ -16850,14 +16858,14 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 <!-- ═══════════════════════════════════════════════
      مدير رزق الذكي — ويدجت موحّد (محرك المعرفة + الواجهة)
      ═══════════════════════════════════════════════ -->
-<script src="rizq_packages_config.js?v=23.0"></script>
-<script src="rizq_packages_ui.js?v=23.0"></script>
-<script src="rizq_merchant_activities.js?v=23.0"></script>
-<script src="rizq_activity_select.js?v=23.0"></script>
-<script src="rizq_video_ads.js?v=promo22"></script>
-<script src="rizq_widget_markdown.js"></script>
-<script src="rizq_landing_ux.js?v=24.1"></script>
-<script src="rizq_disclaimer.js"></script>
+<script src="rizq_packages_config.js?v=23.0" defer></script>
+<script src="rizq_packages_ui.js?v=23.0" defer></script>
+<script src="rizq_merchant_activities.js?v=23.0" defer></script>
+<script src="rizq_activity_select.js?v=23.0" defer></script>
+<script src="rizq_video_ads.js?v=promo22" defer></script>
+<script src="rizq_widget_markdown.js" defer></script>
+<script src="rizq_landing_ux.js?v=24.1" defer></script>
+<script src="rizq_disclaimer.js" defer></script>
 
 
 
