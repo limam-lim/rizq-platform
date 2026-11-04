@@ -121,35 +121,72 @@ function analyzeHtml() {
       await page.addInitScript(() => {
         try { localStorage.setItem('rizq_lang', 'ar'); } catch (e) { /* */ }
         window.__rizqPerf = { firstListingImg: null };
-        const mo = new MutationObserver(() => {
+        function mark() {
           if (window.__rizqPerf.firstListingImg != null) return;
           const img = document.querySelector('#hero-listings img, #cards-track img');
-          if (img && (img.currentSrc || img.src)) {
-            window.__rizqPerf.firstListingImg = performance.now();
-            mo.disconnect();
-          }
-        });
-        mo.observe(document.documentElement, { childList: true, subtree: true });
+          if (!img) return;
+          const src = img.currentSrc || img.src || '';
+          if (!src) return;
+          try {
+            const entries = performance.getEntriesByName(src);
+            if (entries && entries[0] && entries[0].startTime != null) {
+              window.__rizqPerf.firstListingImg = entries[0].startTime;
+              return;
+            }
+          } catch (e) { /* */ }
+          window.__rizqPerf.firstListingImg = performance.now();
+        }
+        const mo = new MutationObserver(mark);
+        mo.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['src'] });
+        document.addEventListener('DOMContentLoaded', mark);
+        document.addEventListener('readystatechange', mark);
+        const iv = setInterval(function () {
+          mark();
+          if (window.__rizqPerf.firstListingImg != null) clearInterval(iv);
+        }, 50);
+        setTimeout(function () { clearInterval(iv); }, 30000);
       });
 
       const t0 = Date.now();
-      await page.goto(srv.base + PAGE, { waitUntil: 'domcontentloaded', timeout: 120000 });
-      const dclWall = Date.now() - t0;
-
+      const gotoPromise = page.goto(srv.base + PAGE, { waitUntil: 'domcontentloaded', timeout: 120000 });
       let firstImg = null;
-      const deadline = Date.now() + 30000;
-      while (Date.now() < deadline) {
-        firstImg = await page.evaluate(() => window.__rizqPerf && window.__rizqPerf.firstListingImg);
-        if (firstImg != null) break;
-        const ready = await page.evaluate(() => {
-          const img = document.querySelector('#hero-listings img, #cards-track img');
-          return !!(img && (img.complete || img.currentSrc || img.src));
-        });
-        if (ready) {
-          firstImg = await page.evaluate(() => performance.now());
-          break;
+      const pollDeadline = Date.now() + 30000;
+      while (Date.now() < pollDeadline) {
+        try {
+          firstImg = await page.evaluate(() => {
+            if (window.__rizqPerf && window.__rizqPerf.firstListingImg != null) {
+              return window.__rizqPerf.firstListingImg;
+            }
+            const img = document.querySelector('#hero-listings img, #cards-track img');
+            if (!img) return null;
+            const src = img.currentSrc || img.src || '';
+            if (!src) return null;
+            try {
+              const entries = performance.getEntriesByName(src);
+              if (entries && entries[0]) return entries[0].startTime || entries[0].responseEnd || performance.now();
+            } catch (e) { /* */ }
+            return performance.now();
+          });
+        } catch (eEval) {
+          firstImg = null;
         }
-        await page.waitForTimeout(100);
+        if (firstImg != null) break;
+        await page.waitForTimeout(50);
+      }
+      await gotoPromise;
+      const dclWall = Date.now() - t0;
+      if (firstImg == null) {
+        firstImg = await page.evaluate(() => {
+          if (window.__rizqPerf && window.__rizqPerf.firstListingImg != null) return window.__rizqPerf.firstListingImg;
+          const img = document.querySelector('#hero-listings img, #cards-track img');
+          if (!img) return null;
+          const src = img.currentSrc || img.src || '';
+          try {
+            const entries = performance.getEntriesByName(src);
+            if (entries && entries[0]) return entries[0].startTime || entries[0].responseEnd || performance.now();
+          } catch (e) { /* */ }
+          return img ? performance.now() : null;
+        });
       }
 
       const nav = await page.evaluate(() => {
