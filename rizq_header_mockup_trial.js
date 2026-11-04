@@ -37,7 +37,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.93';
+    link.href = 'rizq_header_mockup_trial.css?v=5.94';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -1297,12 +1297,13 @@
       if (ticker) topH += Math.ceil(ticker.getBoundingClientRect().height || 0);
       if (topNav) topH += Math.ceil(topNav.getBoundingClientRect().height || 48);
       topH = Math.max(topH, 96);
-            try {
-        /* تجميد قيمة الحجز أول 8ث — ممنوع النمو أو الانكماش (كلاهما يسبب CLS) */
-        var curP = parseFloat(document.body.style.getPropertyValue('--rizq-mock-hdr-h')) || parseFloat(getComputedStyle(document.body).getPropertyValue('--rizq-mock-hdr-h')) || 0;
-        if (curP && performance.now() < 8000) topH = curP;
+      /* حجز ثابت محسوب مرة لكل وضع (هاتف/سطح) — بلا مؤقّت زمني يسبب CLS */
+      try {
+        var lockedP = window.__rmhHdrReserve;
+        if (lockedP && lockedP.mode === 'phone' && lockedP.h > 0) topH = lockedP.h;
+        else window.__rmhHdrReserve = { mode: 'phone', h: topH };
       } catch (eKeepP) {}
-document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
+      document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
       /* browse/detail + legacy chrome read --rizq-header-h — keep it in sync with mock top bar */
       document.body.style.setProperty('--rizq-header-h', topH + 'px');
       document.documentElement.style.setProperty('--rizq-header-h', topH + 'px');
@@ -1315,12 +1316,13 @@ document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
       return;
     }
     var h = measureMockHdrExtent(hdr) || Math.ceil(hdr.getBoundingClientRect().height || 196);
-        /* Freeze reserved header height for first 8s — neither grow nor shrink (both cause CLS) */
+    /* Fixed calculated reserve per layout mode — no time-based freeze */
     try {
-      var curH = parseFloat(document.body.style.getPropertyValue('--rizq-mock-hdr-h')) || parseFloat(getComputedStyle(document.body).getPropertyValue('--rizq-mock-hdr-h')) || 0;
-      if (curH && performance.now() < 8000) h = curH;
+      var lockedH = window.__rmhHdrReserve;
+      if (lockedH && lockedH.mode === 'desk' && lockedH.h > 0) h = lockedH.h;
+      else window.__rmhHdrReserve = { mode: 'desk', h: h };
     } catch (eKeep) {}
-document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
+    document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
     /* Sync legacy --rizq-header-h so .browse-right inset / detail max-height clear the capsule */
     document.body.style.setProperty('--rizq-header-h', h + 'px');
     document.documentElement.style.setProperty('--rizq-header-h', h + 'px');
