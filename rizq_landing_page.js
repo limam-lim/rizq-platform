@@ -484,7 +484,7 @@ function buildCards(){
     if(heroSecEmpty) heroSecEmpty.style.display='';
     if(track && !track.querySelector('.ad-card')){
       var sk0='', si0;
-      for(si0=0; si0<5; si0++){
+      for(si0=0; si0<6; si0++){
         sk0 += '<div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true">'
           + '<div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div>'
           + '<div style="padding:12px;display:flex;flex-direction:column;gap:8px">'
@@ -508,9 +508,11 @@ function buildCards(){
     const c=document.createElement('div');
     c.className='ad-card';
     const d = trAd(a);
+    /* أول بطاقة حقيقية: fetchpriority=high؛ الباقي lazy — يسرّع ظهور أول إعلان في #hero-listings */
+    const heroPriority = (idx === 0) ? 'high' : '';
     const media = (window.RizqAdCards && typeof RizqAdCards.mediaHtml === 'function')
-      ? RizqAdCards.mediaHtml(a, { fr: !isAr, price: d.price, pin: !!d.pin, emoji: d.emoji, bg: d.bg, title: d.title })
-      : ('<div class="ad-card-img" style="background:'+_escCard(d.bg||'')+'">'+_adPhotoHtml(a,d,130)+'</div>');
+      ? RizqAdCards.mediaHtml(a, { fr: !isAr, price: d.price, pin: !!d.pin, emoji: d.emoji, bg: d.bg, title: d.title, fetchPriority: heroPriority })
+      : ('<div class="ad-card-img" style="background:'+_escCard(d.bg||'')+'">'+_adPhotoHtml(a,d,130, heroPriority)+'</div>');
     const actions = (window.RizqAdCards && typeof RizqAdCards.actionsHtml === 'function')
       ? RizqAdCards.actionsHtml(a, { fr: !isAr })
       : '';
@@ -3565,7 +3567,7 @@ function interleaveHomeStores(ads, storeHeroes){
   }
   return result;
 }
-function _adPhotoHtml(a, d, h){
+function _adPhotoHtml(a, d, h, fetchPriority){
   h = h || 130;
   var src = (a && Array.isArray(a.images) && a.images[0]) ? String(a.images[0]) : '';
   if(window.RizqStoreCommerce && typeof RizqStoreCommerce.safeMediaUrl === 'function'){
@@ -3578,7 +3580,10 @@ function _adPhotoHtml(a, d, h){
   }
   var esc = function(s){ return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); };
   if(src){
-    return '<div class="rizq-img-wrap" style="width:100%;height:'+h+'px"><img src="'+esc(src)+'" alt="'+esc(d&&d.title||'')+'" width="400" height="'+h+'" loading="lazy" decoding="async" style="width:100%;height:100%;object-fit:cover;display:block" onload="var w=this.closest(\'.rizq-img-wrap\');if(w)w.classList.add(\'loaded\')"'+_rizqImgPlaceholderOnError()+'></div>';
+    var eager = fetchPriority === 'high';
+    var prioAttr = eager ? ' fetchpriority="high"' : '';
+    var loadAttr = eager ? 'eager' : 'lazy';
+    return '<div class="rizq-img-wrap" style="width:100%;height:'+h+'px"><img src="'+esc(src)+'" alt="'+esc(d&&d.title||'')+'" width="400" height="'+h+'" loading="'+loadAttr+'" decoding="async"'+prioAttr+' style="width:100%;height:100%;object-fit:cover;display:block" onload="var w=this.closest(\'.rizq-img-wrap\');if(w)w.classList.add(\'loaded\')"'+_rizqImgPlaceholderOnError()+'></div>';
   }
   return '<span>'+(d&&d.emoji?d.emoji:'📦')+'</span>';
 }
@@ -3720,30 +3725,32 @@ function applyList(list){
   var skelShownAt = Date.now();
   if(track && !ADS.length){
     if(heroSec) heroSec.style.display = '';
-    var sk = '', si;
-    for(si = 0; si < 5; si++){
-      sk += '<div class="ad-card" style="pointer-events:none;min-width:200px">'
-        + '<div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div>'
-        + '<div style="padding:12px;display:flex;flex-direction:column;gap:8px">'
-        + '<div class="rizq-skel rizq-skel-line mid" style="margin:0"></div>'
-        + '<div class="rizq-skel rizq-skel-line short" style="margin:0"></div>'
-        + '</div></div>';
+    /* الهيكل موجود مسبقاً في HTML (6 بطاقات بأبعاد نهائية) — لا تُعد الكتابة إن وُجد */
+    if(!track.querySelector('.ad-card')){
+      var sk = '', si;
+      for(si = 0; si < 6; si++){
+        sk += '<div class="ad-card" style="pointer-events:none;min-width:200px" aria-hidden="true">'
+          + '<div class="rizq-skel rizq-skel-media" style="height:140px;border-radius:16px 16px 0 0"></div>'
+          + '<div style="padding:12px;display:flex;flex-direction:column;gap:8px">'
+          + '<div class="rizq-skel rizq-skel-line mid" style="margin:0"></div>'
+          + '<div class="rizq-skel rizq-skel-line short" style="margin:0"></div>'
+          + '</div></div>';
+      }
+      track.innerHTML = sk;
     }
-    track.innerHTML = sk;
   }
   function finishHydrate(listOrNull, storeItems){
-    var wait = Math.max(0, 700 - (Date.now() - skelShownAt));
-    setTimeout(function(){
-      var list = listOrNull;
-      if(list && storeItems && storeItems.length){
-        var picked = pickHomeStoreProducts(storeItems).map(function(it){
-          return Object.assign({}, it, { fromStore: true, source: 'store', storeId: it.accountId || it.storeId || null });
-        });
-        if(picked.length) list = interleaveHomeStores(list, picked);
-      }
-      if(list) applyList(list);
-      else if(typeof buildCards==='function') buildCards();
-    }, wait);
+    /* بلا تأخير اصطناعي — الهيكل يحجز الأبعاد؛ الرسم الفوري يسرّع أول صورة */
+    void skelShownAt;
+    var list = listOrNull;
+    if(list && storeItems && storeItems.length){
+      var picked = pickHomeStoreProducts(storeItems).map(function(it){
+        return Object.assign({}, it, { fromStore: true, source: 'store', storeId: it.accountId || it.storeId || null });
+      });
+      if(picked.length) list = interleaveHomeStores(list, picked);
+    }
+    if(list) applyList(list);
+    else if(typeof buildCards==='function') buildCards();
   }
   var adsPromise = fetch(base+'/api/ads?limit=1000').then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; });
   var storesPromise = fetch(base+'/api/catalog/home?section=stores&limit=24').then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; });

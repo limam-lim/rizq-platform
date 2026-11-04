@@ -366,13 +366,17 @@
 
     var slides = '';
     if (imgs.length) {
-      slides = imgs.map(function (src) {
+      var heroPrio = opts.fetchPriority === 'high' || opts.priority === 'high';
+      slides = imgs.map(function (src, imgIdx) {
         var v = imageVariants(src);
         var srcset = esc(v.thumb) + ' 400w, ' + esc(v.medium) + ' 900w, ' + esc(v.full) + ' 1920w';
+        var eager = heroPrio && imgIdx === 0;
         return '<div class="rzq-adx-slide">'
           + '<img src="' + esc(v.medium) + '" srcset="' + srcset + '" sizes="(max-width:600px) 400px, 900px"'
           + ' data-full="' + esc(v.full) + '" alt="' + esc(title) + '"'
-          + ' loading="lazy" decoding="async" class="rzq-adx-zoomable"/>'
+          + ' loading="' + (eager ? 'eager' : 'lazy') + '" decoding="async"'
+          + (eager ? ' fetchpriority="high"' : '')
+          + ' class="rzq-adx-zoomable"/>'
           + '</div>';
       }).join('');
     } else {
