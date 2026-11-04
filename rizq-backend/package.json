@@ -62,7 +62,8 @@
     "test:home-catalog-integrity": "node scripts/run-with-test-db.js scripts/test-home-catalog-integrity.js",
     "test:home-catalog-negatives": "node scripts/run-with-test-db.js scripts/test-home-catalog-negatives.js",
     "test:asset-versions": "node scripts/test-asset-versions.js",
-    "test:founding-no-discount": "node scripts/run-with-test-db.js scripts/test-founding-no-discount.js"
+    "test:founding-no-discount": "node scripts/run-with-test-db.js scripts/test-founding-no-discount.js",
+    "test:all": "node scripts/test-all.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
