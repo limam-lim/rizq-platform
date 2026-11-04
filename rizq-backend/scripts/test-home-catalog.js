@@ -215,6 +215,9 @@ function ok(name, cond, extra) {
   }
 
   void platformStore;
+  try {
+    require('./_cleanupTestUploads').cleanupTestUploads();
+  } catch (eClean) { /* best-effort */ }
   console.log('\n' + (fail ? 'FAILED ' + fail : 'ALL OK') + ' / ' + (pass + fail));
   process.exit(fail ? 1 : 0);
 })().catch((e) => {
