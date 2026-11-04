@@ -68,13 +68,16 @@ function ok(label, cond, detail) {
   const pwaSrc = fs.readFileSync(path.join(ROOT, 'rizq_pwa.js'), 'utf8');
   const swSrc = fs.readFileSync(path.join(ROOT, 'sw.js'), 'utf8');
   const assetM = pwaSrc.match(/ASSET_V\s*=\s*'([^']+)'/);
+  const mockM = pwaSrc.match(/MOCK_HDR_V\s*=\s*'([^']+)'/);
   const cacheM = pwaSrc.match(/SW_CACHE\s*=\s*'([^']+)'/);
   const swCacheM = swSrc.match(/CACHE_NAME\s*=\s*'([^']+)'/);
   const assetV = assetM && assetM[1];
+  const mockHdrV = mockM && mockM[1];
   const swCache = cacheM && cacheM[1];
   const swName = swCacheM && swCacheM[1];
 
   ok('ASSET_V present', !!assetV, assetV);
+  ok('MOCK_HDR_V present', !!mockHdrV, mockHdrV);
   ok('SW_CACHE matches sw CACHE_NAME', swCache === swName, { swCache, swName });
   ok('SW register uses ASSET_V query', /SW_URL\s*=\s*'sw\.js\?v='\s*\+\s*ASSET_V/.test(pwaSrc)
     || pwaSrc.includes("SW_URL = 'sw.js?v=' + ASSET_V"));
@@ -132,8 +135,9 @@ function ok(label, cond, detail) {
   ok('client purged stale caches (no old left)', staleLeft.length === 0, afterClient.keys);
   ok('single mock header in DOM', afterClient.mockHdrCount === 1, afterClient.mockHdrCount);
   ok('mockup script src carries current MOCK_HDR_V',
-    (afterClient.mockScripts || []).some((s) => /v=5\.93/.test(s || '')),
-    afterClient.mockScripts);
+    !!mockHdrV && (afterClient.mockScripts || []).some((s) =>
+      new RegExp('v=' + mockHdrV.replace(/\./g, '\\.')).test(s || '')),
+    { mockHdrV, mockScripts: afterClient.mockScripts });
   ok('pwa script carries ASSET_V', new RegExp('v=' + assetV.replace(/\./g, '\\.')).test(afterClient.assetHint || ''),
     afterClient.assetHint);
 

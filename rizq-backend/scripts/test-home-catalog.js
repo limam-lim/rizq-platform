@@ -150,8 +150,7 @@ function ok(name, cond, extra) {
   /* route mount present */
   const catSrc = fs.readFileSync(path.join(__dirname, '../routes/catalog.js'), 'utf8');
   ok('catalog route mounts /api/catalog/home', /\/api\/catalog\/home/.test(catSrc));
-
-  /* منطق العميل لدمج منتجات المحلات في شريط أحدث الإعلانات — وحدة نقية (كانت في fix-logic-3 / عدّ 23) */
+  /* دمج منتجات المحلات في شريط أحدث الإعلانات — حدود العميل */
   function pickHomeStoreProducts(items) {
     const list = Array.isArray(items) ? items : [];
     const seen = {};
@@ -196,8 +195,7 @@ function ok(name, cond, extra) {
     merged.filter((x) => x.id && String(x.id).startsWith('a')).length === 4
     && merged.filter((x) => x.homeBadge).length === 3, merged);
 
-  /* ربط الواجهة بـ /api/catalog/home — مؤجّل لـ #274 / fix-home-wiring-1 (بعد استعادة d9).
-     STRICT_HOME_WIRING=1 يجعلها إلزامية. بدونها: PENDING لا يُحسب في العدّ. */
+  /* STRICT_HOME_WIRING=1 إلزامي عبر npm run test:home-catalog */
   const landSrc = fs.readFileSync(path.join(__dirname, '../../rizq_landing_v8.html'), 'utf8');
   const strict = process.env.STRICT_HOME_WIRING === '1';
   const styOk = landSrc.includes('/api/catalog/home?section=styles');
@@ -211,12 +209,15 @@ function ok(name, cond, extra) {
     ok('showrooms client single home request', srmOk);
     ok('stores client wires home API into hero-listings', storesOk);
   } else {
-    console.log((styOk ? 'OK   ' : 'PENDING ') + 'styles client uses home API (#274 / fix-home-wiring-1)');
-    console.log((srmOk ? 'OK   ' : 'PENDING ') + 'showrooms client single home request (#274 / fix-home-wiring-1)');
-    console.log((storesOk ? 'OK   ' : 'PENDING ') + 'stores client wires home API (#274 / fix-home-wiring-1)');
+    console.log((styOk ? 'OK   ' : 'PENDING ') + 'styles client uses home API (fix-home-wiring-1)');
+    console.log((srmOk ? 'OK   ' : 'PENDING ') + 'showrooms client single home request (fix-home-wiring-1)');
+    console.log((storesOk ? 'OK   ' : 'PENDING ') + 'stores client wires home API (fix-home-wiring-1)');
   }
 
   void platformStore;
+  try {
+    require('./_cleanupTestUploads').cleanupTestUploads();
+  } catch (eClean) { /* best-effort */ }
   console.log('\n' + (fail ? 'FAILED ' + fail : 'ALL OK') + ' / ' + (pass + fail));
   process.exit(fail ? 1 : 0);
 })().catch((e) => {

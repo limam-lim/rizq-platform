@@ -56,10 +56,14 @@
     "test:ops-1": "node scripts/run-with-test-db.js scripts/test-ops-1.js",
     "test:caddy-security": "node scripts/run-with-test-db.js scripts/test-caddy-security.js",
     "test:package-credit": "node scripts/run-with-test-db.js scripts/test-package-credit.js",
-    "test:home-catalog": "node scripts/run-with-test-db.js scripts/test-home-catalog.js",
+    "test:home-catalog": "STRICT_HOME_WIRING=1 node scripts/run-with-test-db.js scripts/test-home-catalog.js",
+    "test:monthly-only": "node scripts/run-with-test-db.js scripts/test-monthly-only.js",
     "admin:2fa": "node scripts/admin-2fa.js",
     "test:home-catalog-integrity": "node scripts/run-with-test-db.js scripts/test-home-catalog-integrity.js",
-    "test:home-catalog-negatives": "node scripts/run-with-test-db.js scripts/test-home-catalog-negatives.js"
+    "test:home-catalog-negatives": "node scripts/run-with-test-db.js scripts/test-home-catalog-negatives.js",
+    "test:asset-versions": "node scripts/test-asset-versions.js",
+    "test:founding-no-discount": "node scripts/run-with-test-db.js scripts/test-founding-no-discount.js",
+    "test:all": "node scripts/test-all.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",

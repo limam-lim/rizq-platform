@@ -578,16 +578,7 @@
           ? Number(priceOverride)
           : (pdef && pdef.price != null && pdef.price !== '' ? Number(pdef.price) : null);
         var accInfo = accounts[accId] || {};
-        /* خصم الشريك المؤسس بعد انتهاء الفترة المجانية */
-        try {
-          if (finalPrice != null && Number(finalPrice) > 0 && accInfo.foundingPartner) {
-            var pct = Number(accInfo.foundingDiscountPercent);
-            if (!Number.isFinite(pct) || pct < 0) pct = 40;
-            if (pct > 0 && pct <= 90) {
-              finalPrice = Math.round(Number(finalPrice) * (100 - pct) / 100);
-            }
-          }
-        } catch (eFounding) {}
+        /* السعر من الخادم/الكتالوج فقط — شارة شريك مؤسس تكريم بلا خصم */
         global.RizqInvoice.generateInvoice({
           accountId   : accId,
           accountName : accInfo.name || accId,

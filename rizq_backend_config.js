@@ -87,7 +87,6 @@
     daysRemaining: null,
     maintenanceDryRun: true,
     openSections: null,
-    foundingDiscountPercent: 40,
     minActiveAdsToShow: 50,
   };
   window.RIZQ_LAUNCH = window.RIZQ_LAUNCH || Object.assign({}, _launchDefaults);

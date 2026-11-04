@@ -53,7 +53,11 @@ async function main() {
   ok('catalog has of-month default', all.some((p) => p.id === 'of-month' && Number(p.price) === 3500));
   ok('catalog has cp-month default', all.some((p) => p.id === 'cp-month' && Number(p.price) === 3500));
   ok('catalog has tnd-month default', all.some((p) => p.id === 'tnd-month' && Number(p.price) === 5000));
-  ok('catalog has inv-year default', all.some((p) => p.id === 'inv-year' && Number(p.price) === 45000));
+  /* inv-year موقوفة عند الإطلاق الشهري — السعر يبقى في الكتالوج مع includeInactive */
+  ok('public catalog omits inactive inv-year', !all.some((p) => p.id === 'inv-year'));
+  const allInc = await getAllCatalogPackages({ includeInactive: true });
+  ok('inactive inv-year price 45000 retained', allInc.some((p) => p.id === 'inv-year' && Number(p.price) === 45000 && p.active === false));
+  ok('catalog has inv-month default', all.some((p) => p.id === 'inv-month' && Number(p.price) === 5000));
   ok('catalog has vid-basic default', all.some((p) => p.id === 'vid-basic' && Number(p.price) === 5000));
   const st = await findCatalogPackage('st-quart');
   ok('findCatalogPackage(st-quart) price 5500', st && Number(st.price) === 5500);

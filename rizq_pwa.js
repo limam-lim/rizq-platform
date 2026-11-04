@@ -5,10 +5,10 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '31.28';
-  var MOCK_HDR_V = '5.93';
+  var ASSET_V = '31.29';
+  var MOCK_HDR_V = '5.97';
   /* يجب أن يطابق CACHE_NAME في sw.js حرفياً */
-  var SW_CACHE = 'rizq-cache-v31.28';
+  var SW_CACHE = 'rizq-cache-v31.29';
   var SW_URL = 'sw.js?v=' + ASSET_V;
 
   if (typeof window.showToast !== 'function') {
@@ -134,7 +134,8 @@
         document.head.appendChild(mockCssEl);
       }
       if ((mockCssEl.getAttribute('href') || '').indexOf('v=' + MOCK_HDR_V) < 0) {
-        mockCssEl.href = mockCssWant;
+        /* لا تُعد href لشيت مطبّق — التفريغ المؤقت يهدم شبكة الهيدر (CLS) */
+        if (!mockCssEl.sheet) mockCssEl.href = mockCssWant;
       }
       var mockJsEl = document.querySelector('script[src*="rizq_header_mockup_trial.js"]');
       if (!mockJsEl) {

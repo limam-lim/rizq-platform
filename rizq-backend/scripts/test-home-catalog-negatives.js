@@ -132,6 +132,9 @@ function loadRizqBrands() {
   const srmIds = ((srm && srm.items) || []).map((it) => it.id);
   ok('home showrooms cars excludes name-only', !srmIds.includes(carNamedFurniture.id), srmIds);
 
+  try {
+    require('./_cleanupTestUploads').cleanupTestUploads();
+  } catch (eClean) { /* best-effort */ }
   console.log(fail ? ('FAIL ' + fail + ' / pass ' + pass) : ('ALL OK / ' + pass));
   process.exit(fail ? 1 : 0);
 })().catch((e) => {

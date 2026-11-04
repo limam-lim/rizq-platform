@@ -100,6 +100,9 @@ function ok(name, cond, extra) {
     ok('jacket not casio', String(jacket.brandId) === 'zara' && Number(jacket.price) === 22000);
   }
 
+  try {
+    require('./_cleanupTestUploads').cleanupTestUploads();
+  } catch (eClean) { /* best-effort */ }
   console.log(fail ? ('FAIL ' + fail + ' / pass ' + pass) : ('ALL OK / ' + pass));
   process.exit(fail ? 1 : 0);
 })().catch((e) => {

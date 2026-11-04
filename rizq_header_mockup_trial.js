@@ -37,7 +37,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.93';
+    link.href = 'rizq_header_mockup_trial.css?v=5.97';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -1278,52 +1278,75 @@
     return Math.max(0, Math.ceil(bottom - top));
   }
 
+  /**
+   * حجز ارتفاع حتمي بعد أول رسم — لا مؤقّت ولا إعادة قفل عند تبدّل phone/desk.
+   * يفضّل قيمة FOUC المنشورة في CSS/body (180px) وإلا أول قياس غير صفري، ثم لا تُغيَّر.
+   */
+  function lockCssPxOnce(storeKey, styleKeys, measured, fallback) {
+    if (window[storeKey] > 0) return window[storeKey];
+    var published = 0;
+    try {
+      for (var i = 0; i < styleKeys.length; i++) {
+        var k = styleKeys[i];
+        published = parseFloat(document.body.style.getPropertyValue(k))
+          || parseFloat(getComputedStyle(document.body).getPropertyValue(k))
+          || published;
+        if (published > 0) break;
+      }
+    } catch (ePub) { published = 0; }
+    var h = published > 0
+      ? Math.ceil(published)
+      : Math.max(0, Math.ceil(Number(measured) || 0));
+    if (h <= 0) h = Math.max(0, Math.ceil(Number(fallback) || 0));
+    if (h > 0) window[storeKey] = h;
+    return h;
+  }
+
+  function publishLockedHdr(h) {
+    if (!(h > 0)) return;
+    document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
+    document.body.style.setProperty('--rizq-header-h', h + 'px');
+    document.documentElement.style.setProperty('--rizq-header-h', h + 'px');
+  }
+
   function syncMockHdrHeight() {
     var hdr = document.getElementById('rizq-mock-hdr');
     if (!hdr) return;
-    syncPhoneNavSplit();
-    var phoneNow = isPhone();
-    if (window.__rmhWasPhoneFr !== phoneNow) {
+
+    /* 1) اقفل حجز الارتفاع من FOUC فوراً — قبل أي تقسيم DOM */
+    if (!(window.__rmhHdrLockedH > 0)) {
+      var lockedH = lockCssPxOnce(
+        '__rmhHdrLockedH',
+        ['--rizq-mock-hdr-h', '--rizq-header-h'],
+        0,
+        180
+      );
+      publishLockedHdr(lockedH);
+    } else {
+      publishLockedHdr(window.__rmhHdrLockedH);
+    }
+
+    /* 2) تقسيم الهاتف مرة واحدة فقط بعد القفل */
+    if (!window.__rmhNavSplitDone) {
+      syncPhoneNavSplit();
+      window.__rmhNavSplitDone = true;
+      var phoneNow = isPhone();
       window.__rmhWasPhoneFr = phoneNow;
-      try { applyMockLang(); } catch (eLang) {}
-    }
-    var main = hdr.querySelector('.rmh-main');
-    var ticker = hdr.querySelector('.ticker-wrap:not(.is-empty)');
-    var topNav = document.getElementById('rmh-nav-top');
-    var bottomNav = hdr.querySelector('nav.rmh-nav:not(.rmh-nav-top)');
-    var topH;
-    if (isPhone() && main) {
-      topH = Math.ceil(main.getBoundingClientRect().height || 44);
-      if (ticker) topH += Math.ceil(ticker.getBoundingClientRect().height || 0);
-      if (topNav) topH += Math.ceil(topNav.getBoundingClientRect().height || 48);
-      topH = Math.max(topH, 96);
-            try {
-        /* تجميد قيمة الحجز أول 8ث — ممنوع النمو أو الانكماش (كلاهما يسبب CLS) */
-        var curP = parseFloat(document.body.style.getPropertyValue('--rizq-mock-hdr-h')) || parseFloat(getComputedStyle(document.body).getPropertyValue('--rizq-mock-hdr-h')) || 0;
-        if (curP && performance.now() < 8000) topH = curP;
-      } catch (eKeepP) {}
-document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
-      /* browse/detail + legacy chrome read --rizq-header-h — keep it in sync with mock top bar */
-      document.body.style.setProperty('--rizq-header-h', topH + 'px');
-      document.documentElement.style.setProperty('--rizq-header-h', topH + 'px');
-      if (bottomNav) {
-        var nh = Math.ceil(bottomNav.getBoundingClientRect().height || 64);
-        document.body.style.setProperty('--rizq-mock-nav-h', nh + 'px');
-        /* نفس الارتفاع لـ thumb-dock-h حتى تبقى العوامات (ويدجت) فوق الشريط */
-        document.body.style.setProperty('--rizq-thumb-dock-h', nh + 'px');
+      if (phoneNow) {
+        var bottomNav = hdr.querySelector('nav.rmh-nav:not(.rmh-nav-top)');
+        var nh = bottomNav
+          ? Math.ceil(bottomNav.getBoundingClientRect().height || 64)
+          : 64;
+        var lockedNav = lockCssPxOnce('__rmhNavLockedH', ['--rizq-mock-nav-h'], nh, 64);
+        if (lockedNav > 0) {
+          document.body.style.setProperty('--rizq-mock-nav-h', lockedNav + 'px');
+          document.body.style.setProperty('--rizq-thumb-dock-h', lockedNav + 'px');
+        }
       }
-      return;
+    } else if (window.__rmhNavLockedH > 0) {
+      document.body.style.setProperty('--rizq-mock-nav-h', window.__rmhNavLockedH + 'px');
+      document.body.style.setProperty('--rizq-thumb-dock-h', window.__rmhNavLockedH + 'px');
     }
-    var h = measureMockHdrExtent(hdr) || Math.ceil(hdr.getBoundingClientRect().height || 196);
-        /* Freeze reserved header height for first 8s — neither grow nor shrink (both cause CLS) */
-    try {
-      var curH = parseFloat(document.body.style.getPropertyValue('--rizq-mock-hdr-h')) || parseFloat(getComputedStyle(document.body).getPropertyValue('--rizq-mock-hdr-h')) || 0;
-      if (curH && performance.now() < 8000) h = curH;
-    } catch (eKeep) {}
-document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
-    /* Sync legacy --rizq-header-h so .browse-right inset / detail max-height clear the capsule */
-    document.body.style.setProperty('--rizq-header-h', h + 'px');
-    document.documentElement.style.setProperty('--rizq-header-h', h + 'px');
   }
 
   function ensureHeroTagline() {
@@ -1435,10 +1458,20 @@ document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
       if (window.__rmhHdrRo) {
         try { window.__rmhHdrRo.disconnect(); } catch (eRo) {}
       }
-      window.__rmhHdrRo = new ResizeObserver(function () { syncMockHdrHeight(); });
+      /* راقب حتى القفل الأول فقط — بعده إعادة التقسيم تسبب CLS */
+      window.__rmhHdrRo = new ResizeObserver(function () {
+        if (window.__rmhHdrLockedH > 0) {
+          try { window.__rmhHdrRo.disconnect(); } catch (eDisc) {}
+          return;
+        }
+        syncMockHdrHeight();
+      });
       window.__rmhHdrRo.observe(hdrEl);
     }
-    window.addEventListener('resize', syncMockHdrHeight);
+    window.addEventListener('resize', function () {
+      if (window.__rmhHdrLockedH > 0) return;
+      syncMockHdrHeight();
+    });
     window.addEventListener('storage', function (ev) {
       if (ev.key === 'rizq_cart') {
         refreshBadge();

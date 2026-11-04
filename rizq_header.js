@@ -1835,16 +1835,20 @@
   function ensureMockHeaderAssets() {
     try {
       if (isDashShell()) return;
-      var v = '5.93';
+      /* يجب أن يطابق MOCK_HDR_V في rizq_pwa.js / روابط HTML — لا تخفيض لإصدار أقدم */
+      var v = '5.97';
       var cssWant = 'rizq_header_mockup_trial.css?v=' + v;
       var jsWant = 'rizq_header_mockup_trial.js?v=' + v;
       var l = document.querySelector('link[href*="rizq_header_mockup_trial.css"]');
       if (!l) {
         l = document.createElement('link');
         l.rel = 'stylesheet';
+        l.href = cssWant;
         (document.head || document.documentElement).appendChild(l);
+      } else if ((l.getAttribute('href') || '').indexOf('v=' + v) < 0) {
+        /* إعادة تعيين href لشيت محمّل تُفرّغ القواعد لبرهة → CLS كارثي (rmh-main بلا grid) */
+        if (!l.sheet) l.href = cssWant;
       }
-      if ((l.getAttribute('href') || '').indexOf('v=' + v) < 0) l.href = cssWant;
       var s = document.querySelector('script[src*="rizq_header_mockup_trial.js"]');
       if (!s) {
         s = document.createElement('script');
