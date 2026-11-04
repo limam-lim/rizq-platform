@@ -196,7 +196,9 @@ function ok(name, cond, extra) {
     && merged.filter((x) => x.homeBadge).length === 3, merged);
 
   /* STRICT_HOME_WIRING=1 إلزامي عبر npm run test:home-catalog */
-  const landSrc = fs.readFileSync(path.join(__dirname, '../../rizq_landing_v8.html'), 'utf8');
+  const landSrc = fs.readFileSync(path.join(__dirname, '../../rizq_landing_v8.html'), 'utf8')
+    + (fs.existsSync(path.join(__dirname, '../../rizq_landing_page.js'))
+      ? '\n' + fs.readFileSync(path.join(__dirname, '../../rizq_landing_page.js'), 'utf8') : '');
   const strict = process.env.STRICT_HOME_WIRING === '1';
   const styOk = landSrc.includes('/api/catalog/home?section=styles');
   const srmOk = landSrc.includes('section=showrooms') && !/Promise\.all\(corps\.map/.test(landSrc);

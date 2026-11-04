@@ -126,6 +126,10 @@ function writeLocalCaddyfile() {
 			path /vendor /vendor/*
 		}
 		handle @publicFiles {
+			@versionedQuery {
+				query v=*
+			}
+			header @versionedQuery Cache-Control "public, max-age=31536000, immutable"
 			file_server
 		}
 
@@ -258,6 +262,8 @@ async function main() {
   ok(/frame-ancestors 'none'/.test(prodSrc), 'CSP frame-ancestors none (prod)');
   ok(!/path \*\.js/.test(prodSrc) || /@publicFiles[\s\S]*rizq_\*\.js/.test(prodSrc),
     'no blanket *.js public matcher (whitelist rizq_*.js)');
+  ok(/@versionedQuery/.test(prodSrc) && /immutable/.test(prodSrc),
+    'versioned ?v= assets get Cache-Control immutable');
 
   let caddy = findCaddy();
   if (!caddy) {
@@ -327,6 +333,14 @@ async function main() {
     ok(
       /geolocation=\(self\)/.test(cards.headers['permissions-policy'] || ''),
       '/rizq_ad_cards.js Permissions-Policy matches server.js'
+    );
+
+    const versioned = curl('/rizq_ad_cards.js?v=3.13');
+    ok(versioned.status === 200, '/rizq_ad_cards.js?v= → 200', 'status=' + versioned.status);
+    ok(
+      /immutable/.test(versioned.headers['cache-control'] || ''),
+      '/rizq_ad_cards.js?v= Cache-Control immutable',
+      versioned.headers['cache-control'] || '(missing)'
     );
 
     const direct = spawnSync('curl', ['-sS', '--max-time', '3', 'http://127.0.0.1:' + NODE_PORT + '/api/ads'], {
