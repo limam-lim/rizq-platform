@@ -20,38 +20,38 @@ const DEFAULT_INDIVIDUAL_PACKAGES = [
 const DEFAULT_STORE_PACKAGES = [
   { id: 'st-trial', name: 'تجريبية', price: 0, durationDays: 10, maxCatalogItems: 10, active: true },
   { id: 'st-month', name: 'شهرية', price: 2000, durationDays: 30, maxCatalogItems: 100, active: true },
-  { id: 'st-quart', name: 'ربعية', price: 5500, durationDays: 90, maxCatalogItems: 500, active: true },
-  { id: 'st-year', name: 'سنوية', price: 15000, durationDays: 365, maxCatalogItems: null, active: true },
+  { id: 'st-quart', name: 'ربعية', price: 5500, durationDays: 90, maxCatalogItems: 500, active: false },
+  { id: 'st-year', name: 'سنوية', price: 15000, durationDays: 365, maxCatalogItems: null, active: false },
   { id: 'st-diam-std', name: 'الماسية الأساسية', price: 3500, durationDays: 30, maxCatalogItems: null, diamondTier: 'diamond_standard', active: true },
   { id: 'st-diam-pro', name: 'الماسية Pro', price: 6000, durationDays: 30, maxCatalogItems: null, diamondTier: 'diamond_pro', active: true },
 ];
 const DEFAULT_OFFICE_PACKAGES = [
   { id: 'of-trial', name: 'تجريبية', price: 0, durationDays: 10, maxCatalogItems: 3, active: true },
   { id: 'of-month', name: 'شهرية', price: 3500, durationDays: 30, maxCatalogItems: null, active: true },
-  { id: 'of-quart', name: 'ربعية', price: 9000, durationDays: 90, maxCatalogItems: null, active: true },
-  { id: 'of-year', name: 'سنوية', price: 28000, durationDays: 365, maxCatalogItems: null, active: true },
+  { id: 'of-quart', name: 'ربعية', price: 9000, durationDays: 90, maxCatalogItems: null, active: false },
+  { id: 'of-year', name: 'سنوية', price: 28000, durationDays: 365, maxCatalogItems: null, active: false },
   { id: 'of-diam-std', name: 'الماسية الأساسية', price: 4000, durationDays: 30, maxCatalogItems: null, diamondTier: 'diamond_standard', active: true },
   { id: 'of-diam-pro', name: 'الماسية Pro', price: 7500, durationDays: 30, maxCatalogItems: null, diamondTier: 'diamond_pro', active: true },
 ];
 const DEFAULT_CORP_PACKAGES = [
   { id: 'cp-trial', name: 'تجريبية', price: 0, durationDays: 10, active: true },
   { id: 'cp-month', name: 'شهرية', price: 3500, durationDays: 30, maxCatalogItems: 30, active: true },
-  { id: 'cp-quart', name: 'ربعية', price: 9000, durationDays: 90, maxCatalogItems: null, active: true },
-  { id: 'cp-year', name: 'سنوية', price: 25000, durationDays: 365, maxCatalogItems: null, active: true },
+  { id: 'cp-quart', name: 'ربعية', price: 9000, durationDays: 90, maxCatalogItems: null, active: false },
+  { id: 'cp-year', name: 'سنوية', price: 25000, durationDays: 365, maxCatalogItems: null, active: false },
   { id: 'cp-diam-std', name: 'الماسية الأساسية', price: 6000, durationDays: 30, maxCatalogItems: null, diamondTier: 'diamond_standard', active: true },
   { id: 'cp-diam-pro', name: 'الماسية Pro', price: 15000, durationDays: 30, maxCatalogItems: null, diamondTier: 'diamond_pro', active: true },
 ];
 const DEFAULT_TENDER_PACKAGES = [
   { id: 'tnd-trial', name: 'تجريبية', price: 0, durationDays: 10, active: true },
   { id: 'tnd-month', name: 'شهرية', price: 5000, durationDays: 30, active: true },
-  { id: 'tnd-quart', name: 'ربعية', price: 13500, durationDays: 90, active: true },
-  { id: 'tnd-year', name: 'سنوية', price: 45000, durationDays: 365, active: true },
+  { id: 'tnd-quart', name: 'ربعية', price: 13500, durationDays: 90, active: false },
+  { id: 'tnd-year', name: 'سنوية', price: 45000, durationDays: 365, active: false },
 ];
 const DEFAULT_INVESTMENT_PACKAGES = [
   { id: 'inv-trial', name: 'تجريبية', price: 0, durationDays: 10, active: true },
   { id: 'inv-month', name: 'شهرية', price: 5000, durationDays: 30, active: true },
-  { id: 'inv-quart', name: 'ربعية', price: 13500, durationDays: 90, active: true },
-  { id: 'inv-year', name: 'سنوية', price: 45000, durationDays: 365, active: true },
+  { id: 'inv-quart', name: 'ربعية', price: 13500, durationDays: 90, active: false },
+  { id: 'inv-year', name: 'سنوية', price: 45000, durationDays: 365, active: false },
 ];
 const DEFAULT_VIDEO_PACKAGES = [
   { id: 'vid-single', name: 'إعلان فيديو واحد', price: 1500, durationDays: 10, maxVideosPerMonth: 1, payPerAd: true, active: true },
@@ -60,11 +60,31 @@ const DEFAULT_VIDEO_PACKAGES = [
   { id: 'vid-business', name: 'أعمال', price: 25000, durationDays: 30, maxVideosPerMonth: null, active: true },
 ];
 
+
+const DEFAULT_ESTATE_PACKAGES = [
+  { id: 'es-trial', name: 'تجريبية', price: 0, durationDays: 10, maxCatalogItems: 3, active: true },
+  { id: 'es-month', name: 'شهرية', price: 4000, durationDays: 30, maxCatalogItems: 25, active: true },
+  { id: 'es-quart', name: 'ربعية', price: 10500, durationDays: 90, maxCatalogItems: 80, active: false },
+  { id: 'es-year', name: 'سنوية', price: 32000, durationDays: 365, maxCatalogItems: 200, active: false },
+  { id: 'es-diam-std', name: 'الماسية الأساسية', price: 4500, durationDays: 30, maxCatalogItems: null, diamondTier: 'diamond_standard', active: true },
+  { id: 'es-diam-pro', name: 'الماسية Pro', price: 8500, durationDays: 30, maxCatalogItems: null, diamondTier: 'diamond_pro', active: true },
+];
+const DEFAULT_GENERAL_PACKAGES = [
+  { id: 'trial', name: 'تجريبية', price: 0, durationDays: 10, active: true },
+  { id: 'basic', name: 'أساسية', price: 1500, durationDays: 30, active: true },
+  { id: 'pro', name: 'Pro', price: 4000, durationDays: 30, active: true },
+  { id: 'yearly', name: 'سنوية', price: 30000, durationDays: 365, active: false },
+  { id: 'diamond_standard', name: 'الماسية الأساسية', price: 5000, durationDays: 30, diamondTier: 'diamond_standard', active: true },
+  { id: 'diamond_pro', name: 'الماسية Pro', price: 10000, durationDays: 30, diamondTier: 'diamond_pro', active: true },
+];
+
 const DEFAULT_CATALOG_BY_KEY = {
   individual: DEFAULT_INDIVIDUAL_PACKAGES,
   store: DEFAULT_STORE_PACKAGES,
   office: DEFAULT_OFFICE_PACKAGES,
   corp: DEFAULT_CORP_PACKAGES,
+  estate: DEFAULT_ESTATE_PACKAGES,
+  general: DEFAULT_GENERAL_PACKAGES,
   tender: DEFAULT_TENDER_PACKAGES,
   investment: DEFAULT_INVESTMENT_PACKAGES,
   video: DEFAULT_VIDEO_PACKAGES,
@@ -131,7 +151,8 @@ async function getTopupConfig() {
   };
 }
 
-async function getAllCatalogPackages() {
+async function getAllCatalogPackages(opts) {
+  const includeInactive = !!(opts && opts.includeInactive);
   const cfg = await readSiteConfigRaw();
   const pkgs = (cfg.packages && typeof cfg.packages === 'object') ? cfg.packages : {};
   const byCat = Object.create(null);
@@ -142,27 +163,30 @@ async function getAllCatalogPackages() {
   });
 
   // 2) ادمج site-config فوق الافتراضيات حسب id (أو أضف إن غاب)
+  //    inactive من site-config يُدمَج عند includeInactive أو لتعطيل باقة كانت نشطة
   Object.keys(pkgs).forEach((cat) => {
     if (!Array.isArray(pkgs[cat])) return;
     if (!byCat[cat]) byCat[cat] = [];
     pkgs[cat].forEach((p) => {
-      if (!p || p.active === false) return;
+      if (!p) return;
       const row = Object.assign({ _catalog: cat }, p);
       const id = String(p.id || '');
       if (!id) {
+        if (p.active === false && !includeInactive) return;
         byCat[cat].push(row);
         return;
       }
       const idx = byCat[cat].findIndex((x) => String(x.id) === id);
       if (idx >= 0) byCat[cat][idx] = Object.assign({}, byCat[cat][idx], row);
-      else byCat[cat].push(row);
+      else if (p.active !== false || includeInactive) byCat[cat].push(row);
     });
   });
 
   const out = [];
   Object.keys(byCat).forEach((cat) => {
     byCat[cat].forEach((p) => {
-      if (p && p.active !== false) out.push(p);
+      if (!p) return;
+      if (includeInactive || p.active !== false) out.push(p);
     });
   });
   return out;
@@ -177,12 +201,14 @@ async function resolvePackageBoostDays(ref) {
   return null;
 }
 
-async function findCatalogPackage(ref) {
+async function findCatalogPackage(ref, opts) {
   if (!ref) return null;
   const id = typeof ref === 'string' ? ref : String(ref.id || ref.packageId || '');
   const name = typeof ref === 'object' ? String(ref.pkgName || ref.name || '').trim() : '';
   const category = typeof ref === 'object' ? String(ref.category || ref._catalog || '').trim() : '';
-  const all = await getAllCatalogPackages();
+  /* البحث بالمعرّف يشمل الموقوفة (لـ 409 / الاشتراكات القائمة / الرصيد).
+     العرض العام يمر عبر getAllCatalogPackages() بلا includeInactive. */
+  const all = await getAllCatalogPackages({ includeInactive: true });
   const inCat = category
     ? all.filter((p) => String(p._catalog || '') === category)
     : all;
@@ -277,6 +303,8 @@ module.exports = {
   DEFAULT_TENDER_PACKAGES,
   DEFAULT_INVESTMENT_PACKAGES,
   DEFAULT_VIDEO_PACKAGES,
+  DEFAULT_ESTATE_PACKAGES,
+  DEFAULT_GENERAL_PACKAGES,
   DEFAULT_CATALOG_BY_KEY,
   readSiteConfigRaw,
   getQuotaConfig,

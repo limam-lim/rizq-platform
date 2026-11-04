@@ -154,6 +154,7 @@ function buildSystemPrompt({ lang, detectedLang, profile, pageContext, pageFacts
       `For Rizq subscription/package/pricing questions:\n` +
       `1) If business type unknown (محل/مكتب/شركة) — ASK that first in one short question. Do NOT dump package lists.\n` +
       `2) When type is known — call get_packages_info(catalog=store|office|corp|estate) and quote ONLY that live result.\n` +
+      `MONTHLY ONLY AT LAUNCH: Do NOT quote, suggest, or compare quarterly (ربعية/trimestriel) or yearly (سنوية/annuel) packages. Only trial, monthly, diamond monthly, and individual plans from the live catalog.\n` +
       `3) Never invent MRU amounts; never mix catalogs; never use memorized training prices or legacy general 5000/10000.\n` +
       `Do NOT redirect to "open listing card" unless the user asks about a specific ad.\n` +
       `Rizq payments: Bankily, Sedad, or cash with seller. Registration is free.\n` +

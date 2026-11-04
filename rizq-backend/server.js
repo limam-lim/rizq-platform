@@ -2721,12 +2721,14 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
   let catalogPkg = null;
   try {
     const { findCatalogPackage } = require('./services/catalogConfig');
+    const lookupOpts = { includeInactive: true };
     catalogPkg = (await findCatalogPackage({
       pkgName: pkgRef,
       name: pkgRef,
       id: pkgRef,
       category: b.category,
-    })) || (await findCatalogPackage(pkgRef));
+      includeInactive: true,
+    }, lookupOpts)) || (await findCatalogPackage(pkgRef, lookupOpts));
   } catch (catErr) {
     console.warn('[sub-requests] catalog lookup:', catErr.message);
   }
@@ -2735,6 +2737,14 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
       ok: false,
       error: 'UNKNOWN_PKG',
       message: 'باقة غير معروفة في الكتالوج — السعر يُحدَّد من الخادم فقط',
+    });
+  }
+  if (catalogPkg.active === false) {
+    return res.status(409).json({
+      ok: false,
+      error: 'package_inactive',
+      message: 'هذه الباقة غير متاحة حالياً',
+      message_fr: "Cette offre n'est pas disponible actuellement",
     });
   }
   // P0: null/undefined/NaN ليست مجانية — لا نحوّلها إلى 0

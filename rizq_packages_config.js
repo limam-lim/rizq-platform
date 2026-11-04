@@ -576,7 +576,7 @@ var CATALOGS = {
     { id: 'trial',   price: 0,     durationDays: 10,  discountPct: 0, features: ['10 منتجات', 'شارة محل', 'تواصل مباشر'] },
     { id: 'basic',   price: 1500,  durationDays: 30,  discountPct: 2, features: ['30 منتج', 'شارة مميّز برزق', 'إحصائيات'] },
     { id: 'pro',     price: 4000,  durationDays: 30,  discountPct: 3, features: ['منتجات غير محدودة', 'أولوية في نتائج البحث', 'دعم مخصص'] },
-    { id: 'yearly',  price: 30000, durationDays: 365, discountPct: 3, features: ['كل مزايا Pro', 'خصم 37% عن السعر الشهري', 'فوترة سنوية واحدة'] },
+    { id: 'yearly', active: false,  price: 30000, durationDays: 365, discountPct: 3, features: ['كل مزايا Pro', 'خصم 37% عن السعر الشهري', 'فوترة سنوية واحدة'] },
     Object.assign({ id: 'diamond_standard', price: 5000, durationDays: 30, discountPct: 5 }, _diamondStandardFields(5000)),
     Object.assign({ id: 'diamond_pro', price: 10000, durationDays: 30, discountPct: 5 }, _diamondProFields(10000))
   ],
@@ -593,9 +593,9 @@ var CATALOGS = {
       features_fr: ['Accès complet à la plateforme', '10 produits affichés', 'Support technique de base'] },
     { id: 'st-month', price: 2000, durationDays: 30, maxCatalogItems: 100, discountPct: 2, features: ['شارة محل مميّز برزق', 'عرض 100 منتج', 'إحصائيات شهرية', 'دعم بالأولوية'],
       features_fr: ['Badge boutique premium Rizq', '100 produits affichés', 'Statistiques mensuelles', 'Support prioritaire'] },
-    { id: 'st-quart', price: 5500, durationDays: 90, maxCatalogItems: 500, discountPct: 3, features: ['كل مزايا الشهرية', 'توفير 15% عن الشهري', 'عرض 500 منتج', 'مدير حساب مخصص'],
+    { id: 'st-quart', active: false, price: 5500, durationDays: 90, maxCatalogItems: 500, discountPct: 3, features: ['كل مزايا الشهرية', 'توفير 15% عن الشهري', 'عرض 500 منتج', 'مدير حساب مخصص'],
       features_fr: ['Tous les avantages mensuels', '15% d\'économie vs mensuel', '500 produits affichés', 'Gestionnaire de compte dédié'] },
-    { id: 'st-year', price: 15000, durationDays: 365, maxCatalogItems: Infinity, discountPct: 3, features: ['كل مزايا الربعية', 'توفير 35% عن الشهري', 'منتجات غير محدودة', 'دعم VIP 24/7', 'تقارير سنوية'],
+    { id: 'st-year', active: false, price: 15000, durationDays: 365, maxCatalogItems: Infinity, discountPct: 3, features: ['كل مزايا الربعية', 'توفير 35% عن الشهري', 'منتجات غير محدودة', 'دعم VIP 24/7', 'تقارير سنوية'],
       features_fr: ['Tous les avantages trimestriels', '35% d\'économie vs mensuel', 'Produits illimités', 'Support VIP 24/7', 'Rapports annuels'] },
     Object.assign({ id: 'st-diam-std' }, _storeDiamondStandardFields()),
     Object.assign({ id: 'st-diam-pro' }, _storeDiamondProFields())
@@ -609,10 +609,10 @@ var CATALOGS = {
     { id: 'es-month', price: 4000, durationDays: 30, maxCatalogItems: 25, discountPct: 2, highlight: true,
       features: ['حتى 25 عقاراً نشطاً', 'شارة وكالة موثوقة', 'خريطة ومواصفات كاملة', 'طرق دفع + إحالة'],
       features_fr: ['Jusqu\'à 25 biens actifs', 'Badge agence vérifiée', 'Carte et fiches complètes', 'Paiements + parrainage'] },
-    { id: 'es-quart', price: 10500, durationDays: 90, maxCatalogItems: 80, discountPct: 3,
+    { id: 'es-quart', active: false, price: 10500, durationDays: 90, maxCatalogItems: 80, discountPct: 3,
       features: ['حتى 80 عقاراً', 'أولوية في نتائج البحث', 'إحصائيات زيارات', 'دعم بالأولوية'],
       features_fr: ['Jusqu\'à 80 biens', 'Priorité recherche', 'Statistiques de vues', 'Support prioritaire'] },
-    { id: 'es-year', price: 32000, durationDays: 365, maxCatalogItems: 200, discountPct: 3,
+    { id: 'es-year', active: false, price: 32000, durationDays: 365, maxCatalogItems: 200, discountPct: 3,
       features: ['حتى 200 عقار', 'فيديو تعريفي', 'تقارير سنوية', 'دعم VIP'],
       features_fr: ['Jusqu\'à 200 biens', 'Vidéo de présentation', 'Rapports annuels', 'Support VIP'] },
     Object.assign({ id: 'es-diam-std', maxCatalogItems: Infinity }, _diamondStandardFields(4500), {
@@ -635,10 +635,10 @@ var CATALOGS = {
     { id: 'of-month', price: 3500, durationDays: 30, maxCatalogItems: Infinity, discountPct: 2, highlight: true,
       features: ['شارة مكتب موثوق', 'خدمات غير محدودة', 'نظام حجز المواعيد', 'فيديو تعريفي مشمول'],
       features_fr: ['Badge bureau vérifié', 'Services illimités', 'Système de prise de rendez-vous', 'Vidéo de présentation incluse'] },
-    { id: 'of-quart', price: 9000, durationDays: 90, maxCatalogItems: Infinity, discountPct: 3,
+    { id: 'of-quart', active: false, price: 9000, durationDays: 90, maxCatalogItems: Infinity, discountPct: 3,
       features: ['توفير 14%', 'عرض خدمات غير محدود', 'مدير حساب مخصص'],
       features_fr: ['Économisez 14%', 'Services illimités', 'Gestionnaire de compte dédié'] },
-    { id: 'of-year', price: 28000, durationDays: 365, maxCatalogItems: Infinity, discountPct: 3,
+    { id: 'of-year', active: false, price: 28000, durationDays: 365, maxCatalogItems: Infinity, discountPct: 3,
       features: ['توفير 33%', 'فيديو تعريفي مشمول + 1 إضافي مجاناً', 'أولوية الدعم'],
       features_fr: ['Économisez 33%', 'Vidéo incluse + 1 gratuite supplémentaire', 'Support prioritaire'] },
     Object.assign({ id: 'of-diam-std' }, _officeDiamondStandardFields()),
@@ -651,10 +651,10 @@ var CATALOGS = {
     { id: 'cp-month', price: 3500,  durationDays: 30,  discountPct: 2,
       features: ['شارة شركة مميّزة برزق', 'عرض 30 إعلان', 'إحصائيات شهرية', 'دعم بالأولوية'],
       features_fr: ['Badge entreprise premium Rizq', 'Jusqu\'à 30 annonces', 'Statistiques mensuelles', 'Support prioritaire'] },
-    { id: 'cp-quart', price: 9000,  durationDays: 90,  discountPct: 3,
+    { id: 'cp-quart', active: false, price: 9000,  durationDays: 90,  discountPct: 3,
       features: ['كل مزايا الشهرية', 'توفير 15% عن الشهري', 'إعلانات غير محدودة', 'مدير حساب'],
       features_fr: ['Tous les avantages mensuels', '15% d\'économie vs mensuel', 'Annonces illimitées', 'Gestionnaire de compte'] },
-    { id: 'cp-year',  price: 25000, durationDays: 365, discountPct: 3,
+    { id: 'cp-year', active: false,  price: 25000, durationDays: 365, discountPct: 3,
       features: ['كل مزايا الربعية', 'توفير 35% عن الشهري', 'ميزات VIP حصرية', 'دعم 24/7', 'تقارير سنوية شاملة'],
       features_fr: ['Tous les avantages trimestriels', '35% d\'économie vs mensuel', 'Avantages VIP exclusifs', 'Support 24/7', 'Rapports annuels complets'] },
     Object.assign({ id: 'cp-diam-std' }, _corpDiamondStandardFields()),
@@ -669,15 +669,15 @@ var CATALOGS = {
   tender: [
     { id: 'tnd-trial', price: 0,     durationDays: 10,  discountPct: 0, features: ['تصفّح وتصفية المناقصات المنشورة', 'بيانات التواصل مخفية/ضبابية', 'تقديم العروض مقفول'], features_fr: ['Parcourir et filtrer les appels d\'offres', 'Coordonnées masquées / floutées', 'Soumission d\'offres verrouillée'] },
     { id: 'tnd-month', price: 5000,  durationDays: 30,  discountPct: 0, features: ['كشف بيانات تواصل صاحب المناقصة', 'تقديم عروض غير محدود', 'نشر مناقصات'], features_fr: ['Accès aux coordonnées du donneur d\'ordre', 'Soumissions d\'offres illimitées', 'Publication d\'appels d\'offres'] },
-    { id: 'tnd-quart', price: 13500, durationDays: 90,  discountPct: 10, features: ['كل مزايا الشهرية', 'توفير 10% عن الشهري', 'أولوية ظهور عروضك لأصحاب المناقصات'], features_fr: ['Tous les avantages mensuels', '10% d\'économie vs mensuel', 'Priorité d\'affichage de vos offres'] },
-    { id: 'tnd-year',  price: 45000, durationDays: 365, discountPct: 25, features: ['كل مزايا الربعية', 'توفير 25% عن الشهري', 'دعم VIP', 'تنبيهات فورية SMS/واتساب للمناقصات الجديدة'], features_fr: ['Tous les avantages trimestriels', '25% d\'économie vs mensuel', 'Support VIP', 'Alertes SMS/WhatsApp pour les nouveaux appels d\'offres'] }
+    { id: 'tnd-quart', active: false, price: 13500, durationDays: 90,  discountPct: 10, features: ['كل مزايا الشهرية', 'توفير 10% عن الشهري', 'أولوية ظهور عروضك لأصحاب المناقصات'], features_fr: ['Tous les avantages mensuels', '10% d\'économie vs mensuel', 'Priorité d\'affichage de vos offres'] },
+    { id: 'tnd-year', active: false,  price: 45000, durationDays: 365, discountPct: 25, features: ['كل مزايا الربعية', 'توفير 25% عن الشهري', 'دعم VIP', 'تنبيهات فورية SMS/واتساب للمناقصات الجديدة'], features_fr: ['Tous les avantages trimestriels', '25% d\'économie vs mensuel', 'Support VIP', 'Alertes SMS/WhatsApp pour les nouveaux appels d\'offres'] }
   ],
   /* باقات غرفة الاستثمارات — هيكل المناقصات؛ الأسعار الافتراضية قابلة للتعديل من الأدمن */
   investment: [
     { id: 'inv-trial', price: 0,     durationDays: 10,  discountPct: 0, period: 'مجان / 10 أيام', period_fr: 'Gratuit / 10 jours', features: ['تصفّح فرص الاستثمار المنشورة', 'بيانات التواصل مخفية/ضبابية', 'إيداع الفرص مقفول'], features_fr: ['Parcourir les opportunités publiées', 'Coordonnées masquées / floutées', 'Dépôt d\'opportunités verrouillé'] },
     { id: 'inv-month', price: 5000,  durationDays: 30,  discountPct: 0, period: 'MRU / شهر', period_fr: 'MRU / mois', features: ['كشف بيانات تواصل صاحب الفرصة', 'إيداع فرص استثمار غير محدود', 'التواصل مع المستثمرين المهتمين'], features_fr: ['Accès aux coordonnées du porteur', 'Dépôt illimité d\'opportunités', 'Contact avec investisseurs intéressés'] },
-    { id: 'inv-quart', price: 13500, durationDays: 90,  discountPct: 10, period: 'MRU / 3 أشهر', period_fr: 'MRU / 3 mois', features: ['كل مزايا الشهرية', 'توفير 10% عن الشهري', 'أولوية ظهور فرصك للمستثمرين'], features_fr: ['Tous les avantages mensuels', '10% d\'économie vs mensuel', 'Priorité d\'affichage de vos opportunités'] },
-    { id: 'inv-year',  price: 45000, durationDays: 365, discountPct: 25, period: 'MRU / 12 شهر', period_fr: 'MRU / 12 mois', features: ['كل مزايا الربعية', 'توفير 25% عن الشهري', 'دعم VIP', 'تنبيهات فورية للفرص الجديدة'], features_fr: ['Tous les avantages trimestriels', '25% d\'économie vs mensuel', 'Support VIP', 'Alertes pour les nouvelles opportunités'] }
+    { id: 'inv-quart', active: false, price: 13500, durationDays: 90,  discountPct: 10, period: 'MRU / 3 أشهر', period_fr: 'MRU / 3 mois', features: ['كل مزايا الشهرية', 'توفير 10% عن الشهري', 'أولوية ظهور فرصك للمستثمرين'], features_fr: ['Tous les avantages mensuels', '10% d\'économie vs mensuel', 'Priorité d\'affichage de vos opportunités'] },
+    { id: 'inv-year', active: false,  price: 45000, durationDays: 365, discountPct: 25, period: 'MRU / 12 شهر', period_fr: 'MRU / 12 mois', features: ['كل مزايا الربعية', 'توفير 25% عن الشهري', 'دعم VIP', 'تنبيهات فورية للفرص الجديدة'], features_fr: ['Tous les avantages trimestriels', '25% d\'économie vs mensuel', 'Support VIP', 'Alertes pour les nouvelles opportunités'] }
   ],
   verified_plus: [
     { id: 'vp-year', price: 5000, durationDays: 365, discountPct: 0, features: ['شارة موثّق⁺ الرسمية بشعار رزق', 'أعلى درجة ثقة — تحقق هوية مُعزَّز', 'تبرز فوق شارة التوثيق المجانية', 'صالحة لمدة سنة كاملة'] }
@@ -1027,7 +1027,7 @@ function enrichForDisplay(pkg, lang) {
 }
 
 /** Bump when code defaults change — triggers localStorage re-seed on next page load */
-var CATALOG_SYNC_REVISION = '2026-10-22-estate-prices-ai';
+var CATALOG_SYNC_REVISION = '2026-11-03-monthly-only';
 var CATALOG_SYNC_LS_KEY = 'rizq_catalog_sync_revision';
 var STALE_PKG_FEATURE_MARKERS = [
   'فيديو إعلاني واحد',
@@ -1066,7 +1066,7 @@ function _pkgNeedsDefaultRefresh(livePkg, base) {
 function _mergeLive(defaults, live) {
   if (!Array.isArray(defaults) || !defaults.length) return [];
   if (!Array.isArray(live) || !live.length) {
-    return defaults.map(function (p) { return _stampCatalogRev(p); });
+    return defaults.filter(function (p) { return p && p.active !== false; }).map(function (p) { return _stampCatalogRev(p); });
   }
   var byId = {};
   defaults.forEach(function (p) { byId[p.id] = p; });
@@ -1466,7 +1466,8 @@ function buildLiveCatalogPolicyBlock() {
     '3. Quote ONLY prices returned by that live call (Western digits 0-9, plain text).\n' +
     '4. NEVER use catalog=general and NEVER quote legacy 5000/10000 diamond prices.\n' +
     '5. If live tool data is missing, say you need the business type / official catalog — NEVER invent MRU amounts.\n' +
-    '6. Sound like a sharp human manager: short, clear, commercially helpful — not a dumped brochure.\n'
+    '6. Sound like a sharp human manager: short, clear, commercially helpful — not a dumped brochure.\n' +
+    '7. MONTHLY ONLY AT LAUNCH: never quote or suggest quarterly (ربعية/trimestriel) or yearly (سنوية/annuel) plans; live catalog already omits them.\n'
   );
 }
 

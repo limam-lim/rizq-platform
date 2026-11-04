@@ -552,7 +552,7 @@
         else if (/ماس|diamond/i.test(t) && catalogHint === 'store') pkg = 'st-diam-std';
         else if (/ماس|diamond/i.test(t) && catalogHint === 'corp') pkg = 'cp-diam-std';
         else if (/ماس|diamond/i.test(t)) pkg = 'الماسية الأساسية';
-        else if (/سنو|year|annuel/i.test(t)) pkg = 'السنوية';
+        else if (/شهر|month|mensuel/i.test(t)) pkg = 'الشهرية';
         else if (/\bpro\b/i.test(t)) pkg = 'Pro';
         else if (/تجرب|trial/i.test(t)) pkg = 'التجريبية';
       }
@@ -1140,10 +1140,10 @@
           return pkgCfg.buildPublicSummary(L);
         }
         return pick({
-          ar: '🌟 باقات رزق متعددة (تجريبية، شهرية، ربع سنوية، سنوية، وماسية 💎).\n\nللأسعار الحالية، افتح rizq_landing_v8.html#pricing أو أعد المحاولة عندما يكون الخادم متصلاً.',
-          fr: 'Forfaits Rizq : essai, mensuel, trimestriel, annuel et Diamant 💎.\n\nPour les prix actuels : rizq_landing_v8.html#pricing ou réessayez lorsque le serveur est en ligne.',
-          es: 'Planes Rizq: prueba, mensual, trimestral, anual y Diamante 💎.\n\nPrecios actuales: rizq_landing_v8.html#pricing o reintente cuando el servidor esté en línea.',
-          en: 'Rizq plans: trial, monthly, quarterly, yearly, and Diamond 💎.\n\nLive prices: rizq_landing_v8.html#pricing or retry when the server is online.'
+          ar: '🌟 باقات رزق عند الإطلاق: تجريبية، شهرية (عادية وماسية)، وباقات الأفراد — دون ربعية أو سنوية حالياً.\n\nللأسعار الحالية، افتح rizq_landing_v8.html#pricing أو أعد المحاولة عندما يكون الخادم متصلاً.',
+          fr: 'Forfaits Rizq au lancement : essai, mensuel (standard et Diamant), et forfaits particuliers — pas de trimestriel ni annuel pour le moment.\n\nPrix actuels : rizq_landing_v8.html#pricing ou réessayez lorsque le serveur est en ligne.',
+          es: 'Planes Rizq en el lanzamiento: prueba, mensual (estándar y Diamante) y planes individuales — sin trimestral ni anual por ahora.\n\nPrecios: rizq_landing_v8.html#pricing o reintente cuando el servidor esté en línea.',
+          en: 'Rizq plans at launch: trial, monthly (standard and Diamond), and individual plans — no quarterly or yearly for now.\n\nLive prices: rizq_landing_v8.html#pricing or retry when the server is online.'
         });
       }
       if (/دفع|payment|paiement|bankily|sedad|pago|pay/.test(lower)) {
