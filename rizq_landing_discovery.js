@@ -786,7 +786,11 @@
       if(typeof window.rizqScrollLandingHash === 'function') window.rizqScrollLandingHash(true);
     }
 
-    document.addEventListener('DOMContentLoaded', renderAllStrips);
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', renderAllStrips);
+    } else {
+      setTimeout(renderAllStrips, 0);
+    }
     try{
       var _origSetItem = Storage.prototype.setItem;
       Storage.prototype.setItem = function(k, v){
