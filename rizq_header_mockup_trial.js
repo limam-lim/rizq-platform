@@ -37,7 +37,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.94';
+    link.href = 'rizq_header_mockup_trial.css?v=5.95';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -1278,6 +1278,37 @@
     return Math.max(0, Math.ceil(bottom - top));
   }
 
+  /**
+   * حجز ارتفاع ثابت لكل وضع (phone/desk):
+   * - أثناء الاستقرار: لا نسمح بالانكماش (يمنع CLS)
+   * - قياسان متطابقان متتاليان → قفل نهائي (بدل مؤقّت 8000ms)
+   */
+  function settleHdrReserve(mode, measured) {
+    var m = Math.max(0, Math.ceil(Number(measured) || 0));
+    var locked = window.__rmhHdrReserve;
+    if (locked && locked.mode === mode && locked.locked && locked.h > 0) return locked.h;
+    if (locked && locked.mode !== mode) {
+      window.__rmhHdrReserve = null;
+      window.__rmhHdrPending = null;
+      locked = null;
+    }
+    var published = 0;
+    try {
+      published = parseFloat(document.body.style.getPropertyValue('--rizq-mock-hdr-h'))
+        || parseFloat(getComputedStyle(document.body).getPropertyValue('--rizq-mock-hdr-h'))
+        || 0;
+    } catch (ePub) { published = 0; }
+    var next = Math.max(m, published);
+    var pend = window.__rmhHdrPending;
+    if (pend && pend.mode === mode && pend.h === m) {
+      window.__rmhHdrReserve = { mode: mode, h: next, locked: true };
+      window.__rmhHdrPending = null;
+      return next;
+    }
+    window.__rmhHdrPending = { mode: mode, h: m };
+    return next;
+  }
+
   function syncMockHdrHeight() {
     var hdr = document.getElementById('rizq-mock-hdr');
     if (!hdr) return;
@@ -1297,11 +1328,9 @@
       if (ticker) topH += Math.ceil(ticker.getBoundingClientRect().height || 0);
       if (topNav) topH += Math.ceil(topNav.getBoundingClientRect().height || 48);
       topH = Math.max(topH, 96);
-      /* حجز ثابت محسوب مرة لكل وضع (هاتف/سطح) — بلا مؤقّت زمني يسبب CLS */
+      /* حجز محسوب: لا انكماش أثناء الاستقرار، ثم قفل بعد قياسين متطابقين (بلا مؤقّت 8ث) */
       try {
-        var lockedP = window.__rmhHdrReserve;
-        if (lockedP && lockedP.mode === 'phone' && lockedP.h > 0) topH = lockedP.h;
-        else window.__rmhHdrReserve = { mode: 'phone', h: topH };
+        topH = settleHdrReserve('phone', topH);
       } catch (eKeepP) {}
       document.body.style.setProperty('--rizq-mock-hdr-h', topH + 'px');
       /* browse/detail + legacy chrome read --rizq-header-h — keep it in sync with mock top bar */
@@ -1318,9 +1347,7 @@
     var h = measureMockHdrExtent(hdr) || Math.ceil(hdr.getBoundingClientRect().height || 196);
     /* Fixed calculated reserve per layout mode — no time-based freeze */
     try {
-      var lockedH = window.__rmhHdrReserve;
-      if (lockedH && lockedH.mode === 'desk' && lockedH.h > 0) h = lockedH.h;
-      else window.__rmhHdrReserve = { mode: 'desk', h: h };
+      h = settleHdrReserve('desk', h);
     } catch (eKeep) {}
     document.body.style.setProperty('--rizq-mock-hdr-h', h + 'px');
     /* Sync legacy --rizq-header-h so .browse-right inset / detail max-height clear the capsule */
