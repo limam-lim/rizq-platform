@@ -54,10 +54,13 @@ function main() {
     /preserve\.DATABASE_URL/.test(server)
     && /process\.env\.DATABASE_URL = preserve\.DATABASE_URL/.test(server));
 
+  /* اختبارات بلا DB: فحص ملفات ثابتة أو المشغّل الشامل */
+  const noDbOk = new Set(['test:asset-versions', 'test:all']);
   const testScripts = Object.keys(pkg.scripts).filter((k) => k.startsWith('test:'));
-  const allWrapped = testScripts.every((k) => String(pkg.scripts[k]).includes('run-with-test-db.js'));
+  const needDb = testScripts.filter((k) => !noDbOk.has(k));
+  const allWrapped = needDb.every((k) => String(pkg.scripts[k]).includes('run-with-test-db.js'));
   ok('all rizq-backend npm test:* use run-with-test-db.js', allWrapped,
-    'count=' + testScripts.length);
+    'dbWrapped=' + needDb.length + ' exempt=' + [...noDbOk].join(','));
 
   ok('assert-rizq-test-db.js exists',
     fs.existsSync(path.join(__dirname, 'assert-rizq-test-db.js')));
