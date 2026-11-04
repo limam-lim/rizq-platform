@@ -126,6 +126,10 @@ function writeLocalCaddyfile() {
 			path /vendor /vendor/*
 		}
 		handle @publicFiles {
+			@versionedQuery {
+				query v=*
+			}
+			header @versionedQuery Cache-Control "public, max-age=31536000, immutable"
 			file_server
 		}
 
@@ -258,6 +262,8 @@ async function main() {
   ok(/frame-ancestors 'none'/.test(prodSrc), 'CSP frame-ancestors none (prod)');
   ok(!/path \*\.js/.test(prodSrc) || /@publicFiles[\s\S]*rizq_\*\.js/.test(prodSrc),
     'no blanket *.js public matcher (whitelist rizq_*.js)');
+  ok(/@versionedQuery/.test(prodSrc) && /immutable/.test(prodSrc),
+    'versioned ?v= assets get Cache-Control immutable');
 
   let caddy = findCaddy();
   if (!caddy) {
