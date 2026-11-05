@@ -4846,6 +4846,44 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rizq-styles-gender-tabs{
   display:flex;justify-content:center;gap:8px;margin:0 0 18px;flex-wrap:wrap
 }
+/* دليل رزق — 4 أزرار بسطر واحد؛ على الهاتف تمرير أفقي بدون تصغير الخط */
+#rizq-guide{
+  padding:22px 5% 8px;background:var(--bg-section,#eef2f8);position:relative
+}
+#rizq-guide .rizq-guide-inner{max-width:1100px;margin:0 auto}
+#rizq-guide .rizq-guide-head{text-align:center;margin:0 0 14px}
+#rizq-guide .rizq-guide-tag{
+  display:inline-block;font-size:11px;font-weight:800;letter-spacing:.04em;
+  color:var(--gold,#C9A84C);margin:0 0 4px
+}
+#rizq-guide .rizq-guide-title{
+  font-size:clamp(18px,2.4vw,24px);font-weight:800;color:var(--royal,#1B3A6B);margin:0 0 4px
+}
+#rizq-guide .rizq-guide-title span{color:var(--gold,#C9A84C)}
+#rizq-guide .rizq-guide-desc{
+  font-size:12.5px;font-weight:600;color:#5b6b85;margin:0 auto;max-width:520px;line-height:1.45
+}
+.rizq-guide-tabs{
+  display:flex;justify-content:center;gap:8px;margin:0 0 14px;
+  flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;padding:2px 0 6px
+}
+.rizq-guide-tabs::-webkit-scrollbar{display:none}
+.rizq-guide-tabs .rizq-styles-gtab{flex:0 0 auto;white-space:nowrap}
+.rizq-guide-tabs .rizq-styles-gtab[hidden]{display:none!important}
+.rizq-guide-stage{
+  position:relative;min-height:var(--rizq-guide-stage-h,320px);
+  /* ارتفاع ثابت يمنع قفز الصفحة عند تبديل التبويب */
+}
+.rizq-guide-stage .rizq-styles-track-wrap{margin:0}
+.rizq-guide-stage .rzq-disc-wrap{margin:0;min-height:1px}
+.rizq-guide-stage.is-empty{opacity:.72}
+@media(max-width:768px){
+  #rizq-guide{padding:16px var(--rizq-strip-inset,14px) 4px}
+  .rizq-guide-tabs{justify-content:flex-start;gap:6px;margin-bottom:12px}
+  /* نفس مقاس أزرار الأقسام — بلا تصغير خط */
+  .rizq-guide-tabs .rizq-styles-gtab{padding:6px 12px;font-size:11.5px;gap:4px}
+}
 .rizq-styles-gtab{
   display:inline-flex;align-items:center;gap:6px;
   padding:8px 18px;font-size:13px;font-weight:700;font-family:inherit;
@@ -5050,6 +5088,21 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
     radial-gradient(circle at 25% 20%,rgba(201,168,76,.2),transparent 45%),
     linear-gradient(160deg,#102038,#0a1628);
   overflow:hidden;
+}
+/* إطلالات: شبكة صور متساوية — بلا بلاطة أكبر تميّز محلاً عن آخر */
+#rizq-styles .rizq-style-mosaic,
+#rizq-guide[data-guide-pane="styles"] .rizq-style-mosaic{
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:1fr;
+  min-height:168px;
+}
+#rizq-styles .rizq-style-tile:first-child,
+#rizq-guide[data-guide-pane="styles"] .rizq-style-tile:first-child{
+  grid-row:auto;font-size:28px
+}
+#rizq-styles .rizq-style-tile:first-child .rizq-style-tile-price,
+#rizq-guide[data-guide-pane="styles"] .rizq-style-tile:first-child .rizq-style-tile-price{
+  font-size:9px;padding:2px 6px
 }
 .rizq-style-tile{
   display:flex;align-items:center;justify-content:center;
@@ -5492,7 +5545,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_contact_gate.js"></script>
 <script src="rizq_dynamic_nav.js?v=23.5"></script>
 <script src="rizq_module_flags.js?v=1.2"></script>
-<script src="rizq_pwa.js?v=31.34" defer></script>
+<script src="rizq_pwa.js?v=31.35" defer></script>
 <script src="rizq_footer_toggle.js?v=23.8" defer></script>
 <script src="rizq_social_links.js?v=23.13" defer></script>
 <script src="rizq_account_route.js?v=23.0"></script>
@@ -5918,6 +5971,31 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
   </div>
 </section><!-- /hero — هوية + بحث + شريط الإبهار بعرض الشاشة -->
 
+<!-- ══ دليل رزق — 4 أزرار تعرض نفس أشرطة الأقسام (مصدر بيانات مشترك، بلا cloneNode) ══ -->
+<section id="rizq-guide" class="rizq-guide-section" aria-labelledby="rizq-guide-title" data-guide-pane="styles">
+  <div class="rizq-guide-inner">
+    <div class="rizq-guide-head fade-in">
+      <p class="rizq-guide-tag" data-t="guide-tag">دليل رزق</p>
+      <h2 id="rizq-guide-title" class="rizq-guide-title" data-t="guide-title">اكتشف <span>رزق</span> من أول نظرة</h2>
+      <p class="rizq-guide-desc" data-t="guide-desc">إطلالات، معارض، عقارات ومكاتب — نفس البطاقات التي تراها في أقسامها بالأسفل</p>
+    </div>
+    <div class="rizq-guide-tabs rizq-styles-gender-tabs" role="tablist" aria-label="دليل رزق">
+      <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-guide-pane="styles" id="guide-tab-styles">✨ <span data-t="guide-styles">إطلالات</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-pane="showrooms" data-rizq-module="corp" id="guide-tab-showrooms" hidden>🏬 <span data-t="guide-showrooms">من قلب المعارض</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-pane="estate" data-rizq-module="estate" id="guide-tab-estate">🏠 <span data-t="guide-estate">سوق العقارات</span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-pane="offices" data-rizq-module="office" id="guide-tab-offices" hidden>💼 <span data-t="guide-offices">خدمات المكاتب</span></button>
+    </div>
+    <div class="rizq-guide-stage" id="rizq-guide-stage">
+      <div class="rizq-styles-track-wrap fade-in" id="rizq-guide-styles-wrap">
+        <div class="rizq-styles-rail" id="rizq-guide-rail" role="list" aria-live="polite"></div>
+      </div>
+      <div class="rzq-disc-wrap fade-in" id="rizq-guide-office-wrap" hidden>
+        <div id="rizq-guide-disc-office"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ══ CATEGORIES — بعد شريط الإبهار مباشرة ══ -->
 <section class="section categories-after-promo" id="categories" style="background:var(--bg-section)">
   <div class="section-header fade-in">
@@ -5995,6 +6073,34 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
 </div>
 
 <!-- ══ بعد الإبهار: تحويل + Rizq ADS (النماذج عبر شريط «نماذج») ══ -->
+<!-- ══ الإعلانات المميزة — بطاقات أصغر + المميّز ثابت حسب الباقة + زر واحد لكل الإعلانات ══ -->
+<section class="listings-section" id="listings" aria-labelledby="landing-ads-title">
+  <div class="section-header fade-in">
+    <p class="section-tag" data-t="s-lst-tag">مختارات السوق</p>
+    <h2 class="section-title" id="landing-ads-title" data-t="s-lst-title">أبرز العروض على <span>رزق</span></h2>
+    <p class="section-desc" data-t="s-lst-desc">فرص منتقاة تليق بذوقك — اكتشف أفضل ما يعرضه السوق الآن</p>
+  </div>
+  <p class="landing-ads-count" id="landing-ads-count" aria-live="polite"></p>
+  <div class="landing-ads-filters" id="landing-ads-filters" role="tablist" aria-label="تصفية الإعلانات">
+    <button type="button" class="landing-ads-filter is-active" role="tab" aria-selected="true" data-lad-cat="all" onclick="filterLandingAds('all',this)" data-t="f-all">الكل</button>
+    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="عقارات" onclick="filterLandingAds('عقارات',this)" data-t="f-re">عقارات</button>
+    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="سيارات" onclick="filterLandingAds('سيارات',this)" data-t="f-car">سيارات</button>
+    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="إلكترونيات" onclick="filterLandingAds('إلكترونيات',this)" data-t="f-elec">إلكترونيات</button>
+    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="أزياء" onclick="filterLandingAds('أزياء',this)" data-t="f-fashion">موضة</button>
+    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="شاحنات" onclick="filterLandingAds('شاحنات',this)" data-t="f-truck">شاحنات</button>
+    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="ماشية" onclick="filterLandingAds('ماشية',this)" data-t="f-live">ماشية</button>
+    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="خدمات" onclick="filterLandingAds('خدمات',this)" data-t="f-srv">خدمات</button>
+  </div>
+  <div class="listings-grid landing-ads-grid" id="landing-ads-grid" role="list">
+    <!-- يُملأ عبر buildLandingAds() -->
+  </div>
+  <div class="landing-ads-footer fade-in" id="landing-ads-footer">
+    <div class="landing-ads-more" id="landing-ads-more" hidden aria-hidden="true"></div>
+    <a class="landing-ads-browse-full" href="rizq_browse.html" data-t="browse-full">📂 عرض كل الإعلانات ←</a>
+  </div>
+</section>
+
+
 <section class="hero-after-promo" aria-label="فضاءات الأعمال على رزق">
   <div class="hero-after-promo-inner">
       <!-- ترويج Rizq ADS — مباشرة فوق شاشة الإعلان الحصري -->
@@ -6102,33 +6208,6 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
       <div class="rvid-section-title" id="rvid-section-title"></div>
       <div class="rvid-section-sub" id="rvid-section-sub"></div>
     </div>
-  </div>
-</section>
-
-<!-- ══ الإعلانات المميزة — بطاقات أصغر + المميّز ثابت حسب الباقة + زر واحد لكل الإعلانات ══ -->
-<section class="listings-section" id="listings" aria-labelledby="landing-ads-title">
-  <div class="section-header fade-in">
-    <p class="section-tag" data-t="s-lst-tag">مختارات السوق</p>
-    <h2 class="section-title" id="landing-ads-title" data-t="s-lst-title">أبرز العروض على <span>رزق</span></h2>
-    <p class="section-desc" data-t="s-lst-desc">فرص منتقاة تليق بذوقك — اكتشف أفضل ما يعرضه السوق الآن</p>
-  </div>
-  <p class="landing-ads-count" id="landing-ads-count" aria-live="polite"></p>
-  <div class="landing-ads-filters" id="landing-ads-filters" role="tablist" aria-label="تصفية الإعلانات">
-    <button type="button" class="landing-ads-filter is-active" role="tab" aria-selected="true" data-lad-cat="all" onclick="filterLandingAds('all',this)" data-t="f-all">الكل</button>
-    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="عقارات" onclick="filterLandingAds('عقارات',this)" data-t="f-re">عقارات</button>
-    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="سيارات" onclick="filterLandingAds('سيارات',this)" data-t="f-car">سيارات</button>
-    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="إلكترونيات" onclick="filterLandingAds('إلكترونيات',this)" data-t="f-elec">إلكترونيات</button>
-    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="أزياء" onclick="filterLandingAds('أزياء',this)" data-t="f-fashion">موضة</button>
-    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="شاحنات" onclick="filterLandingAds('شاحنات',this)" data-t="f-truck">شاحنات</button>
-    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="ماشية" onclick="filterLandingAds('ماشية',this)" data-t="f-live">ماشية</button>
-    <button type="button" class="landing-ads-filter" role="tab" aria-selected="false" data-lad-cat="خدمات" onclick="filterLandingAds('خدمات',this)" data-t="f-srv">خدمات</button>
-  </div>
-  <div class="listings-grid landing-ads-grid" id="landing-ads-grid" role="list">
-    <!-- يُملأ عبر buildLandingAds() -->
-  </div>
-  <div class="landing-ads-footer fade-in" id="landing-ads-footer">
-    <div class="landing-ads-more" id="landing-ads-more" hidden aria-hidden="true"></div>
-    <a class="landing-ads-browse-full" href="rizq_browse.html" data-t="browse-full">📂 عرض كل الإعلانات ←</a>
   </div>
 </section>
 
@@ -9334,9 +9413,23 @@ function _styAdKind(a){
   if(/ذهب|or\b|bijou|سوار|خاتم|ring/i.test(blob)) return 'gold';
   return '';
 }
-function buildStyleIdeas(reshuffle){
-  var rail = document.getElementById('rizq-styles-rail');
+function _styCardStoreName(items, fr){
+  items = Array.isArray(items) ? items.filter(Boolean) : [];
+  var i, it, n;
+  for(i = 0; i < items.length; i++){
+    it = items[i];
+    n = fr
+      ? (it.storeNameFr || it.storeNameF || it.sellerFR || it.storeName || it.seller || '')
+      : (it.storeName || it.seller || it.storeNameFr || it.storeNameF || '');
+    n = String(n || '').trim();
+    if(n) return n.length > 52 ? (n.slice(0, 49).trim() + '…') : n;
+  }
+  return '';
+}
+function buildStyleIdeas(reshuffle, optMountId){
+  var rail = document.getElementById(optMountId || 'rizq-styles-rail');
   if(!rail) return;
+  var guideMount = !!(optMountId && optMountId !== 'rizq-styles-rail');
   var fr = false;
   try {
     if(typeof isAr !== 'undefined') fr = !isAr;
@@ -9384,7 +9477,8 @@ function buildStyleIdeas(reshuffle){
       seedItems.push(fillSeed);
     }
     if(seedItems.length >= 3){
-      var seedName = fr ? (seed.titleFR || seed.title) : seed.title;
+      var seedName = _styCardStoreName(seedItems, fr)
+        || (fr ? (seed.titleFR || seed.title) : seed.title);
       var seedTiles = '';
       for(var si=0; si<seedItems.length && si<3; si++){
         seedTiles += _styTileHtml(seedItems[si], (templates[0] && templates[0].emoji && templates[0].emoji[si]) || seedItems[si].emoji, seedItems[si].bg);
@@ -9439,7 +9533,8 @@ function buildStyleIdeas(reshuffle){
       items.push(fillSty);
     }
     if(items.length < 3) return; /* لا بطاقة ناقصة ولا خلط أجناس */
-    var name = fr ? tpl.fr : tpl.ar;
+    /* اسم المحل الحقيقي + رابطه — لا عنوان القالب */
+    var name = _styCardStoreName(items, fr) || (fr ? tpl.fr : tpl.ar);
     var href;
     if(primary && primary.href){
       href = primary.href;
@@ -9504,7 +9599,8 @@ function buildStyleIdeas(reshuffle){
       tilesEx += _styTileHtml(itemsEx[tj], emEx[tj], itemsEx[tj] && itemsEx[tj].bg);
     }
     var dEx = (typeof trAd === 'function') ? trAd(adEx) : adEx;
-    var nameEx = String((dEx && (dEx.title || adEx.title)) || (fr ? 'Look Rizq' : 'إطلالة رزق'));
+    var nameEx = _styCardStoreName(itemsEx, fr)
+      || String((dEx && (dEx.title || adEx.title)) || (fr ? 'Look Rizq' : 'إطلالة رزق'));
     if(nameEx.length > 52) nameEx = nameEx.slice(0, 49).trim() + '…';
     var hrefEx = adEx.href
       || (adEx.storeId ? ('rizq_store.html?id=' + encodeURIComponent(adEx.storeId)) : 'rizq_directory.html?type=store');
@@ -9529,16 +9625,18 @@ function buildStyleIdeas(reshuffle){
       : ('لا توجد منتجات كافية لقسم « '+emptyGender+' » في محلات الموضة. تصفّح المحلات أو عد لاحقاً.'))
       + '<div style="margin-top:12px"><a class="rizq-style-cta" href="rizq_directory.html?type=store">'
       + (fr ? 'Voir les boutiques' : 'عرض المحلات') + '</a></div></div>';
+    if(typeof window.RizqGuideNotify === 'function') try { window.RizqGuideNotify('styles', false); } catch(eN0) {}
     return;
   }
   rail.classList.remove('is-empty');
   /* تكرار البطاقات مثل شريط «مباشر» لحركة slide سلسة */
   rail.innerHTML = cards.concat(cards).join('');
-  if(reshuffle){
+  if(reshuffle && !guideMount){
     try { _styStartAutoRefresh(); } catch(e3) {}
   }
-  _styUpdateTick(fr);
+  if(!guideMount) _styUpdateTick(fr);
   requestAnimationFrame(function(){ syncMarqueeShift(rail); });
+  if(typeof window.RizqGuideNotify === 'function') try { window.RizqGuideNotify('styles', true); } catch(eN1) {}
 }
 try { buildStyleIdeas(false); } catch(eSty) {}
 try { _styStartAutoRefresh(); } catch(eAuto) {}
@@ -9766,9 +9864,10 @@ function setShowroomModelCat(cat){
   try { _srmHydrateFromApi(); } catch(eHyd){}
   try { refreshLandingBrandStrips(); } catch(eBrand){}
 }
-function buildShowroomModels(reshuffle){
-  var rail = document.getElementById('rizq-srm-rail');
+function buildShowroomModels(reshuffle, optMountId){
+  var rail = document.getElementById(optMountId || 'rizq-srm-rail');
   if(!rail) return;
+  var guideMount = !!(optMountId && optMountId !== 'rizq-srm-rail');
   var fr = false;
   try {
     if(typeof isAr !== 'undefined') fr = !isAr;
@@ -9880,15 +9979,17 @@ function buildShowroomModels(reshuffle){
     rail.innerHTML = '<div class="rizq-styles-empty">'+(fr
       ? 'Pas encore assez de produits catalogue showroom. Explorez le guide des showrooms.'
       : 'لا توجد منتجات كافية في كتالوج المعارض بعد. تصفّح دليل المعارض.')+'</div>';
+    if(typeof window.RizqGuideNotify === 'function') try { window.RizqGuideNotify('showrooms', false); } catch(eN0) {}
     return;
   }
   rail.classList.remove('is-empty');
   rail.innerHTML = cards.concat(cards).join('');
-  if(reshuffle){
+  if(reshuffle && !guideMount){
     try { _srmStartAutoRefresh(); } catch(e3) {}
   }
-  _srmUpdateTick(fr);
+  if(!guideMount) _srmUpdateTick(fr);
   requestAnimationFrame(function(){ syncMarqueeShift(rail); });
+  if(typeof window.RizqGuideNotify === 'function') try { window.RizqGuideNotify('showrooms', true); } catch(eN1) {}
 }
 /** جلب كتالوجات المعارض من الخادم ثم إعادة بناء اللقطات */
 function _srmHydrateFromApi(){
@@ -10053,9 +10154,10 @@ function _rizqEstStartGalleries(rail){
   try{ window._rizqEstGalleryTimer = _rizqEstGalleryTimer; }catch(e){}
 }
 
-function buildEstateModels(reshuffle){
-  var rail = document.getElementById('rizq-est-rail');
+function buildEstateModels(reshuffle, optMountId){
+  var rail = document.getElementById(optMountId || 'rizq-est-rail');
   if(!rail) return;
+  var guideMount = !!(optMountId && optMountId !== 'rizq-est-rail');
   var fr = false;
   try {
     if(typeof isAr !== 'undefined') fr = !isAr;
@@ -10066,7 +10168,7 @@ function buildEstateModels(reshuffle){
   var list = RIZQ_EST_MODELS.filter(function(x){ return cat === 'all' || x.cat === cat; });
   if(reshuffle && typeof _styShuffle === 'function') list = _styShuffle(list.slice());
   var tick = document.getElementById('rizq-est-tick');
-  if(tick) tick.textContent = fr
+  if(tick && !guideMount) tick.textContent = fr
     ? (list.length + ' modèles · 4 photos')
     : (list.length + ' نموذجاً · 4 صور');
   if(!list.length){
@@ -10074,6 +10176,7 @@ function buildEstateModels(reshuffle){
     rail.innerHTML = '<div class="rizq-styles-empty">'+(fr
       ? 'Aucun modèle pour ce filtre — voir tout le marché immobilier.'
       : 'لا نماذج لهذا التصفية — اعرض سوق كل العقارات.')+'</div>';
+    if(typeof window.RizqGuideNotify === 'function') try { window.RizqGuideNotify('estate', false); } catch(eN0) {}
     return;
   }
   var href = 'rizq_estate.html?demo=1';
@@ -10114,6 +10217,7 @@ function buildEstateModels(reshuffle){
       }
     } catch(e3){}
   });
+  if(typeof window.RizqGuideNotify === 'function') try { window.RizqGuideNotify('estate', true); } catch(eN1) {}
 }
 try { buildEstateModels(false); } catch(eEst) {}
 
@@ -17736,13 +17840,27 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
       renderStrip('rzq-disc-store', 'store');
       renderStrip('rzq-disc-office', 'office');
       renderStrip('rzq-disc-corp', 'corp');
+      /* دليل رزق — نفس مكوّن بطاقة المكاتب */
+      if(document.getElementById('rizq-guide-disc-office')){
+        renderStrip('rizq-guide-disc-office', 'office');
+      }
       /* العقارات: شريط نماذج واحد فقط — بلا شريط اكتشاف منفصل */
       /* المناقصات/الاستثمارات: دليل مستقل — لا شريط اكتشاف على الرئيسية */
       renderLiveActivitySection();
       /* بعد ملء الشرائط: أعد التمرير لهاش الصفحة — وإلا يفشل التمرير الأصلي
          لأن #rzq-disc-* تكون فارغة عند وصول الرابط من صفحة أخرى */
       if(typeof window.rizqScrollLandingHash === 'function') window.rizqScrollLandingHash(true);
+      if(typeof window.RizqGuideNotify === 'function'){
+        try {
+          var go = document.getElementById('rizq-guide-disc-office');
+          var has = !!(go && go.querySelector && go.querySelector('.rzq-disc-card, .rzq-disc-track .rzq-disc-card, [class*="disc"]'));
+          if(!has) has = !!(go && go.children && go.children.length);
+          window.RizqGuideNotify('offices', has);
+        } catch(eGN) {}
+      }
     }
+
+    try { window.RizqDiscRenderStrip = renderStrip; } catch(eExp) {}
 
     document.addEventListener('DOMContentLoaded', renderAllStrips);
     try{
@@ -17823,3 +17941,4 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
     }, true);
   })();
   </script>
+<script src="rizq_home_guide.js?v=31.33" defer></script>

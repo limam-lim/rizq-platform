@@ -5,10 +5,10 @@
 (function () {
   'use strict';
 
-  var ASSET_V = '31.34';
+  var ASSET_V = '31.35';
   var MOCK_HDR_V = '5.99';
   /* يجب أن يطابق CACHE_NAME في sw.js حرفياً */
-  var SW_CACHE = 'rizq-cache-v31.34';
+  var SW_CACHE = 'rizq-cache-v31.35';
   var SW_URL = 'sw.js?v=' + ASSET_V;
 
   if (typeof window.showToast !== 'function') {
