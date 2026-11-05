@@ -210,12 +210,13 @@ function startStatic(state) {
   /* —— زيارة 2: الأصول الجديدة بدون مسح يدوي —— */
   state.phase = 'new';
   await page.goto(origin + '/rizq_landing_v8.html', { waitUntil: 'load', timeout: 90000 });
+  await page.waitForTimeout(1500);
 
   let upgraded = null;
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 45; i++) {
     try {
       await page.waitForLoadState('domcontentloaded', { timeout: 5000 }).catch(function () {});
-      await page.waitForTimeout(700);
+      await page.waitForTimeout(900);
       upgraded = await page.evaluate(async (want) => {
         const keys = (await caches.keys()).filter((k) => /^rizq-cache-v/.test(k));
         const regs = await navigator.serviceWorker.getRegistrations();
