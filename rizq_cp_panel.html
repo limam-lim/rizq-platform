@@ -397,6 +397,7 @@ main, .page-content.active, .main-content, .results-area,
     <div class="sb-section" data-t="sb-section-admin">الإدارة</div>
     <div class="sb-item" data-admin-perm="team.manage" onclick="showPanel('team',this)"><span class="sb-icon">🛡️</span><span class="sb-label" data-t="sb-team">فريق الإدارة</span><span class="sb-badge blue" id="team-count-badge">15</span></div>
     <div class="sb-item" data-admin-perm="packages" onclick="showPanel('packages',this)"><span class="sb-icon">📦</span><span class="sb-label" data-t="sb-packages">إدارة الباقات</span></div>
+    <div class="sb-item" data-admin-perm="packages" onclick="showPanel('seasonal-offers',this)"><span class="sb-icon">🏷️</span><span class="sb-label" data-t="sb-seasonal">العروض الموسمية</span></div>
     <div class="sb-item" data-admin-perm="prices" onclick="showPanel('prices',this)"><span class="sb-icon">🛒</span><span class="sb-label" data-t="sb-prices">أسعار المواد</span></div>
     <div class="sb-item" data-admin-perm="extra-categories" onclick="showPanel('extra-categories',this)"><span class="sb-icon">➕</span><span class="sb-label" data-t="sb-extra-categories">أقسام جديدة</span></div>
     <div class="sb-item" data-admin-perm="promo-video" onclick="showPanel('promo-video',this)"><span class="sb-icon">🎬</span><span class="sb-label" data-t="sb-promo-video">الفيديو الإعلاني</span></div>
@@ -952,6 +953,33 @@ main, .page-content.active, .main-content, .results-area,
     </div>
 
     <!-- ══ UNIFIED PACKAGE MANAGEMENT (كل فئات الباقات في مكان واحد) ══ -->
+    <div class="panel" id="panel-seasonal-offers">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏷️ العروض الموسمية — الخصم الوحيد في المنصة</div>
+        </div>
+        <div style="padding:18px">
+          <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">المدير وحده يقرّر الخصم. متساوٍ لكل المشتركين. لا عرضان متداخلان. شهر مخفّض واحد لكل مشترك في كل عرض. العناوين نص فقط.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+            <label style="font-size:12px">عنوان عربي<input id="so-title-ar" style="width:100%;margin-top:4px;padding:8px;border-radius:8px;border:1px solid #d0d7e2" maxlength="120"/></label>
+            <label style="font-size:12px">Titre FR<input id="so-title-fr" style="width:100%;margin-top:4px;padding:8px;border-radius:8px;border:1px solid #d0d7e2" maxlength="120"/></label>
+            <label style="font-size:12px">النسبة %<input id="so-percent" type="number" min="1" max="90" value="20" style="width:100%;margin-top:4px;padding:8px;border-radius:8px;border:1px solid #d0d7e2"/></label>
+            <label style="font-size:12px">معرّفات الباقات (مفصولة بفاصلة)<input id="so-pkgs" placeholder="st-month,st-year" style="width:100%;margin-top:4px;padding:8px;border-radius:8px;border:1px solid #d0d7e2"/></label>
+            <label style="font-size:12px">بداية<input id="so-start" type="datetime-local" style="width:100%;margin-top:4px;padding:8px;border-radius:8px;border:1px solid #d0d7e2"/></label>
+            <label style="font-size:12px">نهاية<input id="so-end" type="datetime-local" style="width:100%;margin-top:4px;padding:8px;border-radius:8px;border:1px solid #d0d7e2"/></label>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+            <button class="btn-sm btn-outline" type="button" onclick="previewSeasonalOffer()">👁️ معاينة</button>
+            <button class="btn-sm btn-primary" type="button" onclick="saveSeasonalOffer()">💾 نشر العرض</button>
+          </div>
+          <div id="so-preview" style="display:none;padding:14px;border-radius:12px;background:#f8faff;border:1px solid #e0e8f5;margin-bottom:16px"></div>
+          <div id="so-msg" style="font-size:12px;color:#C9A84C;margin-bottom:10px"></div>
+          <h4 style="font-size:14px;margin-bottom:10px">سجل العروض ونتائجها</h4>
+          <div id="so-history" style="font-size:13px;color:var(--text-muted)">—</div>
+        </div>
+      </div>
+    </div>
+
     <div class="panel" id="panel-packages">
       <div class="card">
         <div class="card-header">
@@ -2775,7 +2803,7 @@ let ADMIN_PERM_CATALOG = { permissions: [], presets: {}, panelMap: {}, maxTeamMe
 const PANEL_PERM_KEYS = {
   overview: 'overview', users: 'users', ads: 'ads', reports: 'reports', moderation: 'moderation',
   'tenders-mod': 'tenders', payments: 'payments', analytics: 'analytics', team: 'team.manage',
-  packages: 'packages', prices: 'prices', 'extra-categories': 'extra-categories', 'promo-video': 'promo-video',
+  packages: 'packages', 'seasonal-offers': 'packages', prices: 'prices', 'extra-categories': 'extra-categories', 'promo-video': 'promo-video',
   siteconfig: 'siteconfig', modules: 'modules', settings: 'settings', legal: 'legal', 'legal-editor': 'legal-editor',
   channels: 'channels', announcements: 'announcements', 'subscriber-agents': 'subscriber-agents',
   'quota-guard': 'quota-guard', accounts: 'accounts', 'unified-review': 'accounts', 'special-grant': 'accounts', 'ai-manager': 'ai-manager', 'moderator-config': 'moderator-config',
@@ -3192,6 +3220,7 @@ function showPanel(id, navEl){
   _currentPanelId=id;
   refreshTopbarTitle();
   if(id==='packages') renderPackages();
+  if(id==='seasonal-offers') loadSeasonalOffersPanel();
   if(id==='accounts'){renderPendingAccounts();updatePendingBadge();}
   if(id==='prices') renderPricesAdmin();
   if(id==='extra-categories') renderExtraCategories();
@@ -10415,6 +10444,100 @@ function resolveQuotaAddon(id, status){
   }, 700);
   refreshStripToggleUI();
 })();
+
+function _soEsc(s){
+  return String(s||'').replace(/[&<>"']/g,function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];});
+}
+function _soPayload(){
+  var startEl=document.getElementById('so-start');
+  var endEl=document.getElementById('so-end');
+  return {
+    titleAr: (document.getElementById('so-title-ar')||{}).value||'',
+    titleFr: (document.getElementById('so-title-fr')||{}).value||'',
+    percent: Number((document.getElementById('so-percent')||{}).value||0),
+    packageIds: String((document.getElementById('so-pkgs')||{}).value||''),
+    startAt: startEl && startEl.value ? new Date(startEl.value).toISOString() : '',
+    endAt: endEl && endEl.value ? new Date(endEl.value).toISOString() : '',
+  };
+}
+function previewSeasonalOffer(){
+  var msg=document.getElementById('so-msg');
+  var box=document.getElementById('so-preview');
+  fetch(_adminBackendBase()+'/api/admin/seasonal-offers/preview', {
+    method:'POST',
+    headers:_adminAuthHeaders({'Content-Type':'application/json'}),
+    body: JSON.stringify(Object.assign(_soPayload(), { sampleListPrice: 3000 })),
+  }).then(function(r){return r.json();}).then(function(d){
+    if(!d||!d.ok){ if(msg) msg.textContent=(d&&d.message)||(d&&d.error)||'فشل المعاينة'; return; }
+    var p=d.preview||{};
+    if(box){
+      box.style.display='block';
+      box.textContent='';
+      var t=document.createElement('div');
+      t.style.fontWeight='800'; t.style.fontSize='15px'; t.style.marginBottom='6px';
+      t.textContent=p.titleAr||p.titleFr||'';
+      var sub=document.createElement('div');
+      sub.style.fontSize='12px'; sub.style.color='#64748b';
+      sub.textContent=(p.titleFr||'')+' · '+p.percent+'% · '+_soEsc(String(p.startAt||'')).slice(0,10)+' → '+_soEsc(String(p.endAt||'')).slice(0,10);
+      var sample=document.createElement('div');
+      sample.style.marginTop='10px'; sample.style.fontSize='14px';
+      var list=document.createElement('span');
+      list.style.textDecoration='line-through'; list.style.opacity='.6';
+      list.textContent=(p.sample&&p.sample.listPrice!=null?p.sample.listPrice:3000)+' MRU';
+      sample.appendChild(list);
+      sample.appendChild(document.createTextNode(' → '+(p.sample&&p.sample.price!=null?p.sample.price:'—')+' MRU'));
+      box.appendChild(t); box.appendChild(sub); box.appendChild(sample);
+    }
+    if(msg) msg.textContent='معاينة جاهزة — لم يُنشر بعد';
+  }).catch(function(){ if(msg) msg.textContent='تعذّر الاتصال'; });
+}
+function saveSeasonalOffer(){
+  var msg=document.getElementById('so-msg');
+  fetch(_adminBackendBase()+'/api/admin/seasonal-offers', {
+    method:'POST',
+    headers:_adminAuthHeaders({'Content-Type':'application/json'}),
+    body: JSON.stringify(_soPayload()),
+  }).then(function(r){return r.json();}).then(function(d){
+    if(!d||!d.ok){ if(msg) msg.textContent=(d&&d.message)||(d&&d.error)||'فشل الحفظ'; return; }
+    if(msg) msg.textContent='تم نشر العرض';
+    loadSeasonalOffersPanel();
+  }).catch(function(){ if(msg) msg.textContent='تعذّر الاتصال'; });
+}
+function loadSeasonalOffersPanel(){
+  var el=document.getElementById('so-history');
+  if(!el) return;
+  el.textContent='جارٍ التحميل...';
+  fetch(_adminBackendBase()+'/api/admin/seasonal-offers', { headers:_adminAuthHeaders() })
+    .then(function(r){return r.json();})
+    .then(function(d){
+      var list=(d&&d.offers)||[];
+      if(!list.length){ el.textContent='لا عروض بعد'; return; }
+      el.textContent='';
+      list.forEach(function(o){
+        var row=document.createElement('div');
+        row.style.cssText='padding:10px 12px;border:1px solid rgba(27,58,107,.08);border-radius:10px;margin-bottom:8px';
+        var title=document.createElement('div');
+        title.style.fontWeight='700';
+        title.textContent=(o.titleAr||o.titleFr||o.id)+' — '+o.percent+'% · '+o.status;
+        var meta=document.createElement('div');
+        meta.style.fontSize='11px'; meta.style.color='#64748b'; meta.style.marginTop='4px';
+        meta.textContent='استردادات: '+(o.redemptionCount||0)+' · إيراد مخفّض: '+((o.stats&&o.stats.revenue)||0)+' MRU';
+        row.appendChild(title); row.appendChild(meta);
+        if(o.status==='active'||o.status==='scheduled'){
+          var btn=document.createElement('button');
+          btn.type='button'; btn.className='btn-sm btn-outline';
+          btn.style.marginTop='8px'; btn.textContent='أرشفة';
+          btn.onclick=function(){
+            fetch(_adminBackendBase()+'/api/admin/seasonal-offers/'+encodeURIComponent(o.id)+'/archive', {
+              method:'POST', headers:_adminAuthHeaders(),
+            }).then(function(){ loadSeasonalOffersPanel(); });
+          };
+          row.appendChild(btn);
+        }
+        el.appendChild(row);
+      });
+    }).catch(function(){ el.textContent='تعذّر التحميل'; });
+}
 </script>
 
 <!-- FIXED RIZQ LOGO -->
