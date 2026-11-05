@@ -75,10 +75,10 @@ hero.insertBefore = function (node) {
 assert.strictEqual(C.setHeroPhoto(hero, ''), false);
 assert(!hero.classList.contains('has-hero-photo'));
 
-assert.strictEqual(C.setHeroPhoto(hero, '/demo-media/u-test.svg'), true);
+assert.strictEqual(C.setHeroPhoto(hero, 'rizq-assets/demo-misc/u-test.webp'), true);
 assert(hero.classList.contains('has-hero-photo'));
 assert(hero._photo && hero._photo._img);
-assert.strictEqual(hero._photo._img.src, '/demo-media/u-test.svg');
+assert.strictEqual(hero._photo._img.src, 'rizq-assets/demo-misc/u-test.webp');
 
 assert.strictEqual(C.setHeroPhoto(hero, 'javascript:alert(1)'), false);
 assert(!hero.classList.contains('has-hero-photo'));

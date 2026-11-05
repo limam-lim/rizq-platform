@@ -6,7 +6,7 @@
   'use strict';
 
   function img(seed) {
-    return '/demo-media/p-ed6ac61c0def.svg' + seed + '/640/480';
+    return 'rizq-assets/demo-misc/p-ed6ac61c0def.webp' + seed + '/640/480';
   }
 
   function item(opts) {

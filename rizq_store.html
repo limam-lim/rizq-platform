@@ -11,7 +11,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   <link rel="stylesheet" href="rizq-theme.css?v=23.1"/>
-  <link rel="preload" as="image" href="rizq-assets/demo-heroes/store-boutique-promo.jpg"/>
+  <link rel="preload" as="image" href="rizq-assets/demo-heroes/store-boutique-promo.webp"/>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <meta http-equiv="X-Content-Type-Options" content="nosniff"/>
@@ -1454,7 +1454,7 @@ footer{
       var id = q.get('id') || q.get('store') || '';
       var hero = document.getElementById('store-hero');
       if(!hero) return;
-      var DEMO_COVER = 'rizq-assets/demo-heroes/store-boutique-promo.jpg';
+      var DEMO_COVER = 'rizq-assets/demo-heroes/store-boutique-promo.webp';
       var isDemo = !id || id === 'demo_store' || q.get('demo') === '1';
       var cover = '';
       /* المعاينة دائماً بالغلاف الترويجي الحالي — لا كاش قديم */
@@ -2704,8 +2704,8 @@ function rizqShare(title, url) {
         promo_video: 'rizq-assets/promo/rizq-dashboard-store-demo-light.mp4',
         promo_video_extra: 'rizq-assets/promo/rizq-modules-promo-demo-light.mp4',
         /* غلاف هيرو ترويجي للمحل (واجهة بوتيك) — محلي فوري بلا وميض كحلي */
-        cover: 'rizq-assets/demo-heroes/store-boutique-promo.jpg',
-        thumb: 'rizq-assets/demo-heroes/store-boutique-promo.jpg'
+        cover: 'rizq-assets/demo-heroes/store-boutique-promo.webp',
+        thumb: 'rizq-assets/demo-heroes/store-boutique-promo.webp'
       };
       var products = [
         { id: 'P1', name: 'دراعة رجالية فاخرة', nameF: 'Boubou homme premium', price: 45000, cat: 'أزياء', emoji: '👔', stock: 55, variants: 'S, M, L, XL, XXL, 3XL, 4XL', sizeStock: { S: 8, M: 12, L: 15, XL: 10, XXL: 5, '3XL': 3, '4XL': 2 }, unit: 'قطعة', desc: '' },
