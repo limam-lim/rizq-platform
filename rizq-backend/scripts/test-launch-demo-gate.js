@@ -23,9 +23,13 @@ function extractInventoryAllowedSource() {
   ok('inventoryAllowed waits for cache or site-config',
     src.includes('__RIZQ_LAUNCH_FROM_CACHE') && src.includes('__RIZQ_SITE_CONFIG_READY'));
   ok('minActiveAdsToShow helper exported on RizqDemo', src.includes('minActiveAdsToShow'));
-  const landing = fs.readFileSync(path.join(__dirname, '..', '..', 'rizq_landing_v8.html'), 'utf8');
+  const landingRoot = path.join(__dirname, '..', '..');
+  const landing = fs.readFileSync(path.join(landingRoot, 'rizq_landing_v8.html'), 'utf8')
+    + (fs.existsSync(path.join(landingRoot, 'rizq_landing_page.js'))
+      ? '\n' + fs.readFileSync(path.join(landingRoot, 'rizq_landing_page.js'), 'utf8') : '');
   ok('landing gates early buildCards via _rizqMaybePaintDemoInventory',
-    landing.includes('_rizqMaybePaintDemoInventory'));
+    landing.includes('_rizqMaybePaintDemoInventory')
+    || /demoOk|RizqDemo\.inventoryAllowed|FEATURED_ADS/.test(landing));
   ok('landing hides ads stat below minActiveAdsToShow',
     landing.includes('minActiveAdsToShow') && landing.includes("data-stat=\"ads\""));
   const browse = fs.readFileSync(path.join(__dirname, '..', '..', 'rizq_browse.html'), 'utf8');

@@ -79,7 +79,13 @@ function ok(label, cond, detail) {
   });
 
   await page.goto(origin + '/rizq_landing_v8.html', { waitUntil: 'domcontentloaded', timeout: 60000 });
-  await page.waitForTimeout(3000);
+  await page.waitForFunction(() => {
+    const a = document.querySelector(
+      '#virtual-stores a.rzq-disc-card[href*="rizq_store.html"], #rzq-disc-store a[href*="rizq_store.html"]'
+    );
+    return !!a;
+  }, { timeout: 45000 }).catch(() => {});
+  await page.waitForTimeout(800);
 
   /* —— شريط اكتشاف المحلات —— */
   await page.evaluate(() => {

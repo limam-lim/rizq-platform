@@ -108,7 +108,7 @@
     if (!document.querySelector('link[href*="fonts/cairo.css"], link[href*="cairo.css"]')) {
       var fontLink = document.createElement('link');
       fontLink.rel = 'stylesheet';
-      fontLink.href = 'fonts/cairo.css?v=1.0';
+      fontLink.href = 'fonts/cairo.css?v=1.1';
       document.head.appendChild(fontLink);
     }
     if (!document.querySelector('link[rel="stylesheet"][href*="rizq-theme.css"]')) {
@@ -174,7 +174,13 @@
       appendScript('rizq_dynamic_nav.js?v=' + ASSET_V, { defer: true });
       appendScript('rizq_module_flags.js?v=' + ASSET_V, { defer: true });
     }
-    if (isPublicShell() && !document.querySelector('script[src*="rizq_packages_ui.js"]')) {
+    /* الرئيسية تحمّل الباقات عند الطلب (rizq_landing_ondemand) — لا تحقنها مبكراً */
+    var landingPage = false;
+    try {
+      var leaf = (location.pathname || '').split('/').pop() || '';
+      landingPage = !leaf || leaf === 'index.html' || /^rizq_landing/i.test(leaf);
+    } catch (eLand) {}
+    if (isPublicShell() && !landingPage && !document.querySelector('script[src*="rizq_packages_ui.js"]')) {
       appendScript('rizq_packages_ui.js?v=' + ASSET_V, { defer: true });
     }
     if (!document.querySelector('link[rel="stylesheet"][href*="rizq_mobile.css"]')) {
@@ -205,13 +211,21 @@
     function loadAssistantStack(force) {
       if (window.__rizqAssistantLoaded) return;
       window.__rizqAssistantLoaded = true;
-      appendScript('rizq_packages_config.js?v=' + ASSET_V, { defer: true });
-      appendScript('rizq_agent.js?v=' + ASSET_V, { defer: true });
-      appendScript('rizq_manager_agent_config.js?v=' + ASSET_V, { defer: true });
+      if (!document.querySelector('script[src*="rizq_packages_config.js"]')) {
+        appendScript('rizq_packages_config.js?v=' + ASSET_V, { defer: true });
+      }
+      if (!document.querySelector('script[src*="rizq_agent.js"]')) {
+        appendScript('rizq_agent.js?v=' + ASSET_V, { defer: true });
+      }
+      if (!document.querySelector('script[src*="rizq_manager_agent_config.js"]')) {
+        appendScript('rizq_manager_agent_config.js?v=' + ASSET_V, { defer: true });
+      }
       if (!document.querySelector('script[src*="rizq_widget_markdown.js"]')) {
         appendScript('rizq_widget_markdown.js?v=' + ASSET_V, { defer: true });
       }
-      appendScript('rizq_widget_embed.js?v=' + ASSET_V, { defer: true });
+      if (!document.querySelector('script[src*="rizq_widget_embed.js"]')) {
+        appendScript('rizq_widget_embed.js?v=' + ASSET_V, { defer: true });
+      }
     }
     window.RizqLoadAssistant = loadAssistantStack;
 
