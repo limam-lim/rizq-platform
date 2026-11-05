@@ -46,28 +46,28 @@
     /** معاينات عند الفراغ التام فقط — بصور غلاف حقيقية مثل واجهة المحل */
     var EMPTY_EXAMPLES = {
       store: [
-        { href:'rizq_store.html?demo=1', nameAr:'محل النور', nameFr:'Boutique Al-Nour', tagAr:'أزياء وعطور وإكسسوارات', tagFr:'Mode, parfums et accessoires', icon:'🏪', cover:'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=640&q=80' },
-        { href:'rizq_store.html?demo=1', nameAr:'واجهة محل بالصور والاسم', nameFr:'Vitrine photo + nom', tagAr:'أزياء وموضة', tagFr:'Mode', icon:'👗', cover:'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=640&q=80' }
+        { href:'rizq_store.html?demo=1', nameAr:'محل النور', nameFr:'Boutique Al-Nour', tagAr:'أزياء وعطور وإكسسوارات', tagFr:'Mode, parfums et accessoires', icon:'🏪', cover:'/demo-media/u-1441986300917-64674bd600d8.svg' },
+        { href:'rizq_store.html?demo=1', nameAr:'واجهة محل بالصور والاسم', nameFr:'Vitrine photo + nom', tagAr:'أزياء وموضة', tagFr:'Mode', icon:'👗', cover:'/demo-media/u-1483985988355-763728e1935b.svg' }
       ],
       corp: [
-        { href:'rizq_showroom.html?demo=1', nameAr:'معرض نموذجي على رزق', nameFr:'Showroom modèle Rizq', tagAr:'معارض سيارات', tagFr:'Showroom auto', icon:'🚗', cover:'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=640&q=80' },
-        { href:'rizq_showroom.html?demo=1', nameAr:'كتالوج معرض بالصور', nameFr:'Catalogue showroom', tagAr:'أثاث وإلكترونيات', tagFr:'Meubles & tech', icon:'🏬', cover:'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=640&q=80' }
+        { href:'rizq_showroom.html?demo=1', nameAr:'معرض نموذجي على رزق', nameFr:'Showroom modèle Rizq', tagAr:'معارض سيارات', tagFr:'Showroom auto', icon:'🚗', cover:'/demo-media/u-1492144534655-ae79c964c9d7.svg' },
+        { href:'rizq_showroom.html?demo=1', nameAr:'كتالوج معرض بالصور', nameFr:'Catalogue showroom', tagAr:'أثاث وإلكترونيات', tagFr:'Meubles & tech', icon:'🏬', cover:'/demo-media/u-1555041469-a586c61ea9bc.svg' }
       ],
       office: [
-        { href:'rizq_office.html?demo=1', nameAr:'مكتب محاماة نموذجي', nameFr:'Cabinet d\'avocats modèle', tagAr:'محامون وقانون', tagFr:'Avocats & droit', icon:'⚖️', cover:'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=640&q=80' },
-        { href:'rizq_office.html?demo=1', nameAr:'مكتب خدمات إدارية', nameFr:'Bureau administratif', tagAr:'خدمات إدارية', tagFr:'Services admin.', icon:'🏛️', cover:'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=640&q=80' }
+        { href:'rizq_office.html?demo=1', nameAr:'مكتب محاماة نموذجي', nameFr:'Cabinet d\'avocats modèle', tagAr:'محامون وقانون', tagFr:'Avocats & droit', icon:'⚖️', cover:'/demo-media/u-1497366216548-37526070297c.svg' },
+        { href:'rizq_office.html?demo=1', nameAr:'مكتب خدمات إدارية', nameFr:'Bureau administratif', tagAr:'خدمات إدارية', tagFr:'Services admin.', icon:'🏛️', cover:'/demo-media/u-1521791136064-7986c2920216.svg' }
       ],
       estate: [
-        { href:'rizq_estate.html?demo=1', nameAr:'فيلا بإطلالة غروب', nameFr:'Villa vue coucher de soleil', tagAr:'فلل راقية', tagFr:'Villas premium', icon:'🏡', cover:'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=640&q=80' },
-        { href:'rizq_estate.html?demo=1', nameAr:'شقة فاخرة في المدينة', nameFr:'Appartement premium', tagAr:'شقق للكراء والبيع', tagFr:'Appartements', icon:'🏠', cover:'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=640&q=80' }
+        { href:'rizq_estate.html?demo=1', nameAr:'فيلا بإطلالة غروب', nameFr:'Villa vue coucher de soleil', tagAr:'فلل راقية', tagFr:'Villas premium', icon:'🏡', cover:'/demo-media/u-1613490493576-7fde63acd811.svg' },
+        { href:'rizq_estate.html?demo=1', nameAr:'شقة فاخرة في المدينة', nameFr:'Appartement premium', tagAr:'شقق للكراء والبيع', tagFr:'Appartements', icon:'🏠', cover:'/demo-media/u-1502672260266-1c1ef2d93688.svg' }
       ]
     };
 
     var DEMO_COVER_BY_TYPE = {
-      store: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=960&q=80',
-      corp: 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=960&q=80',
-      office: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=960&q=80',
-      estate: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=960&q=80'
+      store: '/demo-media/u-1441986300917-64674bd600d8.svg',
+      corp: '/demo-media/u-1492144534655-ae79c964c9d7.svg',
+      office: '/demo-media/u-1497366216548-37526070297c.svg',
+      estate: '/demo-media/u-1613490493576-7fde63acd811.svg'
     };
 
     function safeDiscMediaUrl(u){
@@ -105,33 +105,33 @@
       };
       if(type === 'store'){
         return [
-          mk('acc_grad_store_01', 'تقنية الشنقيط', 'هواتف وإكسسوارات أصلية بأسعار واضحة', 'نواكشوط', 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=640&q=80', 2),
-          mk('acc_grad_store_02', 'أناقة موريتانيا', 'دراعة وأزياء رجالية ونسائية', 'نواكشوط', 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=640&q=80', 8),
-          mk('acc_grad_store_03', 'سوق الأمل للأغذية', 'تموين يومي ومواد غذائية جملة وتجزئة', 'نواذيبو', 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=640&q=80', 14),
-          mk('acc_grad_store_04', 'ذهبيات روصو', 'ذهب ومجوهرات بأوزان وأسعار معلنة', 'روصو', 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=640&q=80', 20),
-          mk('acc_grad_store_05', 'بيت الديكور', 'أثاث ومفروشات منزلية عصرية', 'نواكشوط', 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=640&q=80', 30)
+          mk('acc_grad_store_01', 'تقنية الشنقيط', 'هواتف وإكسسوارات أصلية بأسعار واضحة', 'نواكشوط', '/demo-media/u-1511707171634-5f897ff02aa9.svg', 2),
+          mk('acc_grad_store_02', 'أناقة موريتانيا', 'دراعة وأزياء رجالية ونسائية', 'نواكشوط', '/demo-media/u-1483985988355-763728e1935b.svg', 8),
+          mk('acc_grad_store_03', 'سوق الأمل للأغذية', 'تموين يومي ومواد غذائية جملة وتجزئة', 'نواذيبو', '/demo-media/u-1542838132-92c53300491e.svg', 14),
+          mk('acc_grad_store_04', 'ذهبيات روصو', 'ذهب ومجوهرات بأوزان وأسعار معلنة', 'روصو', '/demo-media/u-1515562141207-7a88fb7ce338.svg', 20),
+          mk('acc_grad_store_05', 'بيت الديكور', 'أثاث ومفروشات منزلية عصرية', 'نواكشوط', '/demo-media/u-1555041469-a586c61ea9bc.svg', 30)
         ];
       }
       if(type === 'corp'){
         return [
-          mk('acc_grad_corp_01', 'معرض أمل للسيارات', 'سيارات جديدة ومستعملة موثّقة بالوثائق', 'نواكشوط', 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=640&q=80', 3),
-          mk('acc_grad_corp_02', 'معرض المحيط للإلكترونيات', 'أجهزة وشاشات وكمبيوترات للجملة والتجزئة', 'نواكشوط', 'https://images.unsplash.com/photo-1498049860655-afd7e5aa8d6f?auto=format&fit=crop&w=640&q=80', 12),
-          mk('acc_grad_corp_03', 'معرض الواحة للأثاث', 'أطقم وصالات ومكاتب للشركات والمنازل', 'نواذيبو', 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=640&q=80', 22)
+          mk('acc_grad_corp_01', 'معرض أمل للسيارات', 'سيارات جديدة ومستعملة موثّقة بالوثائق', 'نواكشوط', '/demo-media/u-1492144534655-ae79c964c9d7.svg', 3),
+          mk('acc_grad_corp_02', 'معرض المحيط للإلكترونيات', 'أجهزة وشاشات وكمبيوترات للجملة والتجزئة', 'نواكشوط', '/demo-media/u-1498049860655-afd7e5aa8d6f.svg', 12),
+          mk('acc_grad_corp_03', 'معرض الواحة للأثاث', 'أطقم وصالات ومكاتب للشركات والمنازل', 'نواذيبو', '/demo-media/u-1555041469-a586c61ea9bc.svg', 22)
         ];
       }
       if(type === 'office'){
         return [
-          mk('acc_grad_office_01', 'مكتب أطوار للعقارات', 'بيع وإيجار واستشارات عقارية في كل الولايات', 'نواكشوط', 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=640&q=80', 5),
-          mk('acc_grad_office_02', 'مكتب النخبة للمحاماة', 'استشارات وقضايا مدنية وتجارية', 'نواكشوط', 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=640&q=80', 16),
-          mk('acc_grad_office_03', 'وكالة الصدى الإدارية', 'خدمات إدارية ومعاملات بسرعة ووضوح', 'روصو', 'https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=640&q=80', 28)
+          mk('acc_grad_office_01', 'مكتب أطوار للعقارات', 'بيع وإيجار واستشارات عقارية في كل الولايات', 'نواكشوط', '/demo-media/u-1560518883-ce09059eeffa.svg', 5),
+          mk('acc_grad_office_02', 'مكتب النخبة للمحاماة', 'استشارات وقضايا مدنية وتجارية', 'نواكشوط', '/demo-media/u-1497366216548-37526070297c.svg', 16),
+          mk('acc_grad_office_03', 'وكالة الصدى الإدارية', 'خدمات إدارية ومعاملات بسرعة ووضوح', 'روصو', '/demo-media/u-1521791136064-7986c2920216.svg', 28)
         ];
       }
       if(type === 'estate'){
         return [
-          mk('acc_grad_estate_01', 'أطوار للعقارات', 'فلل وشقق وأراضي بصور احترافية', 'نواكشوط', 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=640&q=80', 4),
-          mk('acc_grad_estate_02', 'واجهة القطب السكني', 'شقق فاخرة للكراء والبيع', 'تفرغ زينة', 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=640&q=80', 11),
-          mk('acc_grad_estate_03', 'أراضي الساحل', 'قطع سكنية وتجارية بوثائق واضحة', 'نواذيبو', 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=640&q=80', 19),
-          mk('acc_grad_estate_04', 'منزل الواحة', 'منازل عائلية بحدائق خاصة', 'كيفة', 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=640&q=80', 27)
+          mk('acc_grad_estate_01', 'أطوار للعقارات', 'فلل وشقق وأراضي بصور احترافية', 'نواكشوط', '/demo-media/u-1613490493576-7fde63acd811.svg', 4),
+          mk('acc_grad_estate_02', 'واجهة القطب السكني', 'شقق فاخرة للكراء والبيع', 'تفرغ زينة', '/demo-media/u-1502672260266-1c1ef2d93688.svg', 11),
+          mk('acc_grad_estate_03', 'أراضي الساحل', 'قطع سكنية وتجارية بوثائق واضحة', 'نواذيبو', '/demo-media/u-1500382017468-9049fed747ef.svg', 19),
+          mk('acc_grad_estate_04', 'منزل الواحة', 'منازل عائلية بحدائق خاصة', 'كيفة', '/demo-media/u-1600596542815-ffad4c1539a9.svg', 27)
         ];
       }
       return [];
