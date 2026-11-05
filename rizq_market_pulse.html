@@ -29,9 +29,9 @@ html,body{background:#eef2f8}
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <link rel="stylesheet" href="rizq-theme.css?v=31.25"/>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="preload" href="fonts/cairo-arabic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/cairo-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/cairo.css?v=1.1"/>
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
 <link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.98"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
@@ -78,8 +78,9 @@ html.rizq-app-nav:has(#rizq-desk-nav) .mp-hero{padding-top:18px}
 }
 @keyframes mpPulse{0%,100%{opacity:1}50%{opacity:.35}}
 .mp-hero h1{
-  font-family:'Amiri',Georgia,'Times New Roman',serif;
-  color:#fff;font-size:clamp(22px,3.6vw,30px);font-weight:700;line-height:1.2;
+  /* Cairo محلي — يتجنب سباق Google Fonts الذي يغيّر ارتفاع الصفحة بين زيارتين */
+  font-family:'Cairo','CairoFallback',system-ui,sans-serif;
+  color:#fff;font-size:clamp(22px,3.6vw,30px);font-weight:800;line-height:1.2;
   margin-bottom:4px;text-shadow:0 2px 16px rgba(0,0,0,.3);
 }
 .mp-hero h1 span{
@@ -312,7 +313,7 @@ html[dir="ltr"] .mp-ticker-wrap::after{
   box-shadow:-3px 0 18px rgba(0,0,0,.35);
 }
 </style>
-<script src="rizq_pwa.js?v=31.32" defer></script>
+<script src="rizq_pwa.js?v=31.33" defer></script>
 </head>
 <body>
 
@@ -445,9 +446,11 @@ html[dir="ltr"] .mp-ticker-wrap::after{
   var _rows = [];
   var _tab = 'food';
   var _q = '';
-  var PER_PAGE = 8;
+  /* أول صفحة = كل صفوف الفئة الافتراضية (طعام 12) — يمنع سباق IO الذي يظهر 8 أو 12 */
+  var PER_PAGE = 12;
   var _visible = PER_PAGE;
   var _loadingMore = false;
+  var _mpAllowAutoMore = false;
 
   function isAr(){
     try{
@@ -634,20 +637,37 @@ html[dir="ltr"] .mp-ticker-wrap::after{
     if(!window._mpScrollBound){
       window._mpScrollBound = true;
       window._mpUserScrolled = false;
+      _mpAllowAutoMore = false;
+      /* تجاهل استعادة التمرير من المتصفح — لا تحميل تلقائي عند الفتح */
+      try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (eSR) {}
+      try { window.scrollTo(0, 0); } catch (eZ) {}
+      function armAutoMore(){ _mpAllowAutoMore = true; window._mpUserScrolled = true; }
+      window.addEventListener('wheel', armAutoMore, {passive:true, once:true});
+      window.addEventListener('touchstart', armAutoMore, {passive:true, once:true});
+      window.addEventListener('pointerdown', armAutoMore, {passive:true, once:true});
+      window.addEventListener('keydown', function(ev){
+        var k = ev.key || '';
+        if(k === 'PageDown' || k === 'ArrowDown' || k === 'End' || k === ' ') armAutoMore();
+      }, {passive:true});
       window.addEventListener('scroll', function(){
+        if(!_mpAllowAutoMore) return;
         if((window.scrollY || document.documentElement.scrollTop) > 40) window._mpUserScrolled = true;
       }, {passive:true});
     }
     window._mpIO = new IntersectionObserver(function(entries){
       entries.forEach(function(en){
-        if(!en.isIntersecting || _loadingMore || !window._mpUserScrolled) return;
+        if(!en.isIntersecting || _loadingMore || !_mpAllowAutoMore || !window._mpUserScrolled) return;
         loadMorePrices();
       });
     }, {root:null, rootMargin:'140px 0px', threshold:0});
     window._mpIO.observe(sentinel);
   }
 
-  function resetPaging(){ _visible = PER_PAGE; window._mpUserScrolled = false; }
+  function resetPaging(){
+    _visible = PER_PAGE;
+    window._mpUserScrolled = false;
+    _mpAllowAutoMore = false;
+  }
 
   function updateStamp(){
     var el = document.getElementById('mp-updated-date');
