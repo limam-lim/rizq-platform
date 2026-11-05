@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 /**
- * محاكاة زائر بكاش قديم → تفعيل SW جديد يمسح الكاشات القديمة
- * ويصل للأصول بإصدار ASSET_V دون boot مزدوج للهيدر.
+ * زائر بـ SW/كاش قديم → زيارة تالية تحصل على ASSET_V الجديد دون مسح يدوي،
+ * ودون boot مزدوج للهيدر.
  *
  * تشغيل: node qa/cls-1/test-sw-cache-bump.js
+ *
+ * ملاحظة: على 127.0.0.1 يعطّل rizq_pwa.js تسجيل SW؛ الاختبار يعيد كتابة
+ * isLocal=false في الرد فقط داخل هذا الهارنس (لا يغيّر الملف على القرص).
  */
 'use strict';
 
@@ -12,6 +15,8 @@ const path = require('path');
 const http = require('http');
 
 const ROOT = path.join(__dirname, '../..');
+const OLD_ASSET = '31.20';
+const OLD_CACHE = 'rizq-cache-v' + OLD_ASSET;
 
 function loadPlaywright() {
   const candidates = [
@@ -25,10 +30,42 @@ function loadPlaywright() {
   throw new Error('playwright not found');
 }
 
-function startStatic() {
+function ok(label, cond, detail) {
+  if (cond) console.log('  ✓ ' + label);
+  else {
+    console.log('  ✗ ' + label + (detail != null ? ' — ' + JSON.stringify(detail) : ''));
+    ok.fail = (ok.fail || 0) + 1;
+  }
+  ok.pass = (ok.pass || 0) + (cond ? 1 : 0);
+}
+
+function rewriteAssetVersion(src, fromV, toV) {
+  return src
+    .split("ASSET_V = '" + fromV + "'").join("ASSET_V = '" + toV + "'")
+    .split("SW_CACHE = 'rizq-cache-v" + fromV + "'").join("SW_CACHE = 'rizq-cache-v" + toV + "'")
+    .split("CACHE_NAME = 'rizq-cache-v" + fromV + "'").join("CACHE_NAME = 'rizq-cache-v" + toV + "'")
+    .split('?v=' + fromV).join('?v=' + toV)
+    .split('rizq-cache-v' + fromV).join('rizq-cache-v' + toV);
+}
+
+/** فرض تسجيل SW في هارنس الاختبار رغم 127.0.0.1 */
+function forceSwRegistration(src) {
+  return src
+    .replace(
+      /var isLocal = !host \|\| host === 'localhost' \|\| host === '127\.0\.0\.1';/,
+      "var isLocal = false; /* test-sw-cache-bump harness */"
+    )
+    .replace(
+      /var isLocal=!host\|\|host==='localhost'\|\|host==='127\.0\.0\.1';/,
+      'var isLocal=false;'
+    );
+}
+
+function startStatic(state) {
   return new Promise((resolve) => {
     const server = http.createServer((req, res) => {
-      let url = decodeURIComponent((req.url || '/').split('?')[0]);
+      const raw = req.url || '/';
+      let url = decodeURIComponent(raw.split('?')[0]);
       if (url === '/') url = '/rizq_landing_v8.html';
       const file = path.join(ROOT, url.replace(/^\//, ''));
       if (!file.startsWith(ROOT) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
@@ -43,25 +80,29 @@ function startStatic() {
         '.svg': 'image/svg+xml',
         '.json': 'application/json',
         '.woff2': 'font/woff2',
+        '.webp': 'image/webp',
       };
-      /* لا كاش من الخادم — نعتمد على Cache API في الصفحة */
+      let body = fs.readFileSync(file);
+      const base = path.basename(url);
+      if (base === 'rizq_pwa.js' || base === 'sw.js') {
+        let text = body.toString('utf8');
+        if (state.phase === 'old') {
+          text = rewriteAssetVersion(text, state.assetV, OLD_ASSET);
+        }
+        if (base === 'rizq_pwa.js') {
+          text = forceSwRegistration(text);
+        }
+        body = Buffer.from(text, 'utf8');
+      }
       res.writeHead(200, {
         'content-type': types[ext] || 'application/octet-stream',
         'cache-control': 'no-store',
+        'service-worker-allowed': '/',
       });
-      fs.createReadStream(file).pipe(res);
+      res.end(body);
     });
     server.listen(0, '127.0.0.1', () => resolve(server));
   });
-}
-
-function ok(label, cond, detail) {
-  if (cond) console.log('  ✓ ' + label);
-  else {
-    console.log('  ✗ ' + label + (detail != null ? ' — ' + JSON.stringify(detail) : ''));
-    ok.fail = (ok.fail || 0) + 1;
-  }
-  ok.pass = (ok.pass || 0) + (cond ? 1 : 0);
 }
 
 (async () => {
@@ -84,65 +125,205 @@ function ok(label, cond, detail) {
   ok('activate deletes other caches', /k !== CACHE_NAME/.test(swSrc) && /caches\.delete/.test(swSrc));
   ok('skipWaiting + clients.claim', /skipWaiting/.test(swSrc) && /clients\.claim/.test(swSrc));
   ok('message SKIP_WAITING handler', /SKIP_WAITING/.test(swSrc));
+  ok('html/css/js network-first (no stale layout)',
+    /\(html\|css\|js\)/.test(swSrc) || /html\|css\|js/.test(swSrc));
 
+  const state = { phase: 'old', assetV: assetV };
   const { chromium } = loadPlaywright();
-  const server = await startStatic();
-  const origin = 'http://127.0.0.1:' + server.address().port;
+  const server = await startStatic(state);
+  const port = server.address().port;
+  const origin = 'http://127.0.0.1:' + port;
 
-  /* سياق يشبه الإنتاج (ليس localhost) حتى يُسجَّل SW */
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     viewport: { width: 390, height: 844 },
     serviceWorkers: 'allow',
   });
 
-  /* زيارة 1: زرع كاش قديم يدوياً ثم تحميل الصفحة */
+  /* —— زيارة 1: SW بالإصدار السابق —— */
   const page = await context.newPage();
-  await page.goto(origin + '/rizq_landing_v8.html', { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.goto(origin + '/rizq_landing_v8.html', { waitUntil: 'load', timeout: 90000 });
 
-  const seeded = await page.evaluate(async () => {
-    if (!('caches' in window)) return { ok: false, reason: 'no caches' };
+  /* انتظر controller */
+  let visit1 = null;
+  for (let i = 0; i < 25; i++) {
+    await page.waitForTimeout(400);
+    visit1 = await page.evaluate(async (want) => {
+      if (!('serviceWorker' in navigator)) {
+        return { noSw: true };
+      }
+      const regs = await navigator.serviceWorker.getRegistrations();
+      const ctrl = navigator.serviceWorker.controller;
+      const keys = (await caches.keys()).filter((k) => /^rizq-cache-v/.test(k));
+      return {
+        regCount: regs.length,
+        controllerUrl: ctrl ? ctrl.scriptURL : null,
+        keys,
+        waiting: !!(regs[0] && regs[0].waiting),
+        active: regs[0] && regs[0].active ? regs[0].active.scriptURL : null,
+        wantOld: want.oldAsset,
+      };
+    }, { oldAsset: OLD_ASSET });
+    if (visit1.noSw) break;
+    if (visit1.controllerUrl || visit1.active) break;
+  }
+
+  ok('serviceWorker API available', !(visit1 && visit1.noSw), visit1);
+  ok('SW registered on first visit (old)', visit1 && visit1.regCount >= 1, visit1);
+
+  /* فعّل waiting إن وُجد ثم ازرع كاشاً قديماً إضافياً */
+  await page.evaluate(async (want) => {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    const reg = regs[0];
+    if (reg && reg.waiting) {
+      reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      await new Promise((r) => setTimeout(r, 500));
+    }
+    await caches.open('rizq-cache-v22.1');
+    const c = await caches.open(want.oldCache);
+    await c.put(want.origin + '/__stale_marker__', new Response('old'));
+  }, { oldCache: OLD_CACHE, origin: origin });
+  await page.waitForTimeout(800);
+
+  visit1 = await page.evaluate(async (want) => {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    const ctrl = navigator.serviceWorker.controller;
+    const keys = (await caches.keys()).filter((k) => /^rizq-cache-v/.test(k));
+    return {
+      regCount: regs.length,
+      controllerUrl: ctrl ? ctrl.scriptURL : null,
+      active: regs[0] && regs[0].active ? regs[0].active.scriptURL : null,
+      keys,
+      hdrs: document.querySelectorAll('#rizq-mock-hdr').length,
+      themeHref: (document.querySelector('link[href*="rizq-theme.css"]') || {}).href || '',
+      wantOld: want.oldAsset,
+    };
+  }, { oldAsset: OLD_ASSET });
+
+  const oldScript = visit1.controllerUrl || visit1.active || '';
+  ok('old SW script active (v=' + OLD_ASSET + ')',
+    oldScript.indexOf('v=' + OLD_ASSET) !== -1, oldScript);
+  ok('old / stale caches present after visit 1',
+    (visit1.keys || []).some((k) => k === OLD_CACHE || k === 'rizq-cache-v22.1'),
+    visit1.keys);
+
+  /* —— زيارة 2: الأصول الجديدة بدون مسح يدوي —— */
+  state.phase = 'new';
+  await page.goto(origin + '/rizq_landing_v8.html', { waitUntil: 'load', timeout: 90000 });
+  await page.waitForTimeout(1500);
+
+  let upgraded = null;
+  for (let i = 0; i < 45; i++) {
+    try {
+      await page.waitForLoadState('domcontentloaded', { timeout: 5000 }).catch(function () {});
+      await page.waitForTimeout(900);
+      upgraded = await page.evaluate(async (want) => {
+        const keys = (await caches.keys()).filter((k) => /^rizq-cache-v/.test(k));
+        const regs = await navigator.serviceWorker.getRegistrations();
+        const ctrl = navigator.serviceWorker.controller;
+        try {
+          if (regs[0]) {
+            if (regs[0].waiting) regs[0].waiting.postMessage({ type: 'SKIP_WAITING' });
+            if (regs[0].update) await regs[0].update();
+          }
+        } catch (eU) { /* */ }
+        const mockScripts = Array.from(document.querySelectorAll('script[src*="rizq_header_mockup_trial.js"]'))
+          .map((s) => s.getAttribute('src'));
+        const themeHref = (document.querySelector('link[href*="rizq-theme.css"]') || {}).href || '';
+        const pwaHint = (document.querySelector('script[src*="rizq_pwa.js"]') || {}).src || '';
+        return {
+          keys,
+          staleLeft: keys.filter((k) => k !== want.swCache),
+          controllerUrl: ctrl ? ctrl.scriptURL : null,
+          active: regs[0] && regs[0].active ? regs[0].active.scriptURL : null,
+          themeHref,
+          pwaHint,
+          mockScripts,
+          hdrs: document.querySelectorAll('#rizq-mock-hdr').length,
+          reloaded: (() => { try { return sessionStorage.getItem('rizq_sw_reloaded'); } catch (e) { return null; } })(),
+        };
+      }, { assetV: assetV, swCache: swCache });
+    } catch (eNav) {
+      /* controllerchange → location.reload() يدمّر السياق — انتظر وأعد المحاولة */
+      await page.waitForTimeout(1000);
+      continue;
+    }
+
+    const scriptUrl = upgraded.controllerUrl || upgraded.active || '';
+    const ctrlOk = scriptUrl.indexOf('v=' + assetV) !== -1;
+    const themeOk = new RegExp('v=' + assetV.replace(/\./g, '\\.')).test(upgraded.themeHref || '');
+    const staleOk = (upgraded.staleLeft || []).every((k) => k === swCache);
+    if (ctrlOk && (themeOk || i > 12) && (staleOk || i > 18)) break;
+  }
+
+  const finalScript = (upgraded && (upgraded.controllerUrl || upgraded.active)) || '';
+  ok('new SW controlling after next visit (v=' + assetV + ')',
+    finalScript.indexOf('v=' + assetV) !== -1, finalScript);
+  ok('injected theme.css carries current ASSET_V (no manual clear)',
+    !!(upgraded && new RegExp('v=' + assetV.replace(/\./g, '\\.')).test(upgraded.themeHref || '')),
+    upgraded && upgraded.themeHref);
+  ok('stale rizq-cache-* purged after upgrade',
+    !!(upgraded && (upgraded.staleLeft || []).every((k) => k === swCache)),
+    upgraded && { keys: upgraded.keys, staleLeft: upgraded.staleLeft });
+  ok('single mock header after upgrade', upgraded && upgraded.hdrs === 1, upgraded && upgraded.hdrs);
+  ok('mockup script src carries current MOCK_HDR_V',
+    !!(mockHdrV && upgraded && (upgraded.mockScripts || []).some((s) =>
+      new RegExp('v=' + mockHdrV.replace(/\./g, '\\.')).test(s || ''))),
+    { mockHdrV, mockScripts: upgraded && upgraded.mockScripts });
+
+  /* مسار localhost الافتراضي: مسح الكاش من العميل بدون فرض SW */
+  const plainServer = await new Promise((resolve) => {
+    const s = http.createServer((req, res) => {
+      let url = decodeURIComponent((req.url || '/').split('?')[0]);
+      if (url === '/') url = '/rizq_landing_v8.html';
+      const file = path.join(ROOT, url.replace(/^\//, ''));
+      if (!file.startsWith(ROOT) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) {
+        res.writeHead(404); res.end('no'); return;
+      }
+      const ext = path.extname(file).toLowerCase();
+      const types = {
+        '.html': 'text/html;charset=utf-8',
+        '.js': 'application/javascript',
+        '.css': 'text/css',
+        '.png': 'image/png',
+        '.svg': 'image/svg+xml',
+        '.json': 'application/json',
+        '.woff2': 'font/woff2',
+      };
+      res.writeHead(200, {
+        'content-type': types[ext] || 'application/octet-stream',
+        'cache-control': 'no-store',
+      });
+      fs.createReadStream(file).pipe(res);
+    });
+    s.listen(0, '127.0.0.1', () => resolve(s));
+  });
+  const local = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    serviceWorkers: 'allow',
+  });
+  const lp = await local.newPage();
+  const localOrigin = 'http://127.0.0.1:' + plainServer.address().port;
+  await lp.goto(localOrigin + '/rizq_landing_v8.html', { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await lp.evaluate(async () => {
     await caches.open('rizq-cache-v22.1');
     await caches.open('rizq-cache-v31.20');
     await caches.open('rizq-cache-v31.24');
-    const keys = await caches.keys();
-    return { ok: true, keys: keys.filter((k) => /^rizq-cache-v/.test(k)) };
   });
-  ok('seeded old caches', seeded.ok && seeded.keys.length >= 3, seeded);
-
-  /* إعادة تحميل لتشغيل منطق المسح في rizq_pwa.js (localhost يعطّل SW لكن المسح يعمل) */
-  await page.reload({ waitUntil: 'domcontentloaded', timeout: 60000 });
-  await page.waitForTimeout(1200);
-
-  const afterClient = await page.evaluate(async (want) => {
+  await lp.reload({ waitUntil: 'domcontentloaded', timeout: 60000 });
+  await lp.waitForTimeout(1200);
+  const afterLocal = await lp.evaluate(async (want) => {
     const keys = (await caches.keys()).filter((k) => /^rizq-cache-v/.test(k));
-    const boots = window.__rizqMockupHdrTrialInit === true
-      || document.body.getAttribute('data-rizq-mock-booted') === '1';
-    const mockScripts = Array.from(document.querySelectorAll('script[src*="rizq_header_mockup_trial.js"]'))
-      .map((s) => s.getAttribute('src'));
     return {
       keys,
-      boots: !!boots,
-      mockScripts,
-      mockHdrCount: document.querySelectorAll('#rizq-mock-hdr').length,
-      assetHint: (document.querySelector('script[src*="rizq_pwa.js"]') || {}).src || '',
-      want: want,
+      stale: keys.filter((k) => k !== want),
+      hdrs: document.querySelectorAll('#rizq-mock-hdr').length,
     };
   }, swCache);
+  ok('localhost client purged stale caches', afterLocal.stale.length === 0, afterLocal.keys);
+  ok('localhost single mock header', afterLocal.hdrs === 1, afterLocal.hdrs);
 
-  /* على localhost: pwa يمسح كل الكاشات القديمة؛ قد لا يفتح SW_CACHE لأن SW غير مسجّل */
-  const staleLeft = (afterClient.keys || []).filter((k) => k !== swCache);
-  ok('client purged stale caches (no old left)', staleLeft.length === 0, afterClient.keys);
-  ok('single mock header in DOM', afterClient.mockHdrCount === 1, afterClient.mockHdrCount);
-  ok('mockup script src carries current MOCK_HDR_V',
-    !!mockHdrV && (afterClient.mockScripts || []).some((s) =>
-      new RegExp('v=' + mockHdrV.replace(/\./g, '\\.')).test(s || '')),
-    { mockHdrV, mockScripts: afterClient.mockScripts });
-  ok('pwa script carries ASSET_V', new RegExp('v=' + assetV.replace(/\./g, '\\.')).test(afterClient.assetHint || ''),
-    afterClient.assetHint);
-
-  /* محاكاة activate purge كما يفعل sw.js */
-  const activateSim = await page.evaluate(async (CACHE_NAME) => {
+  const activateSim = await lp.evaluate(async (CACHE_NAME) => {
     await caches.open('rizq-cache-v31.20');
     await caches.open('rizq-cache-v31.24');
     await caches.open(CACHE_NAME);
@@ -156,17 +337,8 @@ function ok(label, cond, detail) {
   ok('activate strategy leaves only current CACHE_NAME',
     activateSim.left.length === 1 && activateSim.left[0] === swName, activateSim);
 
-  /* لا boot مزدوج: عدّاد init للهيدر */
-  const bootCount = await page.evaluate(() => {
-    return {
-      initFlag: window.__rizqMockupHdrTrialInit === true,
-      bootedAttr: document.body.getAttribute('data-rizq-mock-booted'),
-      hdrs: document.querySelectorAll('#rizq-mock-hdr').length,
-    };
-  });
-  ok('no mockup double-boot (one header, init once)',
-    bootCount.hdrs === 1 && (bootCount.initFlag || bootCount.bootedAttr === '1'), bootCount);
-
+  await local.close();
+  plainServer.close();
   await browser.close();
   server.close();
 
