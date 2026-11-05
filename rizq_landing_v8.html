@@ -8165,8 +8165,15 @@ function _landingAdCardHtml(a, fr){
   var brandSlot = (window.RizqAdCards && typeof RizqAdCards.brandSlotHtml === 'function')
     ? RizqAdCards.brandSlotHtml(a, { fr: !!fr, size: 18 })
     : '<div class="rzq-ad-brand-slot is-empty" aria-hidden="true"></div>';
+  var storeAttr = '';
+  try {
+    var sid = a.storeId || a.accountId || (String(a.id || '').indexOf('store:') === 0
+      ? (String(a.id).match(/^store:([^:]+):/) || [])[1]
+      : '');
+    if (sid) storeAttr = ' data-store-id="' + esc(String(sid)) + '" data-account-id="' + esc(String(sid)) + '"';
+  } catch (eSid) { storeAttr = ''; }
   return ''
-    + '<div class="listing-card' + (pin ? ' pin' : '') + ' fade-in" role="listitem" data-ad-id="' + idAttr + '" data-featured="' + (pin ? '1' : '0') + '" onclick="if(event.target.closest && event.target.closest(\'.rzq-adx-nav,.rzq-adx-fav,.rzq-adx-wa,.rzq-adx-tel,.rzq-adx-actions\')) return; ' + openFn + '">'
+    + '<div class="listing-card' + (pin ? ' pin' : '') + ' fade-in" role="listitem" data-ad-id="' + idAttr + '" data-featured="' + (pin ? '1' : '0') + '"' + storeAttr + ' onclick="if(event.target.closest && event.target.closest(\'.rzq-adx-nav,.rzq-adx-fav,.rzq-adx-wa,.rzq-adx-tel,.rzq-adx-actions\')) return; ' + openFn + '">'
     + media
     + '<div class="l-body">'
     +   '<p class="l-cat">' + cat + '</p>'
@@ -8210,7 +8217,10 @@ function buildLandingAds(resetVisible){
     }
   } else {
     grid.innerHTML = items.map(function(a){ return _landingAdCardHtml(a, fr); }).join('');
-    if(window.RizqAdCards && typeof RizqAdCards.bindAll === 'function') RizqAdCards.bindAll(grid);
+  if(window.RizqAdCards && typeof RizqAdCards.bindAll === 'function') RizqAdCards.bindAll(grid);
+    if(window.RizqEngagement && typeof RizqEngagement.observe === 'function'){
+      try { RizqEngagement.observe(grid, 'home'); } catch (eEng) { /* */ }
+    }
   }
 
   var more = document.getElementById('landing-ads-more');
@@ -9177,6 +9187,13 @@ function _styBuildCardHtml(opts){
     : '';
   var href = opts.href || 'rizq_browse.html';
   var safeHref = _rizqSafeNavHref(href) || 'rizq_browse.html';
+  try {
+    var sidMatch = String(safeHref).match(/[?&]id=([^&]+)/);
+    var storeIdAttr = opts.storeId || (sidMatch ? decodeURIComponent(sidMatch[1]) : '');
+    if (storeIdAttr) {
+      attrs += ' data-store-id="'+_styEsc(String(storeIdAttr))+'" data-account-id="'+_styEsc(String(storeIdAttr))+'"';
+    }
+  } catch (eSt) { /* */ }
   var fromView = opts.fromViewLbl
     ? '<div class="rizq-style-from-view">'+_styEsc(opts.fromViewLbl)+'</div>'
     : '';
@@ -9706,6 +9723,9 @@ function buildStyleIdeas(reshuffle, optMountId){
   rail.classList.remove('is-empty');
   /* تكرار البطاقات مثل شريط «مباشر» لحركة slide سلسة */
   rail.innerHTML = cards.concat(cards).join('');
+  if(window.RizqEngagement && typeof RizqEngagement.observe === 'function'){
+    try { RizqEngagement.observe(rail, 'guide'); } catch (eEngSt) { /* */ }
+  }
   if(reshuffle && !guideMount){
     try { _styStartAutoRefresh(); } catch(e3) {}
   }
@@ -18017,3 +18037,4 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
   })();
   </script>
 <script src="rizq_home_guide.js?v=31.36" defer></script>
+<script src="rizq_engagement_beacon.js?v=1.0" defer></script>

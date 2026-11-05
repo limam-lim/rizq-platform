@@ -66,6 +66,7 @@
     "test:home-catalog-negatives": "node scripts/run-with-test-db.js scripts/test-home-catalog-negatives.js",
     "test:asset-versions": "node scripts/test-asset-versions.js",
     "test:founding-no-discount": "node scripts/run-with-test-db.js scripts/test-founding-no-discount.js",
+    "test:engagement-stats": "node scripts/run-with-test-db.js scripts/test-engagement-stats.js",
     "test:all": "node scripts/test-all.js",
     "test:demo-images-local": "node scripts/test-demo-images-local.js",
     "test:header-all-pages": "npm --prefix ../qa/cls-1 install --no-audit --no-fund && node ../qa/cls-1/test-header-all-pages.js",

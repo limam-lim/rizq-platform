@@ -769,8 +769,13 @@ async function runLifecycleScan(accountsHelpers) {
         try {
           const { getVisitStats } = require('./rizq_visit_tracker');
           const vs = await getVisitStats(String(accountId).split('::')[0]);
-          if (vs && Number(vs.monthTotal) > 0) {
-            impressionsHint = ` ظهر نشاطك ${vs.monthTotal} مرة هذا الشهر.`;
+          const impM = vs && vs.impressions ? Number(vs.impressions.monthTotal) || 0 : 0;
+          const visitM = vs ? Number(vs.monthTotal) || 0 : 0;
+          const shown = impM > 0 ? impM : visitM;
+          if (shown > 0) {
+            impressionsHint = impM > 0
+              ? ` ظهر محلك ${shown} مرة الشهر الماضي على الرئيسية ودليل رزق.`
+              : ` ظهر نشاطك ${shown} مرة هذا الشهر.`;
           }
         } catch (eImp) { /* اختياري */ }
         const msg = `⏰ رزق: باقتك "${rec.pkgName}" تنتهي خلال ${daysRounded} ${daysRounded === 1 ? 'يوم' : 'أيام'}.${impressionsHint} جدّدها الآن لتجنّب إيقاف الميزات.`;
