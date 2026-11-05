@@ -20,10 +20,10 @@
 <link rel="stylesheet" href="rizq_close_band.css?v=1"/>
 <link rel="stylesheet" href="rizq_prefacture.css?v=2"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.6"/>
-<link rel="preload" href="rizq_header.js?v=31.31" as="script"/>
+<link rel="preload" href="rizq_header.js?v=31.32" as="script"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <title>معرض رزق | Showroom Rizq</title>
-<link rel="preload" as="image" href="rizq-assets/demo-heroes/showroom-appliances-promo.jpg"/>
+<link rel="preload" as="image" href="rizq-assets/demo-heroes/showroom-appliances-promo.webp"/>
 <style>
 :root{
   --navy:#1B3A6B;--navy2:#0F2347;--gold:#C9A84C;--gold2:#E8C96A;
@@ -546,12 +546,12 @@ html[dir="ltr"] .sr-wish-btn{left:auto;right:10px}
 
 /* ── FOOTER: يستخدم الآن .rizq-footer الموحّدة من rizq-theme.css ── */
 </style>
-<script src="rizq_pwa.js?v=31.31" defer></script>
+<script src="rizq_pwa.js?v=31.32" defer></script>
 <script src="rizq_footer_toggle.js?v=23.1" defer></script>
 </head>
 <body>
 <!-- حقن الهيدر الموحّد قبل أول رسم — يمنع الشريط الأبيض فوق الهيرو ويسرّع الظهور -->
-<script src="rizq_header.js?v=31.31"></script>
+<script src="rizq_header.js?v=31.32"></script>
 
 <!-- ══ TOPNAV ══ -->
 <nav class="topnav" id="main-nav">
@@ -592,7 +592,7 @@ html[dir="ltr"] .sr-wish-btn{left:auto;right:10px}
       var id = q.get('id') || q.get('corp') || q.get('showroom') || '';
       var hero = document.getElementById('showroom-hero');
       if(!hero) return;
-      var DEMO_COVER = 'rizq-assets/demo-heroes/showroom-appliances-promo.jpg';
+      var DEMO_COVER = 'rizq-assets/demo-heroes/showroom-appliances-promo.webp';
       var isDemo = !id || id === 'demo-corp-001' || id === 'demo_showroom' || q.get('demo') === '1';
       var cover = '';
       if(isDemo){
@@ -1203,26 +1203,26 @@ var _showroomId = _params.get('id') || _params.get('corp') || _params.get('showr
     promo_video: 'rizq-assets/promo/rizq-dashboard-corp-demo-light.mp4',
     promo_video_extra: 'rizq-assets/promo/rizq-modules-promo-demo-light.mp4',
     /* أجهزة كبيرة + صغيرة — خلفية ترويجية لمعرض الأجهزة */
-    cover: 'rizq-assets/demo-heroes/showroom-appliances-promo.jpg',
-    thumb: 'rizq-assets/demo-heroes/showroom-appliances-promo.jpg'
+    cover: 'rizq-assets/demo-heroes/showroom-appliances-promo.webp',
+    thumb: 'rizq-assets/demo-heroes/showroom-appliances-promo.webp'
   };
   var items = [
     { id: 'SR1', name: 'هيونداي توسان 2022 — SUV', nameFr: 'Hyundai Tucson 2022 — SUV', cat: 'سيارات', price: '5,800,000 MRU', emoji: '🚙', stock: 2, specs: 'بيانات عرض', featured: true,
-      image: '/demo-media/u-1606664515524-ed2f786a0bd6.svg',
+      image: 'rizq-assets/demo-cars/u-1606664515524-ed2f786a0bd6.webp',
       images: [
-        '/demo-media/u-1606664515524-ed2f786a0bd6.svg',
-        '/demo-media/u-1519641471654-76ce0107ad1b.svg',
-        '/demo-media/u-1542362567-b07e54358753.svg'
+        'rizq-assets/demo-cars/u-1606664515524-ed2f786a0bd6.webp',
+        'rizq-assets/demo-cars/u-1519641471654-76ce0107ad1b.webp',
+        'rizq-assets/demo-cars/u-1542362567-b07e54358753.webp'
       ] },
     { id: 'SR2', name: 'لابتوب احترافي', nameFr: 'Laptop pro', cat: 'إلكترونيات', price: '85,000 MRU', emoji: '💻', stock: 6, specs: 'بيانات عرض',
-      image: '/demo-media/u-1496181133206-80ce9b88a853.svg',
-      images: ['/demo-media/u-1496181133206-80ce9b88a853.svg'] },
+      image: 'rizq-assets/demo-showroom/u-1496181133206-80ce9b88a853.webp',
+      images: ['rizq-assets/demo-showroom/u-1496181133206-80ce9b88a853.webp'] },
     { id: 'SR3', name: 'طقم صالون', nameFr: 'Salon', cat: 'أثاث', price: '120,000 MRU', emoji: '🛋️', stock: 3, specs: 'بيانات عرض',
-      image: '/demo-media/u-1555041469-a586c61ea9bc.svg',
-      images: ['/demo-media/u-1555041469-a586c61ea9bc.svg'] },
+      image: 'rizq-assets/demo-furniture/u-1555041469-a586c61ea9bc.webp',
+      images: ['rizq-assets/demo-furniture/u-1555041469-a586c61ea9bc.webp'] },
     { id: 'SR4', name: 'مولد كهرباء', nameFr: 'Groupe électrogène', cat: 'معدات', price: '95,000 MRU', emoji: '⚙️', stock: 5, specs: 'بيانات عرض',
-      image: '/demo-media/p-rizq-sr-gen-640x480.svg',
-      images: ['/demo-media/p-rizq-sr-gen-640x480.svg'] }
+      image: 'rizq-assets/demo-showroom/p-rizq-sr-gen-640x480.webp',
+      images: ['rizq-assets/demo-showroom/p-rizq-sr-gen-640x480.webp'] }
   ];
   try{
     localStorage.setItem('rizq_corp_prods_' + _showroomId, JSON.stringify(items));

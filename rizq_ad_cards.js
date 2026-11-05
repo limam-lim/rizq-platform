@@ -619,36 +619,36 @@
     if (!list || !list.length) return;
     var fashionV = 'v14'; /* طلب المستخدم الأخير: الصور المُرسلة بوجوه مختلفة فقط */
     var fashion = {
-      melhafaStreet: 'rizq-assets/demo-fashion/demo-melhafa-street-dark.jpg?' + fashionV,
-      melhafaShop: 'rizq-assets/demo-fashion/demo-melhafa-shop-warm.jpg?' + fashionV,
-      melhafaLilac: 'rizq-assets/demo-fashion/demo-melhafa-street-lilac.jpg?' + fashionV,
-      daraaStreet: 'rizq-assets/demo-fashion/demo-daraa-street-dark.jpg?' + fashionV,
-      daraaShop: 'rizq-assets/demo-fashion/demo-daraa-shop-olive.jpg?' + fashionV,
-      daraaBoutique: 'rizq-assets/demo-fashion/demo-daraa-boutique-navy.jpg?' + fashionV
+      melhafaStreet: 'rizq-assets/demo-fashion/demo-melhafa-street-dark.webp?' + fashionV,
+      melhafaShop: 'rizq-assets/demo-fashion/demo-melhafa-shop-warm.webp?' + fashionV,
+      melhafaLilac: 'rizq-assets/demo-fashion/demo-melhafa-street-lilac.webp?' + fashionV,
+      daraaStreet: 'rizq-assets/demo-fashion/demo-daraa-street-dark.webp?' + fashionV,
+      daraaShop: 'rizq-assets/demo-fashion/demo-daraa-shop-olive.webp?' + fashionV,
+      daraaBoutique: 'rizq-assets/demo-fashion/demo-daraa-boutique-navy.webp?' + fashionV
     };
     var map = {
-      '101': ['/demo-media/u-1560448204-e02f11c3d0e2.svg','/demo-media/u-1502672260266-1c1ef2d93688.svg','/demo-media/u-1522708323590-d24dbb6b0267.svg'],
-      '102': ['/demo-media/u-1533473359331-0135ef1b58bf.svg','/demo-media/u-1492144534655-ae79c964c9d7.svg','/demo-media/u-1503376780353-7e6692767b70.svg'],
-      '103': ['/demo-media/u-1511707171634-5f897ff02aa9.svg','/demo-media/u-1592899677977-9c10ca588bbd.svg'],
-      '201': ['/demo-media/u-1560448204-e02f11c3d0e2.svg','/demo-media/u-1502672260266-1c1ef2d93688.svg','/demo-media/u-1522708323590-d24dbb6b0267.svg'],
-      '204': ['/demo-media/u-1515562141207-7a88fb7ce338.svg','/demo-media/u-1602173574767-37ac01994b2a.svg','/demo-media/u-1611591437281-460bfbe1220a.svg'],
-      '205': ['/demo-media/u-1511707171634-5f897ff02aa9.svg','/demo-media/u-1592899677977-9c10ca588bbd.svg'],
-      '207': ['/demo-media/u-1533473359331-0135ef1b58bf.svg','/demo-media/u-1492144534655-ae79c964c9d7.svg','/demo-media/u-1503376780353-7e6692767b70.svg'],
-      '1': ['/demo-media/u-1560448204-e02f11c3d0e2.svg','/demo-media/u-1502672260266-1c1ef2d93688.svg','/demo-media/u-1522708323590-d24dbb6b0267.svg'],
-      '10': ['/demo-media/u-1533473359331-0135ef1b58bf.svg','/demo-media/u-1492144534655-ae79c964c9d7.svg','/demo-media/u-1503376780353-7e6692767b70.svg'],
+      '101': ['rizq-assets/demo-estate/u-1560448204-e02f11c3d0e2.webp','rizq-assets/demo-estate/u-1502672260266-1c1ef2d93688.webp','rizq-assets/demo-estate/u-1522708323590-d24dbb6b0267.webp'],
+      '102': ['rizq-assets/demo-cars/u-1533473359331-0135ef1b58bf.webp','rizq-assets/demo-cars/u-1492144534655-ae79c964c9d7.webp','rizq-assets/demo-cars/u-1503376780353-7e6692767b70.webp'],
+      '103': ['rizq-assets/demo-electronics/u-1511707171634-5f897ff02aa9.webp','rizq-assets/demo-electronics/u-1592899677977-9c10ca588bbd.webp'],
+      '201': ['rizq-assets/demo-estate/u-1560448204-e02f11c3d0e2.webp','rizq-assets/demo-estate/u-1502672260266-1c1ef2d93688.webp','rizq-assets/demo-estate/u-1522708323590-d24dbb6b0267.webp'],
+      '204': ['rizq-assets/demo-gold/u-1515562141207-7a88fb7ce338.webp','rizq-assets/demo-gold/u-1602173574767-37ac01994b2a.webp','rizq-assets/demo-gold/u-1611591437281-460bfbe1220a.webp'],
+      '205': ['rizq-assets/demo-electronics/u-1511707171634-5f897ff02aa9.webp','rizq-assets/demo-electronics/u-1592899677977-9c10ca588bbd.webp'],
+      '207': ['rizq-assets/demo-cars/u-1533473359331-0135ef1b58bf.webp','rizq-assets/demo-cars/u-1492144534655-ae79c964c9d7.webp','rizq-assets/demo-cars/u-1503376780353-7e6692767b70.webp'],
+      '1': ['rizq-assets/demo-estate/u-1560448204-e02f11c3d0e2.webp','rizq-assets/demo-estate/u-1502672260266-1c1ef2d93688.webp','rizq-assets/demo-estate/u-1522708323590-d24dbb6b0267.webp'],
+      '10': ['rizq-assets/demo-cars/u-1533473359331-0135ef1b58bf.webp','rizq-assets/demo-cars/u-1492144534655-ae79c964c9d7.webp','rizq-assets/demo-cars/u-1503376780353-7e6692767b70.webp'],
       /* هيونداي توسان — لا تستخدم صورة فورد العامة لصنف السيارات */
       '124': [
-        '/demo-media/u-1606664515524-ed2f786a0bd6.svg',
-        '/demo-media/u-1519641471654-76ce0107ad1b.svg',
-        '/demo-media/u-1542362567-b07e54358753.svg'
+        'rizq-assets/demo-cars/u-1606664515524-ed2f786a0bd6.webp',
+        'rizq-assets/demo-cars/u-1519641471654-76ce0107ad1b.webp',
+        'rizq-assets/demo-cars/u-1542362567-b07e54358753.webp'
       ],
       '222': [
-        '/demo-media/u-1606664515524-ed2f786a0bd6.svg',
-        '/demo-media/u-1519641471654-76ce0107ad1b.svg',
-        '/demo-media/u-1542362567-b07e54358753.svg'
+        'rizq-assets/demo-cars/u-1606664515524-ed2f786a0bd6.webp',
+        'rizq-assets/demo-cars/u-1519641471654-76ce0107ad1b.webp',
+        'rizq-assets/demo-cars/u-1542362567-b07e54358753.webp'
       ],
-      '14': ['/demo-media/u-1511707171634-5f897ff02aa9.svg','/demo-media/u-1592899677977-9c10ca588bbd.svg'],
-      '18': ['/demo-media/u-1515562141207-7a88fb7ce338.svg','/demo-media/u-1602173574767-37ac01994b2a.svg'],
+      '14': ['rizq-assets/demo-electronics/u-1511707171634-5f897ff02aa9.webp','rizq-assets/demo-electronics/u-1592899677977-9c10ca588bbd.webp'],
+      '18': ['rizq-assets/demo-gold/u-1515562141207-7a88fb7ce338.webp','rizq-assets/demo-gold/u-1602173574767-37ac01994b2a.webp'],
       /* أزياء تجريبية — صور فوتو فقط لملحفة/دراعة (لا ساعة/حذاء/إكسسوار) */
       '211': [fashion.daraaStreet, fashion.daraaBoutique, fashion.daraaShop],
       '216': [fashion.melhafaStreet, fashion.melhafaShop, fashion.melhafaLilac],
@@ -657,10 +657,10 @@
       '233': [fashion.melhafaLilac, fashion.melhafaShop],
       '234': [fashion.daraaShop, fashion.daraaBoutique],
       /* ماشية — روابط Unsplash القديمة لـ إبل أعطت 404 */
-      '104': ['/demo-media/p-rizq-camel-a-640x480.svg', '/demo-media/p-rizq-camel-b-640x480.svg'],
-      '203': ['/demo-media/p-rizq-camel-a-640x480.svg', '/demo-media/p-rizq-camel-b-640x480.svg', '/demo-media/p-rizq-camel-c-640x480.svg'],
-      '109': ['/demo-media/p-rizq-cattle-a-640x480.svg', '/demo-media/p-rizq-cattle-b-640x480.svg'],
-      '209': ['/demo-media/p-rizq-cattle-a-640x480.svg', '/demo-media/p-rizq-cattle-b-640x480.svg']
+      '104': ['rizq-assets/demo-livestock/p-rizq-camel-a-640x480.webp', 'rizq-assets/demo-livestock/p-rizq-camel-b-640x480.webp'],
+      '203': ['rizq-assets/demo-livestock/p-rizq-camel-a-640x480.webp', 'rizq-assets/demo-livestock/p-rizq-camel-b-640x480.webp', 'rizq-assets/demo-livestock/p-rizq-camel-c-640x480.webp'],
+      '109': ['rizq-assets/demo-livestock/p-rizq-cattle-a-640x480.webp', 'rizq-assets/demo-livestock/p-rizq-cattle-b-640x480.webp'],
+      '209': ['rizq-assets/demo-livestock/p-rizq-cattle-a-640x480.webp', 'rizq-assets/demo-livestock/p-rizq-cattle-b-640x480.webp']
     };
     var byCat = {
       'عقارات': map['101'],
@@ -669,13 +669,13 @@
       'ذهب': map['204'],
       'شاحنات': map['207'],
       /* لا نربط «أزياء» عامة بصور ملحفة — ساعة/حذاء/إكسسوار تبقى إيموجي */
-      'ماشية': ['/demo-media/p-rizq-camel-a-640x480.svg', '/demo-media/p-rizq-cattle-a-640x480.svg', '/demo-media/p-rizq-camel-b-640x480.svg'],
-      'بناء': ['/demo-media/u-1503387762-592deb58ef4e.svg','/demo-media/u-1504307651254-35680f356dfd.svg'],
-      'خدمات': ['/demo-media/u-1581578731548-c64695cc6952.svg','/demo-media/u-1621905251189-08b45d6a269e.svg']
+      'ماشية': ['rizq-assets/demo-livestock/p-rizq-camel-a-640x480.webp', 'rizq-assets/demo-livestock/p-rizq-cattle-a-640x480.webp', 'rizq-assets/demo-livestock/p-rizq-camel-b-640x480.webp'],
+      'بناء': ['rizq-assets/demo-build/u-1503387762-592deb58ef4e.webp','rizq-assets/demo-build/u-1504307651254-35680f356dfd.webp'],
+      'خدمات': ['rizq-assets/demo-services/u-1581578731548-c64695cc6952.webp','rizq-assets/demo-services/u-1621905251189-08b45d6a269e.webp']
     };
     var melhafaSet = [fashion.melhafaStreet, fashion.melhafaShop, fashion.melhafaLilac];
     var daraaSet = [fashion.daraaStreet, fashion.daraaBoutique, fashion.daraaShop];
-    var fallback = ['/demo-media/u-1556740749-887f6717d7e4.svg','/demo-media/u-1441986300917-64674bd600d8.svg'];
+    var fallback = ['rizq-assets/demo-stores/u-1556740749-887f6717d7e4.webp','rizq-assets/demo-stores/u-1441986300917-64674bd600d8.webp'];
     var brokenImg = /photo-1500595046743-cd271d973d8b/i;
     var fashionWomenPhoto = /ملحفة|melhfa|عباية/i;
     var fashionMenDaraa = /دراعة|daraa|boubou/i;

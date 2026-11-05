@@ -7,23 +7,23 @@
   'use strict';
 
   var U = {
-    villaExt: '/demo-media/u-1613490493576-7fde63acd811.svg',
-    villaNight: '/demo-media/u-1600585154340-be6161a56a0c.svg',
-    living: '/demo-media/u-1600607687939-ce8a6c25118c.svg',
-    kitchen: '/demo-media/u-1600566753190-17f0baa2a6c3.svg',
-    kitchen2: '/demo-media/u-1556912173-3bb406ef7e77.svg',
-    bath: '/demo-media/u-1600573472592-401b489a3cdc.svg',
-    bath2: '/demo-media/u-1552321554-5fefe8c9ef14.svg',
-    bedroom: '/demo-media/u-1600047509807-ba8f99d2cdde.svg',
-    bedroom2: '/demo-media/u-1616594039964-ae9021a400a0.svg',
-    terrace: '/demo-media/u-1600210492486-724fe5c67fb0.svg',
-    apt: '/demo-media/u-1502672260266-1c1ef2d93688.svg',
-    apt2: '/demo-media/u-1560448204-e02f11c3d0e2.svg',
-    house: '/demo-media/u-1600596542815-ffad4c1539a9.svg',
-    penthouse: '/demo-media/u-1512917774080-9991f1c4c750.svg',
-    land: '/demo-media/u-1500382017468-9049fed747ef.svg',
-    shop: '/demo-media/u-1441986300917-64674bd600d8.svg',
-    garage: '/demo-media/u-1486006920555-c31d558a1733.svg'
+    villaExt: 'rizq-assets/demo-estate/u-1613490493576-7fde63acd811.webp',
+    villaNight: 'rizq-assets/demo-estate/u-1600585154340-be6161a56a0c.webp',
+    living: 'rizq-assets/demo-estate/u-1600607687939-ce8a6c25118c.webp',
+    kitchen: 'rizq-assets/demo-estate/u-1600566753190-17f0baa2a6c3.webp',
+    kitchen2: 'rizq-assets/demo-estate/u-1556912173-3bb406ef7e77.webp',
+    bath: 'rizq-assets/demo-estate/u-1600573472592-401b489a3cdc.webp',
+    bath2: 'rizq-assets/demo-estate/u-1552321554-5fefe8c9ef14.webp',
+    bedroom: 'rizq-assets/demo-estate/u-1600047509807-ba8f99d2cdde.webp',
+    bedroom2: 'rizq-assets/demo-estate/u-1616594039964-ae9021a400a0.webp',
+    terrace: 'rizq-assets/demo-estate/u-1600210492486-724fe5c67fb0.webp',
+    apt: 'rizq-assets/demo-estate/u-1502672260266-1c1ef2d93688.webp',
+    apt2: 'rizq-assets/demo-estate/u-1560448204-e02f11c3d0e2.webp',
+    house: 'rizq-assets/demo-estate/u-1600596542815-ffad4c1539a9.webp',
+    penthouse: 'rizq-assets/demo-estate/u-1512917774080-9991f1c4c750.webp',
+    land: 'rizq-assets/demo-estate/u-1500382017468-9049fed747ef.webp',
+    shop: 'rizq-assets/demo-stores/u-1441986300917-64674bd600d8.webp',
+    garage: 'rizq-assets/demo-estate/u-1486006920555-c31d558a1733.webp'
   };
 
   var LABEL = {

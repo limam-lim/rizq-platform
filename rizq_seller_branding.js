@@ -8,48 +8,48 @@
   /** @type {Record<string, {cover?: string, logo?: string, accent?: string}>} */
   var BY_SELLER = {
     'وكالة السيارات الأولى': {
-      cover: 'rizq-assets/demo-heroes/showroom-industrial.jpg',
+      cover: 'rizq-assets/demo-heroes/showroom-industrial.webp',
       accent: '#1B3A6B'
     },
     'وكالة السيارات الفاخرة': {
-      cover: 'rizq-assets/demo-heroes/showroom-appliances.jpg',
+      cover: 'rizq-assets/demo-heroes/showroom-appliances.webp',
       accent: '#0f2347'
     },
     'أوتو موريتانيا': {
-      cover: 'rizq-assets/demo-heroes/showroom-industrial.jpg',
+      cover: 'rizq-assets/demo-heroes/showroom-industrial.webp',
       accent: '#234d8f'
     },
     'وكالة النجمة': {
-      cover: 'rizq-assets/demo-heroes/store-boutique-promo.jpg',
+      cover: 'rizq-assets/demo-heroes/store-boutique-promo.webp',
       accent: '#1B3A6B'
     },
     'شركة المعدات الموريتانية': {
-      cover: 'rizq-assets/demo-heroes/showroom-industrial.jpg',
+      cover: 'rizq-assets/demo-heroes/showroom-industrial.webp',
       accent: '#162235'
     },
     'ورشة الذهب الموريتانية': {
-      cover: 'rizq-assets/demo-heroes/store-boutique-promo.jpg',
+      cover: 'rizq-assets/demo-heroes/store-boutique-promo.webp',
       accent: '#7a4a00'
     },
     'الوطنية للعقار': {
-      cover: 'rizq-assets/demo-heroes/office-law-interior.jpg',
+      cover: 'rizq-assets/demo-heroes/office-law-interior.webp',
       accent: '#1B3A6B'
     },
     'محمد ليمام | ADMINIA': {
-      cover: 'rizq-assets/demo-heroes/office-lawyer-justice.jpg',
+      cover: 'rizq-assets/demo-heroes/office-lawyer-justice.webp',
       accent: '#0D1B2A'
     }
   };
 
   /** غلاف افتراضي حسب القسم عند غياب اسم بائع معروف */
   var BY_CAT = {
-    'سيارات': 'rizq-assets/demo-heroes/showroom-industrial.jpg',
-    'شاحنات': 'rizq-assets/demo-heroes/showroom-industrial.jpg',
-    'عقارات': 'rizq-assets/demo-heroes/office-law-interior.jpg',
-    'إلكترونيات': 'rizq-assets/demo-heroes/showroom-appliances.jpg',
-    'أزياء': 'rizq-assets/demo-fashion/demo-daraa-boutique-navy.jpg',
-    'ذهب': 'rizq-assets/demo-heroes/store-boutique-promo.jpg',
-    'خدمات': 'rizq-assets/demo-heroes/office-lawyer-justice.jpg'
+    'سيارات': 'rizq-assets/demo-heroes/showroom-industrial.webp',
+    'شاحنات': 'rizq-assets/demo-heroes/showroom-industrial.webp',
+    'عقارات': 'rizq-assets/demo-heroes/office-law-interior.webp',
+    'إلكترونيات': 'rizq-assets/demo-heroes/showroom-appliances.webp',
+    'أزياء': 'rizq-assets/demo-fashion/demo-daraa-boutique-navy.webp',
+    'ذهب': 'rizq-assets/demo-heroes/store-boutique-promo.webp',
+    'خدمات': 'rizq-assets/demo-heroes/office-lawyer-justice.webp'
   };
 
   function resolveSellerBrand(ad) {
@@ -62,7 +62,7 @@
       known.cover ||
       (Array.isArray(ad.images) && ad.images[0]) ||
       BY_CAT[ad.cat] ||
-      'rizq-assets/demo-heroes/store-boutique-promo.jpg';
+      'rizq-assets/demo-heroes/store-boutique-promo.webp';
     var logo = ad.sellerLogo || ad.sellerAvatar || known.logo || '';
     var accent = ad.sellerAccent || known.accent || '#1B3A6B';
     return {
