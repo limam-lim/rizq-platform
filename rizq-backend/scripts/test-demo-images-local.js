@@ -85,8 +85,19 @@ for (const dir of demoDirs) {
     if (sz > MAX_WEBP) overs.push(path.relative(ROOT, fp) + '=' + sz);
   }
 }
-ok('demo WebP count ≥ 50', webps.length >= 50, 'count=' + webps.length);
+const mediums = webps.filter((fp) => !/\.(thumb|full)\.webp$/i.test(fp));
+ok('demo medium WebP count ≥ 50', mediums.length >= 50, 'count=' + mediums.length);
 ok('every demo WebP ≤ 120KB', overs.length === 0, overs.slice(0, 5).join(', '));
+
+const missingVariants = [];
+for (const fp of webps) {
+  const base = fp.replace(/\.webp$/i, '');
+  if (/\.(thumb|full)$/i.test(base)) continue;
+  if (!fs.existsSync(base + '.thumb.webp')) missingVariants.push(path.relative(ROOT, base + '.thumb.webp'));
+  if (!fs.existsSync(base + '.full.webp')) missingVariants.push(path.relative(ROOT, base + '.full.webp'));
+}
+ok('each medium WebP has .thumb.webp + .full.webp', missingVariants.length === 0, missingVariants.slice(0, 5).join(', '));
+
 ok('each demo-* has CREDITS.md', missingCredits.length === 0, missingCredits.join(','));
 
 const svgRefs = [];

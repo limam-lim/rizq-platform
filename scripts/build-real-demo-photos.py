@@ -40,18 +40,18 @@ PICSUM_SOURCES: dict[str, tuple[str, str, str]] = {
     ),
     "p-rizq-camel-a-640x480": (
         "livestock",
-        f"{PEXEL}/1996333/pexels-photo-1996333.jpeg?auto=compress&cs=tinysrgb&w=900",
-        "Pexels — camel",
+        f"{UNSPLASH}/photo-1703613168013-fd134a8df05f?auto=format&fit=crop&w=900&q=70",
+        "Unsplash — camel in Wadi Rum desert",
     ),
     "p-rizq-camel-b-640x480": (
         "livestock",
-        f"{PEXEL}/235294/pexels-photo-235294.jpeg?auto=compress&cs=tinysrgb&w=900",
-        "Pexels — camel desert",
+        f"{UNSPLASH}/photo-1670687174580-c003b4716959?auto=format&fit=crop&w=900&q=70",
+        "Unsplash — camel walking in desert",
     ),
     "p-rizq-camel-c-640x480": (
         "livestock",
-        f"{PEXEL}/149203/pexels-photo-149203.jpeg?auto=compress&cs=tinysrgb&w=900",
-        "Pexels — camel close-up",
+        f"{UNSPLASH}/photo-1615380098674-d28bf1a87cd3?auto=format&fit=crop&w=900&q=70",
+        "Unsplash — brown camels on desert",
     ),
     "p-rizq-cattle-a-640x480": (
         "livestock",
