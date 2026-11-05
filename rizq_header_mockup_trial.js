@@ -37,7 +37,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.97';
+    link.href = 'rizq_header_mockup_trial.css?v=5.98';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -1499,21 +1499,71 @@
   window.__rizqSyncMockHdrHeight = syncMockHdrHeight;
   window.__rizqApplyMockLang = applyMockLang;
 
-  /* التشغيل مبكراً عند ظهور الهيدر — قبل طلاء hero/categories (يقلّل CLS تقسيم الهاتف) */
+  /*
+   * التشغيل مبكراً عند جاهزية body/الهيدر.
+   * - الرئيسية: #rizq-mock-hdr مكتوب في HTML (بعد سكربت الـ head) → ننتظر ظهوره+nav ثم boot مرة واحدة.
+   * - الصفحات الداخلية: بعد انتهاء التحليل ولا هيدر → ensureMockHeader() يُنشئه ثم boot.
+   *   (e348824 انتظر وجود الهيدر قبل ensureMockHeader فحلّق على الصفحات الداخلية.)
+   *   (إن أنشأنا أثناء readyState=loading قبل وسم الرئيسية → هيدران مكرّران.)
+   * - __rizqMockupHdrTrialInit + __rmhBooted + started تمنع double-boot.
+   */
   function bootWhenHdrReady() {
     var started = false;
+    function pruneDuplicateHeaders(keep) {
+      try {
+        var all = document.querySelectorAll('#rizq-mock-hdr');
+        if (!all || all.length < 2) return keep;
+        var retained = keep;
+        if (!retained || !retained.querySelector) {
+          retained = null;
+          for (var i = 0; i < all.length; i++) {
+            if (all[i].querySelector('nav.rmh-nav')) { retained = all[i]; break; }
+          }
+          retained = retained || all[0];
+        }
+        for (var j = 0; j < all.length; j++) {
+          if (all[j] !== retained) {
+            try { all[j].parentNode.removeChild(all[j]); } catch (eRm) {}
+          }
+        }
+        return retained;
+      } catch (eDup) {
+        return keep;
+      }
+    }
     function go() {
       if (started) return true;
       if (!document.body) return false;
-      var hdrReady = document.getElementById('rizq-mock-hdr');
-      if (!hdrReady) return false;
-      /* انتظر اكتمال nav داخل الهيدر — تفادي boot على وسم فارغ أثناء التحليل */
-      if (!hdrReady.querySelector('nav.rmh-nav')) return false;
-      started = true;
+
       document.body.classList.add('rizq-mockup-hdr-trial');
       document.documentElement.classList.add('rizq-app-nav');
       ensureMockCss();
-      ensureMockHeader();
+
+      var hdrReady = document.getElementById('rizq-mock-hdr');
+      if (!hdrReady) {
+        /*
+         * الرئيسية: السكربت في <head> قبل وسم SSR — الانتظار أثناء loading يمنع هيدراً مكرّراً.
+         * الصفحات الداخلية: لا وسم SSR → أنشئ فوراً عند وجود body (حتى أثناء التحليل)
+         * حتى يُحجز الارتفاع قبل طلاء المحتوى (CLS).
+         */
+        var path = '';
+        try { path = String((location.pathname || '').split('/').pop() || ''); } catch (ePath) { path = ''; }
+        var landingSsr = /^(rizq_landing_v8\.html|index\.html|)$/i.test(path);
+        if (landingSsr && document.readyState === 'loading') return false;
+        try { ensureMockHeader(); } catch (eEnsure) { return false; }
+        hdrReady = document.getElementById('rizq-mock-hdr');
+        if (!hdrReady) return false;
+      }
+
+      /* إن وُجد وسم فارغ أثناء تحليل الرئيسية — انتظر nav */
+      if (!hdrReady.querySelector('nav.rmh-nav')) return false;
+
+      hdrReady = pruneDuplicateHeaders(hdrReady) || hdrReady;
+
+      started = true;
+      /* ترحيل/روابط إن كان الهيدر SSR موجوداً مسبقاً */
+      try { ensureMockHeader(); } catch (eEnsure2) {}
+
       /* إن زامن السكربت بعد </header> مسبقاً — لا تُعد التقسيم/الترجمة قبل boot (CLS من إعادة التدفّق) */
       var alreadySynced = false;
       try { alreadySynced = document.body.getAttribute('data-rizq-hdr-synced') === '1'; } catch (eAttr) {}
@@ -1536,12 +1586,18 @@
       });
       mo.observe(document.documentElement, { childList: true, subtree: true });
     } catch (eMo) { mo = null; }
-    waitBody(function () {
+    function tryFinish() {
       go();
-      if (mo) {
+      if (started && mo) {
         try { mo.disconnect(); } catch (eD2) {}
       }
-    });
+    }
+    /* DOMContentLoaded يضمن: إما هيدر SSR جاهز، أو نحقن للصفحات الداخلية دون سباق parse */
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', tryFinish);
+    } else {
+      waitBody(tryFinish);
+    }
   }
   bootWhenHdrReady();
 })();

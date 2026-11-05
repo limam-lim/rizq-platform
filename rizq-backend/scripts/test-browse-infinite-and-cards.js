@@ -55,7 +55,7 @@ function main() {
     && /process\.env\.DATABASE_URL = preserve\.DATABASE_URL/.test(server));
 
   /* اختبارات بلا DB: فحص ملفات ثابتة أو المشغّل الشامل */
-  const noDbOk = new Set(['test:asset-versions', 'test:all', 'test:header-layout', 'test:demo-images-local']);
+  const noDbOk = new Set(['test:asset-versions', 'test:all', 'test:header-layout', 'test:demo-images-local', 'test:header-all-pages']);
   const testScripts = Object.keys(pkg.scripts).filter((k) => k.startsWith('test:'));
   const needDb = testScripts.filter((k) => !noDbOk.has(k));
   const allWrapped = needDb.every((k) => String(pkg.scripts[k]).includes('run-with-test-db.js'));
