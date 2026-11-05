@@ -84,9 +84,16 @@ function startStatic() {
   const guide = landing.indexOf('id="rizq-guide"');
   const listings = landing.indexOf('id="listings"');
   const vid = landing.indexOf('id="rizq-vid-strip"');
-  ok('order: ads → guide → listings → video',
-    heroAds > 0 && guide > heroAds && listings > guide && vid > listings,
-    { heroAds, guide, listings, vid });
+  const rvid = landing.indexOf('id="rvid-section"');
+  ok('order: hero-ads → guide; video → rvid → listings (main + guide only)',
+    heroAds > 0 && guide > heroAds && vid > guide && rvid > vid && listings > rvid,
+    { heroAds, guide, vid, rvid, listings });
+  ok('guide-desc copy AR/FR',
+    /اختر القسم واكتشف عروضه/.test(landing)
+    && /Choisissez la section et découvrez ses offres/.test(landing)
+    && !/نفس البطاقات التي تراها في أقسامها بالأسفل/.test(landing));
+  ok('per-tile store link helper', /function _styTileStoreLinkHtml/.test(landing)
+    && /rizq-style-tile-store/.test(landing));
 
   const { chromium } = loadPlaywright();
   const server = await startStatic();
@@ -109,26 +116,58 @@ function startStatic() {
     const ads = document.getElementById('hero-listings');
     const listings = document.getElementById('listings');
     const vid = document.getElementById('rizq-vid-strip');
+    const rvid = document.getElementById('rvid-section');
+    const stylesRail = document.getElementById('rizq-styles-rail');
     function top(el) { return el ? el.getBoundingClientRect().top + window.scrollY : -1; }
+    const styleCards = stylesRail
+      ? Array.from(stylesRail.querySelectorAll('.rizq-style-card')).slice(0, 4).map((c) => ({
+        name: ((c.querySelector('.rizq-style-name') || {}).textContent || '').trim(),
+        storeLinks: c.querySelectorAll('a.rizq-style-tile-store').length,
+        tiles: c.querySelectorAll('.rizq-style-tile').length,
+      }))
+      : [];
+    const rvidVisible = !!(rvid && rvid.offsetParent !== null && rvid.getBoundingClientRect().height > 2);
     return {
       hasGuide: !!guideEl,
+      guideDesc: ((guideEl && guideEl.querySelector('.rizq-guide-desc')) || {}).textContent || '',
       tabs,
       railCards: rail ? rail.querySelectorAll('.rizq-style-card, .rizq-est-card').length : 0,
-      orderTops: { ads: top(ads), guide: top(guideEl), listings: top(listings), vid: top(vid) },
+      orderTops: {
+        ads: top(ads),
+        guide: top(guideEl),
+        vid: top(vid),
+        rvid: top(rvid),
+        listings: top(listings),
+      },
+      rvidVisible,
+      sourceOrderOk: !!(vid && rvid && listings
+        && (vid.compareDocumentPosition(rvid) & Node.DOCUMENT_POSITION_FOLLOWING)
+        && (rvid.compareDocumentPosition(listings) & Node.DOCUMENT_POSITION_FOLLOWING)),
+      styleCards,
     };
   });
 
   ok('guide mounts in DOM', snap.hasGuide);
+  ok('guide-desc live text', /اختر القسم واكتشف عروضه/.test(String(snap.guideDesc || '')));
   ok('styles tab visible on phone', snap.tabs.some((t) => t.pane === 'styles' && !t.hidden));
   ok('corp/office tabs hidden when modules closed (or empty)',
     snap.tabs.filter((t) => t.pane === 'showrooms' || t.pane === 'offices').every((t) => t.hidden)
     || snap.tabs.length >= 2,
     snap.tabs);
-  ok('DOM order tops: ads < guide < listings < video',
+  /* rvid قد يكون فارغاً/مخفياً بلا ارتفاع — نعتمد ترتيب المصدر + listings بعد شريط الفيديو */
+  ok('DOM order tops: ads < guide < vid < listings (+ rvid source after vid)',
     snap.orderTops.ads < snap.orderTops.guide
-    && snap.orderTops.guide < snap.orderTops.listings
-    && snap.orderTops.listings < snap.orderTops.vid,
+    && snap.orderTops.guide < snap.orderTops.vid
+    && snap.orderTops.vid < snap.orderTops.listings
+    && snap.sourceOrderOk
+    && (!snap.rvidVisible || (snap.orderTops.vid <= snap.orderTops.rvid && snap.orderTops.rvid <= snap.orderTops.listings)),
     snap.orderTops);
+  const lookNamed = (snap.styleCards || []).filter((c) => c.name && !/^بوتيك|محل|Store/i.test(c.name));
+  const withStoreLinks = (snap.styleCards || []).filter((c) => c.storeLinks > 0);
+  ok('style look titles are look names (not store-only)', lookNamed.length >= 1 || !(snap.styleCards || []).length, snap.styleCards);
+  ok('style tiles include store <a> when store products present',
+    withStoreLinks.length >= 1 || !(snap.styleCards || []).length,
+    snap.styleCards);
 
   await browser.close();
   await new Promise((r) => server.close(r));
