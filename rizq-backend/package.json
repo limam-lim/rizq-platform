@@ -58,6 +58,7 @@
     "test:package-credit": "node scripts/run-with-test-db.js scripts/test-package-credit.js",
     "test:package-expiry": "node scripts/run-with-test-db.js scripts/test-package-expiry.js",
     "test:header-layout": "node ../qa/cls-1/test-header-layout.js",
+    "test:header-slow-cpu": "node ../qa/cls-1/test-header-slow-cpu.js",
     "test:home-catalog": "STRICT_HOME_WIRING=1 node scripts/run-with-test-db.js scripts/test-home-catalog.js",
     "test:monthly-only": "node scripts/run-with-test-db.js scripts/test-monthly-only.js",
     "admin:2fa": "node scripts/admin-2fa.js",

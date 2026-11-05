@@ -37,7 +37,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.99';
+    link.href = 'rizq_header_mockup_trial.css?v=6.00';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -1180,11 +1180,17 @@
   }
 
   function captureNavSlots(bottomNav) {
-    if (__rmhNavSlots || !bottomNav) return;
-    __rmhNavSlots = Array.prototype.map.call(bottomNav.children, function (el) {
+    if (!bottomNav) return;
+    if (!__rmhNavSlots) __rmhNavSlots = [];
+    Array.prototype.forEach.call(bottomNav.children, function (el) {
       var key = el.getAttribute('data-rmh');
       if (!key && el.classList && el.classList.contains('rmh-more-wrap')) key = 'more';
-      return { key: key || '', el: el };
+      key = key || '';
+      for (var i = 0; i < __rmhNavSlots.length; i++) {
+        var s = __rmhNavSlots[i];
+        if (s.el === el || (key && s.key === key)) return;
+      }
+      __rmhNavSlots.push({ key: key, el: el });
     });
   }
 
@@ -1522,6 +1528,11 @@
   }
 
   window.__rizqSyncPhoneNavSplit = syncPhoneNavSplit;
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function () {
+      try { syncPhoneNavSplit(); } catch (eFinalSplit) {}
+    });
+  }
   window.__rizqSyncMockHdrHeight = syncMockHdrHeight;
   window.__rizqApplyMockLang = applyMockLang;
 
