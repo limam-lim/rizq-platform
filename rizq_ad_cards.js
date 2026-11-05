@@ -372,11 +372,12 @@
         return '<div class="rzq-adx-slide">'
           + '<img src="' + esc(v.medium) + '" srcset="' + srcset + '" sizes="(max-width:600px) 400px, 900px"'
           + ' data-full="' + esc(v.full) + '" alt="' + esc(title) + '"'
-          + ' loading="lazy" decoding="async" class="rzq-adx-zoomable"/>'
+          + ' loading="lazy" decoding="async" class="rzq-adx-zoomable"'
+          + ' onerror="try{window.RizqAdCards&&RizqAdCards.imgBroken(this)}catch(e){}"/>'
           + '</div>';
       }).join('');
     } else {
-      slides = '<div class="rzq-adx-slide" style="background:' + esc(bg) + '"><span class="rzq-adx-emoji" aria-hidden="true">' + esc(emoji) + '</span></div>';
+      slides = '<div class="rzq-adx-slide is-fallback" style="background:' + esc(bg) + '"><span class="rzq-adx-emoji" aria-hidden="true">' + esc(emoji) + '</span></div>';
     }
 
     var dots = '';
@@ -395,7 +396,8 @@
     var cls = 'rzq-adx-media' + (multi ? ' has-multi' : '') + (viewed ? ' has-seen' : '') + (pin ? ' has-pin' : '');
 
     return ''
-      + '<div class="' + cls + '" data-ad-id="' + esc(id) + '" data-idx="0" data-count="' + (imgs.length || 1) + '">'
+      + '<div class="' + cls + '" data-ad-id="' + esc(id) + '" data-idx="0" data-count="' + (imgs.length || 1) + '"'
+      +   ' data-fallback-bg="' + esc(bg) + '" data-fallback-emoji="' + esc(emoji) + '">'
       +   '<div class="rzq-adx-slides">' + slides + '</div>'
       +   '<div class="rzq-adx-grad"></div>'
       +   '<span class="rzq-adx-wm" aria-hidden="true">' + (fr ? 'Rizq' : 'رزق') + '</span>'
@@ -411,6 +413,41 @@
           })()
       +   (viewed ? seenHtml(fr) : '')
       + '</div>';
+  }
+
+  /**
+   * صورة فاشلة → أخفِ الرسم (بما فيه نص alt) وأظهر بديل البطاقة (خلفية + إيموجي القسم).
+   * الـ alt يبقى على الـ img لقارئ الشاشة.
+   */
+  function imgBroken(img) {
+    if (!img || img.getAttribute('data-rzq-broken') === '1') return;
+    img.setAttribute('data-rzq-broken', '1');
+    var slide = null;
+    var media = null;
+    try { slide = img.closest ? img.closest('.rzq-adx-slide') : null; } catch (e1) { slide = null; }
+    try { media = img.closest ? img.closest('.rzq-adx-media') : null; } catch (e2) { media = null; }
+    if (!slide) {
+      try { slide = img.parentNode; } catch (e3) { return; }
+    }
+    if (!slide) return;
+    try { slide.classList.add('is-fallback'); } catch (e4) { /* */ }
+    var bg = (media && media.getAttribute('data-fallback-bg')) || 'linear-gradient(145deg,#0f1f3d,#1B3A6B)';
+    var emoji = (media && media.getAttribute('data-fallback-emoji')) || '📦';
+    try { slide.style.background = bg; } catch (e5) { /* */ }
+    if (!slide.querySelector || !slide.querySelector('.rzq-adx-emoji')) {
+      try {
+        var sp = document.createElement('span');
+        sp.className = 'rzq-adx-emoji';
+        sp.setAttribute('aria-hidden', 'true');
+        sp.textContent = emoji;
+        slide.appendChild(sp);
+      } catch (e6) { /* */ }
+    }
+    try {
+      img.classList.add('rzq-adx-img-broken');
+      img.removeAttribute('srcset');
+      img.style.cssText = 'position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;border:0!important;opacity:0!important;pointer-events:none!important;';
+    } catch (e7) { /* */ }
   }
 
   function go(media, dir) {
@@ -612,7 +649,7 @@
       ],
       '14': ['/demo-media/u-1511707171634-5f897ff02aa9.svg','/demo-media/u-1592899677977-9c10ca588bbd.svg'],
       '18': ['/demo-media/u-1515562141207-7a88fb7ce338.svg','/demo-media/u-1602173574767-37ac01994b2a.svg'],
-      /* أزياء تجريبية — ملحفة ودراعة بوجوه وأماكن متنوعة */
+      /* أزياء تجريبية — صور فوتو فقط لملحفة/دراعة (لا ساعة/حذاء/إكسسوار) */
       '211': [fashion.daraaStreet, fashion.daraaBoutique, fashion.daraaShop],
       '216': [fashion.melhafaStreet, fashion.melhafaShop, fashion.melhafaLilac],
       '231': [fashion.melhafaShop, fashion.melhafaStreet],
@@ -631,22 +668,54 @@
       'إلكترونيات': map['103'],
       'ذهب': map['204'],
       'شاحنات': map['207'],
-      'أزياء': [fashion.melhafaShop, fashion.daraaBoutique, fashion.melhafaStreet],
+      /* لا نربط «أزياء» عامة بصور ملحفة — ساعة/حذاء/إكسسوار تبقى إيموجي */
       'ماشية': ['/demo-media/p-rizq-camel-a-640x480.svg', '/demo-media/p-rizq-cattle-a-640x480.svg', '/demo-media/p-rizq-camel-b-640x480.svg'],
       'بناء': ['/demo-media/u-1503387762-592deb58ef4e.svg','/demo-media/u-1504307651254-35680f356dfd.svg'],
       'خدمات': ['/demo-media/u-1581578731548-c64695cc6952.svg','/demo-media/u-1621905251189-08b45d6a269e.svg']
     };
+    var melhafaSet = [fashion.melhafaStreet, fashion.melhafaShop, fashion.melhafaLilac];
+    var daraaSet = [fashion.daraaStreet, fashion.daraaBoutique, fashion.daraaShop];
     var fallback = ['/demo-media/u-1556740749-887f6717d7e4.svg','/demo-media/u-1441986300917-64674bd600d8.svg'];
     var brokenImg = /photo-1500595046743-cd271d973d8b/i;
+    var fashionWomenPhoto = /ملحفة|melhfa|عباية/i;
+    var fashionMenDaraa = /دراعة|daraa|boubou/i;
+    var fashionEmojiOnly = /ساعة|montre|watch|حذاء|chaussure|shoe|إكسسوار|accessoire|حقيبة|sac|bag|خاتم|bague|أسورة|bracelet/i;
     for (var i = 0; i < list.length; i++) {
       var a = list[i];
       if (!a || a.id == null) continue;
+      var blob = [a.title, a.titleFR, a.titleFr, a.subcat, a.cat, a.catKey, a.gender].join(' ');
+      var isFashion = /أزياء|fashion|mode/i.test(String(a.catKey || a.cat || ''));
+      var emojiOnlyFashion = isFashion
+        && fashionEmojiOnly.test(blob)
+        && !fashionWomenPhoto.test(blob)
+        && !fashionMenDaraa.test(blob);
+      /* ساعة/حذاء/إكسسوار: أزل أي صور ملحفة/دراعة عالقة وأبقِ الإيموجي */
+      if (emojiOnlyFashion) {
+        a.images = [];
+        if (!a.phone && !a.whatsapp) {
+          a.phone = a.phone || '+22245000000';
+          a.whatsapp = a.whatsapp || '+22245000000';
+        }
+        continue;
+      }
       var hasBroken = Array.isArray(a.images) && a.images.some(function (u) { return brokenImg.test(String(u || '')); });
       if (Array.isArray(a.images) && a.images.length && !hasBroken) continue;
       var g = map[String(a.id)];
       if (!g) {
         var ck = String(a.catKey || a.cat || '').replace(/^[^\u0600-\u06FFa-zA-Z]+/, '').split(/[—\-\s]/)[0];
-        g = byCat[ck] || byCat[a.catKey] || fallback;
+        /* أزياء: صور فقط لملحفة/دراعة */
+        if (ck === 'أزياء' || isFashion) {
+          if (fashionWomenPhoto.test(blob)) {
+            g = melhafaSet;
+          } else if (fashionMenDaraa.test(blob)) {
+            g = daraaSet;
+          } else {
+            g = null;
+            a.images = [];
+          }
+        } else {
+          g = byCat[ck] || byCat[a.catKey] || fallback;
+        }
       }
       if (g) a.images = g.slice();
       if (!a.phone && !a.whatsapp) {
@@ -700,6 +769,7 @@
     openWhatsApp: openWhatsApp,
     openTel: openTel,
     seedDemoGalleries: seedDemoGalleries,
+    imgBroken: imgBroken,
     isViewed: isViewed,
     markViewed: markViewed,
     viewedIds: viewedIds,
