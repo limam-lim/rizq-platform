@@ -37,7 +37,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=5.98';
+    link.href = 'rizq_header_mockup_trial.css?v=5.99';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -1265,13 +1265,26 @@
     syncPhoneModelsInMore();
   }
 
+  function isDesktopHdrFix() {
+    try { return !!(window.matchMedia && window.matchMedia('(min-width:1025px)').matches); }
+    catch (e) { return false; }
+  }
+
   function measureMockHdrExtent(hdr) {
     if (!hdr) return 0;
     var top = hdr.getBoundingClientRect().top;
     var bottom = hdr.getBoundingClientRect().bottom;
     var nodes = hdr.querySelectorAll('.rmh-main, .ticker-wrap, nav.rmh-nav, .rmh-util');
     for (var i = 0; i < nodes.length; i++) {
-      var r = nodes[i].getBoundingClientRect();
+      var el = nodes[i];
+      /* الشريط السفلي الثابت على الهاتف خارج حجز الارتفاع العلوي */
+      if (el.matches && el.matches('nav.rmh-nav:not(.rmh-nav-top)')) {
+        try {
+          var st = window.getComputedStyle(el);
+          if (st.position === 'fixed' || st.position === 'sticky') continue;
+        } catch (eSkip) { /* */ }
+      }
+      var r = el.getBoundingClientRect();
       if (!r.height && !r.width) continue;
       if (r.bottom > bottom) bottom = r.bottom;
     }
@@ -1280,10 +1293,18 @@
 
   /**
    * حجز ارتفاع حتمي بعد أول رسم — لا مؤقّت ولا إعادة قفل عند تبدّل phone/desk.
-   * يفضّل قيمة FOUC المنشورة في CSS/body (180px) وإلا أول قياس غير صفري، ثم لا تُغيَّر.
+   * هاتف/تابلت: يطابق FOUC التصميم المعتمد (180) دون رفع بالقياس.
+   * كمبيوتر ≥1025 فقط: إن القياس أعلى بـ ≤24px من FOUC خذ القياس (≈189 مقابل 180).
    */
   function lockCssPxOnce(storeKey, styleKeys, measured, fallback) {
-    if (window[storeKey] > 0) return window[storeKey];
+    var desk = isDesktopHdrFix();
+    var m = desk ? Math.max(0, Math.ceil(Number(measured) || 0)) : 0;
+    if (window[storeKey] > 0) {
+      if (desk && m > window[storeKey] && (m - window[storeKey]) <= 24) {
+        window[storeKey] = m;
+      }
+      return window[storeKey];
+    }
     var published = 0;
     try {
       for (var i = 0; i < styleKeys.length; i++) {
@@ -1298,6 +1319,7 @@
       ? Math.ceil(published)
       : Math.max(0, Math.ceil(Number(measured) || 0));
     if (h <= 0) h = Math.max(0, Math.ceil(Number(fallback) || 0));
+    if (desk && m > h && (m - h) <= 24) h = m;
     if (h > 0) window[storeKey] = h;
     return h;
   }
@@ -1313,13 +1335,17 @@
     var hdr = document.getElementById('rizq-mock-hdr');
     if (!hdr) return;
 
-    /* 1) اقفل حجز الارتفاع من FOUC فوراً — قبل أي تقسيم DOM */
-    if (!(window.__rmhHdrLockedH > 0)) {
+    /* 1) اقفل حجز الارتفاع — قياس فعلي للتصحيح فقط على ≥1025 */
+    var measuredNow = 0;
+    if (isDesktopHdrFix()) {
+      try { measuredNow = measureMockHdrExtent(hdr); } catch (eM) { measuredNow = 0; }
+    }
+    if (!(window.__rmhHdrLockedH > 0) || isDesktopHdrFix()) {
       var lockedH = lockCssPxOnce(
         '__rmhHdrLockedH',
         ['--rizq-mock-hdr-h', '--rizq-header-h'],
-        0,
-        180
+        measuredNow,
+        isDesktopHdrFix() ? 189 : 180
       );
       publishLockedHdr(lockedH);
     } else {

@@ -6,7 +6,7 @@
   'use strict';
 
   var ASSET_V = '31.33';
-  var MOCK_HDR_V = '5.98';
+  var MOCK_HDR_V = '5.99';
   /* يجب أن يطابق CACHE_NAME في sw.js حرفياً */
   var SW_CACHE = 'rizq-cache-v31.33';
   var SW_URL = 'sw.js?v=' + ASSET_V;
