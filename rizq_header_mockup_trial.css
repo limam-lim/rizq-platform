@@ -3,7 +3,7 @@
  * يُفعَّل بـ body.rizq-mockup-hdr-trial — سهل الإلغاء بحذف الكلاس أو الملف.
  */
 body.rizq-mockup-hdr-trial{
-  /* احتياطي قبل قياس JS — أوسع قليلاً لتفادي قصّ المحتوى تحت الكبسولة */
+  /* هاتف/تابلت: 180 كالتصميم المعتمد. الكمبيوتر ≥1025 يرفع إلى 189 أدناه */
   --rizq-mock-hdr-h: 180px;
   --rizq-mock-hdr-gap: 12px;
   --rmh-navy: #0a1628;
@@ -601,8 +601,12 @@ html.rizq-app-nav body.rizq-mockup-hdr-trial #detail-content{
   box-shadow:0 2px 10px rgba(0,0,0,.14);
   min-height:44px;
 }
-/* كمبيوتر: بحث في الوسط مع سحب طفيف يميناً نحو الشعار */
+/* كمبيوتر ≥1025: حجز 189 لتفادي قصّ ~9px تحت الكبسولة — الهاتف/التابلت يبقيان 180 */
 @media(min-width:1025px){
+  body.rizq-mockup-hdr-trial{
+    --rizq-mock-hdr-h: 189px;
+    --rizq-header-h: 189px;
+  }
   #rizq-mock-hdr .rmh-search{
     max-width:460px!important;
     justify-self:center!important;

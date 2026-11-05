@@ -289,7 +289,10 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     z-index:var(--rzq-z-modal)!important;
   }
   .mobile-filter-btn{
-    bottom:calc(84px + env(safe-area-inset-bottom,0))!important;
+    bottom:calc(var(--rizq-thumb-dock-h,72px) + 12px + env(safe-area-inset-bottom,0))!important;
+    left:12px!important;
+    right:auto!important;
+    transform:none!important;
     z-index:var(--rzq-z-fab)!important;
   }
   .mobile-bottom-nav{
@@ -733,8 +736,11 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
 
   /* هامش داخلي على الهاتف — يمنع ملامسة البطاقات والفيديوهات للحواف */
   :root{--rizq-strip-inset:14px}
-  .hero-listings-section{
-    padding-bottom:18px!important;
+  .hero-listings-section,
+  #listings.listings-section,
+  .listings-section{
+    /* أبعد آخر صف بطاقات عن زر R/الفقاعة على الموبايل */
+    padding-bottom:calc(88px + env(safe-area-inset-bottom,0))!important;
     overflow:hidden!important;
     width:100%!important;
     margin-inline:0!important;

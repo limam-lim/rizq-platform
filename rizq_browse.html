@@ -13,7 +13,7 @@
 <link rel="preload" href="fonts/cairo-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/cairo.css?v=1.0"/>
   <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
-  <link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.98"/>
+  <link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.99"/>
   <link rel="stylesheet" href="rizq_ad_cards.css?v=27.6"/>
   <link rel="stylesheet" href="rizq_modal_viewport.css?v=1.6"/>
   <script>document.documentElement.classList.add('rizq-app-nav')</script>
@@ -1081,17 +1081,20 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
     align-items:center;
     justify-content:center;
     gap:6px;
-    bottom:calc(18px + env(safe-area-inset-bottom,0));
-    left:50%;
-    transform:translateX(-50%);
+    /* فوق شريط الإبهام، جانباً مقابلاً لزر R حتى لا يغطي وسط البطاقات/الاتصال */
+    bottom:calc(var(--rizq-thumb-dock-h,72px) + 12px + env(safe-area-inset-bottom,0))!important;
+    /* مقابل زر R (يمين الشاشة) — يسار فعلي في RTL/LTR */
+    left:12px!important;
+    right:auto!important;
+    transform:none!important;
     z-index:400!important;
-    max-width:calc(100vw - 32px);
+    max-width:calc(100vw - 120px);
   }
   /* منع تداخل فقاعات الوكيل وزر الفلاتر وأزرار الحالة الفارغة على الهاتف */
   #rizq-prompt-bubbles{
-    bottom:calc(88px + env(safe-area-inset-bottom,0))!important;
+    bottom:calc(var(--rizq-thumb-dock-h,72px) + 128px + env(safe-area-inset-bottom,0))!important;
     right:12px!important;
-    max-width:min(220px, calc(100vw - 100px))!important;
+    max-width:min(200px, calc(100vw - 120px))!important;
   }
   html[dir="ltr"] #rizq-prompt-bubbles{left:12px!important;right:auto!important}
   .rizq-empty-state .es-actions,
@@ -1125,13 +1128,15 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   #result-list-body,
   .results-area,
   .browse-results-col{
-    padding-bottom:calc(88px + env(safe-area-inset-bottom,0));
+    /* مساحة كافية لتمرير آخر بطاقة فوق منطقة الأزرار العائمة */
+    padding-bottom:calc(var(--rizq-thumb-dock-h,72px) + 96px + env(safe-area-inset-bottom,0));
   }
   #rizq-chat-toggle{
-    bottom:calc(88px + env(safe-area-inset-bottom,0))!important;
+    bottom:calc(var(--rizq-thumb-dock-h,72px) + 14px + env(safe-area-inset-bottom,0))!important;
+    inset-inline-end:12px!important;
   }
   .fixed-rizq-logo{
-    bottom:calc(88px + env(safe-area-inset-bottom,0))!important;
+    bottom:calc(var(--rizq-thumb-dock-h,72px) + 14px + env(safe-area-inset-bottom,0))!important;
   }
   .browse-results-col{
     flex:1;
@@ -1350,7 +1355,7 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
   <script src="rizq_announcements.js"></script>
   <!-- مطلوب لحساب شارتَي "موثّق"/"مميّز" الحقيقيتين لكل إعلان (RizqSub.getBadges) — كانت الصفحة تفتقده كلياً -->
   <script src="rizq_subscription_engine.js"></script>
-<script src="rizq_pwa.js?v=31.33" defer></script>
+<script src="rizq_pwa.js?v=31.34" defer></script>
 <script src="rizq_footer_toggle.js?v=22" defer></script>
 <script src="rizq_terms_gate.js"></script>
 <script src="rizq_auth_gate.js?v=19.3" defer></script>
@@ -1469,10 +1474,10 @@ footer.rizq-footer .logo-sub{color:rgba(255,255,255,.75)}
 </script>
 </head>
 <body class="rizq-mockup-hdr-trial" style="--rizq-mock-hdr-h:180px;--rizq-mock-body-gap:0px;--rizq-header-h:180px">
-<script>(function(){try{if(matchMedia('(max-width:768px)').matches){document.body.classList.add('rmh-phone-nav-split');document.body.style.setProperty('--rizq-mock-hdr-h','180px');document.body.style.setProperty('--rizq-header-h','180px');}}catch(e){}})();</script>
+<script>(function(){try{if(matchMedia('(min-width:1025px)').matches){document.body.style.setProperty('--rizq-mock-hdr-h','189px');document.body.style.setProperty('--rizq-header-h','189px');}else if(matchMedia('(max-width:768px)').matches){document.body.classList.add('rmh-phone-nav-split');document.body.style.setProperty('--rizq-mock-hdr-h','180px');document.body.style.setProperty('--rizq-header-h','180px');}}catch(e){}})();</script>
 <!-- الهيدر الموحّد مبكراً (sync) قبل طلاء الشريط المحلي — يقلّل CLS دون تغيير الشكل -->
-<script src="rizq_header_mockup_trial.js?v=5.98"></script>
-<script src="rizq_header.js?v=31.33"></script>
+<script src="rizq_header_mockup_trial.js?v=5.99"></script>
+<script src="rizq_header.js?v=31.34"></script>
 
 <!-- NAV -->
 <nav id="nav-browse-search">
