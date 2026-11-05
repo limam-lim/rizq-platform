@@ -10,7 +10,8 @@ const repos = require('./db/repos');
 const CONTACT_TYPES = ['call', 'whatsapp', 'email'];
 const KEEP_DAYS = 100;
 const MAX_ADS = 200;
-const DEDUPE_TTL_MS = 24 * 60 * 60 * 1000;
+/* موحّد مع visit_tracker: نفس الزائر ≤ مرة كل 30 دقيقة لنفس المحل */
+const DEDUPE_TTL_MS = 30 * 60 * 1000;
 
 /** مفاتيح منع التضخيم في الذاكرة (بديل Redis) */
 const _dedupe = new Map();
@@ -46,7 +47,8 @@ async function trackContactClick(accountId, opts) {
   const now = Date.now();
   _pruneDedupe(now);
 
-  const dedupeKey = [opts.viewerKey || 'anon', accountId, adId || '-', type, day].join('|');
+  /* مفتاح على مستوى المحل (لا يُفرّق يومياً) — يمنع التضخم خلال نافذة 30د */
+  const dedupeKey = [opts.viewerKey || 'anon', accountId, 'contact'].join('|');
   if (_dedupe.has(dedupeKey)) {
     return { ok: true, counted: false, deduped: true };
   }
@@ -89,6 +91,7 @@ async function getContactStats(accountId) {
   if (!rec) {
     return {
       total: 0,
+      weekTotal: 0,
       monthTotal: 0,
       last30: [],
       byType: { call: 0, whatsapp: 0, email: 0 },
@@ -96,9 +99,12 @@ async function getContactStats(accountId) {
     };
   }
   const days = [];
+  let weekTotal = 0;
   for (let i = 29; i >= 0; i--) {
     const d = new Date(Date.now() - i * 86400000).toISOString().slice(0, 10);
-    days.push({ date: d, count: (rec.byDay && rec.byDay[d]) || 0 });
+    const count = (rec.byDay && rec.byDay[d]) || 0;
+    days.push({ date: d, count: count });
+    if (i < 7) weekTotal += count;
   }
   const monthPrefix = _todayKey().slice(0, 7);
   const monthTotal = Object.keys(rec.byDay || {})
@@ -111,6 +117,7 @@ async function getContactStats(accountId) {
 
   return {
     total: rec.total || 0,
+    weekTotal,
     monthTotal,
     last30: days,
     byType: Object.assign({ call: 0, whatsapp: 0, email: 0 }, rec.byType || {}),
@@ -201,4 +208,5 @@ module.exports = {
   getContactStats,
   setupContactTrackingAPI,
   _viewerFingerprint,
+  DEDUPE_TTL_MS,
 };

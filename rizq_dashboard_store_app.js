@@ -809,6 +809,8 @@ function renderContactStats(){
       return;
     }
     monthEl.textContent=(stats.monthTotal||0).toLocaleString();
+    var weekEl=document.getElementById('contact-stat-week');
+    if(weekEl) weekEl.textContent=(stats.weekTotal||0).toLocaleString();
     var bt=stats.byType||{};
     var callEl=document.getElementById('contact-stat-call');
     var waEl=document.getElementById('contact-stat-wa');
@@ -856,6 +858,14 @@ function renderAdvancedStats(){
     }
     if(totalEl) totalEl.textContent=stats.total.toLocaleString();
     if(monthEl) monthEl.textContent=stats.monthTotal.toLocaleString();
+
+    var imp=stats.impressions||{};
+    var clk=stats.clicks||{};
+    var setTxt=function(id,v){ var el=document.getElementById(id); if(el) el.textContent=(Number(v)||0).toLocaleString(); };
+    setTxt('eng-imp-week', imp.weekTotal);
+    setTxt('eng-imp-month', imp.monthTotal);
+    setTxt('eng-click-week', clk.weekTotal);
+    setTxt('eng-click-month', clk.monthTotal);
 
     var days=stats.last30||[];
     var max=Math.max(1, Math.max.apply(null, days.map(function(d){return d.count;})));
@@ -2093,6 +2103,7 @@ function renderSubscriptionPanel(){
   const reminderBanner = (isExpiringSoon||isExpired) ? `
     <div class="sub-card ${isExpired?'expired':'trial'}" style="margin-top:12px;text-align:center">
       <div style="font-size:13px;font-weight:700">${isExpired?_t2('⛔ انتهى اشتراكك — جدد الآن لاستعادة كل المزايا','⛔ Votre abonnement a expiré — renouvelez maintenant pour retrouver tous les avantages'):_t2(`⚠️ اشتراكك سينتهي بعد ${daysLeft} أيام — جدد الآن لتجنب توقف الخدمة`,`⚠️ Votre abonnement expire dans ${daysLeft} jours — renouvelez maintenant pour éviter toute interruption`)}</div>
+      <div id="sub-freeze-impressions" style="font-size:12px;margin-top:8px;opacity:.9"></div>
       <div style="margin-top:10px">
         <button class="btn btn-gold btn-sm" onclick="document.getElementById('packages-display').scrollIntoView({behavior:'smooth'})">${_t2('🔄 تجديد الباقة الآن','🔄 Renouveler maintenant')}</button>
       </div>
@@ -2110,6 +2121,18 @@ function renderSubscriptionPanel(){
   // التجديد الحقيقي الوحيد: packages-display → openPayModal → submitPayment
   // (RizqSub.submitSubscriptionRequest). قسم renewal-section كان localStorage فقط.
   if(renewal) renewal.style.display = 'none';
+  if((isExpiringSoon||isExpired) && typeof RizqSub!=='undefined' && typeof RizqSub.fetchVisitStats==='function' && SESSION_ID){
+    RizqSub.fetchVisitStats(SESSION_ID).then(function(stats){
+      var el=document.getElementById('sub-freeze-impressions');
+      if(!el||!stats) return;
+      var impM=stats.impressions?Number(stats.impressions.monthTotal)||0:0;
+      var shown=impM>0?impM:(Number(stats.monthTotal)||0);
+      if(shown<=0) return;
+      el.textContent=impM>0
+        ? _t2('ظهر محلك '+shown+' مرة الشهر الماضي على الرئيسية ودليل رزق.','Votre boutique a été vue '+shown+' fois le mois dernier.')
+        : _t2('ظهر نشاطك '+shown+' مرة هذا الشهر.','Votre activité a été vue '+shown+' fois ce mois-ci.');
+    }).catch(function(){});
+  }
 }
 
 function renderMyInvoices(){

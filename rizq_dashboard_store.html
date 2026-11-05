@@ -205,7 +205,23 @@
         </div>
         <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px">
           <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:#1B3A6B" id="adv-stat-total">—</div><div style="font-size:11px;color:var(--text-muted)" data-t="adv-stat-total-lbl">إجمالي الزيارات</div></div>
-          <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:#1B3A6B" id="adv-stat-month">—</div><div style="font-size:11px;color:var(--text-muted)" data-t="adv-stat-month-lbl">هذا الشهر</div></div>
+          <div style="text-align:center"><div style="font-size:20px;font-weight:800;color:#1B3A6B" id="adv-stat-month">—</div><div style="font-size:11px;color:var(--text-muted)" data-t="adv-stat-month-lbl">زيارات هذا الشهر</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:14px" id="eng-stats-grid">
+          <div style="text-align:center;padding:10px;border:1px solid rgba(27,58,107,.08);border-radius:10px">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px" data-t="eng-imp-lbl">مرات الظهور (رئيسية/دليل)</div>
+            <div style="font-size:18px;font-weight:800;color:#1B3A6B" id="eng-imp-week">—</div>
+            <div style="font-size:11px;color:var(--text-muted)" data-t="eng-week-lbl">هذا الأسبوع</div>
+            <div style="font-size:18px;font-weight:800;color:#1B3A6B;margin-top:8px" id="eng-imp-month">—</div>
+            <div style="font-size:11px;color:var(--text-muted)" data-t="eng-month-lbl">هذا الشهر</div>
+          </div>
+          <div style="text-align:center;padding:10px;border:1px solid rgba(27,58,107,.08);border-radius:10px">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px" data-t="eng-click-lbl">النقرات</div>
+            <div style="font-size:18px;font-weight:800;color:#1B3A6B" id="eng-click-week">—</div>
+            <div style="font-size:11px;color:var(--text-muted)" data-t="eng-week-lbl2">هذا الأسبوع</div>
+            <div style="font-size:18px;font-weight:800;color:#1B3A6B;margin-top:8px" id="eng-click-month">—</div>
+            <div style="font-size:11px;color:var(--text-muted)" data-t="eng-month-lbl2">هذا الشهر</div>
+          </div>
         </div>
         <div style="height:80px;margin-bottom:14px" id="adv-stats-chart"></div>
         <div id="adv-stats-sources"></div>
@@ -213,9 +229,12 @@
 
       <div class="card" id="contact-stats-card" style="margin-top:0">
         <div class="card-header">
-          <div class="card-title" data-t="contact-stats-title">📞 تواصل معك هذا الشهر</div>
+          <div class="card-title" data-t="contact-stats-title">📞 محاولات التواصل</div>
         </div>
-        <div style="font-size:28px;font-weight:900;color:#1B3A6B;margin-bottom:8px" id="contact-stat-month">—</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">
+          <div><div style="font-size:22px;font-weight:900;color:#1B3A6B" id="contact-stat-week">—</div><div style="font-size:11px;color:var(--text-muted)">هذا الأسبوع</div></div>
+          <div><div style="font-size:22px;font-weight:900;color:#1B3A6B" id="contact-stat-month">—</div><div style="font-size:11px;color:var(--text-muted)">هذا الشهر</div></div>
+        </div>
         <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--text-muted);margin-bottom:12px" id="contact-stat-bytype">
           <span id="contact-stat-call">اتصال —</span>
           <span>·</span>
