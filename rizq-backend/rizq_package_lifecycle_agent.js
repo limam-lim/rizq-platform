@@ -27,7 +27,7 @@ const crypto = require('crypto');
 const { resolveDiamondTier, isTrialPackage } = require('./services/catalogConfig');
 const repos = require('./db/repos');
 
-const REMINDER_WINDOWS_DAYS = [3, 1]; // نُذكّر عند تبقّي 3 أيام ويوم واحد
+const REMINDER_WINDOWS_DAYS = [7, 3, 1]; // تذكير قبل 7 أيام و3 أيام ويوم واحد
 
 // ── تخزين عبر repos (PostgreSQL) — JSON للنسخ الاحتياطي فقط ───────────
 // أثر القراءة: نص JSON لكل سجل لحظة _load — يحدد ما غيّره المستدعي فعلاً
@@ -436,6 +436,8 @@ async function syncAccountPackage(opts) {
     reminderSentAt: paymentConfirmed ? null : existing.reminderSentAt,
     suspendedAt: null,
     downgradedAt: null,
+    expiredAt: paymentConfirmed ? null : existing.expiredAt,
+    archivedAt: paymentConfirmed ? null : existing.archivedAt,
     accessToken,
     packageHistory: history.slice(0, PACKAGE_HISTORY_MAX),
     invoices: invoice
@@ -473,6 +475,13 @@ async function syncAccountPackage(opts) {
     }
   } catch (apiErr) {
     console.warn('[syncAccountPackage] api integration:', apiErr.message);
+  }
+
+  /* تجديد/تفعيل → أظهر فوراً في الرئيسية (بلا انتظار TTL الكاش) */
+  if (paymentConfirmed || isTrial) {
+    try {
+      require('./services/packageFreeze').clearHomeCatalogCacheSafe();
+    } catch (eCache) { /* */ }
   }
 
   const results = { whatsapp: null, email: null };
@@ -724,27 +733,54 @@ async function runLifecycleScan(accountsHelpers) {
   const now = Date.now();
   let changed = false;
 
+  let catalogCacheDirty = false;
+  const { ARCHIVE_AFTER_DAYS, clearHomeCatalogCacheSafe } = require('./services/packageFreeze');
+
   for (const accountId of Object.keys(store)) {
     if (accountId === '__invoiceSeq') continue;
     const rec = store[accountId];
-    if (!rec || !rec.periodEnd || rec.status === 'suspended' || rec.status === 'expired') continue;
+    if (!rec || !rec.periodEnd) continue;
+
+    /* أرشفة بعد 90 يوماً من الانتهاء — الصفحة تصبح 404 لطيفة؛ البيانات محفوظة */
+    if ((rec.status === 'expired' || rec.status === 'suspended') && !rec.archivedAt) {
+      const expMs = new Date(rec.expiredAt || rec.periodEnd).getTime();
+      if (Number.isFinite(expMs) && (now - expMs) >= ARCHIVE_AFTER_DAYS * 24 * 60 * 60 * 1000) {
+        if (await _changedSinceLoad(store, accountId)) continue;
+        rec.archivedAt = new Date(now).toISOString();
+        catalogCacheDirty = true;
+        changed = true;
+      }
+      continue;
+    }
+
+    if (rec.status === 'suspended' || rec.status === 'expired') continue;
 
     const endMs = new Date(rec.periodEnd).getTime();
     if (Number.isNaN(endMs)) continue;
     const daysLeft = (endMs - now) / (24 * 60 * 60 * 1000);
 
-    // تذكير قبل الانتهاء (3 أيام ثم يوم واحد) — مرة واحدة لكل نافذة
+    // تذكير قبل الانتهاء (7 / 3 / 1 أيام) — مرة واحدة لكل نافذة
     if (daysLeft > 0 && REMINDER_WINDOWS_DAYS.some((w) => daysLeft <= w)) {
       const lastReminderAgeMs = rec.reminderSentAt ? now - new Date(rec.reminderSentAt).getTime() : Infinity;
       if (lastReminderAgeMs > 20 * 60 * 60 * 1000) { // لا نكرر نفس التذكير خلال أقل من 20 ساعة
         if (await _changedSinceLoad(store, accountId)) continue;
         const daysRounded = Math.max(1, Math.ceil(daysLeft));
-        const msg = `⏰ رزق: باقتك "${rec.pkgName}" تنتهي خلال ${daysRounded} ${daysRounded === 1 ? 'يوم' : 'أيام'}. جدّدها الآن لتجنّب إيقاف الميزات.`;
+        let impressionsHint = '';
+        try {
+          const { getVisitStats } = require('./rizq_visit_tracker');
+          const vs = await getVisitStats(String(accountId).split('::')[0]);
+          if (vs && Number(vs.monthTotal) > 0) {
+            impressionsHint = ` ظهر نشاطك ${vs.monthTotal} مرة هذا الشهر.`;
+          }
+        } catch (eImp) { /* اختياري */ }
+        const msg = `⏰ رزق: باقتك "${rec.pkgName}" تنتهي خلال ${daysRounded} ${daysRounded === 1 ? 'يوم' : 'أيام'}.${impressionsHint} جدّدها الآن لتجنّب إيقاف الميزات.`;
         if (rec.accountPhone) await _sendWhatsApp(rec.accountPhone, msg);
         if (rec.accountEmail) await _sendEmail(rec.accountEmail, 'رزق — تذكير بقرب انتهاء الباقة', `<p dir="rtl">${msg}</p>`);
+        /* لوحة التحكم: يقرأ status=expiring_soon من /api/account-package */
         rec.status = 'expiring_soon';
         rec.subscriptionStatus = 'expiring_soon';
         rec.reminderSentAt = new Date(now).toISOString();
+        rec.lastReminderWindowDays = daysRounded <= 1 ? 1 : (daysRounded <= 3 ? 3 : 7);
         changed = true;
       }
     } else if (daysLeft <= 0) {
@@ -756,6 +792,7 @@ async function runLifecycleScan(accountsHelpers) {
       rec.planType = downgradePatch.planType;
       rec.downgradedAt = downgradePatch.downgradedAt;
       rec.expiredAt = new Date(now).toISOString();
+      delete rec.archivedAt;
       const msg = `🔒 رزق: انتهت باقة "${rec.pkgName}". تم إيقاف جميع الميزات فوراً. جدّد الآن لاستعادتها.`;
       if (rec.accountPhone) await _sendWhatsApp(rec.accountPhone, msg);
       if (rec.accountEmail) await _sendEmail(rec.accountEmail, 'رزق — انتهت باقتك', `<p dir="rtl">${msg}</p>`);
@@ -772,7 +809,14 @@ async function runLifecycleScan(accountsHelpers) {
         } catch (apiErr) {
           console.warn('[lifecycle] api key suspend:', apiErr.message);
         }
+        /* مكاتب: المواعيد/الطلبات المحجوزة تبقى؛ إبلاغ العميل */
+        try {
+          await _notifyOpenServiceClientsOnExpire(String(accountId).split('::')[0], rec);
+        } catch (eNotify) {
+          console.warn('[lifecycle] office client notify:', eNotify.message);
+        }
       }
+      catalogCacheDirty = true;
       changed = true;
     }
   }
@@ -781,6 +825,9 @@ async function runLifecycleScan(accountsHelpers) {
   const saved = changed ? await _save(store, { ifUnchanged: true }) : { skipped: [] };
   if (saved.skipped.length) {
     console.log('[lifecycle] skipped ' + saved.skipped.length + ' record(s) changed during scan:', saved.skipped.join(', '));
+  }
+  if (catalogCacheDirty) {
+    try { clearHomeCatalogCacheSafe(); } catch (eCache) { /* */ }
   }
   return { ok: true, scannedAt: new Date(now).toISOString(), skipped: saved.skipped };
 }
@@ -807,6 +854,37 @@ async function _applyServerAccountDowngrade(accountId, rec, accountsHelpers, sub
     await accountsHelpers.writeAccounts(accounts);
   } catch (e) {
     console.error('[lifecycle-downgrade] accounts.json:', e.message);
+  }
+}
+
+/**
+ * عند انتهاء باقة مكتب/نشاط: الطلبات المفتوحة تبقى، ونُبلّغ العميل
+ * بأن الموعد/الطلب ما زال قائماً مع تنبيه بأن التواصل المباشر متوقف مؤقتاً.
+ */
+async function _notifyOpenServiceClientsOnExpire(accountId, rec) {
+  const id = String(accountId || '').trim();
+  if (!id) return;
+  let rows = [];
+  try {
+    if (repos.serviceRequests && typeof repos.serviceRequests.list === 'function') {
+      rows = (await repos.serviceRequests.list()) || [];
+    }
+  } catch (e) { return; }
+  const open = rows.filter((r) => {
+    if (!r || String(r.accountId || r.sellerAccountId || '') !== id) return false;
+    const st = String(r.status || 'new').toLowerCase();
+    return st === 'new' || st === 'in_progress' || st === 'pending' || st === 'accepted' || st === 'booked';
+  });
+  if (!open.length) return;
+  const officeName = (rec && (rec.accountName || rec.pkgName)) || 'المكتب';
+  for (const req of open) {
+    const phone = req.buyerPhone || req.phone || '';
+    const email = req.buyerEmail || req.email || '';
+    const when = req.appointmentAt || req.scheduledAt || req.preferredDate || '';
+    const whenHint = when ? ` (موعدكم: ${String(when).slice(0, 32)})` : '';
+    const body = `📅 رزق: طلبكم لدى «${officeName}» ما زال قائماً${whenHint}. التواصل المباشر متوقف مؤقتاً حتى يُجدَّد الاشتراك — سنُبقي طلبكم محفوظاً.`;
+    if (phone) await _sendWhatsApp(phone, body);
+    if (email) await _sendEmail(email, 'رزق — تحديث طلبكم', `<p dir="rtl">${body}</p>`);
   }
 }
 
@@ -962,6 +1040,7 @@ module.exports = {
   sendWhatsApp: _sendWhatsApp,
   applyReferralBonusDays,
   REFERRAL_BONUS_DAYS,
+  REMINDER_WINDOWS_DAYS,
   priorPackageOf,
   isSamePackage,
   isPackageStillActive,

@@ -58,3 +58,4 @@ qa/screens/
 
 # مرفقات تشغيل الخادم (كتالوج، إيصالات، KYC) — تُنشأ أثناء الاختبارات/الإنتاج
 rizq-backend/uploads/
+qa/cls-1/node_modules/

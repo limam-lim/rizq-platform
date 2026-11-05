@@ -280,10 +280,13 @@ function mountAdsRoutes(app, deps) {
     const q = req.query || {};
     const viewerId = await resolveOptionalAccountViewer(req);
     const platformStore = require('../db/platformStore');
+    const { filterListableAccountIds } = require('../services/packageFreeze');
     // الواجهة قد تطلب حتى 2000 — نفس الحد السابق عبر SQL
     const limit = Math.max(1, Math.min(2000, Number(q.limit) || 60));
     const offset = Math.max(0, Number(q.offset) || 0);
-    const { total, ads: slice } = await platformStore.queryPublicAds({
+    /* oversAMPLE ثم فلترة الباقة المنتهية — شريط الإعلانات يخفي المنتهي */
+    const fetchLimit = Math.min(2000, Math.max(limit + offset, limit) * 3 + offset);
+    const { ads: slice } = await platformStore.queryPublicAds({
       category: q.category || '',
       subcat: q.subcat || '',
       brandId: q.brandId || '',
@@ -291,11 +294,19 @@ function mountAdsRoutes(app, deps) {
       wilaya: q.wilaya || '',
       accountId: q.accountId || '',
       search: q.search || '',
-      limit,
-      offset,
+      limit: fetchLimit,
+      offset: 0,
     });
+    const listable = await filterListableAccountIds(slice.map((a) => a && a.accountId));
+    const filtered = slice.filter((ad) => {
+      if (!ad) return false;
+      if (!ad.accountId) return true; /* إعلان بلا حساب بائع — يبقى */
+      return listable.has(String(ad.accountId).split('::')[0]);
+    });
+    const total = filtered.length;
+    const pageSlice = filtered.slice(offset, offset + limit);
     const page = [];
-    for (const ad of slice) {
+    for (const ad of pageSlice) {
       const seller = ad.accountId
         ? (await platformStore.getAccountById(ad.accountId))
         : null;
@@ -315,12 +326,19 @@ function mountAdsRoutes(app, deps) {
     const ids = idsParam.split(',').map((s) => s.trim()).filter(Boolean).slice(0, 30);
     if (!ids.length) return res.json({ ok: true, ads: [] });
     const viewerId = await resolveOptionalAccountViewer(req);
+    const { filterListableAccountIds } = require('../services/packageFreeze');
     const all = await readAds();
     const accounts = await readAccounts();
-    const found = [];
+    const candidates = [];
     for (const id of ids) {
       const ad = all.find((a) => a.id === id && a.status === 'active');
       if (!ad) continue;
+      candidates.push(ad);
+    }
+    const listable = await filterListableAccountIds(candidates.map((a) => a.accountId));
+    const found = [];
+    for (const ad of candidates) {
+      if (ad.accountId && !listable.has(String(ad.accountId).split('::')[0])) continue;
       const seller = accounts.find((a) => a.id === ad.accountId);
       const gate = await resolveContactGate(viewerId, ad.accountId, seller && seller.type);
       found.push(toPublicAdGated(await withBoostFlag(ad), gate, seller));

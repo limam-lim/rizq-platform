@@ -56,6 +56,8 @@
     "test:ops-1": "node scripts/run-with-test-db.js scripts/test-ops-1.js",
     "test:caddy-security": "node scripts/run-with-test-db.js scripts/test-caddy-security.js",
     "test:package-credit": "node scripts/run-with-test-db.js scripts/test-package-credit.js",
+    "test:package-expiry": "node scripts/run-with-test-db.js scripts/test-package-expiry.js",
+    "test:header-layout": "node ../qa/cls-1/test-header-layout.js",
     "test:home-catalog": "STRICT_HOME_WIRING=1 node scripts/run-with-test-db.js scripts/test-home-catalog.js",
     "test:monthly-only": "node scripts/run-with-test-db.js scripts/test-monthly-only.js",
     "admin:2fa": "node scripts/admin-2fa.js",
@@ -64,7 +66,9 @@
     "test:asset-versions": "node scripts/test-asset-versions.js",
     "test:perf-budget": "node scripts/test-perf-budget.js",
     "test:founding-no-discount": "node scripts/run-with-test-db.js scripts/test-founding-no-discount.js",
-    "test:all": "node scripts/test-all.js"
+    "test:all": "node scripts/test-all.js",
+    "test:demo-images-local": "node scripts/test-demo-images-local.js",
+    "test:header-all-pages": "npm --prefix ../qa/cls-1 install --no-audit --no-fund && node ../qa/cls-1/test-header-all-pages.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",

@@ -21,7 +21,7 @@
 <link rel="preload" href="fonts/cairo-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/cairo.css?v=1.0"/>
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.97"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=5.98"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.1"/>
 <link rel="stylesheet" href="rizq_product_detail.css?v=29.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.6"/>
@@ -3347,6 +3347,17 @@ function rizqShare(title, url) {
                 }
                 if(typeof applyFoundingPartnerBadge==='function') applyFoundingPartnerBadge(acc);
                 window._rizqStoreAccountId = id;
+                window._rizqStorePackageFrozen = !!acc.packageFrozen;
+                window._rizqStoreShareDisabled = !!acc.shareDisabled || !!acc.packageFrozen;
+                if(window._rizqStoreShareDisabled){
+                  var shareBtn = document.querySelector('.btn-share, [data-t="btn-share"]');
+                  if(shareBtn){
+                    shareBtn.style.opacity = '0.45';
+                    shareBtn.style.pointerEvents = 'none';
+                    shareBtn.setAttribute('aria-disabled','true');
+                    shareBtn.title = fr ? 'Indisponible pour le moment' : 'غير متاح للتواصل حالياً';
+                  }
+                }
                 if(acc.serviceDesk) window._rizqStoreServiceDesk = acc.serviceDesk;
                 if(Array.isArray(acc.paymentMethods)) window._rizqStorePaymentMethods = acc.paymentMethods;
                 if(window.RizqServiceDesk){
@@ -3396,16 +3407,30 @@ function rizqShare(title, url) {
             var names = {};
             (Array.isArray(localP)?localP:[]).forEach(function(p){ if(p&&p.name) names[p.name]=true; });
             var merged = (Array.isArray(localP)?localP.slice():[]);
+            var invUnconfirmed = !!(cdata && cdata.inventoryUnconfirmed);
             items.forEach(function(p){
               if(names[p.name]) return;
               merged.push({
                 id: p.id || ('B'+p.id), name: p.name, nameF: p.nameF || p.name, price: Number(p.price)||0,
                 cat: p.cat||'', topicId: p.topicId||'', emoji: p.emoji||'📦', desc: p.desc||'', stock: p.stock,
                 accountId: id, storeId: id,
+                inventoryUnconfirmed: invUnconfirmed || !!p.inventoryUnconfirmed,
+                inventoryBadge: p.inventoryBadge || (invUnconfirmed ? (fr?'Stock non confirmé':'المخزون غير مؤكد') : null),
                 imgDataArr: (Array.isArray(p.images)&&p.images.length)?p.images:(p.image?[p.image]:(p.imgDataArr||[]))
               });
             });
             paintStoreProductsGrid(merged, id);
+            if(invUnconfirmed){
+              var grid = document.getElementById('products-grid');
+              if(grid && !grid.querySelector('.rizq-inv-unconfirmed-banner')){
+                var ban = document.createElement('div');
+                ban.className = 'rizq-inv-unconfirmed-banner';
+                ban.setAttribute('role','status');
+                ban.style.cssText = 'grid-column:1/-1;margin:0 0 8px;padding:8px 12px;border:1px solid rgba(201,168,76,.45);background:rgba(15,31,61,.04);color:#0f1f3d;font-size:13px;font-weight:700;border-radius:8px';
+                ban.textContent = fr ? '⚠ Stock non confirmé' : '⚠ المخزون غير مؤكد';
+                grid.insertBefore(ban, grid.firstChild);
+              }
+            }
           }
         }catch(e){}
 
@@ -3879,6 +3904,12 @@ function selectDelivery(opt){
 
 /* Share store page */
 function shareStore(){
+  if(window._rizqStoreShareDisabled || window._rizqStorePackageFrozen){
+    if(typeof showToast==='function'){
+      showToast(_t2('غير متاح للتواصل حالياً','Indisponible pour le moment'),'error');
+    }
+    return;
+  }
   var _sFr = (localStorage.getItem('rizq_lang') === 'fr');
   var name = (document.getElementById('hero-store-name') || document.querySelector('.store-name') || {}).textContent || (_sFr ? 'Boutique Rizq' : 'متجر رزق');
   rizqShare(name.trim(), location.href);
