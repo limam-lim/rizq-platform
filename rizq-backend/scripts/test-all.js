@@ -228,6 +228,7 @@ async function main() {
     'qa/cls-1/test-sw-cache-bump.js',
     'qa/cls-1/test-store-links.js',
     'qa/cls-1/test-market-pulse-stable.js',
+    'qa/cls-1/test-rizq-guide-strip.js',
   ];
   for (const rel of uiTests) {
     if (!fs.existsSync(path.join(ROOT, rel))) continue;
