@@ -366,13 +366,18 @@
 
     var slides = '';
     if (imgs.length) {
-      slides = imgs.map(function (src) {
+      var loadAttr = opts.loading ? String(opts.loading) : 'lazy';
+      var prioAttr = opts.fetchPriority ? String(opts.fetchPriority) : '';
+      /* eager/high فقط للصورة الأولى عند طلبها صراحة — بقية الشرائح lazy */
+      slides = imgs.map(function (src, slideIdx) {
         var v = imageVariants(src);
         var srcset = esc(v.thumb) + ' 400w, ' + esc(v.medium) + ' 900w, ' + esc(v.full) + ' 1920w';
+        var loading = (slideIdx === 0 && loadAttr) ? loadAttr : 'lazy';
+        var prio = (slideIdx === 0 && prioAttr) ? (' fetchpriority="' + esc(prioAttr) + '"') : '';
         return '<div class="rzq-adx-slide">'
           + '<img src="' + esc(v.medium) + '" srcset="' + srcset + '" sizes="(max-width:600px) 400px, 900px"'
           + ' data-full="' + esc(v.full) + '" alt="' + esc(title) + '"'
-          + ' loading="lazy" decoding="async" class="rzq-adx-zoomable"'
+          + ' loading="' + esc(loading) + '" decoding="async" class="rzq-adx-zoomable"' + prio
           + ' onerror="try{window.RizqAdCards&&RizqAdCards.imgBroken(this)}catch(e){}"/>'
           + '</div>';
       }).join('');

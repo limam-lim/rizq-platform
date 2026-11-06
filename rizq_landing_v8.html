@@ -5600,7 +5600,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
 <script src="rizq_seller_branding.js?v=1"></script>
 <script src="rizq_ux_polish.js?v=23.2"></script>
-<script src="rizq_ad_cards.js?v=3.13"></script>
+<script src="rizq_ad_cards.js?v=3.14"></script>
 <script>(function(){function go(){try{document.documentElement.classList.add('rizq-orbs-ready');}catch(e){}}
 if('requestIdleCallback' in window)requestIdleCallback(go,{timeout:2500});
 else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go,0);});})();</script>
@@ -8082,13 +8082,22 @@ function buildCards(){
   /* خفّف DOM الشريط الحي: 12 بطاقة×2 يكفي للماركي السلس بدل عشرات البطاقات الثقيلة */
   var livePool = source.slice(0, 12);
   const all=[...livePool,...livePool];
+  var _heroLcpDone = false;
   all.forEach((a,idx)=>{
     const realIdx = idx % livePool.length;
     const c=document.createElement('div');
     c.className='ad-card';
     const d = trAd(a);
+    /* أول صورة حقيقية في الشريط فقط: eager + high — الباقي lazy */
+    var mediaOpts = { fr: !isAr, price: d.price, pin: !!d.pin, emoji: d.emoji, bg: d.bg, title: d.title };
+    var hasRealImg = !!(a && Array.isArray(a.images) && a.images[0]);
+    if(!_heroLcpDone && hasRealImg && realIdx === idx){
+      mediaOpts.loading = 'eager';
+      mediaOpts.fetchPriority = 'high';
+      _heroLcpDone = true;
+    }
     const media = (window.RizqAdCards && typeof RizqAdCards.mediaHtml === 'function')
-      ? RizqAdCards.mediaHtml(a, { fr: !isAr, price: d.price, pin: !!d.pin, emoji: d.emoji, bg: d.bg, title: d.title })
+      ? RizqAdCards.mediaHtml(a, mediaOpts)
       : ('<div class="ad-card-img" style="background:'+_escCard(d.bg||'')+'">'+_adPhotoHtml(a,d,130)+'</div>');
     const actions = (window.RizqAdCards && typeof RizqAdCards.actionsHtml === 'function')
       ? RizqAdCards.actionsHtml(a, { fr: !isAr })
