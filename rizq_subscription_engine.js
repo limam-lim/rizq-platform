@@ -1055,6 +1055,92 @@
     return [];
   }
 
+  /** باقة تجريبية/مجانية للحساب (ليست boost مدفوع) */
+  function isTrialPackageRow(p) {
+    if (!p) return false;
+    var id = String(p.id || p.packageId || '');
+    var name = String(p.name || p.name_ar || '');
+    if (/boost|مميزة/i.test(id + name) && !/trial/i.test(id)) return false;
+    if (/trial|ind-free|st-trial|of-trial|cp-trial|es-trial|tnd-trial|inv-trial/i.test(id)) return true;
+    if (name === 'تجريبية' || name === 'مجانية' || name === 'Essai' || name === 'Gratuit' || name === 'Gratuite') return true;
+    if (/تجرب|مجاني/.test(name) && isExplicitFreePrice(p.price)) return true;
+    return false;
+  }
+
+  function accountHasConsumedTrial() {
+    try {
+      if (global.__rizqForceTrialUsed === true) return true;
+      if (global.__rizqForceTrialUsed === false) return false;
+      var sub = typeof checkSubscription === 'function' ? checkSubscription() : null;
+      var acc = (sub && sub.acc) || null;
+      if (acc) {
+        if (acc.trialUsed === true || acc.trial_used === true) return true;
+        if (Array.isArray(acc.packageHistory) && acc.packageHistory.some(function (h) { return h && h.isTrial; })) return true;
+      }
+      if (typeof global.getSubInfo === 'function') {
+        var info = global.getSubInfo();
+        if (info && info.trialUsed) return true;
+      }
+    } catch (e) { /* */ }
+    return false;
+  }
+
+  /** أخفِ بطاقة التجربة إن استُعملت سابقاً أو انتهى الاشتراك (تجربة واحدة لكل حساب) */
+  function shouldHideTrialPackageCard() {
+    try {
+      if (global.__rizqForceHideTrial === true) return true;
+      if (global.__rizqForceHideTrial === false) return false;
+      if (typeof global.getSubInfo === 'function') {
+        var info = global.getSubInfo();
+        if (info && info.isExpired) return true;
+      }
+      var sub = typeof checkSubscription === 'function' ? checkSubscription() : null;
+      if (sub && (sub.status === 'expired')) return true;
+      if (accountHasConsumedTrial()) return true;
+    } catch (e2) { /* */ }
+    return false;
+  }
+
+  function isCatalogPackageActiveClient(idOrName) {
+    var key = String(idOrName || '').trim().toLowerCase();
+    if (!key) return false;
+    try {
+      if (typeof global.RizqPackagesConfig !== 'undefined') {
+        var cats = global.RizqPackagesConfig.CATALOGS || {};
+        var keys = Object.keys(cats);
+        for (var i = 0; i < keys.length; i++) {
+          var rows = cats[keys[i]] || [];
+          for (var j = 0; j < rows.length; j++) {
+            var r = rows[j];
+            var rid = String((r && (r.id || r.packageId)) || '').toLowerCase();
+            var rname = String((r && (r.name || r.name_ar)) || '').toLowerCase();
+            if (rid === key || rname === key) return r.active !== false;
+          }
+        }
+        if (typeof global.RizqPackagesConfig.getCatalog === 'function') {
+          /* getCatalog عادة يصفّي inactive — إن وُجد في الكتالوج فهو مفعّل */
+          var found = false;
+          ['store', 'office', 'corp', 'individual', 'estate', 'tender', 'investment', 'video'].forEach(function (cat) {
+            try {
+              var list = global.RizqPackagesConfig.getCatalog(cat, 'ar') || [];
+              if (list.some(function (p) {
+                return String(p.id || '').toLowerCase() === key || String(p.name || '').toLowerCase() === key;
+              })) found = true;
+            } catch (eG) { /* */ }
+          });
+          if (found) return true;
+        }
+      }
+    } catch (e3) { /* */ }
+    return true;
+  }
+
+  function filterActivePackageIdsClient(ids) {
+    return (ids || []).map(function (x) { return String(x || '').trim(); }).filter(function (id) {
+      return id && isCatalogPackageActiveClient(id);
+    });
+  }
+
   // ── بناء بطاقات الباقات (HTML مشترك — يستخدمه store/corp/office) ──
   // كل لوحة تحكم تحتفظ بقاموسها الخاص FEATS/ICONS (نصوص تسويقية تختلف حسب نوع النشاط)
   // وبقائمة باقاتها الفعلية (من localStorage أو DEF الافتراضي الخاص بها) — هذه الدالة فقط
@@ -1113,7 +1199,10 @@
       var priceUnset=isPriceUnset(p.price);
       var isFree=!priceUnset&&isExplicitFreePrice(p.price);
       var isYear=p.name==='سنوية'||p.name==='Annuelle'||Number(p.durationDays)>=360||/-year$/.test(String(p.id||''));
-      var isTrial=isFree||p.name==='تجريبية'||p.name==='Essai'||/trial|تجرب/.test(String(p.id||p.name||''));
+      var isTrialPkg=isTrialPackageRow(p);
+      var isTrial=isTrialPkg||(isFree&&!/boost|مميزة/.test(String(p.id||'')+String(p.name||'')));
+      /* تجربة واحدة لكل حساب: أخفِ بطاقة التجربة إن استُعملت أو انتهى الاشتراك */
+      if (isTrialPkg && shouldHideTrialPackageCard()) return '';
       var isDiamondPkg=!!(p.diamond||p.isDiamond||String(p.name||'').indexOf('ماسي')!==-1||/diamant|diamond/i.test(String(p.name||''))||/diam/.test(String(p.id||'')));
       var bg=isDiamondPkg?'linear-gradient(145deg,#3b0764 0%,#6b21a8 100%)':isYear?'linear-gradient(145deg,#1B3A6B 0%,#0f2347 100%)':isTrial?'linear-gradient(145deg,#f0fdf4,#dcfce7)':p.highlight?'linear-gradient(145deg,#fffbeb,#fef3c7)':'linear-gradient(145deg,#f8faff,#eff3ff)';
       var border=isDiamondPkg?'2px solid rgba(192,132,252,.7)':isYear?'2px solid rgba(201,168,76,.6)':p.highlight?'2px solid #C9A84C':isTrial?'1.5px solid #86efac':'1.5px solid #bfcfef';
@@ -1145,7 +1234,7 @@
           subExpired = !!(!_cs || _cs.status === 'expired' || _cs.status === 'none');
         }
       } catch (eSub) { subExpired = false; }
-      var showCurrentBadge = isFree && category !== 'tender' && !subExpired;
+      var showCurrentBadge = isTrialPkg && category !== 'tender' && !subExpired && !accountHasConsumedTrial();
       return '<div class="rpkg-card" data-pkg-id="'+esc(pkgIdAttr)+'" data-package-id="'+esc(pkgIdAttr)+'" style="background:'+bg+';border:'+border+';box-shadow:'+shadow+'">'
         +(p.highlight&&!isDiamondPkg?'<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#C9A84C,#f0d060);color:#0f2347;font-size:10px;font-weight:900;padding:4px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 10px rgba(201,168,76,.45);letter-spacing:.5px">⭐ '+_t2('الأكثر طلباً','Le plus demandé')+'</div>':'')
         +(isDiamondPkg?'<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:10px;font-weight:900;padding:4px 14px;border-radius:10px;white-space:nowrap;box-shadow:0 3px 10px rgba(168,85,247,.5)">💎 '+esc(badge)+'</div>':'')
@@ -1584,10 +1673,14 @@
       if (n >= 3 && n <= 10) return n + ' أيام';
       return n + ' يوماً';
     },
+    isTrialPackageRow: isTrialPackageRow,
+    shouldHideTrialPackageCard: shouldHideTrialPackageCard,
+    accountHasConsumedTrial: accountHasConsumedTrial,
+    filterActivePackageIdsClient: filterActivePackageIdsClient,
     resolvePackageDisplayNames: function (ids, lang) {
       lang = lang || 'ar';
       var out = [];
-      (ids || []).forEach(function (raw) {
+      filterActivePackageIdsClient(ids || []).forEach(function (raw) {
         var id = String(raw || '').trim();
         if (!id) return;
         var label = '';
@@ -1648,7 +1741,14 @@
           }
           var title = fr ? (offer.titleFr || offer.titleAr) : (offer.titleAr || offer.titleFr);
           var days = Number(offer.daysLeft) || 0;
-          var pkgs = Array.isArray(offer.packageIds) ? offer.packageIds : [];
+          var pkgs = filterActivePackageIdsClient(Array.isArray(offer.packageIds) ? offer.packageIds : []);
+          if (!pkgs.length) {
+            mount.style.display = 'none';
+            mount.textContent = '';
+            try { global.__rizqSeasonalOffer = null; } catch (eEmpty) { /* */ }
+            return;
+          }
+          offer = Object.assign({}, offer, { packageIds: pkgs });
           var pkgNames = self.resolvePackageDisplayNames(pkgs, lang);
           mount.style.display = 'block';
           mount.textContent = '';
@@ -1680,9 +1780,9 @@
     applySeasonalStrikethrough: function (root, list) {
       var offer = global.__rizqSeasonalOffer;
       if (!offer || !root || !list || !list.length) return;
-      var ids = (offer.packageIds || []).map(function (x) { return String(x).toLowerCase(); });
+      var ids = filterActivePackageIdsClient(offer.packageIds || []).map(function (x) { return String(x).toLowerCase(); });
       var pct = Number(offer.percent) || 0;
-      if (!(pct > 0)) return;
+      if (!(pct > 0) || !ids.length) return;
       function paint(priceEl, listPrice) {
         if (!priceEl || !(listPrice > 0)) return;
         var discounted = Math.round(listPrice * (1 - pct / 100));

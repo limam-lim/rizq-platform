@@ -14,22 +14,22 @@
 'use strict';
 
 /* يطابق ASSET_V / SW_CACHE في rizq_pwa.js — ارفع الاثنين معاً عند كل إصدار */
-var CACHE_NAME = 'rizq-cache-v31.36';
+var CACHE_NAME = 'rizq-cache-v31.37';
 var CORE_ASSETS = [
-  'rizq-theme.css?v=31.36',
-  'rizq_header.css?v=31.36',
+  'rizq-theme.css?v=31.37',
+  'rizq_header.css?v=31.37',
   'rizq_header_mockup_trial.css?v=6.00',
-  'rizq_account_route.js?v=31.36',
-  'rizq_header.js?v=31.36',
+  'rizq_account_route.js?v=31.37',
+  'rizq_header.js?v=31.37',
   'rizq_header_mockup_trial.js?v=6.00',
-  'rizq_agent.js?v=31.36',
-  'rizq_dynamic_nav.js?v=31.36',
-  'rizq_manager_agent_config.js?v=31.36',
-  'rizq_widget_embed.js?v=31.36',
-  'rizq_home_guide.js?v=31.36',
-  'rizq_productivity.js?v=31.36',
-  'rizq_i18n.js?v=31.36',
-  'rizq_i18n_data.js?v=31.36',
+  'rizq_agent.js?v=31.37',
+  'rizq_dynamic_nav.js?v=31.37',
+  'rizq_manager_agent_config.js?v=31.37',
+  'rizq_widget_embed.js?v=31.37',
+  'rizq_home_guide.js?v=31.37',
+  'rizq_productivity.js?v=31.37',
+  'rizq_i18n.js?v=31.37',
+  'rizq_i18n_data.js?v=31.37',
   'favicon-192.png',
   'favicon-32.png',
   'favicon-16.png',

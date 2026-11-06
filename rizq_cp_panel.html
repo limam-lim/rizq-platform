@@ -227,6 +227,9 @@ select option{background:#fff !important;color:#1a2535 !important}
 #packages-grid input[type=color]::-webkit-color-swatch{border:none;border-radius:4px}
 #packages-grid input[type=color]::-moz-color-swatch{border:none;border-radius:4px}
 #packages-grid .pkg-duration-input{position:relative;z-index:2;background:#fff}
+/* مقبض تكبير الـ textarea كان يظهر كبيضاوي أزرق فوق حقل المميزات (خصوصاً RTL/Chromium) */
+#packages-grid .pkg-feats-input{resize:none !important;}
+#packages-grid .pkg-feats-input::-webkit-resizer{display:none;background:transparent;border:0;width:0;height:0}
 
 /* ══ TOAST ══ */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:rgba(27,58,107,.95);border:1px solid rgba(201,168,76,.3);color:#fff;padding:12px 24px;border-radius:12px;font-size:13.5px;z-index:9999;transition:transform .4s;backdrop-filter:blur(16px);font-family:'Segoe UI','Arial',sans-serif}
@@ -342,7 +345,7 @@ main, .page-content.active, .main-content, .results-area,
 .disc-close-btn:hover{background:rgba(201,168,76,.28)}
 </style>
   <script src="rizq_backend_config.js"></script>
-  <script src="rizq_subscription_engine.js?v=1.4"></script>
+  <script src="rizq_subscription_engine.js?v=1.5"></script>
   <script src="rizq_invoice_engine.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
@@ -3505,7 +3508,7 @@ function renderPackages(){
           <div class="form-group"><label class="form-label">${t('pkg-text-label','لون النص')}</label><input class="form-input pkg-text-input" type="text" value="${_pe(p.textColor||'')}" placeholder="#ffffff" dir="ltr" autocomplete="off"/></div>
           <div class="form-group"><label class="form-label">${t('pkg-accent-label','لون التمييز')}</label><input class="form-input pkg-accent-input" type="text" value="${_pe(p.accentColor||'')}" placeholder="#C9A84C" dir="ltr" autocomplete="off"/></div>
         </div>
-        <div class="form-group"><label class="form-label">${t('pkg-feats-label','المميزات (كل ميزة في سطر)')}</label><textarea class="form-input pkg-feats-input" rows="3" style="resize:vertical">${_pe((p.features||[]).join('\n'))}</textarea></div>
+        <div class="form-group"><label class="form-label">${t('pkg-feats-label','المميزات (كل ميزة في سطر)')}</label><textarea class="form-input pkg-feats-input" rows="3">${_pe((p.features||[]).join('\n'))}</textarea></div>
         <button class="btn-sm btn-outline" onclick="deletePackage(${i})">${t('pkg-delete-btn','🗑 حذف الباقة')}</button>
       </div>
     </div>

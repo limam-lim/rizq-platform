@@ -193,6 +193,20 @@ function hasRedeemed(state, offerId, accountId) {
  * سعر الباقة بعد العرض الموسمي — يتجاهل أي سعر من المتصفح.
  * @returns {{ listPrice, price, offer, discounted, alreadyRedeemed }}
  */
+async function _isPackageActive(packageId, pkgName) {
+  try {
+    const { findCatalogPackage } = require('./catalogConfig');
+    const hit = await findCatalogPackage(packageId || pkgName, { includeInactive: true });
+    if (!hit) {
+      /* إن لم نجد الصف في الكتالوج لا نمنع الخصم لباقات مخصّصة غير معروفة */
+      return true;
+    }
+    return hit.active !== false;
+  } catch (e) {
+    return true;
+  }
+}
+
 async function resolveOfferPrice(opts) {
   opts = opts || {};
   const listPrice = Math.max(0, Number(opts.listPrice) || 0);
@@ -202,6 +216,11 @@ async function resolveOfferPrice(opts) {
   /* العبرة بتاريخ الدفع / تقديم الطلب — لا أثر رجعي */
   const payMs = opts.paymentAt != null ? _parseMs(opts.paymentAt) : Date.now();
   const atMs = Number.isFinite(payMs) ? payMs : Date.now();
+
+  /* لا خصم على باقة معطّلة في الكتالوج */
+  if (!(await _isPackageActive(packageId, pkgName))) {
+    return { listPrice, price: listPrice, offer: null, discounted: false, alreadyRedeemed: false, inactivePackage: true };
+  }
 
   const state = await _load();
   const live = state.offers.filter((o) => isOfferLive(o, atMs) && offerIncludesPackage(o, packageId, pkgName));
@@ -259,6 +278,16 @@ async function recordRedemption(opts) {
   return { ok: true, already: false };
 }
 
+async function _filterActivePackageIds(ids) {
+  const out = [];
+  for (const raw of ids || []) {
+    const id = String(raw || '').trim();
+    if (!id) continue;
+    if (await _isPackageActive(id, id)) out.push(id);
+  }
+  return out;
+}
+
 /** عرض نشط الآن لبطاقة المشترك (نص فقط — XSS-safe titles) */
 async function getPublicActiveOffer(atMs) {
   const state = await _load();
@@ -268,6 +297,8 @@ async function getPublicActiveOffer(atMs) {
   live.sort((a, b) => _parseMs(b.startAt) - _parseMs(a.startAt));
   const o = live[0];
   const daysLeft = Math.max(0, Math.ceil((_parseMs(o.endAt) - t) / 86400000));
+  const packageIds = await _filterActivePackageIds(o.packageIds);
+  if (!packageIds.length) return null;
   return {
     id: o.id,
     titleAr: _escTitle(o.titleAr),
@@ -275,7 +306,7 @@ async function getPublicActiveOffer(atMs) {
     percent: o.percent,
     startAt: o.startAt,
     endAt: o.endAt,
-    packageIds: o.packageIds.slice(),
+    packageIds,
     daysLeft,
   };
 }
