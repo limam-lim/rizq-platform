@@ -4864,26 +4864,34 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 }
 #rizq-guide .rizq-guide-inner{max-width:none;width:100%;margin:0 auto}
 #rizq-guide .rizq-guide-live.listings-label{margin:0 0 10px;padding:0;width:100%;text-align:center}
+/* تطابق AR/FR: ارتفاع ثابت لكبسولة الشريط + سطر واحد (النص الفرنسي أطول) */
 #rizq-guide .rizq-guide-live > span{
-  display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+  display:flex;align-items:center;gap:10px;flex-wrap:nowrap;justify-content:center;
   width:calc(100% - (2 * var(--rizq-strip-inset,1cm)));
   max-width:none;margin-inline:var(--rizq-strip-inset,1cm);box-sizing:border-box;
+  min-height:42px;height:42px;
   background:
     linear-gradient(135deg,rgba(232,201,106,.16),transparent 40%),
     linear-gradient(145deg,#07111f 0%,#0D1B2A 42%,#1B3A6B 100%);
   border:1px solid rgba(201,168,76,.42);
-  border-radius:10px;padding:8px 16px 8px 12px;
+  border-radius:10px;padding:0 16px 0 12px;
   font-size:12.5px;color:rgba(255,255,255,.92);letter-spacing:.4px;
   font-family:Georgia,'Noto Naskh Arabic',serif;font-weight:600;
   box-shadow:0 10px 28px rgba(7,17,31,.35),inset 0 1px 0 rgba(255,255,255,.12);
+  overflow:hidden;
 }
-#rizq-guide .rizq-guide-live .live-label-sub{color:rgba(255,255,255,.9);font-weight:600}
-#rizq-guide .rizq-guide-live .rizq-guide-topic{color:#E8C96A;font-weight:800}
+#rizq-guide .rizq-guide-live .live-label-sub,
+#rizq-guide .rizq-guide-live .live-capsule-txt,
+#rizq-guide .rizq-guide-live .rizq-guide-topic{
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;
+}
+#rizq-guide .rizq-guide-live .live-label-sub{color:rgba(255,255,255,.9);font-weight:600;min-width:0}
+#rizq-guide .rizq-guide-live .rizq-guide-topic{color:#E8C96A;font-weight:800;flex:0 1 auto;min-width:0}
 .rizq-guide-tabs{
-  display:flex;justify-content:center;gap:8px;margin:0 0 12px;
+  display:flex;justify-content:center;align-items:center;gap:8px;margin:0 0 12px;
   flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
   scrollbar-width:none;padding:2px var(--rizq-strip-inset,1cm) 6px;
-  box-sizing:border-box
+  box-sizing:border-box;min-height:48px;
 }
 .rizq-guide-tabs::-webkit-scrollbar{display:none}
 .rizq-guide-tabs .rizq-styles-gtab{flex:0 0 auto;white-space:nowrap}
@@ -4902,11 +4910,13 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
   #rizq-guide .rizq-guide-live > span{
     width:calc(100% - (2 * var(--rizq-strip-inset,14px)))!important;
     margin-inline:var(--rizq-strip-inset,14px)!important;
-    border-radius:10px!important;font-size:11px!important;padding:7px 12px!important;gap:7px!important;
+    border-radius:10px!important;font-size:11px!important;padding:0 12px!important;gap:7px!important;
+    min-height:36px!important;height:36px!important;
   }
   .rizq-guide-tabs{
     justify-content:flex-start;gap:6px;margin-bottom:10px;
     padding-inline:var(--rizq-strip-inset,14px);
+    min-height:44px;
   }
   .rizq-guide-tabs .rizq-styles-gtab{padding:6px 12px;font-size:11.5px;gap:4px}
   .rizq-guide-stage{padding:0 var(--rizq-strip-inset,14px)}
