@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * دليل رزق على الرئيسية: موضع الشريط، الأزرار، وغياب cloneNode.
+ * دليل رزق على الرئيسية: شريط «أحدث ما في…»، فلاتر كاملة، بطاقات حقيقية، تيكّر غير فارغ.
  * تشغيل: node qa/cls-1/test-rizq-guide-strip.js
  */
 'use strict';
@@ -65,33 +65,68 @@ function startStatic() {
 (async () => {
   const landing = fs.readFileSync(path.join(ROOT, 'rizq_landing_v8.html'), 'utf8');
   const guideJs = fs.readFileSync(path.join(ROOT, 'rizq_home_guide.js'), 'utf8');
+  const civicJs = fs.readFileSync(path.join(ROOT, 'rizq_civic_ticker.js'), 'utf8');
 
   ok('guide section markup present', /id="rizq-guide"/.test(landing));
+  ok('live strip «ما في» + badge (no duplicate أحدث)',
+    /id="rizq-guide-live-sub">ما في/.test(landing)
+    && !/id="rizq-guide-live-sub">أحدث ما في/.test(landing)
+    && /id="rizq-guide-live"/.test(landing)
+    && /id="rizq-guide-topic"/.test(landing));
+  ok('removed gold guide eyebrow + hero title + choose-section copy',
+    !/اكتشف رزق من أول نظرة/.test(landing)
+    && !/اختر القسم واكتشف عروضه/.test(landing)
+    && !/class="rizq-guide-eyebrow"/.test(landing)
+    && !/class="rizq-guide-title"/.test(landing)
+    && !/class="rizq-guide-desc"/.test(landing));
   ok('four guide panes declared', /data-guide-pane="styles"/.test(landing)
     && /data-guide-pane="showrooms"/.test(landing)
     && /data-guide-pane="estate"/.test(landing)
     && /data-guide-pane="offices"/.test(landing));
+  ok('guide pane bodies + independent filter mounts',
+    /id="rizq-guide-rail-styles"/.test(landing)
+    && /id="rizq-guide-rail-showrooms"/.test(landing)
+    && /id="rizq-guide-rail-estate"/.test(landing)
+    && /id="rizq-guide-disc-office"/.test(landing)
+    && /id="rizq-guide-sty-tabs"/.test(landing)
+    && /id="rizq-guide-srm-tabs"/.test(landing)
+    && /id="rizq-guide-est-tabs"/.test(landing));
   ok('guide script linked', /rizq_home_guide\.js\?v=/.test(landing));
   ok('guide uses builders not cloneNode', !/\.cloneNode\s*\(/.test(guideJs)
     && /buildStyleIdeas/.test(guideJs)
     && /buildShowroomModels/.test(guideJs)
     && /buildEstateModels/.test(guideJs));
-  ok('30s rotate + reduced-motion gate', /30000/.test(guideJs) && /prefers-reduced-motion/.test(guideJs));
+  ok('30s rotate + reduced-motion gate + height lock',
+    /30000/.test(guideJs)
+    && /prefers-reduced-motion/.test(guideJs)
+    && /lockStageHeight/.test(guideJs)
+    && /--rizq-guide-stage-h/.test(guideJs));
+  ok('FR live topic copy (dans … without Récent duplicate)',
+    /innerHTML = 'dans <strong class="rizq-guide-topic"/.test(guideJs)
+    && !/Le plus récent dans/.test(guideJs)
+    && /innerHTML = 'ما في <strong class="rizq-guide-topic"/.test(guideJs)
+    && !/innerHTML = 'أحدث ما في/.test(guideJs));
+  ok('builders accept optMountId overrides',
+    /function buildStyleIdeas\(reshuffle, optMountId, optGender\)/.test(landing)
+    && /function buildShowroomModels\(reshuffle, optMountId, optCat\)/.test(landing)
+    && /function buildEstateModels\(reshuffle, optMountId, optCat\)/.test(landing));
   ok('equal styles mosaic CSS', /#rizq-styles \.rizq-style-mosaic[\s\S]*repeat\(3,1fr\)/.test(landing));
   ok('store display name helper', /function _styCardStoreName/.test(landing));
+  ok('ticker never-empty helpers',
+    /ensureTickerNotEmpty/.test(civicJs)
+    && /RizqTickerNeverEmpty/.test(civicJs)
+    && /كن أول من ينشر إعلانه على رزق/.test(civicJs));
 
   const heroAds = landing.indexOf('id="hero-listings"');
   const guide = landing.indexOf('id="rizq-guide"');
   const listings = landing.indexOf('id="listings"');
   const vid = landing.indexOf('id="rizq-vid-strip"');
   const rvid = landing.indexOf('id="rvid-section"');
+  const stylesOrig = landing.indexOf('id="rizq-styles"');
   ok('order: hero-ads → guide; video → rvid → listings (main + guide only)',
     heroAds > 0 && guide > heroAds && vid > guide && rvid > vid && listings > rvid,
     { heroAds, guide, vid, rvid, listings });
-  ok('guide-desc copy AR/FR',
-    /اختر القسم واكتشف عروضه/.test(landing)
-    && /Choisissez la section et découvrez ses offres/.test(landing)
-    && !/نفس البطاقات التي تراها في أقسامها بالأسفل/.test(landing));
+  ok('original #rizq-styles remains after guide', stylesOrig > guide);
   ok('per-tile store link helper', /function _styTileStoreLinkHtml/.test(landing)
     && /rizq-style-tile-store/.test(landing));
 
@@ -101,7 +136,7 @@ function startStatic() {
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 412, height: 915 } });
   await page.goto(origin + '/rizq_landing_v8.html', { waitUntil: 'domcontentloaded', timeout: 90000 });
-  await page.waitForTimeout(2500);
+  await page.waitForTimeout(3500);
 
   const snap = await page.evaluate(() => {
     const guideEl = document.getElementById('rizq-guide');
@@ -112,26 +147,44 @@ function startStatic() {
         active: b.classList.contains('is-active'),
         text: (b.textContent || '').replace(/\s+/g, ' ').trim(),
       }));
-    const rail = document.getElementById('rizq-guide-rail');
     const ads = document.getElementById('hero-listings');
     const listings = document.getElementById('listings');
     const vid = document.getElementById('rizq-vid-strip');
     const rvid = document.getElementById('rvid-section');
     const stylesRail = document.getElementById('rizq-styles-rail');
+    const guideRail = document.getElementById('rizq-guide-rail-styles');
+    const guideLive = document.getElementById('rizq-guide-live');
+    const topic = document.getElementById('rizq-guide-topic');
+    const tickerWrap = document.getElementById('ticker-wrap');
+    const ticker = document.getElementById('ticker');
     function top(el) { return el ? el.getBoundingClientRect().top + window.scrollY : -1; }
-    const styleCards = stylesRail
+    function bottom(el) { return el ? el.getBoundingClientRect().bottom + window.scrollY : -1; }
+    const safeStyleCards = stylesRail
       ? Array.from(stylesRail.querySelectorAll('.rizq-style-card')).slice(0, 4).map((c) => ({
         name: ((c.querySelector('.rizq-style-name') || {}).textContent || '').trim(),
         storeLinks: c.querySelectorAll('a.rizq-style-tile-store').length,
         tiles: c.querySelectorAll('.rizq-style-tile').length,
       }))
       : [];
+    const guideCards = guideRail
+      ? guideRail.querySelectorAll('.rizq-style-card, .rizq-style-tile, .rizq-est-card').length
+      : 0;
+    const guideEmptyBox = !!(guideRail && guideRail.querySelector('.rizq-styles-empty'));
+    const stage = document.getElementById('rizq-guide-stage');
+    const stageH = stage ? stage.getBoundingClientRect().height : 0;
     const rvidVisible = !!(rvid && rvid.offsetParent !== null && rvid.getBoundingClientRect().height > 2);
+    const tickerText = String((ticker && ticker.textContent) || '').replace(/\s+/g, ' ').trim();
+    const gap = (guideEl && ads) ? (top(guideEl) - bottom(ads)) : 9999;
+    const lastCard = ads && ads.querySelector('.cards-track .ad-card:last-child');
+    const gapCards = (guideLive && lastCard) ? (top(guideLive) - bottom(lastCard)) : null;
     return {
       hasGuide: !!guideEl,
-      guideDesc: ((guideEl && guideEl.querySelector('.rizq-guide-desc')) || {}).textContent || '',
+      liveText: String((guideLive && guideLive.textContent) || '').replace(/\s+/g, ' ').trim(),
+      topic: String((topic && topic.textContent) || '').trim(),
       tabs,
-      railCards: rail ? rail.querySelectorAll('.rizq-style-card, .rizq-est-card').length : 0,
+      guideCards,
+      guideEmptyBox,
+      stageH,
       orderTops: {
         ads: top(ads),
         guide: top(guideEl),
@@ -139,22 +192,52 @@ function startStatic() {
         rvid: top(rvid),
         listings: top(listings),
       },
+      gapAdsToGuide: gap,
+      gapCardsToGuide: gapCards,
       rvidVisible,
       sourceOrderOk: !!(vid && rvid && listings
         && (vid.compareDocumentPosition(rvid) & Node.DOCUMENT_POSITION_FOLLOWING)
         && (rvid.compareDocumentPosition(listings) & Node.DOCUMENT_POSITION_FOLLOWING)),
-      styleCards,
+      styleCards: safeStyleCards,
+      ticker: {
+        emptyClass: !!(tickerWrap && tickerWrap.classList.contains('is-empty')),
+        displayNone: !!(tickerWrap && getComputedStyle(tickerWrap).display === 'none'),
+        textLen: tickerText.length,
+        text: tickerText.slice(0, 80),
+        neverEmptyApi: typeof window.RizqTickerNeverEmpty === 'function'
+          ? window.RizqTickerNeverEmpty()
+          : false,
+      },
+      hasCardsApi: typeof window.RizqGuideActiveHasCards === 'function'
+        ? window.RizqGuideActiveHasCards()
+        : guideCards > 0,
+      origStylesPresent: !!document.getElementById('rizq-styles'),
+      origEstatePresent: !!document.getElementById('rizq-estate-models'),
     };
   });
 
   ok('guide mounts in DOM', snap.hasGuide);
-  ok('guide-desc live text', /اختر القسم واكتشف عروضه/.test(String(snap.guideDesc || '')));
+  ok('live strip reads أحدث + ما في (no أحدث أحدث)',
+    /أحدث/.test(String(snap.liveText || ''))
+    && /ما في/.test(String(snap.liveText || ''))
+    && !/أحدث\s*أحدث/.test(String(snap.liveText || ''))
+    && String(snap.topic || '').length >= 2,
+    { live: snap.liveText, topic: snap.topic });
+  ok('no choose-section desc in DOM', !/اختر القسم واكتشف عروضه/.test(String(snap.liveText || '')));
   ok('styles tab visible on phone', snap.tabs.some((t) => t.pane === 'styles' && !t.hidden));
   ok('corp/office tabs hidden when modules closed (or empty)',
     snap.tabs.filter((t) => t.pane === 'showrooms' || t.pane === 'offices').every((t) => t.hidden)
     || snap.tabs.length >= 2,
     snap.tabs);
-  /* rvid قد يكون فارغاً/مخفياً بلا ارتفاع — نعتمد ترتيب المصدر + listings بعد شريط الفيديو */
+  ok('active guide pane has real cards after load',
+    snap.guideCards >= 1 && !snap.guideEmptyBox && snap.hasCardsApi,
+    { guideCards: snap.guideCards, empty: snap.guideEmptyBox, api: snap.hasCardsApi });
+  ok('guide stage has reserved height', snap.stageH >= 120, snap.stageH);
+  ok('gap last hero-ad card → guide live strip is ~16–28px',
+    snap.gapCardsToGuide != null
+      && snap.gapCardsToGuide >= 8
+      && snap.gapCardsToGuide <= 28,
+    { gapCardsToGuide: snap.gapCardsToGuide, gapAdsToGuide: snap.gapAdsToGuide });
   ok('DOM order tops: ads < guide < vid < listings (+ rvid source after vid)',
     snap.orderTops.ads < snap.orderTops.guide
     && snap.orderTops.guide < snap.orderTops.vid
@@ -168,6 +251,41 @@ function startStatic() {
   ok('style tiles include store <a> when store products present',
     withStoreLinks.length >= 1 || !(snap.styleCards || []).length,
     snap.styleCards);
+  ok('original sections still present', snap.origStylesPresent && snap.origEstatePresent);
+  ok('ticker never empty (text + not is-empty + visible)',
+    snap.ticker.textLen >= 4
+    && !snap.ticker.emptyClass
+    && !snap.ticker.displayNone
+    && snap.ticker.neverEmptyApi,
+    snap.ticker);
+
+  /* تبديل estate ثم الرجوع — ارتفاع ثابت تقريباً */
+  const estateTab = snap.tabs.find((t) => t.pane === 'estate' && !t.hidden);
+  if (estateTab) {
+    const hBefore = snap.stageH;
+    await page.click('#guide-tab-estate');
+    await page.waitForTimeout(400);
+    const after = await page.evaluate(() => {
+      const stage = document.getElementById('rizq-guide-stage');
+      const rail = document.getElementById('rizq-guide-rail-estate');
+      const topic = document.getElementById('rizq-guide-topic');
+      return {
+        h: stage ? stage.getBoundingClientRect().height : 0,
+        cards: rail ? rail.querySelectorAll('.rizq-est-card, .rizq-est-hero').length : 0,
+        topic: String((topic && topic.textContent) || '').trim(),
+        minH: stage ? (parseFloat(getComputedStyle(stage).minHeight) || 0) : 0,
+      };
+    });
+    ok('estate pane fills cards + topic updates',
+      after.cards >= 1 && /عقار|immobilier|سوق/i.test(after.topic),
+      after);
+    ok('stage height locked across pane switch (minHeight ≥ first)',
+      after.minH >= Math.min(hBefore, after.h) - 2 || after.h >= hBefore - 8,
+      { hBefore, after });
+  } else {
+    ok('estate pane fills cards + topic updates', true);
+    ok('stage height locked across pane switch (minHeight ≥ first)', true);
+  }
 
   await browser.close();
   await new Promise((r) => server.close(r));

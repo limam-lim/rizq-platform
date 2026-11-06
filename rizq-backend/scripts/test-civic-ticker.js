@@ -83,6 +83,11 @@ assert.ok(panel.includes('لون النص فقط'));
 assert.ok(panel.includes('نص أبيض ناعم'));
 assert.ok(panel.includes('خلفية الشريط تبقى كحلية'));
 
+assert.ok(civicJs.includes('ensureTickerNotEmpty'));
+assert.ok(civicJs.includes('RizqTickerNeverEmpty'));
+assert.ok(civicJs.includes('كن أول من ينشر إعلانه على رزق'));
+assert.ok(civicJs.includes('adsAsTickerItems'));
+
 const landing = fs.readFileSync(path.join(__dirname, '../../rizq_landing_v8.html'), 'utf8');
 assert.ok(landing.includes('rizq_civic_ticker.js'));
 assert.ok(landing.includes('civic-ticker-wrap'));

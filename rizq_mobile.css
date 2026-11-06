@@ -736,14 +736,18 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
 
   /* هامش داخلي على الهاتف — يمنع ملامسة البطاقات والفيديوهات للحواف */
   :root{--rizq-strip-inset:14px}
-  .hero-listings-section,
+  /* #hero-listings داخل الهيرو ويتبعه #rizq-guide — لا هامش 88px (كان يوسّع الفراغ) */
   #listings.listings-section,
-  .listings-section{
+  .listings-section:not(#hero-listings):not(.hero-listings-section){
     /* أبعد آخر صف بطاقات عن زر R/الفقاعة على الموبايل */
     padding-bottom:calc(88px + env(safe-area-inset-bottom,0))!important;
     overflow:hidden!important;
     width:100%!important;
     margin-inline:0!important;
+  }
+  #hero-listings.hero-listings-section,
+  .hero > #hero-listings{
+    padding-bottom:4px!important;
   }
   #hero-listings .listings-label,
   .listings-label{
@@ -751,8 +755,11 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
   }
   #hero-listings .listings-label > span,
   .listings-label > span{
-    display:flex!important;width:100%!important;max-width:none!important;
-    border-radius:0!important;box-sizing:border-box!important;
+    display:flex!important;
+    width:calc(100% - (2 * var(--rizq-strip-inset,14px)))!important;
+    max-width:none!important;
+    margin-inline:var(--rizq-strip-inset,14px)!important;
+    border-radius:10px!important;box-sizing:border-box!important;
     justify-content:center!important;padding:7px 12px!important;
     font-size:11px!important;gap:7px!important;
   }
@@ -764,9 +771,9 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
     overflow:hidden!important;
     overflow-x:hidden!important;
     overflow-y:hidden!important;
-    width:100%!important;
-    max-width:100%!important;
-    margin:0!important;
+    width:calc(100% - (2 * var(--rizq-strip-inset,14px)))!important;
+    max-width:none!important;
+    margin:0 var(--rizq-strip-inset,14px)!important;
     scroll-snap-type:none!important;
     direction:ltr!important;
     border-radius:0!important;

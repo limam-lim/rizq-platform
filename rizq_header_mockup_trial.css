@@ -180,7 +180,8 @@ body.rizq-mockup-hdr-trial .hero{
   align-items:center!important;
   justify-content:flex-start!important;
   padding-top:2px!important;
-  padding-bottom:16px!important;
+  /* ضيّق الفراغ قبل #rizq-guide (~مسافة الشارة→البطاقات) */
+  padding-bottom:4px!important;
   margin-top:0!important;
   min-height:0!important;
   height:auto!important;

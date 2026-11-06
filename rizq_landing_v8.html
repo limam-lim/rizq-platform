@@ -162,10 +162,10 @@ body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-invite,
 <link rel="preload" href="fonts/cairo-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/cairo-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/cairo.css?v=1.1"/>
-<link rel="stylesheet" href="rizq_landing_ux.css?v=31.6"/>
+<link rel="stylesheet" href="rizq_landing_ux.css?v=31.7"/>
 <!-- deploy: ad-card clip fix v27.5 -->
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.6"/>
-<link rel="stylesheet" href="rizq_mobile.css?v=29.6"/>
+<link rel="stylesheet" href="rizq_mobile.css?v=29.7"/>
 <link rel="stylesheet" href="rizq_modal_viewport.css?v=23.1"/>
 <link rel="stylesheet" href="rizq_ui_surfaces.css?v=1"/>
 <link rel="stylesheet" href="rizq_register_wizard.css?v=23.3"/>
@@ -180,7 +180,7 @@ body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-invite,
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=6.00"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=6.01"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
 /* شريط موحّد على كل العروض — الشريط القديم متوقف نهائياً */
@@ -616,7 +616,7 @@ nav>.logo{order:4;flex-shrink:0;margin-inline-start:auto}
    HERO — الجديد الكامل
 ══════════════════════════════════ */
 /* سطح المكتب: ابدأ من أعلى الشاشة ولا توسّط المحتوى الطويل — حتى لا تختفي العناوين خلف الصور/الفيديو */
-.hero{min-height:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-x:hidden;overflow-y:visible;padding-top:86px;padding-bottom:28px;contain:layout}
+.hero{min-height:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-x:hidden;overflow-y:visible;padding-top:86px;padding-bottom:4px;contain:layout}
 
 /* خلفية متحركة */
 .hero-bg{position:absolute;inset:0;background:#ffffff;pointer-events:none}
@@ -1169,11 +1169,13 @@ body.rizq-lang-ar .hero-lead-row{
   width:100%;
   max-width:none;
   margin:6px 0 0;
-  padding:10px 0 28px;
+  /* فراغ قصير قبل #rizq-guide (~مسافة الشارة→البطاقات) */
+  padding:10px 0 4px;
   box-sizing:border-box;
   animation:fadeUp .8s .28s ease both;
   overflow:visible;
-  min-height:426px;
+  /* حجز CLS بلا فراغ تحت البطاقات بعد الملء */
+  min-height:400px;
 }
 .hero > #hero-listings .cards-track-wrap,
 #hero-listings.hero-promo-strip .cards-track-wrap{
@@ -1296,7 +1298,7 @@ body.rizq-lang-ar .hero-lead-row{
 }
 @media(max-width:699px){
   .hero-stage-intent{padding:12px 10px 10px;gap:10px}
-  .hero-promo-strip{padding-bottom:18px}
+  .hero-promo-strip{padding-bottom:4px}
   .categories-after-promo{padding:18px 3% 24px!important;margin-top:4px;border-radius:16px}
   .hero-after-promo-inner{max-width:94vw;gap:16px;padding:12px 8px 4px}
 }
@@ -1535,7 +1537,8 @@ body.rizq-lang-ar .hero-vid-wrap{
     justify-content:flex-start!important;
     min-height:0!important;
     height:auto!important;
-    padding-bottom:36px!important;
+    /* كان 36px يوسّع الفراغ قبل #rizq-guide */
+    padding-bottom:4px!important;
   }
   .hero-content{
     padding-top:14px!important;
@@ -2529,21 +2532,24 @@ html[dir="ltr"] #all-ads-title{
 /* ── شريط مباشر فاخر — أحدث الإعلانات ── */
 .hero-listings-section{
   position:relative;z-index:2;width:100%;overflow:visible;
-  padding:8px 0 52px;
+  padding:8px 0 4px;
   /* حجز المساحة بهيكل min-height فقط — ممنوع height ثابت + overflow:hidden */
-  min-height:426px!important;
+  min-height:400px!important;
   /* ابعد عنوان «مباشر» عن قرص البحث الثابت عند التمرير */
   scroll-margin-top:calc(var(--rizq-search-top, 110px) + 56px);
 }
 .hero-listings-section::before{display:none;content:none}
 .listings-label{position:relative;z-index:2;text-align:center;margin-bottom:18px;animation:fadeUp .8s .5s ease both}
 .listings-label>span{
-  display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+  /* شريط بعرض المحتوى مع هامش جانبي وزوايا دائرية — ليس من حافة إلى حافة */
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+  width:calc(100% - (2 * var(--rizq-strip-inset,1cm)));
+  max-width:none;margin-inline:var(--rizq-strip-inset,1cm);box-sizing:border-box;
   background:
     linear-gradient(135deg,rgba(232,201,106,.16),transparent 40%),
     linear-gradient(145deg,#07111f 0%,#0D1B2A 42%,#1B3A6B 100%);
   border:1px solid rgba(201,168,76,.42);
-  border-radius:8px;padding:8px 16px 8px 12px;
+  border-radius:10px;padding:8px 16px 8px 12px;
   font-size:12.5px;color:rgba(255,255,255,.92);letter-spacing:.4px;
   font-family:Georgia,'Noto Naskh Arabic',serif;font-weight:600;
   box-shadow:0 10px 28px rgba(7,17,31,.35),inset 0 1px 0 rgba(255,255,255,.12);
@@ -3592,18 +3598,21 @@ html[dir="ltr"] .listings-section .section-desc{
   /* هاتف: هامش داخلي حتى لا تلامس البطاقات/الفيديوهات حافة الشاشة */
   :root{--rizq-strip-inset:14px}
   .hero > #hero-listings.hero-promo-strip{
-    margin:4px 0 0!important;padding:6px 0 16px!important;width:100%!important;
+    margin:4px 0 0!important;padding:6px 0 4px!important;width:100%!important;
   }
-  /* كبسولة «مباشر» — شريط بعرض الهاتف من الحافة إلى الحافة */
+  /* كبسولة «مباشر» — شريط بإزاحة جانبية وزوايا دائرية (محاذاة بطاقات الشريط) */
   #hero-listings .listings-label,
   .hero-listings-section .listings-label{
     margin:0 0 8px!important;padding:0!important;width:100%!important;
   }
   #hero-listings .listings-label > span,
   .listings-label > span{
-    display:flex!important;width:100%!important;max-width:none!important;
+    display:flex!important;
+    width:calc(100% - (2 * var(--rizq-strip-inset,14px)))!important;
+    max-width:none!important;
+    margin-inline:var(--rizq-strip-inset,14px)!important;
     box-sizing:border-box!important;justify-content:center!important;
-    border-radius:0!important;font-size:11px!important;
+    border-radius:10px!important;font-size:11px!important;
     padding:7px 12px!important;gap:7px!important;
   }
   /* إعلانات مباشرة: شريط أفقي بنوافذ أصغر — من حافة الهاتف */
@@ -3613,7 +3622,10 @@ html[dir="ltr"] .listings-section .section-desc{
     overflow:hidden!important;overflow-x:hidden!important;overflow-y:hidden!important;
     scroll-snap-type:none!important;-webkit-overflow-scrolling:auto;
     direction:ltr!important;border-radius:0!important;
-    width:100%!important;max-width:100%!important;margin:0!important;padding:4px 0!important;
+    width:calc(100% - (2 * var(--rizq-strip-inset,14px)))!important;
+    max-width:none!important;
+    margin:0 var(--rizq-strip-inset,14px)!important;
+    padding:4px 0!important;
     background:transparent!important;border:none!important;box-shadow:none!important;
   }
   #hero-listings .cards-track-wrap::before,
@@ -4846,43 +4858,58 @@ html[dir="ltr"] .rzq-disc-empty{direction:ltr}
 .rizq-styles-gender-tabs{
   display:flex;justify-content:center;gap:8px;margin:0 0 18px;flex-wrap:wrap
 }
-/* دليل رزق — 4 أزرار بسطر واحد؛ على الهاتف تمرير أفقي بدون تصغير الخط */
+/* دليل رزق — شريط «أحدث ما في…» + أزرار + محتوى كامل (بلا فراغ رمادي) */
 #rizq-guide{
-  padding:22px 5% 8px;background:var(--bg-section,#eef2f8);position:relative
+  padding:4px 0 18px;background:transparent;position:relative
 }
-#rizq-guide .rizq-guide-inner{max-width:1100px;margin:0 auto}
-#rizq-guide .rizq-guide-head{text-align:center;margin:0 0 14px}
-#rizq-guide .rizq-guide-tag{
-  display:inline-block;font-size:11px;font-weight:800;letter-spacing:.04em;
-  color:var(--gold,#C9A84C);margin:0 0 4px
+#rizq-guide .rizq-guide-inner{max-width:none;width:100%;margin:0 auto}
+#rizq-guide .rizq-guide-live.listings-label{margin:0 0 10px;padding:0;width:100%;text-align:center}
+#rizq-guide .rizq-guide-live > span{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+  width:calc(100% - (2 * var(--rizq-strip-inset,1cm)));
+  max-width:none;margin-inline:var(--rizq-strip-inset,1cm);box-sizing:border-box;
+  background:
+    linear-gradient(135deg,rgba(232,201,106,.16),transparent 40%),
+    linear-gradient(145deg,#07111f 0%,#0D1B2A 42%,#1B3A6B 100%);
+  border:1px solid rgba(201,168,76,.42);
+  border-radius:10px;padding:8px 16px 8px 12px;
+  font-size:12.5px;color:rgba(255,255,255,.92);letter-spacing:.4px;
+  font-family:Georgia,'Noto Naskh Arabic',serif;font-weight:600;
+  box-shadow:0 10px 28px rgba(7,17,31,.35),inset 0 1px 0 rgba(255,255,255,.12);
 }
-#rizq-guide .rizq-guide-title{
-  font-size:clamp(18px,2.4vw,24px);font-weight:800;color:var(--royal,#1B3A6B);margin:0 0 4px
-}
-#rizq-guide .rizq-guide-title span{color:var(--gold,#C9A84C)}
-#rizq-guide .rizq-guide-desc{
-  font-size:12.5px;font-weight:600;color:#5b6b85;margin:0 auto;max-width:520px;line-height:1.45
-}
+#rizq-guide .rizq-guide-live .live-label-sub{color:rgba(255,255,255,.9);font-weight:600}
+#rizq-guide .rizq-guide-live .rizq-guide-topic{color:#E8C96A;font-weight:800}
 .rizq-guide-tabs{
-  display:flex;justify-content:center;gap:8px;margin:0 0 14px;
+  display:flex;justify-content:center;gap:8px;margin:0 0 12px;
   flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;
-  scrollbar-width:none;padding:2px 0 6px
+  scrollbar-width:none;padding:2px var(--rizq-strip-inset,1cm) 6px;
+  box-sizing:border-box
 }
 .rizq-guide-tabs::-webkit-scrollbar{display:none}
 .rizq-guide-tabs .rizq-styles-gtab{flex:0 0 auto;white-space:nowrap}
 .rizq-guide-tabs .rizq-styles-gtab[hidden]{display:none!important}
 .rizq-guide-stage{
   position:relative;min-height:var(--rizq-guide-stage-h,320px);
-  /* ارتفاع ثابت يمنع قفز الصفحة عند تبديل التبويب */
+  padding:0 var(--rizq-strip-inset,1cm);box-sizing:border-box;
 }
+.rizq-guide-pane[hidden]{display:none!important}
 .rizq-guide-stage .rizq-styles-track-wrap{margin:0}
 .rizq-guide-stage .rzq-disc-wrap{margin:0;min-height:1px}
-.rizq-guide-stage.is-empty{opacity:.72}
+.rizq-guide-stage .rizq-styles-toolbar{margin:0 0 10px}
+.rizq-guide-stage .rizq-styles-gender-tabs{margin:0 0 12px}
 @media(max-width:768px){
-  #rizq-guide{padding:16px var(--rizq-strip-inset,14px) 4px}
-  .rizq-guide-tabs{justify-content:flex-start;gap:6px;margin-bottom:12px}
-  /* نفس مقاس أزرار الأقسام — بلا تصغير خط */
+  #rizq-guide{padding:4px 0 14px}
+  #rizq-guide .rizq-guide-live > span{
+    width:calc(100% - (2 * var(--rizq-strip-inset,14px)))!important;
+    margin-inline:var(--rizq-strip-inset,14px)!important;
+    border-radius:10px!important;font-size:11px!important;padding:7px 12px!important;gap:7px!important;
+  }
+  .rizq-guide-tabs{
+    justify-content:flex-start;gap:6px;margin-bottom:10px;
+    padding-inline:var(--rizq-strip-inset,14px);
+  }
   .rizq-guide-tabs .rizq-styles-gtab{padding:6px 12px;font-size:11.5px;gap:4px}
+  .rizq-guide-stage{padding:0 var(--rizq-strip-inset,14px)}
 }
 .rizq-styles-gtab{
   display:inline-flex;align-items:center;gap:6px;
@@ -5477,9 +5504,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 #categories{min-height:580px}
 @media(max-width:768px){
   #categories{min-height:1440px}
+  /* طابق ارتفاع المحتوى (~بطاقة+شارة) لتفادي فراغ ~60–90px قبل الدليل */
   .hero > #hero-listings.hero-promo-strip,
   #hero-listings.hero-promo-strip,
-  .hero-listings-section{min-height:460px!important}
+  .hero-listings-section{min-height:400px!important}
   .hero-content{min-height:310px!important;box-sizing:border-box!important}
   .hero-lead-row{min-height:172px!important;box-sizing:border-box!important}
   .hero-brand-row{min-height:104px!important;box-sizing:border-box!important}
@@ -5488,7 +5516,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
   #categories{min-height:1620px}
   .hero > #hero-listings.hero-promo-strip,
   #hero-listings.hero-promo-strip,
-  .hero-listings-section{min-height:470px!important}
+  .hero-listings-section{min-height:400px!important}
 }
 /* fadeUp موحّد: opacity + transform فقط (لا width/height/top/margin) */
 @keyframes fadeUp{
@@ -5554,9 +5582,9 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 </script>
     <script src="rizq_announcements.js"></script>
     <script src="rizq_marquee_kit.js?v=1.3"></script>
-    <script src="rizq_civic_ticker.js?v=1.7"></script>
+    <script src="rizq_civic_ticker.js?v=1.8"></script>
 <script src="rizq_backend_config.js"></script>
-<script src="rizq_header_mockup_trial.js?v=6.00"></script>
+<script src="rizq_header_mockup_trial.js?v=6.01"></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
     <script src="rizq_site_banner.js"></script>
 <script src="rizq_input_bidi.js?v=23.4"></script>
@@ -5991,13 +6019,14 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
   </div>
 </section><!-- /hero — هوية + بحث + شريط الإبهار بعرض الشاشة -->
 
-<!-- ══ دليل رزق — 4 أزرار تعرض نفس أشرطة الأقسام (مصدر بيانات مشترك، بلا cloneNode) ══ -->
-<section id="rizq-guide" class="rizq-guide-section" aria-labelledby="rizq-guide-title" data-guide-pane="styles">
+<!-- ══ دليل رزق — شريط «أحدث ما في…» + فلاتر كاملة من بنّاءات الأقسام (بلا cloneNode) ══ -->
+<section id="rizq-guide" class="rizq-guide-section" aria-label="دليل رزق" data-guide-pane="styles">
   <div class="rizq-guide-inner">
-    <div class="rizq-guide-head fade-in">
-      <p class="rizq-guide-tag" data-t="guide-tag">دليل رزق</p>
-      <h2 id="rizq-guide-title" class="rizq-guide-title" data-t="guide-title">اكتشف <span>رزق</span> من أول نظرة</h2>
-      <p class="rizq-guide-desc" data-t="guide-desc" data-t-fr="Choisissez la section et découvrez ses offres">اختر القسم واكتشف عروضه</p>
+    <div class="listings-label rizq-guide-live fade-in" id="rizq-guide-live">
+      <span>
+        <span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt" data-t="guide-live">أحدث</strong></span>
+        <span class="live-label-sub" id="rizq-guide-live-sub">ما في <strong class="rizq-guide-topic" id="rizq-guide-topic">الإطلالات</strong></span>
+      </span>
     </div>
     <div class="rizq-guide-tabs rizq-styles-gender-tabs" role="tablist" aria-label="دليل رزق">
       <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-guide-pane="styles" id="guide-tab-styles">✨ <span data-t="guide-styles">إطلالات</span></button>
@@ -6006,11 +6035,60 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
       <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-pane="offices" data-rizq-module="office" id="guide-tab-offices" hidden>💼 <span data-t="guide-offices">خدمات المكاتب</span></button>
     </div>
     <div class="rizq-guide-stage" id="rizq-guide-stage">
-      <div class="rizq-styles-track-wrap fade-in" id="rizq-guide-styles-wrap">
-        <div class="rizq-styles-rail" id="rizq-guide-rail" role="list" aria-live="polite"></div>
+      <!-- إطلالات = نفس فلاتر #rizq-styles -->
+      <div class="rizq-guide-pane" id="rizq-guide-pane-styles" data-guide-pane-body="styles">
+        <div class="rizq-styles-toolbar">
+          <button type="button" class="rizq-styles-reshuffle" id="rizq-guide-styles-reshuffle" data-t="sty-reshuffle" aria-label="إطلالات جديدة">🔀 إطلالات جديدة</button>
+          <p class="rizq-styles-tick" id="rizq-guide-styles-tick" aria-live="polite"></p>
+        </div>
+        <div class="rizq-styles-gender-tabs" role="tablist" aria-label="رجال أو نساء أو أولاد أو بنات" id="rizq-guide-sty-tabs">
+          <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-guide-sty-gender="men" id="guide-sty-tab-men">👔 <span data-t="sty-men">رجال</span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-sty-gender="women" id="guide-sty-tab-women">🧕 <span data-t="sty-women">نساء</span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-sty-gender="boys" id="guide-sty-tab-boys">👦 <span data-t="sty-boys">أولاد</span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-sty-gender="girls" id="guide-sty-tab-girls">👧 <span data-t="sty-girls">بنات</span></button>
+        </div>
+        <div class="rzq-landing-brand-strip-wrap fade-in" id="rizq-guide-styles-brand-strip" aria-label="تسوّق حسب الماركة"></div>
+        <div class="rizq-styles-track-wrap fade-in">
+          <div class="rizq-styles-rail" id="rizq-guide-rail-styles" role="list" aria-live="polite"></div>
+        </div>
       </div>
-      <div class="rzq-disc-wrap fade-in" id="rizq-guide-office-wrap" hidden>
-        <div id="rizq-guide-disc-office"></div>
+      <!-- من قلب المعارض = فلاتر #rizq-showroom-models -->
+      <div class="rizq-guide-pane" id="rizq-guide-pane-showrooms" data-guide-pane-body="showrooms" hidden>
+        <div class="rizq-styles-toolbar">
+          <button type="button" class="rizq-styles-reshuffle" id="rizq-guide-srm-reshuffle" data-t="srm-reshuffle" aria-label="نماذج جديدة">🔀 نماذج جديدة</button>
+          <p class="rizq-srm-tick" id="rizq-guide-srm-tick" aria-live="polite"></p>
+        </div>
+        <div class="rizq-styles-gender-tabs" role="tablist" aria-label="أنواع نماذج المعارض" id="rizq-guide-srm-tabs">
+          <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-guide-srm-cat="cars">🚗 <span data-t="srm-cars">سيارات</span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-srm-cat="electronics">📱 <span data-t="srm-electronics">إلكترونيات</span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-srm-cat="furniture">🛋️ <span data-t="srm-furniture">أثاث ومفروشات</span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-srm-cat="equipment">⚙️ <span data-t="srm-equipment">معدات ومكائن</span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-srm-cat="building">🏗️ <span data-t="srm-building">مواد بناء</span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-srm-cat="jewelry">💎 <span data-t="srm-jewelry">مجوهرات</span></button>
+        </div>
+        <div class="rzq-landing-brand-strip-wrap fade-in" id="rizq-guide-srm-brand-strip" aria-label="ماركات المعارض"></div>
+        <div class="rizq-styles-track-wrap fade-in">
+          <div class="rizq-styles-rail" id="rizq-guide-rail-showrooms" role="list" aria-live="polite"></div>
+        </div>
+      </div>
+      <!-- سوق العقارات = فلاتر #rizq-estate-models -->
+      <div class="rizq-guide-pane" id="rizq-guide-pane-estate" data-guide-pane-body="estate" hidden>
+        <div class="rizq-styles-gender-tabs" role="tablist" aria-label="أنواع نماذج العقارات" id="rizq-guide-est-tabs">
+          <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-guide-est-cat="all">🏠 <span data-t="est-all">الكل</span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-est-cat="apartment">🏢 <span data-t="est-apt">شقق</span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-est-cat="villa">🏡 <span data-t="est-villa">فلل</span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-est-cat="land">🌍 <span data-t="est-land">أراضي</span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-est-cat="shop">🏪 <span data-t="est-shop">محلات</span></button>
+        </div>
+        <div class="rizq-styles-track-wrap fade-in">
+          <div class="rizq-styles-rail" id="rizq-guide-rail-estate" role="list" aria-live="polite"></div>
+        </div>
+      </div>
+      <!-- خدمات المكاتب = #virtual-offices شريط الاكتشاف -->
+      <div class="rizq-guide-pane" id="rizq-guide-pane-offices" data-guide-pane-body="offices" hidden>
+        <div class="rzq-disc-wrap fade-in" id="rizq-guide-office-wrap">
+          <div id="rizq-guide-disc-office"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -9417,6 +9495,7 @@ function _landingBrandCatForSrm(cat){
   if(cat === 'electronics') return 'إلكترونيات';
   return '';
 }
+try { window._landingBrandCatForSrm = _landingBrandCatForSrm; } catch (eBrandCat) {}
 function _landingBrandBrowse(brandId, catKey){
   if(!brandId) return;
   var fr = _landingBrandFr();
@@ -9433,6 +9512,7 @@ function _landingBrandBrowse(brandId, catKey){
   try { window.location.href = 'rizq_browse.html?' + params.toString(); } catch(e2){}
 }
 function _fillLandingBrandStrip(mountId, catKey, ariaAr, ariaFr){
+  try { window._fillLandingBrandStrip = _fillLandingBrandStrip; } catch (eFillExp) {}
   var mount = document.getElementById(mountId);
   if(!mount) return;
   var fr = _landingBrandFr();
@@ -9467,7 +9547,7 @@ function refreshLandingBrandStrips(){
 function setStyleGender(gender){
   if(!RIZQ_STYLE_GENDERS[gender]) gender = 'men';
   _rizqStyleGender = gender;
-  document.querySelectorAll('.rizq-styles-gtab').forEach(function(btn){
+  document.querySelectorAll('#rizq-styles .rizq-styles-gtab[data-sty-gender]').forEach(function(btn){
     var on = btn.getAttribute('data-sty-gender') === gender;
     btn.classList.toggle('is-active', on);
     btn.setAttribute('aria-selected', on ? 'true' : 'false');
@@ -9503,7 +9583,7 @@ function _styCardStoreName(items, fr){
   }
   return '';
 }
-function buildStyleIdeas(reshuffle, optMountId){
+function buildStyleIdeas(reshuffle, optMountId, optGender){
   var rail = document.getElementById(optMountId || 'rizq-styles-rail');
   if(!rail) return;
   var guideMount = !!(optMountId && optMountId !== 'rizq-styles-rail');
@@ -9512,7 +9592,8 @@ function buildStyleIdeas(reshuffle, optMountId){
     if(typeof isAr !== 'undefined') fr = !isAr;
     else fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr';
   } catch(e) {}
-  var gender = (typeof RIZQ_STYLE_GENDERS !== 'undefined' && RIZQ_STYLE_GENDERS[_rizqStyleGender]) ? _rizqStyleGender : (_rizqStyleGender === 'women' ? 'women' : 'men');
+  var genderKey = (optGender != null && optGender !== '') ? optGender : _rizqStyleGender;
+  var gender = (typeof RIZQ_STYLE_GENDERS !== 'undefined' && RIZQ_STYLE_GENDERS[genderKey]) ? genderKey : (genderKey === 'women' ? 'women' : 'men');
   var templates = (typeof _styTemplatesFor === 'function') ? _styTemplatesFor(gender) : (gender === 'women' ? RIZQ_STYLE_WOMEN_TEMPLATES : RIZQ_STYLE_MEN_TEMPLATES);
   var pool = _styPool().filter(_styIsStyleCat);
   var gendered = pool.filter(function(a){ return _styMatchGender(a, gender); });
@@ -9693,6 +9774,12 @@ function buildStyleIdeas(reshuffle, optMountId){
   }
 
   if(!cards.length){
+    if(guideMount){
+      /* لا مربع رمادي فارغ في الدليل — نترك السكة لإعادة المحاولة من rizq_home_guide */
+      rail.classList.remove('is-empty');
+      if(!rail.querySelector('.rizq-style-card, .rizq-style-tile')) rail.innerHTML = '';
+      return;
+    }
     rail.classList.add('is-empty');
     var emptyGender = _styGenderBadge(gender, fr);
     rail.innerHTML = '<div class="rizq-styles-empty">'+(fr
@@ -9939,7 +10026,7 @@ function setShowroomModelCat(cat){
   try { _srmHydrateFromApi(); } catch(eHyd){}
   try { refreshLandingBrandStrips(); } catch(eBrand){}
 }
-function buildShowroomModels(reshuffle, optMountId){
+function buildShowroomModels(reshuffle, optMountId, optCat){
   var rail = document.getElementById(optMountId || 'rizq-srm-rail');
   if(!rail) return;
   var guideMount = !!(optMountId && optMountId !== 'rizq-srm-rail');
@@ -9948,7 +10035,8 @@ function buildShowroomModels(reshuffle, optMountId){
     if(typeof isAr !== 'undefined') fr = !isAr;
     else fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr';
   } catch(e) {}
-  var cat = RIZQ_SRM_CATS[_rizqSrmCat] ? _rizqSrmCat : 'cars';
+  var catKey = (optCat != null && optCat !== '') ? optCat : _rizqSrmCat;
+  var cat = RIZQ_SRM_CATS[catKey] ? catKey : 'cars';
   var meta = _srmCatMeta(cat);
   var templates = _srmTemplatesFor(cat);
   /* كتالوج المعارض فقط — لا إعلانات التصفح (تفادي صور خاطئة مثل توسان←فورد) */
@@ -10050,6 +10138,11 @@ function buildShowroomModels(reshuffle, optMountId){
   }
 
   if(!cards.length){
+    if(guideMount){
+      rail.classList.remove('is-empty');
+      if(!rail.querySelector('.rizq-style-card, .rizq-style-tile')) rail.innerHTML = '';
+      return;
+    }
     rail.classList.add('is-empty');
     rail.innerHTML = '<div class="rizq-styles-empty">'+(fr
       ? 'Pas encore assez de produits catalogue showroom. Explorez le guide des showrooms.'
@@ -10229,7 +10322,7 @@ function _rizqEstStartGalleries(rail){
   try{ window._rizqEstGalleryTimer = _rizqEstGalleryTimer; }catch(e){}
 }
 
-function buildEstateModels(reshuffle, optMountId){
+function buildEstateModels(reshuffle, optMountId, optCat){
   var rail = document.getElementById(optMountId || 'rizq-est-rail');
   if(!rail) return;
   var guideMount = !!(optMountId && optMountId !== 'rizq-est-rail');
@@ -10238,7 +10331,7 @@ function buildEstateModels(reshuffle, optMountId){
     if(typeof isAr !== 'undefined') fr = !isAr;
     else fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr';
   } catch(e) {}
-  var cat = _rizqEstCat || 'all';
+  var cat = (optCat != null && optCat !== '') ? optCat : (_rizqEstCat || 'all');
   var esc = typeof _styEsc === 'function' ? _styEsc : function(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); };
   var list = RIZQ_EST_MODELS.filter(function(x){ return cat === 'all' || x.cat === cat; });
   if(reshuffle && typeof _styShuffle === 'function') list = _styShuffle(list.slice());
@@ -10247,6 +10340,11 @@ function buildEstateModels(reshuffle, optMountId){
     ? (list.length + ' modèles · 4 photos')
     : (list.length + ' نموذجاً · 4 صور');
   if(!list.length){
+    if(guideMount){
+      rail.classList.remove('is-empty');
+      if(!rail.querySelector('.rizq-est-card, .rizq-est-hero')) rail.innerHTML = '';
+      return;
+    }
     rail.classList.add('is-empty');
     rail.innerHTML = '<div class="rizq-styles-empty">'+(fr
       ? 'Aucun modèle pour ce filtre — voir tout le marché immobilier.'
@@ -18016,4 +18114,4 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
     }, true);
   })();
   </script>
-<script src="rizq_home_guide.js?v=31.37" defer></script>
+<script src="rizq_home_guide.js?v=31.40" defer></script>
