@@ -5582,7 +5582,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 </script>
     <script src="rizq_announcements.js"></script>
     <script src="rizq_marquee_kit.js?v=1.3"></script>
-    <script src="rizq_civic_ticker.js?v=1.8"></script>
+    <script src="rizq_civic_ticker.js?v=1.9"></script>
 <script src="rizq_backend_config.js"></script>
 <script src="rizq_header_mockup_trial.js?v=6.01"></script>
 <script src="rizq_phone_utils.js?v=1.0"></script>
@@ -5611,8 +5611,8 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
 <div id="rizq-ads-preview-banner" role="status" hidden>
   <div class="rzq-preview-inner">
     <span class="rzq-preview-dot" aria-hidden="true"></span>
-    <span id="rizq-ads-preview-text">معاينة فكرة Rizq ADS — الإعلانات المبوبة منفصلة · مساحة إعلانية واحدة في الصفحة · يمكن الرجوع عبر Git</span>
-    <button type="button" id="rizq-ads-preview-dismiss" aria-label="إخفاء">✕</button>
+    <span id="rizq-ads-preview-text" data-t="ads-preview-banner"></span>
+    <button type="button" id="rizq-ads-preview-dismiss" data-t-aria="ads-preview-dismiss" aria-label="">✕</button>
   </div>
 </div>
 <style>
@@ -5658,11 +5658,17 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
   var t=document.getElementById('rizq-ads-preview-text');
   var d=document.getElementById('rizq-ads-preview-dismiss');
   if(!b) return;
-  var fr=(document.documentElement.lang==='fr')||(localStorage.getItem('rizq_lang')==='fr');
-  if(t) t.textContent=fr
-    ? 'Aperçu Rizq ADS — Annonces classées séparées · 1 emplacement homepage · Annulable via Git'
-    : 'معاينة فكرة Rizq ADS — الإعلانات المبوبة منفصلة · مساحة إعلانية واحدة في الصفحة · يمكن الرجوع عبر Git';
+  function paintPreview(){
+    var fr=(document.documentElement.lang==='fr')||(localStorage.getItem('rizq_lang')==='fr');
+    var pack=(window.LANG&&window.LANG[fr?'fr':'ar'])||{};
+    if(t) t.textContent=pack['ads-preview-banner']||'';
+    if(d) d.setAttribute('aria-label', pack['ads-preview-dismiss']||'');
+  }
   b.hidden=false;
+  paintPreview();
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', paintPreview);
+  else setTimeout(paintPreview, 0);
+  document.addEventListener('rizq:langchange', paintPreview);
   if(d) d.addEventListener('click',function(){
     b.hidden=true;
     try{sessionStorage.setItem('rizq_ads_preview_hide','1')}catch(e){}
@@ -5684,8 +5690,8 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
     <span class="rmh-util-notice">تنويه خدمة عامة — تحقق من المصادر الرسمية قبل إعادة النشر</span>
   </div>
   <!-- شريط الخدمة العامة / الطوارئ — يُدار من الأدمن ويتحرك -->
-  <div class="ticker-wrap is-invite civic-ticker-wrap rmh-ticker" id="ticker-wrap" role="status" aria-label="دعوة للنشر على رزق">
-    <div class="ticker-inner" id="ticker"><div class="ticker-item ticker-invite"><div class="ticker-dot"></div><span data-ar="كن أول من ينشر إعلانه على رزق" data-fr="Soyez le premier à publier votre annonce sur Rizq">كن أول من ينشر إعلانه على رزق</span></div></div>
+  <div class="ticker-wrap is-invite civic-ticker-wrap rmh-ticker" id="ticker-wrap" role="status" data-t-aria="ticker-invite-aria" aria-label="">
+    <div class="ticker-inner" id="ticker"><div class="ticker-item ticker-invite"><div class="ticker-dot"></div><span data-t="ticker-invite-msg"></span></div></div>
   </div>
   <div id="rizq-free-countdown" class="rizq-free-countdown" hidden role="status" aria-live="polite"></div>
   <div class="rmh-main">
@@ -6003,9 +6009,9 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
   </div><!-- /hero-content — الهوية + البحث فقط؛ الشريط بعرض الشاشة -->
 
   <!-- شريط العروض — هامش ~2سم من يمين/يسار الشاشة -->
-  <div class="hero-listings-section hero-promo-strip" id="hero-listings" aria-label="شريط العروض المميزة">
+  <div class="hero-listings-section hero-promo-strip" id="hero-listings" data-t-aria="hero-listings-aria" aria-label="">
     <div class="listings-label">
-      <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">أحدث</strong></span><span class="live-label-sub" data-t="promo-strip-sub">الإعلانات على رزق — عروض تخطف الأنظار</span></span>
+      <span><span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt" data-t="guide-live"></strong></span><span class="live-label-sub" data-t="promo-strip-sub"></span></span>
     </div>
     <div class="cards-track-wrap">
       <div class="cards-track" id="cards-track">
@@ -6020,34 +6026,34 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
 </section><!-- /hero — هوية + بحث + شريط الإبهار بعرض الشاشة -->
 
 <!-- ══ دليل رزق — شريط «أحدث ما في…» + فلاتر كاملة من بنّاءات الأقسام (بلا cloneNode) ══ -->
-<section id="rizq-guide" class="rizq-guide-section" aria-label="دليل رزق" data-guide-pane="styles">
+<section id="rizq-guide" class="rizq-guide-section" data-t-aria="guide-aria" aria-label="" data-guide-pane="styles">
   <div class="rizq-guide-inner">
     <div class="listings-label rizq-guide-live fade-in" id="rizq-guide-live">
       <span>
-        <span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt" data-t="guide-live">أحدث</strong></span>
-        <span class="live-label-sub" id="rizq-guide-live-sub">ما في <strong class="rizq-guide-topic" id="rizq-guide-topic">الإطلالات</strong></span>
+        <span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt" data-t="guide-live"></strong></span>
+        <span class="live-label-sub" id="rizq-guide-live-sub"><span data-t="guide-in"></span> <strong class="rizq-guide-topic" id="rizq-guide-topic" data-t="guide-topic-styles"></strong></span>
       </span>
     </div>
-    <div class="rizq-guide-tabs rizq-styles-gender-tabs" role="tablist" aria-label="دليل رزق">
-      <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-guide-pane="styles" id="guide-tab-styles">✨ <span data-t="guide-styles">إطلالات</span></button>
-      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-pane="showrooms" data-rizq-module="corp" id="guide-tab-showrooms" hidden>🏬 <span data-t="guide-showrooms">من قلب المعارض</span></button>
-      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-pane="estate" data-rizq-module="estate" id="guide-tab-estate">🏠 <span data-t="guide-estate">سوق العقارات</span></button>
-      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-pane="offices" data-rizq-module="office" id="guide-tab-offices" hidden>💼 <span data-t="guide-offices">خدمات المكاتب</span></button>
+    <div class="rizq-guide-tabs rizq-styles-gender-tabs" role="tablist" data-t-aria="guide-aria" aria-label="">
+      <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-guide-pane="styles" id="guide-tab-styles">✨ <span data-t="guide-styles"></span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-pane="showrooms" data-rizq-module="corp" id="guide-tab-showrooms" hidden>🏬 <span data-t="guide-showrooms"></span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-pane="estate" data-rizq-module="estate" id="guide-tab-estate">🏠 <span data-t="guide-estate"></span></button>
+      <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-pane="offices" data-rizq-module="office" id="guide-tab-offices" hidden>💼 <span data-t="guide-offices"></span></button>
     </div>
     <div class="rizq-guide-stage" id="rizq-guide-stage">
       <!-- إطلالات = نفس فلاتر #rizq-styles -->
       <div class="rizq-guide-pane" id="rizq-guide-pane-styles" data-guide-pane-body="styles">
         <div class="rizq-styles-toolbar">
-          <button type="button" class="rizq-styles-reshuffle" id="rizq-guide-styles-reshuffle" data-t="sty-reshuffle" aria-label="إطلالات جديدة">🔀 إطلالات جديدة</button>
+          <button type="button" class="rizq-styles-reshuffle" id="rizq-guide-styles-reshuffle" data-t="sty-reshuffle" data-t-aria="sty-reshuffle-aria" aria-label=""></button>
           <p class="rizq-styles-tick" id="rizq-guide-styles-tick" aria-live="polite"></p>
         </div>
-        <div class="rizq-styles-gender-tabs" role="tablist" aria-label="رجال أو نساء أو أولاد أو بنات" id="rizq-guide-sty-tabs">
-          <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-guide-sty-gender="men" id="guide-sty-tab-men">👔 <span data-t="sty-men">رجال</span></button>
-          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-sty-gender="women" id="guide-sty-tab-women">🧕 <span data-t="sty-women">نساء</span></button>
-          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-sty-gender="boys" id="guide-sty-tab-boys">👦 <span data-t="sty-boys">أولاد</span></button>
-          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-sty-gender="girls" id="guide-sty-tab-girls">👧 <span data-t="sty-girls">بنات</span></button>
+        <div class="rizq-styles-gender-tabs" role="tablist" data-t-aria="guide-sty-tabs-aria" aria-label="" id="rizq-guide-sty-tabs">
+          <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-guide-sty-gender="men" id="guide-sty-tab-men">👔 <span data-t="sty-men"></span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-sty-gender="women" id="guide-sty-tab-women">🧕 <span data-t="sty-women"></span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-sty-gender="boys" id="guide-sty-tab-boys">👦 <span data-t="sty-boys"></span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-sty-gender="girls" id="guide-sty-tab-girls">👧 <span data-t="sty-girls"></span></button>
         </div>
-        <div class="rzq-landing-brand-strip-wrap fade-in" id="rizq-guide-styles-brand-strip" aria-label="تسوّق حسب الماركة"></div>
+        <div class="rzq-landing-brand-strip-wrap fade-in" id="rizq-guide-styles-brand-strip" data-t-aria="guide-brand-styles-aria" aria-label=""></div>
         <div class="rizq-styles-track-wrap fade-in">
           <div class="rizq-styles-rail" id="rizq-guide-rail-styles" role="list" aria-live="polite"></div>
         </div>
@@ -6055,30 +6061,30 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
       <!-- من قلب المعارض = فلاتر #rizq-showroom-models -->
       <div class="rizq-guide-pane" id="rizq-guide-pane-showrooms" data-guide-pane-body="showrooms" hidden>
         <div class="rizq-styles-toolbar">
-          <button type="button" class="rizq-styles-reshuffle" id="rizq-guide-srm-reshuffle" data-t="srm-reshuffle" aria-label="نماذج جديدة">🔀 نماذج جديدة</button>
+          <button type="button" class="rizq-styles-reshuffle" id="rizq-guide-srm-reshuffle" data-t="srm-reshuffle" data-t-aria="srm-reshuffle-aria" aria-label=""></button>
           <p class="rizq-srm-tick" id="rizq-guide-srm-tick" aria-live="polite"></p>
         </div>
-        <div class="rizq-styles-gender-tabs" role="tablist" aria-label="أنواع نماذج المعارض" id="rizq-guide-srm-tabs">
-          <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-guide-srm-cat="cars">🚗 <span data-t="srm-cars">سيارات</span></button>
-          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-srm-cat="electronics">📱 <span data-t="srm-electronics">إلكترونيات</span></button>
-          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-srm-cat="furniture">🛋️ <span data-t="srm-furniture">أثاث ومفروشات</span></button>
-          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-srm-cat="equipment">⚙️ <span data-t="srm-equipment">معدات ومكائن</span></button>
-          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-srm-cat="building">🏗️ <span data-t="srm-building">مواد بناء</span></button>
-          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-srm-cat="jewelry">💎 <span data-t="srm-jewelry">مجوهرات</span></button>
+        <div class="rizq-styles-gender-tabs" role="tablist" data-t-aria="guide-srm-tabs-aria" aria-label="" id="rizq-guide-srm-tabs">
+          <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-guide-srm-cat="cars">🚗 <span data-t="srm-cars"></span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-srm-cat="electronics">📱 <span data-t="srm-electronics"></span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-srm-cat="furniture">🛋️ <span data-t="srm-furniture"></span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-srm-cat="equipment">⚙️ <span data-t="srm-equipment"></span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-srm-cat="building">🏗️ <span data-t="srm-building"></span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-srm-cat="jewelry">💎 <span data-t="srm-jewelry"></span></button>
         </div>
-        <div class="rzq-landing-brand-strip-wrap fade-in" id="rizq-guide-srm-brand-strip" aria-label="ماركات المعارض"></div>
+        <div class="rzq-landing-brand-strip-wrap fade-in" id="rizq-guide-srm-brand-strip" data-t-aria="guide-brand-srm-aria" aria-label=""></div>
         <div class="rizq-styles-track-wrap fade-in">
           <div class="rizq-styles-rail" id="rizq-guide-rail-showrooms" role="list" aria-live="polite"></div>
         </div>
       </div>
       <!-- سوق العقارات = فلاتر #rizq-estate-models -->
       <div class="rizq-guide-pane" id="rizq-guide-pane-estate" data-guide-pane-body="estate" hidden>
-        <div class="rizq-styles-gender-tabs" role="tablist" aria-label="أنواع نماذج العقارات" id="rizq-guide-est-tabs">
-          <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-guide-est-cat="all">🏠 <span data-t="est-all">الكل</span></button>
-          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-est-cat="apartment">🏢 <span data-t="est-apt">شقق</span></button>
-          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-est-cat="villa">🏡 <span data-t="est-villa">فلل</span></button>
-          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-est-cat="land">🌍 <span data-t="est-land">أراضي</span></button>
-          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-est-cat="shop">🏪 <span data-t="est-shop">محلات</span></button>
+        <div class="rizq-styles-gender-tabs" role="tablist" data-t-aria="guide-est-tabs-aria" aria-label="" id="rizq-guide-est-tabs">
+          <button type="button" class="rizq-styles-gtab is-active" role="tab" aria-selected="true" data-guide-est-cat="all">🏠 <span data-t="est-all"></span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-est-cat="apartment">🏢 <span data-t="est-apt"></span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-est-cat="villa">🏡 <span data-t="est-villa"></span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-est-cat="land">🌍 <span data-t="est-land"></span></button>
+          <button type="button" class="rizq-styles-gtab" role="tab" aria-selected="false" data-guide-est-cat="shop">🏪 <span data-t="est-shop"></span></button>
         </div>
         <div class="rizq-styles-track-wrap fade-in">
           <div class="rizq-styles-rail" id="rizq-guide-rail-estate" role="list" aria-live="polite"></div>
@@ -8013,13 +8019,24 @@ function syncAllMarquees(){
   try{ if(window.RizqMarqueeKit) RizqMarqueeKit.enhanceAllRaf(); }catch(eKit3){}
   _rzqEnsureMarqueeLoop();
 }
+function _landingLangPack(fr){
+  var pack = {};
+  try { pack = (LANG && LANG[fr ? 'fr' : 'ar']) || {}; } catch (eLang) {
+    try { pack = (window.LANG && window.LANG[fr ? 'fr' : 'ar']) || {}; } catch (e2) { pack = {}; }
+  }
+  return pack;
+}
 function liveListingsLabelHtml(fr){
-  return fr
-    ? '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">Récent</strong></span><span class="live-label-sub" data-t="promo-strip-sub">Dernières annonces sur Rizq — offres qui impressionnent</span>'
-    : '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt">أحدث</strong></span><span class="live-label-sub" data-t="promo-strip-sub">الإعلانات على رزق — عروض تخطف الأنظار</span>';
+  var pack = _landingLangPack(fr);
+  var live = pack['guide-live'] || '';
+  var sub = pack['promo-strip-sub'] || '';
+  return '<span class="live-capsule"><span class="live-capsule-light" aria-hidden="true"></span><strong class="live-capsule-txt" data-t="guide-live">'
+    + live.replace(/</g, '&lt;') + '</strong></span><span class="live-label-sub" data-t="promo-strip-sub">'
+    + sub.replace(/</g, '&lt;') + '</span>';
 }
 function paintLiveListingsLabel(){
-  var el = document.querySelector('.listings-label > span');
+  var root = document.getElementById('hero-listings');
+  var el = root ? root.querySelector('.listings-label > span') : document.querySelector('#hero-listings .listings-label > span');
   if(!el) return;
   var fr = false;
   try{
@@ -8028,7 +8045,7 @@ function paintLiveListingsLabel(){
   }catch(e){}
   el.innerHTML = liveListingsLabelHtml(fr);
 }
-paintLiveListingsLabel();
+try { paintLiveListingsLabel(); } catch (ePaintLive) { /* LANG may still be in TDZ — applyLandingLang repaints */ }
 
 function _adHasPublicTitle(a){
   if(!a) return false;
@@ -9531,8 +9548,13 @@ function _fillLandingBrandStrip(mountId, catKey, ariaAr, ariaFr){
     mount.style.display = 'none';
     return;
   }
+  var headingPack = {};
+  try { headingPack = (LANG && LANG[fr ? 'fr' : 'ar']) || {}; } catch (eHd) {
+    try { headingPack = (window.LANG && window.LANG[fr ? 'fr' : 'ar']) || {}; } catch (eHd2) { headingPack = {}; }
+  }
+  var heading = headingPack['brand-strip-heading'] || ariaFr || ariaAr || '';
   var html = catKey ? RizqBrands.stripHtml(catKey, fr, {
-    heading: fr ? 'Shop by Brand' : 'تسوّق حسب الماركة',
+    heading: heading,
     imgSize: 64
   }) : '';
   if(!html){
@@ -11892,6 +11914,31 @@ const LANG = {
     'hbiz-browse': 'ابحث أو تصفّح الأقسام',
     'hbiz-browse-sub': 'عقارات، سيارات، ذهب… ابدأ من هنا خلال ثوانٍ',
     'promo-strip-sub': 'الإعلانات على رزق — عروض تخطف الأنظار',
+    'guide-live': 'أحدث',
+    'guide-in': 'ما في',
+    'guide-topic-styles': 'الإطلالات',
+    'guide-topic-showrooms': 'من قلب المعارض',
+    'guide-topic-estate': 'سوق العقارات',
+    'guide-topic-offices': 'خدمات المكاتب',
+    'guide-styles': 'إطلالات',
+    'guide-showrooms': 'من قلب المعارض',
+    'guide-estate': 'سوق العقارات',
+    'guide-offices': 'خدمات المكاتب',
+    'guide-aria': 'دليل رزق',
+    'hero-listings-aria': 'شريط العروض المميزة',
+    'guide-sty-tabs-aria': 'رجال أو نساء أو أولاد أو بنات',
+    'guide-srm-tabs-aria': 'أنواع نماذج المعارض',
+    'guide-est-tabs-aria': 'أنواع نماذج العقارات',
+    'guide-brand-styles-aria': 'تسوّق حسب الماركة',
+    'guide-brand-srm-aria': 'ماركات المعارض',
+    'sty-reshuffle-aria': 'إطلالات جديدة',
+    'srm-reshuffle-aria': 'نماذج جديدة',
+    'ticker-civic-aria': 'إعلانات خدمة عامة',
+    'ticker-invite-aria': 'دعوة للنشر على رزق',
+    'ticker-invite-msg': 'كن أول من ينشر إعلانه على رزق',
+    'brand-strip-heading': 'تسوّق حسب الماركة',
+    'ads-preview-banner': 'معاينة فكرة Rizq ADS — الإعلانات المبوبة منفصلة · مساحة إعلانية واحدة في الصفحة · يمكن الرجوع عبر Git',
+    'ads-preview-dismiss': 'إخفاء',
     'hero-tagline': 'متجرك الافتراضي · مكتبك المهني · إعلانك المؤسسي — كل شيء في مكان واحد',
     'hbiz-stores-hint': 'بيع أقوى كل يوم', 'vs-own-site': 'موقعك الخاص على الإنترنت — بدون تكلفة موقع', 'id-privacy-notice': '🔒 صورة بطاقتك تُحذف نهائياً بعد التوثيق — نحتفظ برقمها فقط',
     'hbiz-offices-hint': 'عملاء يبحثون عنك',
@@ -12058,6 +12105,31 @@ const LANG = {
     'hbiz-browse': 'Recherchez ou parcourez les catégories',
     'hbiz-browse-sub': 'Immobilier, voitures, or… commencez en quelques secondes',
     'promo-strip-sub': 'Dernières annonces sur Rizq — offres qui impressionnent',
+    'guide-live': 'Récent',
+    'guide-in': 'dans',
+    'guide-topic-styles': 'les looks',
+    'guide-topic-showrooms': 'les showrooms',
+    'guide-topic-estate': "l'immobilier",
+    'guide-topic-offices': 'les services de bureau',
+    'guide-styles': 'Looks',
+    'guide-showrooms': 'Au cœur des showrooms',
+    'guide-estate': 'Marché immobilier',
+    'guide-offices': 'Services de bureau',
+    'guide-aria': 'Guide Rizq',
+    'hero-listings-aria': 'Bandeau des offres vedettes',
+    'guide-sty-tabs-aria': 'Hommes, femmes, garçons ou filles',
+    'guide-srm-tabs-aria': 'Types de modèles showroom',
+    'guide-est-tabs-aria': 'Types de modèles immobilier',
+    'guide-brand-styles-aria': 'Acheter par marque',
+    'guide-brand-srm-aria': 'Marques showroom',
+    'sty-reshuffle-aria': 'Nouveaux looks',
+    'srm-reshuffle-aria': 'Nouveaux modèles',
+    'ticker-civic-aria': 'Annonces de service public',
+    'ticker-invite-aria': 'Invitation à publier sur Rizq',
+    'ticker-invite-msg': 'Soyez le premier à publier votre annonce sur Rizq',
+    'brand-strip-heading': 'Acheter par marque',
+    'ads-preview-banner': 'Aperçu Rizq ADS — Annonces classées séparées · 1 emplacement homepage · Annulable via Git',
+    'ads-preview-dismiss': 'Masquer',
     'hero-tagline': 'Boutique virtuelle · Bureau pro · Pub institutionnelle — tout en un seul endroit',
     'hbiz-stores-hint': 'Vendez plus fort chaque jour', 'vs-own-site': 'Votre site sur internet — sans coût de site', 'id-privacy-notice': '🔒 La photo de votre pièce est définitivement supprimée après vérification — seul le numéro est conservé',
     'hbiz-offices-hint': 'Des clients vous cherchent',
@@ -12136,6 +12208,7 @@ const LANG = {
     'f-all':'Tout','f-re':'Immobilier','f-car':'Voitures','f-live':'Bétail','f-elec':'Électronique','f-truck':'Camions','f-srv':'Services','f-fashion':'Mode',
   }
 };
+try { window.LANG = LANG; } catch (eLangExp) {}
 
 // Category names
 var _catNamesInit = (typeof RizqCategories !== 'undefined') ? RizqCategories.catNamesArrays() : {
@@ -12382,6 +12455,11 @@ function applyLandingLang(toAr) {
     else if (el.querySelector('.cat-card, .cats-grid, .qcat')) return;
     else el.innerHTML = t[key];
   });
+  /* aria من مفاتيح i18n — شريط الدليل / العروض وغيرها */
+  document.querySelectorAll('[data-t-aria]').forEach(function(el) {
+    var aKey = el.getAttribute('data-t-aria');
+    if (aKey && t[aKey]) el.setAttribute('aria-label', t[aKey]);
+  });
 
   var accBtn = document.querySelector('.nav-account-btn');
   if (accBtn) accBtn.setAttribute('aria-label', isAr ? 'حسابي' : 'Compte');
@@ -12605,9 +12683,22 @@ function applyLandingLang(toAr) {
   // Live label — كبسولة مباشر بضوء أحمر
   if(typeof paintLiveListingsLabel === 'function') paintLiveListingsLabel();
   else {
-    const liveLabel = document.querySelector('.listings-label > span');
+    const liveLabel = document.querySelector('#hero-listings .listings-label > span');
     if(liveLabel) liveLabel.innerHTML = liveListingsLabelHtml(!isAr);
   }
+  /* دليل رزق: أعد الشارة/الموضوع بعد تبديل اللغة */
+  try {
+    if (typeof window.RizqGuideRefreshLang === 'function') window.RizqGuideRefreshLang();
+    else if (typeof window.RizqGuideShow === 'function') {
+      var gp = document.getElementById('rizq-guide');
+      var pane = gp && gp.getAttribute('data-guide-pane');
+      window.RizqGuideShow(pane || 'styles', false);
+    }
+  } catch (eGuideLang) {}
+  var gStyReshuffle = document.getElementById('rizq-guide-styles-reshuffle');
+  if (gStyReshuffle) gStyReshuffle.setAttribute('aria-label', t['sty-reshuffle-aria'] || t['sty-reshuffle'] || '');
+  var gSrmReshuffle = document.getElementById('rizq-guide-srm-reshuffle');
+  if (gSrmReshuffle) gSrmReshuffle.setAttribute('aria-label', t['srm-reshuffle-aria'] || t['srm-reshuffle'] || '');
   /* أعد قياس الشرائط بعد تبديل dir — اتجاه عربي ≠ فرنسي */
   if(typeof syncAllMarquees === 'function') setTimeout(syncAllMarquees, 40);
 
@@ -12870,6 +12961,10 @@ document.addEventListener('click', function (e) {
 (function syncLandingLangOnLoad() {
   var saved;
   try { saved = localStorage.getItem('rizq_lang'); } catch (e) { saved = null; }
+  try {
+    var q = new URLSearchParams(location.search || '');
+    if (q.get('lang') === 'fr' || q.get('lang') === 'ar') saved = q.get('lang');
+  } catch (eQ) { /* */ }
   var run = function () {
     applyLandingLang(saved === 'fr' ? false : true);
   };
@@ -18115,4 +18210,4 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
     }, true);
   })();
   </script>
-<script src="rizq_home_guide.js?v=31.40" defer></script>
+<script src="rizq_home_guide.js?v=31.41" defer></script>

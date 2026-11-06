@@ -103,8 +103,21 @@
 
   function pickText(item) {
     var lang = getLang();
-    if (lang === 'fr') return item.textFr || item.textAr || '';
-    return item.textAr || item.textFr || '';
+    /* FR: never fall back to Arabic — that was an i18n leak into the French UI */
+    if (lang === 'fr') return item.textFr || item.text || '';
+    return item.textAr || item.text || item.textFr || '';
+  }
+
+  function uiText(key, fallback) {
+    try {
+      if (global.RizqI18n && typeof global.RizqI18n.t === 'function') {
+        var via = global.RizqI18n.t(key);
+        if (via) return via;
+      }
+    } catch (eT) { /* */ }
+    var lang = getLang();
+    var pack = (global.LANG && global.LANG[lang]) || {};
+    return pack[key] || fallback || '';
   }
 
   function injectCSS() {
@@ -215,10 +228,13 @@
     pools.forEach(function (list) {
       list.forEach(function (a) {
         if (!a || out.length >= 8) return;
-        var title = String(a.title || a.titleFR || '').trim();
-        if (!title || seen[title]) return;
-        seen[title] = 1;
-        out.push({ text: title, textAr: a.title || title, textFr: a.titleFR || a.title || title, color: '#C9A84C' });
+        var titleAr = String(a.title || '').trim();
+        var titleFr = String(a.titleFR || a.titleFr || '').trim();
+        if (!titleAr && !titleFr) return;
+        var dedupe = titleFr || titleAr;
+        if (seen[dedupe]) return;
+        seen[dedupe] = 1;
+        out.push({ text: titleFr || titleAr, textAr: titleAr, textFr: titleFr, color: '#C9A84C' });
       });
     });
     return out;
@@ -232,9 +248,7 @@
     wrap.classList.remove('is-empty', 'is-invite');
     wrap.classList.add('civic-ticker-wrap');
     wrap.setAttribute('role', 'marquee');
-    wrap.setAttribute('aria-label', getLang() === 'fr'
-      ? 'Annonces de service public'
-      : 'إعلانات خدمة عامة');
+    wrap.setAttribute('aria-label', uiText('ticker-civic-aria'));
     wrap.classList.toggle('ticker-has-urgent', (items || []).some(isUrgent));
     try {
       var th = Math.max(36, Math.round(wrap.getBoundingClientRect().height || 42));
@@ -259,14 +273,13 @@
   }
 
   function inviteHtml() {
-    var fr = getLang() === 'fr';
-    var msg = fr
-      ? 'Soyez le premier à publier votre annonce sur Rizq'
-      : 'كن أول من ينشر إعلانه على رزق';
+    var msg = uiText('ticker-invite-msg');
+    var ar = ((global.LANG && global.LANG.ar) || {})['ticker-invite-msg'] || '';
+    var fr = ((global.LANG && global.LANG.fr) || {})['ticker-invite-msg'] || '';
     return '<div class="ticker-item ticker-invite">'
       + '<div class="ticker-dot"></div>'
-      + '<span data-ar="كن أول من ينشر إعلانه على رزق" data-fr="Soyez le premier à publier votre annonce sur Rizq">'
-      + msg + '</span></div>';
+      + '<span data-ar="' + esc(ar) + '" data-fr="' + esc(fr) + '">'
+      + esc(msg) + '</span></div>';
   }
 
   function showInviteStrip(wrap, inner) {
@@ -276,9 +289,7 @@
     wrap.classList.remove('is-empty', 'ticker-has-urgent');
     inner.innerHTML = inviteHtml();
     wrap.setAttribute('role', 'status');
-    wrap.setAttribute('aria-label', getLang() === 'fr'
-      ? 'Invitation à publier sur Rizq'
-      : 'دعوة للنشر على رزق');
+    wrap.setAttribute('aria-label', uiText('ticker-invite-aria'));
     try { document.documentElement.style.setProperty('--rizq-ticker-h', '42px'); } catch (e) {}
   }
 
@@ -312,9 +323,7 @@
     /* لا تُسقط الشريط من التدفق؛ min-height محجوز بـ CSS للهيدر الموحّد بغضّ النظر عن is-invite */
     wrap.classList.remove('is-empty', 'is-invite');
     wrap.setAttribute('role', 'marquee');
-    wrap.setAttribute('aria-label', getLang() === 'fr'
-      ? 'Annonces de service public'
-      : 'إعلانات خدمة عامة');
+    wrap.setAttribute('aria-label', uiText('ticker-civic-aria'));
 
     // علامة عاجل للنص فقط — لا نعيد تلوين خلفية الشريط
     wrap.classList.toggle('ticker-has-urgent', active.some(isUrgent));

@@ -229,6 +229,7 @@ async function main() {
     'qa/cls-1/test-store-links.js',
     'qa/cls-1/test-market-pulse-stable.js',
     'qa/cls-1/test-rizq-guide-strip.js',
+    'qa/cls-1/test-fr-no-arabic-leak.js',
     'qa/cls-1/test-slow-phone-nav-capture.js',
   ];
   for (const rel of uiTests) {

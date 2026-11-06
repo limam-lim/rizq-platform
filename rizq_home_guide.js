@@ -1,17 +1,18 @@
 /**
- * دليل رزق — شريط «أحدث ما في…» + فلاتر كاملة من بنّاءات الأقسام.
- * بلا cloneNode. تبديل تلقائي كل 30ث. فلاتر الدليل مستقلة عن الأقسام الأصلية.
+ * Rizq Guide — live strip + full filters from section builders.
+ * No cloneNode. Auto-rotate every 30s. Guide filters independent of originals.
+ * UI copy comes from LANG / RizqI18n only (no hardcoded AR/FR UI strings).
  */
 (function (global) {
   'use strict';
 
   var PANES = ['styles', 'showrooms', 'estate', 'offices'];
   var ROTATE_MS = 30000;
-  var TOPICS = {
-    styles: { ar: 'الإطلالات', fr: 'les looks' },
-    showrooms: { ar: 'من قلب المعارض', fr: 'les showrooms' },
-    estate: { ar: 'سوق العقارات', fr: "l'immobilier" },
-    offices: { ar: 'خدمات المكاتب', fr: 'les services de bureau' }
+  var TOPIC_KEYS = {
+    styles: 'guide-topic-styles',
+    showrooms: 'guide-topic-showrooms',
+    estate: 'guide-topic-estate',
+    offices: 'guide-topic-offices'
   };
 
   var _pane = 'styles';
@@ -29,10 +30,26 @@
   function isFr() {
     try {
       if (typeof global.isAr !== 'undefined') return !global.isAr;
+      if (global.RizqI18n && typeof global.RizqI18n.getLang === 'function') {
+        return global.RizqI18n.getLang() === 'fr';
+      }
       return (localStorage.getItem('rizq_lang') || 'ar') === 'fr';
     } catch (e) {
       return false;
     }
+  }
+
+  function t(key) {
+    if (!key) return '';
+    try {
+      if (global.RizqI18n && typeof global.RizqI18n.t === 'function') {
+        var via = global.RizqI18n.t(key);
+        if (via) return via;
+      }
+    } catch (eT) { /* */ }
+    var lang = isFr() ? 'fr' : 'ar';
+    var pack = (global.LANG && global.LANG[lang]) || {};
+    return pack[key] || '';
   }
 
   function reducedMotion() {
@@ -59,22 +76,24 @@
   }
 
   function updateLiveLabel(pane) {
-    var topic = TOPICS[pane] || TOPICS.styles;
+    var topicKey = TOPIC_KEYS[pane] || TOPIC_KEYS.styles;
+    var topic = t(topicKey);
     var topicEl = $('rizq-guide-topic');
     var subEl = $('rizq-guide-live-sub');
     var liveTxt = document.querySelector('#rizq-guide-live .live-capsule-txt');
-    var fr = isFr();
-    if (liveTxt) liveTxt.textContent = fr ? 'Récent' : 'أحدث';
-    if (topicEl) topicEl.textContent = fr ? topic.fr : topic.ar;
+    if (liveTxt) {
+      liveTxt.setAttribute('data-t', 'guide-live');
+      liveTxt.textContent = t('guide-live');
+    }
+    if (topicEl) {
+      topicEl.setAttribute('data-t', topicKey);
+      topicEl.textContent = topic;
+    }
     if (subEl) {
-      /* الشارة تحمل «أحدث»/Récent — النص بجانبها بدون تكرار */
-      if (fr) {
-        subEl.innerHTML = 'dans <strong class="rizq-guide-topic" id="rizq-guide-topic">' +
-          String(topic.fr).replace(/</g, '&lt;') + '</strong>';
-      } else {
-        subEl.innerHTML = 'ما في <strong class="rizq-guide-topic" id="rizq-guide-topic">' +
-          String(topic.ar).replace(/</g, '&lt;') + '</strong>';
-      }
+      var inWord = t('guide-in');
+      subEl.innerHTML = '<span data-t="guide-in">' + String(inWord).replace(/</g, '&lt;') +
+        '</span> <strong class="rizq-guide-topic" id="rizq-guide-topic" data-t="' + topicKey + '">' +
+        String(topic).replace(/</g, '&lt;') + '</strong>';
     }
   }
 
@@ -149,13 +168,15 @@
   function fillBrand(pane) {
     try {
       if (pane === 'styles' && typeof global._fillLandingBrandStrip === 'function') {
-        global._fillLandingBrandStrip('rizq-guide-styles-brand-strip', 'أزياء', 'تسوّق حسب الماركة', 'Shop by Brand');
+        var stylesAria = t('guide-brand-styles-aria');
+        global._fillLandingBrandStrip('rizq-guide-styles-brand-strip', 'أزياء', stylesAria, stylesAria);
       } else if (pane === 'showrooms' && typeof global._fillLandingBrandStrip === 'function') {
         var cat = _guideSrmCat || 'cars';
         var brandCat = typeof global._landingBrandCatForSrm === 'function'
           ? global._landingBrandCatForSrm(cat)
-          : 'سيارات';
-        global._fillLandingBrandStrip('rizq-guide-srm-brand-strip', brandCat, 'ماركات المعارض', 'Marques showroom');
+          : (cat === 'electronics' ? 'إلكترونيات' : 'سيارات');
+        var srmAria = t('guide-brand-srm-aria');
+        global._fillLandingBrandStrip('rizq-guide-srm-brand-strip', brandCat, srmAria, srmAria);
       }
     } catch (eB) { /* */ }
   }
@@ -306,6 +327,11 @@
     }
   }
 
+  function refreshLang() {
+    updateLiveLabel(_pane);
+    fillBrand(_pane);
+  }
+
   function bind() {
     var root = $('rizq-guide');
     if (!root || root.getAttribute('data-guide-bound') === '1') return;
@@ -323,16 +349,20 @@
       root.addEventListener(ev, function () { pauseRotate(); }, { passive: true });
     });
 
+    document.addEventListener('rizq:langchange', function () {
+      refreshLang();
+    });
+
     syncTabVisibility();
     showPane('styles', false);
 
-    /* إعادة ملء بعد اكتمال ADS/الكتالوج — يمنع المربع الرمادي الفارغ على الهاتف */
     var retries = [400, 1200, 2500, 4500];
     retries.forEach(function (ms) {
       setTimeout(function () {
         if (!paneHasCards(_pane)) fillPane(_pane);
         else if (!_paused) lockStageHeight();
         syncTabVisibility();
+        refreshLang();
       }, ms);
     });
   }
@@ -341,6 +371,7 @@
   global.RizqGuideShow = showPane;
   global.RizqGuideHasCards = paneHasCards;
   global.RizqGuideActiveHasCards = function () { return paneHasCards(_pane); };
+  global.RizqGuideRefreshLang = refreshLang;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bind);
