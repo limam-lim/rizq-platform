@@ -271,6 +271,8 @@ function stripComments(html) {
     await page.addInitScript(() => {
       try { localStorage.setItem('rizq_lang', 'fr'); } catch (e) { /* */ }
       try { document.cookie = 'rizq_lang=fr;path=/;max-age=31536000'; } catch (e2) { /* */ }
+      /* بذرة ثابتة لـ _styShuffle داخل الاختبار فقط */
+      window.__RIZQ_STY_SEED = 424242;
     });
     let navOk = true;
     try {
