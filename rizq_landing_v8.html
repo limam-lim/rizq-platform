@@ -1528,6 +1528,12 @@ body.rizq-lang-ar .hero-vid-wrap{
   aspect-ratio:16/9;
   max-height:min(48vh,460px);
   width:100%;
+  /* مساحة محجوزة عبر aspect-ratio قبل تسليح الفيديو — بلا قفز CLS */
+  background:#0a1628;
+}
+.hero-vid-wrap .hero-vid-inner > video#hero-featured-vid{
+  width:100%;height:100%;object-fit:cover;display:block;
+  background:#0a1628;
 }
 /* سطح المكتب — إصلاح فراغ الهيرو دون تصغير كبسولة رزق أو شاشة ADS */
 @media (min-width:769px) and (min-height:501px){
@@ -6094,82 +6100,6 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
   </div>
 </section>
 
-<!-- ══ CATEGORIES — بعد شريط الإبهار مباشرة ══ -->
-<section class="section categories-after-promo" id="categories" style="background:var(--bg-section)">
-  <div class="section-header fade-in">
-    <p class="section-tag" data-t="s-cats-tag">كل الأقسام</p>
-    <h2 class="section-title" data-t="s-cats-title">كل ما تحتاجه في <span>مكان واحد</span></h2>
-    <p class="section-desc" data-t="s-cats-desc">من الدراعة إلى السيارة — كل ما يبحث عنه الموريتاني في مكان واحد</p>
-  </div>
-  <div class="cats-grid">
-    <div id="builtin-cats-mount"></div>
-    <!-- ══ INLINE EXPAND PANEL — يمتد على عرض الشبكة كاملاً ══ -->
-    <div id="cat-inline-panel"></div>
-  </div>
-</section>
-
-<!-- ══ نماذج الأعمال — نافذة منبثقة من شريط «نماذج» (لم تعد في تدفق الصفحة) ══ -->
-<div id="rizq-models-modal" class="rizq-models-modal" role="dialog" aria-modal="true" aria-labelledby="hero-spaces-title" hidden>
-  <div class="rizq-models-backdrop" data-models-close tabindex="-1" aria-hidden="true"></div>
-  <div class="rizq-models-panel" role="document">
-    <button type="button" class="rizq-models-close" data-models-close aria-label="إغلاق">×</button>
-    <section class="hero-spaces" id="models" aria-labelledby="hero-spaces-title">
-      <div class="hero-spaces-head">
-        <p class="hero-spaces-kicker"><span data-t="hbiz-kicker">منصة موريتانية للأعمال</span><span class="hero-kicker-place" data-t="hero-one-place"> — كل شيء في مكان واحد</span></p>
-        <h2 class="hero-spaces-title" id="hero-spaces-title" data-t="hbiz-pick">شاهد النماذج على رزق</h2>
-        <p class="hero-spaces-sub" data-t="hbiz-pick-sub">من محلك إلى استثمارك — حضورك المهني يبدأ من هنا</p>
-      </div>
-      <nav class="hero-biz-nav" aria-label="بوابات النماذج الجاهزة">
-        <a href="rizq_store.html?demo=1" class="hero-biz-btn hero-biz-gold" data-space-portal="store" data-rizq-module="store" aria-label="نموذج محل">
-          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏪</span></span>
-          <span class="hero-biz-text">
-            <span class="hero-biz-label" data-t="hbiz-stores">المحلات</span>
-            <span class="hero-biz-hint" data-t="hbiz-stores-hint">بيع أقوى كل يوم</span>
-          </span>
-        </a>
-        <a href="rizq_showroom.html?demo=1" class="hero-biz-btn hero-biz-diamond" data-space-portal="showroom" data-rizq-module="corp" aria-label="نموذج معرض">
-          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏬</span></span>
-          <span class="hero-biz-text">
-            <span class="hero-biz-label" data-t="hbiz-showrooms">المعارض والمصانع</span>
-            <span class="hero-biz-hint" data-t="hbiz-showrooms-hint">عرض يلفت الأنظار</span>
-          </span>
-        </a>
-        <a href="rizq_estate.html?demo=1" class="hero-biz-btn hero-biz-estate" data-space-portal="estate" data-rizq-module="estate" aria-label="وكالة العقارات — نموذج سوق العقارات">
-          <span class="hero-biz-badge" data-t="hbiz-estate-badge">جديد</span>
-          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏠</span></span>
-          <span class="hero-biz-text">
-            <span class="hero-biz-label" data-t="hbiz-estate">سوق العقارات</span>
-            <span class="hero-biz-hint" data-t="hbiz-estate-hint">عقارك يصل للجادّين</span>
-          </span>
-        </a>
-        <a href="rizq_office.html?demo=1" class="hero-biz-btn hero-biz-royal" data-space-portal="office" data-rizq-module="office" aria-label="نموذج مكتب">
-          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">💼</span></span>
-          <span class="hero-biz-text">
-            <span class="hero-biz-label" data-t="hbiz-offices">المكاتب</span>
-            <span class="hero-biz-hint" data-t="hbiz-offices-hint">عملاء يبحثون عنك</span>
-          </span>
-        </a>
-        <a href="rizq_tenders.html?demo=1" class="hero-biz-btn hero-biz-tender" data-space-portal="tenders" data-rizq-module="tenders" aria-label="نموذج غرفة المناقصات">
-          <span class="hero-biz-badge" data-t="hbiz-tender-badge">جديد</span>
-          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📑</span></span>
-          <span class="hero-biz-text">
-            <span class="hero-biz-label" data-t="hbiz-tenders">المناقصات</span>
-            <span class="hero-biz-hint" data-t="hbiz-tenders-hint">فرص أعمال حقيقية</span>
-          </span>
-        </a>
-        <a href="rizq_investments.html?demo=1" class="hero-biz-btn hero-biz-invest" data-space-portal="investments" data-rizq-module="investments" aria-label="نموذج غرفة الاستثمارات">
-          <span class="hero-biz-badge" data-t="hbiz-inv-badge">جديد</span>
-          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📈</span></span>
-          <span class="hero-biz-text">
-            <span class="hero-biz-label" data-t="hbiz-investments">الاستثمارات</span>
-            <span class="hero-biz-hint" data-t="hbiz-investments-hint">شراكات تنمو معك</span>
-          </span>
-        </a>
-      </nav>
-    </section>
-  </div>
-</div>
-
 <!-- ══ بعد الإبهار: تحويل + Rizq ADS (النماذج عبر شريط «نماذج») ══ -->
 
 <section class="hero-after-promo" aria-label="فضاءات الأعمال على رزق">
@@ -6281,6 +6211,82 @@ else setTimeout(go,1200);window.addEventListener('load',function(){setTimeout(go
     </div>
   </div>
 </section>
+
+<!-- ══ CATEGORIES — بعد شاشة الإعلانات وشريط الفيديوهات (ترتيب القرار المعتمد) ══ -->
+<section class="section categories-after-promo" id="categories" style="background:var(--bg-section)">
+  <div class="section-header fade-in">
+    <p class="section-tag" data-t="s-cats-tag">كل الأقسام</p>
+    <h2 class="section-title" data-t="s-cats-title">كل ما تحتاجه في <span>مكان واحد</span></h2>
+    <p class="section-desc" data-t="s-cats-desc">من الدراعة إلى السيارة — كل ما يبحث عنه الموريتاني في مكان واحد</p>
+  </div>
+  <div class="cats-grid">
+    <div id="builtin-cats-mount"></div>
+    <!-- ══ INLINE EXPAND PANEL — يمتد على عرض الشبكة كاملاً ══ -->
+    <div id="cat-inline-panel"></div>
+  </div>
+</section>
+
+<!-- ══ نماذج الأعمال — نافذة منبثقة من شريط «نماذج» (لم تعد في تدفق الصفحة) ══ -->
+<div id="rizq-models-modal" class="rizq-models-modal" role="dialog" aria-modal="true" aria-labelledby="hero-spaces-title" hidden>
+  <div class="rizq-models-backdrop" data-models-close tabindex="-1" aria-hidden="true"></div>
+  <div class="rizq-models-panel" role="document">
+    <button type="button" class="rizq-models-close" data-models-close aria-label="إغلاق">×</button>
+    <section class="hero-spaces" id="models" aria-labelledby="hero-spaces-title">
+      <div class="hero-spaces-head">
+        <p class="hero-spaces-kicker"><span data-t="hbiz-kicker">منصة موريتانية للأعمال</span><span class="hero-kicker-place" data-t="hero-one-place"> — كل شيء في مكان واحد</span></p>
+        <h2 class="hero-spaces-title" id="hero-spaces-title" data-t="hbiz-pick">شاهد النماذج على رزق</h2>
+        <p class="hero-spaces-sub" data-t="hbiz-pick-sub">من محلك إلى استثمارك — حضورك المهني يبدأ من هنا</p>
+      </div>
+      <nav class="hero-biz-nav" aria-label="بوابات النماذج الجاهزة">
+        <a href="rizq_store.html?demo=1" class="hero-biz-btn hero-biz-gold" data-space-portal="store" data-rizq-module="store" aria-label="نموذج محل">
+          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏪</span></span>
+          <span class="hero-biz-text">
+            <span class="hero-biz-label" data-t="hbiz-stores">المحلات</span>
+            <span class="hero-biz-hint" data-t="hbiz-stores-hint">بيع أقوى كل يوم</span>
+          </span>
+        </a>
+        <a href="rizq_showroom.html?demo=1" class="hero-biz-btn hero-biz-diamond" data-space-portal="showroom" data-rizq-module="corp" aria-label="نموذج معرض">
+          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏬</span></span>
+          <span class="hero-biz-text">
+            <span class="hero-biz-label" data-t="hbiz-showrooms">المعارض والمصانع</span>
+            <span class="hero-biz-hint" data-t="hbiz-showrooms-hint">عرض يلفت الأنظار</span>
+          </span>
+        </a>
+        <a href="rizq_estate.html?demo=1" class="hero-biz-btn hero-biz-estate" data-space-portal="estate" data-rizq-module="estate" aria-label="وكالة العقارات — نموذج سوق العقارات">
+          <span class="hero-biz-badge" data-t="hbiz-estate-badge">جديد</span>
+          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">🏠</span></span>
+          <span class="hero-biz-text">
+            <span class="hero-biz-label" data-t="hbiz-estate">سوق العقارات</span>
+            <span class="hero-biz-hint" data-t="hbiz-estate-hint">عقارك يصل للجادّين</span>
+          </span>
+        </a>
+        <a href="rizq_office.html?demo=1" class="hero-biz-btn hero-biz-royal" data-space-portal="office" data-rizq-module="office" aria-label="نموذج مكتب">
+          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">💼</span></span>
+          <span class="hero-biz-text">
+            <span class="hero-biz-label" data-t="hbiz-offices">المكاتب</span>
+            <span class="hero-biz-hint" data-t="hbiz-offices-hint">عملاء يبحثون عنك</span>
+          </span>
+        </a>
+        <a href="rizq_tenders.html?demo=1" class="hero-biz-btn hero-biz-tender" data-space-portal="tenders" data-rizq-module="tenders" aria-label="نموذج غرفة المناقصات">
+          <span class="hero-biz-badge" data-t="hbiz-tender-badge">جديد</span>
+          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📑</span></span>
+          <span class="hero-biz-text">
+            <span class="hero-biz-label" data-t="hbiz-tenders">المناقصات</span>
+            <span class="hero-biz-hint" data-t="hbiz-tenders-hint">فرص أعمال حقيقية</span>
+          </span>
+        </a>
+        <a href="rizq_investments.html?demo=1" class="hero-biz-btn hero-biz-invest" data-space-portal="investments" data-rizq-module="investments" aria-label="نموذج غرفة الاستثمارات">
+          <span class="hero-biz-badge" data-t="hbiz-inv-badge">جديد</span>
+          <span class="hero-biz-ico-wrap" aria-hidden="true"><span class="hero-biz-ico">📈</span></span>
+          <span class="hero-biz-text">
+            <span class="hero-biz-label" data-t="hbiz-investments">الاستثمارات</span>
+            <span class="hero-biz-hint" data-t="hbiz-investments-hint">شراكات تنمو معك</span>
+          </span>
+        </a>
+      </nav>
+    </section>
+  </div>
+</div>
 
 <!-- ══ الإعلانات المميزة — بطاقات أصغر + المميّز ثابت حسب الباقة + زر واحد لكل الإعلانات ══ -->
 <section class="listings-section" id="listings" aria-labelledby="landing-ads-title">
@@ -16939,10 +16945,34 @@ function closeRvidPopup(){ document.getElementById('rvid-overlay').classList.rem
           }
           /* بدون / أولية — وإلا يفشل على GitHub Pages تحت /rizq-platform/ */
           if (/^\/rizq-assets\//i.test(heroSrc)) heroSrc = heroSrc.replace(/^\//, '');
-          vid.src = heroSrc;
-          vid.play().catch(function(){});
           wrap.style.display = '';
-          if (ph) ph.style.display = 'none';
+          vid.setAttribute('preload', 'none');
+          vid.preload = 'none';
+          /* لا src ولا تشغيل قبل دخول منطقة العرض — poster فقط + مساحة محجوزة */
+          try { vid.removeAttribute('src'); } catch (eHeroClr) { /* ignore */ }
+          var heroArmed = false;
+          function armHeroFromConfig() {
+            if (heroArmed) return;
+            heroArmed = true;
+            vid.src = heroSrc;
+            if (ph) ph.style.display = 'none';
+            wrap.classList.add('is-playing');
+            vid.play().catch(function(){});
+          }
+          if (typeof IntersectionObserver !== 'undefined') {
+            var heroCfgIo = new IntersectionObserver(function (entries) {
+              for (var hi = 0; hi < entries.length; hi++) {
+                if (entries[hi].isIntersecting && entries[hi].intersectionRatio > 0) {
+                  heroCfgIo.disconnect();
+                  armHeroFromConfig();
+                  break;
+                }
+              }
+            }, { root: null, rootMargin: '0px', threshold: [0, 0.15, 0.5] });
+            heroCfgIo.observe(wrap);
+          } else {
+            armHeroFromConfig();
+          }
           /* بيانات المعلن تحت الإطار فقط — بلا كتابات على مساحة الإعلان */
           if (pv.heroAdvertiser) {
             var advBar = document.getElementById('hero-vid-adv-bar');
@@ -17152,7 +17182,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
      مدير رزق الذكي — ويدجت موحّد (محرك المعرفة + الواجهة)
      packages* محمّلة مرة في الرأس — لا تكرار هنا
      ═══════════════════════════════════════════════ -->
-<script src="rizq_video_ads.js?v=promo22"></script>
+<script src="rizq_video_ads.js?v=promo23"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=24.1"></script>
 <script src="rizq_disclaimer.js"></script>
