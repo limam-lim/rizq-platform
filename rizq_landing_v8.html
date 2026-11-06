@@ -5065,14 +5065,14 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   overflow-wrap:anywhere;word-break:break-word;
   background:rgba(27,58,107,.04);border:1.5px dashed rgba(27,58,107,.18);border-radius:14px
 }
-/* بطاقات أنماط الأزياء + أنماط المعارض — الصورة أكبر من النص */
+/* بطاقات أنماط الأزياء + أنماط المعارض — أكبر (تكبير بطاقات المحلات) */
 .rizq-style-card{
   display:flex;flex-direction:column;
-  width:220px;min-width:220px;max-width:220px;
-  flex:0 0 220px;
+  width:248px;min-width:248px;max-width:248px;
+  flex:0 0 248px;
   /* ارتفاع يكفي للصورة + شارة/اسم/وصف/زر دون قصّ النص السفلي */
-  min-height:392px;
-  height:392px;
+  min-height:440px;
+  height:440px;
   background:#ffffff!important;
   border:1.5px solid rgba(201,168,76,.5);
   border-radius:10px;
@@ -5121,7 +5121,7 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 #rizq-guide[data-guide-pane="styles"] .rizq-style-mosaic{
   grid-template-columns:repeat(3,1fr);
   grid-template-rows:1fr;
-  min-height:168px;
+  min-height:200px;
 }
 #rizq-styles .rizq-style-tile:first-child,
 #rizq-guide[data-guide-pane="styles"] .rizq-style-tile:first-child{
@@ -5298,14 +5298,14 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     white-space:normal!important;overflow-wrap:anywhere;word-break:break-word
   }
   .rizq-style-card{
-    width:168px!important;min-width:168px!important;max-width:168px!important;
-    flex:0 0 168px!important;
-    min-height:340px!important;height:340px!important;
+    width:196px!important;min-width:196px!important;max-width:196px!important;
+    flex:0 0 196px!important;
+    min-height:400px!important;height:400px!important;
     border-radius:10px;
     box-shadow:0 4px 14px rgba(13,27,42,.08);
   }
   .rizq-style-card:hover{transform:none;box-shadow:0 4px 14px rgba(13,27,42,.08)}
-  .rizq-style-mosaic{min-height:168px;height:auto;flex:1 1 0;gap:2px}
+  .rizq-style-mosaic{min-height:200px;height:auto;flex:1 1 0;gap:2px}
   .rizq-style-tile{font-size:18px}
   .rizq-style-tile:first-child{font-size:26px}
   .rizq-style-body{padding:7px 8px 9px;gap:3px;flex:0 0 auto}
@@ -5318,10 +5318,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 /* إطلالات/معارض — تابلت: صورة سائدة مع بطاقة أضيق من الكمبيوتر */
 @media(min-width:641px) and (max-width:1100px){
   .rizq-style-card{
-    width:196px;min-width:196px;max-width:196px;flex:0 0 196px;
-    min-height:368px;height:368px;
+    width:224px;min-width:224px;max-width:224px;flex:0 0 224px;
+    min-height:420px;height:420px;
   }
-  .rizq-style-mosaic{min-height:188px;height:auto;flex:1 1 0}
+  .rizq-style-mosaic{min-height:210px;height:auto;flex:1 1 0}
   .rizq-style-body{padding:7px 9px 9px;gap:3px;flex:0 0 auto}
   .rizq-style-brand-row{min-height:0;margin:0 0 3px}
   .rizq-style-brand-row .rzq-brand-logo-name-img{width:30px;height:30px;border-radius:9px}
@@ -5331,7 +5331,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 }
 /* كمبيوتر عريض: فسحة أوضح للصورة مع الإبقاء على نص كامل ظاهر */
 @media(min-width:1101px){
-  .rizq-style-mosaic{min-height:210px}
+  .rizq-style-mosaic{min-height:236px}
   .rizq-style-brand-row .rzq-brand-logo-name-img{width:34px;height:34px}
 }
 
