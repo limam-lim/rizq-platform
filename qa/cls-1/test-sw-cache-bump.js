@@ -213,10 +213,11 @@ function startStatic(state) {
   await page.waitForTimeout(1500);
 
   let upgraded = null;
-  for (let i = 0; i < 45; i++) {
+  /* تحت ضغط test:all المتوازي قد يتأخر تفعيل SW الجديد — نطيل النافذة ونفرض SKIP_WAITING */
+  for (let i = 0; i < 70; i++) {
     try {
       await page.waitForLoadState('domcontentloaded', { timeout: 5000 }).catch(function () {});
-      await page.waitForTimeout(900);
+      await page.waitForTimeout(i < 10 ? 700 : 1100);
       upgraded = await page.evaluate(async (want) => {
         const keys = (await caches.keys()).filter((k) => /^rizq-cache-v/.test(k));
         const regs = await navigator.serviceWorker.getRegistrations();
@@ -224,6 +225,9 @@ function startStatic(state) {
         try {
           if (regs[0]) {
             if (regs[0].waiting) regs[0].waiting.postMessage({ type: 'SKIP_WAITING' });
+            if (regs[0].installing) {
+              try { regs[0].installing.postMessage({ type: 'SKIP_WAITING' }); } catch (eI) { /* */ }
+            }
             if (regs[0].update) await regs[0].update();
           }
         } catch (eU) { /* */ }
@@ -245,7 +249,7 @@ function startStatic(state) {
       }, { assetV: assetV, swCache: swCache });
     } catch (eNav) {
       /* controllerchange → location.reload() يدمّر السياق — انتظر وأعد المحاولة */
-      await page.waitForTimeout(1000);
+      await page.waitForTimeout(1200);
       continue;
     }
 
@@ -253,7 +257,11 @@ function startStatic(state) {
     const ctrlOk = scriptUrl.indexOf('v=' + assetV) !== -1;
     const themeOk = new RegExp('v=' + assetV.replace(/\./g, '\\.')).test(upgraded.themeHref || '');
     const staleOk = (upgraded.staleLeft || []).every((k) => k === swCache);
-    if (ctrlOk && (themeOk || i > 12) && (staleOk || i > 18)) break;
+    if (ctrlOk && (themeOk || i > 20) && (staleOk || i > 28)) break;
+    /* إن بقي المتحكم على الإصدار القديم بعد عدة محاولات — أعد تحميل الصفحة لإكمال الترقية */
+    if (!ctrlOk && i > 8 && i % 8 === 0) {
+      try { await page.reload({ waitUntil: 'load', timeout: 60000 }); } catch (eR) { /* */ }
+    }
   }
 
   const finalScript = (upgraded && (upgraded.controllerUrl || upgraded.active)) || '';
