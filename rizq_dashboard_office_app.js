@@ -1513,18 +1513,18 @@ function renderSubPanel(){
   const {daysLeft,isTrial,isExpired,isExpiringSoon}=info;
   const isExp=isExpired;
   const cls=isExp?'expired':isTrial?'trial':'active-plan';
-  const reminderBanner=(isExpiringSoon||isExpired)?`
-    <div class="sub-card ${isExpired?'expired':'trial'}" style="margin-top:12px;text-align:center">
-      <div style="font-size:13px;font-weight:700">${isExpired?'⛔ '+_t2('انتهى اشتراكك — جدد الآن لاستعادة كل المزايا','Votre abonnement a expiré — renouvelez maintenant pour retrouver tous les avantages'):'⚠️ '+_t2(`اشتراكك سينتهي بعد ${daysLeft} أيام — جدد الآن لتجنب توقف الخدمة`,`Votre abonnement expire dans ${daysLeft} jours — renouvelez maintenant pour éviter toute interruption`)}</div>
+  const reminderBanner=(!isExpired&&isExpiringSoon)?`
+    <div class="sub-card trial" style="margin-top:12px;text-align:center">
+      <div style="font-size:13px;font-weight:700">${'⚠️ '+_t2(`اشتراكك سينتهي بعد ${daysLeft} أيام — جدد الآن لتجنب توقف الخدمة`,`Votre abonnement expire dans ${daysLeft} jours — renouvelez maintenant pour éviter toute interruption`)}</div>
       <div style="margin-top:10px">
         <button class="btn btn-gold btn-sm" onclick="document.getElementById('packages-display').scrollIntoView({behavior:'smooth'})">🔄 ${_t2('تجديد الباقة الآن','Renouveler le forfait maintenant')}</button>
       </div>
     </div>`:'';
   document.getElementById('sub-card-wrap').innerHTML=`<div class="sub-card ${cls}">
-    <div style="font-size:18px;font-weight:800;margin-bottom:4px">${isTrial?'🎁 '+_t2('فترة تجريبية',"Période d'essai"):'✅ '+_t2('اشتراك نشط','Abonnement actif')}</div>
-    <div style="font-size:12px;opacity:.75;margin-bottom:12px">${daysLeft>0?_t2(`ينتهي خلال ${daysLeft} يوم`,`Expire dans ${daysLeft} jours`):_t2('انتهى الاشتراك','Abonnement expiré')}</div>
+    <div style="font-size:18px;font-weight:800;margin-bottom:4px">${isExp?'❌ '+_t2('انتهى الاشتراك','Abonnement expiré'):isTrial?'🎁 '+_t2('فترة تجريبية',"Période d'essai"):'✅ '+_t2('اشتراك نشط','Abonnement actif')}</div>
+    <div style="font-size:12px;opacity:.75;margin-bottom:12px">${isExp?_t2('جدد الآن لاستعادة كل المزايا','Renouvelez maintenant pour retrouver tous les avantages'):daysLeft>0?_t2(`ينتهي خلال ${daysLeft} يوم`,`Expire dans ${daysLeft} jours`):''}</div>
     ${!isExp?`<div style="height:5px;background:rgba(255,255,255,.2);border-radius:3px"><div style="height:100%;width:${info.pct}%;background:var(--gold);border-radius:3px"></div></div>`:''}
-    <button class="btn btn-gold btn-sm" style="margin-top:14px" onclick="document.getElementById('packages-display').scrollIntoView({behavior:'smooth'})">🔄 ${_t2('تجديد الاشتراك',"Renouveler l'abonnement")}</button>
+    <button class="btn btn-gold btn-sm" style="margin-top:14px" onclick="document.getElementById('packages-display').scrollIntoView({behavior:'smooth'})">🔄 ${isExp?_t2('تجديد الباقة الآن','Renouveler le forfait maintenant'):_t2('تجديد الاشتراك',"Renouveler l'abonnement")}</button>
   </div>${reminderBanner}`;
   // إصلاح جوهري: كان الزران أعلاه (وهذا التفعيل التلقائي عند انتهاء الاشتراك)
   // يفتحان renewal-section القديم — يحفظ فقط في localStorage['rizq_renewal_

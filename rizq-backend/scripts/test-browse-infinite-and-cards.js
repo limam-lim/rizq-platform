@@ -60,6 +60,8 @@ function main() {
     'test:all',
     'test:header-layout',
     'test:header-slow-cpu',
+    'test:pkg-admin-hydrate',
+    'test:trial-ui-once',
     'test:demo-images-local',
     'test:header-all-pages',
     'test:demo-fashion-images',

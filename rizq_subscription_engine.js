@@ -1055,6 +1055,92 @@
     return [];
   }
 
+  /** باقة تجريبية/مجانية للحساب (ليست boost مدفوع) */
+  function isTrialPackageRow(p) {
+    if (!p) return false;
+    var id = String(p.id || p.packageId || '');
+    var name = String(p.name || p.name_ar || '');
+    if (/boost|مميزة/i.test(id + name) && !/trial/i.test(id)) return false;
+    if (/trial|ind-free|st-trial|of-trial|cp-trial|es-trial|tnd-trial|inv-trial/i.test(id)) return true;
+    if (name === 'تجريبية' || name === 'مجانية' || name === 'Essai' || name === 'Gratuit' || name === 'Gratuite') return true;
+    if (/تجرب|مجاني/.test(name) && isExplicitFreePrice(p.price)) return true;
+    return false;
+  }
+
+  function accountHasConsumedTrial() {
+    try {
+      if (global.__rizqForceTrialUsed === true) return true;
+      if (global.__rizqForceTrialUsed === false) return false;
+      var sub = typeof checkSubscription === 'function' ? checkSubscription() : null;
+      var acc = (sub && sub.acc) || null;
+      if (acc) {
+        if (acc.trialUsed === true || acc.trial_used === true) return true;
+        if (Array.isArray(acc.packageHistory) && acc.packageHistory.some(function (h) { return h && h.isTrial; })) return true;
+      }
+      if (typeof global.getSubInfo === 'function') {
+        var info = global.getSubInfo();
+        if (info && info.trialUsed) return true;
+      }
+    } catch (e) { /* */ }
+    return false;
+  }
+
+  /** أخفِ بطاقة التجربة إن استُعملت سابقاً أو انتهى الاشتراك (تجربة واحدة لكل حساب) */
+  function shouldHideTrialPackageCard() {
+    try {
+      if (global.__rizqForceHideTrial === true) return true;
+      if (global.__rizqForceHideTrial === false) return false;
+      if (typeof global.getSubInfo === 'function') {
+        var info = global.getSubInfo();
+        if (info && info.isExpired) return true;
+      }
+      var sub = typeof checkSubscription === 'function' ? checkSubscription() : null;
+      if (sub && (sub.status === 'expired')) return true;
+      if (accountHasConsumedTrial()) return true;
+    } catch (e2) { /* */ }
+    return false;
+  }
+
+  function isCatalogPackageActiveClient(idOrName) {
+    var key = String(idOrName || '').trim().toLowerCase();
+    if (!key) return false;
+    try {
+      if (typeof global.RizqPackagesConfig !== 'undefined') {
+        var cats = global.RizqPackagesConfig.CATALOGS || {};
+        var keys = Object.keys(cats);
+        for (var i = 0; i < keys.length; i++) {
+          var rows = cats[keys[i]] || [];
+          for (var j = 0; j < rows.length; j++) {
+            var r = rows[j];
+            var rid = String((r && (r.id || r.packageId)) || '').toLowerCase();
+            var rname = String((r && (r.name || r.name_ar)) || '').toLowerCase();
+            if (rid === key || rname === key) return r.active !== false;
+          }
+        }
+        if (typeof global.RizqPackagesConfig.getCatalog === 'function') {
+          /* getCatalog عادة يصفّي inactive — إن وُجد في الكتالوج فهو مفعّل */
+          var found = false;
+          ['store', 'office', 'corp', 'individual', 'estate', 'tender', 'investment', 'video'].forEach(function (cat) {
+            try {
+              var list = global.RizqPackagesConfig.getCatalog(cat, 'ar') || [];
+              if (list.some(function (p) {
+                return String(p.id || '').toLowerCase() === key || String(p.name || '').toLowerCase() === key;
+              })) found = true;
+            } catch (eG) { /* */ }
+          });
+          if (found) return true;
+        }
+      }
+    } catch (e3) { /* */ }
+    return true;
+  }
+
+  function filterActivePackageIdsClient(ids) {
+    return (ids || []).map(function (x) { return String(x || '').trim(); }).filter(function (id) {
+      return id && isCatalogPackageActiveClient(id);
+    });
+  }
+
   // ── بناء بطاقات الباقات (HTML مشترك — يستخدمه store/corp/office) ──
   // كل لوحة تحكم تحتفظ بقاموسها الخاص FEATS/ICONS (نصوص تسويقية تختلف حسب نوع النشاط)
   // وبقائمة باقاتها الفعلية (من localStorage أو DEF الافتراضي الخاص بها) — هذه الدالة فقط
@@ -1113,7 +1199,10 @@
       var priceUnset=isPriceUnset(p.price);
       var isFree=!priceUnset&&isExplicitFreePrice(p.price);
       var isYear=p.name==='سنوية'||p.name==='Annuelle'||Number(p.durationDays)>=360||/-year$/.test(String(p.id||''));
-      var isTrial=isFree||p.name==='تجريبية'||p.name==='Essai'||/trial|تجرب/.test(String(p.id||p.name||''));
+      var isTrialPkg=isTrialPackageRow(p);
+      var isTrial=isTrialPkg||(isFree&&!/boost|مميزة/.test(String(p.id||'')+String(p.name||'')));
+      /* تجربة واحدة لكل حساب: أخفِ بطاقة التجربة إن استُعملت أو انتهى الاشتراك */
+      if (isTrialPkg && shouldHideTrialPackageCard()) return '';
       var isDiamondPkg=!!(p.diamond||p.isDiamond||String(p.name||'').indexOf('ماسي')!==-1||/diamant|diamond/i.test(String(p.name||''))||/diam/.test(String(p.id||'')));
       var bg=isDiamondPkg?'linear-gradient(145deg,#3b0764 0%,#6b21a8 100%)':isYear?'linear-gradient(145deg,#1B3A6B 0%,#0f2347 100%)':isTrial?'linear-gradient(145deg,#f0fdf4,#dcfce7)':p.highlight?'linear-gradient(145deg,#fffbeb,#fef3c7)':'linear-gradient(145deg,#f8faff,#eff3ff)';
       var border=isDiamondPkg?'2px solid rgba(192,132,252,.7)':isYear?'2px solid rgba(201,168,76,.6)':p.highlight?'2px solid #C9A84C':isTrial?'1.5px solid #86efac':'1.5px solid #bfcfef';
@@ -1135,20 +1224,31 @@
         : '';
       var roiTxt = lang==='fr' ? (p.roi_fr || p.roi || '') : (p.roi || '');
       var descTxt = lang==='fr' ? (p.description_fr || p.description || '') : (p.description || '');
-      return '<div class="rpkg-card" style="background:'+bg+';border:'+border+';box-shadow:'+shadow+'">'
+      var pkgIdAttr = String(p.id || p.packageId || '').trim();
+      var subExpired = false;
+      try {
+        if (typeof global.getSubInfo === 'function') {
+          subExpired = !!(global.getSubInfo().isExpired);
+        } else if (typeof checkSubscription === 'function') {
+          var _cs = checkSubscription();
+          subExpired = !!(!_cs || _cs.status === 'expired' || _cs.status === 'none');
+        }
+      } catch (eSub) { subExpired = false; }
+      var showCurrentBadge = isTrialPkg && category !== 'tender' && !subExpired && !accountHasConsumedTrial();
+      return '<div class="rpkg-card" data-pkg-id="'+esc(pkgIdAttr)+'" data-package-id="'+esc(pkgIdAttr)+'" style="background:'+bg+';border:'+border+';box-shadow:'+shadow+'">'
         +(p.highlight&&!isDiamondPkg?'<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#C9A84C,#f0d060);color:#0f2347;font-size:10px;font-weight:900;padding:4px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 10px rgba(201,168,76,.45);letter-spacing:.5px">⭐ '+_t2('الأكثر طلباً','Le plus demandé')+'</div>':'')
         +(isDiamondPkg?'<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#a855f7,#c084fc);color:#fff;font-size:10px;font-weight:900;padding:4px 14px;border-radius:10px;white-space:nowrap;box-shadow:0 3px 10px rgba(168,85,247,.5)">💎 '+esc(badge)+'</div>':'')
         +(isYear?'<div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:10px;font-weight:900;padding:4px 16px;border-radius:20px;white-space:nowrap;box-shadow:0 3px 10px rgba(124,58,237,.4)">💎 '+_t2('الأفضل قيمة','Meilleur rapport qualité-prix')+'</div>':'')
         +'<div style="font-size:38px;margin-bottom:10px;margin-top:'+(p.highlight||isYear||isDiamondPkg?'14':'2')+'px">'+(ICONS[p.name]||ICONS[p.name_ar]||(isDiamondPkg?'💎':'📦'))+'</div>'
-        +'<div style="font-size:18px;font-weight:900;color:'+nameCol+';margin-bottom:2px;letter-spacing:.3px">'+esc(namePick.text||trName(p.name))+nameFallbackNote+'</div>'
+        +'<div class="pkg-name" style="font-size:18px;font-weight:900;color:'+nameCol+';margin-bottom:2px;letter-spacing:.3px">'+esc(namePick.text||trName(p.name))+nameFallbackNote+'</div>'
         +(descTxt?'<div style="font-size:11.5px;color:'+featCol+';line-height:1.55;margin:8px 0 12px;text-align:'+(lang==='fr'?'left':'right')+'">'+esc(descTxt)+'</div>':'')
         +'<div style="font-size:11px;color:'+mutedCol+';margin-bottom:14px;font-weight:600;letter-spacing:.5px;text-transform:uppercase">'+esc(trDur(p.duration||p.period||''))+'</div>'
         +'<div style="height:1px;background:'+(isYear?'rgba(255,255,255,.12)':'rgba(27,58,107,.08)')+';margin-bottom:14px"></div>'
-        +'<div style="margin-bottom:16px"><span style="font-size:30px;font-weight:900;color:'+priceCol+';line-height:1">'+(isFree?_t2('مجاناً','Gratuit'):Number(p.price).toLocaleString())+'</span>'
+        +'<div class="pkg-price" data-price="'+esc(String(Number(p.price)||0))+'" style="margin-bottom:16px"><span style="font-size:30px;font-weight:900;color:'+priceCol+';line-height:1">'+(isFree?_t2('مجاناً','Gratuit'):Number(p.price).toLocaleString())+'</span>'
         +(!isFree?'<div style="font-size:10px;color:'+mutedCol+';margin-top:1px;font-weight:600">MRU / '+esc(trDur((p.period && !/^MRU\s*\//i.test(String(p.period))) ? p.period : (p.name==='مميزة' ? 'لكل إعلان' : (p.duration||''))))+'</div>':'')+'</div>'
         +(isDiamondPkg && roiTxt ? '<div style="margin:0 0 14px;padding:10px 12px;border-radius:12px;background:rgba(251,191,36,.14);border:1px solid rgba(251,191,36,.4);font-size:11.5px;line-height:1.55;color:#fde68a;text-align:'+(lang==='fr'?'left':'right')+'">💼 '+esc(roiTxt)+'</div>' : '')
         +'<div style="margin-bottom:18px;padding:0 4px;text-align:right">'+feats.map(function(f){return '<div class="rpkg-feat"><span style="color:'+checkCol+';font-size:14px;flex-shrink:0;margin-top:1px">✓</span><span style="color:'+featCol+'">'+f+'</span></div>';}).join('')+(featFallbackNote||'')+'</div>'
-        +(isFree && category !== 'tender'
+        +(showCurrentBadge
           ?'<div style="background:rgba(16,185,129,.1);border:1.5px solid rgba(16,185,129,.3);border-radius:11px;padding:10px;font-size:12px;font-weight:800;color:#065f46">✓ '+_t2('الباقة الحالية','Forfait actuel')+'</div>'
           : (isFree && category === 'tender'
               ? '<button onclick="openPayModal(\''+esc(p.name)+'\','+p.price+',\'tender\')" style="width:100%;padding:11px;border-radius:11px;border:none;background:'+btnBg+';color:'+btnCol+';font-weight:900;font-size:13px;cursor:pointer;font-family:inherit;letter-spacing:.3px;box-shadow:0 3px 12px rgba(0,0,0,.18);transition:opacity .15s" onmouseover="this.style.opacity=\'.86\'" onmouseout="this.style.opacity=\'1\'">'+_t2('ابدأ التجربة المجانية ←','Commencer l\'essai gratuit →')+'</button>'
@@ -1563,12 +1663,71 @@
     getMinPackageForFeature: getMinPackageForFeature,
     getAvailablePackages : getAvailablePackages,
     renderPackageCardsHTML: renderPackageCardsHTML,
+    formatOfferDaysLeft: function (n, lang) {
+      n = Math.max(0, Math.floor(Number(n) || 0));
+      if (lang === 'fr') {
+        return n <= 1 ? (n + ' jour') : (n + ' jours');
+      }
+      if (n === 1) return '1 يوم';
+      if (n === 2) return 'يومان';
+      if (n >= 3 && n <= 10) return n + ' أيام';
+      return n + ' يوماً';
+    },
+    isTrialPackageRow: isTrialPackageRow,
+    shouldHideTrialPackageCard: shouldHideTrialPackageCard,
+    accountHasConsumedTrial: accountHasConsumedTrial,
+    filterActivePackageIdsClient: filterActivePackageIdsClient,
+    resolvePackageDisplayNames: function (ids, lang) {
+      lang = lang || 'ar';
+      var out = [];
+      filterActivePackageIdsClient(ids || []).forEach(function (raw) {
+        var id = String(raw || '').trim();
+        if (!id) return;
+        var label = '';
+        try {
+          if (typeof global.RizqPackagesConfig !== 'undefined') {
+            if (typeof global.RizqPackagesConfig.catalogPackageLabel === 'function') {
+              label = global.RizqPackagesConfig.catalogPackageLabel(id, lang) || '';
+            }
+            if (!label && typeof global.RizqPackagesConfig.localizedName === 'function') {
+              label = global.RizqPackagesConfig.localizedName({ id: id, name: id }, lang) || '';
+            }
+          }
+        } catch (eL) { /* */ }
+        if (!label || label === id) {
+          // بحث في الكتالوجات الحية بالاسم العربي الافتراضي
+          try {
+            if (global.RizqPackagesConfig && global.RizqPackagesConfig.CATALOGS) {
+              Object.keys(global.RizqPackagesConfig.CATALOGS).some(function (cat) {
+                var row = (global.RizqPackagesConfig.CATALOGS[cat] || []).find(function (p) {
+                  return String(p.id || '') === id;
+                });
+                if (row) {
+                  if (typeof global.RizqPackagesConfig.enrichForDisplay === 'function') {
+                    var en = global.RizqPackagesConfig.enrichForDisplay(Object.assign({}, row), lang);
+                    label = (en && (en.name || en.name_ar)) || '';
+                  }
+                  if (!label && typeof global.RizqPackagesConfig.catalogPackageLabel === 'function') {
+                    label = global.RizqPackagesConfig.catalogPackageLabel(id, lang) || '';
+                  }
+                  return !!label;
+                }
+                return false;
+              });
+            }
+          } catch (e2) { /* */ }
+        }
+        out.push(label || id);
+      });
+      return out;
+    },
     renderSeasonalOfferCard: function (opts) {
       opts = opts || {};
       var mount = document.getElementById(opts.mountId || 'seasonal-offer-card');
       if (!mount || !global.RIZQ_BACKEND_BASE) return;
       var lang = opts.lang || 'ar';
       var fr = lang === 'fr';
+      var self = this;
       var onReady = typeof opts.onReady === 'function' ? opts.onReady : null;
       fetch(String(global.RIZQ_BACKEND_BASE).replace(/\/$/, '') + '/api/seasonal-offers/active', { credentials: 'omit' })
         .then(function (r) { return r.ok ? r.json() : null; })
@@ -1582,7 +1741,15 @@
           }
           var title = fr ? (offer.titleFr || offer.titleAr) : (offer.titleAr || offer.titleFr);
           var days = Number(offer.daysLeft) || 0;
-          var pkgs = Array.isArray(offer.packageIds) ? offer.packageIds : [];
+          var pkgs = filterActivePackageIdsClient(Array.isArray(offer.packageIds) ? offer.packageIds : []);
+          if (!pkgs.length) {
+            mount.style.display = 'none';
+            mount.textContent = '';
+            try { global.__rizqSeasonalOffer = null; } catch (eEmpty) { /* */ }
+            return;
+          }
+          offer = Object.assign({}, offer, { packageIds: pkgs });
+          var pkgNames = self.resolvePackageDisplayNames(pkgs, lang);
           mount.style.display = 'block';
           mount.textContent = '';
           var card = document.createElement('div');
@@ -1592,15 +1759,16 @@
           h.textContent = title || '';
           var p = document.createElement('div');
           p.style.cssText = 'font-size:13px;opacity:.92';
+          var daysTxt = self.formatOfferDaysLeft(days, lang);
           p.textContent = fr
-            ? ('Remise ' + offer.percent + '% · se termine dans ' + days + ' jour(s)')
-            : ('خصم ' + offer.percent + '% · ينتهي بعد ' + days + ' يوم' + (days === 1 ? '' : 'اً'));
+            ? ('Remise ' + offer.percent + '% · se termine dans ' + daysTxt)
+            : ('خصم ' + offer.percent + '% · ينتهي بعد ' + daysTxt);
           card.appendChild(h);
           card.appendChild(p);
-          if (pkgs.length) {
+          if (pkgNames.length) {
             var meta = document.createElement('div');
             meta.style.cssText = 'font-size:11px;opacity:.75;margin-top:8px';
-            meta.textContent = (fr ? 'Forfaits: ' : 'الباقات: ') + pkgs.join(', ');
+            meta.textContent = (fr ? 'Forfaits: ' : 'الباقات: ') + pkgNames.join(' · ');
             card.appendChild(meta);
           }
           mount.appendChild(card);
@@ -1612,23 +1780,29 @@
     applySeasonalStrikethrough: function (root, list) {
       var offer = global.__rizqSeasonalOffer;
       if (!offer || !root || !list || !list.length) return;
-      var ids = (offer.packageIds || []).map(function (x) { return String(x).toLowerCase(); });
+      var ids = filterActivePackageIdsClient(offer.packageIds || []).map(function (x) { return String(x).toLowerCase(); });
       var pct = Number(offer.percent) || 0;
-      if (!(pct > 0)) return;
+      if (!(pct > 0) || !ids.length) return;
       function paint(priceEl, listPrice) {
         if (!priceEl || !(listPrice > 0)) return;
         var discounted = Math.round(listPrice * (1 - pct / 100));
         priceEl.textContent = '';
         var strike = document.createElement('span');
-        strike.style.textDecoration = 'line-through';
-        strike.style.opacity = '.55';
-        strike.style.marginInlineEnd = '6px';
-        strike.textContent = listPrice.toLocaleString() + ' MRU';
+        strike.style.cssText = 'text-decoration:line-through;opacity:.55;margin-inline-end:8px;font-size:18px;font-weight:700';
+        strike.textContent = listPrice.toLocaleString();
+        var main = document.createElement('span');
+        main.style.cssText = 'font-size:30px;font-weight:900;line-height:1';
+        main.textContent = discounted.toLocaleString();
+        var unit = document.createElement('div');
+        unit.style.cssText = 'font-size:10px;opacity:.7;margin-top:1px;font-weight:600';
+        unit.textContent = 'MRU';
         priceEl.appendChild(strike);
-        priceEl.appendChild(document.createTextNode(discounted.toLocaleString() + ' MRU'));
+        priceEl.appendChild(document.createTextNode(' '));
+        priceEl.appendChild(main);
+        priceEl.appendChild(unit);
       }
       Array.prototype.forEach.call(
-        root.querySelectorAll('.pkg-card, .package-card, [data-pkg-id], [data-package-id]'),
+        root.querySelectorAll('.rpkg-card, .pkg-card, .package-card, [data-pkg-id], [data-package-id]'),
         function (card) {
           var id = String(card.getAttribute('data-pkg-id') || card.getAttribute('data-package-id') || '').toLowerCase();
           var name = '';
@@ -1641,19 +1815,25 @@
             var p = list[i];
             var pid = String((p && (p.id || p.packageId)) || '').toLowerCase();
             var pname = String((p && (p.name || p.pkgName)) || '').toLowerCase();
-            if (ids.indexOf(pid) < 0 && ids.indexOf(pname) < 0) continue;
-            if ((id && id === pid) || (name && name === pname) || (!id && !name)) {
+            var inOffer = ids.indexOf(pid) >= 0 || ids.indexOf(pname) >= 0;
+            if (!inOffer) continue;
+            if ((id && id === pid) || (name && name === pname) || (id && ids.indexOf(id) >= 0 && id === pid)) {
               matchedPkg = p;
               break;
             }
           }
-          if (!matchedPkg && ids.some(function (x) { return (id && x === id) || (name && x === name); })) {
-            matchedPkg = { price: 0 };
+          if (!matchedPkg && id && ids.indexOf(id) >= 0) {
+            for (var j = 0; j < list.length; j++) {
+              if (String((list[j] && (list[j].id || list[j].packageId)) || '').toLowerCase() === id) {
+                matchedPkg = list[j];
+                break;
+              }
+            }
           }
           if (!matchedPkg) return;
           var priceEl = card.querySelector('.pkg-price, .package-price, .price, [data-price]');
           var listPrice = Number(matchedPkg.price)
-            || Number(String((priceEl && (priceEl.getAttribute('data-price') || priceEl.textContent)) || '').replace(/[^\d.]/g, ''))
+            || Number(String((priceEl && priceEl.getAttribute('data-price')) || '').replace(/[^\d.]/g, ''))
             || 0;
           paint(priceEl, listPrice);
         }

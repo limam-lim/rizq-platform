@@ -112,6 +112,38 @@ function ok(name, cond, extra) {
     await so.archiveOffer(offerId);
     const afterArch = await so.getPublicActiveOffer();
     ok('archived offer not public', !afterArch || afterArch.id !== offerId, afterArch);
+
+    console.log('\n— active packages only —');
+    const mixed = await so.upsertOffer({
+      titleAr: 'عرض مفعّل فقط',
+      titleFr: 'Actifs seulement',
+      percent: 30,
+      startAt: start,
+      endAt: end,
+      packageIds: ['st-month', 'st-year'],
+    });
+    ok('create offer with active+inactive pkgs', mixed.ok && mixed.offer, mixed);
+    const pubActive = await so.getPublicActiveOffer();
+    ok('public offer omits inactive st-year',
+      pubActive && Array.isArray(pubActive.packageIds)
+      && pubActive.packageIds.indexOf('st-month') >= 0
+      && pubActive.packageIds.indexOf('st-year') < 0,
+      pubActive);
+    const inactivePrice = await so.resolveOfferPrice({
+      listPrice: 15000,
+      packageId: 'st-year',
+      accountId: 'acc-season-3',
+      paymentAt: new Date().toISOString(),
+    });
+    ok('no discount on inactive package', !inactivePrice.discounted && inactivePrice.price === 15000, inactivePrice);
+    const activePrice = await so.resolveOfferPrice({
+      listPrice: 2000,
+      packageId: 'st-month',
+      accountId: 'acc-season-3',
+      paymentAt: new Date().toISOString(),
+    });
+    ok('discount still applies to active package', activePrice.discounted && activePrice.price === 1400, activePrice);
+    if (mixed.offer && mixed.offer.id) await so.archiveOffer(mixed.offer.id);
   }
 
   /* تنظيف */
