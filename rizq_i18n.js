@@ -400,6 +400,11 @@
       cacheArAttr(el, 'data-ar-title', function () { return el.getAttribute('title') || ''; });
       el.setAttribute('title', isFr ? el.getAttribute('data-fr-title') : el.getAttribute('data-ar-title'));
     });
+    root.querySelectorAll('[data-fr-aria]').forEach(function (el) {
+      cacheArAttr(el, 'data-ar-aria', function () { return el.getAttribute('aria-label') || ''; });
+      var aria = isFr ? el.getAttribute('data-fr-aria') : el.getAttribute('data-ar-aria');
+      if (aria != null) el.setAttribute('aria-label', aria);
+    });
   }
 
   function applyDocumentTitle() {
@@ -439,6 +444,18 @@
       var ns = el.getAttribute('data-t-ns') || defaultNs;
       var val = _t(key, ns);
       if (val) el.title = val;
+    });
+    /* aria-label من مفاتيح القاموس — يمنع بقاء عربية في الوضع الفرنسي */
+    root.querySelectorAll('[data-t-aria]').forEach(function (el) {
+      var key = el.getAttribute('data-t-aria');
+      var ns = el.getAttribute('data-t-ns') || defaultNs;
+      var val = _t(key, ns);
+      if (val) el.setAttribute('aria-label', val);
+    });
+    root.querySelectorAll('a.adminia-ft').forEach(function (el) {
+      if (!el.getAttribute('data-t-title')) el.setAttribute('data-t-title', 'adminia-about-title');
+      var val = _t('adminia-about-title', el.getAttribute('data-t-ns') || defaultNs);
+      if (val) el.setAttribute('title', val);
     });
     applyLegacyBridge(root);
   }

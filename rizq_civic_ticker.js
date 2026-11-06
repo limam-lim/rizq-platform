@@ -103,19 +103,26 @@
 
   function pickText(item) {
     var lang = getLang();
-    /* FR: never fall back to Arabic — that was an i18n leak into the French UI */
-    if (lang === 'fr') return item.textFr || item.text || '';
-    return item.textAr || item.text || item.textFr || '';
+    /* FR: only textFr — no Arabic fallback, no empty placeholder row */
+    if (lang === 'fr') {
+      var fr = String((item && item.textFr) || '').trim();
+      return fr;
+    }
+    return String((item && (item.textAr || item.text || item.textFr)) || '').trim();
   }
 
   function uiText(key, fallback) {
+    var lang = getLang();
     try {
       if (global.RizqI18n && typeof global.RizqI18n.t === 'function') {
         var via = global.RizqI18n.t(key);
         if (via) return via;
       }
     } catch (eT) { /* */ }
-    var lang = getLang();
+    try {
+      var packI18n = lang === 'fr' ? global.RIZQ_I18N_FR : global.RIZQ_I18N_AR;
+      if (packI18n && packI18n.common && packI18n.common[key]) return packI18n.common[key];
+    } catch (eD) { /* */ }
     var pack = (global.LANG && global.LANG[lang]) || {};
     return pack[key] || fallback || '';
   }
@@ -432,6 +439,10 @@
     }, POLL_MS);
   }
 
+  function refreshLang() {
+    try { render(fromCache()); } catch (eR) { /* */ }
+  }
+
   global.RizqCivicTicker = {
     STORAGE_KEY: STORAGE_KEY,
     HIDDEN_KEY: HIDDEN_KEY,
@@ -439,6 +450,7 @@
     render: render,
     apply: applyList,
     reload: init,
+    refreshLang: refreshLang,
     getAll: fromCache,
     isHidden: isStripHidden,
     setHidden: applyHidden,
@@ -473,4 +485,10 @@
   } else {
     init();
   }
+
+  document.addEventListener('rizq:langchange', refreshLang);
+  document.addEventListener('langchange', refreshLang);
+  try {
+    window.addEventListener('rizq:langchange', refreshLang);
+  } catch (eW) { /* */ }
 })(typeof window !== 'undefined' ? window : this);

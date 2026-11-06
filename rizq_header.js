@@ -1836,7 +1836,7 @@
     try {
       if (isDashShell()) return;
       /* يجب أن يطابق MOCK_HDR_V في rizq_pwa.js / روابط HTML — لا تخفيض لإصدار أقدم */
-      var v = '6.01';
+      var v = '6.02';
       var cssWant = 'rizq_header_mockup_trial.css?v=' + v;
       var jsWant = 'rizq_header_mockup_trial.js?v=' + v;
       var l = document.querySelector('link[href*="rizq_header_mockup_trial.css"]');

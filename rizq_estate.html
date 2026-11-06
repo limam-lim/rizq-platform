@@ -900,7 +900,7 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
       <a href="#est-reviews">التقييمات</a>
     </nav>
     <div class="est-top-actions">
-      <button type="button" class="est-wish-chip" id="est-top-wish" onclick="toggleEstateWishPanel()" title="المفضلة" aria-label="المفضلة">
+      <button type="button" class="est-wish-chip" id="est-top-wish" onclick="toggleEstateWishPanel()" data-t-title="est-wish" title="المفضلة" data-t-aria="est-wish" aria-label="المفضلة">
         <span class="est-wish-ico" aria-hidden="true">♡</span>
         <span data-t="est-wish-label">المفضلة</span>
         <span class="est-wish-count" id="est-wish-count">0</span>
@@ -940,7 +940,7 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
 
 <main class="est-mid" id="est-mid">
 <div class="est-wrap">
-  <div class="est-agency-bar" aria-label="تواصل مع الوكالة">
+  <div class="est-agency-bar" data-t-aria="est-agency-bar-aria" aria-label="تواصل مع الوكالة">
     <div class="est-agency-bar-id">
       <div>
         <strong id="est-bar-name">وكالة أطوار العقارية</strong>
@@ -1036,35 +1036,35 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
           <p>شقق وفلل وأراضي ومحلات — افتح أي عرض بزر «عرض التفاصيل» للاطلاع على الوصف والتواصل مع الوكالة.</p>
         </div>
         <div class="est-listings-wish-row">
-          <button type="button" class="est-wish-chip" id="est-listings-wish" onclick="toggleEstateWishPanel()" title="المفضلة" aria-label="المفضلة">
+          <button type="button" class="est-wish-chip" id="est-listings-wish" onclick="toggleEstateWishPanel()" data-t-title="est-wish" title="المفضلة" data-t-aria="est-wish" aria-label="المفضلة">
             <span class="est-wish-ico" aria-hidden="true">♡</span>
             <span data-t="est-wish-label">المفضلة</span>
             <span class="est-wish-count">0</span>
           </button>
         </div>
         <div class="est-search-panel" id="est-search-panel">
-          <form class="est-search" id="est-search" role="search" aria-label="بحث العقارات">
+          <form class="est-search" id="est-search" role="search" data-t-aria="est-search-aria" aria-label="بحث العقارات">
             <label>
               <span>الولاية</span>
-              <select id="est-wilaya" name="wilaya" aria-label="الولاية">
+              <select id="est-wilaya" name="wilaya" data-t-aria="est-wilaya-aria" aria-label="الولاية">
                 <option value="">كل الولايات</option>
               </select>
             </label>
             <label>
               <span>المدينة</span>
-              <select id="est-city" name="city" aria-label="المدينة" disabled>
+              <select id="est-city" name="city" data-t-aria="est-city-aria" aria-label="المدينة" disabled>
                 <option value="">كل المدن</option>
               </select>
             </label>
             <label>
               <span>الحي أو المنطقة</span>
-              <select id="est-quartier" name="quartier" aria-label="الحي أو المنطقة" disabled>
+              <select id="est-quartier" name="quartier" data-t-aria="est-quartier-aria" aria-label="الحي أو المنطقة" disabled>
                 <option value="">كل الأحياء</option>
               </select>
             </label>
             <label>
               <span>نوع العقار</span>
-              <select id="est-cat" name="cat" aria-label="نوع العقار">
+              <select id="est-cat" name="cat" data-t-aria="est-cat-aria" aria-label="نوع العقار">
                 <option value="all">الكل</option>
                 <option value="apartment">شقق</option>
                 <option value="villa">فلل ومنازل</option>
@@ -1074,7 +1074,7 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
             </label>
             <label>
               <span>للبيع أو الكراء</span>
-              <select id="est-deal" name="deal" aria-label="للبيع أو الكراء">
+              <select id="est-deal" name="deal" data-t-aria="est-deal-aria" aria-label="للبيع أو الكراء">
                 <option value="all">الكل</option>
                 <option value="sale">للبيع</option>
                 <option value="rent">للكراء</option>
@@ -1095,16 +1095,16 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
         </div>
       </div>
       <div class="est-rail-wrap">
-        <div class="est-rail" id="est-rail" aria-label="معرض صور العقارات"></div>
+        <div class="est-rail" id="est-rail" data-t-aria="est-rail-aria" aria-label="معرض صور العقارات"></div>
       </div>
 
-      <section class="est-svc-card" id="est-desk" aria-label="استفسار عقاري" style="margin-top:22px">
+      <section class="est-svc-card" id="est-desk" data-t-aria="est-desk-aria" aria-label="استفسار عقاري" style="margin-top:22px">
         <h3 id="est-desk-title" data-desk="title">📩 استفسار عن عقار</h3>
         <p class="est-svc-sub" id="est-desk-hint" data-desk="hint">اترك بياناتك وسنتواصل معك بخصوص المعاينة أو العرض.</p>
         <form class="est-desk-fields" id="est-req-form" novalidate>
           <input id="est-rf-name" name="name" type="text" autocomplete="name" placeholder="الاسم الكامل *" required/>
           <input id="est-rf-phone" name="phone" type="tel" autocomplete="tel" dir="ltr" placeholder="رقم الهاتف / واتساب *" required/>
-          <select id="est-rf-interest" name="interest" aria-label="نوع الطلب">
+          <select id="est-rf-interest" name="interest" data-t-aria="est-interest-aria" aria-label="نوع الطلب">
             <option value="visit">طلب معاينة</option>
             <option value="buy">استفسار شراء</option>
             <option value="rent">استفسار كراء</option>
@@ -1118,14 +1118,14 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
         </form>
       </section>
 
-      <section class="est-reviews" id="est-reviews" aria-label="تقييمات العملاء">
+      <section class="est-reviews" id="est-reviews" data-t-aria="est-reviews-aria" aria-label="تقييمات العملاء">
         <div class="est-section-head" style="text-align:start;margin-top:28px">
           <div class="tag">آراء العملاء</div>
           <h2>التقييمات والآراء</h2>
           <p>آراء عملاء تعاملوا مع الوكالة في البيع والكراء والمعاينة.</p>
         </div>
         <div class="est-reviews-summary">
-          <div class="est-reviews-score"><b id="est-rev-avg">—</b><span>من 5</span></div>
+          <div class="est-reviews-score"><b id="est-rev-avg">—</b><span data-t="rating-of-5">من 5</span></div>
           <div class="est-reviews-stars" id="est-rev-stars" aria-hidden="true">☆☆☆☆☆</div>
           <div class="est-reviews-count" id="est-rev-count">0 تقييم</div>
         </div>
@@ -1202,7 +1202,7 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
         <div class="est-pd-nearby" id="est-pd-nearby"></div>
       </div>
       <div class="est-pd-cta" id="est-pd-cta">
-        <button type="button" class="est-pd-wish" id="est-modal-wish" data-wish-id="">♡ المفضلة</button>
+        <button type="button" class="est-pd-wish" id="est-modal-wish" data-wish-id=""><span data-t="est-wish">♡ المفضلة</span></button>
         <button type="button" class="est-btn est-btn-visit" id="est-modal-visit">📅 حجز معاينة ميدانية</button>
         <a class="est-btn est-wa" id="est-modal-wa" href="https://wa.me/22242000111" target="_blank" rel="noopener">💬 تواصل واتساب مباشر</a>
         <button type="button" class="est-btn est-btn-quote" id="est-modal-quote">💬 طلب عرض سعر / تفاوض</button>
@@ -2154,7 +2154,7 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
     var bits = [];
     if(item.cat === 'land'){
       bits.push('<span>📐 '+esc(areaLabel(item.area, fr))+'</span>');
-      if(item.land && item.land.frontage) bits.push('<span>📏 '+(fr?'Façade ':'واجهة ')+esc(item.land.frontage)+' م</span>');
+      if(item.land && item.land.frontage) bits.push('<span>📏 '+(fr?'Façade ':'واجهة ')+esc(item.land.frontage)+(fr?' m':' م')+'</span>');
       if(item.land && item.land.zoning) bits.push('<span>🏷 '+esc(fr ? (item.land.zoningFr || item.land.zoning) : item.land.zoning)+'</span>');
       if(item.land && item.land.deed) bits.push('<span>📄 '+esc(item.land.deed)+'</span>');
       return bits.join('');
@@ -3067,7 +3067,31 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
     if(labs[2]) labs[2].textContent = fr ? 'Quartier' : 'الحي أو المنطقة';
     if(labs[3]) labs[3].textContent = fr ? 'Type de bien' : 'نوع العقار';
     if(labs[4]) labs[4].textContent = fr ? 'Vente ou location' : 'للبيع أو الكراء';
+    var ariaMap = [
+      ['est-wilaya', 'الولاية', 'Wilaya'],
+      ['est-city', 'المدينة', 'Ville'],
+      ['est-quartier', 'الحي أو المنطقة', 'Quartier'],
+      ['est-cat', 'نوع العقار', 'Type de bien'],
+      ['est-deal', 'للبيع أو الكراء', 'Vente ou location'],
+      ['est-search', 'بحث العقارات', 'Recherche immobilière'],
+      ['est-rail', 'معرض صور العقارات', 'Galerie photos immobilières'],
+      ['est-desk', 'استفسار عقاري', 'Demande immobilière'],
+      ['est-rf-interest', 'نوع الطلب', 'Type de demande'],
+      ['est-reviews', 'تقييمات العملاء', 'Avis clients']
+    ];
+    ariaMap.forEach(function(row){
+      var el = document.getElementById(row[0]);
+      if(el) el.setAttribute('aria-label', fr ? row[2] : row[1]);
+    });
+    document.querySelectorAll('.est-agency-bar,[data-t-aria="est-agency-bar-aria"]').forEach(function(el){
+      el.setAttribute('aria-label', fr ? 'Contacter l\'agence' : 'تواصل مع الوكالة');
+    });
+    var of5 = document.querySelector('[data-t="rating-of-5"]');
+    if(of5) of5.textContent = fr ? 'sur 5' : 'من 5';
     syncGeoSelects();
+    ['est-wilaya','est-city','est-quartier','est-cat','est-deal'].forEach(function(id){
+      syncEstDdFromSelect(document.getElementById(id));
+    });
     var catSelLang = document.getElementById('est-cat');
     if(catSelLang && catSelLang.options){
       Array.prototype.forEach.call(catSelLang.options, function(opt){
@@ -3330,10 +3354,10 @@ html[dir="ltr"] .est-wish-btn{left:auto;right:10px}
 })();
 </script>
 <link rel="stylesheet" href="rizq_header.css?v=31.6"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=6.01"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=6.02"/>
 <script>document.documentElement.classList.add('rizq-app-nav')</script>
 <script src="rizq_header.js?v=31.37" defer></script>
-<script src="rizq_header_mockup_trial.js?v=6.01" defer></script>
+<script src="rizq_header_mockup_trial.js?v=6.02" defer></script>
 <script src="rizq_pwa.js?v=31.37" defer></script>
 </body>
 </html>
