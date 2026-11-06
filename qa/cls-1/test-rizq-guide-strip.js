@@ -68,11 +68,13 @@ function startStatic() {
   const civicJs = fs.readFileSync(path.join(ROOT, 'rizq_civic_ticker.js'), 'utf8');
 
   ok('guide section markup present', /id="rizq-guide"/.test(landing));
-  ok('live strip «ما في» + badge (no duplicate أحدث)',
-    /id="rizq-guide-live-sub">ما في/.test(landing)
+  ok('live strip uses i18n keys (guide-in + topic; no hardcoded AR in markup)',
+    /id="rizq-guide-live-sub"/.test(landing)
+    && /data-t="guide-in"/.test(landing)
+    && /data-t="guide-live"/.test(landing)
+    && /id="rizq-guide-topic"/.test(landing)
     && !/id="rizq-guide-live-sub">أحدث ما في/.test(landing)
-    && /id="rizq-guide-live"/.test(landing)
-    && /id="rizq-guide-topic"/.test(landing));
+    && !/id="rizq-guide-live-sub">ما في/.test(landing));
   ok('removed gold guide eyebrow + hero title + choose-section copy',
     !/اكتشف رزق من أول نظرة/.test(landing)
     && !/اختر القسم واكتشف عروضه/.test(landing)
@@ -101,21 +103,24 @@ function startStatic() {
     && /prefers-reduced-motion/.test(guideJs)
     && /lockStageHeight/.test(guideJs)
     && /--rizq-guide-stage-h/.test(guideJs));
-  ok('FR live topic copy (dans … without Récent duplicate)',
-    /innerHTML = 'dans <strong class="rizq-guide-topic"/.test(guideJs)
-    && !/Le plus récent dans/.test(guideJs)
-    && /innerHTML = 'ما في <strong class="rizq-guide-topic"/.test(guideJs)
-    && !/innerHTML = 'أحدث ما في/.test(guideJs));
+  ok('live topic built from i18n keys (guide-in / guide-topic-*)',
+    /t\('guide-in'\)/.test(guideJs)
+    && /TOPIC_KEYS/.test(guideJs)
+    && /guide-topic-styles/.test(guideJs)
+    && !/innerHTML = 'ما في/.test(guideJs)
+    && !/innerHTML = 'أحدث ما في/.test(guideJs)
+    && !/Le plus récent dans/.test(guideJs));
   ok('builders accept optMountId overrides',
     /function buildStyleIdeas\(reshuffle, optMountId, optGender\)/.test(landing)
     && /function buildShowroomModels\(reshuffle, optMountId, optCat\)/.test(landing)
     && /function buildEstateModels\(reshuffle, optMountId, optCat\)/.test(landing));
   ok('equal styles mosaic CSS', /#rizq-styles \.rizq-style-mosaic[\s\S]*repeat\(3,1fr\)/.test(landing));
   ok('store display name helper', /function _styCardStoreName/.test(landing));
-  ok('ticker never-empty helpers',
+  ok('ticker never-empty helpers (i18n key, no hardcoded AR invite)',
     /ensureTickerNotEmpty/.test(civicJs)
     && /RizqTickerNeverEmpty/.test(civicJs)
-    && /كن أول من ينشر إعلانه على رزق/.test(civicJs));
+    && /ticker-invite-msg/.test(civicJs)
+    && !/كن أول من ينشر إعلانه على رزق/.test(civicJs));
 
   const heroAds = landing.indexOf('id="hero-listings"');
   const guide = landing.indexOf('id="rizq-guide"');

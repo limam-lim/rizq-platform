@@ -694,7 +694,7 @@ html[dir="ltr"] .sr-wish-btn{left:auto;right:10px}
 </div>
 
 <!-- روابط أقسام المعرض — لا تُخفى مع topnav على الجوال -->
-<div class="page-sec-strip" role="navigation" aria-label="أقسام المعرض">
+<div class="page-sec-strip" role="navigation" data-t-aria="showroom-sections-aria" aria-label="أقسام المعرض">
   <div class="page-sec-strip-inner">
     <button type="button" class="page-sec-btn" onclick="rizqScroll('catalog-section')" id="sec-catalog-lbl">📦 الكتالوج</button>
     <button type="button" class="page-sec-btn" onclick="rizqScroll('about-section')" id="sec-about-lbl">من نحن</button>
@@ -790,7 +790,7 @@ html[dir="ltr"] .sr-wish-btn{left:auto;right:10px}
           </div>
         </div>
         <div style="margin-top:14px">
-          <div class="map-placeholder" id="showroom-map-preview" onclick="openMaps()" role="button" tabindex="0" aria-label="عرض على الخريطة">
+          <div class="map-placeholder" id="showroom-map-preview" onclick="openMaps()" role="button" tabindex="0" data-t-aria="map-preview-aria" aria-label="عرض على الخريطة">
             <div class="map-icon">🗺️</div>
             <div class="map-text" id="map-text-lbl">عرض على الخريطة</div>
             <div class="map-addr" id="info-city-lbl">نواكشوط، موريتانيا</div>
@@ -817,7 +817,7 @@ html[dir="ltr"] .sr-wish-btn{left:auto;right:10px}
 
     <!-- غرفة الطلبات بعد التعريف والموقع والساعات -->
     <div class="showroom-under-band" id="showroom-under-band">
-      <section class="info-card showroom-desk-hz" id="showroom-service-desk" style="border-top:3px solid var(--gold);display:flex!important" aria-label="غرفة الطلبات">
+      <section class="info-card showroom-desk-hz" id="showroom-service-desk" style="border-top:3px solid var(--gold);display:flex!important" data-t-aria="desk-aria" aria-label="غرفة الطلبات">
         <div class="showroom-desk-eyebrow" id="sr-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
         <div class="info-card-title" data-desk="title" id="sr-req-title" style="margin-bottom:4px;padding-bottom:0;border-bottom:none">📩 طلب من المعرض</div>
         <p class="showroom-desk-hint" data-desk="hint" id="sr-req-hint">أدخل اسمك ورقم هاتفك — بياناتك تصل للمعرض مباشرة. يمكنك رفع بيان الدفع (صورة أو PDF) على المنصة.</p>
@@ -875,7 +875,7 @@ html[dir="ltr"] .sr-wish-btn{left:auto;right:10px}
       </div>
 
       <!-- التقييمات بجانب غرفة الطلبات (تابلت/كمبيوتر عبر grid-area) -->
-      <section class="showroom-reviews-hz" id="reviews-section" aria-label="تقييمات الزبائن">
+      <section class="showroom-reviews-hz" id="reviews-section" data-t-aria="reviews-aria" aria-label="تقييمات الزبائن">
         <div class="info-card-title" style="margin-bottom:10px" id="reviews-title-lbl">⭐ تقييمات الزبائن</div>
         <div class="showroom-reviews-inner">
           <div class="showroom-reviews-summary">
@@ -1003,7 +1003,7 @@ html[dir="ltr"] .sr-wish-btn{left:auto;right:10px}
   </div>
   <div class="footer-bottom">
     <p class="footer-copy" id="ft-copy">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</p>
-    <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" title="ADMINIA SARL — التعريف بالشركة / À propos"><div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#C9A84C;letter-spacing:2px;font-family:sans-serif">AML</div>
+    <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" data-t-title="adminia-about-title" title="ADMINIA SARL — التعريف بالشركة / À propos"><div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#C9A84C;letter-spacing:2px;font-family:sans-serif">AML</div>
       <div>
         <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:2px;font-family:Georgia,serif;line-height:1">ADMINIA <span style="color:#C9A84C">SARL</span></div>
         <div style="font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:1.5px;margin-top:3px">POWERED BY <span style="color:rgba(201,168,76,0.7);font-weight:700">M. LIMAM</span></div>

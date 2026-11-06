@@ -37,7 +37,7 @@
     if (document.querySelector('link[href*="rizq_header_mockup_trial.css"]')) return;
     var link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = 'rizq_header_mockup_trial.css?v=6.01';
+    link.href = 'rizq_header_mockup_trial.css?v=6.02';
     (document.head || document.documentElement).appendChild(link);
   }
 
@@ -588,6 +588,21 @@
     closeCart();
 
     hdr.setAttribute('aria-label', tMock('شريط رزق', 'Barre Rizq'));
+    var tickerWrap = document.getElementById('ticker-wrap');
+    if (tickerWrap) {
+      var inviteAria = tMock('دعوة للنشر على رزق', 'Invitation à publier sur Rizq');
+      var civicAria = tMock('إعلانات خدمة عامة', 'Annonces de service public');
+      tickerWrap.setAttribute(
+        'aria-label',
+        tickerWrap.classList.contains('is-invite') ? inviteAria : civicAria
+      );
+      var inviteSpan = tickerWrap.querySelector('.ticker-invite span[data-fr], .ticker-invite span[data-ar]');
+      if (inviteSpan) {
+        var arMsg = inviteSpan.getAttribute('data-ar') || 'كن أول من ينشر إعلانه على رزق';
+        var frMsg = inviteSpan.getAttribute('data-fr') || 'Soyez le premier à publier votre annonce sur Rizq';
+        inviteSpan.textContent = fr ? frMsg : arMsg;
+      }
+    }
     hdr.querySelectorAll('nav.rmh-nav').forEach(function (navEl) {
       navEl.setAttribute('dir', wantDir);
       navEl.setAttribute('aria-label', tMock('أقسام رزق', 'Rubriques Rizq'));

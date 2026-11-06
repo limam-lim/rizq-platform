@@ -21,7 +21,7 @@
 <link rel="preload" href="fonts/cairo-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/cairo.css?v=1.1"/>
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=6.01"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=6.02"/>
 <link rel="stylesheet" href="rizq_ad_cards.css?v=27.6"/>
 <link rel="stylesheet" href="rizq_product_detail.css?v=29.0"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.6"/>
@@ -1521,7 +1521,7 @@ footer{
       </div>
     </div>
   </div>
-  <div class="hero-videos" id="store-hero-videos" aria-label="فيديوهات المحل">
+  <div class="hero-videos" id="store-hero-videos" data-t-aria="store-hero-videos-aria" aria-label="فيديوهات المحل">
     <div class="hero-video-card hero-video-card--intro" id="hero-intro-card" style="display:none">
       <div class="hero-video-mount" id="hero-intro-video-mount"></div>
     </div>
@@ -1613,7 +1613,7 @@ footer{
           <div><div class="info-label" data-t="info-label-email">البريد الإلكتروني</div><div class="info-value"><span id="info-value-email-el" class="rzq-contact-masked" onclick="rizqRequireAuth(function(){document.getElementById('info-value-email-el').classList.add('shown')},'reasonGeneric')">—</span></div></div>
         </div>
         <div style="margin-top:14px">
-          <div class="map-placeholder" id="store-map-preview" onclick="openMaps()" role="button" tabindex="0" aria-label="عرض على الخريطة">
+          <div class="map-placeholder" id="store-map-preview" onclick="openMaps()" role="button" tabindex="0" data-t-aria="map-preview-aria" aria-label="عرض على الخريطة">
             <div class="map-icon">🗺️</div>
             <div class="map-text" data-t="map-text">عرض على الخريطة</div>
             <div class="map-addr" id="map-addr-el">—</div>
@@ -1700,9 +1700,9 @@ footer{
 
     <!-- تحت المنتجات بجانب الشريط: غرفة الطلبات (1) | التقييمات (2) — يملآن الفراغ الأبيض -->
     <div class="store-under-band" id="store-under-band">
-      <section class="info-card store-desk-hz" id="store-service-desk" style="border-top:3px solid var(--gold);display:flex!important" aria-label="غرفة الطلبات">
+      <section class="info-card store-desk-hz" id="store-service-desk" style="border-top:3px solid var(--gold);display:flex!important" data-t-aria="desk-aria" aria-label="غرفة الطلبات">
         <div class="store-desk-head">
-          <div class="store-desk-eyebrow">SERVICE DESK · غرفة الطلبات</div>
+          <div class="store-desk-eyebrow"><span data-t="desk-eyebrow">SERVICE DESK · غرفة الطلبات</span></div>
           <div class="info-card-title" data-desk="title" id="store-req-title" style="margin-bottom:0;padding-bottom:0;border-bottom:none">📩 طلب من المحل</div>
           <p class="store-desk-hint" data-desk="hint" id="store-req-hint">أدخل اسمك ورقم هاتفك وسيتواصل معك المحل مباشرة.</p>
         </div>
@@ -1753,7 +1753,7 @@ footer{
         </div>
       </section>
 
-      <section class="store-reviews-hz" id="reviews-section" aria-label="تقييمات الزبائن">
+      <section class="store-reviews-hz" id="reviews-section" data-t-aria="reviews-aria" aria-label="تقييمات الزبائن">
         <div class="info-card-title" data-t="reviews-title">⭐ تقييمات الزبائن</div>
         <div class="store-reviews-inner">
           <div class="store-reviews-summary">
@@ -2201,7 +2201,7 @@ function rizqShare(title, url) {
   </div>
   <div class="footer-bottom">
     <p class="footer-copy" id="rzq-ft-copy">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</p>
-    <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" title="ADMINIA SARL — التعريف بالشركة / À propos"><div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#C9A84C;letter-spacing:2px;font-family:sans-serif">AML</div>
+    <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" data-t-title="adminia-about-title" title="ADMINIA SARL — التعريف بالشركة / À propos"><div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#C9A84C;letter-spacing:2px;font-family:sans-serif">AML</div>
       <div>
         <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:2px;font-family:Georgia,serif;line-height:1">ADMINIA <span style="color:#C9A84C">SARL</span></div>
         <div style="font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:1.5px;margin-top:3px">POWERED BY <span style="color:rgba(201,168,76,0.7);font-weight:700">M. LIMAM</span></div>

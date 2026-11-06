@@ -18,7 +18,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="rizq-theme.css?v=23.1"/>
 <link rel="stylesheet" href="rizq_header.css?v=31.8"/>
-<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=6.01"/>
+<link rel="stylesheet" href="rizq_header_mockup_trial.css?v=6.02"/>
 <link rel="stylesheet" href="rizq_close_band.css?v=1"/>
 <link rel="stylesheet" href="rizq_mobile.css?v=29.6"/>
 <link rel="preload" href="rizq_header.js?v=31.37" as="script"/>
@@ -1050,7 +1050,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
       </div>
     </div>
   </div>
-  <div class="hero-videos" id="office-hero-videos" aria-label="فيديوهات المكتب">
+  <div class="hero-videos" id="office-hero-videos" data-t-aria="office-hero-videos-aria" aria-label="فيديوهات المكتب">
     <div class="hero-video-card hero-video-card--intro" id="office-hero-intro-card" style="display:none">
       <div class="hero-video-mount" id="office-hero-intro-video-mount"></div>
     </div>
@@ -1092,7 +1092,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
   </div>
 </div>
 
-<div class="page-sec-strip" role="navigation" aria-label="أقسام المكتب">
+<div class="page-sec-strip" role="navigation" data-t-aria="office-sections-aria" aria-label="أقسام المكتب">
   <div class="page-sec-strip-inner">
     <button type="button" class="page-sec-btn" id="sec-services-btn" data-t="sec-services-btn" onclick="document.getElementById('svc-section')&&document.getElementById('svc-section').scrollIntoView({behavior:'smooth'})">🛡️ الخدمات</button>
     <button type="button" class="page-sec-btn" id="sec-about-btn" data-t="sec-about-btn" onclick="document.getElementById('about-section')&&document.getElementById('about-section').scrollIntoView({behavior:'smooth'})">عن المكتب</button>
@@ -1150,7 +1150,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
         </div>
       </div>
       <div style="margin-top:14px">
-        <div class="map-placeholder" id="office-map-preview" onclick="openMaps()" role="button" tabindex="0" aria-label="عرض على الخريطة">
+        <div class="map-placeholder" id="office-map-preview" onclick="openMaps()" role="button" tabindex="0" data-t-aria="map-preview-aria" aria-label="عرض على الخريطة">
           <div style="font-size:22px">🗺️</div>
           <div style="font-size:14px;font-weight:700;color:var(--teal)" id="map-addr" data-t="map-addr">—</div>
           <div style="font-size:12px;color:var(--muted)" id="map-hint" data-t="map-hint">انقر لفتح الخريطة</div>
@@ -1217,11 +1217,11 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
           <div style="font-size:10.5px;color:var(--muted);margin-top:6px" id="calc-note" data-t="calc-note">تقدير أولي فقط وليس عرض سعر نهائي — التأكيد يتم من المكتب مباشرة</div>
           <button class="req-btn" style="margin-top:10px;width:100%" onclick="calcToRequest()" id="calc-req-btn" data-t="calc-req-btn">② التالي — أدخل اسمك ورقم هاتفك</button>
           <div id="office-fulfill-calc" style="margin-top:10px;text-align:right">
-            <div style="font-size:11px;font-weight:800;color:var(--navy);margin-bottom:6px">كيف ستتم الخدمة؟</div>
+            <div style="font-size:11px;font-weight:800;color:var(--navy);margin-bottom:6px"><span data-t="office-fulfill-q">كيف ستتم الخدمة؟</span></div>
             <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end">
-              <button type="button" class="office-fulfill-opt" data-fulfill="bank" onclick="selectOfficeFulfill('bank')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer">تحويل بنكي</button>
-              <button type="button" class="office-fulfill-opt" data-fulfill="pickup" onclick="selectOfficeFulfill('pickup')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer">استلام بالمكتب</button>
-              <button type="button" class="office-fulfill-opt" data-fulfill="delivery" onclick="selectOfficeFulfill('delivery')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer">زيارة / متابعة</button>
+              <button type="button" class="office-fulfill-opt" data-fulfill="bank" onclick="selectOfficeFulfill('bank')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer" data-t="office-fulfill-bank">تحويل بنكي</button>
+              <button type="button" class="office-fulfill-opt" data-fulfill="pickup" onclick="selectOfficeFulfill('pickup')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer" data-t="office-fulfill-pickup">استلام بالمكتب</button>
+              <button type="button" class="office-fulfill-opt" data-fulfill="delivery" onclick="selectOfficeFulfill('delivery')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer" data-t="office-fulfill-visit">زيارة / متابعة</button>
             </div>
           </div>
           <button type="button" class="rizq-prf-trigger-gold" style="margin-top:8px;width:100%;display:none" hidden onclick="issueOfficePrefactureFromCalc()" id="calc-prf-btn" data-t="calc-prf-btn">PREFACTUR · فاتورة قبل</button>
@@ -1231,7 +1231,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
 
     <!-- غرفة الطلبات + التقييمات — أفقيان تحت الخدمات بنفس ترتيب المحل -->
     <div class="office-under-band" id="office-under-band">
-      <section class="req-box office-desk-hz" id="office-service-desk" aria-label="غرفة الطلبات">
+      <section class="req-box office-desk-hz" id="office-service-desk" data-t-aria="desk-aria" aria-label="غرفة الطلبات">
         <div class="desk-step" id="desk-step-lbl" data-t="desk-step-lbl">② الخطوة 2 — بياناتك للتواصل</div>
         <div class="office-desk-eyebrow" id="desk-brand-eyebrow" data-t="desk-brand-eyebrow">SERVICE DESK · غرفة الطلبات</div>
         <div id="req-title" data-desk="title" data-t="req-title">📩 طلب خدمة</div>
@@ -1285,11 +1285,11 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
             </div>
             <button type="button" class="req-btn rzq-desk-submit" onclick="submitReq()" id="req-submit-btn" data-t="req-submit-btn">📤 إرسال الطلب للمكتب</button>
             <div id="office-fulfill-req" style="margin-top:8px;text-align:right">
-              <div style="font-size:11px;font-weight:800;color:var(--navy);margin-bottom:6px">كيف ستتم الخدمة؟</div>
+              <div style="font-size:11px;font-weight:800;color:var(--navy);margin-bottom:6px"><span data-t="office-fulfill-q">كيف ستتم الخدمة؟</span></div>
               <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end">
-                <button type="button" class="office-fulfill-opt" data-fulfill="bank" onclick="selectOfficeFulfill('bank')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer">تحويل بنكي</button>
-                <button type="button" class="office-fulfill-opt" data-fulfill="pickup" onclick="selectOfficeFulfill('pickup')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer">استلام بالمكتب</button>
-                <button type="button" class="office-fulfill-opt" data-fulfill="delivery" onclick="selectOfficeFulfill('delivery')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer">زيارة / متابعة</button>
+                <button type="button" class="office-fulfill-opt" data-fulfill="bank" onclick="selectOfficeFulfill('bank')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer" data-t="office-fulfill-bank">تحويل بنكي</button>
+                <button type="button" class="office-fulfill-opt" data-fulfill="pickup" onclick="selectOfficeFulfill('pickup')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer" data-t="office-fulfill-pickup">استلام بالمكتب</button>
+                <button type="button" class="office-fulfill-opt" data-fulfill="delivery" onclick="selectOfficeFulfill('delivery')" style="padding:7px 10px;border-radius:9px;border:1.5px solid #d5deea;background:#fff;font:700 11.5px Cairo,sans-serif;color:#1B3A6B;cursor:pointer" data-t="office-fulfill-visit">زيارة / متابعة</button>
               </div>
             </div>
             <button type="button" class="rizq-prf-trigger" style="display:none" hidden onclick="issueOfficePrefactureFromRequest()" id="req-prf-btn" data-t="req-prf-btn">PREFACTUR · فاتورة قبل</button>
@@ -1297,7 +1297,7 @@ window._pageSellerName = document.querySelector('.office-name,.biz-name,h1')?.te
         </div>
       </section>
 
-      <section class="office-reviews-hz" id="reviews-section" aria-label="آراء الزبائن">
+      <section class="office-reviews-hz" id="reviews-section" data-t-aria="office-reviews-aria" aria-label="آراء الزبائن">
         <div class="section-head">
           <div class="section-bar"></div>
           <div class="section-ttl" id="reviews-section-ttl" data-t="reviews-section-ttl">آراء الزبائن</div>
@@ -3003,7 +3003,7 @@ window._rizqProfile = (function() {
   </div>
   <div class="footer-bottom">
     <p class="footer-copy" id="rzq-ft-copy">© 2026 رزق | Rizq — جميع الحقوق محفوظة 🇲🇷</p>
-    <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" title="ADMINIA SARL — التعريف بالشركة / À propos"><div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#C9A84C;letter-spacing:2px;font-family:sans-serif">AML</div>
+    <a href="rizq_about.html" class="adminia-ft" style="text-decoration:none;color:inherit;cursor:pointer;display:flex;align-items:center;gap:12px;padding:10px 20px;background:rgba(255,255,255,0.03);border:1px solid rgba(201,168,76,0.16);border-radius:12px" data-t-title="adminia-about-title" title="ADMINIA SARL — التعريف بالشركة / À propos"><div style="width:34px;height:34px;border-radius:9px;border:1.5px solid rgba(201,168,76,0.5);background:#0d0a04;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:700;color:#C9A84C;letter-spacing:2px;font-family:sans-serif">AML</div>
       <div>
         <div style="font-size:13px;font-weight:700;color:#fff;letter-spacing:2px;font-family:Georgia,serif;line-height:1">ADMINIA <span style="color:#C9A84C">SARL</span></div>
         <div style="font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:1.5px;margin-top:3px">POWERED BY <span style="color:rgba(201,168,76,0.7);font-weight:700">M. LIMAM</span></div>
