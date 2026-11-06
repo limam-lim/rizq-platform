@@ -179,7 +179,7 @@ body.rizq-mockup-hdr-trial #rizq-mock-hdr .ticker-wrap.is-invite,
   } catch (e) {}
 })();
 </script>
-<link rel="stylesheet" href="rizq_header.css?v=31.8"/>
+<link rel="stylesheet" href="rizq_header.css?v=31.9"/>
 <link rel="stylesheet" href="rizq_header_mockup_trial.css?v=6.01"/>
 <script>
 document.documentElement.classList.add('rizq-app-nav');
@@ -5594,7 +5594,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 <script src="rizq_dynamic_nav.js?v=23.5"></script>
 <script src="rizq_module_flags.js?v=1.2"></script>
 <script src="rizq_pwa.js?v=31.37" defer></script>
-<script src="rizq_footer_toggle.js?v=23.8" defer></script>
+<script src="rizq_footer_toggle.js?v=23.9" defer></script>
 <script src="rizq_social_links.js?v=23.13" defer></script>
 <script src="rizq_account_route.js?v=23.0"></script>
 <script src="rizq_auth_gate.js?v=23.0" defer></script>
@@ -16903,12 +16903,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape')closeRizqPro
     </div>
   </div>
 </div>
-<!-- إصلاح: عنوان الخادم أصبح مضبوطاً من ملف مشترك واحد (rizq_backend_config.js)
-     بدل تكراره داخل كل صفحة على حدة — راجع تعليقات ذلك الملف للتفاصيل. -->
-<script src="rizq_backend_config.js"></script>
-<script src="rizq_phone_utils.js?v=1.0"></script>
-<script src="rizq_verification_policy.js"></script>
-<script src="rizq_contact_gate.js"></script>
+<!-- backend/phone/verification/contact محمّلة مرة في الرأس — لا تكرار هنا -->
 <script>
 // ══ الفيديو الإعلاني للزوار — يقرأ إعدادات حقيقية من rizq-backend (لا بيانات وهمية) ══
 
@@ -17146,11 +17141,8 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeR
 </script>
 <!-- ═══════════════════════════════════════════════
      مدير رزق الذكي — ويدجت موحّد (محرك المعرفة + الواجهة)
+     packages* محمّلة مرة في الرأس — لا تكرار هنا
      ═══════════════════════════════════════════════ -->
-<script src="rizq_packages_config.js?v=23.0"></script>
-<script src="rizq_packages_ui.js?v=23.0"></script>
-<script src="rizq_merchant_activities.js?v=23.0"></script>
-<script src="rizq_activity_select.js?v=23.0"></script>
 <script src="rizq_video_ads.js?v=promo22"></script>
 <script src="rizq_widget_markdown.js"></script>
 <script src="rizq_landing_ux.js?v=24.1"></script>

@@ -108,7 +108,7 @@
     if (!document.querySelector('link[href*="fonts/cairo.css"], link[href*="cairo.css"]')) {
       var fontLink = document.createElement('link');
       fontLink.rel = 'stylesheet';
-      fontLink.href = 'fonts/cairo.css?v=1.0';
+      fontLink.href = 'fonts/cairo.css?v=1.1';
       document.head.appendChild(fontLink);
     }
     if (!document.querySelector('link[rel="stylesheet"][href*="rizq-theme.css"]')) {

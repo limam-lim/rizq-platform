@@ -374,7 +374,7 @@
     } catch (e) {}
     if (document.querySelector('script[src*="rizq_social_links.js"]')) return;
     var s = document.createElement('script');
-    s.src = 'rizq_social_links.js?v=23.12';
+    s.src = 'rizq_social_links.js?v=23.13';
     s.defer = true;
     (document.head || document.documentElement).appendChild(s);
   }
