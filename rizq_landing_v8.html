@@ -18,21 +18,63 @@
         html.lang = 'ar'; html.dir = 'rtl';
         html.classList.add('rizq-lang-ar'); html.classList.remove('rizq-lang-fr');
       }
-      /* إخفاء الطلاء حتى تُطبَّق نصوص اللغة — يُرفع في applyLandingLang */
+      /* إخفاء نصوص اللغة فقط (لا الصفحة) حتى applyLandingLang — يُرفع هناك أو بعد 1500ms */
       html.classList.add('rizq-lang-booting');
+      setTimeout(function () {
+        try {
+          if (html.classList.contains('rizq-lang-booting')) {
+            html.classList.remove('rizq-lang-booting');
+            html.classList.add('rizq-lang-ready');
+          }
+        } catch (eT) { /* */ }
+      }, 1500);
     } catch (e) {}
   })();
   </script>
   <meta charset="UTF-8"/>
   <style id="rizq-lang-boot-guard">
-  /* لا طلاء خاطئ باللغة الافتراضية قبل applyLandingLang */
-  html.rizq-lang-booting body{opacity:0}
-  html.rizq-lang-ready body{opacity:1}
+  /*
+   * إخفاء نصوص اللغة فقط — لا body/opacity على الصفحة (يحافظ على FCP/LCP).
+   * مساحة العناصر تبقى محجوزة (visibility) لتفادي CLS.
+   * fallback: animation بعد 1.5s يظهر النص حتى لو فشل JS.
+   */
+  html.rizq-lang-booting :is(
+    [data-t],[data-t-fr],[data-t-aria],[data-ph-fr],
+    .live-label-sub,.live-capsule-txt,.hero-title,.hero-headline,.hero-subtitle-primary,.hero-subtitle-secondary,
+    .hero-eyebrow,.section-tag,.section-title,.section-desc,.btn-lang,.btn-lang-primary,
+    .rmh-post-nav,.rizq-phone-ltr .rmh-lbl,#rmh-lang-btn,.hero-cta-primary,.hero-spaces-trust,
+    .rizq-guide-live,.rizq-vid-strip-title,.rizq-vid-strip-hint,.rizq-vid-strip-tier
+  ){
+    visibility:hidden;
+    animation:rizq-lang-text-reveal .01s linear 1.5s forwards;
+  }
+  @keyframes rizq-lang-text-reveal{to{visibility:visible}}
+  html.rizq-lang-ready :is(
+    [data-t],[data-t-fr],[data-t-aria],[data-ph-fr],
+    .live-label-sub,.live-capsule-txt,.hero-title,.hero-headline,.hero-subtitle-primary,.hero-subtitle-secondary,
+    .hero-eyebrow,.section-tag,.section-title,.section-desc,.btn-lang,.btn-lang-primary,
+    .rmh-post-nav,.rizq-phone-ltr .rmh-lbl,#rmh-lang-btn,.hero-cta-primary,.hero-spaces-trust,
+    .rizq-guide-live,.rizq-vid-strip-title,.rizq-vid-strip-hint,.rizq-vid-strip-tier
+  ){
+    visibility:visible;
+    animation:none;
+  }
   /* #ticker بعرض المحتوى للماركي — لا ينكمش تحت عرض الشريط (كان CLS FR~0.32) */
   #ticker.ticker-inner,.ticker-inner{min-width:100%!important;box-sizing:border-box!important}
   /* احجز ارتفاع شريط أحدث الإعلانات قبل امتلاء البطاقات */
   #hero-listings .cards-track-wrap{min-height:248px;box-sizing:border-box}
   </style>
+  <noscript>
+    <style id="rizq-lang-boot-noscript">
+    html.rizq-lang-booting :is(
+      [data-t],[data-t-fr],[data-t-aria],[data-ph-fr],
+      .live-label-sub,.live-capsule-txt,.hero-title,.hero-headline,.hero-subtitle-primary,.hero-subtitle-secondary,
+      .hero-eyebrow,.section-tag,.section-title,.section-desc,.btn-lang,.btn-lang-primary,
+      .rmh-post-nav,.rizq-phone-ltr .rmh-lbl,#rmh-lang-btn,.hero-cta-primary,.hero-spaces-trust,
+      .rizq-guide-live,.rizq-vid-strip-title,.rizq-vid-strip-hint,.rizq-vid-strip-tier
+    ){visibility:visible!important;animation:none!important}
+    </style>
+  </noscript>
   <script>
   /* منع استعادة موضع التمرير قبل اكتمال المحتوى (قفزة F5) */
   try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(eSR){}
@@ -13220,7 +13262,7 @@ document.addEventListener('click', function (e) {
 // ── مزامنة اللغة عند فتح الصفحة مع اختيار المستخدم السابق في أي صفحة من الموقع ──
 // (نفس مفتاح rizq_lang الذي يستعمله rizq_i18n.js في الصفحات المهاجَرة بالفعل)
 (function syncLandingLangOnLoad() {
-  /* أمان: لا تبقَ الصفحة مخفية إن فشل applyLandingLang */
+  /* أمان إضافي: كشف نصوص اللغة إن بقي booting (الـ head لديه 1500ms أيضاً) */
   setTimeout(function () {
     try {
       var html = document.documentElement;
@@ -13229,7 +13271,7 @@ document.addEventListener('click', function (e) {
         html.classList.add('rizq-lang-ready');
       }
     } catch (eBoot) { /* */ }
-  }, 2500);
+  }, 1500);
   var saved;
   try { saved = localStorage.getItem('rizq_lang'); } catch (e) { saved = null; }
   try {
