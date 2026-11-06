@@ -1,21 +1,39 @@
 /**
- * دليل رزق — شريط أزرار تحت أحدث الإعلانات.
- * يعيد استخدام buildStyleIdeas / buildShowroomModels / buildEstateModels / renderStrip
- * بلا cloneNode. تبديل تلقائي كل 30 ثانية ما لم يلمس الزائر أو يفعّل تقليل الحركة.
+ * دليل رزق — شريط «أحدث ما في…» + فلاتر كاملة من بنّاءات الأقسام.
+ * بلا cloneNode. تبديل تلقائي كل 30ث. فلاتر الدليل مستقلة عن الأقسام الأصلية.
  */
 (function (global) {
   'use strict';
 
   var PANES = ['styles', 'showrooms', 'estate', 'offices'];
   var ROTATE_MS = 30000;
+  var TOPICS = {
+    styles: { ar: 'الإطلالات', fr: 'les looks' },
+    showrooms: { ar: 'من قلب المعارض', fr: 'les showrooms' },
+    estate: { ar: 'سوق العقارات', fr: "l'immobilier" },
+    offices: { ar: 'خدمات المكاتب', fr: 'les services de bureau' }
+  };
+
   var _pane = 'styles';
   var _timer = null;
   var _paused = false;
   var _avail = { styles: true, showrooms: false, estate: true, offices: false };
   var _maxH = 0;
   var _loaded = { styles: false, showrooms: false, estate: false, offices: false };
+  var _guideGender = 'men';
+  var _guideSrmCat = 'cars';
+  var _guideEstCat = 'all';
 
   function $(id) { return document.getElementById(id); }
+
+  function isFr() {
+    try {
+      if (typeof global.isAr !== 'undefined') return !global.isAr;
+      return (localStorage.getItem('rizq_lang') || 'ar') === 'fr';
+    } catch (e) {
+      return false;
+    }
+  }
 
   function reducedMotion() {
     try {
@@ -36,9 +54,27 @@
       var nav = document.querySelector('[data-rizq-module="' + key + '"]');
       if (nav && nav.classList.contains('rizq-module-soon')) return false;
     } catch (e) { /* */ }
-    /* افتراضي الإطلاق: المعارض والمكاتب مغلقة */
     if (key === 'corp' || key === 'office') return false;
     return true;
+  }
+
+  function updateLiveLabel(pane) {
+    var topic = TOPICS[pane] || TOPICS.styles;
+    var topicEl = $('rizq-guide-topic');
+    var subEl = $('rizq-guide-live-sub');
+    var liveTxt = document.querySelector('#rizq-guide-live .live-capsule-txt');
+    var fr = isFr();
+    if (liveTxt) liveTxt.textContent = fr ? 'Récent' : 'أحدث';
+    if (topicEl) topicEl.textContent = fr ? topic.fr : topic.ar;
+    if (subEl) {
+      if (fr) {
+        subEl.innerHTML = 'Le plus récent dans <strong class="rizq-guide-topic" id="rizq-guide-topic">' +
+          String(topic.fr).replace(/</g, '&lt;') + '</strong>';
+      } else {
+        subEl.innerHTML = 'أحدث ما في <strong class="rizq-guide-topic" id="rizq-guide-topic">' +
+          String(topic.ar).replace(/</g, '&lt;') + '</strong>';
+      }
+    }
   }
 
   function syncTabVisibility() {
@@ -49,20 +85,18 @@
       offices: moduleOpen('office')
     };
     PANES.forEach(function (p) {
-      var btn = $('guide-tab-' + (p === 'showrooms' ? 'showrooms' : p === 'offices' ? 'offices' : p === 'estate' ? 'estate' : 'styles'));
+      var btn = document.querySelector('.rizq-guide-tabs [data-guide-pane="' + p + '"]');
       if (!btn) return;
       var open = map[p];
-      var filled = _avail[p] !== false;
-      var show = open && (p === 'styles' || p === 'estate' || filled || !_loaded[p]);
-      if (p === 'showrooms' || p === 'offices') {
+      var show;
+      if (p === 'styles' || p === 'estate') {
+        show = open;
+      } else {
         show = open && (_avail[p] || !_loaded[p]);
         if (_loaded[p] && !_avail[p]) show = false;
         if (!open) show = false;
       }
       btn.hidden = !show;
-      if (!show && btn.classList.contains('is-active')) {
-        /* سينتقل showPane لأول تبويب ظاهر */
-      }
     });
   }
 
@@ -95,6 +129,55 @@
     });
     var root = $('rizq-guide');
     if (root) root.setAttribute('data-guide-pane', pane);
+    document.querySelectorAll('.rizq-guide-pane[data-guide-pane-body]').forEach(function (el) {
+      el.hidden = el.getAttribute('data-guide-pane-body') !== pane;
+    });
+  }
+
+  function paneHasCards(pane) {
+    if (pane === 'offices') {
+      var go = $('rizq-guide-disc-office');
+      return !!(go && go.querySelector('.rzq-disc-card, .rzq-disc-strip .rzq-disc-card'));
+    }
+    var rail = $('rizq-guide-rail-' + pane);
+    if (!rail) return false;
+    if (rail.classList.contains('is-empty')) return false;
+    return !!rail.querySelector('.rizq-style-card, .rizq-est-card, .rizq-style-tile, .rizq-est-hero');
+  }
+
+  function fillBrand(pane) {
+    try {
+      if (pane === 'styles' && typeof global._fillLandingBrandStrip === 'function') {
+        global._fillLandingBrandStrip('rizq-guide-styles-brand-strip', 'أزياء', 'تسوّق حسب الماركة', 'Shop by Brand');
+      } else if (pane === 'showrooms' && typeof global._fillLandingBrandStrip === 'function') {
+        var cat = _guideSrmCat || 'cars';
+        var brandCat = typeof global._landingBrandCatForSrm === 'function'
+          ? global._landingBrandCatForSrm(cat)
+          : 'سيارات';
+        global._fillLandingBrandStrip('rizq-guide-srm-brand-strip', brandCat, 'ماركات المعارض', 'Marques showroom');
+      }
+    } catch (eB) { /* */ }
+  }
+
+  function fillPane(pane) {
+    try {
+      if (pane === 'styles' && typeof global.buildStyleIdeas === 'function') {
+        global.buildStyleIdeas(false, 'rizq-guide-rail-styles', _guideGender);
+      } else if (pane === 'showrooms' && typeof global.buildShowroomModels === 'function') {
+        global.buildShowroomModels(false, 'rizq-guide-rail-showrooms', _guideSrmCat);
+      } else if (pane === 'estate' && typeof global.buildEstateModels === 'function') {
+        global.buildEstateModels(false, 'rizq-guide-rail-estate', _guideEstCat);
+      } else if (pane === 'offices') {
+        if (typeof global.RizqDiscRenderStrip === 'function') {
+          global.RizqDiscRenderStrip('rizq-guide-disc-office', 'office');
+        } else if (typeof global.renderStrip === 'function') {
+          global.renderStrip('rizq-guide-disc-office', 'office');
+        }
+      }
+    } catch (eFill) { /* */ }
+    fillBrand(pane);
+    _loaded[pane] = true;
+    _avail[pane] = paneHasCards(pane);
   }
 
   function showPane(pane, fromUser) {
@@ -102,39 +185,13 @@
     if (list.indexOf(pane) < 0) pane = list[0] || 'styles';
     _pane = pane;
     setActiveTab(pane);
-
-    var stylesWrap = $('rizq-guide-styles-wrap');
-    var officeWrap = $('rizq-guide-office-wrap');
-    if (pane === 'offices') {
-      if (stylesWrap) stylesWrap.hidden = true;
-      if (officeWrap) officeWrap.hidden = false;
-      if (typeof global.RizqDiscRenderStrip === 'function') {
-        try { global.RizqDiscRenderStrip('rizq-guide-disc-office', 'office'); } catch (eO) { /* */ }
-      }
-      var go = $('rizq-guide-disc-office');
-      _loaded.offices = true;
-      _avail.offices = !!(go && go.innerHTML && go.innerHTML.replace(/\s/g, '').length > 40);
-    } else {
-      if (stylesWrap) stylesWrap.hidden = false;
-      if (officeWrap) officeWrap.hidden = true;
-      try {
-        if (pane === 'styles' && typeof global.buildStyleIdeas === 'function') {
-          global.buildStyleIdeas(false, 'rizq-guide-rail');
-        } else if (pane === 'showrooms' && typeof global.buildShowroomModels === 'function') {
-          global.buildShowroomModels(false, 'rizq-guide-rail');
-        } else if (pane === 'estate' && typeof global.buildEstateModels === 'function') {
-          global.buildEstateModels(false, 'rizq-guide-rail');
-        }
-      } catch (eB) { /* */ }
-      _loaded[pane] = true;
-      var rail = $('rizq-guide-rail');
-      _avail[pane] = !!(rail && !rail.classList.contains('is-empty') && rail.querySelector('.rizq-style-card, .rizq-est-card'));
-    }
+    updateLiveLabel(pane);
+    fillPane(pane);
 
     syncTabVisibility();
     requestAnimationFrame(function () {
       lockStageHeight();
-      var rail = $('rizq-guide-rail');
+      var rail = $('rizq-guide-rail-' + pane);
       if (rail && typeof global.syncMarqueeShift === 'function' && pane !== 'offices') {
         try { global.syncMarqueeShift(rail); } catch (eS) { /* */ }
       }
@@ -178,6 +235,76 @@
     if (list.indexOf(_pane) < 0 && list.length) showPane(list[0], false);
   }
 
+  function setGuideGender(gender) {
+    if (!gender) gender = 'men';
+    _guideGender = gender;
+    document.querySelectorAll('#rizq-guide-sty-tabs [data-guide-sty-gender]').forEach(function (btn) {
+      var on = btn.getAttribute('data-guide-sty-gender') === gender;
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    if (_pane === 'styles') fillPane('styles');
+    pauseRotate();
+  }
+
+  function setGuideSrmCat(cat) {
+    if (!cat) cat = 'cars';
+    _guideSrmCat = cat;
+    document.querySelectorAll('#rizq-guide-srm-tabs [data-guide-srm-cat]').forEach(function (btn) {
+      var on = btn.getAttribute('data-guide-srm-cat') === cat;
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    if (_pane === 'showrooms') fillPane('showrooms');
+    pauseRotate();
+  }
+
+  function setGuideEstCat(cat) {
+    if (!cat) cat = 'all';
+    _guideEstCat = cat;
+    document.querySelectorAll('#rizq-guide-est-tabs [data-guide-est-cat]').forEach(function (btn) {
+      var on = btn.getAttribute('data-guide-est-cat') === cat;
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    if (_pane === 'estate') fillPane('estate');
+    pauseRotate();
+  }
+
+  function bindFilters() {
+    document.querySelectorAll('#rizq-guide-sty-tabs [data-guide-sty-gender]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        setGuideGender(btn.getAttribute('data-guide-sty-gender') || 'men');
+      });
+    });
+    document.querySelectorAll('#rizq-guide-srm-tabs [data-guide-srm-cat]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        setGuideSrmCat(btn.getAttribute('data-guide-srm-cat') || 'cars');
+      });
+    });
+    document.querySelectorAll('#rizq-guide-est-tabs [data-guide-est-cat]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        setGuideEstCat(btn.getAttribute('data-guide-est-cat') || 'all');
+      });
+    });
+    var reshuffle = $('rizq-guide-styles-reshuffle');
+    if (reshuffle) {
+      reshuffle.addEventListener('click', function () {
+        try { global.buildStyleIdeas(true, 'rizq-guide-rail-styles', _guideGender); } catch (e) { /* */ }
+        _avail.styles = paneHasCards('styles');
+        pauseRotate();
+      });
+    }
+    var srmReshuffle = $('rizq-guide-srm-reshuffle');
+    if (srmReshuffle) {
+      srmReshuffle.addEventListener('click', function () {
+        try { global.buildShowroomModels(true, 'rizq-guide-rail-showrooms', _guideSrmCat); } catch (e) { /* */ }
+        _avail.showrooms = paneHasCards('showrooms');
+        pauseRotate();
+      });
+    }
+  }
+
   function bind() {
     var root = $('rizq-guide');
     if (!root || root.getAttribute('data-guide-bound') === '1') return;
@@ -189,6 +316,8 @@
       });
     });
 
+    bindFilters();
+
     ['pointerdown', 'touchstart', 'wheel', 'keydown'].forEach(function (ev) {
       root.addEventListener(ev, function () { pauseRotate(); }, { passive: true });
     });
@@ -196,14 +325,21 @@
     syncTabVisibility();
     showPane('styles', false);
 
-    /* إعادة ملء بعد اكتمال هيدرات الكتالوج */
-    setTimeout(function () {
-      if (!_paused) showPane(_pane, false);
-    }, 1800);
+    /* إعادة ملء بعد اكتمال ADS/الكتالوج — يمنع المربع الرمادي الفارغ على الهاتف */
+    var retries = [400, 1200, 2500, 4500];
+    retries.forEach(function (ms) {
+      setTimeout(function () {
+        if (!paneHasCards(_pane)) fillPane(_pane);
+        else if (!_paused) lockStageHeight();
+        syncTabVisibility();
+      }, ms);
+    });
   }
 
   global.RizqGuideNotify = notify;
   global.RizqGuideShow = showPane;
+  global.RizqGuideHasCards = paneHasCards;
+  global.RizqGuideActiveHasCards = function () { return paneHasCards(_pane); };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bind);

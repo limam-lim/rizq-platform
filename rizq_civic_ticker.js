@@ -199,11 +199,63 @@
   }
 
   function hideStrip(wrap) {
-    /* إخفاء أدمن فقط — يُسقط الشريط من التدفق */
-    if (!wrap) return;
-    wrap.classList.add('is-empty', 'civic-ticker-wrap');
-    wrap.classList.remove('is-invite', 'ticker-has-urgent');
-    try { document.documentElement.style.setProperty('--rizq-ticker-h', '0px'); } catch (e) {}
+    /* سابقاً: إخفاء أدمن يسقط الشريط (فارغ بصرياً). الآن: لا فراغ — نعرض دعوة النشر */
+    var inner = document.getElementById('ticker');
+    showInviteStrip(wrap, inner);
+  }
+
+  function adsAsTickerItems() {
+    var out = [];
+    var pools = [];
+    try {
+      if (typeof global.FEATURED_ADS !== 'undefined' && Array.isArray(global.FEATURED_ADS)) pools.push(global.FEATURED_ADS);
+      if (typeof global.ADS !== 'undefined' && Array.isArray(global.ADS)) pools.push(global.ADS);
+    } catch (e) { /* */ }
+    var seen = {};
+    pools.forEach(function (list) {
+      list.forEach(function (a) {
+        if (!a || out.length >= 8) return;
+        var title = String(a.title || a.titleFR || '').trim();
+        if (!title || seen[title]) return;
+        seen[title] = 1;
+        out.push({ text: title, textAr: a.title || title, textFr: a.titleFR || a.title || title, color: '#C9A84C' });
+      });
+    });
+    return out;
+  }
+
+  function paintTickerItems(wrap, inner, items) {
+    if (!wrap || !inner) return false;
+    var html = (items || []).map(buildItemHtml).filter(Boolean).join('');
+    if (!html) return false;
+    inner.innerHTML = html + html;
+    wrap.classList.remove('is-empty', 'is-invite');
+    wrap.classList.add('civic-ticker-wrap');
+    wrap.setAttribute('role', 'marquee');
+    wrap.setAttribute('aria-label', getLang() === 'fr'
+      ? 'Annonces de service public'
+      : 'إعلانات خدمة عامة');
+    wrap.classList.toggle('ticker-has-urgent', (items || []).some(isUrgent));
+    try {
+      var th = Math.max(36, Math.round(wrap.getBoundingClientRect().height || 42));
+      document.documentElement.style.setProperty('--rizq-ticker-h', th + 'px');
+    } catch (eH) {}
+    if (typeof global.syncMarqueeShift === 'function' && typeof global.requestAnimationFrame === 'function') {
+      global.requestAnimationFrame(function () {
+        global.syncMarqueeShift(inner);
+        global.requestAnimationFrame(function () { global.syncMarqueeShift(inner); });
+      });
+    }
+    return true;
+  }
+
+  function ensureTickerNotEmpty(wrap, inner) {
+    if (!wrap || !inner) return;
+    var text = String(inner.textContent || '').replace(/\s+/g, ' ').trim();
+    if (text.length >= 4 && !wrap.classList.contains('is-empty')) return;
+    var fromAds = adsAsTickerItems();
+    if (fromAds.length && paintTickerItems(wrap, inner, fromAds)) return;
+    showInviteStrip(wrap, inner);
   }
 
   function inviteHtml() {
@@ -238,21 +290,21 @@
 
     wrap.classList.add('civic-ticker-wrap');
 
-    // إخفاء الشريط بالكامل من لوحة السوبر أدمن — بدون تغيير لون الخلفية
+    /* إخفاء أدمن لم يعد يترك الشريط فارغاً — دعوة أو إعلانات */
     if (isStripHidden()) {
-      hideStrip(wrap);
+      ensureTickerNotEmpty(wrap, inner);
       return;
     }
 
     var active = sortedActive(list);
     if (!active.length) {
-      showInviteStrip(wrap, inner);
+      ensureTickerNotEmpty(wrap, inner);
       return;
     }
 
     var html = active.map(buildItemHtml).filter(Boolean).join('');
     if (!html) {
-      showInviteStrip(wrap, inner);
+      ensureTickerNotEmpty(wrap, inner);
       return;
     }
 
@@ -388,10 +440,23 @@
 
   // توافق: نداءات قديمة كانت تملأ الشريط من عناوين الإعلانات التجارية
   global.renderTickerFromAds = function () {
-    if (!document.getElementById('ticker-wrap') || !document.getElementById('ticker')) return;
+    var wrap = document.getElementById('ticker-wrap');
+    var inner = document.getElementById('ticker');
+    if (!wrap || !inner) return;
     var cached = fromCache();
-    if (cached.length) render(cached);
-    else showInviteStrip(document.getElementById('ticker-wrap'), document.getElementById('ticker'));
+    if (cached.length) {
+      render(cached);
+      return;
+    }
+    ensureTickerNotEmpty(wrap, inner);
+  };
+
+  global.RizqTickerNeverEmpty = function () {
+    var wrap = document.getElementById('ticker-wrap');
+    var inner = document.getElementById('ticker');
+    ensureTickerNotEmpty(wrap, inner);
+    var text = String((inner && inner.textContent) || '').replace(/\s+/g, ' ').trim();
+    return text.length >= 4 && !wrap.classList.contains('is-empty');
   };
 
   if (document.readyState === 'loading') {
