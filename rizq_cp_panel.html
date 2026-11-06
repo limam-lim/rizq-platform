@@ -210,9 +210,10 @@ select option{background:#fff !important;color:#1a2535 !important}
 .toggle-info .toggle-name{font-size:13.5px;font-weight:600;color:#1a2535}
 .toggle-info .toggle-desc{font-size:11px;color:var(--text-muted);margin-top:2px}
 .toggle-sw{width:42px;height:23px;border-radius:12px;border:none;cursor:pointer;position:relative;transition:background .3s;flex-shrink:0;background:#e2e8f5;border:1px solid #e2e8f5}
-.toggle-sw::after{content:'';position:absolute;width:17px;height:17px;background:#fff;border-radius:50%;top:3px;right:3px;transition:right .3s;box-shadow:0 1px 3px rgba(15,35,65,.25)}
-.toggle-sw.on{background:linear-gradient(135deg,var(--gold),var(--gold-light))}
-.toggle-sw.on::after{right:22px}
+.toggle-sw::after{content:'';position:absolute;width:17px;height:17px;background:#fff;border-radius:50%;top:3px;inset-inline-start:3px;transition:transform .25s ease;box-shadow:0 1px 3px rgba(15,35,65,.25)}
+.toggle-sw.on{background:linear-gradient(135deg,var(--gold),var(--gold-light));border-color:rgba(201,168,76,.6)}
+.toggle-sw.on::after{transform:translateX(19px)}
+[dir=rtl] .toggle-sw.on::after{transform:translateX(-19px)}
 /* عيّنات الألوان مربّعة صغيرة — لا تغطي حقول المدة/الأيام (كان الـ oval الأصلي يتداخل في RTL) */
 #packages-grid .pkg-color-row{overflow:hidden;position:relative;z-index:0}
 #packages-grid input[type=color].pkg-bg-picker,
@@ -3500,9 +3501,9 @@ function renderPackages(){
           <div class="form-group"><label class="form-label">${t('pkg-duration-label','عدد الأيام')}</label><input class="form-input pkg-duration-input" type="number" autocomplete="off" value="${Number(p.durationDays)||30}" dir="ltr"/></div>
         </div>
         <div class="pkg-color-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px">
-          <div class="form-group"><label class="form-label">${t('pkg-bg-label','لون الخلفية')}</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input pkg-bg-input" type="text" value="${_pe(p.bgColor||'')}" placeholder="#0a1628" dir="ltr" style="flex:1;min-width:0"/><input type="color" class="pkg-bg-picker" value="${_pe((p.bgColor&&/^#[0-9a-fA-F]{6}$/.test(p.bgColor))?p.bgColor:'#0a1628')}" oninput="var i=this.closest('.form-group').querySelector('.pkg-bg-input');if(i)i.value=this.value" title="${_pe(t('pkg-bg-pick','اختر لون الخلفية'))}"/></div></div>
-          <div class="form-group"><label class="form-label">${t('pkg-text-label','لون النص')}</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input pkg-text-input" type="text" value="${_pe(p.textColor||'')}" placeholder="#ffffff" dir="ltr" style="flex:1;min-width:0"/><input type="color" class="pkg-text-picker" value="${_pe((p.textColor&&/^#[0-9a-fA-F]{6}$/.test(p.textColor))?p.textColor:'#ffffff')}" oninput="var i=this.closest('.form-group').querySelector('.pkg-text-input');if(i)i.value=this.value" title="${_pe(t('pkg-text-pick','اختر لون النص'))}"/></div></div>
-          <div class="form-group"><label class="form-label">${t('pkg-accent-label','لون التمييز')}</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input pkg-accent-input" type="text" value="${_pe(p.accentColor||'')}" placeholder="#C9A84C" dir="ltr" style="flex:1;min-width:0"/><input type="color" class="pkg-accent-picker" value="${_pe((p.accentColor&&/^#[0-9a-fA-F]{6}$/.test(p.accentColor))?p.accentColor:'#C9A84C')}" oninput="var i=this.closest('.form-group').querySelector('.pkg-accent-input');if(i)i.value=this.value" title="${_pe(t('pkg-accent-pick','اختر لون التمييز'))}"/></div></div>
+          <div class="form-group"><label class="form-label">${t('pkg-bg-label','لون الخلفية')}</label><input class="form-input pkg-bg-input" type="text" value="${_pe(p.bgColor||'')}" placeholder="#0a1628" dir="ltr" autocomplete="off"/></div>
+          <div class="form-group"><label class="form-label">${t('pkg-text-label','لون النص')}</label><input class="form-input pkg-text-input" type="text" value="${_pe(p.textColor||'')}" placeholder="#ffffff" dir="ltr" autocomplete="off"/></div>
+          <div class="form-group"><label class="form-label">${t('pkg-accent-label','لون التمييز')}</label><input class="form-input pkg-accent-input" type="text" value="${_pe(p.accentColor||'')}" placeholder="#C9A84C" dir="ltr" autocomplete="off"/></div>
         </div>
         <div class="form-group"><label class="form-label">${t('pkg-feats-label','المميزات (كل ميزة في سطر)')}</label><textarea class="form-input pkg-feats-input" rows="3" style="resize:vertical">${_pe((p.features||[]).join('\n'))}</textarea></div>
         <button class="btn-sm btn-outline" onclick="deletePackage(${i})">${t('pkg-delete-btn','🗑 حذف الباقة')}</button>
