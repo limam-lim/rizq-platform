@@ -208,17 +208,21 @@
     var host = mount && mount.parentNode;
     if (!host) return;
 
-    if (phEl) phEl.style.display = 'none';
+    /* مساحة محجوزة ثابتة (aspect-ratio) + poster فقط — بلا src/تشغيل قبل دخول العرض */
     wrapEl.style.display = '';
-    wrapEl.classList.add('is-playing');
-    try { host.classList.add('is-playing'); } catch (ePlay) { /* ignore */ }
-
+    if (mount) {
+      applyMobileVideoAttrs(mount, mount.getAttribute('poster') || posterForVideoUrl(DEFAULT_PLATFORM_PROMO));
+      try {
+        mount.removeAttribute('src');
+        mount.removeAttribute('autoplay');
+        /* لا نستدعِ load() هنا — يُبقي poster فقط بلا طلب شبكة */
+      } catch (eClr) { /* ignore */ }
+    }
     /* لا نصوص/شارات على مساحة الفيديو — حتى عدّاد المعلنين */
     if (viewsEl) {
       viewsEl.textContent = '';
       viewsEl.style.display = 'none';
     }
-    if (phEl) phEl.style.display = 'none';
 
     function paintMeta(ad) {
       /* بلا كتابات على/فوق مساحة الإعلان — البيانات الاختيارية تحت الإطار فقط لاحقاً إن لزم */
@@ -355,7 +359,30 @@
       _heroAdvanceTimer = setTimeout(advance, slotSec * 1000);
     }
 
-    playAt(0);
+    var armed = false;
+    function armHeroPlayback() {
+      if (armed) return;
+      armed = true;
+      if (phEl) phEl.style.display = 'none';
+      wrapEl.classList.add('is-playing');
+      try { host.classList.add('is-playing'); } catch (ePlay) { /* ignore */ }
+      playAt(0);
+    }
+
+    if (typeof IntersectionObserver !== 'undefined') {
+      var heroIo = new IntersectionObserver(function (entries) {
+        for (var i = 0; i < entries.length; i++) {
+          if (entries[i].isIntersecting && entries[i].intersectionRatio > 0) {
+            heroIo.disconnect();
+            armHeroPlayback();
+            break;
+          }
+        }
+      }, { root: null, rootMargin: '0px', threshold: [0, 0.15, 0.5] });
+      heroIo.observe(wrapEl);
+    } else {
+      armHeroPlayback();
+    }
   }
 
   // ════════════════════════════════════════
@@ -619,6 +646,11 @@
     if (_stripPlaying) stopStripVideo(_stripPlaying);
     var v = card.querySelector('video');
     if (!v) return;
+    /* تسليح المصدر عند أول تشغيل فقط — preload=none + poster حتى دخول العرض */
+    var pendingSrc = v.getAttribute('data-src');
+    if (pendingSrc && !v.getAttribute('src')) {
+      v.src = pendingSrc;
+    }
     // التشغيل التلقائي دائماً صامت؛ الصوت يبقى بعد لمسة المستخدم فقط
     if (card.getAttribute('data-sound-on') !== '1') v.muted = true;
     var p = v.play();
@@ -670,7 +702,7 @@
         '<div class="rizq-vcard-thumb">' +
           '<video muted playsinline loop preload="none"' +
             (posterUrl ? ' poster="' + esc(posterUrl) + '"' : '') +
-            ' src="' + esc(ad.url) + '"></video>' +
+            ' data-src="' + esc(ad.url) + '"></video>' +
           '<div class="rizq-vcard-shade"></div>' +
           '<span class="rizq-vcard-tag">' + esc(vidLbl) + '</span>' +
           '<span class="rizq-vcard-play" aria-hidden="true">▶</span>' +
