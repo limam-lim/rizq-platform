@@ -68,7 +68,9 @@ function startStatic() {
   const civicJs = fs.readFileSync(path.join(ROOT, 'rizq_civic_ticker.js'), 'utf8');
 
   ok('guide section markup present', /id="rizq-guide"/.test(landing));
-  ok('live strip «أحدث ما في» present', /أحدث ما في/.test(landing)
+  ok('live strip «ما في» + badge (no duplicate أحدث)',
+    /id="rizq-guide-live-sub">ما في/.test(landing)
+    && !/id="rizq-guide-live-sub">أحدث ما في/.test(landing)
     && /id="rizq-guide-live"/.test(landing)
     && /id="rizq-guide-topic"/.test(landing));
   ok('removed gold guide eyebrow + hero title + choose-section copy',
@@ -99,7 +101,11 @@ function startStatic() {
     && /prefers-reduced-motion/.test(guideJs)
     && /lockStageHeight/.test(guideJs)
     && /--rizq-guide-stage-h/.test(guideJs));
-  ok('FR live topic copy', /Le plus récent dans/.test(guideJs));
+  ok('FR live topic copy (dans … without Récent duplicate)',
+    /innerHTML = 'dans <strong class="rizq-guide-topic"/.test(guideJs)
+    && !/Le plus récent dans/.test(guideJs)
+    && /innerHTML = 'ما في <strong class="rizq-guide-topic"/.test(guideJs)
+    && !/innerHTML = 'أحدث ما في/.test(guideJs));
   ok('builders accept optMountId overrides',
     /function buildStyleIdeas\(reshuffle, optMountId, optGender\)/.test(landing)
     && /function buildShowroomModels\(reshuffle, optMountId, optCat\)/.test(landing)
@@ -169,6 +175,8 @@ function startStatic() {
     const rvidVisible = !!(rvid && rvid.offsetParent !== null && rvid.getBoundingClientRect().height > 2);
     const tickerText = String((ticker && ticker.textContent) || '').replace(/\s+/g, ' ').trim();
     const gap = (guideEl && ads) ? (top(guideEl) - bottom(ads)) : 9999;
+    const lastCard = ads && ads.querySelector('.cards-track .ad-card:last-child');
+    const gapCards = (guideLive && lastCard) ? (top(guideLive) - bottom(lastCard)) : null;
     return {
       hasGuide: !!guideEl,
       liveText: String((guideLive && guideLive.textContent) || '').replace(/\s+/g, ' ').trim(),
@@ -185,6 +193,7 @@ function startStatic() {
         listings: top(listings),
       },
       gapAdsToGuide: gap,
+      gapCardsToGuide: gapCards,
       rvidVisible,
       sourceOrderOk: !!(vid && rvid && listings
         && (vid.compareDocumentPosition(rvid) & Node.DOCUMENT_POSITION_FOLLOWING)
@@ -208,8 +217,10 @@ function startStatic() {
   });
 
   ok('guide mounts in DOM', snap.hasGuide);
-  ok('live strip shows أحدث ما في + topic',
-    /أحدث ما في/.test(String(snap.liveText || ''))
+  ok('live strip reads أحدث + ما في (no أحدث أحدث)',
+    /أحدث/.test(String(snap.liveText || ''))
+    && /ما في/.test(String(snap.liveText || ''))
+    && !/أحدث\s*أحدث/.test(String(snap.liveText || ''))
     && String(snap.topic || '').length >= 2,
     { live: snap.liveText, topic: snap.topic });
   ok('no choose-section desc in DOM', !/اختر القسم واكتشف عروضه/.test(String(snap.liveText || '')));
@@ -222,9 +233,11 @@ function startStatic() {
     snap.guideCards >= 1 && !snap.guideEmptyBox && snap.hasCardsApi,
     { guideCards: snap.guideCards, empty: snap.guideEmptyBox, api: snap.hasCardsApi });
   ok('guide stage has reserved height', snap.stageH >= 120, snap.stageH);
-  ok('gap hero-listings → guide is modest (≤ 48px)',
-    snap.gapAdsToGuide >= -4 && snap.gapAdsToGuide <= 48,
-    snap.gapAdsToGuide);
+  ok('gap last hero-ad card → guide live strip is ~16–28px',
+    snap.gapCardsToGuide != null
+      && snap.gapCardsToGuide >= 8
+      && snap.gapCardsToGuide <= 28,
+    { gapCardsToGuide: snap.gapCardsToGuide, gapAdsToGuide: snap.gapAdsToGuide });
   ok('DOM order tops: ads < guide < vid < listings (+ rvid source after vid)',
     snap.orderTops.ads < snap.orderTops.guide
     && snap.orderTops.guide < snap.orderTops.vid

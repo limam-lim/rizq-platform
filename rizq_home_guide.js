@@ -67,11 +67,12 @@
     if (liveTxt) liveTxt.textContent = fr ? 'Récent' : 'أحدث';
     if (topicEl) topicEl.textContent = fr ? topic.fr : topic.ar;
     if (subEl) {
+      /* الشارة تحمل «أحدث»/Récent — النص بجانبها بدون تكرار */
       if (fr) {
-        subEl.innerHTML = 'Le plus récent dans <strong class="rizq-guide-topic" id="rizq-guide-topic">' +
+        subEl.innerHTML = 'dans <strong class="rizq-guide-topic" id="rizq-guide-topic">' +
           String(topic.fr).replace(/</g, '&lt;') + '</strong>';
       } else {
-        subEl.innerHTML = 'أحدث ما في <strong class="rizq-guide-topic" id="rizq-guide-topic">' +
+        subEl.innerHTML = 'ما في <strong class="rizq-guide-topic" id="rizq-guide-topic">' +
           String(topic.ar).replace(/</g, '&lt;') + '</strong>';
       }
     }

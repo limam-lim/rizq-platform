@@ -736,14 +736,18 @@ nav:not(.hero-biz-nav):not(.rizq-hdr-row2):not(.rizq-reg-footer):not(.rizq-reg-c
 
   /* هامش داخلي على الهاتف — يمنع ملامسة البطاقات والفيديوهات للحواف */
   :root{--rizq-strip-inset:14px}
-  .hero-listings-section,
+  /* #hero-listings داخل الهيرو ويتبعه #rizq-guide — لا هامش 88px (كان يوسّع الفراغ) */
   #listings.listings-section,
-  .listings-section{
+  .listings-section:not(#hero-listings):not(.hero-listings-section){
     /* أبعد آخر صف بطاقات عن زر R/الفقاعة على الموبايل */
     padding-bottom:calc(88px + env(safe-area-inset-bottom,0))!important;
     overflow:hidden!important;
     width:100%!important;
     margin-inline:0!important;
+  }
+  #hero-listings.hero-listings-section,
+  .hero > #hero-listings{
+    padding-bottom:4px!important;
   }
   #hero-listings .listings-label,
   .listings-label{
