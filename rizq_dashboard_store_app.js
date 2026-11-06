@@ -512,7 +512,17 @@ function showPanel(id, el){
   if(id==='messages') renderMessages();
   if(id==='requests'){ _rizqMergeServiceRequests(); loadStoreServiceDeskForm(); renderStoreServiceRequests(); }
   if(id==='photos') renderPhotos();
-  if(id==='subscription'){ renderSubscriptionPanel(); renderPackagesDisplay(); renderVideoPackagesDisplay(); }
+  if(id==='subscription'){
+    renderSubscriptionPanel();
+    if(typeof RizqSub!=='undefined'&&typeof RizqSub.renderSeasonalOfferCard==='function'){
+      RizqSub.renderSeasonalOfferCard({
+        lang:(typeof _storeLang!=='undefined'?_storeLang:'ar'),
+        onReady:function(){ try{ renderPackagesDisplay(); }catch(e){} }
+      });
+    }
+    renderPackagesDisplay();
+    renderVideoPackagesDisplay();
+  }
   if(id==='mypayments'){renderRizqPayment('rzq-pay-section');if(typeof renderMyPayments==='function')renderMyPayments();}
   if(id==='agents') renderAgents();
   if(id==='tenders'){ renderTenderSubStatus(); renderMyTenders(); }
@@ -2184,25 +2194,10 @@ function renderPackagesDisplay(){
   el.innerHTML=r.grid;
   var rp=document.getElementById('renewal-packages');
   if(rp)rp.innerHTML=r.renewal;
+  try{ if(typeof RizqSub.applySeasonalStrikethrough==='function') RizqSub.applySeasonalStrikethrough(el, list); }catch(eSo){}
 }
 
-// ── Rizq ADS — باقات إعلان الفيديو (نفس محرك RizqSub، فئة 'video') ──
-function renderVideoPackagesDisplay(){
-  var el=document.getElementById('rizq-ads-packages-display'); if(!el) return;
-  var lang=(typeof _storeLang!=='undefined'?_storeLang:'ar');
-  var pkgs=[];
-  if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
-    try{ pkgs=RizqPackagesConfig.getCatalog('video', lang).filter(function(p){return p.active!==false;}); }catch(e){}
-  }
-  if(!pkgs.length){ try{ pkgs=JSON.parse(localStorage.getItem('rizq_video_packages')||'[]').filter(function(p){return p.active!==false;}); }catch(e){ pkgs=[]; } }
-  if(!pkgs.length && window.RizqPackagesConfig && RizqPackagesConfig.CATALOGS && RizqPackagesConfig.CATALOGS.video){
-    pkgs=JSON.parse(JSON.stringify(RizqPackagesConfig.CATALOGS.video));
-  }
-  var list=pkgs;
-  var FEATS_AR={'إعلان فيديو واحد':['فيديو إعلاني واحد لمدة 10 أيام','ظهور في قسم الإعلانات بالصفحة الرئيسية','دفع لكل إعلان — بلا اشتراك شهري'],'أساسي فيديو':['حتى 3 فيديوهات إعلانية ترويجية شهرياً','ظهور في قسم الإعلانات بالصفحة الرئيسية','إحصائيات أداء أساسية آلية'],'احترافي فيديو':['حتى 10 فيديوهات إعلانية ترويجية شهرياً','أولوية الترتيب في نتائج البحث','شارة «محتوى مميّز برزق» الموثّقة'],'أعمال ومعارض':['فيديوهات وعروض غير محدودة','ظهور مميز في القسم الرئيسي بالصفحة الرئيسية','تقارير تحليل أداء آلية مفصّلة','دعم VIP ذو أولوية + شارة VIP موثّقة'],'أساسي':['حتى 3 فيديوهات إعلانية ترويجية شهرياً','ظهور في قسم الإعلانات بالصفحة الرئيسية','إحصائيات أداء أساسية آلية'],'احترافي':['حتى 10 فيديوهات إعلانية ترويجية شهرياً','أولوية الترتيب في نتائج البحث','شارة «محتوى مميّز برزق» الموثّقة']};
-  var FEATS_FR={'إعلان فيديو واحد':['Une vidéo publicitaire pendant 10 jours','Section publicitaire page d\'accueil','Paiement par annonce — sans abonnement mensuel'],'أساسي فيديو':['Jusqu\'à 3 vidéos promotionnelles / mois','Section publicitaire page d\'accueil','Statistiques de performance de base automatisées'],'احترافي فيديو':['Jusqu\'à 10 vidéos promotionnelles / mois','Priorité dans les résultats de recherche','Badge « Contenu vedette Rizq » vérifié'],'أعمال ومعارض':['Vidéos et vitrines illimitées','Placement premium section principale','Rapports d\'analyse automatisés détaillés','Support VIP prioritaire + badge VIP vérifié'],'أساسي':['Jusqu\'à 3 vidéos promotionnelles / mois','Section publicitaire page d\'accueil','Statistiques de performance de base automatisées'],'احترافي':['Jusqu\'à 10 vidéos promotionnelles / mois','Priorité dans les résultats de recherche','Badge « Contenu vedette Rizq » vérifié']};
-  var FEATS=(lang==='fr')?FEATS_FR:FEATS_AR;
-  var ICONS={'إعلان فيديو واحد':'⚡','أساسي فيديو':'🎬','احترافي فيديو':'🥇','أعمال ومعارض':'💎','أساسي':'🎬','احترافي':'🥇'};
+يديو':'🥇','أعمال ومعارض':'💎','أساسي':'🎬','احترافي':'🥇'};
   var r=RizqSub.renderPackageCardsHTML(list,FEATS,ICONS,lang,'video');
   el.innerHTML=r.grid;
 }

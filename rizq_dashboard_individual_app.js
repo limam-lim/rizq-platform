@@ -505,7 +505,16 @@ function showPanel(id, navEl){
   const titles={overview:'نظرة عامة','my-ads':'إعلاناتي',messages:'الرسائل',notifications:'الإشعارات',favorites:'المفضلة',profile:'ملفي الشخصي',security:'الأمان',subscription:'💳 باقتي','video-ads':'🎬 إعلان فيديو',tenders:'📋 المناقصات',referral:'🎁 إحالة الأصدقاء',verifiedplus:'🛡️ شارة موثّق⁺'};
   const titlesFr={overview:'Vue d\'ensemble','my-ads':'Mes annonces',messages:'Messages',notifications:'Notifications',favorites:'Favoris',profile:'Mon profil',security:'Sécurité',subscription:'💳 Mon forfait','video-ads':'🎬 Annonce vidéo',tenders:'📋 Appels d\'offres',referral:'🎁 Parrainage',verifiedplus:'🛡️ Badge Vérifié+'};
   document.getElementById('topbar-title').textContent=(_rizqLang()==='fr'?(titlesFr[id]||'Tableau de bord'):(titles[id]||'لوحة التحكم'));
-  if(id==='subscription'){ renderSubscriptionPanel(); renderPackagesDisplay(); }
+  if(id==='subscription'){
+    renderSubscriptionPanel();
+    if(typeof RizqSub!=='undefined'&&typeof RizqSub.renderSeasonalOfferCard==='function'){
+      RizqSub.renderSeasonalOfferCard({
+        lang:_rizqLang(),
+        onReady:function(){ try{ renderPackagesDisplay(); }catch(e){} }
+      });
+    }
+    renderPackagesDisplay();
+  }
   if(id==='video-ads'){ renderVideoPackagesDisplay(); if(USER_ACC) _rizqRenderAdsStatus(USER_ACC); }
   if(id==='tenders'){ renderTenderSubStatus(); renderMyTenders(); }
   if(id==='referral'){ renderReferralPanel(); }
@@ -1458,6 +1467,7 @@ function renderPackagesDisplay(){
   el.innerHTML=r.grid;
   var rp=document.getElementById('renewal-packages');
   if(rp) rp.innerHTML=r.renewal;
+  try{ if(typeof RizqSub.applySeasonalStrikethrough==='function') RizqSub.applySeasonalStrikethrough(el, list); }catch(eSo){}
 }
 
 // ── Rizq ADS — باقات إعلان الفيديو (فئة video) ──

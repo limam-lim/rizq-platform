@@ -2762,15 +2762,40 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
     });
   }
   // P0: null/undefined/NaN ليست مجانية — لا نحوّلها إلى 0
-  const serverPrice = catalogPkg.price != null && catalogPkg.price !== '' && Number.isFinite(Number(catalogPkg.price))
+  // السعر من الكتالوج فقط — أي سعر من المتصفح يُتجاهل دائماً
+  const listPrice = catalogPkg.price != null && catalogPkg.price !== '' && Number.isFinite(Number(catalogPkg.price))
     ? Number(catalogPkg.price)
     : null;
-  if (serverPrice == null || catalogPkg.pricePending) {
+  if (listPrice == null || catalogPkg.pricePending) {
     return res.status(400).json({
       ok: false,
       error: 'price_unset',
       message: 'سعر الباقة غير مضبوط — حدّده السوبر أدمن من لوحة إدارة الباقات أولاً',
     });
+  }
+  let serverPrice = listPrice;
+  let seasonalOfferMeta = null;
+  try {
+    const seasonal = require('./services/seasonalOffers');
+    const payAt = b.submittedAt || new Date().toISOString();
+    const offered = await seasonal.resolveOfferPrice({
+      listPrice,
+      packageId: catalogPkg.id,
+      pkgName: catalogPkg.name || catalogPkg.id,
+      accountId: String(b.accountId || '').slice(0, 60),
+      paymentAt: payAt,
+    });
+    if (offered && offered.discounted) {
+      serverPrice = Number(offered.price);
+      seasonalOfferMeta = {
+        offerId: offered.offer && offered.offer.id,
+        percent: offered.offer && offered.offer.percent,
+        titleAr: offered.offer && offered.offer.titleAr,
+        titleFr: offered.offer && offered.offer.titleFr,
+      };
+    }
+  } catch (eSeason) {
+    console.warn('[sub-requests] seasonal offer:', eSeason.message);
   }
   // الفئة تتبع الباقة نفسها (لا يختارها العميل): باقة 300 أوقية لا تفتح غرفة المناقصات
   {
@@ -2891,8 +2916,9 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
     pkg: String((catalogPkg && (catalogPkg.name || catalogPkg.id)) || pkgRef).slice(0, 60),
     packageId: String((catalogPkg && catalogPkg.id) || pkgRef).slice(0, 60),
     price: authoritativePrice,
-    expectedPrice: serverPrice,
-    listPrice: serverPrice,
+    expectedPrice: listPrice,
+    listPrice: listPrice,
+    seasonalOffer: seasonalOfferMeta,
     packageCredit: packageCredit && packageCredit.applicable ? packageCredit : null,
     submittedAt: b.submittedAt || new Date().toISOString(),
     status: 'pending',
@@ -2946,7 +2972,8 @@ app.post('/api/sub-requests', subRequestsLimiter, async (req, res) => {
     ok: true,
     id,
     price: rec.price,
-    listPrice: serverPrice,
+    listPrice: listPrice,
+    seasonalOffer: seasonalOfferMeta,
     packageCredit: rec.packageCredit,
   });
 
@@ -2988,9 +3015,25 @@ app.get('/api/sub-requests/package-credit', async (req, res) => {
       pkgName: pkgRef, name: pkgRef, id: pkgRef, category: 'package',
     })) || (await findCatalogPackage(pkgRef));
     if (!catalogPkg) return res.status(400).json({ ok: false, error: 'UNKNOWN_PKG' });
-    const serverPrice = catalogPkg.price != null && Number.isFinite(Number(catalogPkg.price))
+    const listPrice = catalogPkg.price != null && Number.isFinite(Number(catalogPkg.price))
       ? Number(catalogPkg.price) : null;
-    if (serverPrice == null) return res.status(400).json({ ok: false, error: 'price_unset' });
+    if (listPrice == null) return res.status(400).json({ ok: false, error: 'price_unset' });
+    let serverPrice = listPrice;
+    let seasonalOffer = null;
+    try {
+      const seasonal = require('./services/seasonalOffers');
+      const offered = await seasonal.resolveOfferPrice({
+        listPrice,
+        packageId: catalogPkg.id,
+        pkgName: catalogPkg.name || catalogPkg.id,
+        accountId,
+        paymentAt: new Date().toISOString(),
+      });
+      if (offered && offered.discounted) {
+        serverPrice = Number(offered.price);
+        seasonalOffer = offered.offer;
+      }
+    } catch (eSo) { /* */ }
     const {
       resolvePackageDurationDays,
       resolveSwitchCreditForAccount,
@@ -3008,10 +3051,11 @@ app.get('/api/sub-requests/package-credit', async (req, res) => {
     );
     return res.json({
       ok: true,
-      listPrice: serverPrice,
+      listPrice,
       price: credit && credit.applicable ? credit.amountDue : serverPrice,
       days: newDays,
       packageCredit: credit,
+      seasonalOffer,
       pkg: catalogPkg.name || catalogPkg.id,
       packageId: catalogPkg.id || null,
     });
@@ -3372,6 +3416,12 @@ mountSentinelRoutes(app, {
 
 const { mountMarketingRoutes } = require('./routes/marketing');
 mountMarketingRoutes(app, { requireAdminPermission });
+
+const { mountSeasonalOfferRoutes } = require('./routes/seasonalOffers');
+mountSeasonalOfferRoutes(app, {
+  requireAdminPermission,
+  seasonalOffers: require('./services/seasonalOffers'),
+});
 require('./services/marketingAgent').startScheduler().catch((eMkt) => {
   console.warn('[marketingAgent] scheduler not started:', eMkt && eMkt.message);
 });

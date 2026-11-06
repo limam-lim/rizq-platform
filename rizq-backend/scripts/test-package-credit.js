@@ -296,6 +296,43 @@ const near = (ms, expected, tolMs) => Math.abs(ms - expected) <= (tolMs || 90000
     } catch (e) { /* */ }
   }
 
+  console.log('\n— credit uses amount actually paid (seasonal discount) —');
+  {
+    const t0 = Date.now();
+    const in15 = new Date(t0 + 15 * DAY).toISOString();
+    /* اشترى شهرية بخصم 50%: دفع 1500 بدل 3000 — عند الترقية الرصيد من 1500 لا 3000 */
+    const paidUp = computePackageCredit({
+      switched: true, active: true,
+      oldPrice: 1500, oldDays: 30, periodEnd: in15,
+      newPrice: 15000, newDays: 365, nowMs: t0,
+    });
+    ok('seasonal paid upgrade credit ≈ 750 (not 1500)', Math.abs(paidUp.credit - 750) < 1, paidUp);
+    ok('seasonal paid upgrade amountDue ≈ 14250', Math.abs(paidUp.amountDue - 14250) < 1, paidUp);
+
+    const listUp = computePackageCredit({
+      switched: true, active: true,
+      oldPrice: 3000, oldDays: 30, periodEnd: in15,
+      newPrice: 15000, newDays: 365, nowMs: t0,
+    });
+    ok('list-price credit would be ≈ 1500 (contrast)', Math.abs(listUp.credit - 1500) < 1, listUp);
+    ok('paid credit < list credit', paidUp.credit < listUp.credit - 100, { paid: paidUp.credit, list: listUp.credit });
+
+    /* تخفيض من باقة دُفعت مخفّضة: رصيد أقل → مطلوب أكبر أو تمديد أقل */
+    const paidDown = computePackageCredit({
+      switched: true, active: true,
+      oldPrice: 1500, oldDays: 30, periodEnd: in15,
+      newPrice: 500, newDays: 30, nowMs: t0,
+    });
+    const listDown = computePackageCredit({
+      switched: true, active: true,
+      oldPrice: 3000, oldDays: 30, periodEnd: in15,
+      newPrice: 500, newDays: 30, nowMs: t0,
+    });
+    ok('seasonal paid downgrade credit ≈ 750', Math.abs(paidDown.credit - 750) < 1, paidDown);
+    ok('paid downgrade extends less than list-price path',
+      paidDown.totalDays < listDown.totalDays - 5, { paid: paidDown.totalDays, list: listDown.totalDays });
+  }
+
   console.log('\n' + (fail ? 'FAILED ' + fail : 'ALL OK') + ' / ' + (pass + fail));
   process.exit(fail ? 1 : 0);
 })().catch((e) => {

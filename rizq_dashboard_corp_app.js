@@ -696,8 +696,18 @@ function showPanel(id, btn){
   if(id==='referral'){ renderReferralPanel(); }
   if(id==='verifiedplus'){ renderVerifiedPlusPanel(); }
   if(id==='mypayments'){renderRizqPayment('rzq-pay-section');if(typeof renderMyPayments==='function')renderMyPayments();}
-  if(id==='subscription'){renderRizqPayment('rzq-pay-sub');if(typeof renderSubDetails==='function')renderSubDetails();if(typeof renderPackagesDisplay==='function')renderPackagesDisplay();if(typeof renderVideoPackagesDisplay==='function')renderVideoPackagesDisplay();}
-  if(id==='subscription'){renderSubDetails();renderPackagesDisplay();}
+  if(id==='subscription'){
+    renderRizqPayment('rzq-pay-sub');
+    if(typeof renderSubDetails==='function')renderSubDetails();
+    if(typeof RizqSub!=='undefined'&&typeof RizqSub.renderSeasonalOfferCard==='function'){
+      RizqSub.renderSeasonalOfferCard({
+        lang:(typeof _corpLang!=='undefined'?_corpLang:'ar'),
+        onReady:function(){ try{ renderPackagesDisplay(); }catch(e){} }
+      });
+    }
+    if(typeof renderPackagesDisplay==='function')renderPackagesDisplay();
+    if(typeof renderVideoPackagesDisplay==='function')renderVideoPackagesDisplay();
+  }
   if(id==='subscription_X'){
     // Render packages into corp-packages-grid using same tier logic
     var pg = document.getElementById('corp-packages-grid');
@@ -1978,6 +1988,7 @@ function renderPackagesDisplay(){
   el.innerHTML=r.grid;
   var rp=document.getElementById('renewal-packages');
   if(rp)rp.innerHTML=r.renewal;
+  try{ if(typeof RizqSub.applySeasonalStrikethrough==='function') RizqSub.applySeasonalStrikethrough(el, list); }catch(eSo){}
 }
 
 // ── Rizq ADS — باقات إعلان الفيديو (نفس محرك RizqSub، فئة 'video') ──

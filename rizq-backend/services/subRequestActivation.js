@@ -557,11 +557,15 @@ async function _activateClaimed(req, deps) {
           skippedDuplicate: true,
         };
       }
-      /* أعد حساب الرصيد من حالة الحساب الحية — لا تثق بـ packageCredit من الطلب (سباق متزامن) */
+      /* أعد حساب الرصيد من حالة الحساب الحية — لا تثق بـ packageCredit من الطلب (سباق متزامن).
+       * newPrice = المبلغ المدفوع فعلاً (بعد عرض موسمي إن وُجد) لا السعر الأصلي. */
+      const creditNewPrice = paidPrice > 0
+        ? paidPrice
+        : (Number.isFinite(catalogPrice) && catalogPrice > 0 ? catalogPrice : 0);
       const creditInfo = await resolveSwitchCreditForAccount(
         req.accountId,
         { id: newPkgId, name: req.pkg },
-        Number.isFinite(catalogPrice) && catalogPrice > 0 ? catalogPrice : paidPrice,
+        creditNewPrice,
         days,
         getAccountRecord
       );
@@ -596,6 +600,22 @@ async function _activateClaimed(req, deps) {
         switchedPackage: !!switchedPackage,
       });
       if (!result.ok) return result;
+
+      if (req.seasonalOffer && req.seasonalOffer.offerId
+        && paidPrice < (Number.isFinite(catalogPrice) ? catalogPrice : Infinity)) {
+        try {
+          const seasonal = require('./seasonalOffers');
+          await seasonal.recordRedemption({
+            offerId: req.seasonalOffer.offerId,
+            accountId: req.accountId,
+            requestId: req.id,
+            paidPrice,
+            listPrice: Number.isFinite(catalogPrice) ? catalogPrice : paidPrice,
+          });
+        } catch (eRed) {
+          console.warn('[sub-activation] seasonal redemption:', eRed && eRed.message);
+        }
+      }
 
       if (!isTrial && (await isDiamondPackageRef(req.pkg)) && accountPhone && typeof registerSubscriber === 'function') {
         try {

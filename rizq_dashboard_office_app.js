@@ -165,7 +165,17 @@ function showPanel(id,el){
   if(id==='requests'){ _rizqMergeRequestsFromBackend(); _rizqMergeServiceRequests(); loadOfficeServiceDeskForm(); renderRequests(); }
   if(id==='services'){ renderServices(); try{ mountOfficeListingContext(); }catch(eSvcCtx){} }
   if(id==='hours')renderHours();
-  if(id==='subscription'){renderSubPanel();renderPackagesDisplay();renderVideoPackagesDisplay();}
+  if(id==='subscription'){
+    renderSubPanel();
+    if(typeof RizqSub!=='undefined'&&typeof RizqSub.renderSeasonalOfferCard==='function'){
+      RizqSub.renderSeasonalOfferCard({
+        lang:(typeof _officeLang!=='undefined'?_officeLang:'ar'),
+        onReady:function(){ try{ renderPackagesDisplay(); }catch(e){} }
+      });
+    }
+    renderPackagesDisplay();
+    renderVideoPackagesDisplay();
+  }
   if(id==='agents')renderAgentsOffice();
   if(id==='tenders'){renderTenderSubStatus();renderMyTenders();}
   if(id==='referral'){renderReferralPanel();}
@@ -1876,6 +1886,7 @@ function renderPackagesDisplay(){
   el.innerHTML=r.grid;
   var rp=document.getElementById('renewal-packages');
   if(rp)rp.innerHTML=r.renewal;
+  try{ if(typeof RizqSub.applySeasonalStrikethrough==='function') RizqSub.applySeasonalStrikethrough(el, list); }catch(eSo){}
 }
 
 // ── Rizq ADS — باقات إعلان الفيديو (نفس محرك RizqSub، فئة 'video') ──
