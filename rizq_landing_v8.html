@@ -2,19 +2,37 @@
 <html lang="ar" dir="rtl" data-rizq-strip="22.6">
 <head>
   <script>
-  /* حسم lang/dir قبل أول طلاء — الكوكي أولاً (مصدر الخادم)، ثم localStorage للتوافق */
+  /* حسم lang/dir + صنف اللغة قبل أول طلاء (كوكي/localStorage) — يقلّل CLS من قلب RTL→LTR */
   (function(){
     try {
       var lang = null;
       var m = document.cookie.match(/(?:^|;\s*)rizq_lang=(fr|ar)/);
       if (m) lang = m[1];
       if (!lang) { try { lang = localStorage.getItem('rizq_lang'); } catch (e0) {} }
-      if (lang === 'fr') { document.documentElement.lang = 'fr'; document.documentElement.dir = 'ltr'; }
-      else if (lang === 'ar') { document.documentElement.lang = 'ar'; document.documentElement.dir = 'rtl'; }
+      if (!lang) lang = 'ar';
+      var html = document.documentElement;
+      if (lang === 'fr') {
+        html.lang = 'fr'; html.dir = 'ltr';
+        html.classList.add('rizq-lang-fr'); html.classList.remove('rizq-lang-ar');
+      } else {
+        html.lang = 'ar'; html.dir = 'rtl';
+        html.classList.add('rizq-lang-ar'); html.classList.remove('rizq-lang-fr');
+      }
+      /* إخفاء الطلاء حتى تُطبَّق نصوص اللغة — يُرفع في applyLandingLang */
+      html.classList.add('rizq-lang-booting');
     } catch (e) {}
   })();
   </script>
   <meta charset="UTF-8"/>
+  <style id="rizq-lang-boot-guard">
+  /* لا طلاء خاطئ باللغة الافتراضية قبل applyLandingLang */
+  html.rizq-lang-booting body{opacity:0}
+  html.rizq-lang-ready body{opacity:1}
+  /* #ticker بعرض المحتوى للماركي — لا ينكمش تحت عرض الشريط (كان CLS FR~0.32) */
+  #ticker.ticker-inner,.ticker-inner{min-width:100%!important;box-sizing:border-box!important}
+  /* احجز ارتفاع شريط أحدث الإعلانات قبل امتلاء البطاقات */
+  #hero-listings .cards-track-wrap{min-height:248px;box-sizing:border-box}
+  </style>
   <script>
   /* منع استعادة موضع التمرير قبل اكتمال المحتوى (قفزة F5) */
   try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(eSR){}
@@ -13161,9 +13179,6 @@ function applyLandingLang(toAr) {
     } catch (eG) {}
   });
 
-}
-
-
   section('civic-ticker-lang', function () {
     try {
       if (window.RizqCivicTicker && typeof window.RizqCivicTicker.refreshLang === 'function') {
@@ -13171,6 +13186,15 @@ function applyLandingLang(toAr) {
       }
     } catch (eTick) { /* */ }
   });
+
+  section('lang-boot-ready', function () {
+    var html = document.documentElement;
+    html.classList.add(isAr ? 'rizq-lang-ar' : 'rizq-lang-fr');
+    html.classList.remove(isAr ? 'rizq-lang-fr' : 'rizq-lang-ar');
+    html.classList.remove('rizq-lang-booting');
+    html.classList.add('rizq-lang-ready');
+  });
+}
 
 var _langBusy = false;
 function toggleLang() {
@@ -13196,6 +13220,16 @@ document.addEventListener('click', function (e) {
 // ── مزامنة اللغة عند فتح الصفحة مع اختيار المستخدم السابق في أي صفحة من الموقع ──
 // (نفس مفتاح rizq_lang الذي يستعمله rizq_i18n.js في الصفحات المهاجَرة بالفعل)
 (function syncLandingLangOnLoad() {
+  /* أمان: لا تبقَ الصفحة مخفية إن فشل applyLandingLang */
+  setTimeout(function () {
+    try {
+      var html = document.documentElement;
+      if (html.classList.contains('rizq-lang-booting')) {
+        html.classList.remove('rizq-lang-booting');
+        html.classList.add('rizq-lang-ready');
+      }
+    } catch (eBoot) { /* */ }
+  }, 2500);
   var saved;
   try { saved = localStorage.getItem('rizq_lang'); } catch (e) { saved = null; }
   try {
