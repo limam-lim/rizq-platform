@@ -1563,6 +1563,102 @@
     getMinPackageForFeature: getMinPackageForFeature,
     getAvailablePackages : getAvailablePackages,
     renderPackageCardsHTML: renderPackageCardsHTML,
+    renderSeasonalOfferCard: function (opts) {
+      opts = opts || {};
+      var mount = document.getElementById(opts.mountId || 'seasonal-offer-card');
+      if (!mount || !global.RIZQ_BACKEND_BASE) return;
+      var lang = opts.lang || 'ar';
+      var fr = lang === 'fr';
+      var onReady = typeof opts.onReady === 'function' ? opts.onReady : null;
+      fetch(String(global.RIZQ_BACKEND_BASE).replace(/\/$/, '') + '/api/seasonal-offers/active', { credentials: 'omit' })
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (data) {
+          var offer = data && data.offer;
+          if (!offer) {
+            mount.style.display = 'none';
+            mount.textContent = '';
+            try { global.__rizqSeasonalOffer = null; } catch (e0) { /* */ }
+            return;
+          }
+          var title = fr ? (offer.titleFr || offer.titleAr) : (offer.titleAr || offer.titleFr);
+          var days = Number(offer.daysLeft) || 0;
+          var pkgs = Array.isArray(offer.packageIds) ? offer.packageIds : [];
+          mount.style.display = 'block';
+          mount.textContent = '';
+          var card = document.createElement('div');
+          card.style.cssText = 'background:linear-gradient(135deg,#0f2347,#1B3A6B);color:#fff;border-radius:14px;padding:16px 18px';
+          var h = document.createElement('div');
+          h.style.cssText = 'font-size:15px;font-weight:800;margin-bottom:6px';
+          h.textContent = title || '';
+          var p = document.createElement('div');
+          p.style.cssText = 'font-size:13px;opacity:.92';
+          p.textContent = fr
+            ? ('Remise ' + offer.percent + '% · se termine dans ' + days + ' jour(s)')
+            : ('خصم ' + offer.percent + '% · ينتهي بعد ' + days + ' يوم' + (days === 1 ? '' : 'اً'));
+          card.appendChild(h);
+          card.appendChild(p);
+          if (pkgs.length) {
+            var meta = document.createElement('div');
+            meta.style.cssText = 'font-size:11px;opacity:.75;margin-top:8px';
+            meta.textContent = (fr ? 'Forfaits: ' : 'الباقات: ') + pkgs.join(', ');
+            card.appendChild(meta);
+          }
+          mount.appendChild(card);
+          try { global.__rizqSeasonalOffer = offer; } catch (e1) { /* */ }
+          if (onReady) onReady(offer);
+        })
+        .catch(function () { mount.style.display = 'none'; });
+    },
+    applySeasonalStrikethrough: function (root, list) {
+      var offer = global.__rizqSeasonalOffer;
+      if (!offer || !root || !list || !list.length) return;
+      var ids = (offer.packageIds || []).map(function (x) { return String(x).toLowerCase(); });
+      var pct = Number(offer.percent) || 0;
+      if (!(pct > 0)) return;
+      function paint(priceEl, listPrice) {
+        if (!priceEl || !(listPrice > 0)) return;
+        var discounted = Math.round(listPrice * (1 - pct / 100));
+        priceEl.textContent = '';
+        var strike = document.createElement('span');
+        strike.style.textDecoration = 'line-through';
+        strike.style.opacity = '.55';
+        strike.style.marginInlineEnd = '6px';
+        strike.textContent = listPrice.toLocaleString() + ' MRU';
+        priceEl.appendChild(strike);
+        priceEl.appendChild(document.createTextNode(discounted.toLocaleString() + ' MRU'));
+      }
+      Array.prototype.forEach.call(
+        root.querySelectorAll('.pkg-card, .package-card, [data-pkg-id], [data-package-id]'),
+        function (card) {
+          var id = String(card.getAttribute('data-pkg-id') || card.getAttribute('data-package-id') || '').toLowerCase();
+          var name = '';
+          try {
+            var nameEl = card.querySelector('.pkg-name, .package-name, h3, h4');
+            if (nameEl) name = String(nameEl.textContent || '').trim().toLowerCase();
+          } catch (eN) { /* */ }
+          var matchedPkg = null;
+          for (var i = 0; i < list.length; i++) {
+            var p = list[i];
+            var pid = String((p && (p.id || p.packageId)) || '').toLowerCase();
+            var pname = String((p && (p.name || p.pkgName)) || '').toLowerCase();
+            if (ids.indexOf(pid) < 0 && ids.indexOf(pname) < 0) continue;
+            if ((id && id === pid) || (name && name === pname) || (!id && !name)) {
+              matchedPkg = p;
+              break;
+            }
+          }
+          if (!matchedPkg && ids.some(function (x) { return (id && x === id) || (name && x === name); })) {
+            matchedPkg = { price: 0 };
+          }
+          if (!matchedPkg) return;
+          var priceEl = card.querySelector('.pkg-price, .package-price, .price, [data-price]');
+          var listPrice = Number(matchedPkg.price)
+            || Number(String((priceEl && (priceEl.getAttribute('data-price') || priceEl.textContent)) || '').replace(/[^\d.]/g, ''))
+            || 0;
+          paint(priceEl, listPrice);
+        }
+      );
+    },
     getDurationDays      : getDurationDays,
     getPackageTier       : getPackageTier,
     isDiamondName        : isDiamondName,

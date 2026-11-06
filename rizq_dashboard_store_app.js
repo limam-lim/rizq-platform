@@ -512,7 +512,17 @@ function showPanel(id, el){
   if(id==='messages') renderMessages();
   if(id==='requests'){ _rizqMergeServiceRequests(); loadStoreServiceDeskForm(); renderStoreServiceRequests(); }
   if(id==='photos') renderPhotos();
-  if(id==='subscription'){ renderSubscriptionPanel(); renderSeasonalOfferCard(); renderPackagesDisplay(); renderVideoPackagesDisplay(); }
+  if(id==='subscription'){
+    renderSubscriptionPanel();
+    if(typeof RizqSub!=='undefined'&&typeof RizqSub.renderSeasonalOfferCard==='function'){
+      RizqSub.renderSeasonalOfferCard({
+        lang:(typeof _storeLang!=='undefined'?_storeLang:'ar'),
+        onReady:function(){ try{ renderPackagesDisplay(); }catch(e){} }
+      });
+    }
+    renderPackagesDisplay();
+    renderVideoPackagesDisplay();
+  }
   if(id==='mypayments'){renderRizqPayment('rzq-pay-section');if(typeof renderMyPayments==='function')renderMyPayments();}
   if(id==='agents') renderAgents();
   if(id==='tenders'){ renderTenderSubStatus(); renderMyTenders(); }
@@ -2163,46 +2173,6 @@ function _paintInvoices(invs, isLocalSource){
     + '</tr></thead><tbody>'+rows+'</tbody></table></div></div>';
 }
 
-function renderSeasonalOfferCard(){
-  var mount=document.getElementById('seasonal-offer-card');
-  if(!mount||!window.RIZQ_BACKEND_BASE) return;
-  var lang=(typeof _storeLang!=='undefined'?_storeLang:'ar');
-  var fr=lang==='fr';
-  fetch(String(window.RIZQ_BACKEND_BASE).replace(/\/$/,'')+'/api/seasonal-offers/active',{credentials:'omit'})
-    .then(function(r){return r.ok?r.json():null;})
-    .then(function(data){
-      var offer=data&&data.offer;
-      if(!offer){ mount.style.display='none'; mount.textContent=''; return; }
-      var title=fr?(offer.titleFr||offer.titleAr):(offer.titleAr||offer.titleFr);
-      var days=Number(offer.daysLeft)||0;
-      var pkgs=Array.isArray(offer.packageIds)?offer.packageIds:[];
-      var list=pkgs.length?pkgs:[];
-      /* بطاقة العرض: عنوان نص فقط + ~~سعر~~ ← مخفّض عبر بطاقات الباقات عند الجلب من الخادم */
-      mount.style.display='block';
-      mount.textContent='';
-      var card=document.createElement('div');
-      card.style.cssText='background:linear-gradient(135deg,#0f2347,#1B3A6B);color:#fff;border-radius:14px;padding:16px 18px';
-      var h=document.createElement('div');
-      h.style.cssText='font-size:15px;font-weight:800;margin-bottom:6px';
-      h.textContent=title||'';
-      var p=document.createElement('div');
-      p.style.cssText='font-size:13px;opacity:.92';
-      p.textContent=fr
-        ? ('Remise '+offer.percent+'% · se termine dans '+days+' jour(s)')
-        : ('خصم '+offer.percent+'% · ينتهي بعد '+days+' يوم'+(days===1?'':'اً'));
-      card.appendChild(h); card.appendChild(p);
-      if(list.length){
-        var meta=document.createElement('div');
-        meta.style.cssText='font-size:11px;opacity:.75;margin-top:8px';
-        meta.textContent=(fr?'Forfaits: ':'الباقات: ')+list.join(', ');
-        card.appendChild(meta);
-      }
-      mount.appendChild(card);
-      try{ window.__rizqSeasonalOffer=offer; }catch(e){}
-      try{ if(typeof renderPackagesDisplay==='function') renderPackagesDisplay(); }catch(e2){}
-    }).catch(function(){ mount.style.display='none'; });
-}
-
 function renderPackagesDisplay(){
   var pkgs=JSON.parse(localStorage.getItem('rizq_store_packages')||localStorage.getItem('rizq_packages')||'[]').filter(function(p){return p.active!==false;});
   var el=document.getElementById('packages-display'); if(!el) return;
@@ -2224,81 +2194,10 @@ function renderPackagesDisplay(){
   el.innerHTML=r.grid;
   var rp=document.getElementById('renewal-packages');
   if(rp)rp.innerHTML=r.renewal;
-  try{ _applySeasonalStrikethrough(el, list); }catch(eSo){}
+  try{ if(typeof RizqSub.applySeasonalStrikethrough==='function') RizqSub.applySeasonalStrikethrough(el, list); }catch(eSo){}
 }
 
-function _applySeasonalStrikethrough(root, list){
-  var offer=window.__rizqSeasonalOffer;
-  if(!offer||!root||!list||!list.length) return;
-  var ids=(offer.packageIds||[]).map(function(x){return String(x).toLowerCase();});
-  var pct=Number(offer.percent)||0;
-  if(!(pct>0)) return;
-  Array.prototype.forEach.call(root.querySelectorAll('.pkg-card, .package-card, [data-pkg-id], [data-package-id]'), function(card){
-    var id=String(card.getAttribute('data-pkg-id')||card.getAttribute('data-package-id')||'').toLowerCase();
-    var name='';
-    try{
-      var nameEl=card.querySelector('.pkg-name, .package-name, h3, h4');
-      if(nameEl) name=String(nameEl.textContent||'').trim().toLowerCase();
-    }catch(eN){}
-    var hit=ids.some(function(x){ return (id&&x===id)||(name&&(x===name||name.indexOf(x)>=0)); });
-    if(!hit){
-      /* مطابقة عبر قائمة الباقات المعروضة */
-      for(var i=0;i<list.length;i++){
-        var p=list[i];
-        var pid=String((p&&(p.id||p.packageId))||'').toLowerCase();
-        var pname=String((p&&(p.name||p.pkgName))||'').toLowerCase();
-        if(ids.indexOf(pid)>=0||ids.indexOf(pname)>=0){
-          if((id&&id===pid)||(name&&name===pname)||(!id&&!name&&card.textContent&&card.textContent.indexOf(p.name)>=0)){
-            hit=true; id=pid;
-            var priceEl0=card.querySelector('.pkg-price, .package-price, .price, [data-price]');
-            if(priceEl0 && p.price!=null){
-              var listP=Number(p.price)||0;
-              var disc=Math.round(listP*(1-pct/100));
-              priceEl0.textContent='';
-              var s=document.createElement('span');
-              s.style.textDecoration='line-through'; s.style.opacity='.55'; s.style.marginLeft='6px';
-              s.textContent=listP.toLocaleString()+' MRU';
-              priceEl0.appendChild(s);
-              priceEl0.appendChild(document.createTextNode(' '+disc.toLocaleString()+' MRU'));
-            }
-            return;
-          }
-        }
-      }
-      return;
-    }
-    var priceEl=card.querySelector('.pkg-price, .package-price, .price, [data-price]');
-    if(!priceEl) return;
-    var raw=priceEl.getAttribute('data-price')||priceEl.textContent||'';
-    var listPrice=Number(String(raw).replace(/[^\d.]/g,''))||0;
-    if(!(listPrice>0)) return;
-    var discounted=Math.round(listPrice*(1-pct/100));
-    priceEl.textContent='';
-    var strike=document.createElement('span');
-    strike.style.textDecoration='line-through'; strike.style.opacity='.55'; strike.style.marginInlineEnd='6px';
-    strike.textContent=listPrice.toLocaleString()+' MRU';
-    priceEl.appendChild(strike);
-    priceEl.appendChild(document.createTextNode(discounted.toLocaleString()+' MRU'));
-  });
-}
-
-// ── Rizq ADS — باقات إعلان الفيديو (نفس محرك RizqSub، فئة 'video') ──
-function renderVideoPackagesDisplay(){
-  var el=document.getElementById('rizq-ads-packages-display'); if(!el) return;
-  var lang=(typeof _storeLang!=='undefined'?_storeLang:'ar');
-  var pkgs=[];
-  if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
-    try{ pkgs=RizqPackagesConfig.getCatalog('video', lang).filter(function(p){return p.active!==false;}); }catch(e){}
-  }
-  if(!pkgs.length){ try{ pkgs=JSON.parse(localStorage.getItem('rizq_video_packages')||'[]').filter(function(p){return p.active!==false;}); }catch(e){ pkgs=[]; } }
-  if(!pkgs.length && window.RizqPackagesConfig && RizqPackagesConfig.CATALOGS && RizqPackagesConfig.CATALOGS.video){
-    pkgs=JSON.parse(JSON.stringify(RizqPackagesConfig.CATALOGS.video));
-  }
-  var list=pkgs;
-  var FEATS_AR={'إعلان فيديو واحد':['فيديو إعلاني واحد لمدة 10 أيام','ظهور في قسم الإعلانات بالصفحة الرئيسية','دفع لكل إعلان — بلا اشتراك شهري'],'أساسي فيديو':['حتى 3 فيديوهات إعلانية ترويجية شهرياً','ظهور في قسم الإعلانات بالصفحة الرئيسية','إحصائيات أداء أساسية آلية'],'احترافي فيديو':['حتى 10 فيديوهات إعلانية ترويجية شهرياً','أولوية الترتيب في نتائج البحث','شارة «محتوى مميّز برزق» الموثّقة'],'أعمال ومعارض':['فيديوهات وعروض غير محدودة','ظهور مميز في القسم الرئيسي بالصفحة الرئيسية','تقارير تحليل أداء آلية مفصّلة','دعم VIP ذو أولوية + شارة VIP موثّقة'],'أساسي':['حتى 3 فيديوهات إعلانية ترويجية شهرياً','ظهور في قسم الإعلانات بالصفحة الرئيسية','إحصائيات أداء أساسية آلية'],'احترافي':['حتى 10 فيديوهات إعلانية ترويجية شهرياً','أولوية الترتيب في نتائج البحث','شارة «محتوى مميّز برزق» الموثّقة']};
-  var FEATS_FR={'إعلان فيديو واحد':['Une vidéo publicitaire pendant 10 jours','Section publicitaire page d\'accueil','Paiement par annonce — sans abonnement mensuel'],'أساسي فيديو':['Jusqu\'à 3 vidéos promotionnelles / mois','Section publicitaire page d\'accueil','Statistiques de performance de base automatisées'],'احترافي فيديو':['Jusqu\'à 10 vidéos promotionnelles / mois','Priorité dans les résultats de recherche','Badge « Contenu vedette Rizq » vérifié'],'أعمال ومعارض':['Vidéos et vitrines illimitées','Placement premium section principale','Rapports d\'analyse automatisés détaillés','Support VIP prioritaire + badge VIP vérifié'],'أساسي':['Jusqu\'à 3 vidéos promotionnelles / mois','Section publicitaire page d\'accueil','Statistiques de performance de base automatisées'],'احترافي':['Jusqu\'à 10 vidéos promotionnelles / mois','Priorité dans les résultats de recherche','Badge « Contenu vedette Rizq » vérifié']};
-  var FEATS=(lang==='fr')?FEATS_FR:FEATS_AR;
-  var ICONS={'إعلان فيديو واحد':'⚡','أساسي فيديو':'🎬','احترافي فيديو':'🥇','أعمال ومعارض':'💎','أساسي':'🎬','احترافي':'🥇'};
+يديو':'🥇','أعمال ومعارض':'💎','أساسي':'🎬','احترافي':'🥇'};
   var r=RizqSub.renderPackageCardsHTML(list,FEATS,ICONS,lang,'video');
   el.innerHTML=r.grid;
 }
