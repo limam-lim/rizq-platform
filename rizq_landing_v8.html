@@ -8392,10 +8392,23 @@ function _styTabIdFor(gender){
   return 'sty-tab-men';
 }
 
+/* بذرة اختيارية للاختبارات فقط: window.__RIZQ_STY_SEED — الإنتاج يبقى Math.random */
+var _stySeedState = null;
+function _styRand(){
+  try {
+    if (_stySeedState == null && typeof window !== 'undefined' && window.__RIZQ_STY_SEED != null) {
+      var seed = Number(window.__RIZQ_STY_SEED);
+      _stySeedState = (seed >= 1 && isFinite(seed)) ? Math.floor(seed) : 1;
+    }
+  } catch (eSeed) { _stySeedState = null; }
+  if (_stySeedState == null) return Math.random();
+  _stySeedState = (_stySeedState * 16807) % 2147483647;
+  return (_stySeedState - 1) / 2147483646;
+}
 function _styShuffle(arr){
   var a = arr.slice();
   for(var i=a.length-1;i>0;i--){
-    var j = Math.floor(Math.random()*(i+1));
+    var j = Math.floor(_styRand()*(i+1));
     var t=a[i]; a[i]=a[j]; a[j]=t;
   }
   return a;

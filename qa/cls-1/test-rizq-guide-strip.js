@@ -140,6 +140,8 @@ function startStatic() {
   const origin = 'http://127.0.0.1:' + server.address().port;
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage({ viewport: { width: 412, height: 915 } });
+  /* بذرة ثابتة لـ _styShuffle داخل الاختبار فقط — الإنتاج عشوائي */
+  await page.addInitScript(() => { window.__RIZQ_STY_SEED = 424242; });
   await page.goto(origin + '/rizq_landing_v8.html', { waitUntil: 'domcontentloaded', timeout: 90000 });
   await page.waitForTimeout(3500);
 
