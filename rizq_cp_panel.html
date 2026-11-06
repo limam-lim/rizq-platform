@@ -213,6 +213,19 @@ select option{background:#fff !important;color:#1a2535 !important}
 .toggle-sw::after{content:'';position:absolute;width:17px;height:17px;background:#fff;border-radius:50%;top:3px;right:3px;transition:right .3s;box-shadow:0 1px 3px rgba(15,35,65,.25)}
 .toggle-sw.on{background:linear-gradient(135deg,var(--gold),var(--gold-light))}
 .toggle-sw.on::after{right:22px}
+/* عيّنات الألوان مربّعة صغيرة — لا تغطي حقول المدة/الأيام (كان الـ oval الأصلي يتداخل في RTL) */
+#packages-grid .pkg-color-row{overflow:hidden;position:relative;z-index:0}
+#packages-grid input[type=color].pkg-bg-picker,
+#packages-grid input[type=color].pkg-text-picker,
+#packages-grid input[type=color].pkg-accent-picker{
+  -webkit-appearance:none;appearance:none;
+  width:28px;height:28px;min-width:28px;max-width:28px;padding:0;
+  border:1px solid rgba(27,58,107,.25);border-radius:6px;background:#fff;cursor:pointer;flex-shrink:0;
+}
+#packages-grid input[type=color]::-webkit-color-swatch-wrapper{padding:2px}
+#packages-grid input[type=color]::-webkit-color-swatch{border:none;border-radius:4px}
+#packages-grid input[type=color]::-moz-color-swatch{border:none;border-radius:4px}
+#packages-grid .pkg-duration-input{position:relative;z-index:2;background:#fff}
 
 /* ══ TOAST ══ */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:rgba(27,58,107,.95);border:1px solid rgba(201,168,76,.3);color:#fff;padding:12px 24px;border-radius:12px;font-size:13.5px;z-index:9999;transition:transform .4s;backdrop-filter:blur(16px);font-family:'Segoe UI','Arial',sans-serif}
@@ -328,7 +341,7 @@ main, .page-content.active, .main-content, .results-area,
 .disc-close-btn:hover{background:rgba(201,168,76,.28)}
 </style>
   <script src="rizq_backend_config.js"></script>
-  <script src="rizq_subscription_engine.js"></script>
+  <script src="rizq_subscription_engine.js?v=1.4"></script>
   <script src="rizq_invoice_engine.js"></script>
   <script src="rizq_i18n_data.js"></script>
   <script src="rizq_i18n.js"></script>
@@ -3367,11 +3380,37 @@ function pkgCatLabel(key){
   return window.RizqI18n ? RizqI18n.t('pkg-cat-'+cat.key,'admin') : cat.label;
 }
 
+/** دمج صف محفوظ مع الافتراضي بالمعرّف — يمنع عرض «باقة بدون اسم» عندما الموقع العام يملأ الأسماء من NAMES فقط */
+function hydratePkgRow(key, row){
+  const defs = PKG_DEFAULTS[key] || [];
+  const id = String((row && row.id) || '');
+  const def = defs.find(d => String(d.id) === id) || null;
+  const out = Object.assign({}, def || {}, row || {});
+  if(!(String(out.name || '').trim()) && def && def.name) out.name = def.name;
+  if(!(String(out.period || '').trim()) && def && def.period) out.period = def.period;
+  if(!(Number(out.durationDays) > 0) && def && def.durationDays) out.durationDays = def.durationDays;
+  if((!Array.isArray(out.features) || !out.features.length) && def && Array.isArray(def.features)) out.features = def.features.slice();
+  if(out.active === undefined || out.active === null) out.active = def ? def.active !== false : true;
+  if(out.price == null && def && def.price != null) out.price = def.price;
+  // أسماء من كتالوج العرض العام إن وُجد (id-only rows)
+  if(!(String(out.name || '').trim()) && id && typeof RizqPackagesConfig !== 'undefined' && typeof RizqPackagesConfig.catalogPackageLabel === 'function'){
+    try{
+      const label = RizqPackagesConfig.catalogPackageLabel(id, 'ar');
+      if(label) out.name = label;
+    }catch(e){}
+  }
+  return out;
+}
+function hydratePkgList(key, list){
+  if(!Array.isArray(list) || !list.length) return JSON.parse(JSON.stringify(PKG_DEFAULTS[key] || []));
+  return list.map(p => hydratePkgRow(key, p));
+}
+
 function loadPkgCategory(key){
   const cat = pkgCatInfo(key);
   try{
     const raw = localStorage.getItem(cat.ls);
-    if(raw){ const p = JSON.parse(raw); if(Array.isArray(p) && p.length) return p; }
+    if(raw){ const p = JSON.parse(raw); if(Array.isArray(p) && p.length) return hydratePkgList(key, p); }
   }catch(e){}
   return JSON.parse(JSON.stringify(PKG_DEFAULTS[key]||[]));
 }
@@ -3422,7 +3461,8 @@ function syncPkgCatFromBackend(key){
     .then(function(res){ return res.ok ? res.json() : null; })
     .then(function(data){
       if(!data || !data.ok || !data.config || !data.config.packages || !Array.isArray(data.config.packages[key])) return false;
-      localStorage.setItem(pkgCatInfo(key).ls, JSON.stringify(data.config.packages[key]));
+      var hydrated = hydratePkgList(key, data.config.packages[key]);
+      localStorage.setItem(pkgCatInfo(key).ls, JSON.stringify(hydrated));
       return true;
     }).catch(function(){ return false; });
 }
@@ -3457,12 +3497,12 @@ function renderPackages(){
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
           <div class="form-group"><label class="form-label">${t('pkg-price-label','السعر (MRU، 0 = مجاناً)')}</label><input class="form-input pkg-price-input" type="number" value="${Number(p.price)||0}" dir="ltr"/></div>
           <div class="form-group"><label class="form-label">${t('pkg-period-label','المدة / الوصف')}</label><input class="form-input pkg-period-input" value="${_pe(p.period||'')}"/></div>
-          <div class="form-group"><label class="form-label">${t('pkg-duration-label','عدد الأيام')}</label><input class="form-input pkg-duration-input" type="number" value="${Number(p.durationDays)||30}" dir="ltr"/></div>
+          <div class="form-group"><label class="form-label">${t('pkg-duration-label','عدد الأيام')}</label><input class="form-input pkg-duration-input" type="number" autocomplete="off" value="${Number(p.durationDays)||30}" dir="ltr"/></div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
-          <div class="form-group"><label class="form-label">${t('pkg-bg-label','لون الخلفية')}</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input pkg-bg-input" type="text" value="${_pe(p.bgColor||'')}" placeholder="#0a1628" dir="ltr" style="flex:1"/><input type="color" class="pkg-bg-picker" value="${_pe((p.bgColor&&/^#[0-9a-fA-F]{6}$/.test(p.bgColor))?p.bgColor:'#0a1628')}" oninput="var i=this.closest('.form-group').querySelector('.pkg-bg-input');if(i)i.value=this.value" title="${_pe(t('pkg-bg-pick','اختر لون الخلفية'))}"/></div></div>
-          <div class="form-group"><label class="form-label">${t('pkg-text-label','لون النص')}</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input pkg-text-input" type="text" value="${_pe(p.textColor||'')}" placeholder="#ffffff" dir="ltr" style="flex:1"/><input type="color" class="pkg-text-picker" value="${_pe((p.textColor&&/^#[0-9a-fA-F]{6}$/.test(p.textColor))?p.textColor:'#ffffff')}" oninput="var i=this.closest('.form-group').querySelector('.pkg-text-input');if(i)i.value=this.value" title="${_pe(t('pkg-text-pick','اختر لون النص'))}"/></div></div>
-          <div class="form-group"><label class="form-label">${t('pkg-accent-label','لون التمييز')}</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input pkg-accent-input" type="text" value="${_pe(p.accentColor||'')}" placeholder="#C9A84C" dir="ltr" style="flex:1"/><input type="color" class="pkg-accent-picker" value="${_pe((p.accentColor&&/^#[0-9a-fA-F]{6}$/.test(p.accentColor))?p.accentColor:'#C9A84C')}" oninput="var i=this.closest('.form-group').querySelector('.pkg-accent-input');if(i)i.value=this.value" title="${_pe(t('pkg-accent-pick','اختر لون التمييز'))}"/></div></div>
+        <div class="pkg-color-row" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:8px">
+          <div class="form-group"><label class="form-label">${t('pkg-bg-label','لون الخلفية')}</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input pkg-bg-input" type="text" value="${_pe(p.bgColor||'')}" placeholder="#0a1628" dir="ltr" style="flex:1;min-width:0"/><input type="color" class="pkg-bg-picker" value="${_pe((p.bgColor&&/^#[0-9a-fA-F]{6}$/.test(p.bgColor))?p.bgColor:'#0a1628')}" oninput="var i=this.closest('.form-group').querySelector('.pkg-bg-input');if(i)i.value=this.value" title="${_pe(t('pkg-bg-pick','اختر لون الخلفية'))}"/></div></div>
+          <div class="form-group"><label class="form-label">${t('pkg-text-label','لون النص')}</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input pkg-text-input" type="text" value="${_pe(p.textColor||'')}" placeholder="#ffffff" dir="ltr" style="flex:1;min-width:0"/><input type="color" class="pkg-text-picker" value="${_pe((p.textColor&&/^#[0-9a-fA-F]{6}$/.test(p.textColor))?p.textColor:'#ffffff')}" oninput="var i=this.closest('.form-group').querySelector('.pkg-text-input');if(i)i.value=this.value" title="${_pe(t('pkg-text-pick','اختر لون النص'))}"/></div></div>
+          <div class="form-group"><label class="form-label">${t('pkg-accent-label','لون التمييز')}</label><div style="display:flex;gap:8px;align-items:center"><input class="form-input pkg-accent-input" type="text" value="${_pe(p.accentColor||'')}" placeholder="#C9A84C" dir="ltr" style="flex:1;min-width:0"/><input type="color" class="pkg-accent-picker" value="${_pe((p.accentColor&&/^#[0-9a-fA-F]{6}$/.test(p.accentColor))?p.accentColor:'#C9A84C')}" oninput="var i=this.closest('.form-group').querySelector('.pkg-accent-input');if(i)i.value=this.value" title="${_pe(t('pkg-accent-pick','اختر لون التمييز'))}"/></div></div>
         </div>
         <div class="form-group"><label class="form-label">${t('pkg-feats-label','المميزات (كل ميزة في سطر)')}</label><textarea class="form-input pkg-feats-input" rows="3" style="resize:vertical">${_pe((p.features||[]).join('\n'))}</textarea></div>
         <button class="btn-sm btn-outline" onclick="deletePackage(${i})">${t('pkg-delete-btn','🗑 حذف الباقة')}</button>
@@ -3496,19 +3536,32 @@ function savePkgCategory(){
   const t = (k,fb)=> window.RizqI18n ? RizqI18n.t(k,'admin') : fb;
   const cards = document.querySelectorAll('#packages-grid .card');
   const pkgs = loadPkgCategory(currentPkgCat);
+  const emptyNames = [];
   cards.forEach(card=>{
     const i = +card.getAttribute('data-idx');
     if(!pkgs[i]) return;
-    pkgs[i].name = card.querySelector('.pkg-name-input').value.trim();
+    const nameVal = (card.querySelector('.pkg-name-input')||{}).value;
+    const trimmed = String(nameVal == null ? '' : nameVal).trim();
+    if(!trimmed){
+      emptyNames.push(pkgs[i].id || ('#'+(i+1)));
+      return;
+    }
+    pkgs[i].name = trimmed;
     pkgs[i].price = +card.querySelector('.pkg-price-input').value || 0;
-    pkgs[i].period = card.querySelector('.pkg-period-input').value.trim();
-    pkgs[i].durationDays = +card.querySelector('.pkg-duration-input').value || 30;
+    const periodVal = String((card.querySelector('.pkg-period-input')||{}).value || '').trim();
+    if(periodVal) pkgs[i].period = periodVal; // لا تكتب فترة فارغة فوق قيمة موجودة
+    const dur = +((card.querySelector('.pkg-duration-input')||{}).value);
+    if(Number.isFinite(dur) && dur > 0) pkgs[i].durationDays = dur;
     pkgs[i].features = card.querySelector('.pkg-feats-input').value.split('\n').map(f=>f.trim()).filter(Boolean);
     pkgs[i].bgColor = (card.querySelector('.pkg-bg-input')||{}).value.trim() || '';
     pkgs[i].textColor = (card.querySelector('.pkg-text-input')||{}).value.trim() || '';
     pkgs[i].accentColor = (card.querySelector('.pkg-accent-input')||{}).value.trim() || '';
     pkgs[i].active = card.querySelector('.toggle-sw').classList.contains('on');
   });
+  if(emptyNames.length){
+    showToast(t('pkg-toast-empty-name','❌ لا يمكن حفظ اسم فارغ — عبّئ اسم الباقة أولاً: ')+emptyNames.join(', '), 'error');
+    return;
+  }
   localStorage.setItem(pkgCatInfo(currentPkgCat).ls, JSON.stringify(pkgs));
   _syncPkgCatToBackend(currentPkgCat, pkgs);
   showToast(t('pkg-toast-saved','✅ تم حفظ باقات «{cat}» — التغييرات مُطبَّقة الآن على الموقع').replace('{cat}', pkgCatLabel(currentPkgCat)));

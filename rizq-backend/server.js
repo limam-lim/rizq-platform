@@ -1565,28 +1565,54 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), async (req, r
       if (/^(rgb|rgba|hsl|hsla)\(/i.test(s) && s.length <= 60) return s;
       return '';
     }
-    PKG_CAT_KEYS.forEach((key) => {
-      if (!Array.isArray(body.packages[key])) return;
-      mergedPkgs[key] = body.packages[key].slice(0, 30).map((p) => ({
-        id: String(p.id || ('pkg' + Date.now())).slice(0, 60),
-        name: String(p.name || '').slice(0, 80),
-        price: Number(p.price) || 0,
-        period: String(p.period || '').slice(0, 60),
-        durationDays: Math.max(1, Math.min(3650, Number(p.durationDays) || 30)),
-        maxCatalogItems: p.maxCatalogItems != null ? Number(p.maxCatalogItems) : undefined,
-        boostDays: Math.max(0, Math.min(365, Number(p.boostDays) || 0)),
-        features: Array.isArray(p.features) ? p.features.slice(0, 20).map((f) => String(f).slice(0, 200)) : [],
-        active: p.active !== false,
-        diamondTier: String(p.diamondTier || '').slice(0, 30),
-        audioAccess: p.audioAccess === true,
-        quotaMessages: Math.max(0, Math.min(100000, Number(p.quotaMessages) || 0)),
-        quotaMinutes: Math.max(0, Math.min(100000, Number(p.quotaMinutes) || 0)),
-        aiModel: String(p.aiModel || '').slice(0, 80),
-        bgColor: sanitizePkgColor(p.bgColor || p.backgroundColor),
-        textColor: sanitizePkgColor(p.textColor || p.color),
-        accentColor: sanitizePkgColor(p.accentColor),
-      }));
-    });
+    let packageNameError = null;
+    for (const key of PKG_CAT_KEYS) {
+      if (!Array.isArray(body.packages[key])) continue;
+      const prevList = Array.isArray(existingPkgs[key]) ? existingPkgs[key] : [];
+      const mapped = [];
+      for (const p of body.packages[key].slice(0, 30)) {
+        const id = String(p.id || ('pkg' + Date.now())).slice(0, 60);
+        const prev = prevList.find((x) => String(x && x.id) === id) || null;
+        let name = String(p.name || '').trim().slice(0, 80);
+        // لا تسمح باسم فارغ يمحو اسماً محفوظاً
+        if (!name) {
+          packageNameError = {
+            ok: false,
+            error: 'package_name_required',
+            message: 'لا يمكن حفظ اسم باقة فارغ (' + id + ')',
+            packageId: id,
+            category: key,
+          };
+          break;
+        }
+        let period = String(p.period || '').trim().slice(0, 60);
+        if (!period && prev && prev.period) period = String(prev.period).slice(0, 60);
+        mapped.push({
+          id,
+          name,
+          price: Number(p.price) || 0,
+          period,
+          durationDays: Math.max(1, Math.min(3650, Number(p.durationDays) || (prev && prev.durationDays) || 30)),
+          maxCatalogItems: p.maxCatalogItems != null ? Number(p.maxCatalogItems) : undefined,
+          boostDays: Math.max(0, Math.min(365, Number(p.boostDays) || 0)),
+          features: Array.isArray(p.features) ? p.features.slice(0, 20).map((f) => String(f).slice(0, 200)) : [],
+          active: p.active !== false,
+          diamondTier: String(p.diamondTier || '').slice(0, 30),
+          audioAccess: p.audioAccess === true,
+          quotaMessages: Math.max(0, Math.min(100000, Number(p.quotaMessages) || 0)),
+          quotaMinutes: Math.max(0, Math.min(100000, Number(p.quotaMinutes) || 0)),
+          aiModel: String(p.aiModel || '').slice(0, 80),
+          bgColor: sanitizePkgColor(p.bgColor || p.backgroundColor),
+          textColor: sanitizePkgColor(p.textColor || p.color),
+          accentColor: sanitizePkgColor(p.accentColor),
+        });
+      }
+      if (packageNameError) break;
+      mergedPkgs[key] = mapped;
+    }
+    if (packageNameError) {
+      return res.status(400).json(packageNameError);
+    }
     next.packages = mergedPkgs;
   }
 

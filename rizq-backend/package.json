@@ -67,6 +67,7 @@
     "test:asset-versions": "node scripts/test-asset-versions.js",
     "test:founding-no-discount": "node scripts/run-with-test-db.js scripts/test-founding-no-discount.js",
     "test:seasonal-offers": "node scripts/run-with-test-db.js scripts/test-seasonal-offers.js",
+    "test:pkg-admin-hydrate": "node scripts/test-pkg-admin-hydrate.js",
     "test:all": "node scripts/test-all.js",
     "test:demo-images-local": "node scripts/test-demo-images-local.js",
     "test:header-all-pages": "npm --prefix ../qa/cls-1 install --no-audit --no-fund && node ../qa/cls-1/test-header-all-pages.js",

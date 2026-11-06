@@ -2100,9 +2100,10 @@ function renderSubscriptionPanel(){
   if(!wrap) return;
   const bgClass = isExpired?'expired':isTrial?'trial':'active-plan';
   const statusText = isExpired?_t2('❌ انتهى الاشتراك','❌ Abonnement expiré'):isTrial?_t2('🎁 فترة تجريبية مجانية','🎁 Période d\'essai gratuite'):_t2('✅ اشتراك نشط','✅ Abonnement actif');
-  const reminderBanner = (isExpiringSoon||isExpired) ? `
-    <div class="sub-card ${isExpired?'expired':'trial'}" style="margin-top:12px;text-align:center">
-      <div style="font-size:13px;font-weight:700">${isExpired?_t2('⛔ انتهى اشتراكك — جدد الآن لاستعادة كل المزايا','⛔ Votre abonnement a expiré — renouvelez maintenant pour retrouver tous les avantages'):_t2(`⚠️ اشتراكك سينتهي بعد ${daysLeft} أيام — جدد الآن لتجنب توقف الخدمة`,`⚠️ Votre abonnement expire dans ${daysLeft} jours — renouvelez maintenant pour éviter toute interruption`)}</div>
+  // بطاقة واحدة فقط عند الانتهاء — بدون تكرار «انتهى الاشتراك» في العنوان والوصف وبانر ثانٍ
+  const reminderBanner = (!isExpired && isExpiringSoon) ? `
+    <div class="sub-card trial" style="margin-top:12px;text-align:center">
+      <div style="font-size:13px;font-weight:700">${_t2(`⚠️ اشتراكك سينتهي بعد ${daysLeft} أيام — جدد الآن لتجنب توقف الخدمة`,`⚠️ Votre abonnement expire dans ${daysLeft} jours — renouvelez maintenant pour éviter toute interruption`)}</div>
       <div style="margin-top:10px">
         <button class="btn btn-gold btn-sm" onclick="document.getElementById('packages-display').scrollIntoView({behavior:'smooth'})">${_t2('🔄 تجديد الباقة الآن','🔄 Renouveler maintenant')}</button>
       </div>
@@ -2111,10 +2112,14 @@ function renderSubscriptionPanel(){
     <div class="sub-card ${bgClass}">
       <div style="position:absolute;top:20px;left:20px;opacity:.08;font-size:80px">💳</div>
       <div class="sub-plan-name">${statusText}</div>
-      <div class="sub-expires">${isExpired?_t2('انتهى الاشتراك — جدّد الآن','Abonnement expiré — renouvelez maintenant'):isTrial?_t2(`الفترة التجريبية تنتهي خلال ${daysLeft} يوم`,`La période d'essai se termine dans ${daysLeft} jour(s)`):_t2(`ينتهي خلال ${daysLeft} يوماً`,`Expire dans ${daysLeft} jour(s)`)}</div>
+      <div class="sub-expires">${isExpired
+        ? _t2('جدد الآن لاستعادة كل المزايا','Renouvelez maintenant pour retrouver tous les avantages')
+        : isTrial
+          ? _t2(`الفترة التجريبية تنتهي خلال ${daysLeft} يوم`,`La période d'essai se termine dans ${daysLeft} jour(s)`)
+          : _t2(`ينتهي خلال ${daysLeft} يوماً`,`Expire dans ${daysLeft} jour(s)`)}</div>
       ${!isExpired?`<div class="sub-progress"><div class="sub-progress-bar" style="width:${info.pct}%"></div></div><div class="sub-days-left">${_t2(`${daysLeft} يوم متبقٍ`,`${daysLeft} jour(s) restant(s)`)}</div>`:''}
       <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-gold btn-sm" onclick="document.getElementById('packages-display').scrollIntoView({behavior:'smooth'})">${_t2('🔄 عرض الباقات','🔄 Voir les forfaits')}</button>
+        <button class="btn btn-gold btn-sm" onclick="document.getElementById('packages-display').scrollIntoView({behavior:'smooth'})">${isExpired?_t2('🔄 تجديد الباقة الآن','🔄 Renouveler maintenant'):_t2('🔄 عرض الباقات','🔄 Voir les forfaits')}</button>
       </div>
     </div>${reminderBanner}`;
   // التجديد الحقيقي الوحيد: packages-display → openPayModal → submitPayment
@@ -2197,7 +2202,22 @@ function renderPackagesDisplay(){
   try{ if(typeof RizqSub.applySeasonalStrikethrough==='function') RizqSub.applySeasonalStrikethrough(el, list); }catch(eSo){}
 }
 
-يديو':'🥇','أعمال ومعارض':'💎','أساسي':'🎬','احترافي':'🥇'};
+function renderVideoPackagesDisplay(){
+  var el=document.getElementById('rizq-ads-packages-display'); if(!el) return;
+  var lang=(typeof _storeLang!=='undefined'?_storeLang:'ar');
+  var pkgs=[];
+  if(typeof RizqPackagesConfig!=='undefined' && typeof RizqPackagesConfig.getCatalog==='function'){
+    try{ pkgs=RizqPackagesConfig.getCatalog('video', lang).filter(function(p){return p.active!==false;}); }catch(e){}
+  }
+  if(!pkgs.length){ try{ pkgs=JSON.parse(localStorage.getItem('rizq_video_packages')||'[]').filter(function(p){return p.active!==false;}); }catch(e){ pkgs=[]; } }
+  if(!pkgs.length && window.RizqPackagesConfig && RizqPackagesConfig.CATALOGS && RizqPackagesConfig.CATALOGS.video){
+    pkgs=JSON.parse(JSON.stringify(RizqPackagesConfig.CATALOGS.video));
+  }
+  var list=pkgs;
+  var FEATS_AR={'إعلان فيديو واحد':['فيديو إعلاني واحد لمدة 10 أيام','ظهور في قسم الإعلانات بالصفحة الرئيسية','دفع لكل إعلان — بلا اشتراك شهري'],'أساسي فيديو':['حتى 3 فيديوهات إعلانية ترويجية شهرياً','ظهور في قسم الإعلانات بالصفحة الرئيسية','إحصائيات أداء أساسية آلية'],'احترافي فيديو':['حتى 10 فيديوهات إعلانية ترويجية شهرياً','أولوية الترتيب في نتائج البحث','شارة «محتوى مميّز برزق» الموثّقة'],'أعمال ومعارض':['فيديوهات وعروض غير محدودة','ظهور مميز في القسم الرئيسي بالصفحة الرئيسية','تقارير تحليل أداء آلية مفصّلة','دعم VIP ذو أولوية + شارة VIP موثّقة'],'أساسي':['حتى 3 فيديوهات إعلانية ترويجية شهرياً','ظهور في قسم الإعلانات بالصفحة الرئيسية','إحصائيات أداء أساسية آلية'],'احترافي':['حتى 10 فيديوهات إعلانية ترويجية شهرياً','أولوية الترتيب في نتائج البحث','شارة «محتوى مميّز برزق» الموثّقة']};
+  var FEATS_FR={'إعلان فيديو واحد':['Une vidéo publicitaire pendant 10 jours','Section publicitaire page d\'accueil','Paiement par annonce — sans abonnement mensuel'],'أساسي فيديو':['Jusqu\'à 3 vidéos promotionnelles / mois','Section publicitaire page d\'accueil','Statistiques de performance de base automatisées'],'احترافي فيديو':['Jusqu\'à 10 vidéos promotionnelles / mois','Priorité dans les résultats de recherche','Badge « Contenu vedette Rizq » vérifié'],'أعمال ومعارض':['Vidéos et vitrines illimitées','Placement premium section principale','Rapports d\'analyse automatisés détaillés','Support VIP prioritaire + badge VIP vérifié'],'أساسي':['Jusqu\'à 3 vidéos promotionnelles / mois','Section publicitaire page d\'accueil','Statistiques de performance de base automatisées'],'احترافي':['Jusqu\'à 10 vidéos promotionnelles / mois','Priorité dans les résultats de recherche','Badge « Contenu vedette Rizq » vérifié']};
+  var FEATS=(lang==='fr')?FEATS_FR:FEATS_AR;
+  var ICONS={'إعلان فيديو واحد':'⚡','أساسي فيديو':'🎬','احترافي فيديو':'🥇','أعمال ومعارض':'💎','أساسي':'🎬','احترافي':'🥇'};
   var r=RizqSub.renderPackageCardsHTML(list,FEATS,ICONS,lang,'video');
   el.innerHTML=r.grid;
 }
@@ -2207,6 +2227,7 @@ function renderPackagesDisplay(){
 // زال قيد المراجعة أو انتهى — يقرأ الآن الإعداد الحي نفسه (site-config)
 // الذي تعرضه الصفحة الرئيسية فعلياً، فتكون الحالة المعروضة هنا مطابقة
 // 100% لما يراه الزائر الحقيقي، بلا وعد بمعلومة غير موجودة فعلياً.
+
 function _rizqRenderAdsStatus(acc){
   var mount=document.getElementById('rizq-ads-status-mount');
   if(!mount || !window.RIZQ_BACKEND_BASE || !acc || !acc.id) return;

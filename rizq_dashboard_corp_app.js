@@ -2557,16 +2557,16 @@ function saveMyPayment(){
     var info = getSubInfo();
     var daysLeft=info.daysLeft, isTrial=info.isTrial, isExpired=info.isExpired, isExpiringSoon=info.isExpiringSoon;
     var cls = isExpired?'expired':isTrial?'trial':'active-plan';
-    var reminderBanner = (isExpiringSoon||isExpired) ?
-      '<div class="sub-card '+(isExpired?'expired':'trial')+'" style="margin-top:12px;text-align:center">'+
-        '<div style="font-size:13px;font-weight:700">'+(isExpired?_t2('⛔ انتهى اشتراكك — جدد الآن لاستعادة كل المزايا','⛔ Votre abonnement a expiré — renouvelez maintenant pour retrouver tous les avantages'):(_t2('⚠️ اشتراكك سينتهي بعد '+daysLeft+' أيام — جدد الآن لتجنب توقف الخدمة','⚠️ Votre abonnement expire dans '+daysLeft+' jours — renouvelez maintenant pour éviter une interruption de service')))+'</div>'+
+    var reminderBanner = (!isExpired && isExpiringSoon) ?
+      '<div class="sub-card trial" style="margin-top:12px;text-align:center">'+
+        '<div style="font-size:13px;font-weight:700">'+_t2('⚠️ اشتراكك سينتهي بعد '+daysLeft+' أيام — جدد الآن لتجنب توقف الخدمة','⚠️ Votre abonnement expire dans '+daysLeft+' jours — renouvelez maintenant pour éviter une interruption de service')+'</div>'+
         '<div style="margin-top:10px"><button class="btn btn-gold btn-sm" onclick="document.getElementById(\'packages-display\').scrollIntoView({behavior:\'smooth\'})">🔄 '+_t2('تجديد الباقة الآن','Renouveler le forfait maintenant')+'</button></div>'+
       '</div>' : '';
     wrap.innerHTML = '<div class="sub-card '+cls+'">'+
-      '<div style="font-size:18px;font-weight:800;margin-bottom:4px">'+(isTrial?_t2('🎁 فترة تجريبية','🎁 Période d\'essai'):_t2('✅ اشتراك نشط','✅ Abonnement actif'))+'</div>'+
-      '<div style="font-size:12px;opacity:.75;margin-bottom:12px">'+(daysLeft>0?(_t2('ينتهي خلال '+daysLeft+' يوم','Expire dans '+daysLeft+' jours')):_t2('انتهى الاشتراك','Abonnement expiré'))+'</div>'+
+      '<div style="font-size:18px;font-weight:800;margin-bottom:4px">'+(isExpired?_t2('❌ انتهى الاشتراك','❌ Abonnement expiré'):isTrial?_t2('🎁 فترة تجريبية','🎁 Période d\'essai'):_t2('✅ اشتراك نشط','✅ Abonnement actif'))+'</div>'+
+      '<div style="font-size:12px;opacity:.75;margin-bottom:12px">'+(isExpired?_t2('جدد الآن لاستعادة كل المزايا','Renouvelez maintenant pour retrouver tous les avantages'):(daysLeft>0?(_t2('ينتهي خلال '+daysLeft+' يوم','Expire dans '+daysLeft+' jours')):''))+'</div>'+
       (!isExpired?('<div style="height:5px;background:rgba(255,255,255,.2);border-radius:3px"><div style="height:100%;width:'+info.pct+'%;background:var(--gold);border-radius:3px"></div></div>'):'')+
-      '<button class="btn btn-gold btn-sm" style="margin-top:14px" onclick="document.getElementById(\'packages-display\').scrollIntoView({behavior:\'smooth\'})">🔄 '+_t2('عرض/تجديد الباقات','Afficher/renouveler les forfaits')+'</button>'+
+      '<button class="btn btn-gold btn-sm" style="margin-top:14px" onclick="document.getElementById(\'packages-display\').scrollIntoView({behavior:\'smooth\'})">🔄 '+(isExpired?_t2('تجديد الباقة الآن','Renouveler le forfait maintenant'):_t2('عرض/تجديد الباقات','Afficher/renouveler les forfaits'))+'</button>'+
     '</div>'+reminderBanner;
   }
   function renderAdsPackages(){ renderAds(); }
