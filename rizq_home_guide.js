@@ -329,7 +329,8 @@
 
   function refreshLang() {
     updateLiveLabel(_pane);
-    fillBrand(_pane);
+    /* أعد بناء بطاقات الدليل بلغة الصفحة — لا تترك HTML عربياً بعد FR */
+    fillPane(_pane);
   }
 
   function bind() {
@@ -359,10 +360,12 @@
     var retries = [400, 1200, 2500, 4500];
     retries.forEach(function (ms) {
       setTimeout(function () {
+        /* لا نعيد fillPane إن وُجدت بطاقات — تجنّب CLS من إعادة البناء المتكررة */
         if (!paneHasCards(_pane)) fillPane(_pane);
         else if (!_paused) lockStageHeight();
         syncTabVisibility();
-        refreshLang();
+        updateLiveLabel(_pane);
+        fillBrand(_pane);
       }, ms);
     });
   }

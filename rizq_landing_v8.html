@@ -2,19 +2,79 @@
 <html lang="ar" dir="rtl" data-rizq-strip="22.6">
 <head>
   <script>
-  /* حسم lang/dir قبل أول طلاء — الكوكي أولاً (مصدر الخادم)، ثم localStorage للتوافق */
+  /* حسم lang/dir + صنف اللغة قبل أول طلاء (كوكي/localStorage) — يقلّل CLS من قلب RTL→LTR */
   (function(){
     try {
       var lang = null;
       var m = document.cookie.match(/(?:^|;\s*)rizq_lang=(fr|ar)/);
       if (m) lang = m[1];
       if (!lang) { try { lang = localStorage.getItem('rizq_lang'); } catch (e0) {} }
-      if (lang === 'fr') { document.documentElement.lang = 'fr'; document.documentElement.dir = 'ltr'; }
-      else if (lang === 'ar') { document.documentElement.lang = 'ar'; document.documentElement.dir = 'rtl'; }
+      if (!lang) lang = 'ar';
+      var html = document.documentElement;
+      if (lang === 'fr') {
+        html.lang = 'fr'; html.dir = 'ltr';
+        html.classList.add('rizq-lang-fr'); html.classList.remove('rizq-lang-ar');
+      } else {
+        html.lang = 'ar'; html.dir = 'rtl';
+        html.classList.add('rizq-lang-ar'); html.classList.remove('rizq-lang-fr');
+      }
+      /* إخفاء نصوص اللغة فقط (لا الصفحة) حتى applyLandingLang — يُرفع هناك أو بعد 1500ms */
+      html.classList.add('rizq-lang-booting');
+      setTimeout(function () {
+        try {
+          if (html.classList.contains('rizq-lang-booting')) {
+            html.classList.remove('rizq-lang-booting');
+            html.classList.add('rizq-lang-ready');
+          }
+        } catch (eT) { /* */ }
+      }, 1500);
     } catch (e) {}
   })();
   </script>
   <meta charset="UTF-8"/>
+  <style id="rizq-lang-boot-guard">
+  /*
+   * إخفاء نصوص اللغة فقط — لا body/opacity على الصفحة (يحافظ على FCP/LCP).
+   * مساحة العناصر تبقى محجوزة (visibility) لتفادي CLS.
+   * fallback: animation بعد 1.5s يظهر النص حتى لو فشل JS.
+   */
+  html.rizq-lang-booting :is(
+    [data-t],[data-t-fr],[data-t-aria],[data-ph-fr],
+    .live-label-sub,.live-capsule-txt,.hero-title,.hero-headline,.hero-subtitle-primary,.hero-subtitle-secondary,
+    .hero-eyebrow,.section-tag,.section-title,.section-desc,.btn-lang,.btn-lang-primary,
+    .rmh-post-nav,.rizq-phone-ltr .rmh-lbl,#rmh-lang-btn,.hero-cta-primary,.hero-spaces-trust,
+    .rizq-guide-live,.rizq-vid-strip-title,.rizq-vid-strip-hint,.rizq-vid-strip-tier
+  ){
+    visibility:hidden;
+    animation:rizq-lang-text-reveal .01s linear 1.5s forwards;
+  }
+  @keyframes rizq-lang-text-reveal{to{visibility:visible}}
+  html.rizq-lang-ready :is(
+    [data-t],[data-t-fr],[data-t-aria],[data-ph-fr],
+    .live-label-sub,.live-capsule-txt,.hero-title,.hero-headline,.hero-subtitle-primary,.hero-subtitle-secondary,
+    .hero-eyebrow,.section-tag,.section-title,.section-desc,.btn-lang,.btn-lang-primary,
+    .rmh-post-nav,.rizq-phone-ltr .rmh-lbl,#rmh-lang-btn,.hero-cta-primary,.hero-spaces-trust,
+    .rizq-guide-live,.rizq-vid-strip-title,.rizq-vid-strip-hint,.rizq-vid-strip-tier
+  ){
+    visibility:visible;
+    animation:none;
+  }
+  /* #ticker بعرض المحتوى للماركي — لا ينكمش تحت عرض الشريط (كان CLS FR~0.32) */
+  #ticker.ticker-inner,.ticker-inner{min-width:100%!important;box-sizing:border-box!important}
+  /* احجز ارتفاع شريط أحدث الإعلانات قبل امتلاء البطاقات */
+  #hero-listings .cards-track-wrap{min-height:248px;box-sizing:border-box}
+  </style>
+  <noscript>
+    <style id="rizq-lang-boot-noscript">
+    html.rizq-lang-booting :is(
+      [data-t],[data-t-fr],[data-t-aria],[data-ph-fr],
+      .live-label-sub,.live-capsule-txt,.hero-title,.hero-headline,.hero-subtitle-primary,.hero-subtitle-secondary,
+      .hero-eyebrow,.section-tag,.section-title,.section-desc,.btn-lang,.btn-lang-primary,
+      .rmh-post-nav,.rizq-phone-ltr .rmh-lbl,#rmh-lang-btn,.hero-cta-primary,.hero-spaces-trust,
+      .rizq-guide-live,.rizq-vid-strip-title,.rizq-vid-strip-hint,.rizq-vid-strip-tier
+    ){visibility:visible!important;animation:none!important}
+    </style>
+  </noscript>
   <script>
   /* منع استعادة موضع التمرير قبل اكتمال المحتوى (قفزة F5) */
   try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(eSR){}
@@ -5075,14 +5135,14 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   overflow-wrap:anywhere;word-break:break-word;
   background:rgba(27,58,107,.04);border:1.5px dashed rgba(27,58,107,.18);border-radius:14px
 }
-/* بطاقات أنماط الأزياء + أنماط المعارض — الصورة أكبر من النص */
+/* بطاقات أنماط الأزياء + أنماط المعارض — نسبة ~4:5 (عريضة لا شريط عمودي) */
 .rizq-style-card{
   display:flex;flex-direction:column;
-  width:220px;min-width:220px;max-width:220px;
-  flex:0 0 220px;
-  /* ارتفاع يكفي للصورة + شارة/اسم/وصف/زر دون قصّ النص السفلي */
-  min-height:392px;
-  height:392px;
+  width:340px;min-width:340px;max-width:340px;
+  flex:0 0 340px;
+  /* ~340×420 على سطح المكتب — هوية كحلي/ذهبي كما هي */
+  min-height:420px;
+  height:420px;
   background:#ffffff!important;
   border:1.5px solid rgba(201,168,76,.5);
   border-radius:10px;
@@ -5128,19 +5188,53 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
 }
 /* إطلالات: شبكة صور متساوية — بلا بلاطة أكبر تميّز محلاً عن آخر */
 #rizq-styles .rizq-style-mosaic,
-#rizq-guide[data-guide-pane="styles"] .rizq-style-mosaic{
-  grid-template-columns:repeat(3,1fr);
-  grid-template-rows:1fr;
-  min-height:168px;
+#rizq-guide[data-guide-pane="styles"] .rizq-style-mosaic,
+.rizq-style-card[data-look-grid="1"] .rizq-style-mosaic{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr;
+  gap:6px;
+  min-height:0;
+  height:auto;
+  flex:1 1 auto;
+  padding:8px;
+  background:#0f1f3d;
+  box-sizing:border-box;
 }
 #rizq-styles .rizq-style-tile:first-child,
-#rizq-guide[data-guide-pane="styles"] .rizq-style-tile:first-child{
-  grid-row:auto;font-size:28px
+#rizq-guide[data-guide-pane="styles"] .rizq-style-tile:first-child,
+.rizq-style-card[data-look-grid="1"] .rizq-style-tile:first-child{
+  grid-row:auto;font-size:22px
 }
 #rizq-styles .rizq-style-tile:first-child .rizq-style-tile-price,
-#rizq-guide[data-guide-pane="styles"] .rizq-style-tile:first-child .rizq-style-tile-price{
+#rizq-guide[data-guide-pane="styles"] .rizq-style-tile:first-child .rizq-style-tile-price,
+.rizq-style-card[data-look-grid="1"] .rizq-style-tile:first-child .rizq-style-tile-price{
   font-size:9px;padding:2px 6px
 }
+/* رأس بطاقة الإطلالة — كحلي + عنوان ووسم الجنس */
+.rizq-style-card[data-look-grid="1"] .rizq-style-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:#0f1f3d;color:#f8f4e8;
+  padding:10px 12px 8px;flex:0 0 auto;
+  border-bottom:1px solid rgba(201,168,76,.35);
+}
+.rizq-style-card[data-look-grid="1"] .rizq-style-head .rizq-style-name{
+  margin:0;color:#f8f4e8;font-size:13px;font-weight:800;line-height:1.25;
+  -webkit-line-clamp:2;flex:1 1 auto;min-width:0;
+}
+.rizq-style-card[data-look-grid="1"] .rizq-style-head .rizq-style-badge{
+  margin:0;flex:0 0 auto;
+  background:rgba(201,168,76,.18);color:#E8C96A;border:1px solid rgba(201,168,76,.45);
+  font-size:10px;padding:3px 8px;border-radius:999px;white-space:nowrap;
+}
+.rizq-style-card[data-look-grid="1"]{
+  display:flex;flex-direction:column;
+  overflow:hidden;padding:0;
+  border:1.5px solid #C9A84C;
+  background:#0f1f3d!important;
+}
+.rizq-style-card[data-look-grid="1"] .rizq-style-mosaic{flex:1 1 auto;min-height:0}
+.rizq-style-card[data-look-grid="1"] .rizq-style-body{display:none}
 .rizq-style-tile{
   display:flex;align-items:center;justify-content:center;
   font-size:28px;line-height:1;position:relative;overflow:hidden;z-index:1;
@@ -5148,6 +5242,45 @@ html[dir="ltr"] .rizq-styles-rail .rizq-style-card{direction:ltr}
   cursor:default;border:0;padding:0;appearance:none;-webkit-appearance:none;
   color:inherit;font-family:inherit;pointer-events:none;
   text-decoration:none;box-sizing:border-box;
+}
+/* خانات الإطلالة — مربعات متساوية، عاجية، إطار ذهبي، صورة contain */
+.rizq-style-card[data-look-grid="1"] .rizq-style-tile{
+  aspect-ratio:1;
+  width:100%;min-width:0;min-height:0;
+  background:#F7F3EA!important;
+  border:1px solid #C9A84C;
+  border-radius:8px;
+  pointer-events:auto;
+  flex-direction:column;
+}
+.rizq-style-card[data-look-grid="1"] .rizq-style-tile img{
+  width:100%;height:100%;object-fit:contain;object-position:center;
+  display:block;pointer-events:none;padding:10px 10px 22px;box-sizing:border-box;
+  background:transparent;
+}
+.rizq-style-card[data-look-grid="1"] .rizq-style-tile-store-lbl{
+  position:absolute;left:5px;right:5px;bottom:4px;
+  font-size:9px;font-weight:700;line-height:1.2;text-align:center;
+  color:#0f1f3d;opacity:.88;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  pointer-events:none;z-index:2;
+}
+.rizq-style-card[data-look-grid="1"] .rizq-style-tile-price{
+  /* فكّ bottom/start من القاعدة العامة وإلا تمتد الشارة على كامل الخانة */
+  position:absolute;top:5px;bottom:auto;inset-inline-end:5px;inset-inline-start:auto;
+  width:auto;height:auto;line-height:1.2;
+  background:linear-gradient(135deg,#C9A84C,#E8C96A);color:#0a1424;
+  font-size:9px;font-weight:800;padding:2px 6px;border-radius:999px;
+  box-shadow:0 2px 6px rgba(15,31,61,.18);z-index:3;max-width:72%;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.rizq-style-card[data-look-grid="1"] .rizq-style-tile-cta{
+  background:linear-gradient(160deg,#102038,#0a1628)!important;
+  border-color:#C9A84C;color:#E8C96A;text-decoration:none;
+}
+.rizq-style-card[data-look-grid="1"] .rizq-style-tile-cta-txt{
+  font-size:11px;font-weight:800;text-align:center;line-height:1.35;
+  padding:8px;color:#E8C96A;
 }
 a.rizq-style-tile{color:inherit;text-decoration:none}
 .rizq-style-tile.is-linked{
@@ -5159,7 +5292,7 @@ a.rizq-style-tile{color:inherit;text-decoration:none}
 .rizq-style-tile.is-linked:hover img{transform:scale(1.08)}
 .rizq-style-card:hover .rizq-style-tile:not(.is-linked){transform:scale(1.06)}
 .rizq-style-card:hover .rizq-style-tile img{transform:scale(1.06)}
-.rizq-style-tile:first-child{grid-row:1 / span 2;font-size:42px}
+.rizq-style-card:not([data-look-grid="1"]) .rizq-style-tile:first-child{grid-row:1 / span 2;font-size:42px}
 /* سعر على كل بلاطة منتج (ستايل + معارض) — ذهب معتم واضح فوق أي صورة */
 .rizq-style-tile-price{
   position:absolute;inset-inline-start:4px;bottom:4px;z-index:4;
@@ -5198,10 +5331,11 @@ a.rizq-style-tile{color:inherit;text-decoration:none}
 #rizq-showroom-models .rizq-style-tile.is-linked,
 #rizq-style-looks .rizq-style-tile.is-linked{cursor:zoom-in}
 /* بلاطات المعارض تتحرك — ليست جامدة (إيموجي وصور) */
-.rizq-style-tile{animation:rizqTileFloat 4.8s ease-in-out infinite}
-.rizq-style-tile:nth-child(2){animation-delay:.4s}
-.rizq-style-tile:nth-child(3){animation-delay:.8s}
-.rizq-style-tile.is-linked{animation-name:rizqTileFloatLinked}
+.rizq-style-card:not([data-look-grid="1"]) .rizq-style-tile{animation:rizqTileFloat 4.8s ease-in-out infinite}
+.rizq-style-card:not([data-look-grid="1"]) .rizq-style-tile:nth-child(2){animation-delay:.4s}
+.rizq-style-card:not([data-look-grid="1"]) .rizq-style-tile:nth-child(3){animation-delay:.8s}
+.rizq-style-card:not([data-look-grid="1"]) .rizq-style-tile.is-linked{animation-name:rizqTileFloatLinked}
+.rizq-style-card[data-look-grid="1"] .rizq-style-tile{animation:none!important}
 @keyframes rizqTileFloat{
   0%,100%{transform:translateY(0) scale(1)}
   50%{transform:translateY(-3px) scale(1.04)}
@@ -5308,14 +5442,15 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
     white-space:normal!important;overflow-wrap:anywhere;word-break:break-word
   }
   .rizq-style-card{
-    width:168px!important;min-width:168px!important;max-width:168px!important;
-    flex:0 0 168px!important;
-    min-height:340px!important;height:340px!important;
+    /* هاتف ~300px مع ظهور طرف البطاقة التالية — نسبة ~4:5 */
+    width:300px!important;min-width:300px!important;max-width:300px!important;
+    flex:0 0 300px!important;
+    min-height:375px!important;height:375px!important;
     border-radius:10px;
     box-shadow:0 4px 14px rgba(13,27,42,.08);
   }
   .rizq-style-card:hover{transform:none;box-shadow:0 4px 14px rgba(13,27,42,.08)}
-  .rizq-style-mosaic{min-height:168px;height:auto;flex:1 1 0;gap:2px}
+  .rizq-style-mosaic{min-height:210px;height:auto;flex:1 1 0;gap:2px}
   .rizq-style-tile{font-size:18px}
   .rizq-style-tile:first-child{font-size:26px}
   .rizq-style-body{padding:7px 8px 9px;gap:3px;flex:0 0 auto}
@@ -5328,10 +5463,10 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 /* إطلالات/معارض — تابلت: صورة سائدة مع بطاقة أضيق من الكمبيوتر */
 @media(min-width:641px) and (max-width:1100px){
   .rizq-style-card{
-    width:196px;min-width:196px;max-width:196px;flex:0 0 196px;
-    min-height:368px;height:368px;
+    width:320px;min-width:320px;max-width:320px;flex:0 0 320px;
+    min-height:400px;height:400px;
   }
-  .rizq-style-mosaic{min-height:188px;height:auto;flex:1 1 0}
+  .rizq-style-mosaic{min-height:220px;height:auto;flex:1 1 0}
   .rizq-style-body{padding:7px 9px 9px;gap:3px;flex:0 0 auto}
   .rizq-style-brand-row{min-height:0;margin:0 0 3px}
   .rizq-style-brand-row .rzq-brand-logo-name-img{width:30px;height:30px;border-radius:9px}
@@ -5341,7 +5476,7 @@ html[dir="ltr"] .rizq-style-card:hover .rizq-style-cta::after{transform:translat
 }
 /* كمبيوتر عريض: فسحة أوضح للصورة مع الإبقاء على نص كامل ظاهر */
 @media(min-width:1101px){
-  .rizq-style-mosaic{min-height:210px}
+  .rizq-style-mosaic{min-height:248px}
   .rizq-style-brand-row .rzq-brand-logo-name-img{width:34px;height:34px}
 }
 
@@ -8511,6 +8646,8 @@ function _styNormalizeStoreProduct(p, store){
     productId: pid,
     storeId: storeId,
     storeName: storeName,
+    storeNameFr: storeNameF,
+    storeNameF: storeNameF,
     title: String(p.name || p.title || pid),
     titleFR: String(p.nameF || p.nameFr || p.titleFR || p.name || pid),
     emoji: p.emoji || '🛍️',
@@ -8551,6 +8688,27 @@ function _styNormalizeStoreProduct(p, store){
 }
 /** كتالوجات محلات أزياء تجريبية — عندما لا توجد محلات موضة مسجّلة بعد */
 function _styDemoFashionStores(){
+  var daraa = [
+    'rizq-assets/demo-fashion/demo-daraa-boutique-navy.webp',
+    'rizq-assets/demo-fashion/demo-daraa-shop-olive.webp',
+    'rizq-assets/demo-fashion/demo-daraa-street-dark.webp',
+    'rizq-assets/demo-fashion/p-rizq-grad-ad03a-640x480.webp',
+    'rizq-assets/demo-fashion/p-rizq-grad-ad03b-640x480.webp',
+    'rizq-assets/demo-fashion/p-rizq-grad-cat-s02-01-640x480.webp',
+    'rizq-assets/demo-fashion/p-rizq-grad-cat-s02-02-640x480.webp',
+    'rizq-assets/demo-fashion/p-rizq-grad-cat-s02-03-640x480.webp'
+  ];
+  var melhfa = [
+    'rizq-assets/demo-fashion/demo-melhafa-shop-warm.webp',
+    'rizq-assets/demo-fashion/demo-melhafa-street-lilac.webp',
+    'rizq-assets/demo-fashion/demo-melhafa-street-dark.webp',
+    'rizq-assets/demo-fashion/p-rizq-grad-ad03a-640x480.webp',
+    'rizq-assets/demo-fashion/p-rizq-grad-ad03b-640x480.webp',
+    'rizq-assets/demo-fashion/p-rizq-grad-cat-s02-01-640x480.webp',
+    'rizq-assets/demo-fashion/p-rizq-grad-cat-s02-02-640x480.webp',
+    'rizq-assets/demo-fashion/p-rizq-grad-cat-s02-03-640x480.webp'
+  ];
+  var kids = daraa.slice(2).concat(melhfa.slice(0, 3));
   return [
     {
       id: 'demo_fashion_men',
@@ -8559,14 +8717,14 @@ function _styDemoFashionStores(){
       type: 'store',
       activity: 'ملابس رجالية',
       products: [
-        { id: 'M1', name: 'دراعة رجالية فاخرة', nameF: 'Daraa homme premium', price: 45000, cat: 'أزياء', emoji: '👔', gender: 'men' },
-        { id: 'M2', name: 'قميص قطني رجالي', nameF: 'Chemise coton homme', price: 12000, cat: 'أزياء', emoji: '👔', gender: 'men' },
-        { id: 'M3', name: 'ساعة رجالية كلاسيكية', nameF: 'Montre homme', price: 28000, cat: 'إكسسوارات', emoji: '⌚', gender: 'men', brandId: 'casio', brandName: 'كاسيو', brandNameFr: 'Casio' },
-        { id: 'M4', name: 'حذاء رسمي رجالي', nameF: 'Chaussures formal', price: 32000, cat: 'أحذية', emoji: '👞', gender: 'men' },
-        { id: 'M5', name: 'صندل رجالي جلد', nameF: 'Sandale homme cuir', price: 6500, cat: 'أحذية', emoji: '🩴', gender: 'men' },
-        { id: 'M6', name: 'سبحة كهرمان', nameF: 'Chapelet ambre', price: 18000, cat: 'إكسسوارات', emoji: '📿', gender: 'men' },
-        { id: 'M7', name: 'تيشيرت قطن رجالي', nameF: 'T-shirt homme', price: 5000, cat: 'أزياء', emoji: '👕', gender: 'men' },
-        { id: 'M8', name: 'معطف خفيف رجالي', nameF: 'Manteau léger', price: 40000, cat: 'أزياء', emoji: '🧥', gender: 'men' }
+        { id: 'M1', name: 'دراعة رجالية فاخرة', nameF: 'Daraa homme premium', price: 45000, cat: 'أزياء', emoji: '👔', gender: 'men', images: [daraa[0]] },
+        { id: 'M2', name: 'قميص قطني رجالي', nameF: 'Chemise coton homme', price: 12000, cat: 'أزياء', emoji: '👔', gender: 'men', images: [daraa[1]] },
+        { id: 'M3', name: 'ساعة رجالية كلاسيكية', nameF: 'Montre homme', price: 28000, cat: 'إكسسوارات', emoji: '⌚', gender: 'men', brandId: 'casio', brandName: 'كاسيو', brandNameFr: 'Casio', images: [daraa[5]] },
+        { id: 'M4', name: 'حذاء رسمي رجالي', nameF: 'Chaussures formal', price: 32000, cat: 'أحذية', emoji: '👞', gender: 'men', images: [daraa[2]] },
+        { id: 'M5', name: 'صندل رجالي جلد', nameF: 'Sandale homme cuir', price: 6500, cat: 'أحذية', emoji: '🩴', gender: 'men', images: [daraa[3]] },
+        { id: 'M6', name: 'سبحة كهرمان', nameF: 'Chapelet ambre', price: 18000, cat: 'إكسسوارات', emoji: '📿', gender: 'men', images: [daraa[4]] },
+        { id: 'M7', name: 'تيشيرت قطن رجالي', nameF: 'T-shirt homme', price: 5000, cat: 'أزياء', emoji: '👕', gender: 'men', images: [daraa[6]] },
+        { id: 'M8', name: 'معطف خفيف رجالي', nameF: 'Manteau léger', price: 40000, cat: 'أزياء', emoji: '🧥', gender: 'men', images: [daraa[7]] }
       ]
     },
     {
@@ -8576,14 +8734,14 @@ function _styDemoFashionStores(){
       type: 'store',
       activity: 'ملابس نسائية',
       products: [
-        { id: 'W1', name: 'ملحفة حريرية فاخرة', nameF: 'Melhfa soie', price: 38000, cat: 'أزياء', emoji: '🧕', gender: 'women' },
-        { id: 'W2', name: 'فستان سهرة', nameF: 'Robe de soirée', price: 55000, cat: 'أزياء', emoji: '👗', gender: 'women' },
-        { id: 'W3', name: 'حقيبة نسائية أنيقة', nameF: 'Sac femme', price: 9800, cat: 'إكسسوارات', emoji: '👜', gender: 'women' },
-        { id: 'W4', name: 'عطر نسائي', nameF: 'Parfum femme', price: 21000, cat: 'عطور', emoji: '🌸', gender: 'women' },
-        { id: 'W5', name: 'صندل صيفي نسائي', nameF: 'Sandales femme', price: 8000, cat: 'أحذية', emoji: '👠', gender: 'women' },
-        { id: 'W6', name: 'أسورة ذهب مظهر', nameF: 'Bracelet doré', price: 15000, cat: 'إكسسوارات', emoji: '💍', gender: 'women' },
-        { id: 'W7', name: 'نظارة شمسية نسائية', nameF: 'Lunettes femme', price: 9000, cat: 'إكسسوارات', emoji: '🕶️', gender: 'women' },
-        { id: 'W8', name: 'ملحفة نقش تقليدي', nameF: 'Melhfa traditionnelle', price: 42000, cat: 'أزياء', emoji: '🧕', gender: 'women' }
+        { id: 'W1', name: 'ملحفة حريرية فاخرة', nameF: 'Melhfa soie', price: 38000, cat: 'أزياء', emoji: '🧕', gender: 'women', images: [melhfa[0]] },
+        { id: 'W2', name: 'فستان سهرة', nameF: 'Robe de soirée', price: 55000, cat: 'أزياء', emoji: '👗', gender: 'women', images: [melhfa[1]] },
+        { id: 'W3', name: 'حقيبة نسائية أنيقة', nameF: 'Sac femme', price: 9800, cat: 'إكسسوارات', emoji: '👜', gender: 'women', images: [melhfa[5]] },
+        { id: 'W4', name: 'عطر نسائي', nameF: 'Parfum femme', price: 21000, cat: 'عطور', emoji: '🌸', gender: 'women', images: [melhfa[6]] },
+        { id: 'W5', name: 'صندل صيفي نسائي', nameF: 'Sandales femme', price: 8000, cat: 'أحذية', emoji: '👠', gender: 'women', images: [melhfa[2]] },
+        { id: 'W6', name: 'أسورة ذهب مظهر', nameF: 'Bracelet doré', price: 15000, cat: 'إكسسوارات', emoji: '💍', gender: 'women', images: [melhfa[3]] },
+        { id: 'W7', name: 'نظارة شمسية نسائية', nameF: 'Lunettes femme', price: 9000, cat: 'إكسسوارات', emoji: '🕶️', gender: 'women', images: [melhfa[4]] },
+        { id: 'W8', name: 'ملحفة نقش تقليدي', nameF: 'Melhfa traditionnelle', price: 42000, cat: 'أزياء', emoji: '🧕', gender: 'women', images: [melhfa[7]] }
       ]
     },
     {
@@ -8593,14 +8751,14 @@ function _styDemoFashionStores(){
       type: 'store',
       activity: 'ملابس أطفال',
       products: [
-        { id: 'B1', name: 'طقم أولاد يومي', nameF: 'Ensemble garçon', price: 8500, cat: 'أطفال', emoji: '👦', gender: 'boys', subcat: 'ملابس أطفال ورضع' },
-        { id: 'B2', name: 'حذاء رياضي أولاد', nameF: 'Baskets garçon', price: 5200, cat: 'أطفال', emoji: '👟', gender: 'boys', subcat: 'ملابس أطفال ورضع' },
-        { id: 'B3', name: 'حقيبة مدرسية أولاد', nameF: 'Cartable garçon', price: 4800, cat: 'أطفال', emoji: '🎒', gender: 'boys', subcat: 'ملابس أطفال ورضع' },
-        { id: 'B4', name: 'كاب أولاد صيفي', nameF: 'Casquette garçon', price: 1900, cat: 'أطفال', emoji: '🧢', gender: 'boys', subcat: 'ملابس أطفال ورضع' },
-        { id: 'G1', name: 'فستان يومي بنات', nameF: 'Robe fille', price: 7800, cat: 'أطفال', emoji: '👧', gender: 'girls', subcat: 'ملابس أطفال ورضع' },
-        { id: 'G2', name: 'حذاء أنيق بنات', nameF: 'Chaussures fille', price: 4600, cat: 'أطفال', emoji: '👟', gender: 'girls', subcat: 'ملابس أطفال ورضع' },
-        { id: 'G3', name: 'طقم فيونكات بنات', nameF: 'Accessoires fille', price: 2400, cat: 'أطفال', emoji: '🎀', gender: 'girls', subcat: 'ملابس أطفال ورضع' },
-        { id: 'G4', name: 'قبعة صيفية بنات', nameF: 'Chapeau fille', price: 2100, cat: 'أطفال', emoji: '👒', gender: 'girls', subcat: 'ملابس أطفال ورضع' }
+        { id: 'B1', name: 'طقم أولاد يومي', nameF: 'Ensemble garçon', price: 8500, cat: 'أطفال', emoji: '👦', gender: 'boys', subcat: 'ملابس أطفال ورضع', images: [kids[0]] },
+        { id: 'B2', name: 'حذاء رياضي أولاد', nameF: 'Baskets garçon', price: 5200, cat: 'أطفال', emoji: '👟', gender: 'boys', subcat: 'ملابس أطفال ورضع', images: [kids[1]] },
+        { id: 'B3', name: 'حقيبة مدرسية أولاد', nameF: 'Cartable garçon', price: 4800, cat: 'أطفال', emoji: '🎒', gender: 'boys', subcat: 'ملابس أطفال ورضع', images: [kids[2]] },
+        { id: 'B4', name: 'كاب أولاد صيفي', nameF: 'Casquette garçon', price: 1900, cat: 'أطفال', emoji: '🧢', gender: 'boys', subcat: 'ملابس أطفال ورضع', images: [kids[3]] },
+        { id: 'G1', name: 'فستان يومي بنات', nameF: 'Robe fille', price: 7800, cat: 'أطفال', emoji: '👧', gender: 'girls', subcat: 'ملابس أطفال ورضع', images: [kids[4]] },
+        { id: 'G2', name: 'حذاء أنيق بنات', nameF: 'Chaussures fille', price: 4600, cat: 'أطفال', emoji: '👟', gender: 'girls', subcat: 'ملابس أطفال ورضع', images: [kids[5]] },
+        { id: 'G3', name: 'طقم فيونكات بنات', nameF: 'Accessoires fille', price: 2400, cat: 'أطفال', emoji: '🎀', gender: 'girls', subcat: 'ملابس أطفال ورضع', images: [kids[0]] },
+        { id: 'G4', name: 'قبعة صيفية بنات', nameF: 'Chapeau fille', price: 2100, cat: 'أطفال', emoji: '👒', gender: 'girls', subcat: 'ملابس أطفال ورضع', images: [kids[1]] }
       ]
     }
   ];
@@ -8669,6 +8827,7 @@ function _styHydrateFromApi(){
       window.__rizqHomeCatalog.styles = data.items;
       window.__rizqStylesApiItems = data.items;
       try { if(typeof buildStyleIdeas === 'function') buildStyleIdeas(false); } catch(eB){}
+      try { if(typeof window.RizqGuideRefreshLang === 'function') window.RizqGuideRefreshLang(); } catch(eG){}
     })
     .catch(function(){})
     .then(function(){ window.__rizqStylesHydrating = 0; });
@@ -9299,6 +9458,7 @@ function _styBuildCardHtml(opts){
   if(opts.gender) attrs += ' data-sty-gender="'+_styEsc(opts.gender)+'"';
   if(opts.srmCat) attrs += ' data-srm-cat="'+_styEsc(opts.srmCat)+'"';
   if(opts.seed) attrs += ' data-sty-seed="1"';
+  if(opts.lookGrid) attrs += ' data-look-grid="1"';
   var idAttr = opts.primaryId != null && opts.primaryId !== ''
     ? String(opts.primaryId).replace(/'/g,'&#39;')
     : '';
@@ -9310,6 +9470,16 @@ function _styBuildCardHtml(opts){
   var brandRow = opts.brandHtml
     ? '<div class="rizq-style-brand-row" aria-label="الماركة">'+opts.brandHtml+'</div>'
     : '';
+  /* إطلالات: رأس كحلي + شبكة 2×2 — بلا جسم سفلي */
+  if(opts.lookGrid){
+    return '<article'+attrs+'>'
+      + '<div class="rizq-style-head">'
+      +   '<div class="rizq-style-name">'+_styEsc(opts.name || '')+'</div>'
+      +   '<div class="rizq-style-badge">'+_styEsc(opts.badge || '')+'</div>'
+      + '</div>'
+      + '<div class="rizq-style-mosaic">'+(opts.tilesHtml || '')+'</div>'
+      + '</article>';
+  }
   /* رابط حقيقي — بدون preventDefault؛ البلاطات المرتبطة تمنع التقاط النقرة عبر stopPropagation */
   return '<article'+attrs+'>'
     + '<div class="rizq-style-mosaic">'+(opts.tilesHtml || '')+'</div>'
@@ -9346,7 +9516,21 @@ function _styTilePriceHtml(ad){
   if(short.length > 18) short = short.slice(0, 16) + '…';
   return '<span class="rizq-style-tile-price" dir="ltr">'+_styEsc(short)+'</span>';
 }
-/** رابط صغير لاسم المحل فوق السعر — بلا تغيير أبعاد البلاطة */
+function _styStoreHrefFromAd(ad){
+  if(!ad) return '';
+  if(ad.storeId){
+    return 'rizq_store.html?id=' + encodeURIComponent(String(ad.storeId));
+  }
+  if(ad.id && String(ad.id).indexOf('store:') === 0){
+    var m = String(ad.id).match(/^store:([^:]+):/);
+    if(m) return 'rizq_store.html?id=' + encodeURIComponent(m[1]);
+  }
+  if(ad.href && /rizq_store\.html/.test(String(ad.href))){
+    return String(ad.href).split('&product=')[0];
+  }
+  return '';
+}
+/** رابط صغير لاسم المحل فوق السعر — بلا تغيير أبعاد البلاطة (معارض) */
 function _styTileStoreLinkHtml(ad){
   if(!ad) return '';
   var fr = false;
@@ -9356,26 +9540,50 @@ function _styTileStoreLinkHtml(ad){
   } catch(eL) {}
   var name = _styCardStoreName([ad], fr);
   if(!name) return '';
-  var href = '';
-  if(ad.storeId){
-    href = 'rizq_store.html?id=' + encodeURIComponent(String(ad.storeId));
-  } else if(ad.id && String(ad.id).indexOf('store:') === 0){
-    var m = String(ad.id).match(/^store:([^:]+):/);
-    if(m) href = 'rizq_store.html?id=' + encodeURIComponent(m[1]);
-  } else if(ad.href && /rizq_store\.html/.test(String(ad.href))){
-    href = String(ad.href).split('&product=')[0];
-  }
+  var href = _styStoreHrefFromAd(ad);
   if(!href) return '';
   var safe = (typeof _rizqSafeNavHref === 'function') ? (_rizqSafeNavHref(href) || href) : href;
   var short = name.length > 18 ? (name.slice(0, 16).trim() + '…') : name;
   return '<a class="rizq-style-tile-store" href="'+_styEsc(safe)+'" onclick="event.stopPropagation()"'
     + ' title="'+_styEsc(name)+'">'+_styEsc(short)+'</a>';
 }
-function _styTileHtml(ad, fallbackEmoji, fallbackBg){
-  var bg = (ad && ad.bg) || fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
+function _styI18nCta(fr){
+  try {
+    var pack = (typeof LANG !== 'undefined' && LANG && LANG[fr ? 'fr' : 'ar'])
+      || (window.LANG && window.LANG[fr ? 'fr' : 'ar'])
+      || {};
+    if(pack['sty-cta']) return String(pack['sty-cta']);
+  } catch(e) {}
+  return fr ? 'Voir le look' : 'تسوّق الإطلالة';
+}
+/** خانة رابعة عند نقص القطع — CTA تسوّق الإطلالة عبر i18n */
+function _styLookCtaTileHtml(href, fr){
+  var label = _styI18nCta(!!fr);
+  var safe = (typeof _rizqSafeNavHref === 'function') ? (_rizqSafeNavHref(href) || href || 'rizq_directory.html?type=store') : (href || 'rizq_directory.html?type=store');
+  return '<a class="rizq-style-tile rizq-style-tile-cta is-linked" href="'+_styEsc(safe)+'"'
+    + ' aria-label="'+_styEsc(label)+'">'
+    + '<span class="rizq-style-tile-cta-txt">'+_styEsc(label)+'</span></a>';
+}
+/**
+ * بلاطة إطلالة: الخانة كلها رابط للمحل، تسمية محل صغيرة، سعر ذهبي، صورة contain.
+ * opts.lookTile=true يفعّل نمط الإطلالة؛ وإلا سلوك المعارض القديم.
+ */
+function _styTileHtml(ad, fallbackEmoji, fallbackBg, opts){
+  opts = opts || {};
+  var look = !!opts.lookTile;
+  var bg = look ? '#F7F3EA' : ((ad && ad.bg) || fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)');
   var emoji = (ad && ad.emoji) || fallbackEmoji || '✨';
   var src = (ad && Array.isArray(ad.images) && ad.images[0]) ? String(ad.images[0]) : '';
-  var linked = !!(ad && ad.id != null);
+  var fr = false;
+  try {
+    var lsT = localStorage.getItem('rizq_lang') || '';
+    var htmlT = (document.documentElement && document.documentElement.lang) || '';
+    if(htmlT === 'fr' || lsT === 'fr') fr = true;
+    else if(htmlT === 'ar' || lsT === 'ar') fr = false;
+    else if(typeof isAr !== 'undefined') fr = !isAr;
+  } catch(eL2) {
+    try { fr = (typeof isAr !== 'undefined') ? !isAr : false; } catch(eL3) {}
+  }
   var title = '';
   if(ad){
     try {
@@ -9384,6 +9592,29 @@ function _styTileHtml(ad, fallbackEmoji, fallbackBg){
     } catch(e){ title = String(ad.title || '').trim(); }
   }
   var priceBadge = _styTilePriceHtml(ad);
+  var storeName = _styCardStoreName([ad], fr);
+  var storeHref = _styStoreHrefFromAd(ad);
+  if(look){
+    var safeStore = storeHref
+      ? ((typeof _rizqSafeNavHref === 'function') ? (_rizqSafeNavHref(storeHref) || storeHref) : storeHref)
+      : '';
+    var shortStore = storeName
+      ? (storeName.length > 22 ? (storeName.slice(0, 20).trim() + '…') : storeName)
+      : '';
+    var storeLbl = shortStore
+      ? '<span class="rizq-style-tile-store-lbl">'+_styEsc(shortStore)+'</span>'
+      : '';
+    var ariaLook = ' aria-label="'+_styEsc((shortStore || title || 'Rizq') + (priceBadge ? ' — ' + String(ad.price||'') : ''))+'"';
+    var openLook = safeStore
+      ? '<a class="rizq-style-tile is-linked" href="'+_styEsc(safeStore)+'"'+ariaLook+'>'
+      : '<span class="rizq-style-tile"'+ariaLook+'>';
+    var closeLook = safeStore ? '</a>' : '</span>';
+    var bodyLook = src
+      ? '<img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" width="200" height="200" loading="lazy" decoding="async"'+_rizqImgPlaceholderOnError()+'/>'
+      : emoji;
+    return openLook + bodyLook + storeLbl + priceBadge + closeLook;
+  }
+  var linked = !!(ad && ad.id != null);
   var storeLink = _styTileStoreLinkHtml(ad);
   var aria = linked
     ? ' aria-label="'+_styEsc((title ? title + ' — ' : '') + (priceBadge ? String(ad.price||'') : '') || String(ad.id))+'"'
@@ -9398,6 +9629,20 @@ function _styTileHtml(ad, fallbackEmoji, fallbackBg){
     return openTag+'<img src="'+_styEsc(src)+'" alt="'+_styEsc(title)+'" width="200" height="200" loading="lazy" decoding="async"'+_rizqImgPlaceholderOnError()+'/>'+overlays+'</span>';
   }
   return openTag+emoji+overlays+'</span>';
+}
+/** شبكة إطلالة 2×2: حتى 4 منتجات؛ إن نقصت للـ3 تُملأ الخانة الرابعة بـ CTA */
+function _styLookMosaicHtml(items, lookHref, fr, emojis){
+  items = Array.isArray(items) ? items.filter(Boolean) : [];
+  var html = '';
+  var maxProd = Math.min(items.length, 4);
+  var i;
+  for(i = 0; i < maxProd; i++){
+    html += _styTileHtml(items[i], (emojis || [])[i], items[i] && items[i].bg, { lookTile: true });
+  }
+  if(maxProd < 4){
+    html += _styLookCtaTileHtml(lookHref, fr);
+  }
+  return html;
 }
 function _styTileFromSrc(src, fallbackEmoji, fallbackBg, adId, titleHint, priceHint){
   var bg = fallbackBg || 'linear-gradient(145deg,#1B3A6B,#0f2347)';
@@ -9643,9 +9888,15 @@ function buildStyleIdeas(reshuffle, optMountId, optGender){
   var guideMount = !!(optMountId && optMountId !== 'rizq-styles-rail');
   var fr = false;
   try {
-    if(typeof isAr !== 'undefined') fr = !isAr;
-    else fr = (localStorage.getItem('rizq_lang')||'ar') === 'fr';
-  } catch(e) {}
+    /* فضّل إشارة الصفحة المحفوظة — حتى قبل اكتمال applyLandingLang/isAr */
+    var lsLang = localStorage.getItem('rizq_lang') || '';
+    var htmlLang = (document.documentElement && document.documentElement.lang) || '';
+    if(htmlLang === 'fr' || lsLang === 'fr') fr = true;
+    else if(htmlLang === 'ar' || lsLang === 'ar') fr = false;
+    else if(typeof isAr !== 'undefined') fr = !isAr;
+  } catch(e) {
+    try { fr = (typeof isAr !== 'undefined') ? !isAr : false; } catch(e2) {}
+  }
   var genderKey = (optGender != null && optGender !== '') ? optGender : _rizqStyleGender;
   var gender = (typeof RIZQ_STYLE_GENDERS !== 'undefined' && RIZQ_STYLE_GENDERS[genderKey]) ? genderKey : (genderKey === 'women' ? 'women' : 'men');
   var templates = (typeof _styTemplatesFor === 'function') ? _styTemplatesFor(gender) : (gender === 'women' ? RIZQ_STYLE_WOMEN_TEMPLATES : RIZQ_STYLE_MEN_TEMPLATES);
@@ -9662,12 +9913,17 @@ function buildStyleIdeas(reshuffle, optMountId, optGender){
   var usedIds = {};
   var cards = [];
   /* لا نلمس معرف LANG هنا — يُعرَّف لاحقاً بـ const ويسبب TDZ إن استُدعي buildStyleIdeas مبكراً */
-  var cta = fr ? 'Voir le look' : 'تسوّق الإطلالة';
+  var cta = _styI18nCta(fr);
   var fromViewLbl = fr ? 'Vu récemment' : 'من مشاهدتك';
+  try {
+    var packFv = (typeof LANG !== 'undefined' && LANG && LANG[fr ? 'fr' : 'ar'])
+      || (window.LANG && window.LANG[fr ? 'fr' : 'ar']) || {};
+    if(packFv['sty-from-view']) fromViewLbl = String(packFv['sty-from-view']);
+  } catch(eFv) {}
   /* مصدر المنتجات لهذا التبويب فقط — ممنوع السقوط إلى أزياء جنس آخر */
   var styleGendered = gendered.slice();
 
-  /* بطاقة أولى من آخر منتج أزياء/إكسسوار شاهدته — بلاطات مرافقة مختلفة بأسعارها */
+  /* بطاقة أولى من آخر منتج أزياء/إكسسوار شاهدته — شبكة 2×2 */
   if(seeds.length && styleGendered.length >= 2){
     var seed = seeds[0];
     usedIds[String(seed.id)] = 1;
@@ -9678,7 +9934,7 @@ function buildStyleIdeas(reshuffle, optMountId, optGender){
       gender: seed.gender || gender
     });
     var seedComps = (typeof _styPickLookCompanions === 'function')
-      ? _styPickLookCompanions(seedAsAd, styleGendered, gender, 2)
+      ? _styPickLookCompanions(seedAsAd, styleGendered, gender, 3)
       : [];
     var seedItems = [seedAsAd].concat(seedComps);
     while(seedItems.length < 3){
@@ -9689,24 +9945,27 @@ function buildStyleIdeas(reshuffle, optMountId, optGender){
       seedItems.push(fillSeed);
     }
     if(seedItems.length >= 3){
-      var seedName = fr ? (seed.titleFR || seed.title) : seed.title;
-      var seedTiles = '';
-      for(var si=0; si<seedItems.length && si<3; si++){
-        seedTiles += _styTileHtml(seedItems[si], (templates[0] && templates[0].emoji && templates[0].emoji[si]) || seedItems[si].emoji, seedItems[si].bg);
+      while(seedItems.length < 4){
+        var fillSeed4 = styleGendered.find(function(a){
+          return a && !seedItems.some(function(x){ return x && String(x.id)===String(a.id); });
+        });
+        if(!fillSeed4) break;
+        seedItems.push(fillSeed4);
       }
+      var seedName = fr ? (seed.titleFR || seed.title) : seed.title;
       var genderBadge0 = _styGenderBadge(gender, fr);
       var seedHref = seed.href
         || (seed.storeId ? ('rizq_store.html?id=' + encodeURIComponent(seed.storeId)) : '')
         || 'rizq_directory.html?type=store';
+      var seedEmojis = (templates[0] && templates[0].emoji) || [];
       cards.push(_styBuildCardHtml({
         gender: gender,
         seed: true,
-        tilesHtml: seedTiles,
+        lookGrid: true,
+        tilesHtml: _styLookMosaicHtml(seedItems.slice(0, 4), seedHref, fr, seedEmojis),
         fromViewLbl: fromViewLbl,
-        brandHtml: _styBrandChipForLook(seedItems, fr, 'أزياء'),
         badge: genderBadge0,
         name: seedName,
-        meta: fr ? 'Inspiré par une boutique visitée' : 'مستوحى من محل زرته',
         cta: cta,
         href: seedHref,
         primaryId: seed.id
@@ -9733,8 +9992,8 @@ function buildStyleIdeas(reshuffle, optMountId, optGender){
       return a && String(a.id) !== String(primary.id);
     });
     var companions = (typeof _styPickLookCompanions === 'function'
-          ? _styPickLookCompanions(primary, companionPool, gender, 2)
-          : _styPickCompanions(primary, companionPool, gender, 2));
+          ? _styPickLookCompanions(primary, companionPool, gender, 3)
+          : _styPickCompanions(primary, companionPool, gender, 3));
     var items = [primary].concat(companions);
     while(items.length < 3){
       var fillSty = companionPool.find(function(a){
@@ -9744,6 +10003,13 @@ function buildStyleIdeas(reshuffle, optMountId, optGender){
       items.push(fillSty);
     }
     if(items.length < 3) return; /* لا بطاقة ناقصة ولا خلط أجناس */
+    while(items.length < 4){
+      var fillSty4 = companionPool.find(function(a){
+        return a && !items.some(function(x){ return x && String(x.id)===String(a.id); });
+      });
+      if(!fillSty4) break;
+      items.push(fillSty4);
+    }
     /* عنوان الإطلالة يبقى اسم القالب — اسم المحل على كل بلاطة */
     var name = fr ? tpl.fr : tpl.ar;
     var href;
@@ -9758,17 +10024,12 @@ function buildStyleIdeas(reshuffle, optMountId, optGender){
       href = 'rizq_directory.html?type=store';
     }
     var genderBadge = _styGenderBadge(gender, fr);
-    var tiles = '';
-    for(var ti=0; ti<3; ti++){
-      tiles += _styTileHtml(items[ti], (tpl.emoji||[])[ti], items[ti] && items[ti].bg);
-    }
     cards.push(_styBuildCardHtml({
       gender: gender,
-      tilesHtml: tiles,
-      brandHtml: _styBrandChipForLook(items, fr, 'أزياء'),
+      lookGrid: true,
+      tilesHtml: _styLookMosaicHtml(items.slice(0, 4), href, fr, tpl.emoji || []),
       badge: genderBadge,
       name: name,
-      meta: _styClearMeta(items, fr),
       cta: cta,
       href: href,
       primaryId: primary && primary.id != null ? primary.id : ''
@@ -9778,10 +10039,10 @@ function buildStyleIdeas(reshuffle, optMountId, optGender){
   /* بطاقات إضافية لسلسلة أفقية أطول — من نفس الجنس فقط */
   var extras = _styShuffle(styleGendered.filter(function(a){ return !usedIds[String(a.id)]; }));
   var emojiSets = {
-    men: [['👔','⌚','👟'],['🧥','📿','👞']],
-    women: [['👗','👜','👠'],['🪙','💍','✨']],
-    boys: [['👦','👕','🎒'],['🧢','👟','📗']],
-    girls: [['👧','🎀','👟'],['👗','✨','👒']]
+    men: [['👔','⌚','👟','🧥'],['🧥','📿','👞','✨']],
+    women: [['👗','👜','👠','✨'],['🪙','💍','✨','🧣']],
+    boys: [['👦','👕','🎒','🧢'],['🧢','👟','📗','✨']],
+    girls: [['👧','🎀','👟','👗'],['👗','✨','👒','🎀']]
   };
   var emSet = emojiSets[gender] || emojiSets.men;
   for(var ex=0; cards.length < 6 && ex < extras.length; ex++){
@@ -9791,9 +10052,9 @@ function buildStyleIdeas(reshuffle, optMountId, optGender){
       return a && String(a.id) !== String(adEx.id);
     });
     var companionsEx = (typeof _styPickLookCompanions === 'function')
-      ? _styPickLookCompanions(adEx, companionPoolEx, gender, 2)
+      ? _styPickLookCompanions(adEx, companionPoolEx, gender, 3)
       : ((typeof _styPickCompanions === 'function')
-          ? _styPickCompanions(adEx, companionPoolEx, gender, 2)
+          ? _styPickCompanions(adEx, companionPoolEx, gender, 3)
           : []);
     var itemsEx = [adEx].concat(companionsEx);
     while(itemsEx.length < 3){
@@ -9804,11 +10065,14 @@ function buildStyleIdeas(reshuffle, optMountId, optGender){
       itemsEx.push(fillEx);
     }
     if(itemsEx.length < 3) continue;
-    var emEx = emSet[ex % emSet.length];
-    var tilesEx = '';
-    for(var tj=0; tj<3; tj++){
-      tilesEx += _styTileHtml(itemsEx[tj], emEx[tj], itemsEx[tj] && itemsEx[tj].bg);
+    while(itemsEx.length < 4){
+      var fillEx4 = companionPoolEx.find(function(a){
+        return a && !itemsEx.some(function(x){ return x && String(x.id)===String(a.id); });
+      });
+      if(!fillEx4) break;
+      itemsEx.push(fillEx4);
     }
+    var emEx = emSet[ex % emSet.length];
     var dEx = (typeof trAd === 'function') ? trAd(adEx) : adEx;
     var nameEx = String((dEx && (dEx.title || adEx.title)) || (fr ? 'Look Rizq' : 'إطلالة رزق'));
     if(nameEx.length > 52) nameEx = nameEx.slice(0, 49).trim() + '…';
@@ -9816,11 +10080,10 @@ function buildStyleIdeas(reshuffle, optMountId, optGender){
       || (adEx.storeId ? ('rizq_store.html?id=' + encodeURIComponent(adEx.storeId)) : 'rizq_directory.html?type=store');
     cards.push(_styBuildCardHtml({
       gender: gender,
-      tilesHtml: tilesEx,
-      brandHtml: _styBrandChipForLook(itemsEx, fr, 'أزياء'),
+      lookGrid: true,
+      tilesHtml: _styLookMosaicHtml(itemsEx.slice(0, 4), hrefEx, fr, emEx),
       badge: _styGenderBadge(gender, fr),
       name: nameEx,
-      meta: _styClearMeta(itemsEx, fr),
       cta: cta,
       href: hrefEx,
       primaryId: adEx.id
@@ -13161,9 +13424,6 @@ function applyLandingLang(toAr) {
     } catch (eG) {}
   });
 
-}
-
-
   section('civic-ticker-lang', function () {
     try {
       if (window.RizqCivicTicker && typeof window.RizqCivicTicker.refreshLang === 'function') {
@@ -13171,6 +13431,15 @@ function applyLandingLang(toAr) {
       }
     } catch (eTick) { /* */ }
   });
+
+  section('lang-boot-ready', function () {
+    var html = document.documentElement;
+    html.classList.add(isAr ? 'rizq-lang-ar' : 'rizq-lang-fr');
+    html.classList.remove(isAr ? 'rizq-lang-fr' : 'rizq-lang-ar');
+    html.classList.remove('rizq-lang-booting');
+    html.classList.add('rizq-lang-ready');
+  });
+}
 
 var _langBusy = false;
 function toggleLang() {
@@ -13196,6 +13465,16 @@ document.addEventListener('click', function (e) {
 // ── مزامنة اللغة عند فتح الصفحة مع اختيار المستخدم السابق في أي صفحة من الموقع ──
 // (نفس مفتاح rizq_lang الذي يستعمله rizq_i18n.js في الصفحات المهاجَرة بالفعل)
 (function syncLandingLangOnLoad() {
+  /* أمان إضافي: كشف نصوص اللغة إن بقي booting (الـ head لديه 1500ms أيضاً) */
+  setTimeout(function () {
+    try {
+      var html = document.documentElement;
+      if (html.classList.contains('rizq-lang-booting')) {
+        html.classList.remove('rizq-lang-booting');
+        html.classList.add('rizq-lang-ready');
+      }
+    } catch (eBoot) { /* */ }
+  }, 1500);
   var saved;
   try { saved = localStorage.getItem('rizq_lang'); } catch (e) { saved = null; }
   try {

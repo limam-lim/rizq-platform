@@ -114,7 +114,10 @@ function startStatic() {
     /function buildStyleIdeas\(reshuffle, optMountId, optGender\)/.test(landing)
     && /function buildShowroomModels\(reshuffle, optMountId, optCat\)/.test(landing)
     && /function buildEstateModels\(reshuffle, optMountId, optCat\)/.test(landing));
-  ok('equal styles mosaic CSS', /#rizq-styles \.rizq-style-mosaic[\s\S]*repeat\(3,1fr\)/.test(landing));
+  ok('equal styles mosaic CSS (2×2 look grid)',
+    /grid-template-columns:1fr 1fr/.test(landing)
+    && /aspect-ratio:1/.test(landing)
+    && /data-look-grid/.test(landing));
   ok('store display name helper', /function _styCardStoreName/.test(landing));
   ok('ticker never-empty helpers (i18n key, no hardcoded AR invite)',
     /ensureTickerNotEmpty/.test(civicJs)
@@ -133,7 +136,9 @@ function startStatic() {
     { heroAds, guide, vid, rvid, listings });
   ok('original #rizq-styles remains after guide', stylesOrig > guide);
   ok('per-tile store link helper', /function _styTileStoreLinkHtml/.test(landing)
-    && /rizq-style-tile-store/.test(landing));
+    && /rizq-style-tile-store/.test(landing)
+    && /data-look-grid/.test(landing)
+    && /_styLookMosaicHtml/.test(landing));
 
   const { chromium } = loadPlaywright();
   const server = await startStatic();
@@ -169,8 +174,14 @@ function startStatic() {
     const safeStyleCards = stylesRail
       ? Array.from(stylesRail.querySelectorAll('.rizq-style-card')).slice(0, 4).map((c) => ({
         name: ((c.querySelector('.rizq-style-name') || {}).textContent || '').trim(),
-        storeLinks: c.querySelectorAll('a.rizq-style-tile-store').length,
+        lookGrid: c.getAttribute('data-look-grid') === '1',
+        storeLinks: c.querySelectorAll('a.rizq-style-tile[href*="rizq_store"], a.rizq-style-tile-store').length,
+        storeLbls: c.querySelectorAll('.rizq-style-tile-store-lbl').length,
         tiles: c.querySelectorAll('.rizq-style-tile').length,
+        squareTiles: Array.from(c.querySelectorAll('.rizq-style-tile')).filter((t) => {
+          const r = t.getBoundingClientRect();
+          return r.width > 20 && Math.abs(r.width - r.height) <= 3;
+        }).length,
       }))
       : [];
     const guideCards = guideRail
@@ -253,10 +264,14 @@ function startStatic() {
     && (!snap.rvidVisible || (snap.orderTops.vid <= snap.orderTops.rvid && snap.orderTops.rvid <= snap.orderTops.listings)),
     snap.orderTops);
   const lookNamed = (snap.styleCards || []).filter((c) => c.name && !/^بوتيك|محل|Store/i.test(c.name));
-  const withStoreLinks = (snap.styleCards || []).filter((c) => c.storeLinks > 0);
+  const withStoreLinks = (snap.styleCards || []).filter((c) => c.storeLinks > 0 || c.storeLbls > 0);
+  const lookGridCards = (snap.styleCards || []).filter((c) => c.lookGrid && c.tiles === 4);
   ok('style look titles are look names (not store-only)', lookNamed.length >= 1 || !(snap.styleCards || []).length, snap.styleCards);
   ok('style tiles include store <a> when store products present',
     withStoreLinks.length >= 1 || !(snap.styleCards || []).length,
+    snap.styleCards);
+  ok('look cards use 2×2 grid of 4 equal tiles',
+    lookGridCards.length >= 1 || !(snap.styleCards || []).length,
     snap.styleCards);
   ok('original sections still present', snap.origStylesPresent && snap.origEstatePresent);
   ok('ticker never empty (text + not is-empty + visible)',
@@ -293,6 +308,34 @@ function startStatic() {
     ok('estate pane fills cards + topic updates', true);
     ok('stage height locked across pane switch (minHeight ≥ first)', true);
   }
+
+  /* FR: عناوين/وسوم/أسماء محلات الإطلالة عبر i18n على سكة الدليل */
+  await page.evaluate(() => { try { localStorage.setItem('rizq_lang', 'fr'); } catch (e) {} });
+  await page.reload({ waitUntil: 'domcontentloaded', timeout: 90000 });
+  await page.waitForTimeout(3500);
+  const frSnap = await page.evaluate(() => {
+    const rail = document.getElementById('rizq-guide-rail-styles');
+    const cards = rail
+      ? Array.from(rail.querySelectorAll('.rizq-style-card[data-look-grid="1"]')).slice(0, 3).map((c) => ({
+        name: ((c.querySelector('.rizq-style-name') || {}).textContent || '').trim(),
+        badge: ((c.querySelector('.rizq-style-badge') || {}).textContent || '').trim(),
+        store: ((c.querySelector('.rizq-style-tile-store-lbl') || {}).textContent || '').trim(),
+        hasImg: !!c.querySelector('.rizq-style-tile img'),
+        tileCount: c.querySelectorAll('.rizq-style-tile').length,
+      }))
+      : [];
+    return {
+      lang: document.documentElement.lang,
+      dir: document.documentElement.dir,
+      cards,
+    };
+  });
+  const frOk = frSnap.lang === 'fr'
+    && frSnap.cards.length >= 1
+    && frSnap.cards.every((c) => /Hommes|Femmes|Garçons|Filles/.test(c.badge))
+    && frSnap.cards.every((c) => c.name && !/[\u0600-\u06FF]/.test(c.name))
+    && frSnap.cards.every((c) => !c.store || !/[\u0600-\u06FF]/.test(c.store));
+  ok('FR look cards use i18n titles/badges/store labels (guide rail)', frOk, frSnap);
 
   await browser.close();
   await new Promise((r) => server.close(r));
