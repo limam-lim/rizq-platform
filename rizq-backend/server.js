@@ -20,6 +20,8 @@
   if (Object.prototype.hasOwnProperty.call(preserve, 'DATABASE_URL')) process.env.DATABASE_URL = preserve.DATABASE_URL;
   if (Object.prototype.hasOwnProperty.call(preserve, 'DB_DRIVER')) process.env.DB_DRIVER = preserve.DB_DRIVER;
   if (Object.prototype.hasOwnProperty.call(preserve, 'TRUST_PROXY')) process.env.TRUST_PROXY = preserve.TRUST_PROXY;
+  /* قبل أي اتصال بـ Postgres / جلسات — ارفض .env المنسوخ من المثال */
+  require('./scripts/env-preflight').runEnvPreflight({ exitOnFail: true, context: 'server' });
 })();
 process.env.TZ = process.env.RIZQ_TIMEZONE || process.env.MAINTENANCE_CRON_TZ || 'Africa/Nouakchott';
 process.on('unhandledRejection', (err) => {
