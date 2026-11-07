@@ -231,6 +231,7 @@ async function main() {
     'qa/cls-1/test-rizq-guide-strip.js',
     'qa/cls-1/test-fr-no-arabic-leak.js',
     'qa/cls-1/test-slow-phone-nav-capture.js',
+    'qa/cls-1/test-looks-genders.js',
   ];
   for (const rel of uiTests) {
     if (!fs.existsSync(path.join(ROOT, rel))) continue;
