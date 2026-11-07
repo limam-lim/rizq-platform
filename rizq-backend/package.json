@@ -7,6 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
+    "preflight": "node scripts/env-preflight.js",
     "backup": "node scripts/run-backup.js",
     "migrate": "node -r dotenv/config node_modules/node-pg-migrate/bin/node-pg-migrate.js up -m migrations --database-url-var DATABASE_URL",
     "migrate:down": "node -r dotenv/config node_modules/node-pg-migrate/bin/node-pg-migrate.js down -m migrations --database-url-var DATABASE_URL",
@@ -70,6 +71,7 @@
     "test:pkg-admin-hydrate": "node scripts/test-pkg-admin-hydrate.js",
     "test:trial-ui-once": "node scripts/test-trial-ui-once.js",
     "test:all": "node scripts/test-all.js",
+    "test:env-preflight": "node scripts/test-env-preflight.js",
     "test:demo-images-local": "node scripts/test-demo-images-local.js",
     "test:header-all-pages": "npm --prefix ../qa/cls-1 install --no-audit --no-fund && node ../qa/cls-1/test-header-all-pages.js",
     "test:demo-fashion-images": "node scripts/test-demo-fashion-images.js"

@@ -39,24 +39,12 @@ function loadDotenvFile() {
 
 function ensureGatePassword() {
   loadDotenvFile();
-  if (!process.env.ADMIN_PANEL_GATE_KEY || !String(process.env.ADMIN_PANEL_GATE_KEY).trim()) {
-    process.env.ADMIN_PANEL_GATE_KEY = 'test-gate-key-rizq-local-only';
-    console.log('[test:all] ADMIN_PANEL_GATE_KEY → test default (not for production)');
-  } else {
-    console.log('[test:all] ADMIN_PANEL_GATE_KEY present');
-  }
-  if (!process.env.BACKEND_SHARED_SECRET || !String(process.env.BACKEND_SHARED_SECRET).trim()) {
-    process.env.BACKEND_SHARED_SECRET = process.env.ADMIN_PANEL_GATE_KEY;
-  }
+  /* فشل فوري إن كانت الأسرار ناقصة / مساوية لـ .env.example — لا ملء صامت يُخفي SCRAM */
+  const { runEnvPreflight, assertDotenvGitignored } = require('./env-preflight');
+  if (!assertDotenvGitignored()) process.exit(1);
+  runEnvPreflight({ exitOnFail: true, context: 'test:all' });
   if (!process.env.ADMIN_PANEL_PATH || !String(process.env.ADMIN_PANEL_PATH).trim()) {
     process.env.ADMIN_PANEL_PATH = 'cp-test-local';
-  }
-  /* Sentinel DB role — نفس أسلوب بوابة الأدمن على آلة نظيفة */
-  if (!process.env.SENTINEL_DB_PASSWORD || !String(process.env.SENTINEL_DB_PASSWORD).trim()) {
-    process.env.SENTINEL_DB_PASSWORD = 'sentinel_test_pass_9d2d';
-    console.log('[test:all] SENTINEL_DB_PASSWORD → test default (not for production)');
-  } else {
-    console.log('[test:all] SENTINEL_DB_PASSWORD present');
   }
   if (!process.env.RIZQ_SENTINEL_PASSWORD || !String(process.env.RIZQ_SENTINEL_PASSWORD).trim()) {
     process.env.RIZQ_SENTINEL_PASSWORD = process.env.SENTINEL_DB_PASSWORD;
