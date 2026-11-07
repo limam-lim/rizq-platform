@@ -13,6 +13,7 @@
 'use strict';
 const { injectDemoMode, isDemoModeEnabled } = require('../lib/demoMode');
 const { injectCategoryStats, getCategoryStats } = require('../lib/categoryStats');
+const { injectAdsStat, resolveAdsStatPresentation } = require('../lib/adsStat');
 
 const { spawn, spawnSync } = require('child_process');
 const fs = require('fs');
@@ -146,6 +147,16 @@ function startStaticServer() {
         let html = fs.readFileSync(file, 'utf8');
         html = injectDemoMode(html, isDemoModeEnabled());
         try { html = injectCategoryStats(html, getCategoryStats()); } catch (eInj) { /* */ }
+        try {
+          const adsPres = resolveAdsStatPresentation({
+            ads: [],
+            minActiveAdsToShow: 50,
+            siteAdsCount: isDemoModeEnabled() ? 1200 : 0,
+            demoMode: isDemoModeEnabled(),
+            lang: 'ar',
+          });
+          html = injectAdsStat(html, adsPres);
+        } catch (eAds) { /* */ }
         res.writeHead(200, {
           'content-type': types[ext],
           'cache-control': 'no-store',

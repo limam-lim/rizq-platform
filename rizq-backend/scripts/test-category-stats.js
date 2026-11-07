@@ -46,10 +46,11 @@ ok('wilayas fixed at 15',
 
 const landingPath = path.join(__dirname, '..', '..', 'rizq_landing_v8.html');
 const landing = fs.readFileSync(landingPath, 'utf8');
-ok('landing marks cats/subs/wilayas for server inject',
+ok('landing marks cats/subs/wilayas/ads for server inject',
   /data-rizq-stat="cats"/.test(landing)
   && /data-rizq-stat="subs"/.test(landing)
-  && /data-rizq-stat="wilayas"/.test(landing));
+  && /data-rizq-stat="wilayas"/.test(landing)
+  && /data-rizq-stat="ads"/.test(landing));
 ok('landing no longer hardcodes 22/268 as sole source',
   !/<span class="h-stat-num" data-target="22">22<\/span>/.test(landing)
   && !/<span class="h-stat-num" data-target="268" data-suffix="\+">268\+<\/span>/.test(landing));

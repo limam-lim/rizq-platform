@@ -67,6 +67,7 @@ function main() {
     'test:demo-fashion-images',
     'test:demo-mode',
     'test:category-stats',
+    'test:ads-stat',
   ]);
   const testScripts = Object.keys(pkg.scripts).filter((k) => k.startsWith('test:'));
   const needDb = testScripts.filter((k) => !noDbOk.has(k));

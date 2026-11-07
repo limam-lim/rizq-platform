@@ -64,7 +64,7 @@ function getCategoryStats() {
 
 /**
  * يحقن أرقام الأقسام/الفروع/الولايات في بطاقة #platform-stats.
- * الإعلانات النشطة تبقى حية من /api/discovery/platform-stats (لا تُحقن هنا).
+ * خانة الإعلانات تُحقن عبر lib/adsStat.js في sendRizqHtmlFile.
  */
 function injectCategoryStats(html, stats) {
   if (typeof html !== 'string' || !html) return html;

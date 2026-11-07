@@ -49,6 +49,7 @@ const crypto = require('crypto');
 const { createAdminAuth } = require('./middleware/adminAuth');
 const { isDemoModeEnabled, injectDemoMode } = require('./lib/demoMode');
 const { getCategoryStats, injectCategoryStats } = require('./lib/categoryStats');
+const { buildAdsStatPresentation, injectAdsStat, formatRoundedAds } = require('./lib/adsStat');
 const { isProdEnv, extractAccountToken, extractDashToken, tokenMatchesAccount, stampAccessToken, stampDashToken, accessTokenStillValid } = require('./middleware/accountAuth');
 const { timingSafeEqualStr } = require('./lib/secureCompare');
 const { normalizeDisplayName, normalizeEmailSafe, stripBidiControls } = require('./lib/sanitizeText');
@@ -4930,12 +4931,13 @@ app.post('/api/telegram/setup-webhook', requireSuperAdmin, async (req, res) => {
 // ══════════════════════════════════════════════════════════════════
 
 /**
- * GET /api/discovery/platform-stats — أرقام حية صادقة لشريط الإحصائيات تحت إعلان الفيديو.
- * لا أرقام وهمية: قبل الإطلاق الحقيقي تبقى أصفار النشاط ظاهرة كما هي.
+ * GET /api/discovery/platform-stats — تحديث لاحق اختياري لشريط الإحصائيات.
+ * الرقم الأساسي يُحقن في HTML عند الطلب عبر injectAdsStat / injectCategoryStats.
  */
 app.get('/api/discovery/platform-stats', async (req, res) => {
   try {
-    const adsActive = (await readAds()).filter((a) =>
+    const allAds = await readAds();
+    const adsActive = allAds.filter((a) =>
       a && a.status === 'active'
       && !String(a.accountId || '').startsWith('acc_demo')
       && !/^RZQ-2026-1000\d$/i.test(String(a.id || ''))
@@ -4970,12 +4972,27 @@ app.get('/api/discovery/platform-stats', async (req, res) => {
     const activityTotal = adsActive + businessesApproved + tendersOpen + investmentsLive;
     let catStats = { cats: 0, subs: 0, wilayas: 15 };
     try { catStats = getCategoryStats(); } catch (eCatStats) { /* keep defaults */ }
+
+    const lang = resolveRizqHtmlLang(req);
+    let adsPres = null;
+    try {
+      adsPres = await buildAdsStatPresentation({
+        readAds: async () => allAds,
+        getSiteConfig: () => repos.getSiteConfig(),
+        demoMode: isDemoModeEnabled(),
+        lang,
+      });
+    } catch (eAdsPres) { /* optional */ }
+
     res.set('Cache-Control', 'public, max-age=20');
     res.json({
       ok: true,
       live: true,
       prelaunch: activityTotal === 0,
       adsActive,
+      adsMode: adsPres ? adsPres.mode : 'number',
+      adsDisplay: adsPres ? adsPres.display : formatRoundedAds(adsActive),
+      adsLabel: adsPres ? adsPres.label : undefined,
       cats: catStats.cats,
       subs: catStats.subs,
       wilayas: catStats.wilayas,
@@ -5114,6 +5131,15 @@ async function sendRizqHtmlFile(req, res, filePath) {
   html = injectRizqHtmlLangDir(html, lang);
   html = injectDemoMode(html, isDemoModeEnabled());
   try { html = injectCategoryStats(html, getCategoryStats()); } catch (eInjCats) { /* leave placeholders */ }
+  try {
+    const adsPres = await buildAdsStatPresentation({
+      readAds,
+      getSiteConfig: () => repos.getSiteConfig(),
+      demoMode: isDemoModeEnabled(),
+      lang,
+    });
+    html = injectAdsStat(html, adsPres);
+  } catch (eInjAds) { /* leave ads placeholder */ }
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store');
   res.send(html);
