@@ -4,6 +4,7 @@
  * تشغيل: node qa/cls-1/test-rizq-guide-strip.js
  */
 'use strict';
+const { injectDemoMode } = require('../../rizq-backend/lib/demoMode');
 
 const fs = require('fs');
 const path = require('path');
@@ -52,6 +53,15 @@ function startStatic() {
         '.woff2': 'font/woff2',
         '.webp': 'image/webp',
       };
+      if (ext === '.html') {
+        const html = injectDemoMode(fs.readFileSync(file, 'utf8'), true);
+        res.writeHead(200, {
+          'content-type': types[ext],
+          'cache-control': 'no-store',
+        });
+        res.end(html);
+        return;
+      }
       res.writeHead(200, {
         'content-type': types[ext] || 'application/octet-stream',
         'cache-control': 'no-store',

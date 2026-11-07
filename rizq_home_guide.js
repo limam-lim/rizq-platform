@@ -205,6 +205,22 @@
   function showPane(pane, fromUser) {
     var list = visiblePanes();
     if (list.indexOf(pane) < 0) pane = list[0] || 'styles';
+    /* عند العودة لشريط الإطلالات: تناوب عادل بين الأجناس المتوفرة */
+    if (pane === 'styles' && !fromUser) {
+      try {
+        var nextG = (typeof global._styNextFairGender === 'function')
+          ? global._styNextFairGender(_guideGender)
+          : _guideGender;
+        if (nextG && nextG !== _guideGender) {
+          _guideGender = nextG;
+          document.querySelectorAll('#rizq-guide-sty-tabs [data-guide-sty-gender]').forEach(function (btn) {
+            var on = btn.getAttribute('data-guide-sty-gender') === nextG;
+            btn.classList.toggle('is-active', on);
+            btn.setAttribute('aria-selected', on ? 'true' : 'false');
+          });
+        }
+      } catch (eFair) { /* */ }
+    }
     _pane = pane;
     setActiveTab(pane);
     updateLiveLabel(pane);
@@ -259,11 +275,19 @@
 
   function setGuideGender(gender) {
     if (!gender) gender = 'men';
+    try {
+      if (typeof global._stySyncGenderTabs === 'function') global._stySyncGenderTabs();
+      else if (typeof global._styGendersWithLooks === 'function') {
+        var avail = global._styGendersWithLooks(3) || [];
+        if (avail.length && avail.indexOf(gender) < 0) gender = avail[0];
+      }
+    } catch (eSyncG) { /* */ }
     _guideGender = gender;
     document.querySelectorAll('#rizq-guide-sty-tabs [data-guide-sty-gender]').forEach(function (btn) {
       var on = btn.getAttribute('data-guide-sty-gender') === gender;
       btn.classList.toggle('is-active', on);
       btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      /* لا خانة فارغة: أخفِ التبويب إن كان مخفياً من المزامنة */
     });
     if (_pane === 'styles') fillPane('styles');
     pauseRotate();

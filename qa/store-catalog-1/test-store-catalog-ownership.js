@@ -10,6 +10,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const { pathToFileURL } = require('url');
+const { injectDemoMode } = require('../../rizq-backend/lib/demoMode');
 
 const ROOT = path.resolve(__dirname, '../..');
 const FIXTURE = path.join(ROOT, 'rizq-backend/fixtures/graduation-demo.json');
@@ -61,6 +62,13 @@ function startStaticServer() {
         if (!fp.startsWith(ROOT) || !fs.existsSync(fp) || fs.statSync(fp).isDirectory()) {
           res.writeHead(404);
           res.end('not found');
+          return;
+        }
+        let body;
+        if (fp.endsWith('.html')) {
+          body = injectDemoMode(fs.readFileSync(fp, 'utf8'), true);
+          res.writeHead(200, { 'Content-Type': mime(fp), 'Cache-Control': 'no-store' });
+          res.end(body);
           return;
         }
         res.writeHead(200, { 'Content-Type': mime(fp), 'Cache-Control': 'no-store' });
@@ -316,6 +324,18 @@ async function main() {
         })
       });
     });
+    await pageLaunch.route('**/rizq_store.html*', async (route) => {
+      const html = injectDemoMode(
+        fs.readFileSync(path.join(ROOT, 'rizq_store.html'), 'utf8'),
+        false
+      );
+      await route.fulfill({
+        status: 200,
+        contentType: 'text/html; charset=utf-8',
+        body: html,
+        headers: { 'cache-control': 'no-store' }
+      });
+    });
     await pageLaunch.goto(base + '/rizq_store.html?id=acc_grad_store_03', {
       waitUntil: 'domcontentloaded',
       timeout: 30000
@@ -332,13 +352,13 @@ async function main() {
       const cards = document.querySelectorAll('.product-card').length;
       return { allowed, gradCount, emptyVisible, emptyText, cards, body: (document.body.innerText || '') };
     });
-    assert.strictEqual(postLaunch.allowed, false, 'inventoryAllowed must be false after launchDate');
-    assert.strictEqual(postLaunch.gradCount, 0, 'graduation productsFor must be empty after launchDate');
+    assert.strictEqual(postLaunch.allowed, false, 'inventoryAllowed must be false when DEMO_MODE=false');
+    assert.strictEqual(postLaunch.gradCount, 0, 'graduation productsFor must be empty when DEMO_MODE=false');
     assert.ok(
       postLaunch.emptyVisible || /لا توجد منتجات بعد/.test(postLaunch.emptyText) || /لا توجد منتجات بعد/.test(postLaunch.body),
-      'acc_grad_store_03 must show empty state after launchDate: ' + JSON.stringify(postLaunch)
+      'acc_grad_store_03 must show empty state when DEMO_MODE=false: ' + JSON.stringify(postLaunch)
     );
-    assert.ok(postLaunch.cards === 0, 'no product cards after launchDate, got ' + postLaunch.cards);
+    assert.ok(postLaunch.cards === 0, 'no product cards when DEMO_MODE=false, got ' + postLaunch.cards);
     report.push({ id: 'acc_grad_store_03@post-launch', ok: true, empty: true });
     await pageLaunch.close();
     await ctxLaunch.close();

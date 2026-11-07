@@ -118,8 +118,9 @@ function main() {
       'contactsLocked → contact pill');
   }
 
-  // محاكاة inventoryAllowed لآراء العرض
+  // محاكاة inventoryAllowed — حكم __RIZQ_DEMO_MODE من الخادم فقط
   const demoGate = {
+    __RIZQ_DEMO_MODE: true,
     __RIZQ_SITE_CONFIG_READY: true,
     __RIZQ_LAUNCH_FROM_CACHE: true,
     RIZQ_LAUNCH: { launchDate: null },
@@ -128,11 +129,21 @@ function main() {
   demoGate.window = demoGate;
   vm.createContext(demoGate);
   vm.runInContext(backendCfg, demoGate);
-  ok(demoGate.RizqDemo.inventoryAllowed() === true, 'inventoryAllowed true when launchDate null');
+  ok(demoGate.RizqDemo.inventoryAllowed() === true, 'inventoryAllowed true when __RIZQ_DEMO_MODE true');
   demoGate.RIZQ_LAUNCH.launchDate = '2026-12-01';
-  ok(demoGate.RizqDemo.inventoryAllowed() === false, 'inventoryAllowed false when launchDate set');
-  demoGate.location.search = '?demo=1';
-  ok(demoGate.RizqDemo.inventoryAllowed() === true, 'inventoryAllowed true with ?demo=1 even after launch');
+  ok(demoGate.RizqDemo.inventoryAllowed() === true, 'launchDate ignored while server DEMO_MODE true');
+  // إعادة سياق بـ DEMO_MODE=false + ?demo=1
+  const demoOff = {
+    __RIZQ_DEMO_MODE: false,
+    __RIZQ_SITE_CONFIG_READY: true,
+    __RIZQ_LAUNCH_FROM_CACHE: true,
+    RIZQ_LAUNCH: { launchDate: null },
+    location: { search: '?demo=1' },
+  };
+  demoOff.window = demoOff;
+  vm.createContext(demoOff);
+  vm.runInContext(backendCfg, demoOff);
+  ok(demoOff.RizqDemo.inventoryAllowed() === false, 'inventoryAllowed false when DEMO_MODE false even with ?demo=1');
 
   if (failed) {
     console.error('\n' + failed + ' assertion(s) failed');

@@ -65,6 +65,7 @@ function main() {
     'test:demo-images-local',
     'test:header-all-pages',
     'test:demo-fashion-images',
+    'test:demo-mode',
   ]);
   const testScripts = Object.keys(pkg.scripts).filter((k) => k.startsWith('test:'));
   const needDb = testScripts.filter((k) => !noDbOk.has(k));

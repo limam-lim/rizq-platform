@@ -20,7 +20,9 @@ function extractInventoryAllowedSource() {
   const p = path.join(__dirname, '..', '..', 'rizq_backend_config.js');
   const src = fs.readFileSync(p, 'utf8');
   ok('backend_config persists launch cache key', src.includes('rizq_launch_cache_v1'));
-  ok('inventoryAllowed waits for cache or site-config',
+  ok('inventoryAllowed gated by server __RIZQ_DEMO_MODE',
+    src.includes('__RIZQ_DEMO_MODE') && src.includes('_rizqServerDemoMode'));
+  ok('backend_config still tracks launch cache / site-config readiness',
     src.includes('__RIZQ_LAUNCH_FROM_CACHE') && src.includes('__RIZQ_SITE_CONFIG_READY'));
   ok('minActiveAdsToShow helper exported on RizqDemo', src.includes('minActiveAdsToShow'));
   const landing = fs.readFileSync(path.join(__dirname, '..', '..', 'rizq_landing_v8.html'), 'utf8');
