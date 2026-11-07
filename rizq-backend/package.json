@@ -48,6 +48,7 @@
     "test:package-period": "node scripts/run-with-test-db.js scripts/test-package-period-history.js",
     "test:lifecycle-save": "node scripts/run-with-test-db.js scripts/test-lifecycle-concurrent-save.js",
     "test:trial-once": "node scripts/run-with-test-db.js scripts/test-trial-once.js",
+    "test:category-stats": "node scripts/test-category-stats.js",
     "test:browse": "node scripts/run-with-test-db.js scripts/test-browse-infinite-and-cards.js",
     "test:sentinel": "node scripts/run-with-test-db.js scripts/test-sentinel-1.js",
     "test:sentinel-1": "node scripts/run-with-test-db.js scripts/test-sentinel-1.js",

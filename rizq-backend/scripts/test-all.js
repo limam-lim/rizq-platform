@@ -12,6 +12,7 @@
  */
 'use strict';
 const { injectDemoMode, isDemoModeEnabled } = require('../lib/demoMode');
+const { injectCategoryStats, getCategoryStats } = require('../lib/categoryStats');
 
 const { spawn, spawnSync } = require('child_process');
 const fs = require('fs');
@@ -142,7 +143,9 @@ function startStaticServer() {
         '.mp4': 'video/mp4',
       };
       if (ext === '.html') {
-        const html = injectDemoMode(fs.readFileSync(file, 'utf8'), isDemoModeEnabled());
+        let html = fs.readFileSync(file, 'utf8');
+        html = injectDemoMode(html, isDemoModeEnabled());
+        try { html = injectCategoryStats(html, getCategoryStats()); } catch (eInj) { /* */ }
         res.writeHead(200, {
           'content-type': types[ext],
           'cache-control': 'no-store',

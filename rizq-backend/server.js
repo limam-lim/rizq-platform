@@ -48,6 +48,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { createAdminAuth } = require('./middleware/adminAuth');
 const { isDemoModeEnabled, injectDemoMode } = require('./lib/demoMode');
+const { getCategoryStats, injectCategoryStats } = require('./lib/categoryStats');
 const { isProdEnv, extractAccountToken, extractDashToken, tokenMatchesAccount, stampAccessToken, stampDashToken, accessTokenStillValid } = require('./middleware/accountAuth');
 const { timingSafeEqualStr } = require('./lib/secureCompare');
 const { normalizeDisplayName, normalizeEmailSafe, stripBidiControls } = require('./lib/sanitizeText');
@@ -4967,12 +4968,17 @@ app.get('/api/discovery/platform-stats', async (req, res) => {
     }
 
     const activityTotal = adsActive + businessesApproved + tendersOpen + investmentsLive;
+    let catStats = { cats: 0, subs: 0, wilayas: 15 };
+    try { catStats = getCategoryStats(); } catch (eCatStats) { /* keep defaults */ }
     res.set('Cache-Control', 'public, max-age=20');
     res.json({
       ok: true,
       live: true,
       prelaunch: activityTotal === 0,
       adsActive,
+      cats: catStats.cats,
+      subs: catStats.subs,
+      wilayas: catStats.wilayas,
       businessesApproved,
       businessesByType: byType,
       tendersOpen,
@@ -5107,6 +5113,7 @@ async function sendRizqHtmlFile(req, res, filePath) {
   let html = await fsP.readFile(filePath, 'utf8');
   html = injectRizqHtmlLangDir(html, lang);
   html = injectDemoMode(html, isDemoModeEnabled());
+  try { html = injectCategoryStats(html, getCategoryStats()); } catch (eInjCats) { /* leave placeholders */ }
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store');
   res.send(html);
