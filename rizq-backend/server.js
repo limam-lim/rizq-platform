@@ -5104,6 +5104,15 @@ async function sendRizqHtmlFile(req, res, filePath) {
   const lang = resolveRizqHtmlLang(req);
   let html = await fsP.readFile(filePath, 'utf8');
   html = injectRizqHtmlLangDir(html, lang);
+  try {
+    const base = path.basename(String(filePath || ''));
+    if (base === 'rizq_landing_v8.html' || base === 'index.html') {
+      const { injectHeroListingsHtml } = require('./lib/ssrHeroListings');
+      html = await injectHeroListingsHtml(html, { lang, count: 6 });
+    }
+  } catch (eSsr) {
+    /* حقن SSR اختياري — لا يُسقط الصفحة إن فشل */
+  }
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store');
   res.send(html);

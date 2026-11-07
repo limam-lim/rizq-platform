@@ -72,7 +72,8 @@
     "test:all": "node scripts/test-all.js",
     "test:demo-images-local": "node scripts/test-demo-images-local.js",
     "test:header-all-pages": "npm --prefix ../qa/cls-1 install --no-audit --no-fund && node ../qa/cls-1/test-header-all-pages.js",
-    "test:demo-fashion-images": "node scripts/test-demo-fashion-images.js"
+    "test:demo-fashion-images": "node scripts/test-demo-fashion-images.js",
+    "test:ssr-hero": "node scripts/run-with-test-db.js scripts/test-ssr-hero-listings.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
