@@ -8783,13 +8783,16 @@ function _styDemoFashionStores(){
   ];
 }
 function _styDemoLooksAllowed(){
-  /* مفتاح صريح فقط — لا fallback ضمني عند غياب RizqDemo */
+  /* حكم الخادم فقط — __RIZQ_DEMO_MODE من Express (DEMO_MODE) */
+  try {
+    if(window.__RIZQ_DEMO_MODE !== true) return false;
+  } catch(eDemoFlag){ return false; }
   try {
     if(window.RizqDemo && typeof RizqDemo.inventoryAllowed === 'function'){
       return !!RizqDemo.inventoryAllowed();
     }
   } catch(eDemoLooks){}
-  return false;
+  return true;
 }
 function _styReadStoreAccounts(){
   var map = {};

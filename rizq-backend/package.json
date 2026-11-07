@@ -39,6 +39,7 @@
     "test:contact-scrub": "node scripts/run-with-test-db.js scripts/test-contact-scrub.js",
     "test:register-sync-fail": "node scripts/run-with-test-db.js scripts/test-register-sync-fail.js",
     "test:verify-dash-pending": "node scripts/run-with-test-db.js scripts/test-verify-dash-pending.js",
+    "test:demo-mode": "node scripts/test-demo-mode.js",
     "test:launch-demo": "node scripts/run-with-test-db.js scripts/test-launch-demo-gate.js",
     "test:a1-launch": "node scripts/run-with-test-db.js scripts/test-a1-launch-config-api.js",
     "test:quota-concurrency": "node scripts/run-with-test-db.js scripts/test-quota-concurrency.js",

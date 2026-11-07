@@ -11,6 +11,7 @@
  * وثائق: qa/TESTING.md
  */
 'use strict';
+const { injectDemoMode, isDemoModeEnabled } = require('../lib/demoMode');
 
 const { spawn, spawnSync } = require('child_process');
 const fs = require('fs');
@@ -140,6 +141,15 @@ function startStaticServer() {
         '.webp': 'image/webp',
         '.mp4': 'video/mp4',
       };
+      if (ext === '.html') {
+        const html = injectDemoMode(fs.readFileSync(file, 'utf8'), isDemoModeEnabled());
+        res.writeHead(200, {
+          'content-type': types[ext],
+          'cache-control': 'no-store',
+        });
+        res.end(html);
+        return;
+      }
       res.writeHead(200, {
         'content-type': types[ext] || 'application/octet-stream',
         'cache-control': 'no-store',

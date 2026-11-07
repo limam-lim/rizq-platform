@@ -147,6 +147,19 @@
         try {
           if (data && data.config) {
             window.__RIZQ_LAST_SITE_CONFIG = data.config;
+            if (typeof data.config.demoMode === 'boolean'
+                && typeof window.__RIZQ_DEMO_MODE === 'undefined') {
+              try {
+                Object.defineProperty(window, '__RIZQ_DEMO_MODE', {
+                  value: !!data.config.demoMode,
+                  writable: false,
+                  configurable: false,
+                  enumerable: true
+                });
+              } catch (eDmSet) {
+                window.__RIZQ_DEMO_MODE = !!data.config.demoMode;
+              }
+            }
           }
           var launch = data && data.config && data.config.launch;
           window.__RIZQ_SITE_CONFIG_READY = true;
@@ -192,29 +205,35 @@
   };
 
   /**
-   * مخزون DEMO_ADS / نوافذ العرض التجريبية:
-   * - يظهر ما دام launchDate فارغاً في site-config
-   * - يختفي تلقائياً عند ضبط تاريخ الإطلاق
-   * - بلا كاش وبدون رد site-config بعد: يُمنع العرض لتجنّب الرمشة بعد الإطلاق
-   * - ?demo=1 يُبقي الظهور للاختبار فقط حتى بعد الإطلاق
+   * مخزون DEMO — الحكم للخادم فقط عبر window.__RIZQ_DEMO_MODE
+   * (يحقنه Express من DEMO_MODE، أو site-config.demoMode إن غاب الحقن).
+   * DEMO_MODE=false (إنتاج): لا ديمو أبداً، ويُتجاهل ?demo=1.
+   * DEMO_MODE=true (مرحلة الديمو/تطوير): يُسمح بالديمو بلا بارامتر.
+   * RizqDemo ليس مفتاحاً يمكن فتحه من الـ console ضد حكم الخادم.
    */
   window.RizqDemo = window.RizqDemo || {};
-  window.RizqDemo.inventoryAllowed = function () {
+  function _rizqServerDemoMode() {
     try {
-      if (/[?&]demo=1(?:&|$)/.test(String(window.location && window.location.search || ''))) {
-        return true;
-      }
-    } catch (eDemoQ) {}
-    try {
-      if (!window.__RIZQ_LAUNCH_FROM_CACHE && !window.__RIZQ_SITE_CONFIG_READY) {
-        return false;
-      }
-      var ld = window.RIZQ_LAUNCH && window.RIZQ_LAUNCH.launchDate;
-      return !ld;
-    } catch (eDemoL) {
+      return window.__RIZQ_DEMO_MODE === true;
+    } catch (eSdm) {
       return false;
     }
-  };
+  }
+  function _rizqInventoryAllowedImpl() {
+    /* الخادم هو الحكم — لا ?demo=1 ولا launchDate يتجاوزان DEMO_MODE=false */
+    if (!_rizqServerDemoMode()) return false;
+    return true;
+  }
+  try {
+    Object.defineProperty(window.RizqDemo, 'inventoryAllowed', {
+      value: _rizqInventoryAllowedImpl,
+      writable: false,
+      configurable: false,
+      enumerable: true
+    });
+  } catch (eDefDemo) {
+    window.RizqDemo.inventoryAllowed = _rizqInventoryAllowedImpl;
+  }
   window.RizqDemo.minActiveAdsToShow = function () {
     try {
       var n = Number(window.RIZQ_LAUNCH && window.RIZQ_LAUNCH.minActiveAdsToShow);

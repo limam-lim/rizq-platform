@@ -47,6 +47,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { createAdminAuth } = require('./middleware/adminAuth');
+const { isDemoModeEnabled, injectDemoMode } = require('./lib/demoMode');
 const { isProdEnv, extractAccountToken, extractDashToken, tokenMatchesAccount, stampAccessToken, stampDashToken, accessTokenStillValid } = require('./middleware/accountAuth');
 const { timingSafeEqualStr } = require('./lib/secureCompare');
 const { normalizeDisplayName, normalizeEmailSafe, stripBidiControls } = require('./lib/sanitizeText');
@@ -1330,6 +1331,7 @@ app.get('/api/site-config', async (req, res) => {
     otp: getPublicOtpConfig(),
     demoDashboardAllowed: !isProdEnv(),
     production: isProdEnv(),
+    demoMode: isDemoModeEnabled(),
     packages: raw.packages || undefined,
     prices: raw.prices
       ? Object.assign({}, raw.prices, {
@@ -5104,6 +5106,7 @@ async function sendRizqHtmlFile(req, res, filePath) {
   const lang = resolveRizqHtmlLang(req);
   let html = await fsP.readFile(filePath, 'utf8');
   html = injectRizqHtmlLangDir(html, lang);
+  html = injectDemoMode(html, isDemoModeEnabled());
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store');
   res.send(html);
