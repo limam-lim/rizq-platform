@@ -130,10 +130,25 @@ function startStatic() {
   const listings = landing.indexOf('id="listings"');
   const vid = landing.indexOf('id="rizq-vid-strip"');
   const rvid = landing.indexOf('id="rvid-section"');
+  const cats = landing.indexOf('id="categories"');
+  const heroVidWrap = landing.indexOf('id="hero-vid-wrap"');
   const stylesOrig = landing.indexOf('id="rizq-styles"');
   ok('order: hero-ads → guide; video → rvid → listings (main + guide only)',
     heroAds > 0 && guide > heroAds && vid > guide && rvid > vid && listings > rvid,
     { heroAds, guide, vid, rvid, listings });
+  ok('approved order: guide → ads screen → vid strip → categories → listings',
+    guide > 0 && heroVidWrap > guide && vid > heroVidWrap && cats > vid && cats > rvid && listings > cats,
+    { guide, heroVidWrap, vid, rvid, cats, listings });
+  const heroVidTag = (landing.match(/<video[^>]*id="hero-featured-vid"[^>]*>/) || [''])[0];
+  ok('hero featured video: preload=none + poster, no eager src',
+    /preload="none"/.test(heroVidTag)
+    && /poster=/.test(heroVidTag)
+    && !/\ssrc=/.test(heroVidTag));
+  const videoAdsJs = fs.readFileSync(path.join(ROOT, 'rizq_video_ads.js'), 'utf8');
+  ok('hero video IO gate present',
+    /armHeroFromConfig/.test(landing)
+    && /armHeroPlayback/.test(videoAdsJs)
+    && /IntersectionObserver/.test(videoAdsJs));
   ok('original #rizq-styles remains after guide', stylesOrig > guide);
   ok('per-tile store link helper', /function _styTileStoreLinkHtml/.test(landing)
     && /rizq-style-tile-store/.test(landing)
