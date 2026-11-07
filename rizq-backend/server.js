@@ -48,6 +48,13 @@ const path = require('path');
 const crypto = require('crypto');
 const { createAdminAuth } = require('./middleware/adminAuth');
 const { isDemoModeEnabled, injectDemoMode } = require('./lib/demoMode');
+const { getCategoryStats, injectCategoryStats } = require('./lib/categoryStats');
+const { buildAdsStatPresentation, injectAdsStat, formatRoundedAds } = require('./lib/adsStat');
+const {
+  getCachedCategoryStats,
+  invalidateAdsStatsCache,
+  invalidatePlatformStatsCache,
+} = require('./lib/platformStatsCache');
 const { isProdEnv, extractAccountToken, extractDashToken, tokenMatchesAccount, stampAccessToken, stampDashToken, accessTokenStillValid } = require('./middleware/accountAuth');
 const { timingSafeEqualStr } = require('./lib/secureCompare');
 const { normalizeDisplayName, normalizeEmailSafe, stripBidiControls } = require('./lib/sanitizeText');
@@ -1922,6 +1929,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), async (req, r
   }
 
   await repos.saveSiteConfig(next);
+  try { invalidateAdsStatsCache(); } catch (eInvSite) { /* */ }
   if (body.packages) {
     try {
       const pkgCfg = require('../rizq_packages_config');
@@ -3726,6 +3734,7 @@ app.post('/api/admin/launch-config', requireSuperAdmin, async (req, res) => {
     });
 
     await repos.saveSiteConfig(next);
+    try { invalidateAdsStatsCache(); } catch (eInvLaunch) { /* */ }
     const launch = await launchMode.publicLaunchConfig(await getModuleFlags());
     res.json({
       ok: true,
@@ -4086,7 +4095,11 @@ mountInvestmentsRoutes(app, {
 // localStorage.setItem بطلب fetch حقيقي.
 const ADS_FILE = path.join(DATA_DIR, 'ads.json');
 async function readAds() { return await repos.ads.list(); }
-async function writeAds(list) { return await repos.ads.replaceAll(list); }
+async function writeAds(list) {
+  const out = await repos.ads.replaceAll(list);
+  try { invalidateAdsStatsCache(); } catch (eInv) { /* */ }
+  return out;
+}
 
 // صور الإعلانات تُكتب كملفات حقيقية على القرص (لا base64 داخل ads.json) —
 // قرار مبرَّر: كود publishAd() في rizq_post.html يحتوي أصلاً على منطق
@@ -4929,16 +4942,17 @@ app.post('/api/telegram/setup-webhook', requireSuperAdmin, async (req, res) => {
 // ══════════════════════════════════════════════════════════════════
 
 /**
- * GET /api/discovery/platform-stats — أرقام حية صادقة لشريط الإحصائيات تحت إعلان الفيديو.
- * لا أرقام وهمية: قبل الإطلاق الحقيقي تبقى أصفار النشاط ظاهرة كما هي.
+ * GET /api/discovery/platform-stats — تحديث لاحق اختياري لشريط الإحصائيات.
+ * الرقم الأساسي يُحقن في HTML عند الطلب عبر injectAdsStat / injectCategoryStats.
  */
 app.get('/api/discovery/platform-stats', async (req, res) => {
   try {
-    const adsActive = (await readAds()).filter((a) =>
-      a && a.status === 'active'
-      && !String(a.accountId || '').startsWith('acc_demo')
-      && !/^RZQ-2026-1000\d$/i.test(String(a.id || ''))
-    ).length;
+    const { getAdsCountSnapshot } = require('./lib/platformStatsCache');
+    const adsSnap = await getAdsCountSnapshot({
+      readAds,
+      getSiteConfig: () => repos.getSiteConfig(),
+    });
+    const adsActive = adsSnap.real;
 
     const { isSentinelAccount } = require('./lib/sentinelAccount');
     const businesses = (await readAccounts()).filter((a) =>
@@ -4967,12 +4981,33 @@ app.get('/api/discovery/platform-stats', async (req, res) => {
     }
 
     const activityTotal = adsActive + businessesApproved + tendersOpen + investmentsLive;
+    let catStats = { cats: 0, subs: 0, wilayas: 15 };
+    try { catStats = getCachedCategoryStats(getCategoryStats); } catch (eCatStats) { /* keep defaults */ }
+
+    const lang = resolveRizqHtmlLang(req);
+    let adsPres = null;
+    try {
+      adsPres = await buildAdsStatPresentation({
+        readAds,
+        getSiteConfig: () => repos.getSiteConfig(),
+        demoMode: isDemoModeEnabled(),
+        lang,
+        useCache: true,
+      });
+    } catch (eAdsPres) { /* optional */ }
+
     res.set('Cache-Control', 'public, max-age=20');
     res.json({
       ok: true,
       live: true,
       prelaunch: activityTotal === 0,
       adsActive,
+      adsMode: adsPres ? adsPres.mode : 'number',
+      adsDisplay: adsPres ? adsPres.display : formatRoundedAds(adsActive),
+      adsLabel: adsPres ? adsPres.label : undefined,
+      cats: catStats.cats,
+      subs: catStats.subs,
+      wilayas: catStats.wilayas,
       businessesApproved,
       businessesByType: byType,
       tendersOpen,
@@ -5107,6 +5142,17 @@ async function sendRizqHtmlFile(req, res, filePath) {
   let html = await fsP.readFile(filePath, 'utf8');
   html = injectRizqHtmlLangDir(html, lang);
   html = injectDemoMode(html, isDemoModeEnabled());
+  try { html = injectCategoryStats(html, getCachedCategoryStats(getCategoryStats)); } catch (eInjCats) { /* leave placeholders */ }
+  try {
+    const adsPres = await buildAdsStatPresentation({
+      readAds,
+      getSiteConfig: () => repos.getSiteConfig(),
+      demoMode: isDemoModeEnabled(),
+      lang,
+      useCache: true,
+    });
+    html = injectAdsStat(html, adsPres);
+  } catch (eInjAds) { /* leave ads placeholder */ }
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
   res.setHeader('Cache-Control', 'no-store');
   res.send(html);

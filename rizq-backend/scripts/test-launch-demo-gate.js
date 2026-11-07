@@ -28,8 +28,9 @@ function extractInventoryAllowedSource() {
   const landing = fs.readFileSync(path.join(__dirname, '..', '..', 'rizq_landing_v8.html'), 'utf8');
   ok('landing gates early buildCards via _rizqMaybePaintDemoInventory',
     landing.includes('_rizqMaybePaintDemoInventory'));
-  ok('landing hides ads stat below minActiveAdsToShow',
-    landing.includes('minActiveAdsToShow') && landing.includes("data-stat=\"ads\""));
+  ok('landing applies minActiveAdsToShow (free copy below floor)',
+    landing.includes('minActiveAdsToShow') && landing.includes("data-stat=\"ads\"")
+    && landing.includes('data-rizq-ads-mode'));
   const browse = fs.readFileSync(path.join(__dirname, '..', '..', 'rizq_browse.html'), 'utf8');
   ok('browse syncs DEMO after rizq:launch', browse.includes('syncDemoWithLaunch'));
   const panel = fs.readFileSync(path.join(__dirname, '..', '..', 'rizq_cp_panel.html'), 'utf8');
