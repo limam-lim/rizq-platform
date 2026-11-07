@@ -52,7 +52,9 @@ function adsLabelCopy(lang) {
 
 /**
  * @param {object} opts
- * @param {Array} opts.ads
+ * @param {Array} [opts.ads]
+ * @param {number} [opts.realCount] — إن وُجد يتجاوز عدّ المصفوفة
+ * @param {number} [opts.withDemoCount]
  * @param {number} [opts.minActiveAdsToShow]
  * @param {number} [opts.siteAdsCount]
  * @param {boolean} [opts.demoMode]
@@ -63,8 +65,12 @@ function resolveAdsStatPresentation(opts) {
   const demoMode = o.demoMode != null ? !!o.demoMode : isDemoModeEnabled();
   const lang = o.lang === 'fr' ? 'fr' : 'ar';
   const minShow = launchMode.normalizeMinActiveAdsToShow(o.minActiveAdsToShow);
-  const real = countActiveAds(o.ads, false);
-  const withDemo = countActiveAds(o.ads, true);
+  const real = o.realCount != null
+    ? Math.max(0, Math.floor(Number(o.realCount) || 0))
+    : countActiveAds(o.ads, false);
+  const withDemo = o.withDemoCount != null
+    ? Math.max(0, Math.floor(Number(o.withDemoCount) || 0))
+    : countActiveAds(o.ads, true);
   const siteCount = Math.max(0, Math.floor(Number(o.siteAdsCount) || 0));
 
   if (demoMode) {
@@ -108,18 +114,36 @@ function resolveAdsStatPresentation(opts) {
 
 async function buildAdsStatPresentation(deps) {
   const d = deps || {};
-  const readAds = d.readAds;
-  const getLaunchSettings = d.getLaunchSettings || (() => launchMode.getLaunchSettings());
-  const getSiteConfig = d.getSiteConfig;
   const demoMode = d.demoMode != null ? !!d.demoMode : isDemoModeEnabled();
   const lang = d.lang === 'fr' ? 'fr' : 'ar';
 
-  const ads = typeof readAds === 'function' ? await readAds() : [];
+  /* مسار مخزّن مؤقتاً (60–120ث) — يتجنّب readAds في كل طلب للرئيسية */
+  if (d.useCache !== false) {
+    try {
+      const { getAdsCountSnapshot } = require('./platformStatsCache');
+      const snap = await getAdsCountSnapshot({
+        readAds: d.readAds,
+        getSiteConfig: d.getSiteConfig,
+        getLaunchSettings: d.getLaunchSettings,
+      });
+      return resolveAdsStatPresentation({
+        realCount: snap.real,
+        withDemoCount: snap.withDemo,
+        minActiveAdsToShow: snap.minShow,
+        siteAdsCount: snap.siteAdsCount,
+        demoMode,
+        lang,
+      });
+    } catch (eCache) { /* fall through */ }
+  }
+
+  const ads = typeof d.readAds === 'function' ? await d.readAds() : [];
+  const getLaunchSettings = d.getLaunchSettings || (() => launchMode.getLaunchSettings());
   const launch = await getLaunchSettings();
   let siteAdsCount = 0;
-  if (typeof getSiteConfig === 'function') {
+  if (typeof d.getSiteConfig === 'function') {
     try {
-      const cfg = (await getSiteConfig()) || {};
+      const cfg = (await d.getSiteConfig()) || {};
       siteAdsCount = Number(cfg.site && cfg.site.adsCount) || 0;
     } catch (e) { /* */ }
   }

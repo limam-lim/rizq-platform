@@ -75,7 +75,8 @@ ok('inject keeps wilayas = 15',
 
 const serverSrc = fs.readFileSync(path.join(__dirname, '..', 'server.js'), 'utf8');
 ok('sendRizqHtmlFile calls injectCategoryStats',
-  /injectCategoryStats\(/.test(serverSrc) && /getCategoryStats\(/.test(serverSrc));
+  /injectCategoryStats\(/.test(serverSrc)
+  && (/getCachedCategoryStats\(getCategoryStats\)/.test(serverSrc) || /getCategoryStats\(/.test(serverSrc)));
 ok('platform-stats JSON exposes cats/subs/wilayas',
   /cats:\s*catStats\.cats/.test(serverSrc)
   && /subs:\s*catStats\.subs/.test(serverSrc)

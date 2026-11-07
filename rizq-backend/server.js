@@ -50,6 +50,11 @@ const { createAdminAuth } = require('./middleware/adminAuth');
 const { isDemoModeEnabled, injectDemoMode } = require('./lib/demoMode');
 const { getCategoryStats, injectCategoryStats } = require('./lib/categoryStats');
 const { buildAdsStatPresentation, injectAdsStat, formatRoundedAds } = require('./lib/adsStat');
+const {
+  getCachedCategoryStats,
+  invalidateAdsStatsCache,
+  invalidatePlatformStatsCache,
+} = require('./lib/platformStatsCache');
 const { isProdEnv, extractAccountToken, extractDashToken, tokenMatchesAccount, stampAccessToken, stampDashToken, accessTokenStillValid } = require('./middleware/accountAuth');
 const { timingSafeEqualStr } = require('./lib/secureCompare');
 const { normalizeDisplayName, normalizeEmailSafe, stripBidiControls } = require('./lib/sanitizeText');
@@ -1924,6 +1929,7 @@ app.post('/api/site-config', requireAdminPermission('siteconfig'), async (req, r
   }
 
   await repos.saveSiteConfig(next);
+  try { invalidateAdsStatsCache(); } catch (eInvSite) { /* */ }
   if (body.packages) {
     try {
       const pkgCfg = require('../rizq_packages_config');
@@ -3728,6 +3734,7 @@ app.post('/api/admin/launch-config', requireSuperAdmin, async (req, res) => {
     });
 
     await repos.saveSiteConfig(next);
+    try { invalidateAdsStatsCache(); } catch (eInvLaunch) { /* */ }
     const launch = await launchMode.publicLaunchConfig(await getModuleFlags());
     res.json({
       ok: true,
@@ -4088,7 +4095,11 @@ mountInvestmentsRoutes(app, {
 // localStorage.setItem بطلب fetch حقيقي.
 const ADS_FILE = path.join(DATA_DIR, 'ads.json');
 async function readAds() { return await repos.ads.list(); }
-async function writeAds(list) { return await repos.ads.replaceAll(list); }
+async function writeAds(list) {
+  const out = await repos.ads.replaceAll(list);
+  try { invalidateAdsStatsCache(); } catch (eInv) { /* */ }
+  return out;
+}
 
 // صور الإعلانات تُكتب كملفات حقيقية على القرص (لا base64 داخل ads.json) —
 // قرار مبرَّر: كود publishAd() في rizq_post.html يحتوي أصلاً على منطق
@@ -4936,12 +4947,12 @@ app.post('/api/telegram/setup-webhook', requireSuperAdmin, async (req, res) => {
  */
 app.get('/api/discovery/platform-stats', async (req, res) => {
   try {
-    const allAds = await readAds();
-    const adsActive = allAds.filter((a) =>
-      a && a.status === 'active'
-      && !String(a.accountId || '').startsWith('acc_demo')
-      && !/^RZQ-2026-1000\d$/i.test(String(a.id || ''))
-    ).length;
+    const { getAdsCountSnapshot } = require('./lib/platformStatsCache');
+    const adsSnap = await getAdsCountSnapshot({
+      readAds,
+      getSiteConfig: () => repos.getSiteConfig(),
+    });
+    const adsActive = adsSnap.real;
 
     const { isSentinelAccount } = require('./lib/sentinelAccount');
     const businesses = (await readAccounts()).filter((a) =>
@@ -4971,16 +4982,17 @@ app.get('/api/discovery/platform-stats', async (req, res) => {
 
     const activityTotal = adsActive + businessesApproved + tendersOpen + investmentsLive;
     let catStats = { cats: 0, subs: 0, wilayas: 15 };
-    try { catStats = getCategoryStats(); } catch (eCatStats) { /* keep defaults */ }
+    try { catStats = getCachedCategoryStats(getCategoryStats); } catch (eCatStats) { /* keep defaults */ }
 
     const lang = resolveRizqHtmlLang(req);
     let adsPres = null;
     try {
       adsPres = await buildAdsStatPresentation({
-        readAds: async () => allAds,
+        readAds,
         getSiteConfig: () => repos.getSiteConfig(),
         demoMode: isDemoModeEnabled(),
         lang,
+        useCache: true,
       });
     } catch (eAdsPres) { /* optional */ }
 
@@ -5130,13 +5142,14 @@ async function sendRizqHtmlFile(req, res, filePath) {
   let html = await fsP.readFile(filePath, 'utf8');
   html = injectRizqHtmlLangDir(html, lang);
   html = injectDemoMode(html, isDemoModeEnabled());
-  try { html = injectCategoryStats(html, getCategoryStats()); } catch (eInjCats) { /* leave placeholders */ }
+  try { html = injectCategoryStats(html, getCachedCategoryStats(getCategoryStats)); } catch (eInjCats) { /* leave placeholders */ }
   try {
     const adsPres = await buildAdsStatPresentation({
       readAds,
       getSiteConfig: () => repos.getSiteConfig(),
       demoMode: isDemoModeEnabled(),
       lang,
+      useCache: true,
     });
     html = injectAdsStat(html, adsPres);
   } catch (eInjAds) { /* leave ads placeholder */ }
