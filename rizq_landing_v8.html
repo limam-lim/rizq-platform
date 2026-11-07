@@ -8202,9 +8202,53 @@ function _adHasPublicTitle(a){
   return true;
 }
 
+function _bindSsrHeroCards(track){
+  if(!track) return;
+  var nodes = track.querySelectorAll('.ad-card[data-rizq-ssr-hero="1"]');
+  if(!nodes.length) return;
+  /* لا وميض ولا إعادة رسم — اربط الأحداث فقط، ونسخ الماركي مرة واحدة */
+  if(track.getAttribute('data-rizq-ssr-bound') !== '1'){
+    if(track.querySelectorAll('.ad-card').length === nodes.length){
+      Array.prototype.forEach.call(nodes, function(node){
+        var clone = node.cloneNode(true);
+        clone.removeAttribute('data-rizq-ssr-hero');
+        clone.setAttribute('data-rizq-ssr-clone', '1');
+        clone.setAttribute('aria-hidden', 'true');
+        track.appendChild(clone);
+      });
+    }
+    track.setAttribute('data-rizq-ssr-bound', '1');
+  }
+  Array.prototype.forEach.call(track.querySelectorAll('.ad-card[data-ad-id]'), function(card){
+    if(card.getAttribute('data-rizq-ssr-click') === '1') return;
+    card.setAttribute('data-rizq-ssr-click', '1');
+    card.addEventListener('click', function(ev){
+      if(ev.target && ev.target.closest && ev.target.closest('.rzq-adx-nav,.rzq-adx-fav,.rzq-adx-wa,.rzq-adx-tel,.rzq-adx-actions')) return;
+      var id = card.getAttribute('data-ad-id');
+      if(id && typeof openCarouselAdById === 'function') openCarouselAdById(id);
+    });
+  });
+  if(window.RizqAdCards && typeof RizqAdCards.bindAll === 'function'){
+    try{ RizqAdCards.bindAll(track); }catch(eBind){}
+  }
+  requestAnimationFrame(function(){
+    if(typeof bindRafMarquee === 'function') bindRafMarquee(track, {pxPerSec:56});
+    requestAnimationFrame(function(){
+      if(typeof syncMarqueeShift === 'function') syncMarqueeShift(track);
+    });
+  });
+}
+
 function buildCards(){
   const track=document.getElementById('cards-track');
   if(!track) return;
+  /* بطاقات SSR من الخادم: اكتشفها ولا تُعد رسمها (لا وميض / لا تكرار DOM) */
+  if(track.querySelector('.ad-card[data-rizq-ssr-hero="1"]')){
+    var heroSecSsr=document.getElementById('hero-listings');
+    if(heroSecSsr) heroSecSsr.style.display='';
+    _bindSsrHeroCards(track);
+    return;
+  }
   var demoOk = (window.RizqDemo && typeof RizqDemo.inventoryAllowed === 'function')
     ? RizqDemo.inventoryAllowed()
     : !(window.RIZQ_LAUNCH && RIZQ_LAUNCH.launchDate);
@@ -11714,7 +11758,8 @@ function applyList(list){
   var track = document.getElementById('cards-track');
   var heroSec = document.getElementById('hero-listings');
   var skelShownAt = Date.now();
-  if(track && !ADS.length){
+  /* لا تمسح بطاقات SSR المحقونة من الخادم بهيكل عظمي */
+  if(track && !ADS.length && !track.querySelector('.ad-card[data-rizq-ssr-hero="1"]')){
     if(heroSec) heroSec.style.display = '';
     var sk = '', si;
     for(si = 0; si < 5; si++){
@@ -13195,7 +13240,22 @@ function applyLandingLang(toAr) {
   section('rebuild-dynamic', function () {
     // Rebuild carousel with translated button text
     const track = document.getElementById('cards-track');
-    if(track) { track.innerHTML=''; buildCards(); if(typeof renderPrices==='function') renderPrices(); }
+    if(track) {
+      var pageLang = (typeof isAr !== 'undefined' && isAr) ? 'ar' : 'fr';
+      var ssrLang = track.getAttribute('data-rizq-ssr-lang') || '';
+      var hasSsr = !!track.querySelector('.ad-card[data-rizq-ssr-hero="1"]');
+      /* أبقِ بطاقات SSR عند تطابق لغة الصفحة — لا تمسح أول طلاء (LCP) */
+      if(hasSsr && ssrLang && ssrLang === pageLang){
+        if(typeof _bindSsrHeroCards === 'function') _bindSsrHeroCards(track);
+      } else {
+        track.removeAttribute('data-rizq-ssr-bound');
+        track.removeAttribute('data-rizq-ssr-seeded');
+        track.removeAttribute('data-rizq-ssr-lang');
+        track.innerHTML='';
+        buildCards();
+      }
+      if(typeof renderPrices==='function') renderPrices();
+    }
     if(typeof buildFeaturedCards==='function') buildFeaturedCards();
     if(typeof buildStyleIdeas==='function') buildStyleIdeas(false);
     if(typeof buildShowroomModels==='function') buildShowroomModels(false);
