@@ -9256,21 +9256,27 @@ function _styPickLookCompanions(primary, pool, gender, n){
   });
   var usedStores = {};
   if(sameStoreId) usedStores[sameStoreId] = 1;
-  function takeCand(list){
+  function hasUnusedStore(){
+    for(var hi = 0; hi < stylePool.length; hi++){
+      var h = stylePool[hi];
+      if(!h || used[String(h.id)]) continue;
+      var hs = String(h.storeId || '');
+      if(hs && !usedStores[hs]) return true;
+    }
+    return false;
+  }
+  function takeCand(list, allowDupStore){
     for(var ti = 0; ti < list.length; ti++){
       var c = list[ti];
       if(!c || used[String(c.id)]) continue;
       var sid = String(c.storeId || '');
-      if(sid && usedStores[sid] && picks.length < n){
-        /* أجّل نفس المحل إن وُجد بديل */
-        continue;
-      }
+      if(sid && usedStores[sid]) continue;
       picks.push(c);
       used[String(c.id)] = 1;
       if(sid) usedStores[sid] = 1;
       return true;
     }
-    /* إن لم يبقَ محل جديد — اقبل أي مرشح */
+    if(!allowDupStore && hasUnusedStore()) return false;
     for(var tj = 0; tj < list.length; tj++){
       var c2 = list[tj];
       if(!c2 || used[String(c2.id)]) continue;
@@ -9286,13 +9292,19 @@ function _styPickLookCompanions(primary, pool, gender, n){
     var cand = _styShuffle(stylePool.filter(function(a){
       return a && !used[String(a.id)] && _styAdKind(a) === kind;
     }));
-    takeCand(cand);
+    takeCand(cand, false);
+  }
+  if(picks.length < n){
+    var restUnique = _styShuffle(stylePool.filter(function(a){
+      return a && !used[String(a.id)] && a.storeId && !usedStores[String(a.storeId)];
+    }));
+    while(picks.length < n && takeCand(restUnique, false)){ /* */ }
   }
   if(picks.length < n){
     var rest = _styShuffle(stylePool.filter(function(a){
       return a && !used[String(a.id)];
     }));
-    while(picks.length < n && takeCand(rest)){ /* */ }
+    while(picks.length < n && takeCand(rest, true)){ /* */ }
   }
   return picks.slice(0, n);
 }

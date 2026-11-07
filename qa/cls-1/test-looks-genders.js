@@ -169,21 +169,24 @@ ok('empty copy via i18n keys',
         const n = rail ? rail.querySelectorAll('.rizq-style-card, .rizq-look-card').length : 0;
         if (n > 0) gendersWithCards.push(g);
       });
-      /* 4 بلاطات من 4 محلات مختلفة */
+      /* 4 بلاطات من 4 محلات مختلفة — أفضل بطاقة في السكة */
       let fourStoreLook = false;
       let storeIds = [];
       try {
         if (typeof buildStyleIdeas === 'function') buildStyleIdeas(true, 'rizq-guide-rail-styles', 'men');
         const rail = document.getElementById('rizq-guide-rail-styles');
-        const card = rail && rail.querySelector('.rizq-style-card, .rizq-look-card');
-        if (card) {
-          const hrefs = [...card.querySelectorAll('a[href*="rizq_store"]')].map((a) => a.getAttribute('href') || '');
-          storeIds = [...new Set(hrefs.map((h) => {
+        const cards = rail ? [...rail.querySelectorAll('.rizq-style-card, .rizq-look-card')] : [];
+        let best = [];
+        cards.forEach((card) => {
+          const hrefs = [...card.querySelectorAll('.rizq-style-mosaic a[href*="rizq_store"]')].map((a) => a.getAttribute('href') || '');
+          const ids = [...new Set(hrefs.map((h) => {
             const m = /[?&]id=([^&]+)/.exec(h);
             return m ? decodeURIComponent(m[1]) : '';
           }).filter(Boolean))];
-          fourStoreLook = storeIds.length >= 4;
-        }
+          if (ids.length > best.length) best = ids;
+        });
+        storeIds = best;
+        fourStoreLook = storeIds.length >= 4;
       } catch (e2) {}
       return {
         allowed,
